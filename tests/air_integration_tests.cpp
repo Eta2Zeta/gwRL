@@ -41,8 +41,8 @@ State fixture(Phase phase = Phase::CombatMovement) {
     s.completedTurns["ccp"] = s.completedTurns["mongolia"] = 1;
     s.nations.at("japan").atWarWith.insert("kmt");
     s.nations.at("kmt").atWarWith.insert("japan");
-    s.territories.at(beiping).possessor = "japan";
-    s.territories.at(hopeh).possessor = "kmt";
+    s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
+    s.territories.at(zoneNumber(s, hopeh)).possessor = "kmt";
     s.captureTurnStart();
     return s;
 }
@@ -51,9 +51,9 @@ void add(State &s, const Id &id, const Id &type, const Id &owner, const Id &zone
     u.id = id;
     u.type = type;
     u.owner = owner;
-    u.zone = u.turnOrigin = zone;
+    u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, 0, catalogContext(s, owner, zone)).movement;
+        s.definition->catalog->stats(type, 0, catalogContext(s, owner, zoneNumber(s, zone))).movement;
     s.units.emplace(id, std::move(u));
 }
 std::shared_ptr<const Rules> rules() {
@@ -106,7 +106,7 @@ void actualAirborneEntryFacesCityAAAndReplays() {
                   [](const Action &a) { return a.parameters.require("unit").asString() == "transport"; }));
     check(!e.state().units.contains("transport") && !e.state().units.contains("paratrooper"),
           "City AA transport casualty landed cargo or let it attack");
-    check(e.state().territories.at(hopeh).possessor == "kmt", "Failed assault captured the city");
+    check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "kmt", "Failed assault captured the city");
     auto replayed = Engine::replay(s.definition, rules(), checkpoint, e.state().history);
     check(replayed.exactReplayIdentity() == e.exactReplayIdentity(), "Actual airborne entry replay diverged");
 }
@@ -149,7 +149,7 @@ void actualAirborneEntryResolvesFightersAndAaaBeforeLanding() {
               !e.state().units.contains("escort") && !e.state().units.contains("defending_fighter") &&
               !e.state().chance && e.state().decisions.empty() &&
               e.state().battles.at(battle).flags.at("finished") &&
-              e.state().territories.at(hopeh).possessor == "kmt",
+              e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "kmt",
           "Step-4 losses landed, lost simultaneous return fire, or prolonged an eliminated assault");
     auto replay = Engine::replay(s.definition, rules(), checkpoint, e.state().history);
     check(replay.exactReplayIdentity() == e.exactReplayIdentity(), "Actual airborne step-4 entry replay diverged");
@@ -172,11 +172,11 @@ void controlledMinorsRetainSeparateAttackingForces() {
     add(s, "dadao", "infantry", "dadao", hopeh);
     rejects(
         [&] {
-            registerLandBattle(s, hopeh, "japan", {"japanese", "dadao"},
-                               {{"japanese", beiping}, {"dadao", beiping}});
+            registerLandBattle(s, zoneNumber(s, hopeh), "japan", {"japanese", "dadao"},
+                               {{"japanese", zoneNumber(s, beiping)}, {"dadao", zoneNumber(s, beiping)}});
         },
         "Controlling Japan and Dadao combined an attack");
-    registerLandBattle(s, hopeh, "dadao", {"dadao"}, {{"dadao", beiping}});
+    registerLandBattle(s, zoneNumber(s, hopeh), "dadao", {"dadao"}, {{"dadao", zoneNumber(s, beiping)}});
     check(s.battles.size() == 1 && s.battles.begin()->second.attacker == "dadao",
           "Separate Dadao attack lost its identity");
 }
@@ -193,7 +193,7 @@ void aircraftLaunchesFromCarrierAndReplaysCargoLinks() {
     }));
     check(!e.state().units.at("fighter").carriedBy && e.state().units.at("carrier").cargo.empty(),
           "Launched fighter remained attached to its carrier");
-    check(e.state().units.at("fighter").zone == tokyo && e.state().units.at("fighter").movementRemaining == 3,
+    check(e.state().units.at("fighter").zone == zoneNumber(e.state(), tokyo) && e.state().units.at("fighter").movementRemaining == 3,
           "Carrier launch lost origin or charged incorrect movement");
     e.step(select(e, "air_land_noncombat", [](const Action &a) {
         return a.parameters.require("unit").asString() == "fighter" &&
@@ -235,7 +235,7 @@ void successfulAirScreeningContinuesToAnotherAttackAndReplays() {
         a.parameters.require("kind").asString()=="city"&&a.parameters.require("target").asString()=="land_china_nanking";}));
     check(e.state().clock.phase==Phase::Combat,"Continuing aircraft introduced a new movement phase");
     e.step(select(e,"air_begin_bombing"));e.resolveChance();e.resolveChance();e.step(select(e,"air_land"));
-    check(e.state().territories.at("land_china_nanking").flags.at("city_damage")==2&&e.state().battles.empty(),
+    check(e.state().territories.at(zoneNumber(e.state(), "land_china_nanking")).flags.at("city_damage")==2&&e.state().battles.empty(),
           "Continuing bomber did not complete its subsequent city bombing");
     auto replay=Engine::replay(s.definition,rules(),checkpoint,e.state().history);
     check(replay.exactReplayIdentity()==e.exactReplayIdentity(),"Screening→continuing attack replay diverged");
@@ -251,7 +251,7 @@ void failedAirScreeningForcesTheContinuingAircraftToLand() {
     check(!e.state().units.contains("screen")&&e.state().units.contains("defender")&&
           !e.state().units.at("continuing").turnFlags.contains("air_screening_ready")&&
           !e.state().units.at("continuing").turnFlags.contains("air_in_flight")&&
-          e.state().units.at("continuing").zone!=hopeh,"Failed screening let continuing aircraft attack through enemy fighters");
+          e.state().units.at("continuing").zone != zoneNumber(e.state(), hopeh),"Failed screening let continuing aircraft attack through enemy fighters");
 }
 void continuingAircraftCannotPerformAnAirborneAssault() {
     auto s=fixture();add(s,"screen","fighter","japan",beiping);add(s,"transport","air_transport","japan",beiping);
@@ -281,7 +281,7 @@ void survivingAirborneTransportLandsBeforeInfantryAttack() {
     check(!e.state().chance&&e.state().decisions.back().kind=="air_landing"&&
           !e.state().units.at("para").carriedBy,"Transport did not unload and land before airborne infantry fire");
     e.step(select(e,"air_land",[](const Action& a){return a.parameters.require("destination").asString()==beiping;}));
-    check(e.state().units.at("transport").zone==beiping&&e.state().units.at("para").zone==hopeh,
+    check(e.state().units.at("transport").zone==zoneNumber(e.state(), beiping)&&e.state().units.at("para").zone==zoneNumber(e.state(), hopeh),
           "Airborne transport did not leave its surviving infantry at the battle");
     if(!e.state().chance)e.step(select(e,"land_progress_battle"));
     check(e.state().chance&&e.state().chance->purpose=="land_combat_roll","Airborne infantry fire did not follow transport landing");
@@ -298,7 +298,7 @@ void ordinaryAircraftRetreatUsesRemainingFlightAndReplays() {
     e.step(select(e,"land_retreat_begin"));
     check(e.state().decisions.back().kind=="air_landing","Aircraft retreat did not choose a flight landing");
     e.step(select(e,"air_land",[](const Action& a){return a.parameters.require("destination").asString()==beiping;}));
-    check(e.state().units.at("fighter").zone==beiping&&e.state().units.at("fighter").movementRemaining==2&&
+    check(e.state().units.at("fighter").zone == zoneNumber(e.state(), beiping)&&e.state().units.at("fighter").movementRemaining==2&&
           !e.state().units.at("fighter").turnFlags.contains("air_in_flight"),"Aircraft retreat ignored its actual remaining movement");
     auto replay=Engine::replay(s.definition,rules(),checkpoint,e.state().history);
     check(replay.exactReplayIdentity()==e.exactReplayIdentity(),"Aircraft retreat/landing replay diverged");
@@ -307,7 +307,7 @@ void ownerChoosesWhoIsLostWhenCombatSinksACarrier() {
     // Two fighters attack from two carriers. Should combat sink one carrier, the
     // returning fighters have one seat between them and their owner decides who
     // is lost; with a seat for each, landing needs no such choice.
-    auto s=fixture();s.territories.at(beiping).possessor="kmt";s.captureTurnStart();
+    auto s=fixture();s.territories.at(zoneNumber(s, beiping)).possessor="kmt";s.captureTurnStart();
     add(s,"c1","light_carrier","japan","sea_p14");add(s,"c2","light_carrier","japan","sea_p14");
     for(const auto& [fighter,carrier]:{std::pair<Id,Id>{"f1","c1"},{"f2","c2"}}){
         add(s,fighter,"fighter","japan","sea_p14");attachCargo(s,carrier,fighter);s.units.at(fighter).movementRemaining=2;

@@ -33,7 +33,7 @@ void unit(State& state, const Id& id, const Id& owner, const Id& zone,
     value.id = id;
     value.type = type;
     value.owner = owner;
-    value.zone = value.turnOrigin = zone;
+    value.zone = value.turnOrigin = zoneNumber(state, zone);
     value.movementAllowance = value.movementRemaining = 1;
     state.units[id] = value;
 }
@@ -133,7 +133,7 @@ std::size_t ownedUnits(const State& state, const Id& owner, const Id& type) {
 
 void wholeWarlordAndUniqueAdjacency() {
     auto state = fixture();
-    state.territories.at(sui).possessor = "ccp";
+    state.territories.at(zoneNumber(state, sui)).possessor = "ccp";
     state.captureTurnStart();
     borders(state, {{shensi, beiping, true}, {shensi, hopeh, true}, {sui, hopeh, true}});
     check(hasInfluence(state, clique, 2), "Whole-warlord adjacent-zone union was not counted");
@@ -142,7 +142,7 @@ void wholeWarlordAndUniqueAdjacency() {
     check(pendingPolitical(state, state.chance->continuation).require("threshold").asInt() == 2,
           "Threshold did not include the adjacent unoccupied possession");
     resolve(state, 2);
-    check(state.territories.at(beiping).possessor == "ccp" && state.territories.at(hopeh).possessor == "ccp",
+    check(state.territories.at(zoneNumber(state, beiping)).possessor == "ccp" && state.territories.at(zoneNumber(state, hopeh)).possessor == "ccp",
           "Influence aligned only one part of the warlord");
     check(state.units.at("warlord_a").owner == "ccp" && state.units.at("warlord_b").owner == "ccp",
           "Influence did not transfer all remaining warlord military units");
@@ -158,7 +158,7 @@ void beginningUnitAndPassability() {
     check(!hasInfluence(state, clique), "Unit newly present this turn established an Influencing Zone");
     state.captureTurnStart();
     check(hasInfluence(state, clique), "Beginning-turn garrison was ignored");
-    state.units.at("ccp_garrison").route = {hopeh, shensi};
+    state.units.at("ccp_garrison").route = zoneNumbers(state, {hopeh, shensi});
     check(!hasInfluence(state, clique), "Departed-and-returned unit was treated as a continuous garrison");
     state.units.erase("ccp_garrison");
     check(!hasInfluence(state, clique), "Destroyed garrison still established influence");
@@ -167,7 +167,7 @@ void beginningUnitAndPassability() {
     allied.politics.chineseTruce = true;
     auto& garrison = allied.units.at("ccp_garrison");
     garrison.owner = "kmt";
-    garrison.route = {"land_china_nanking", shensi};
+    garrison.route = zoneNumbers(allied, {"land_china_nanking", shensi});
     garrison.turnFlags["placed_this_turn"] = 1;  // Stale from KMT's earlier turn.
     allied.captureTurnStart();
     check(hasInfluence(allied, clique), "Another nation's stale turn flags invalidated a start-present unit");
@@ -190,20 +190,21 @@ void spendingCapAndPaidBeforeChance() {
     check(*state.nations.at("ccp").treasury == cash - 1 && state.chance,
           "Influence payment was not recorded before the die roll");
     resolve(state, 2);  // 2 - 1 <= base1.
-    check(state.territories.at(hopeh).possessor == "ccp", "Paid modifier did not change success threshold");
+    check(state.territories.at(zoneNumber(state, hopeh)).possessor == "ccp", "Paid modifier did not change success threshold");
 }
 
 void failedInfluenceAndNaturalTwelve() {
     auto failed = fixture();
     applyInfluenceAction(failed, influence(failed, clique));
     resolve(failed, 11);
-    check(failed.territories.at(beiping).possessor == clique && !hasInfluence(failed, clique),
+    check(failed.territories.at(zoneNumber(failed, beiping)).possessor == clique && !hasInfluence(failed, clique),
           "Failed attempt transferred land or did not consume the attempt");
 
     auto state = fixture("japan");
     std::vector<std::tuple<Id, Id, bool>> edges;
     int adjacent = 0;
-    for (auto& [zone, territory] : state.territories) {
+    for (auto& [number, territory] : state.territories) {
+        const auto& zone = zoneName(state, number);
         if (zone == beiping || zone == hopeh || zone == shensi || zone == "land_china_nanking"
                 || zone == central || adjacent == 12) continue;
         territory.possessor = "japan";
@@ -217,7 +218,7 @@ void failedInfluenceAndNaturalTwelve() {
     borders(state, edges);
     applyInfluenceAction(state, influence(state, clique, 12));
     resolve(state, 12);  // Even 12 - 12 <= 12 must backfire.
-    check(state.territories.at(beiping).possessor == "kmt" && state.territories.at(hopeh).possessor == "kmt",
+    check(state.territories.at(zoneNumber(state, beiping)).possessor == "kmt" && state.territories.at(zoneNumber(state, hopeh)).possessor == "kmt",
           "Natural12 was treated as a modified successful roll");
     check(state.units.at("warlord_a").owner == "kmt" && !state.nations.contains("dadao"),
           "Backfire created Dadao or failed whole-warlord transfer");
@@ -232,7 +233,7 @@ void dadaoRemainsControlledMinorAndJoins() {
     const auto japanLand = possessedLand(state, "japan").size();
     applyInfluenceAction(state, influence(state, clique));
     resolve(state, 1);
-    check(state.territories.at(beiping).possessor == "dadao" && state.territories.at(hopeh).possessor == "dadao",
+    check(state.territories.at(zoneNumber(state, beiping)).possessor == "dadao" && state.territories.at(zoneNumber(state, hopeh)).possessor == "dadao",
           "Japanese influence did not create the separate Dadao nation");
     const auto& dadao = state.nations.at("dadao");
     check(dadao.controllerNation == "japan" && dadao.player == "axis" && !dadao.treasury,
@@ -249,7 +250,7 @@ void dadaoRemainsControlledMinorAndJoins() {
     check(pendingPolitical(state, state.chance->continuation).require("threshold").asInt() == 2,
           "Japanese threshold ignored controlled Dadao possessions");
     resolve(state, 4);
-    check(state.territories.at("land_china_tsinghai").possessor == "dadao"
+    check(state.territories.at(zoneNumber(state, "land_china_tsinghai")).possessor == "dadao"
           && state.nations.at("dadao").controllerNation == "japan",
           "Subsequent influence did not join the existing Dadao nation");
 }
@@ -257,7 +258,7 @@ void dadaoRemainsControlledMinorAndJoins() {
 void backfireRevivesOnlyActualWarlordAssets() {
     auto state = fixture();
     state.nations.at("kmt").powerStatus = "major";
-    state.politics.capitals["kmt"] = "land_china_nanking";
+    state.politics.capitals["kmt"] = zoneNumber(state, "land_china_nanking");
     state.politics.evolutionAwarded.insert("kmt");
     surrenderNation(state, "kmt", "ccp");
     check(state.politics.surrendered.contains("kmt") && !state.units.contains("kmt_garrison")
@@ -269,11 +270,11 @@ void backfireRevivesOnlyActualWarlordAssets() {
     resolve(state, 12);
     check(!state.politics.surrendered.contains("kmt") && state.nations.at("kmt").gameFlags.at("surrendered") == 0,
           "Adopted always-backfire could not align with surrendered KMT");
-    check(state.territories.at(beiping).possessor == "kmt" && state.territories.at(hopeh).possessor == "kmt"
+    check(state.territories.at(zoneNumber(state, beiping)).possessor == "kmt" && state.territories.at(zoneNumber(state, hopeh)).possessor == "kmt"
           && state.units.at("warlord_a").owner == "kmt" && state.units.at("warlord_b").owner == "kmt",
           "Backfire failed to transfer the actual remaining warlord assets");
     check(!state.units.contains("kmt_garrison") && state.nations.at("kmt").treasury == 0
-          && state.territories.at("land_china_nanking").possessor != "kmt"
+          && state.territories.at(zoneNumber(state, "land_china_nanking")).possessor != "kmt"
           && state.nations.at("kmt").powerStatus == "major",
           "Backfire resurrected old KMT forces, cash, capital possession or changed its power status");
     check(state.facilities.size() == facilities && state.construction.size() == construction
@@ -293,7 +294,7 @@ void influenceAfterDadaoIncorporation() {
     borders(state, {{beiping, zone, true}, {hopeh, zone, true}});
     applyInfluenceAction(state, influence(state, target));
     resolve(state, 1);
-    check(state.territories.at(zone).possessor == "japan" && state.units.at("next_warlord").owner == "japan",
+    check(state.territories.at(zoneNumber(state, zone)).possessor == "japan" && state.units.at("next_warlord").owner == "japan",
           "Japanese success tried to transfer assets into an inactive incorporated Dadao");
     check(possessedLand(state, "dadao").empty() && state.nations.at("dadao").gameFlags.at("incorporated") == 1
           && !state.nations.at("dadao").treasury,
@@ -305,7 +306,7 @@ void ccpPossessionOnlyAndMajorLoss() {
     ensureDadao(state);
     state.nations.at("dadao").controllerNation = "ccp";
     state.nations.at("dadao").player = "comintern";
-    state.territories.at(sui).possessor = "dadao";
+    state.territories.at(zoneNumber(state, sui)).possessor = "dadao";
     unit(state, "controlled_garrison", "dadao", sui);
     state.captureTurnStart();
     borders(state, {{shensi, beiping, true}, {sui, hopeh, true}});
@@ -319,7 +320,7 @@ void ccpPossessionOnlyAndMajorLoss() {
 
 void ccpRecruitmentAndSplitMilitia() {
     auto state = fixture();
-    state.territories.at(sui).possessor = "ccp";
+    state.territories.at(zoneNumber(state, sui)).possessor = "ccp";
     state.captureTurnStart();
     const auto cash = state.nations.at("ccp").treasury;
     applyInfluenceAction(state, recruitment(state, "ccp"));
@@ -346,15 +347,15 @@ void ccpRecruitmentAndSplitMilitia() {
 
 void recruitmentUsesBeginningPossessionAndHome() {
     auto state = fixture();
-    state.territories.at(sui).possessor = "ccp";  // Acquired after snapshot.
-    state.territories.at("land_jap_honshu").possessor = "ccp";
-    state.turnStart.possessions["land_jap_honshu"] = "ccp";
+    state.territories.at(zoneNumber(state, sui)).possessor = "ccp";  // Acquired after snapshot.
+    state.territories.at(zoneNumber(state, "land_jap_honshu")).possessor = "ccp";
+    state.turnStart.possessions[zoneNumber(state, "land_jap_honshu")] = "ccp";
     applyInfluenceAction(state, recruitment(state, "ccp"));
     resolve(state, 1);
     const auto options = actions(state, "recruitment_place_infantry");
     check(options.size() == 1 && options.front().parameters.require("zone").asString() == shensi,
           "CCP recruitment ignored start-possession or Chinese Home Country");
-    state.territories.at(shensi).flags["last_possession_change_turn"] = static_cast<int>(state.clock.playerTurnSerial);
+    state.territories.at(zoneNumber(state, shensi)).flags["last_possession_change_turn"] = static_cast<int>(state.clock.playerTurnSerial);
     const auto before = state.serialize();
     rejects([&] { applyInfluenceAction(state, options.front()); }, "Lost-and-retaken recruitment site remained eligible");
     check(state.serialize() == before, "Stale recruitment choice consumed pending work");
@@ -397,8 +398,8 @@ void recruitmentMilitiaExemptFromPurchaseQuota() {
 void offshoreThresholdDoesNotForbidPlacement() {
     auto state = fixture("japan");
     ensureDadao(state);
-    state.territories.at(beiping).possessor = "dadao";
-    state.territories.at("land_hainan").possessor = "dadao";
+    state.territories.at(zoneNumber(state, beiping)).possessor = "dadao";
+    state.territories.at(zoneNumber(state, "land_hainan")).possessor = "dadao";
     state.captureTurnStart();
     applyInfluenceAction(state, recruitment(state, "dadao"));
     check(pendingPolitical(state, state.chance->continuation).require("threshold").asInt() == 1,
@@ -427,7 +428,7 @@ void freeShipAdvanceAndFacilityRepair() {
           "Controlled-minor queue work changed a national treasury");
 
     auto repair = fixture("mongolia");
-    repair.facilities["minor_repair"] = FacilityState{"minor_repair", "major_factory", central, 9, {}};
+    repair.facilities["minor_repair"] = FacilityState{"minor_repair", "major_factory", zoneNumber(repair, central), 9, {}};
     repair.repairs["pending_job"] = RepairJob{"pending_job", "mongolia", "minor_repair", 9, 9, true};
     applyInfluenceAction(repair, recruitment(repair, "mongolia"));
     resolve(repair, 1);
@@ -444,7 +445,7 @@ void freeShipAdvanceAndFacilityRepair() {
 void dadaoRecruitmentAfterJapanSurrenders() {
     auto state = fixture("japan");
     ensureDadao(state);
-    state.territories.at(beiping).possessor = "dadao";
+    state.territories.at(zoneNumber(state, beiping)).possessor = "dadao";
     state.captureTurnStart();
     state.construction.clear();  // This fixture isolates surviving Dadao, not surrender ship dice.
     surrenderNation(state, "japan", "kmt");
@@ -456,7 +457,7 @@ void dadaoRecruitmentAfterJapanSurrenders() {
     resolve(state, 1);
     applyInfluenceAction(state, actions(state, "recruitment_place_infantry").front());
     check(ownedUnits(state, "dadao", "infantry") == 1 && !state.nations.at("dadao").treasury
-          && state.territories.at(beiping).possessor == "dadao" && state.currentNation() == "japan",
+          && state.territories.at(zoneNumber(state, beiping)).possessor == "dadao" && state.currentNation() == "japan",
           "Surviving Dadao lost separate recruitment in the existing Japanese slot");
 }
 

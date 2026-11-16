@@ -45,9 +45,9 @@ void add(State& state, const Id& id, const Id& type, const Id& zone, const Id& o
     unit.id = id;
     unit.type = type;
     unit.owner = owner;
-    unit.zone = unit.turnOrigin = zone;
+    unit.zone = unit.turnOrigin = zoneNumber(state, zone);
     unit.movementAllowance = unit.movementRemaining =
-        state.definition->catalog->stats(type, 0, catalogContext(state, owner, zone)).movement;
+        state.definition->catalog->stats(type, 0, catalogContext(state, owner, zoneNumber(state, zone))).movement;
     state.units.emplace(id, std::move(unit));
 }
 
@@ -80,8 +80,8 @@ void raiderChoicesRemainReachableAndBounceStops() {
     // real progress is an attack on KMT-held Hopeh.
     source.nations.at("japan").atWarWith.insert("kmt");
     source.nations.at("kmt").atWarWith.insert("japan");
-    source.territories.at(beiping).possessor = "japan";
-    source.territories.at(hopeh).possessor = "kmt";
+    source.territories.at(zoneNumber(source, beiping)).possessor = "japan";
+    source.territories.at(zoneNumber(source, hopeh)).possessor = "kmt";
     add(source, "raider", "battlecruiser", sea);
     add(source, "walker", "infantry", beiping);
     source.captureTurnStart();
@@ -157,7 +157,7 @@ void zeroMovementCarrierAssignmentsRemainReachable() {
 
 void inPortDeckLandAssignmentsCannotCycle() {
     auto source = fixture(Phase::NonCombatMovement);
-    source.facilities["test_port"] = {"test_port", "major_port", honshu, 0, {{"border:" + sea, 1}}};
+    source.facilities["test_port"] = {"test_port", "major_port", zoneNumber(source, honshu), 0, {{"border:" + sea, 1}}};
     add(source, "carrier", "fleet_carrier", honshu);
     source.units.at("carrier").gameFlags["in_port:test_port"] = 1;
     add(source, "plane", "fighter", honshu);
@@ -176,9 +176,9 @@ State railFixture(const Id& recipient) {
     source.nations.at("japan").treasury = 100;
     source.nations.at("japan").atWarWith.erase(recipient);
     source.nations.at(recipient).atWarWith.erase("japan");
-    source.territories.at("land_manchuria_rehe").possessor = "japan";
-    source.territories.at("land_china_hopeh").possessor = "japan";
-    source.territories.at("land_china_suiyuan").possessor = recipient;
+    source.territories.at(zoneNumber(source, "land_manchuria_rehe")).possessor = "japan";
+    source.territories.at(zoneNumber(source, "land_china_hopeh")).possessor = "japan";
+    source.territories.at(zoneNumber(source, "land_china_suiyuan")).possessor = recipient;
     source.captureTurnStart();
     beginEconomyTurn(source);
     source.nations.at("japan").turnFlags["economy_research_finished"] = 1;

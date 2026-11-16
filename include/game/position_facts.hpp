@@ -41,25 +41,39 @@ class PositionFacts {
         answers_.emplace(std::make_tuple(fact, first, second), answer);
         return answer;
     }
-
+    // The same for a question about one zone.
     template <class Compute>
-    int number(Fact fact, const std::string& key, Compute&& compute) {
-        if (const auto found = numbers_.find(std::tie(fact, key)); found != numbers_.end()) return found->second;
-        const int answer = compute();
-        numbers_.emplace(std::make_tuple(fact, key), answer);
+    bool rememberAt(Fact fact, const Id& first, ZoneId zone, Compute&& compute) {
+        if (const auto found = zoneAnswers_.find(std::tie(fact, first, zone)); found != zoneAnswers_.end())
+            return found->second;
+        const bool answer = compute();
+        zoneAnswers_.emplace(std::make_tuple(fact, first, zone), answer);
         return answer;
     }
 
     template <class Compute>
-    const std::set<Id>& zones(Fact fact, const Id& nation, Compute&& compute) {
+    int number(Fact fact, const std::string& key, Compute&& compute) {
+        return numberAt(fact, key, ZoneId {}, std::forward<Compute>(compute));
+    }
+    template <class Compute>
+    int numberAt(Fact fact, const std::string& key, ZoneId zone, Compute&& compute) {
+        if (const auto found = numbers_.find(std::tie(fact, key, zone)); found != numbers_.end()) return found->second;
+        const int answer = compute();
+        numbers_.emplace(std::make_tuple(fact, key, zone), answer);
+        return answer;
+    }
+
+    template <class Compute>
+    const NumberSet<ZoneId>& zones(Fact fact, const Id& nation, Compute&& compute) {
         if (const auto found = zones_.find(std::tie(fact, nation)); found != zones_.end()) return found->second;
         return zones_.emplace(std::make_tuple(fact, nation), compute()).first->second;
     }
 
   private:
     std::map<std::tuple<Fact, Id, Id>, bool, std::less<>> answers_;
-    std::map<std::tuple<Fact, std::string>, int, std::less<>> numbers_;
-    std::map<std::tuple<Fact, Id>, std::set<Id>, std::less<>> zones_;
+    std::map<std::tuple<Fact, Id, ZoneId>, bool, std::less<>> zoneAnswers_;
+    std::map<std::tuple<Fact, std::string, ZoneId>, int, std::less<>> numbers_;
+    std::map<std::tuple<Fact, Id>, NumberSet<ZoneId>, std::less<>> zones_;
 };
 
 // Facts for this exact State object while a scope for it is open, else null.

@@ -37,9 +37,9 @@ Action action(const State &s, const Id &kind, O args = {}) {
 Id unique(State &s, const Id &prefix) {
     return "economy_" + prefix + "_" + std::to_string(++s.flags["economy_sequence"]);
 }
-bool recipientHome(const State &s, const Id &recipient, const Id &zone) {
+bool recipientHome(const State &s, const Id &recipient, ZoneId zone) {
     return s.territories.at(zone).possessor == recipient &&
-           (s.definition->factions.at(recipient).homeCountry.contains(zone) ||
+           (s.definition->factions.at(recipient).homeZones.contains(zone) ||
             (recipient == "dadao" && chineseHomeCountry(s, zone)));
 }
 bool baseType(const Id &type) {
@@ -70,18 +70,18 @@ Id controllerTurn(const State &s, const Id &nation) {
         return *s.nations.at(nation).controllerNation;
     return "japan";
 }
-std::vector<std::pair<Id, Id>> senderFactories(const State &s, const BuildProject &p) {
-    std::vector<std::pair<Id, Id>> out;
+std::vector<std::pair<Id, ZoneId>> senderFactories(const State &s, const BuildProject &p) {
+    std::vector<std::pair<Id, ZoneId>> out;
     if (s.definition->catalog->facilities().contains(p.type) || value(p.flags, "lease_militia_upgrade") ||
         value(p.flags, "lease_repair"))
-        return {{"", ""}};
+        return {{"", ZoneId {}}};
     const bool naval = s.definition->catalog->unit(p.type).classes.contains("naval");
     const bool capital = s.definition->catalog->unit(p.type).classes.contains("capital_ship");
     if (p.type == "militia")
-        return {{"", ""}};
+        return {{"", ZoneId {}}};
     if (decentralizedProduction(s, p.owner) &&
         (s.definition->catalog->unit(p.type).classes.contains("infantry_class") || p.type == "cavalry"))
-        return {{"", ""}};
+        return {{"", ZoneId {}}};
     for (const auto &[id, f] : s.facilities)
         if (facilityCapacity(s, p.owner, id, false) > 0 &&
             (naval ? (f.type.find("shipyard") != Id::npos && (!capital || f.type == "major_shipyard"))
@@ -126,22 +126,22 @@ std::vector<Action> recipientPlacements(const State &s, const BuildProject &p) {
                             exists = true;
                     if (!exists)
                         out.push_back(
-                            action(s, "economy_lease_place", {{"project", V(p.id)}, {"zone", V(zone)}}));
+                            action(s, "economy_lease_place", {{"project", V(p.id)}, {"zone", V(zoneName(s, zone))}}));
                 } else
                     for (const auto &edge : s.definition->geography.require("nodes")
-                                                .require(zone)
+                                                .require(zoneName(s, zone))
                                                 .require("neighbors")
                                                 .asArray()) {
                         const auto sea = edge.require("neighbor_id").asString();
-                        if (!s.territories.contains(sea)) {
-                            O args{{"project", V(p.id)}, {"zone", V(zone)}, {"border", V(sea)}};
+                        if (!s.territories.contains(zoneNumber(s, sea))) {
+                            O args{{"project", V(p.id)}, {"zone", V(zoneName(s, zone))}, {"border", V(sea)}};
                             out.push_back(action(s, "economy_lease_place", args));
                             for (const auto &next : s.definition->geography.require("nodes")
-                                                        .require(zone)
+                                                        .require(zoneName(s, zone))
                                                         .require("neighbors")
                                                         .asArray()) {
                                 const auto second = next.require("neighbor_id").asString();
-                                if (sea < second && !s.territories.contains(second)) {
+                                if (sea < second && !s.territories.contains(zoneNumber(s, second))) {
                                     auto dual = args;
                                     dual["border2"] = V(second);
                                     out.push_back(action(s, "economy_lease_place", std::move(dual)));
@@ -220,7 +220,7 @@ std::vector<Action> lendLeaseActions(const State &s) {
                 if (!transportable(s, p, route))
                     continue;
                 for (const auto &[factory, location] : senderFactories(s, p)) {
-                    O params{{"project", V(id)}, {"zone", V(zone)}};
+                    O params{{"project", V(id)}, {"zone", V(zoneName(s, zone))}};
                     if (!factory.empty())
                         params["factory"] = V(factory);
                     if (s.definition->catalog->units().contains(p.type) &&
@@ -230,7 +230,7 @@ std::vector<Action> lendLeaseActions(const State &s) {
                         if (!route.facilities.empty())
                             for (const auto &sea : navalFacilitySeaZones(s, route.facilities.back())) {
                                 auto afloat = params;
-                                afloat["sea"] = V(sea);
+                                afloat["sea"] = V(zoneName(s, sea));
                                 out.push_back(action(s, "economy_lease_deliver", std::move(afloat)));
                             }
                         for (const auto &[fid, f] : s.facilities)
@@ -299,7 +299,7 @@ bool applyLendLeaseAction(State &s, const Action &a) {
         } else {
             FacilityState f;
             f.id = unique(s, "lease_base");
-            f.zone = a.parameters.require("zone").asString();
+            f.zone = zoneNumber(s, a.parameters.require("zone").asString());
             f.type = p.type;
             f.flags["placed_this_turn"] = 1;
             f.flags["original_owner:" + p.owner] = 1;
@@ -317,7 +317,7 @@ bool applyLendLeaseAction(State &s, const Action &a) {
         const auto id = a.parameters.require("project").asString();
         auto &p = s.construction.at(id);
         const auto recipient = *marker(p.flags, "lend_to:");
-        const auto zone = a.parameters.require("zone").asString();
+        const auto zone = zoneNumber(s, a.parameters.require("zone").asString());
         s.nations.at(a.nation).turnFlags["lease_delivered:" + recipient] = 1;
         if (const auto *factory = a.parameters.find("factory"))
             ++s.nations.at(a.nation).turnFlags["economy_used:" + factory->asString()];
@@ -359,7 +359,7 @@ bool applyLendLeaseAction(State &s, const Action &a) {
                 s.definition->catalog->automaticConversions(u.type, catalogContext(s, recipient, zone));
             if (!conversions.empty())
                 u.type = conversions.front().to;
-            u.zone = u.turnOrigin = a.parameters.find("sea") ? a.parameters.require("sea").asString() : zone;
+            u.zone = u.turnOrigin = a.parameters.find("sea") ? zoneNumber(s, a.parameters.require("sea").asString()) : zone;
             u.movementAllowance =
                 s.definition->catalog->stats(u.type, 0, catalogContext(s, recipient, zone)).movement;
             u.movementRemaining = 0;

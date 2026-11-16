@@ -427,7 +427,7 @@ void scenarioIntegration(const Catalog& catalog) {
             u.id = "catalog_" + type + "_" + std::to_string(damage);
             u.type = type;
             u.owner = "japan";
-            u.zone = definition.classes.contains("naval") ? sea : land;
+            u.zone = zoneNumber(state, definition.classes.contains("naval") ? sea : land);
             u.turnOrigin = u.zone;
             u.damage = damage;
             u.movementAllowance = catalog.stats(type, damage, catalogContext(state, u.owner, u.zone)).movement;

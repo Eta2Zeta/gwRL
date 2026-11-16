@@ -322,6 +322,15 @@ PYBIND11_MODULE(gwrl_cpp, module) {
             auto text = self.call([](const CampaignEnv& env) { return game::campaign::canonicalJson(env.observation()); });
             return py::module_::import("json").attr("loads")(text);
         })
+        .def("name_tables", [](const NativeCampaignEnv& self) {
+            const auto zones = self.call([](const CampaignEnv& env) {
+                return game::campaign::names(env.engine().state()).zones.names();
+            });
+            py::dict tables;
+            tables["zones"] = zones;
+            return tables;
+        }, "The tables that number the definition's names, by kind: each kind's names listed in "
+           "number order, so a name's number is its place in its list (include/game/names.hpp).")
         .def("zone_encoding_spec", [](const NativeCampaignEnv& self) {
             const auto spec = self.call([](const CampaignEnv& env) {
                 return game::campaign::zoneEncodingSpec(env.engine().state());

@@ -19,10 +19,15 @@ bool onMaritimeAirPatrol(const State &, const UnitState &);
 // Whether this nation has an aircraft with an attack value in the zone,
 // carried or not. A patrol plane may decline combat with its ships only when
 // it has none (RB 9.3.1 and 9.4).
-bool attackAircraftPresent(const State &, const Id &nation, const Id &zone);
-FlightResult validateFlight(const State &, const Id &unit, const std::vector<Id> &path, bool combat,
+bool attackAircraftPresent(const State &, const Id &nation, ZoneId zone);
+FlightResult validateFlight(const State &, const Id &unit, const std::vector<ZoneId> &path, bool combat,
                             bool attackDestination = false);
+// Where an airborne aircraft may land: zone names and carrier unit ids.
 std::vector<Id> airLandingSpots(const State &, const Id &unit);
+// Whether the aircraft may land in this zone.
+bool airLandingAvailable(const State &, const Id &unit, ZoneId zone);
+// Whether it may land at a destination named as a landing action names it:
+// a carrier's unit id or a zone's name.
 bool airLandingAvailable(const State &, const Id &unit, const Id &destination);
 // Empty aircraft list checks every airborne attacker and aircraft on MAP.
 // Carrier seats occupied by grounded cargo or reserved for scramble returns
@@ -44,7 +49,7 @@ bool airLandingPlanReachableWithin(const State &, int shortfall);
 bool airLandingsKept(const State &before, const State &after);
 // Whether `unit` flying `path` keeps itself a landing and leaves no more
 // aircraft without one, without changing or copying the state.
-bool airFlightKeepsLandings(const State &, const Id &unit, const std::vector<Id> &path);
+bool airFlightKeepsLandings(const State &, const Id &unit, const std::vector<ZoneId> &path);
 // Whether the moving side has aircraft in flight or on patrol, whose landings
 // its moves must keep; without them no move can strand one.
 bool movingSideAirborne(const State &);
@@ -63,8 +68,8 @@ void finishAirCombat(State &, const Id &battle);
 // the land battle pauses. The pending return choices live in BattleState.data.
 void returnCarpetBombers(State &, const Id &battle, const std::vector<Id> &bombers);
 void applyFacilityBombDamage(State &, const Id &facility, int damage);
-void applyCityBombDamage(State &, const Id &zone, int damage);
-void applyRailBombDamage(State &, const Id &zone, const Id &borderNeighbor, int damage);
+void applyCityBombDamage(State &, ZoneId zone, int damage);
+void applyRailBombDamage(State &, ZoneId zone, ZoneId borderNeighbor, int damage);
 class AirRules final : public Rules {
   public:
     explicit AirRules(std::shared_ptr<const Rules> gameplay = nullptr);

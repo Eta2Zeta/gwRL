@@ -29,13 +29,10 @@ bool hostile(const State &s, const Id &a, const Id &b) {
 bool friendly(const State &s, const Id &a, const Id &b) {
   return a == b || politicallyFriendly(s, a, b);
 }
-bool sea(const State &s, const Id &zone) {
+bool sea(const State &s, ZoneId zone) {
   return !s.territories.contains(zone);
 }
-const V &node(const State &s, const Id &id) {
-  return mapNode(s, id);
-}
-bool adjacent(const State &s, const Id &a, const Id &b) {
+bool adjacent(const State &s, ZoneId a, ZoneId b) {
   return mapEdge(s, a, b) != nullptr;
 }
 V ids(const std::vector<Id> &values) {
@@ -93,7 +90,7 @@ bool ship(const State &s, const UnitState &u) {
 // amphibious assault from it, except an aircraft on MAP that declined combat
 // (RB 10.8.1): a patrol plane that let these transports pass and has not
 // accepted a battle since (patrolLetPass).
-bool occupiedForAssault(const State &s, const Id &owner, const Id &zone,
+bool occupiedForAssault(const State &s, const Id &owner, ZoneId zone,
                         const std::vector<Id> &transports) {
   for (const auto &[id, u] : s.units)
     if (u.zone == zone && !u.carriedBy && hostile(s, owner, u.owner) &&
@@ -113,11 +110,11 @@ bool unavailable(const UnitState &u) {
 // from the aircraft's zone. Enemy Fighters may occupy only a path's final zone,
 // its target, so paths into them are kept but never extended. One search finds
 // what a separate search per target would.
-std::map<Id, std::vector<Id>> combatPaths(const State &s, const Id &unit) {
+std::map<ZoneId, std::vector<ZoneId>> combatPaths(const State &s, const Id &unit) {
   const auto &u = s.units.at(unit);
-  std::map<Id, std::vector<Id>> paths;
-  std::deque<std::vector<Id>> q{{u.zone}};
-  std::set<Id> visited;
+  std::map<ZoneId, std::vector<ZoneId>> paths;
+  std::deque<std::vector<ZoneId>> q{{u.zone}};
+  NumberSet<ZoneId> visited;
   while (!q.empty()) {
     auto path = std::move(q.front());
     q.pop_front();
@@ -137,7 +134,7 @@ std::map<Id, std::vector<Id>> combatPaths(const State &s, const Id &unit) {
   }
   return paths;
 }
-void moveAircraft(State &s, const Id &id, const std::vector<Id> &path) {
+void moveAircraft(State &s, const Id &id, const std::vector<ZoneId> &path) {
   auto &u = s.units.at(id);
   const auto result = validateFlight(s, id, path, true, true);
   require(result.allowed, result.reason);
@@ -153,7 +150,7 @@ void moveAircraft(State &s, const Id &id, const std::vector<Id> &path) {
   u.turnFlags["air_in_flight"] = 1;
   u.commitments.insert("combat_move");
 }
-bool landingAfter(const State &s, const Id &id, const std::vector<Id> &path) {
+bool landingAfter(const State &s, const Id &id, const std::vector<ZoneId> &path) {
   return airFlightKeepsLandings(s, id, path);
 }
 std::vector<Id> portDefenders(const State &s, const Id &facility,
@@ -185,7 +182,7 @@ bool activeBattle(const State &s) {
 // Declared assault cargo still aboard a transport in the assault's sea zone. A
 // transport that retreats takes its cargo out of the assault (RCL-018).
 std::vector<Id> assaultCargo(const State &s, const BattleState &b) {
-  const auto water = b.data.require("sea").asString();
+  const auto water = zoneNumber(s, b.data.require("sea").asString());
   std::vector<Id> out;
   for (const auto &c : readIds(b.data.require("cargo"))) {
     const auto unit = s.units.find(c);
@@ -203,7 +200,7 @@ std::vector<Id> assaultTransports(const State &s, const BattleState &b) {
   return {out.begin(), out.end()};
 }
 std::vector<Id> shoreCandidates(const State &s, const BattleState &b) {
-  const auto water = b.data.require("sea").asString();
+  const auto water = zoneNumber(s, b.data.require("sea").asString());
   std::vector<Id> out;
   const auto selected = readIds(b.data.require("bombarding"));
   const auto count = assaultCargo(s, b).size();
@@ -231,10 +228,11 @@ void shoreChoice(State &s, BattleState &b) {
 void beginAssaultLand(State &s, const Id &id) {
   const auto prep = s.battles.at(id);
   const auto cargo = assaultCargo(s, prep);
-  const auto water = prep.data.require("sea").asString();
+  const auto &waterName = prep.data.require("sea").asString();
+  const auto water = zoneNumber(s, waterName);
   std::vector<Id> attackers;
   std::vector<Id> waiting;
-  std::map<Id, Id> origins;
+  std::map<Id, ZoneId> origins;
   bool defended = false;
   for (const auto &[unit, u] : s.units)
     if (u.zone == prep.zone && !u.carriedBy &&
@@ -271,8 +269,8 @@ void beginAssaultLand(State &s, const Id &id) {
     s.battles.at(battle).flags["shore_resolved"] = 1;
     if (prep.attacker == "japan") {
       auto &flags = s.nations.at("japan").turnFlags;
-      const bool selected = flag(flags, "surprise_attack_zone:" + water);
-      const bool seaUsed = flag(flags, "surprise_attack_naval_sea:" + water);
+      const bool selected = flag(flags, "surprise_attack_zone:" + waterName);
+      const bool seaUsed = flag(flags, "surprise_attack_naval_sea:" + waterName);
       const bool alreadyLinked =
           std::any_of(flags.begin(), flags.end(), [](const auto &entry) {
             return entry.second &&
@@ -281,18 +279,18 @@ void beginAssaultLand(State &s, const Id &id) {
       if (!alreadyLinked &&
           (seaUsed || (selected && !flag(flags, "surprise_attack_used")))) {
         flags["surprise_attack_used"] = 1;
-        flags["surprise_attack_linked_land:" + prep.zone] = 1;
+        flags["surprise_attack_linked_land:" + zoneName(s, prep.zone)] = 1;
         s.battles.at(battle).flags["japanese_surprise_attack"] = 1;
       }
     }
     put(s.battles.at(battle), "amphibious_waiting", ids(waiting));
-    put(s.battles.at(battle), "amphibious_sea", V(water));
+    put(s.battles.at(battle), "amphibious_sea", V(waterName));
   } else if (!waiting.empty()) {
     for (auto &[battle, b] : s.battles)
       if (b.zone == prep.zone && b.attacker == prep.attacker &&
           b.stage == "awaiting_combat_rules") {
         put(b, "amphibious_waiting", ids(waiting));
-        put(b, "amphibious_sea", V(water));
+        put(b, "amphibious_sea", V(waterName));
         b.flags["amphibious_assault"] = 1;
         break;
       }
@@ -374,7 +372,7 @@ void rollShore(State &s, BattleState &b) {
     if (!stats.bombardment)
       continue;
     u.commitments.insert("shore_bombardment");
-    u.turnFlags["assault_zone:" + b.zone] = 1;
+    u.turnFlags["assault_zone:" + zoneName(s, b.zone)] = 1;
     attackingShips.insert(id);
     for (int n = 0; n < std::max(1, stats.bombardmentDice); ++n)
       shots.emplace_back(
@@ -457,7 +455,7 @@ bool canBerth(const State &s, const UnitState &u, const Id &facility) {
     if (v && k.rfind("assault_zone:", 0) == 0)
       assaults.insert(k.substr(13));
   if (!assaults.empty() &&
-      (assaults.size() != 1 || !assaults.contains(f.zone) ||
+      (assaults.size() != 1 || !assaults.contains(zoneName(s, f.zone)) ||
        *s.territories.at(f.zone).possessor != u.owner))
     return false;
   for (const auto &[key, value] : u.turnFlags)
@@ -482,10 +480,10 @@ void beginEvacuationCombat(State &s, const Id &facility) {
 }
 void commitEvacuation(State &s, const Id &facility, int moved,
                       const A &selected) {
-  std::map<std::pair<Id, Id>, std::vector<Id>> fleets;
+  std::map<std::pair<ZoneId, Id>, std::vector<Id>> fleets;
   for (const auto &entry : selected) {
     const auto id = entry.require("unit").asString();
-    const auto water = entry.require("sea").asString();
+    const auto water = zoneNumber(s, entry.require("sea").asString());
     auto &u = s.units.at(id);
     require(berth(u) == facility && !unavailable(u),
             "Selected evacuation ship is no longer available");
@@ -507,7 +505,7 @@ void commitEvacuation(State &s, const Id &facility, int moved,
     if (!fight)
       continue;
     std::vector<Id> attackers;
-    std::map<Id, Id> origins;
+    std::map<Id, ZoneId> origins;
     for (const auto &[id, u] : s.units)
       if (u.zone == water && hostile(s, owner, u.owner) &&
           (ship(s, u) || isAircraft(s, u))) {
@@ -518,7 +516,7 @@ void commitEvacuation(State &s, const Id &facility, int moved,
           const auto origin =
               u.route.size() > 1 ? u.route[u.route.size() - 2] : u.turnOrigin;
           if (sea(s, origin) && adjacent(s, origin, water) &&
-              flag(u.turnFlags, "naval_last_origin:" + origin) ==
+              flag(u.turnFlags, "naval_last_origin:" + zoneName(s, origin)) ==
                   static_cast<int>(s.clock.playerTurnSerial + 1))
             origins[id] = origin;
         }
@@ -565,7 +563,7 @@ void evacuationChoice(State &s, const Id &facility, int moved,
         options.push_back(action(s, owner, "naval_evacuate_port",
                                  {{"facility", V(facility)},
                                   {"unit", V(id)},
-                                  {"sea", V(water)},
+                                  {"sea", V(zoneName(s, water))},
                                   {"moved", V(static_cast<double>(moved))},
                                   {"selected", V(selected)},
                                   {"declined", V(declined)}}));
@@ -640,8 +638,7 @@ std::vector<Action> navalOperationActions(const State &s) {
                    entry.first.rfind("surprise_attack_zone:", 0) == 0;
           });
       if (!selected)
-        for (const auto &[zone, n] :
-             s.definition->geography.require("nodes").asObject()) {
+        for (const auto zone : names(s).zones.numbers()) {
           if (!sea(s, zone))
             continue;
           bool target = false;
@@ -649,8 +646,7 @@ std::vector<Action> navalOperationActions(const State &s) {
             if (u.zone == zone &&
                 flag(flags, "surprise_attack_target:" + u.owner))
               target = true;
-          for (const auto &e : n.require("neighbors").asArray()) {
-            const auto land = e.require("neighbor_id").asString();
+          for (const auto land : mapNeighbors(s, zone)) {
             if (s.territories.contains(land) &&
                 s.territories.at(land).possessor &&
                 flag(flags, "surprise_attack_target:" +
@@ -659,7 +655,7 @@ std::vector<Action> navalOperationActions(const State &s) {
           }
           if (target)
             out.push_back(action(s, "japan", "naval_select_surprise_zone",
-                                 {{"zone", V(zone)}}));
+                                 {{"zone", V(zoneName(s, zone))}}));
         }
     }
     for (const auto &[id, u] : s.units) {
@@ -675,9 +671,8 @@ std::vector<Action> navalOperationActions(const State &s) {
           !u.commitments.contains("combat") &&
           !u.commitments.contains("air_battle") &&
           !flag(u.turnFlags, "air_in_flight")) {
-        std::optional<std::map<Id, std::vector<Id>>> paths;
-        for (const auto &[zone, n] :
-             s.definition->geography.require("nodes").asObject()) {
+        std::optional<std::map<ZoneId, std::vector<ZoneId>>> paths;
+        for (const auto zone : names(s).zones.numbers()) {
           if (!sea(s, zone))
             continue;
           bool enemy = false;
@@ -696,7 +691,7 @@ std::vector<Action> navalOperationActions(const State &s) {
           if (enemy && catalogStats(s, u.type, u.damage, u.owner).attack)
             out.push_back(action(
                 s, s.currentNation(), "naval_air_attack",
-                {{"unit", V(id)}, {"path", ids(path)}, {"sea", V(zone)}}));
+                {{"unit", V(id)}, {"path", ids(zoneNames(s, path))}, {"sea", V(zoneName(s, zone))}}));
           if (u.type != "fighter" && u.type != "jet_fighter" &&
               u.type != "seaplane" && u.type != "tactical_bomber" &&
               u.type != "medium_bomber")
@@ -713,8 +708,8 @@ std::vector<Action> navalOperationActions(const State &s) {
               continue;
             out.push_back(action(s, s.currentNation(), "naval_port_attack",
                                  {{"unit", V(id)},
-                                  {"path", ids(path)},
-                                  {"sea", V(zone)},
+                                  {"path", ids(zoneNames(s, path))},
+                                  {"sea", V(zoneName(s, zone))},
                                   {"facility", V(fid)}}));
           }
         }
@@ -730,8 +725,7 @@ std::vector<Action> navalOperationActions(const State &s) {
             s.units.at(c).commitments.contains("assault_declared") ||
             u.commitments.contains("unloaded_noncombat"))
           continue;
-        for (const auto &e : node(s, u.zone).require("neighbors").asArray()) {
-          const auto land = e.require("neighbor_id").asString();
+        for (const auto land : mapNeighbors(s, u.zone)) {
           if (!s.territories.contains(land) ||
               !s.territories.at(land).possessor ||
               !hostile(s, u.owner, *s.territories.at(land).possessor) ||
@@ -739,7 +733,7 @@ std::vector<Action> navalOperationActions(const State &s) {
             continue;
           out.push_back(action(
               s, s.currentNation(), "naval_declare_assault",
-              {{"transport", V(id)}, {"cargo", V(c)}, {"zone", V(land)}}));
+              {{"transport", V(id)}, {"cargo", V(c)}, {"zone", V(zoneName(s, land))}}));
         }
       }
     }
@@ -807,8 +801,9 @@ bool applyNavalOperationAction(State &s, const Action &a) {
     const auto id = a.parameters.require("unit").asString();
     const auto owner = s.units.at(id).owner;
     const auto origin = s.units.at(id).zone;
-    const auto water = a.parameters.require("sea").asString();
-    const auto path = readIds(a.parameters.require("path"));
+    const auto &waterName = a.parameters.require("sea").asString();
+    const auto water = zoneNumber(s, waterName);
+    const auto path = zoneNumbers(s, readIds(a.parameters.require("path")));
     require(airFlightKeepsLandings(s, id, path),
             "Naval air attack has no joint landing plan");
     moveAircraft(s, id, path);
@@ -820,7 +815,7 @@ bool applyNavalOperationAction(State &s, const Action &a) {
     if (a.kind == "naval_port_attack") {
       const auto facility = a.parameters.require("facility").asString();
       options["facility"] = V(facility);
-      options["sea"] = V(water);
+      options["sea"] = V(waterName);
       options["defenders"] = ids(portDefenders(s, facility, owner));
     }
     registerNavalBattle(s, water, owner, {id}, {{id, origin}}, V(options));
@@ -837,7 +832,7 @@ bool applyNavalOperationAction(State &s, const Action &a) {
   if (a.kind == "naval_declare_assault") {
     const auto t = a.parameters.require("transport").asString(),
                c = a.parameters.require("cargo").asString();
-    const auto zone = a.parameters.require("zone").asString();
+    const auto zone = zoneNumber(s, a.parameters.require("zone").asString());
     auto &transport = s.units.at(t);
     require(!occupiedForAssault(s, transport.owner, transport.zone, {t}),
             "Clear the launching sea before declaring the amphibious assault");
@@ -850,13 +845,13 @@ bool applyNavalOperationAction(State &s, const Action &a) {
     transport.commitments.insert("unloaded_combat");
     transport.turnFlags["naval_combat_unloaded"] = 1;
     transport.turnFlags["naval_unloaded"] = 1;
-    transport.turnFlags["assault_zone:" + zone] = 1;
+    transport.turnFlags["assault_zone:" + zoneName(s, zone)] = 1;
     s.units.at(c).commitments.insert("assault_declared");
     BattleState *existing = nullptr;
     for (auto &[id, b] : s.battles)
       if (b.stage == "amphibious_declared" && b.zone == zone &&
           b.attacker == transport.owner &&
-          b.data.require("sea").asString() == transport.zone)
+          b.data.require("sea").asString() == zoneName(s, transport.zone))
         existing = &b;
     if (!existing) {
       BattleState b;
@@ -866,7 +861,7 @@ bool applyNavalOperationAction(State &s, const Action &a) {
       b.defender = *s.territories.at(zone).possessor;
       b.stage = "amphibious_declared";
       b.flags["amphibious_preparation"] = 1;
-      b.data = V(O{{"sea", V(transport.zone)},
+      b.data = V(O{{"sea", V(zoneName(s, transport.zone))},
                    {"cargo", V(A{})},
                    {"bombarding", V(A{})}});
       const auto id = b.id;
@@ -886,7 +881,7 @@ bool applyNavalOperationAction(State &s, const Action &a) {
   if (a.kind == "naval_begin_assault") {
     auto &b = s.battles.at(a.parameters.require("battle").asString());
     require(
-        !occupiedForAssault(s, b.attacker, b.data.require("sea").asString(),
+        !occupiedForAssault(s, b.attacker, zoneNumber(s, b.data.require("sea").asString()),
                             assaultTransports(s, b)),
         "Sea must be cleared before assault");
     b.stage = "amphibious_shore_selection";
@@ -1077,7 +1072,7 @@ bool applyNavalOperationChance(State &s, const ChanceRequest &r,
 bool assaultCalledOff(const State &s, const BattleState &b) {
   return s.clock.phase == Phase::Combat && b.stage == "amphibious_declared" &&
          flag(b.flags, "amphibious_preparation") &&
-         (occupiedForAssault(s, b.attacker, b.data.require("sea").asString(),
+         (occupiedForAssault(s, b.attacker, zoneNumber(s, b.data.require("sea").asString()),
                              assaultTransports(s, b)) ||
           assaultCargo(s, b).empty());
 }
@@ -1169,7 +1164,7 @@ void preparePortLandDefence(State &s, const Id &id) {
     s.units.emplace(u.id, std::move(u));
   }
 }
-void resolveCapturedPorts(State &s, const Id &landZone, const Id &captor) {
+void resolveCapturedPorts(State &s, ZoneId landZone, const Id &captor) {
   for (auto &[id, u] : s.units)
     if (u.zone == landZone && !berth(u).empty() && hostile(s, captor, u.owner))
       u.gameFlags["captured_port_pending:" + captor] = 1;

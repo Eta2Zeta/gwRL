@@ -36,6 +36,11 @@ Everything about a game at one moment is its *state* (`State` in
 | The clock | The round, the nation whose turn it is and the phase | round 1, the CCP, Production |
 | Pending work | Decisions waiting for an answer, and a dice roll waiting to be made | none |
 
+The state holds zones as numbers: a zone's place in the sorted list of the
+map's zone names (zone 0 is `land_china_beiping`). Everything else, and
+everything the engine reads or writes, uses names; [names held as
+numbers](names.md) explains the numbering and lists the campaign's zones.
+
 Two things are kept beside the state:
 
 - **The definition** never changes during a game: the map, the catalog of
@@ -223,7 +228,8 @@ engine builds the list once and shares it between copies.
   position. The integration tests run them after every step of random
   campaigns four rounds long, in both move interfaces.
 - **Each module has its own test suite** in `tests/`, with small set-up
-  positions for each rule: 26 C++ suites in all.
+  positions for each rule, and one for the name tables and the containers
+  keyed by numbers (`tests/names_tests.cpp`): 27 C++ suites in all.
 - **Random play** finds what set-up positions miss.
   `tools/fuzz_campaign_dead_ends.py` plays random games looking for positions
   with no legal move and for moves that change nothing.

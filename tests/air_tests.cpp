@@ -33,9 +33,9 @@ State fixture(Phase phase = Phase::CombatMovement) {
     s.completedTurns["ccp"] = s.completedTurns["mongolia"] = 1;
     s.nations.at("japan").atWarWith.insert("kmt");
     s.nations.at("kmt").atWarWith.insert("japan");
-    s.territories.at(beiping).possessor = "japan";
-    s.territories.at(hopeh).possessor = "kmt";
-    s.territories.at(shantung).possessor = "japan";
+    s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
+    s.territories.at(zoneNumber(s, hopeh)).possessor = "kmt";
+    s.territories.at(zoneNumber(s, shantung)).possessor = "japan";
     s.captureTurnStart();
     return s;
 }
@@ -44,9 +44,9 @@ void add(State &s, const Id &id, const Id &type, const Id &owner, const Id &zone
     u.id = id;
     u.type = type;
     u.owner = owner;
-    u.zone = u.turnOrigin = zone;
+    u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, 0, catalogContext(s, owner, zone)).movement;
+        s.definition->catalog->stats(type, 0, catalogContext(s, owner, zoneNumber(s, zone))).movement;
     s.units[id] = u;
 }
 std::shared_ptr<const Rules> rules() {
@@ -107,21 +107,21 @@ void resolveToLanding(Engine &e) {
 void flightPermissionAndRange() {
     auto s = fixture();
     add(s, "f", "fighter", "japan", beiping);
-    check(validateFlight(s, "f", {beiping, hopeh}, true, true).allowed, "Enemy target flight blocked");
+    check(validateFlight(s, "f", zoneNumbers(s, {beiping, hopeh}), true, true).allowed, "Enemy target flight blocked");
     add(s, "enemy", "fighter", "kmt", hopeh);
-    check(!validateFlight(s, "f", {beiping, hopeh, shantung}, true, true).allowed,
+    check(!validateFlight(s, "f", zoneNumbers(s, {beiping, hopeh, shantung}), true, true).allowed,
           "Enemy fighter transit permitted");
-    check(!validateFlight(s, "f", {beiping, "land_china_shensi"}, false).allowed,
+    check(!validateFlight(s, "f", zoneNumbers(s, {beiping, "land_china_shensi"}), false).allowed,
           "Nonadjacent or neutral overflight permitted");
     s.units.at("f").movementRemaining = 0;
-    check(!validateFlight(s, "f", {beiping, hopeh}, true, true).allowed, "Zero range flew");
+    check(!validateFlight(s, "f", zoneNumbers(s, {beiping, hopeh}), true, true).allowed, "Zero range flew");
 }
 void landingTimingAndCarrierCapacity() {
     auto s = fixture();
     add(s, "f", "fighter", "japan", beiping);
     check(airLandingAvailable(s, "f", beiping), "Held friendly land unavailable");
-    s.territories.at(hopeh).possessor = "japan";
-    s.territories.at(hopeh).flags["last_possession_change_turn"] = 2;
+    s.territories.at(zoneNumber(s, hopeh)).possessor = "japan";
+    s.territories.at(zoneNumber(s, hopeh)).flags["last_possession_change_turn"] = 2;
     check(!airLandingAvailable(s, "f", hopeh), "Newly captured landing allowed");
     add(s, "cv", "fleet_carrier", "japan", beiping);
     check(airLandingAvailable(s, "f", "cv"), "Carrier landing unavailable");
@@ -140,7 +140,7 @@ void ordinaryFlightsKeepALandingContinuation() {
     add(s, "b", "tactical_bomber", "japan", tokyo);
     s.units.at("b").movementAllowance = s.units.at("b").movementRemaining = 5;
     const std::vector<Id> stranded{tokyo, honshu, "sea_p15", "sea_p32", "sea_p41", hainan};
-    check(validateFlight(s, "b", stranded, false).allowed,
+    check(validateFlight(s, "b", zoneNumbers(s, stranded), false).allowed,
           "Stranded-flight fixture did not pass ordinary path/range checks");
     Engine e(s, rules());
     for (const auto& action : e.legalActions())
@@ -167,7 +167,7 @@ void ordinaryFlightsKeepALandingContinuation() {
         return action.parameters.require("destination").asString() == formosa;
     });
     e.step(landing); clone.step(landing);
-    check(offered(e, "end_phase") && e.state().units.at("b").zone == formosa &&
+    check(offered(e, "end_phase") && e.state().units.at("b").zone == zoneNumber(e.state(), formosa) &&
               clone.exactReplayIdentity() == e.exactReplayIdentity(),
           "A split flight lost its later landing or clone identity");
     auto replay = Engine::replay(s.definition, rules(), initial, e.state().history);
@@ -238,7 +238,7 @@ void flightMayPrecedeItsLandingCarrier() {
 void bombingDamageThenAAAndReplay() {
     auto s = fixture();
     add(s, "b", "medium_bomber", "japan", beiping);
-    s.facilities["factory"] = {"factory", "major_factory", hopeh, 0, {}};
+    s.facilities["factory"] = {"factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
     Engine e(s, rules(), 4);
     e.setDiceTapeForTesting({6, 1});
     auto checkpoint = e.serialize();
@@ -261,7 +261,7 @@ void interceptorAndEscortSimultaneous() {
     add(s, "b", "medium_bomber", "japan", beiping);
     add(s, "escort", "fighter", "japan", beiping);
     add(s, "i", "fighter", "kmt", hopeh);
-    s.facilities["factory"] = {"factory", "major_factory", hopeh, 0, {}};
+    s.facilities["factory"] = {"factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
     Engine e(s, rules());
     choose(e, "air_bomb",
            [](const auto &a) { return a.parameters.require("target").asString() == "factory"; });
@@ -277,32 +277,32 @@ void interceptorAndEscortSimultaneous() {
 void railroadSideAndAllTracks() {
     auto s = fixture();
     s.rails.clear();
-    s.rails["r"] = {"r", hopeh, beiping, {}};
-    s.rails["second"] = {"second", beiping, hopeh, {}};
-    applyRailBombDamage(s, hopeh, beiping, 6);
-    check(s.rails.at("r").damageByEndpoint.at(hopeh) == 1 &&
-              s.rails.at("second").damageByEndpoint.at(hopeh) == 1,
+    s.rails["r"] = {"r", zoneNumber(s, hopeh), zoneNumber(s, beiping), {}};
+    s.rails["second"] = {"second", zoneNumber(s, beiping), zoneNumber(s, hopeh), {}};
+    applyRailBombDamage(s, zoneNumber(s, hopeh), zoneNumber(s, beiping), 6);
+    check(s.rails.at("r").damageByEndpoint.at(zoneNumber(s, hopeh)) == 1 &&
+              s.rails.at("second").damageByEndpoint.at(zoneNumber(s, hopeh)) == 1,
           "Rail cap/all tracks wrong");
-    check(!s.rails.at("r").damageByEndpoint.contains(beiping), "Bombing damaged opposite side");
-    applyRailBombDamage(s, beiping, hopeh, 1);
-    check(s.rails.at("r").damageByEndpoint.at(beiping) == 1, "Opposite side independent damage lost");
+    check(!s.rails.at("r").damageByEndpoint.contains(zoneNumber(s, beiping)), "Bombing damaged opposite side");
+    applyRailBombDamage(s, zoneNumber(s, beiping), zoneNumber(s, hopeh), 1);
+    check(s.rails.at("r").damageByEndpoint.at(zoneNumber(s, beiping)) == 1, "Opposite side independent damage lost");
 }
 void cityPermanentIPPAndDestruction() {
     auto s = fixture();
-    s.territories.at(nanking).possessor = "kmt";
-    applyCityBombDamage(s, nanking, 20);
-    check(effectiveTerritorialIpp(s, nanking) == 1, "City IPP not reduced");
-    s.territories.at(nanking).flags["city_damage"] = 0;
-    check(effectiveTerritorialIpp(s, nanking) == 1, "Repair restored permanently destroyed IPP");
-    applyCityBombDamage(s, nanking, 100);
-    check(s.territories.at(nanking).flags.at("city_destroyed") == 1 &&
-              s.territories.at(nanking).flags.at("city_damage") == 45,
+    s.territories.at(zoneNumber(s, nanking)).possessor = "kmt";
+    applyCityBombDamage(s, zoneNumber(s, nanking), 20);
+    check(effectiveTerritorialIpp(s, zoneNumber(s, nanking)) == 1, "City IPP not reduced");
+    s.territories.at(zoneNumber(s, nanking)).flags["city_damage"] = 0;
+    check(effectiveTerritorialIpp(s, zoneNumber(s, nanking)) == 1, "Repair restored permanently destroyed IPP");
+    applyCityBombDamage(s, zoneNumber(s, nanking), 100);
+    check(s.territories.at(zoneNumber(s, nanking)).flags.at("city_destroyed") == 1 &&
+              s.territories.at(zoneNumber(s, nanking)).flags.at("city_damage") == 45,
           "Ordinary city cap wrong");
 }
 void improvedConstructionPerPlayerTurn() {
     auto s = fixture();
     s.nations.at("kmt").technologyStages["improved_construction"] = 4;
-    s.facilities["factory"] = {"factory", "major_factory", hopeh, 0, {}};
+    s.facilities["factory"] = {"factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
     applyFacilityBombDamage(s, "factory", 4);
     applyFacilityBombDamage(s, "factory", 4);
     check(s.facilities.at("factory").damage == 3, "Factory mitigation stacked across missions");
@@ -322,7 +322,7 @@ void airliftHeavyCapacityAndContinuation() {
         return a.parameters.require("path").asArray().back().asString() == shantung;
     });
     choose(e, "air_unload");
-    check(e.state().units.at("a").zone == shantung && e.state().units.at("a").movementRemaining == 0,
+    check(e.state().units.at("a").zone == zoneNumber(e.state(), shantung) && e.state().units.at("a").movementRemaining == 0,
           "Airlift cargo moved after unloading");
     check(e.state().units.at("t").movementRemaining.value() > 0 && offered(e, "air_fly"),
           "Transport cannot continue after unloading");
@@ -366,7 +366,7 @@ void airliftKeepsMilitiaHome() {
                a.parameters.require("destination").asString() == tokyo;
     });
     const auto &m = e.state().units.at("m");
-    check(!m.carriedBy && m.zone == tokyo && m.movementRemaining == 0, "Militia stayed aboard a landed transport");
+    check(!m.carriedBy && m.zone == zoneNumber(e.state(), tokyo) && m.movementRemaining == 0, "Militia stayed aboard a landed transport");
 }
 void failedLanding() {
     // Combat Movement too: a flight that waited for a Carrier that never came
@@ -419,7 +419,7 @@ void strandedAttackersStillEndCombatMovement() {
 void noAircraftCapture() {
     auto s = fixture();
     add(s, "f", "fighter", "japan", hopeh);
-    check(s.territories.at(hopeh).possessor == "kmt", "Fixture owner");
+    check(s.territories.at(zoneNumber(s, hopeh)).possessor == "kmt", "Fixture owner");
     Engine e(s, rules());
     check(!offered(e, "movement_route"), "Aircraft got ordinary land capture route");
 }

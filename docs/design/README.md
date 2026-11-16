@@ -630,9 +630,11 @@ and a run cannot resume across a layout change.
 ### 5.6 More detail: how the encoder builds the input
 
 The encoder reads the engine's memory directly; no text is written or parsed.
-But the engine identifies everything by name (unit types, marks on units, battle
-notes, a move's details), so the encoder translates names into question numbers
-through fixed lists. Encoding costs about 0.17 ms per decision, about 4% of a
+The engine holds zones as numbers, and a zone's number is its column in the
+encoder's zone list ([names held as numbers](../engine/names.md)). Everything
+else it identifies by name (unit types, marks on units, battle notes, a move's
+details), so the encoder translates those names into question numbers through
+fixed lists. Encoding costs about 0.17 ms per decision, about 4% of a
 game process's work.
 
 [The network's input](network_input.md) explains the families, the roles, how
@@ -1550,11 +1552,14 @@ Inside the engine a few rule checks take the most. Enumerating and checking the
 routes a naval force could sail takes about a quarter of the engine's time.
 Finding landing plans for aircraft in flight takes a seventh. The economy's
 options, movement allowances and Supply Paths take about a tenth each. By kind
-of work, 59% of the engine's time goes to comparing names, allocating memory,
-looking up maps and copying memory, and 41% to the rules' own logic. The position
-keeps its zones, units, facilities and nations in maps keyed by name, and every
-rule check names them as strings
+of work, 59% of the engine's time went to comparing names, allocating memory,
+looking up maps and copying memory, and 41% to the rules' own logic, while the
+position kept its zones, units, facilities and nations in maps keyed by name
 ([record](../archive/records/self_play_limits_2026_11_16.md#inside-the-engine)).
+The engine now holds zones as numbers, which took 7.2% to 7.9% of the
+instructions out of a searched game with play unchanged
+([record](../archive/records/zone_numbers_2026_11_16.md)); units, facilities and
+nations are still keyed by name ([names held as numbers](../engine/names.md)).
 While the engine lists a position's legal moves, it keeps a cache of facts about
 that position, such as whether a zone is in supply for a nation, so that each is
 worked out once (`PositionScope` in `include/game/position_facts.hpp`). Playing a

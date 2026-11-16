@@ -31,10 +31,10 @@ bool truth(const V &v, const Id &k) {
 const V *profile(const State &s) {
   return s.definition->rules.find("movement_profile");
 }
-const V &node(const State &s, const Id &id) {
-  return mapNode(s, id);
+const V &node(const State &s, ZoneId zone) {
+  return mapNode(s, zone);
 }
-const V *edge(const State &s, const Id &a, const Id &b) {
+const V *edge(const State &s, ZoneId a, ZoneId b) {
   return mapEdge(s, a, b);
 }
 std::set<Id> terrains(const V *v) {
@@ -57,12 +57,12 @@ bool logisticsFriendly(const State &s, const Id &nation, const Id &owner) {
   return nation == owner || politicallyFriendly(s, nation, owner) ||
          controlledBy(s, owner, nation);
 }
-bool hostileFighterAt(const State &s, const Id &nation, const Id &zone) {
+bool hostileFighterAt(const State &s, const Id &nation, ZoneId zone) {
   if (auto *facts = positionFacts(s))
     return facts
         ->zones(PositionFacts::Fact::HostileFighterClassZones, nation,
                 [&] {
-                  std::set<Id> zones;
+                  NumberSet<ZoneId> zones;
                   for (const auto &[id, u] : s.units)
                     if (hostile(s, nation, u.owner) &&
                         unitClass(s, u, "fighter"))
@@ -83,10 +83,10 @@ bool restrictedTerrain(const std::set<Id> &t) {
       return true;
   return false;
 }
-bool inHome(const State &s, const Id &nation, const Id &zone) {
+bool inHome(const State &s, const Id &nation, ZoneId zone) {
   auto i = s.definition->factions.find(nation);
   return i != s.definition->factions.end() &&
-         i->second.homeCountry.contains(zone);
+         i->second.homeZones.contains(zone);
 }
 bool hasTech(const State &s, const Id &nation, const Id &tech) {
   auto i = s.nations.at(nation).technologyStages.find(tech);
@@ -97,7 +97,7 @@ bool damagedThisTurn(const State &s, const Id &id) {
   return i != s.flags.end() &&
          i->second == static_cast<int>(s.clock.playerTurnSerial + 1);
 }
-std::vector<const RailState *> rails(const State &s, const Id &a, const Id &b) {
+std::vector<const RailState *> rails(const State &s, ZoneId a, ZoneId b) {
   std::vector<const RailState *> out;
   for (const auto &[id, r] : s.rails)
     if ((r.endpointA == a && r.endpointB == b) ||
@@ -105,11 +105,11 @@ std::vector<const RailState *> rails(const State &s, const Id &a, const Id &b) {
       out.push_back(&r);
   return out;
 }
-bool hasRail(const State &s, const Id &a, const Id &b) {
+bool hasRail(const State &s, ZoneId a, ZoneId b) {
   const auto *e = edge(s, a, b);
   return !rails(s, a, b).empty() || (e && truth(*e, "railway_connection"));
 }
-bool hasRiver(const State &s, const Id &a, const Id &b) {
+bool hasRiver(const State &s, ZoneId a, ZoneId b) {
   const auto *e = edge(s, a, b);
   return e && truth(*e, "has_river");
 }
@@ -118,7 +118,7 @@ bool continuousInfrastructure(const State &s, const Id &id) {
   auto i = s.flags.find("logistics_start_damaged:" + id);
   return (i == s.flags.end() || i->second == 0) && !damagedThisTurn(s, id);
 }
-bool strategicPermission(const State &s, const Id &nation, const Id &zone) {
+bool strategicPermission(const State &s, const Id &nation, ZoneId zone) {
   const auto owner = s.territories.at(zone).possessor;
   if (!owner)
     return false;
@@ -131,7 +131,7 @@ bool strategicPermission(const State &s, const Id &nation, const Id &zone) {
     return true;
   return flag(s.nations.at(*owner).turnFlags, "rail_permission:" + nation);
 }
-bool gaugeChange(const State &s, const Id &a, const Id &b) {
+bool gaugeChange(const State &s, ZoneId a, ZoneId b) {
   const auto *e = edge(s, a, b);
   const auto *raw = e ? e->find("gauge_change") : nullptr;
   if ((!e || !truth(*e, "railway_connection")) && !rails(s, a, b).empty()) {
@@ -145,28 +145,29 @@ bool gaugeChange(const State &s, const Id &a, const Id &b) {
   if (const auto *p = profile(s))
     for (const auto &r : p->require("rail_gauges").asArray()) {
       const auto &ends = r.require("endpoints").asArray();
-      if ((ends[0].asString() == a && ends[1].asString() == b) ||
-          (ends[0].asString() == b && ends[1].asString() == a))
+      const auto &first = zoneName(s, a), &second = zoneName(s, b);
+      if ((ends[0].asString() == first && ends[1].asString() == second) ||
+          (ends[0].asString() == second && ends[1].asString() == first))
         return r.require("gauge_change").asBool();
     }
-  throw std::runtime_error("Unreviewed railroad gauge at " + a + " -> " + b);
+  throw std::runtime_error("Unreviewed railroad gauge at " + zoneName(s, a) + " -> " + zoneName(s, b));
 }
-bool opposingFortification(const State &s, const Id &nation, const Id &from,
-                           const Id &to) {
+bool opposingFortification(const State &s, const Id &nation, ZoneId from,
+                           ZoneId to) {
   if (!s.territories.at(to).possessor ||
       !hostile(s, nation, *s.territories.at(to).possessor))
     return false;
   for (const auto &[id, f] : s.facilities)
     if (f.zone == to &&
         (f.type == "fortification" || f.type == "improved_fortification")) {
-      if (truth(node(s, to), "is_city") || flag(f.flags, "border:" + from))
+      if (truth(node(s, to), "is_city") || flag(f.flags, "border:" + zoneName(s, from)))
         return true;
       const auto *metadata = s.definition->geography.find("facilities");
       const auto *spec = metadata ? metadata->find(id) : nullptr;
       if (spec)
         if (const auto *protectedBorders = spec->find("land_accesses"))
           for (const auto &x : protectedBorders->asArray())
-            if (x.asString() == from)
+            if (x.asString() == zoneName(s, from))
               return true;
     }
   return false;
@@ -182,7 +183,7 @@ bool navalFacilityType(const Id &t) {
          t.find("shipyard") != Id::npos;
 }
 bool narrowBlocked(const State &s, const Id &nation, const V &e, bool combat,
-                   const Id &target) {
+                   ZoneId target) {
   if (combat)
     for (const auto &[id, f] : s.facilities)
       if (f.zone == target && f.type == "coastal_artillery")
@@ -190,26 +191,28 @@ bool narrowBlocked(const State &s, const Id &nation, const V &e, bool combat,
   const auto *seas = e.find("narrow_crossing_sea_zones");
   if (!seas)
     return true;
-  for (const auto &sea : seas->asArray())
+  for (const auto &seaName : seas->asArray()) {
+    const auto sea = findZone(s, seaName.asString());
     for (const auto &[id, u] : s.units)
-      if (u.zone == sea.asString() && hostile(s, nation, u.owner)) {
+      if (sea && u.zone == *sea && hostile(s, nation, u.owner)) {
         if (unitClass(s, u, "surface_warship") ||
             (unitClass(s, u, "submarine") && !flag(u.turnFlags, "submerged")) ||
             u.commitments.contains("maritime_air_patrol") ||
             flag(u.turnFlags, "on_map"))
           return true;
       }
+  }
   return false;
 }
-Id crossingCounter(const V &e, const Id &a, const Id &b) {
+Id crossingCounter(const State &s, const V &e, ZoneId a, ZoneId b) {
   const auto *id = e.find("narrow_crossing_id");
   return "crossing_used:" +
-         (id ? id->asString() : std::min(a, b) + "__" + std::max(a, b));
+         (id ? id->asString() : zoneName(s, std::min(a, b)) + "__" + zoneName(s, std::max(a, b)));
 }
 Action movementAction(const State &s, const RouteRequest &r) {
   A path;
-  for (const auto &z : r.path)
-    path.emplace_back(z);
+  for (const auto z : r.path)
+    path.emplace_back(zoneName(s, z));
   O parameters{{"unit", V(r.unit)},
                {"path", V(path)},
                {"mode", V(toString(r.mode))},
@@ -225,11 +228,11 @@ Action movementAction(const State &s, const RouteRequest &r) {
           std::nullopt,
           std::move(params)};
 }
-RouteRequest requestFrom(const Action &a) {
+RouteRequest requestFrom(const State &s, const Action &a) {
   RouteRequest r;
   r.unit = a.parameters.require("unit").asString();
   for (const auto &x : a.parameters.require("path").asArray())
-    r.path.push_back(x.asString());
+    r.path.push_back(zoneNumber(s, x.asString()));
   r.mode = parseMovementMode(a.parameters.require("mode").asString());
   r.combat = a.parameters.require("combat").asBool();
   if (const auto *towed = a.parameters.find("towed"))
@@ -278,7 +281,7 @@ bool movementController(const State &s, const Id &nation) {
           flag(s.nations.at(nation).gameFlags,
                "direct_axis_control_after_japan_surrender"));
 }
-bool landAccess(const State &s, const Id &nation, const Id &zone, bool combat) {
+bool landAccess(const State &s, const Id &nation, ZoneId zone, bool combat) {
   if (!s.territories.contains(zone))
     return false;
   const auto owner = s.territories.at(zone).possessor;
@@ -293,7 +296,7 @@ bool landAccess(const State &s, const Id &nation, const Id &zone, bool combat) {
   return hostile(s, nation, *owner) ||
          mayDeclareWar(s, nation, *owner, DeclarationMode::LandAttack).allowed;
 }
-bool aircraftFlightAccess(const State &s, const Id &nation, const Id &zone,
+bool aircraftFlightAccess(const State &s, const Id &nation, ZoneId zone,
                           bool combat) {
   if (!chineseMovementAllowed(s, nation, zone))
     return false;
@@ -312,7 +315,7 @@ bool aircraftFlightAccess(const State &s, const Id &nation, const Id &zone,
     return false;
   return combat || !hostileFighterAt(s, nation, zone);
 }
-bool heldSinceTurnStart(const State &s, const Id &nation, const Id &zone,
+bool heldSinceTurnStart(const State &s, const Id &nation, ZoneId zone,
                         bool allowFriendly) {
   const auto t = s.territories.find(zone);
   const auto start = s.turnStart.possessions.find(zone);
@@ -326,7 +329,7 @@ bool heldSinceTurnStart(const State &s, const Id &nation, const Id &zone,
   return *t->second.possessor == nation ||
          (allowFriendly && logisticsFriendly(s, nation, *t->second.possessor));
 }
-bool enterableThisTurn(const State &s, const Id &nation, const Id &zone,
+bool enterableThisTurn(const State &s, const Id &nation, ZoneId zone,
                        bool allowFriendly) {
   if (heldSinceTurnStart(s, nation, zone, allowFriendly))
     return true;
@@ -340,7 +343,7 @@ bool enterableThisTurn(const State &s, const Id &nation, const Id &zone,
   return *t->second.possessor == nation ||
          (allowFriendly && logisticsFriendly(s, nation, *t->second.possessor));
 }
-bool heldSinceNationTurnStart(const State &s, const Id &nation, const Id &zone,
+bool heldSinceNationTurnStart(const State &s, const Id &nation, ZoneId zone,
                               bool allowFriendly) {
   const auto t = s.territories.find(zone);
   if (t == s.territories.end() || !t->second.possessor ||
@@ -357,7 +360,7 @@ bool heldSinceNationTurnStart(const State &s, const Id &nation, const Id &zone,
   return ownStart != s.nations.at(nation).gameFlags.end() &&
          changed->second + 1 < ownStart->second;
 }
-BorderApproach borderApproach(const State &s, const Id &from, const Id &to) {
+BorderApproach borderApproach(const State &s, ZoneId from, ZoneId to) {
   BorderApproach out;
   out.from = from;
   out.to = to;
@@ -371,15 +374,15 @@ BorderApproach borderApproach(const State &s, const Id &from, const Id &to) {
   if (!out.riverKnown)
     if (const auto *p = profile(s))
       for (const auto &review : p->require("river_crossings").asArray())
-        if (review.require("from").asString() == from &&
-            review.require("to").asString() == to) {
+        if (review.require("from").asString() == zoneName(s, from) &&
+            review.require("to").asString() == zoneName(s, to)) {
           out.river = review.require("river_crossing").asBool();
           out.riverKnown = true;
           break;
         }
   return out;
 }
-bool railUndamaged(const State &s, const Id &from, const Id &to, bool since) {
+bool railUndamaged(const State &s, ZoneId from, ZoneId to, bool since) {
   if (!hasRail(s, from, to))
     return false;
   for (const auto *r : rails(s, from, to)) {
@@ -397,14 +400,15 @@ bool railUndamaged(const State &s, const Id &from, const Id &to, bool since) {
   }
   return true;
 }
-bool riverRouteAvailable(const State &s, const Id &nation, const Id &from,
-                         const Id &to) {
+bool riverRouteAvailable(const State &s, const Id &nation, ZoneId from,
+                         ZoneId to) {
   if (!hasRiver(s, from, to))
     return false;
   const auto *e = edge(s, from, to);
   if (const auto *banks = e->find("river_banks"))
     for (const auto &z : banks->asArray()) {
-      const auto i = s.territories.find(z.asString());
+      const auto bank = findZone(s, z.asString());
+      const auto i = bank ? s.territories.find(*bank) : s.territories.end();
       if (i == s.territories.end())
         return false;
       if (i->second.possessor && hostile(s, nation, *i->second.possessor))
@@ -417,7 +421,8 @@ bool riverRouteAvailable(const State &s, const Id &nation, const Id &from,
       return false;
   return true;
 }
-Id railRegion(const State &s, const Id &zone) {
+Id railRegion(const State &s, ZoneId zoneNumber) {
+  const auto &zone = zoneName(s, zoneNumber);
   const auto *rg = s.definition->geography.find("rail_geography");
   const auto *memberships = rg ? rg->find("memberships") : nullptr;
   const auto *entry = memberships ? memberships->find(zone) : nullptr;
@@ -435,8 +440,8 @@ int regionalRailCapacity(const Id &r) {
       {"asia", 1}};
   return capacities.at(r);
 }
-bool blitzPairValid(const State &s, const UnitState &u, const Id &from,
-                    const Id &to) {
+bool blitzPairValid(const State &s, const UnitState &u, ZoneId from,
+                    ZoneId to) {
   if (u.type == "light_armor" || u.type == "medium_armor" || u.type == "t_34" ||
       u.type == "heavy_armor" || u.type == "tiger_i" ||
       u.type == "panzergrenadier")
@@ -445,8 +450,8 @@ bool blitzPairValid(const State &s, const UnitState &u, const Id &from,
     if (link.rfind("blitz_with:", 0) == 0) {
       const auto armor = s.units.find(link.substr(11));
       return armor != s.units.end() && armor->second.zone == to &&
-             armor->second.commitments.contains("blitz_from:" + from) &&
-             armor->second.commitments.contains("blitz_to:" + to);
+             armor->second.commitments.contains("blitz_from:" + zoneName(s, from)) &&
+             armor->second.commitments.contains("blitz_to:" + zoneName(s, to));
     }
   return false;
 }
@@ -521,10 +526,10 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
       !blitzPairValid(s, u, r.path.front(), r.path.back()))
     return fail(
         "Blitz companion must follow its paired armor to the same target");
-  std::set<Id> seen{r.path.front()};
+  NumberSet<ZoneId> seen{r.path.front()};
   for (std::size_t i = 1; i < r.path.size(); ++i) {
-    const auto &a = r.path[i - 1];
-    const auto &b = r.path[i];
+    const auto a = r.path[i - 1];
+    const auto b = r.path[i];
     if (!s.territories.contains(a) || !s.territories.contains(b))
       return fail("Land route left the selected map");
     if (!chineseMovementAllowed(s, u.owner, b))
@@ -596,7 +601,7 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
         if (narrowBlocked(s, u.owner, *e, r.combat, b))
           return fail("Enemy units prevent the narrow crossing");
         const int cap = e->require("unit_capacity").asInt();
-        auto used = s.flags.find(crossingCounter(*e, a, b));
+        auto used = s.flags.find(crossingCounter(s, *e, a, b));
         if (used != s.flags.end() && used->second >= cap)
           return fail("Narrow crossing capacity exhausted");
         out.exhaustsMovement = true;
@@ -683,7 +688,7 @@ RouteResult validateRoute(const State &s, const RouteRequest &r) {
   return motorResult;
 }
 RouteResult validateFactoryRailRoute(const State &s, const Id &facility,
-                                     const std::vector<Id> &path) {
+                                     const std::vector<ZoneId> &path) {
   RouteResult out;
   const auto i = s.facilities.find(facility);
   if (i == s.facilities.end()) {
@@ -755,33 +760,32 @@ RouteResult validateFactoryRailRoute(const State &s, const Id &facility,
   return out;
 }
 
-std::vector<Id> navalFacilitySeaZones(const State &s, const Id &id) {
+std::vector<ZoneId> navalFacilitySeaZones(const State &s, const Id &id) {
   const auto &f = s.facilities.at(id);
-  std::set<Id> out;
+  NumberSet<ZoneId> out;
   const auto *metadata = s.definition->geography.find("facilities");
   const auto *spec = metadata ? metadata->find(id) : nullptr;
   if (spec)
     if (const auto *accesses = spec->find("sea_accesses"))
       for (const auto &x : accesses->asArray())
-        if (s.definition->geography.require("nodes").find(x.asString()))
-          out.insert(x.asString());
+        if (const auto zone = findZone(s, x.asString()))
+          out.insert(*zone);
   for (const auto &[k, v] : f.flags)
     if (v && k.rfind("border:", 0) == 0) {
-      const auto zone = k.substr(7);
-      const auto *n = s.definition->geography.require("nodes").find(zone);
-      if (n && n->require("type").asString() == "sea")
-        out.insert(zone);
+      const auto zone = findZone(s, std::string_view(k).substr(7));
+      if (zone && node(s, *zone).require("type").asString() == "sea")
+        out.insert(*zone);
     }
   if (out.empty())
     for (const auto &e : node(s, f.zone).require("neighbors").asArray())
       if (const auto *ids = e.find("naval_facility_ids"))
         for (const auto &x : ids->asArray())
           if (x.asString() == id)
-            out.insert(e.require("neighbor_id").asString());
+            out.insert(zoneNumber(s, e.require("neighbor_id").asString()));
   return {out.begin(), out.end()};
 }
 namespace {
-bool blockadedNow(const State &s, const Id &nation, const Id &sea) {
+bool blockadedNow(const State &s, const Id &nation, ZoneId sea) {
   std::map<Id, int> count;
   for (const auto &[id, u] : s.units)
     if (u.zone == sea && unitClass(s, u, "surface_warship") &&
@@ -811,9 +815,9 @@ bool blockadedNow(const State &s, const Id &nation, const Id &sea) {
   return false;
 }
 } // namespace
-bool seaBlockaded(const State &s, const Id &nation, const Id &sea) {
+bool seaBlockaded(const State &s, const Id &nation, ZoneId sea) {
   if (auto *facts = positionFacts(s))
-    return facts->remember(PositionFacts::Fact::SeaBlockaded, nation, sea,
+    return facts->rememberAt(PositionFacts::Fact::SeaBlockaded, nation, sea,
                            [&] { return blockadedNow(s, nation, sea); });
   return blockadedNow(s, nation, sea);
 }
@@ -842,22 +846,21 @@ bool navalFacilityUsable(const State &s, const Id &nation, const Id &id,
 }
 
 namespace {
-SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
+SupplyRoute traceSupply(const State &s, const Id &nation, ZoneId destination,
                         const std::optional<Id> &recipient, bool navalUnit) {
   SupplyRoute none;
-  if (!s.definition->factions.contains(nation) ||
-      !s.definition->geography.require("nodes").find(destination))
+  if (!s.definition->factions.contains(nation) || !isZone(s, destination))
     return none;
-  auto permittedLand = [&](const Id &zone) {
+  auto permittedLand = [&](ZoneId zone) {
     if (heldSinceTurnStart(s, nation, zone))
       return true;
     return recipient && zone == destination &&
            heldSinceTurnStart(s, *recipient, zone, false);
   };
-  auto landPaths = [&](const std::vector<Id> &starts) {
-    std::map<Id, std::vector<Id>> paths;
-    std::deque<Id> todo;
-    for (const auto &z : starts)
+  auto landPaths = [&](const std::vector<ZoneId> &starts) {
+    std::map<ZoneId, std::vector<ZoneId>> paths;
+    std::deque<ZoneId> todo;
+    for (const auto z : starts)
       if (permittedLand(z)) {
         paths[z] = {z};
         todo.push_back(z);
@@ -873,8 +876,8 @@ SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
            (*recipient == "dadao" && nation == "japan" &&
             chineseHomeCountry(s, z))))
         continue;
-      std::set<Id> adjacent;
-      for (const auto &next : mapNeighbors(s, z))
+      NumberSet<ZoneId> adjacent;
+      for (const auto next : mapNeighbors(s, z))
         if (s.territories.contains(next))
           adjacent.insert(next);
       for (const auto &[id, r] : s.rails)
@@ -882,7 +885,7 @@ SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
           adjacent.insert(r.endpointB);
         else if (r.endpointB == z)
           adjacent.insert(r.endpointA);
-      for (const auto &next : adjacent)
+      for (const auto next : adjacent)
         if (!paths.contains(next) && permittedLand(next) &&
             (railUndamaged(s, z, next, true) ||
              riverRouteAvailable(s, nation, z, next))) {
@@ -908,8 +911,8 @@ SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
            !navalFacilitySeaZones(s, id).empty() &&
            !facilityBlockaded(s, *recipient, id);
   };
-  std::vector<Id> homes;
-  for (const auto &home : s.definition->factions.at(nation).homeCountry)
+  std::vector<ZoneId> homes;
+  for (const auto home : s.definition->factions.at(nation).homeZones)
     if (s.territories.contains(home) &&
         heldSinceTurnStart(s, nation, home, false))
       homes.push_back(home);
@@ -918,7 +921,7 @@ SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
     return {true, initial.at(destination), {}};
   struct PortVisit {
     Id facility;
-    std::vector<Id> zones;
+    std::vector<ZoneId> zones;
     std::vector<Id> facilities;
   };
   std::deque<PortVisit> ports;
@@ -931,35 +934,35 @@ SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
   // Whether a facility is usable, and the sea zones it opens onto, stay the
   // same while the search runs. They are worked out once, when a sea zone is
   // first reached, and kept by sea zone in the order of the facilities.
-  std::optional<std::map<Id, std::vector<Id>>> openOnto;
+  std::optional<std::map<ZoneId, std::vector<Id>>> openOnto;
   const std::vector<Id> noFacilities;
-  auto facilitiesOnto = [&](const Id &sea) -> const std::vector<Id> & {
+  auto facilitiesOnto = [&](ZoneId sea) -> const std::vector<Id> & {
     if (!openOnto) {
       openOnto.emplace();
       for (const auto &[id, f] : s.facilities)
         if (usable(id))
-          for (const auto &access : navalFacilitySeaZones(s, id))
+          for (const auto access : navalFacilitySeaZones(s, id))
             (*openOnto)[access].push_back(id);
     }
     const auto found = openOnto->find(sea);
     return found == openOnto->end() ? noFacilities : found->second;
   };
-  std::set<Id> missedLandfalls;  // Landfall zones whose land search missed the destination.
+  std::set<ZoneId> missedLandfalls;  // Landfall zones whose land search missed the destination.
   while (!ports.empty()) {
     auto port = std::move(ports.front());
     ports.pop_front();
     const auto &origin = s.facilities.at(port.facility);
     struct SeaVisit {
-      Id sea;
+      ZoneId sea;
       int distance;
-      std::vector<Id> path;
+      std::vector<ZoneId> path;
     };
     std::deque<SeaVisit> seas;
-    std::set<Id> visitedSeas;
+    NumberSet<ZoneId> visitedSeas;
     auto starts = navalFacilitySeaZones(s, port.facility);
     if (!port.zones.empty() && !s.territories.contains(port.zones.back()))
       starts = {port.zones.back()};
-    for (const auto &sea : starts)
+    for (const auto sea : starts)
       if (!seaBlockaded(s, nation, sea)) {
         auto path = port.zones;
         if (path.empty() || path.back() != sea)
@@ -1002,8 +1005,8 @@ SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
           navalRange(origin) +
               (hasTech(s, nation, "improved_logistics") ? 1 : 0))
         continue;
-      for (const auto &next : mapNeighbors(s, sea.sea)) {
-        if (s.territories.contains(next) || !findMapNode(s, next) ||
+      for (const auto next : mapNeighbors(s, sea.sea)) {
+        if (s.territories.contains(next) ||
             seaBlockaded(s, nation, next) || !visitedSeas.insert(next).second)
           continue;
         auto path = sea.path;
@@ -1016,11 +1019,11 @@ SupplyRoute traceSupply(const State &s, const Id &nation, const Id &destination,
 }
 } // namespace
 SupplyRoute supplyRoute(const State &s, const Id &nation,
-                        const Id &destination) {
+                        ZoneId destination) {
   return traceSupply(s, nation, destination, std::nullopt, false);
 }
 SupplyRoute lendLeaseSupplyRoute(const State &s, const Id &sender,
-                                 const Id &recipient, const Id &destination,
+                                 const Id &recipient, ZoneId destination,
                                  bool navalUnit) {
   if (!s.nations.contains(recipient) || !s.territories.contains(destination) ||
       s.territories.at(destination).possessor != recipient)
@@ -1031,9 +1034,9 @@ SupplyRoute lendLeaseSupplyRoute(const State &s, const Id &sender,
     return {};
   return traceSupply(s, sender, destination, recipient, navalUnit);
 }
-bool inSupply(const State &s, const Id &nation, const Id &zone) {
+bool inSupply(const State &s, const Id &nation, ZoneId zone) {
   if (auto *facts = positionFacts(s))
-    return facts->remember(PositionFacts::Fact::InSupply, nation, zone, [&] {
+    return facts->rememberAt(PositionFacts::Fact::InSupply, nation, zone, [&] {
       return supplyRoute(s, nation, zone).connected;
     });
   return supplyRoute(s, nation, zone).connected;
@@ -1043,21 +1046,23 @@ bool burmaRoadOpen(const State &s, bool ledo) {
   if (date.first * 100 + date.second < 193807 || !s.nations.contains("japan") ||
       !s.nations.contains("kmt") || !hostile(s, "kmt", "japan"))
     return false;
-  auto allied = [&](const Id &z) {
-    const auto i = s.territories.find(z);
+  auto allied = [&](std::string_view name) {
+    const auto z = findZone(s, name);
+    const auto i = z ? s.territories.find(*z) : s.territories.end();
     return i != s.territories.end() && i->second.possessor &&
            s.nations.at(*i->second.possessor).alliance == "allies";
   };
-  const auto y = s.territories.find("land_china_yunnan");
+  const auto yunnan = findZone(s, "land_china_yunnan");
+  const auto y = yunnan ? s.territories.find(*yunnan) : s.territories.end();
   return y != s.territories.end() && y->second.possessor == "kmt" &&
          allied("land_burma") && (!ledo || allied("land_bengal"));
 }
-bool ccpSovietRailConnected(const State &s, const Id &zone) {
+bool ccpSovietRailConnected(const State &s, ZoneId zone) {
   if (!s.nations.contains("ussr") || !s.territories.contains(zone) ||
       s.territories.at(zone).possessor != "ccp")
     return false;
-  std::deque<Id> todo{zone};
-  std::set<Id> seen;
+  std::deque<ZoneId> todo{zone};
+  NumberSet<ZoneId> seen;
   while (!todo.empty()) {
     const auto z = todo.front();
     todo.pop_front();
@@ -1066,7 +1071,7 @@ bool ccpSovietRailConnected(const State &s, const Id &zone) {
     if (s.territories.at(z).possessor == "ussr")
       return true;
     for (const auto &[id, r] : s.rails) {
-      Id next;
+      ZoneId next;
       if (r.endpointA == z)
         next = r.endpointB;
       else if (r.endpointB == z)
@@ -1084,7 +1089,7 @@ bool ccpSovietRailConnected(const State &s, const Id &zone) {
   return false;
 }
 std::set<Id> withdrawalEligibleRecipients(const State &s, const Id &attacker,
-                                          const Id &zone) {
+                                          ZoneId zone) {
   std::set<Id> recipients;
   if (!s.territories.contains(zone) || !movementController(s, attacker))
     return recipients;
@@ -1098,7 +1103,7 @@ std::set<Id> withdrawalEligibleRecipients(const State &s, const Id &attacker,
       auto &p = probe.units.at(id);
       p.turnFlags["must_withdraw_from_chinese_gift"] = 1;
       bool canLeave = false;
-      std::function<void(std::vector<Id>)> search = [&](std::vector<Id> path) {
+      std::function<void(std::vector<ZoneId>)> search = [&](std::vector<ZoneId> path) {
         if (canLeave)
           return;
         if (path.size() > 1) {
@@ -1108,11 +1113,11 @@ std::set<Id> withdrawalEligibleRecipients(const State &s, const Id &attacker,
           canLeave = true;
           return;
         }
-        for (const auto &zone : mapNeighbors(s, path.back()))
-          if (s.territories.contains(zone)) {
-            auto next = path;
-            next.push_back(zone);
-            search(std::move(next));
+        for (const auto next : mapNeighbors(s, path.back()))
+          if (s.territories.contains(next)) {
+            auto extended = path;
+            extended.push_back(next);
+            search(std::move(extended));
           }
       };
       search({u.zone});
@@ -1178,7 +1183,7 @@ void attachCargo(State &s, const Id &transport, const Id &cargo) {
   t.cargo.push_back(cargo);
 }
 void detachCargo(State &s, const Id &transport, const Id &cargo,
-                 const Id &destination) {
+                 ZoneId destination) {
   auto &t = s.units.at(transport);
   auto &c = s.units.at(cargo);
   require(c.carriedBy == transport, "Cargo is not on this transport");
@@ -1205,9 +1210,9 @@ std::vector<Action> MovementRules::actions(const State &s) const {
     if (movementController(s, u.owner) && !u.carriedBy &&
         s.territories.contains(u.zone)) {
       // Zones this unit reaches by an ordinary noncombat move.
-      std::set<Id> ordinaryEnds;
+      NumberSet<ZoneId> ordinaryEnds;
       if (unitClass(s, u, "land")) {
-        std::function<void(std::vector<Id>)> visit = [&](std::vector<Id> path) {
+        std::function<void(std::vector<ZoneId>)> visit = [&](std::vector<ZoneId> path) {
           if (path.size() > 1) {
             RouteRequest r{id, path,
                            blitz ? MovementMode::Blitz : MovementMode::Ordinary,
@@ -1236,7 +1241,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
           if (path.size() >
               static_cast<std::size_t>(u.movementRemaining.value_or(0)))
             return;
-          for (const auto &next : mapNeighbors(s, path.back())) {
+          for (const auto next : mapNeighbors(s, path.back())) {
             if (!s.territories.contains(next) ||
                 std::find(path.begin(), path.end(), next) != path.end())
               continue;
@@ -1250,7 +1255,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
           for (const auto &e : node(s, u.zone).require("neighbors").asArray())
             if (narrow(&e)) {
               RouteRequest r{id,
-                             {u.zone, e.require("neighbor_id").asString()},
+                             {u.zone, zoneNumber(s, e.require("neighbor_id").asString())},
                              MovementMode::NarrowCrossing,
                              combat};
               if (validateRoute(s, r).allowed && (!combat || landRouteAttacks(s, u.owner, r)))
@@ -1258,14 +1263,14 @@ std::vector<Action> MovementRules::actions(const State &s) const {
             }
       }
       if (!combat && !blitz) {
-        std::deque<std::vector<Id>> todo{{u.zone}};
-        std::set<Id> seen{u.zone};
+        std::deque<std::vector<ZoneId>> todo{{u.zone}};
+        NumberSet<ZoneId> seen{u.zone};
         while (!todo.empty()) {
           auto path = std::move(todo.front());
           todo.pop_front();
           const auto last = path.back();
-          std::set<Id> adjacent;
-          for (const auto &next : mapNeighbors(s, last))
+          NumberSet<ZoneId> adjacent;
+          for (const auto next : mapNeighbors(s, last))
             if (s.territories.contains(next))
               adjacent.insert(next);
           for (const auto &[rid, r] : s.rails)
@@ -1273,7 +1278,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
               adjacent.insert(r.endpointB);
             else if (r.endpointB == last)
               adjacent.insert(r.endpointA);
-          for (const auto &next : adjacent)
+          for (const auto next : adjacent)
             if (!seen.contains(next)) {
               auto p = path;
               p.push_back(next);
@@ -1296,12 +1301,12 @@ std::vector<Action> MovementRules::actions(const State &s) const {
     for (const auto &[id, f] : s.facilities)
       if (f.type == "minor_factory" || f.type == "medium_factory" ||
           f.type == "major_factory") {
-        std::deque<std::vector<Id>> todo{{f.zone}};
-        std::set<Id> seen{f.zone};
+        std::deque<std::vector<ZoneId>> todo{{f.zone}};
+        NumberSet<ZoneId> seen{f.zone};
         while (!todo.empty()) {
           auto path = std::move(todo.front());
           todo.pop_front();
-          for (const auto &next : mapNeighbors(s, path.back())) {
+          for (const auto next : mapNeighbors(s, path.back())) {
             if (!s.territories.contains(next) || seen.contains(next))
               continue;
             auto p = path;
@@ -1312,8 +1317,8 @@ std::vector<Action> MovementRules::actions(const State &s) const {
             seen.insert(next);
             todo.push_back(p);
             A encoded;
-            for (const auto &z : p)
-              encoded.emplace_back(z);
+            for (const auto z : p)
+              encoded.emplace_back(zoneName(s, z));
             V params(O{{"facility", V(id)}, {"path", V(std::move(encoded))}});
             out.push_back(
                 {"factory_rail_" + contentDigest(canonicalJson(params)),
@@ -1388,9 +1393,9 @@ void MovementRules::apply(State &s, const Action &a) const {
   }
   if (a.kind == "movement_factory_rail") {
     const auto id = a.parameters.require("facility").asString();
-    std::vector<Id> path;
+    std::vector<ZoneId> path;
     for (const auto &z : a.parameters.require("path").asArray())
-      path.push_back(z.asString());
+      path.push_back(zoneNumber(s, z.asString()));
     const auto result = validateFactoryRailRoute(s, id, path);
     require(result.allowed, result.reason);
     for (const auto &region : result.regions)
@@ -1406,7 +1411,7 @@ void MovementRules::apply(State &s, const Action &a) const {
     gameplay_->apply(s, a);
     return;
   }
-  const auto r = requestFrom(a);
+  const auto r = requestFrom(s, a);
   const auto result = validateRoute(s, r);
   require(result.allowed, result.reason);
   auto &u = s.units.at(r.unit);
@@ -1438,14 +1443,14 @@ void MovementRules::apply(State &s, const Action &a) const {
     u.turnFlags["strategic_moved"] = 1;
   }
   if (r.mode == MovementMode::NarrowCrossing) {
-    ++s.flags[crossingCounter(*edge(s, from, target), from, target)];
+    ++s.flags[crossingCounter(s, *edge(s, from, target), from, target)];
     if (r.combat)
       u.commitments.insert("amphibious_assault");
   }
   if (r.mode == MovementMode::Blitz) {
     u.turnFlags.erase("blitz_eligible");
-    u.commitments.insert("blitz_from:" + from);
-    u.commitments.insert("blitz_to:" + target);
+    u.commitments.insert("blitz_from:" + zoneName(s, from));
+    u.commitments.insert("blitz_to:" + zoneName(s, target));
   }
   for (std::size_t i = 1; i < r.path.size(); ++i)
     u.route.push_back(r.path[i]);
@@ -1461,7 +1466,7 @@ void MovementRules::apply(State &s, const Action &a) const {
   if (attack) {
     recordLandAttack(s, owner, target);
     std::vector<Id> attackers{r.unit};
-    std::map<Id, Id> origins{{r.unit, r.path[r.path.size() - 2]}};
+    std::map<Id, ZoneId> origins{{r.unit, r.path[r.path.size() - 2]}};
     if (r.towed) {
       attackers.push_back(*r.towed);
       origins[*r.towed] = r.path[r.path.size() - 2];

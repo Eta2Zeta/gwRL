@@ -44,7 +44,7 @@ target_compile_definitions(campaign_benchmark PRIVATE GWRL_SOURCE_DIR="${CMAKE_C
 
 include(CTest)
 if(BUILD_TESTING)
-    foreach(test_name campaign_state campaign_runtime campaign_setup campaign_env campaign_action_interface training_action_progress training_battle_clearing campaign_reward campaign_integration catalog politics politics_influence politics_warlords movement economy land_combat land_truce air air_logistics air_integration air_mission naval_movement naval_combat naval_operations json_integrity zone_encoding)
+    foreach(test_name campaign_state campaign_runtime campaign_setup campaign_env campaign_action_interface training_action_progress training_battle_clearing campaign_reward campaign_integration catalog politics politics_influence politics_warlords movement economy land_combat land_truce air air_logistics air_integration air_mission naval_movement naval_combat naval_operations json_integrity zone_encoding names)
         add_executable(${test_name}_tests tests/${test_name}_tests.cpp)
         target_link_libraries(${test_name}_tests PRIVATE gw_engine)
         target_compile_definitions(${test_name}_tests PRIVATE GWRL_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")

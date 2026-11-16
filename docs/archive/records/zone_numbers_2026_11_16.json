@@ -1,0 +1,91 @@
+{
+ "date": "2026-11-16",
+ "question": "Does holding zones as numbers instead of names leave play unchanged, and what does it save?",
+ "code": {
+  "before": "9519ea7",
+  "after": "this change"
+ },
+ "machine": "Apple M4 Max: 10 performance and 4 efficiency cores, 36 GB",
+ "tool": "tools/compare_engine_builds.py",
+ "random_games": {
+  "seeds": "7000-7299",
+  "calendar_rounds": 11,
+  "processes": 4,
+  "games_compared": 300,
+  "identical": 300,
+  "steps": 443974,
+  "per_call": {
+   "legal_actions": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "before": 10.03,
+     "after": 8.73,
+     "change_percent": -13.0
+    },
+    "microseconds_per_call": {
+     "before": 640,
+     "after": 546
+    }
+   },
+   "apply_action": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "before": 4.31,
+     "after": 3.91,
+     "change_percent": -9.3
+    },
+    "microseconds_per_call": {
+     "before": 311,
+     "after": 281
+    }
+   },
+   "resolve_chance": {
+    "calls": 52134,
+    "million_instructions_per_call": {
+     "before": 3.2,
+     "after": 3.04,
+     "change_percent": -5.0
+    },
+    "microseconds_per_call": {
+     "before": 225,
+     "after": 216
+    }
+   }
+  },
+  "first_run_million_instructions_per_call": {
+   "legal_actions": 8.74,
+   "apply_action": 3.91,
+   "resolve_chance": 3.05
+  }
+ },
+ "searched_games": {
+  "seeds": "41-44",
+  "calendar_rounds": 11,
+  "simulations": 64,
+  "max_depth": 16,
+  "network": "64x2 networks with random-filled first-layer tables (tools/replay_coordinator_rounds.py --make-weights), evaluated one position at a time",
+  "games_compared": 4,
+  "identical": 4,
+  "events": 4985,
+  "billion_instructions": {
+   "before": 6782,
+   "after": 6292,
+   "change_percent": -7.2,
+   "first_run_after": 6248,
+   "first_run_change_percent": -7.9
+  },
+  "cpu_seconds": {
+   "before": 555.0,
+   "after": 487.4,
+   "first_run_after": 482.4
+  }
+ },
+ "checks": {
+  "cpp_suites": "27 of 27",
+  "python_suite": "467 tests, 6 skipped"
+ },
+ "notes": [
+  "Both runs of the new build played the same games; they differ only in a refactor with no runtime effect. Their searched-game instruction counts differ by 0.7%, which is the spread of this measure.",
+  "Instructions do not depend on the Mac's other work; CPU seconds do."
+ ]
+}

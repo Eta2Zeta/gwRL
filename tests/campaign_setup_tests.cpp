@@ -100,9 +100,9 @@ int main() {
         State clone = state.clone();
         require(clone.definition == state.definition, "Clone copied immutable definition");
         clone.nations.at("japan").treasury = 0;
-        clone.territories.at("land_china_beiping").possessor = "kmt";
+        clone.territories.at(zoneNumber(clone, "land_china_beiping")).possessor = "kmt";
         require(state.nations.at("japan").treasury == 15
-                && state.territories.at("land_china_beiping").possessor == "warlord_beiping_hopeh", "Clone leaked mutations");
+                && state.territories.at(zoneNumber(state, "land_china_beiping")).possessor == "warlord_beiping_hopeh", "Clone leaked mutations");
         require(state.definition->geography.require("nodes").require("land_china_beiping").require("original_owner").asString() == "Zhili Clique",
                 "Possession rewrote original nationality");
         std::cout << "PASS real setup clone isolation and serialization\n";

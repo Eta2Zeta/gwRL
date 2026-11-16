@@ -374,7 +374,7 @@ std::set<Id> retreatOrigins(const State& s, const BattleState& b) {
         const auto& nodes = s.definition->geography.require("nodes");
         if (!nodes.find(from) || nodes.require(from).require("type").asString() != "sea") continue;
         bool adjacent = false;
-        for (const auto& edge : nodes.require(b.zone).require("neighbors").asArray())
+        for (const auto& edge : nodes.require(zoneName(s, b.zone)).require("neighbors").asArray())
             adjacent |= edge.require("neighbor_id").asString() == from;
         if (!adjacent) continue;
         // RB10.3 requires the real adjacent entry sea, not Friendly ownership.
@@ -617,13 +617,13 @@ bool designatedRaider(const State& s, const Id& id) {
 bool hasRaider(const State& s, const std::vector<Id>& units) {
     return std::any_of(units.begin(), units.end(), [&](const Id& id) { return designatedRaider(s, id); });
 }
-bool joinsDeclaredBattle(const BattleState& existing, const Id& zone, const Id& attacker, const Id& context) {
+bool joinsDeclaredBattle(const BattleState& existing, ZoneId zone, const Id& attacker, const Id& context) {
     return marked(existing.flags, "naval_battle") && existing.stage == "naval_declared" && existing.zone == zone &&
            existing.attacker == attacker && string(existing, "context") == context;
 }
 } // namespace
 
-bool raiderWouldCombine(const State& s, const Id& zone, const Id& attacker,
+bool raiderWouldCombine(const State& s, ZoneId zone, const Id& attacker,
                         const std::vector<Id>& attackers, const Id& context) {
     if (attackers.size() > 1 && hasRaider(s, attackers)) return true;
     return std::any_of(s.battles.begin(), s.battles.end(), [&](const auto& entry) {
@@ -633,9 +633,9 @@ bool raiderWouldCombine(const State& s, const Id& zone, const Id& attacker,
     });
 }
 
-Id registerNavalBattle(State& s, const Id& zone, const Id& attacker,
-                       const std::vector<Id>& attackers, const std::map<Id, Id>& origins, const V& options) {
-    require(s.definition->geography.require("nodes").find(zone) && s.nations.contains(attacker) && !attackers.empty(),
+Id registerNavalBattle(State& s, ZoneId zone, const Id& attacker,
+                       const std::vector<Id>& attackers, const std::map<Id, ZoneId>& origins, const V& options) {
+    require(isZone(s, zone) && s.nations.contains(attacker) && !attackers.empty(),
             "Invalid naval battle registration");
     require(options.isObject(), "Naval battle options must be an object");
     const bool evacuation = options.find("port_evacuation");
@@ -652,7 +652,7 @@ Id registerNavalBattle(State& s, const Id& zone, const Id& attacker,
                 require(s.units.contains(id) && s.units.at(id).owner == attacker && s.units.at(id).zone == zone,
                         "Invalid merged naval attacker");
                 if (std::find(existing.attackers.begin(), existing.attackers.end(), id) == existing.attackers.end()) existing.attackers.push_back(id);
-                if (origins.contains(id)) { oldOrigins[id] = V(origins.at(id)); if (has(s, s.units.at(id), "naval")) entries.emplace_back(origins.at(id)); }
+                if (origins.contains(id)) { oldOrigins[id] = V(zoneName(s, origins.at(id))); if (has(s, s.units.at(id), "naval")) entries.emplace_back(zoneName(s, origins.at(id))); }
             }
             if (const auto* defenders = options.find("defenders"))
                 for (const auto& id : readIds(*defenders)) if (std::find(existing.defenders.begin(), existing.defenders.end(), id) == existing.defenders.end()) existing.defenders.push_back(id);
@@ -668,8 +668,8 @@ Id registerNavalBattle(State& s, const Id& zone, const Id& attacker,
                 "Naval attackers must be one nation's units in the battle zone outside mandatory port evacuations");
         require(has(s, s.units.at(id), "naval") || plane(s, s.units.at(id)), "Invalid naval attacker type");
         if (origins.contains(id)) {
-            originData[id] = V(origins.at(id));
-            if (has(s, s.units.at(id), "naval")) entries.emplace_back(origins.at(id));
+            originData[id] = V(zoneName(s, origins.at(id)));
+            if (has(s, s.units.at(id), "naval")) entries.emplace_back(zoneName(s, origins.at(id)));
         }
     }
     if (const auto* defenders = options.find("defenders")) b.defenders = readIds(*defenders);
@@ -699,13 +699,13 @@ void beginNavalBattle(State& s, const Id& id) {
     auto& b = s.battles.at(id);
     require(marked(b.flags, "naval_battle") && b.stage == "naval_declared" && !s.chance && s.decisions.empty(),
             "Naval battle cannot begin now");
-    const Id targetZone = string(b, "context") == "port_attack" && b.data.find("facility") &&
+    const ZoneId targetZone = string(b, "context") == "port_attack" && b.data.find("facility") &&
         s.facilities.contains(string(b, "facility")) ? s.facilities.at(string(b, "facility")).zone : b.zone;
-    if (b.attacker == "japan" && marked(s.nations.at("japan").turnFlags, "surprise_attack_zone:" + targetZone) &&
+    if (b.attacker == "japan" && marked(s.nations.at("japan").turnFlags, "surprise_attack_zone:" + zoneName(s, targetZone)) &&
         !marked(s.nations.at("japan").turnFlags, "surprise_attack_used")) {
         b.flags["japanese_surprise_attack"] = 1;
         s.nations.at("japan").turnFlags["surprise_attack_used"] = 1;
-        if (string(b, "context") != "port_attack") s.nations.at("japan").turnFlags["surprise_attack_naval_sea:" + b.zone] = 1;
+        if (string(b, "context") != "port_attack") s.nations.at("japan").turnFlags["surprise_attack_naval_sea:" + zoneName(s, b.zone)] = 1;
     }
     b.stage = "naval_patrol_choices"; advance(s, b);
 }
@@ -814,7 +814,7 @@ bool applyNavalCombatAction(State& s, const Action& a) {
     if (a.kind == "naval_carrier_land") {
         release(s, a); const auto unit = a.parameters.require("unit").asString(), destination = a.parameters.require("destination").asString();
         require(airLandingAvailable(s, unit, destination), "Carrier rescue landing no longer available");
-        auto& u = s.units.at(unit); const auto zone = s.units.contains(destination) ? s.units.at(destination).zone : destination;
+        auto& u = s.units.at(unit); const auto zone = s.units.contains(destination) ? s.units.at(destination).zone : zoneNumber(s, destination);
         if (zone != u.zone) u.movementRemaining = std::max(0, u.movementRemaining.value_or(0) - 1);
         u.zone = zone; u.turnFlags.erase("air_in_flight");
         if (s.units.contains(destination)) attachCargo(s, destination, unit);
@@ -826,8 +826,8 @@ bool applyNavalCombatAction(State& s, const Action& a) {
     if (a.kind == "naval_retreat_unit") {
         release(s, a); auto& u = s.units.at(a.parameters.require("unit").asString()); const auto destination = a.parameters.require("zone").asString();
         require(retreatOrigins(s, b).contains(destination), "Naval retreat destination is not an entry sea zone");
-        u.zone = destination; u.movementRemaining = 0; u.turnFlags["naval_retreated"] = 1; u.commitments.insert("retreated");
-        for (const auto& cargo : u.cargo) s.units.at(cargo).zone = destination;
+        u.zone = zoneNumber(s, destination); u.movementRemaining = 0; u.turnFlags["naval_retreated"] = 1; u.commitments.insert("retreated");
+        for (const auto& cargo : u.cargo) s.units.at(cargo).zone = u.zone;
         assignRetreat(s, b); return true;
     }
     return false;

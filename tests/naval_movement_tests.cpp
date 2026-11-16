@@ -43,10 +43,10 @@ void add(State &s, const Id &id, const Id &type, const Id &zone,
   u.id = id;
   u.type = type;
   u.owner = n;
-  u.zone = u.turnOrigin = zone;
+  u.zone = u.turnOrigin = zoneNumber(s, zone);
   u.damage = damage;
   u.movementAllowance = u.movementRemaining =
-      s.definition->catalog->stats(type, damage, catalogContext(s, n, zone))
+      s.definition->catalog->stats(type, damage, catalogContext(s, n, zoneNumber(s, zone)))
           .movement;
   s.units.emplace(id, std::move(u));
 }
@@ -93,7 +93,7 @@ void regularMovementAndReplay() {
   Engine e(s, rules(), 4);
   const auto start = e.serialize();
   move(e, "ship", {p16, p15, p14});
-  check(e.state().units.at("ship").zone == p14 &&
+  check(e.state().units.at("ship").zone == zoneNumber(e.state(), p14) &&
             e.state().units.at("ship").movementRemaining == 2,
         "Ship movement lost facility bonus or route cost");
   check(e.state().battles.empty(),
@@ -108,11 +108,11 @@ void supplyDamageAndSubmarineRanges() {
   add(s, "dd", "destroyer", p16);
   add(s, "bb", "battleship", p16, "japan", 1);
   add(s, "sub", "submarine", p16);
-  check(!validateNavalRoute(s, {{"dd"}, {p16, p15, p32, p41}}).allowed,
+  check(!validateNavalRoute(s, {{"dd"}, zoneNumbers(s, {p16, p15, p32, p41})}).allowed,
         "Unsupplied surface ship retained full range");
-  check(!validateNavalRoute(s, {{"bb"}, {p16, p15}}).allowed,
+  check(!validateNavalRoute(s, {{"bb"}, zoneNumbers(s, {p16, p15})}).allowed,
         "Damage and absent supply did not stack");
-  check(validateNavalRoute(s, {{"sub"}, {p16, p15, p32, p41}}).allowed,
+  check(validateNavalRoute(s, {{"sub"}, zoneNumbers(s, {p16, p15, p32, p41})}).allowed,
         "Submarine incorrectly suffered surface supply penalty");
 }
 void transportComposition() {
@@ -148,7 +148,7 @@ void loadVoyageAndFriendlyUnload() {
     return a.parameters.require("zone").asString() == beiping;
   });
   check(!e.state().units.at("i").carriedBy &&
-            e.state().units.at("i").zone == beiping &&
+            e.state().units.at("i").zone == zoneNumber(e.state(), beiping) &&
             e.state().units.at("t").movementRemaining == 0,
         "Unload did not exhaust cargo and carrier");
   for (const auto &a : e.legalActions())
@@ -158,7 +158,7 @@ void movedCargoAndSplitUnloadingRejected() {
   auto s = fixture();
   add(s, "t", "naval_transport", p15);
   add(s, "i", "infantry", honshu);
-  s.units.at("i").route = {honshu};
+  s.units.at("i").route = zoneNumbers(s, {honshu});
   for (const auto &a : navalMovementActions(s))
     check(a.kind != "naval_load", "Moved land cargo loaded");
   s.units.at("i").route.clear();
@@ -173,7 +173,7 @@ void destroyerTransportRangeAndStop() {
   add(s, "dd", "destroyer", p16);
   add(s, "m", "marine", p16);
   attachCargo(s, "dd", "m");
-  check(!validateNavalRoute(s, {{"dd"}, {p16, p15, p32, p41, p32}}).allowed,
+  check(!validateNavalRoute(s, {{"dd"}, zoneNumbers(s, {p16, p15, p32, p41, p32})}).allowed,
         "Loaded destroyer did not lose movement");
   Engine e(s, rules());
   move(e, "dd", {p16, p15, p14});
@@ -191,7 +191,7 @@ void strategicCapacityEndpointsAndUnloading() {
   attachCargo(s, "t", "i");
   attachCargo(s, "t", "a");
   NavalRouteRequest r{{"t"},
-                      {p16, p15, p14},
+                      zoneNumbers(s, {p16, p15, p14}),
                       false,
                       true,
                       "facility_tokyo_major_shipyard",
@@ -201,7 +201,7 @@ void strategicCapacityEndpointsAndUnloading() {
   check(!validateNavalRoute(s, r).allowed, "Strategic capacity omitted cargo");
   s.nations.at("japan").turnFlags.clear();
   Engine e(s, rules());
-  move(e, "t", r.path, true, *r.destinationFacility);
+  move(e, "t", zoneNames(s, r.path), true, *r.destinationFacility);
   check(e.state().nations.at("japan").turnFlags.at("strategic_naval_used") == 3,
         "Strategic accounting does not count transport plus cargo");
   for (const auto &a : e.legalActions())
@@ -218,7 +218,7 @@ void strategicPickupAlongRoute() {
   check(e.state().decisions.back().kind == "naval_strategic_pickup",
         "Strategic route skipped legal intermediate pickup");
   choose(e, "naval_strategic_pickup");
-  check(e.state().units.at("t").zone == p14 &&
+  check(e.state().units.at("t").zone == zoneNumber(e.state(), p14) &&
             e.state().units.at("i").carriedBy == "t" &&
             e.state().nations.at("japan").turnFlags.at(
                 "strategic_naval_used") == 2,
@@ -233,7 +233,7 @@ void alliedShipsLeaveCarrierReach() {
   ensureDadao(s);
   add(s, "c", "fleet_carrier", p32);
   add(s, "d", "naval_transport", p15, "dadao");
-  check(navalEndZones(s, "c").contains(p16), "A Dadao transport stopped a Japanese carrier");
+  check(navalEndZones(s, "c").contains(zoneNumber(s, p16)), "A Dadao transport stopped a Japanese carrier");
 }
 void strategicPickupKeepsMilitiaHome() {
   // Strategic cargo lands only at the destination port, so militia, who end
@@ -273,7 +273,7 @@ void patrolPlaneMayFightShipsItLetPass() {
   s.nations.at("kmt").atWarWith.insert("japan");
   // Evolved, so that the plane may land in Korea (RB 14.3.1).
   s.nations.at("kmt").powerStatus = "major";
-  s.territories.at("land_korea").possessor = "kmt";
+  s.territories.at(zoneNumber(s, "land_korea")).possessor = "kmt";
   add(s, "patrol", "fighter", p15, "kmt");
   s.units.at("patrol").gameFlags["on_map"] = 1;
   s.units.at("patrol").gameFlags["map_range"] = 1;
@@ -319,7 +319,7 @@ void patrolPlaneMayFightShipsItLetPass() {
     return e;
   };
   auto e = pass({});
-  check(e->state().units.at("t").zone == p15 && e->state().units.at("e").zone == p15 &&
+  check(e->state().units.at("t").zone == zoneNumber(e->state(), p15) && e->state().units.at("e").zone == zoneNumber(e->state(), p15) &&
             e->state().battles.empty(),
         "The transport and its escort did not pass the patrol");
   check(engages(*e, "t") && engages(*e, "e"),
@@ -381,7 +381,7 @@ void patrolPlaneCannotLetShipsPassUnderAttackingAircraft() {
   auto s = fixture(Phase::CombatMovement);
   s.nations.at("japan").atWarWith.insert("kmt");
   s.nations.at("kmt").atWarWith.insert("japan");
-  s.territories.at("land_korea").possessor = "kmt";
+  s.territories.at(zoneNumber(s, "land_korea")).possessor = "kmt";
   add(s, "patrol", "fighter", p15, "kmt");
   s.units.at("patrol").gameFlags["on_map"] = 1;
   s.units.at("patrol").gameFlags["map_range"] = 1;
@@ -414,7 +414,7 @@ void patrolPlaneInAScreeningBattle() {
   auto s = fixture(Phase::CombatMovement);
   s.nations.at("japan").atWarWith.insert("kmt");
   s.nations.at("kmt").atWarWith.insert("japan");
-  s.territories.at(shantung).possessor = "kmt";
+  s.territories.at(zoneNumber(s, shantung)).possessor = "kmt";
   add(s, "patrol", "fighter", p14, "kmt");
   s.units.at("patrol").gameFlags["on_map"] = 1;
   s.units.at("patrol").gameFlags["map_range"] = 1;
@@ -470,7 +470,7 @@ void patrolPlaneInAScreeningBattle() {
       e->step(e->legalActions().front());
   }
   check(!e->state().units.contains("kd") && e->state().units.contains("patrol") &&
-            e->state().units.at("s2").zone == p14 && !e->state().decisions.empty() &&
+            e->state().units.at("s2").zone == zoneNumber(e->state(), p14) && !e->state().decisions.empty() &&
             e->state().decisions.back().kind == "naval_screening_continuation",
         "The screen lost, or the patrol plane was lost, though the plane stayed out");
 }
@@ -487,7 +487,7 @@ void patrolFighterBarsTheWayOn() {
   s.nations.at("kmt").atWarWith.insert("japan");
   // Evolved, so that the plane may land in Korea (RB 14.3.1).
   s.nations.at("kmt").powerStatus = "major";
-  s.territories.at("land_korea").possessor = "kmt";
+  s.territories.at(zoneNumber(s, "land_korea")).possessor = "kmt";
   add(s, "s1", "destroyer", p16);
   add(s, "s2", "destroyer", p16);
   add(s, "s3", "destroyer", p16);
@@ -533,7 +533,7 @@ void patrolFighterBarsTheWayOn() {
     return e;
   };
   const auto at = [](const Engine &e, const Id &zone) {
-    return e.state().units.at("s1").zone == zone && e.state().units.at("s2").zone == zone;
+    return e.state().units.at("s1").zone == zoneNumber(e.state(), zone) && e.state().units.at("s2").zone == zoneNumber(e.state(), zone);
   };
   // Whether this ship may still start a voyage; attacking where it is does not count.
   const auto sails = [&](Engine &e, const Id &ship) {
@@ -584,14 +584,14 @@ void patrolFighterBarsTheWayOn() {
           "The screen did not win when the fighter stayed out");
     choose(*e, "naval_screen_continue_route");
     settle(*e);
-    check(e->state().units.at("s2").zone == p14 && e->state().units.contains("patrol"),
+    check(e->state().units.at("s2").zone == zoneNumber(e->state(), p14) && e->state().units.contains("patrol"),
           "The ship sailing on did not reach its destination past the fighter");
   }
   {
     // In Combat the fighter sinks the screening destroyer, which misses.
     auto e = screened("naval_patrol_engage", {12, 12, 12, 1, 12});
     check(!e->state().units.contains("s1") && e->state().units.contains("patrol") &&
-              e->state().units.at("s2").zone == p16,
+              e->state().units.at("s2").zone == zoneNumber(e->state(), p16),
           "The ship sailing on did not turn back when the fighter won the screen");
   }
   {
@@ -616,7 +616,7 @@ void patrolFighterBarsTheWayOn() {
     move(*e, "s3", onward);
     choose(*e, "naval_reaction_decline");
     settle(*e);
-    check(e->state().units.at("s3").zone == p14 && e->state().decisions.empty(),
+    check(e->state().units.at("s3").zone == zoneNumber(e->state(), p14) && e->state().decisions.empty(),
           "A fighter that let a later ship pass still barred its way");
   }
 }
@@ -630,7 +630,7 @@ void unevolvedChinaKeepsToChineseWaters() {
   s.completedTurns["japan"] = 1;
   s.captureTurnStart();
   add(s, "t", "naval_transport", p32, "kmt");
-  const auto sails = [&](std::vector<Id> path) { return validateNavalRoute(s, {{"t"}, path}).allowed; };
+  const auto sails = [&](std::vector<Id> path) { return validateNavalRoute(s, {{"t"}, zoneNumbers(s, path)}).allowed; };
   check(sails({p32, p41}) && sails({p32, p14}), "KMT transport could not sail beside China");
   check(!sails({p32, p33}) && !sails({p32, p15}), "Unevolved KMT transport left Chinese waters");
   s.nations.at("kmt").powerStatus = "major";
@@ -643,7 +643,7 @@ void strategicAndNoncombatBlockers() {
   add(s, "t", "naval_transport", p16);
   add(s, "enemy", "naval_transport", p16, "kmt");
   NavalRouteRequest r{{"t"},
-                      {p16, p15, p14},
+                      zoneNumbers(s, {p16, p15, p14}),
                       false,
                       true,
                       "facility_tokyo_major_shipyard",
@@ -653,11 +653,11 @@ void strategicAndNoncombatBlockers() {
   s.units.erase("enemy");
   add(s, "enemy", "destroyer", p15, "kmt");
   check(!validateNavalRoute(s, r).allowed &&
-            !validateNavalRoute(s, {{"t"}, {p16, p15, p14}}).allowed,
+            !validateNavalRoute(s, {{"t"}, zoneNumbers(s, {p16, p15, p14})}).allowed,
         "Enemy warship failed to block route");
   s.units.at("enemy").gameFlags["raider"] = 1;
   s.units.at("enemy").type = "battlecruiser";
-  check(validateNavalRoute(s, {{"t"}, {p16, p15, p14}}).allowed,
+  check(validateNavalRoute(s, {{"t"}, zoneNumbers(s, {p16, p15, p14})}).allowed,
         "Ordinary movement could not ignore raiding battlecruiser");
   check(!validateNavalRoute(s, r).allowed,
         "Strategic move ignored enemy raider");
@@ -669,7 +669,7 @@ void carrierMovementGivesNoAircraftRide() {
   attachCargo(s, "cv", "f");
   Engine e(s, rules());
   move(e, "cv", {p16, p15});
-  check(e.state().units.at("f").zone == p16 &&
+  check(e.state().units.at("f").zone == zoneNumber(e.state(), p16) &&
             !e.state().units.at("f").carriedBy &&
             e.state().units.at("f").movementRemaining == 4,
         "Aircraft rode carrier before receiving own flight");
@@ -680,7 +680,7 @@ void portExitCostsZero() {
   s.units.at("dd").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
   Engine e(s, rules());
   move(e, "dd", {p16});
-  check(e.state().units.at("dd").zone == p16 &&
+  check(e.state().units.at("dd").zone == zoneNumber(e.state(), p16) &&
             e.state().units.at("dd").movementRemaining == 4,
         "Port exit consumed ship movement");
 }
@@ -694,12 +694,12 @@ void noncombatPortExitCannotPassEnemyWarships() {
   add(s, "dd", "destroyer", tokyo);
   s.units.at("dd").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
   add(s, "enemy", "destroyer", p16, "kmt");
-  check(!validateNavalRoute(s, {{"dd"}, {p16}}).allowed &&
-            !validateNavalRoute(s, {{"dd"}, {p16, p15}}).allowed,
+  check(!validateNavalRoute(s, {{"dd"}, zoneNumbers(s, {p16})}).allowed &&
+            !validateNavalRoute(s, {{"dd"}, zoneNumbers(s, {p16, p15})}).allowed,
         "Noncombat port exit passed an Enemy Surface Warship");
   auto combat = s.clone();
   combat.clock.phase = Phase::CombatMovement;
-  check(validateNavalRoute(combat, {{"dd"}, {p16}, true}).allowed,
+  check(validateNavalRoute(combat, {{"dd"}, zoneNumbers(combat, {p16}), true}).allowed,
         "Combat Movement lost its port sortie against an Enemy warship");
 }
 // Enemy surface warships off a port stop surface ships, which must screen to
@@ -714,7 +714,7 @@ void submarinesLeavePortPastSurfaceWarships() {
   add(s, "enemy", "heavy_cruiser", p16, "kmt");
   Engine e(s, rules());
   move(e, "sub", {p16, p15});
-  check(e.state().units.at("sub").zone == p15 && e.state().battles.empty() &&
+  check(e.state().units.at("sub").zone == zoneNumber(e.state(), p15) && e.state().battles.empty() &&
             e.state().decisions.empty(),
         "A submarine leaving port was held to screen past surface warships");
 }
@@ -732,25 +732,25 @@ void carrierRoutesKeepLandingsWhereverTheyCanEnd() {
   s.units.at("f").turnFlags["air_in_flight"] = 1;
   // Leave the carrier exactly the two points this route spends.
   for (int spent = 1; spent < 12 &&
-                      validateNavalRoute(s, {{"cv"}, {p16, p15, p14}, true}).reason !=
+                      validateNavalRoute(s, {{"cv"}, zoneNumbers(s, {p16, p15, p14}), true}).reason !=
                           "Insufficient naval movement";
        ++spent)
     s.units.at("cv").turnFlags["naval_movement_spent"] = spent;
   --s.units.at("cv").turnFlags["naval_movement_spent"];
-  check(validateNavalRoute(s, {{"cv"}, {p16, p15}, true}).allowed &&
-            !validateNavalRoute(s, {{"cv"}, {p16, p15, p14}, true}).allowed,
+  check(validateNavalRoute(s, {{"cv"}, zoneNumbers(s, {p16, p15}), true}).allowed &&
+            !validateNavalRoute(s, {{"cv"}, zoneNumbers(s, {p16, p15, p14}), true}).allowed,
         "A carrier sailed past a transport, away from the aircraft waiting for it");
   auto blocked = s.clone();
   blocked.units.erase("convoy");
   add(blocked, "screen", "destroyer", p15, "kmt");
-  blocked.units.at("f").zone = p14;
+  blocked.units.at("f").zone = zoneNumber(blocked, p14);
   // No carrier can pass the warships, so the fighter beyond them is lost
   // already; the carrier may not also abandon the one waiting beside it.
   add(blocked, "g", "fighter", p16);
   blocked.units.at("g").movementRemaining = 0;
   blocked.units.at("g").turnFlags["air_in_flight"] = 1;
   check(airLandingShortfall(blocked) == 1 &&
-            !validateNavalRoute(blocked, {{"cv"}, {p16, p15, p14}, true}).allowed,
+            !validateNavalRoute(blocked, {{"cv"}, zoneNumbers(blocked, {p16, p15, p14}), true}).allowed,
         "A lone carrier counted on passing blocking warships to reach its aircraft");
 }
 // Patrol aircraft only react, so a carrier sails on past them; and a lone
@@ -768,7 +768,7 @@ void carrierRoutesAreNotHeldWhereTheForceSailsOn() {
   add(s, "f", "fighter", p14);
   s.units.at("f").movementRemaining = 0;
   s.units.at("f").turnFlags["air_in_flight"] = 1;
-  check(validateNavalRoute(s, {{"cv"}, {p16, p15, p14}, true}).allowed,
+  check(validateNavalRoute(s, {{"cv"}, zoneNumbers(s, {p16, p15, p14}), true}).allowed,
         "A carrier was held behind an Enemy patrol that only reacts");
   auto sortie = fixture(Phase::CombatMovement);
   sortie.nations.at("japan").atWarWith.insert("kmt");
@@ -779,7 +779,7 @@ void carrierRoutesAreNotHeldWhereTheForceSailsOn() {
   attachCargo(sortie, "cv", "deck");
   sortie.units.at("deck").movementRemaining = 0;
   add(sortie, "enemy", "destroyer", p16, "kmt");
-  check(validateNavalRoute(sortie, {{"cv"}, {p16}, true}).allowed,
+  check(validateNavalRoute(sortie, {{"cv"}, zoneNumbers(sortie, {p16}), true}).allowed,
         "A lone carrier's sortie was refused as if it could stay in port");
   // A larger force may leave its carrier in port while an escort screens, so
   // the aircraft the carrier launches outside must still have a landing.
@@ -788,8 +788,8 @@ void carrierRoutesAreNotHeldWhereTheForceSailsOn() {
   pair.units.at("dd").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
   auto fuelled = pair.clone();
   fuelled.units.at("deck").movementRemaining = 2;
-  check(!validateNavalRoute(pair, {{"cv", "dd"}, {p16}, true}).allowed &&
-            validateNavalRoute(fuelled, {{"cv", "dd"}, {p16}, true}).allowed,
+  check(!validateNavalRoute(pair, {{"cv", "dd"}, zoneNumbers(pair, {p16}), true}).allowed &&
+            validateNavalRoute(fuelled, {{"cv", "dd"}, zoneNumbers(fuelled, {p16}), true}).allowed,
         "A force's sortie ignored its carrier staying in port behind a screen");
 }
 // Aircraft never unload from a carrier: they take off by flying and land on
@@ -837,7 +837,7 @@ void carriersNeitherUnloadNorStrandPatrols() {
         "A carrier entered port, leaving its patrol at sea without a landing");
   add(berth, "dd", "destroyer", p16);
   auto away = berth.clone();
-  away.units.at("cv").zone = p15;
+  away.units.at("cv").zone = zoneNumber(away, p15);
   check(berths(berth, "dd") > 0 && airLandingPlanReachable(away) && berths(away, "dd") == 0,
         "A destroyer entered port while the patrol's carrier still had to sail back to it");
 }
@@ -885,22 +885,22 @@ void blockadedPortKeepsContinuingShipsInBerth() {
     return canonicalJson(a.parameters.require("request").require("path")) ==
            canonicalJson(V(V::Array{V(p16), V(p15)}));
   });
-  check(e.state().units.at("waiting").zone == tokyo &&
-            e.state().units.at("screen").zone == tokyo,
+  check(e.state().units.at("waiting").zone == zoneNumber(e.state(), tokyo) &&
+            e.state().units.at("screen").zone == zoneNumber(e.state(), tokyo),
         "Fleet left blocked berth before assigning screening force");
   choose(e, "naval_screen_add", [](const Action &a) {
     return a.parameters.require("unit").asString() == "screen";
   });
   choose(e, "naval_screen_confirm");
-  check(e.state().units.at("screen").zone == p16 &&
-            e.state().units.at("waiting").zone == tokyo,
+  check(e.state().units.at("screen").zone == zoneNumber(e.state(), p16) &&
+            e.state().units.at("waiting").zone == zoneNumber(e.state(), tokyo),
         "Continuing ships exited port with screening force");
   auto failed = e.state().clone();
   const auto id = failed.battles.begin()->first;
   failed.battles.at(id).stage = "naval_complete";
   failed.battles.at(id).flags["finished"] = 1;
   continueNavalMovement(failed, id);
-  check(failed.units.at("waiting").zone == tokyo &&
+  check(failed.units.at("waiting").zone == zoneNumber(failed, tokyo) &&
             failed.units.at("waiting").gameFlags.contains(
                 "in_port:facility_tokyo_major_shipyard"),
         "Failed port screening moved or destroyed waiting ships");
@@ -910,7 +910,7 @@ void blockadedPortKeepsContinuingShipsInBerth() {
   success.battles.at(id).flags["finished"] = 1;
   continueNavalMovement(success, id);
   check(success.decisions.back().kind == "naval_screening_continuation" &&
-            success.units.at("waiting").zone == p16,
+            success.units.at("waiting").zone == zoneNumber(success, p16),
         "Victorious continuing force lost its choice to stop at cleared sea");
   auto stopped = success.clone();
   const auto stop = *std::find_if(
@@ -918,7 +918,7 @@ void blockadedPortKeepsContinuingShipsInBerth() {
       stopped.decisions.back().options.end(),
       [](const Action &a) { return a.kind == "naval_screen_stop_route"; });
   applyNavalMovementAction(stopped, stop);
-  check(stopped.battles.empty() && stopped.units.at("waiting").zone == p16 &&
+  check(stopped.battles.empty() && stopped.units.at("waiting").zone == zoneNumber(stopped, p16) &&
             stopped.units.at("waiting").turnFlags.at(
                 "naval_screening_continuing") == 1,
         "Stopping after screening moved the fleet or lost continuation "
@@ -928,7 +928,7 @@ void blockadedPortKeepsContinuingShipsInBerth() {
       success.decisions.back().options.end(),
       [](const Action &a) { return a.kind == "naval_screen_continue_route"; });
   applyNavalMovementAction(success, resume);
-  check(success.units.at("waiting").zone == p15 &&
+  check(success.units.at("waiting").zone == zoneNumber(success, p15) &&
             !success.units.at("waiting").gameFlags.contains(
                 "in_port:facility_tokyo_major_shipyard"),
         "Successful screening failed to release waiting sortie");
@@ -957,7 +957,7 @@ void immediateSubmarineReactionResumesTheVoyage() {
     }
   }
   check(
-      e.state().battles.empty() && e.state().units.at("dd").zone == p14 &&
+      e.state().battles.empty() && e.state().units.at("dd").zone == zoneNumber(e.state(), p14) &&
           e.state().clock.phase == Phase::NonCombatMovement,
       "One-round submarine reaction did not resume original voyage and phase");
   auto replay =
@@ -981,7 +981,7 @@ void defendingCarrierAircraftMayEngageMovingSubmarine() {
         "Carrier aircraft could not act as defensive MAP against moving "
         "submarine");
   choose(e, "naval_reaction_decline");
-  check(e.state().units.at("sub").zone == p14 &&
+  check(e.state().units.at("sub").zone == zoneNumber(e.state(), p14) &&
             e.state().units.at("fighter").carriedBy == "carrier",
         "Declined carrier patrol reaction changed aircraft or blocked "
         "submarine voyage");
@@ -989,7 +989,7 @@ void defendingCarrierAircraftMayEngageMovingSubmarine() {
 void controlledDadaoUsesControllerCalendarForCargo() {
   auto s = fixture();
   ensureDadao(s);
-  s.territories.at(honshu).possessor = "dadao";
+  s.territories.at(zoneNumber(s, honshu)).possessor = "dadao";
   add(s, "t", "naval_transport", p15, "dadao");
   add(s, "i", "infantry", honshu, "dadao");
   s.captureTurnStart();
@@ -1009,28 +1009,28 @@ void peacefulSeaEntryWindowsAreSequentialAndReplayable() {
   add(s, "c", "destroyer", p14, "ccp");
   auto nc = s.clone();
   nc.clock.phase = Phase::NonCombatMovement;
-  check(!validateNavalRoute(nc, {{"dd"}, {p16, p15, p14}}).allowed,
+  check(!validateNavalRoute(nc, {{"dd"}, zoneNumbers(nc, {p16, p15, p14})}).allowed,
         "Peaceful potential-DoW entry bypassed Combat Movement");
   Engine e(s, rules(), 91);
   const auto checkpoint = e.serialize();
   move(e, "dd", {p16, p15, p14});
-  check(e.state().units.at("dd").zone == p16 &&
+  check(e.state().units.at("dd").zone == zoneNumber(e.state(), p16) &&
             e.state().decisions.back().kind == "naval_entry_intent",
         "Mover entered sea before declaring intent");
   choose(e, "naval_entry_peaceful");
   check(
-      e.state().units.at("dd").zone == p16 &&
+      e.state().units.at("dd").zone == zoneNumber(e.state(), p16) &&
           e.state().decisions.back().nation == "kmt",
       "Defender declaration opportunity occurred after entry or went to mover");
   choose(e, "naval_entry_neutral");
-  check(e.state().units.at("dd").zone == p15 &&
+  check(e.state().units.at("dd").zone == zoneNumber(e.state(), p15) &&
             e.state().decisions.back().kind == "naval_entry_intent",
         "Multi-leg route skipped second entry window");
   choose(e, "naval_entry_peaceful");
   check(e.state().decisions.back().nation == "ccp",
         "Second peaceful nation did not receive its own response");
   choose(e, "naval_entry_neutral");
-  check(e.state().units.at("dd").zone == p14 && e.state().battles.empty(),
+  check(e.state().units.at("dd").zone == zoneNumber(e.state(), p14) && e.state().battles.empty(),
         "Neutral responses failed to resume route");
   auto replay =
       Engine::replay(s.definition, rules(), checkpoint, e.state().history);
@@ -1040,8 +1040,8 @@ void peacefulSeaEntryWindowsAreSequentialAndReplayable() {
 void defenderDeclarationQueuesCombatAndAllowsReinforcements() {
   auto s = fixture(Phase::CombatMovement);
   s.nations.at("kmt").powerStatus = "major";
-  s.territories.at(beiping).possessor = "kmt";
-  s.politics.capitals["kmt"] = beiping;
+  s.territories.at(zoneNumber(s, beiping)).possessor = "kmt";
+  s.politics.capitals["kmt"] = zoneNumber(s, beiping);
   s.captureTurnStart();
   add(s, "dd", "destroyer", p16);
   add(s, "reinforcement", "destroyer", p16);
@@ -1095,18 +1095,18 @@ void raiderAttacksAlone() {
   s.units.at("bc").gameFlags["raider"] = 1;
   // Selected together, a raider and another ship have no joint attack on offer.
   auto together = s.clone();
-  registerNavalBattle(together, p15, "japan", {"dd"}, {{"dd", p15}});
+  registerNavalBattle(together, zoneNumber(together, p15), "japan", {"dd"}, {{"dd", zoneNumber(together, p15)}});
   const auto attack = [&](State &state, const Id &unit) {
-    return registerNavalBattle(state, p15, "japan", {unit}, {{unit, p15}});
+    return registerNavalBattle(state, zoneNumber(state, p15), "japan", {unit}, {{unit, zoneNumber(state, p15)}});
   };
-  check(raiderWouldCombine(s, p15, "japan", {"bc", "dd"}, "standard"),
+  check(raiderWouldCombine(s, zoneNumber(s, p15), "japan", {"bc", "dd"}, "standard"),
         "A raider joined a joint attack");
-  check(!raiderWouldCombine(s, p15, "japan", {"bc"}, "standard"),
+  check(!raiderWouldCombine(s, zoneNumber(s, p15), "japan", {"bc"}, "standard"),
         "A lone raider could not attack");
   // Once it attacks, nobody joins it and no route ends in its battle.
   auto declared = s.clone();
   attack(declared, "bc");
-  check(raiderWouldCombine(declared, p15, "japan", {"dd"}, "standard"),
+  check(raiderWouldCombine(declared, zoneNumber(declared, p15), "japan", {"dd"}, "standard"),
         "A ship joined a raider's attack");
   Engine e(declared, rules(), 23);
   bool routed = false;
@@ -1153,10 +1153,10 @@ void attackingRaiderSlipIsExplicitAndReplayable() {
           "Raider movement did not expose opposed discovery dice");
     e.resolveChance();
     if (success)
-      check(e.state().units.at("bc").zone == p14 && e.state().battles.empty(),
+      check(e.state().units.at("bc").zone == zoneNumber(e.state(), p14) && e.state().battles.empty(),
             "Successful attacking raider slip did not continue");
     else
-      check(e.state().units.at("bc").zone == p15 &&
+      check(e.state().units.at("bc").zone == zoneNumber(e.state(), p15) &&
                 e.state().battles.size() == 1 &&
                 e.state()
                         .battles.begin()
@@ -1180,11 +1180,11 @@ void convoyMissionsRemainExcluded() {
 }
 void giftWithdrawalBoardsOnlyAUsableTransport() {
   auto s = fixture();
-  s.territories.at(shantung).possessor = "ccp";
+  s.territories.at(zoneNumber(s, shantung)).possessor = "ccp";
   add(s, "t", "naval_transport", p14);
   add(s, "gift", "infantry", shantung);
   auto &u = s.units.at("gift");
-  u.route = {beiping, shantung};
+  u.route = zoneNumbers(s, {beiping, shantung});
   u.commitments.insert("combat_move");
   u.commitments.insert("combat");
   u.turnFlags["must_withdraw_from_chinese_gift"] = 1;

@@ -270,7 +270,7 @@ void setupValuesAndNoDoubleCounting() {
     auto bare = emptyAssets();
     UnitState battleship;
     battleship.id = "battleship"; battleship.type = "battleship"; battleship.owner = "japan";
-    battleship.zone = battleship.turnOrigin = "sea_p15";
+    battleship.zone = battleship.turnOrigin = zoneNumber(s, "sea_p15");
     battleship.movementAllowance = battleship.movementRemaining = 2;
     bare.units.emplace(battleship.id, battleship);
     auto& ship = bare.units.begin()->second;
@@ -278,7 +278,7 @@ void setupValuesAndNoDoubleCounting() {
     ship.damage = 1;
     near(allianceWealth(bare)[0].units, undamaged, "Invented a capital ship damage discount despite free repair");
     UnitState crew;
-    crew.id = "crew"; crew.owner = "japan"; crew.type = "militia"; crew.zone = crew.turnOrigin = "land_jap_honshu";
+    crew.id = "crew"; crew.owner = "japan"; crew.type = "militia"; crew.zone = crew.turnOrigin = zoneNumber(s, "land_jap_honshu");
     crew.gameFlags["ship_crew:" + ship.id] = 1;
     bare.units.emplace(crew.id, crew);
     near(allianceWealth(bare)[0].units, undamaged, "Temporary crew was counted as another purchased asset");
@@ -287,13 +287,13 @@ void setupValuesAndNoDoubleCounting() {
 void repairsRailAndNeutralAttribution() {
     auto s = emptyAssets();
     const auto healthyCity = allianceWealth(s)[0];
-    s.territories.at("land_jap_tokyo").flags["city_damage"] = 20;
+    s.territories.at(zoneNumber(s, "land_jap_tokyo")).flags["city_damage"] = 20;
     const auto bombedCity = allianceWealth(s)[0];
     near(healthyCity.incomeRate - bombedCity.incomeRate, 1, "City bombing did not change the current legal income rate");
     near(healthyCity.infrastructure, bombedCity.infrastructure, "City label created a separately priced asset or repair deduction");
-    s.territories.at("land_jap_tokyo").flags.clear();
+    s.territories.at(zoneNumber(s, "land_jap_tokyo")).flags.clear();
     FacilityState factory;
-    factory.id = "factory"; factory.type = "major_factory"; factory.zone = "land_jap_honshu"; factory.damage = 20;
+    factory.id = "factory"; factory.type = "major_factory"; factory.zone = zoneNumber(s, "land_jap_honshu"); factory.damage = 20;
     s.facilities.emplace(factory.id, factory);
     near(allianceWealth(s)[0].infrastructure, -2, "Negative surviving facility value was clamped");
     const auto before = allianceWealth(s)[0].total();
@@ -301,10 +301,10 @@ void repairsRailAndNeutralAttribution() {
     s.repairs.emplace("paid", RepairJob{"paid", "japan", "factory", 3, 0, false, std::nullopt});
     near(allianceWealth(s)[0].total(), before, "Prepaid repair lost both cash and repair value");
     auto captured = emptyAssets();
-    captured.facilities.emplace("yard", FacilityState{"yard", "major_shipyard", "land_jap_honshu", 3});
+    captured.facilities.emplace("yard", FacilityState{"yard", "major_shipyard", zoneNumber(s, "land_jap_honshu"), 3});
     captured.repairs.emplace("old_repair", RepairJob{"old_repair", "japan", "yard", 3, 0, false, std::nullopt});
     near(allianceWealth(captured)[0].infrastructure, 10, "Current owner's prepaid repair was not credited");
-    captured.territories.at("land_jap_honshu").possessor = "kmt";
+    captured.territories.at(zoneNumber(captured, "land_jap_honshu")).possessor = "kmt";
     near(allianceWealth(captured)[1].infrastructure, 7, "Old owner's cancelled repair inflated the captured asset");
     auto railState = loadScenario(scenario);
     railState.units.clear(); railState.facilities.clear(); railState.construction.clear();

@@ -49,8 +49,8 @@ void popDecision(State& state) {
     state.decisions.pop_back();
     erasePoliticalContinuation(state, continuation);
 }
-std::map<Id, std::pair<std::vector<Id>, std::vector<Id>>> mixedChineseStacks(const State& state) {
-    std::map<Id, std::pair<std::vector<Id>, std::vector<Id>>> stacks;
+std::map<ZoneId, std::pair<std::vector<Id>, std::vector<Id>>> mixedChineseStacks(const State& state) {
+    std::map<ZoneId, std::pair<std::vector<Id>, std::vector<Id>>> stacks;
     for (const auto& [id, unit] : state.units) {
         // The rule applies in land zones, including aircraft sharing that land.
         if (!state.territories.contains(unit.zone) || unit.carriedBy) continue;
@@ -65,7 +65,7 @@ std::map<Id, std::pair<std::vector<Id>, std::vector<Id>>> mixedChineseStacks(con
 void queueSharedBattles(State& state, const Id& breaker) {
     for (const auto& [zone, sides] : mixedChineseStacks(state)) {
         BattleState battle;
-        battle.id = "truce_shared_" + std::to_string(state.clock.playerTurnSerial) + "_" + zone;
+        battle.id = "truce_shared_" + std::to_string(state.clock.playerTurnSerial) + "_" + zoneName(state, zone);
         battle.zone = zone;
         const auto possessor = state.territories.at(zone).possessor;
         if (!possessor || (*possessor != "ccp" && *possessor != "kmt"))
@@ -94,10 +94,10 @@ void queueSharedBattles(State& state, const Id& breaker) {
             const auto from = unit.route.size() > 1
                 ? unit.route[unit.route.size() - 2] : unit.turnOrigin;
             if (passableLandBorder(state, from, zone)) {
-                origins[id] = V(from);
+                origins[id] = V(zoneName(state, from));
                 if (state.definition->catalog->unit(unit.type).classes.contains("land") &&
                     !unit.commitments.contains("airborne_assault") &&
-                    !unit.commitments.contains("amphibious_assault")) landEntries.emplace_back(from);
+                    !unit.commitments.contains("amphibious_assault")) landEntries.emplace_back(zoneName(state, from));
             }
         }
         battle.data = V(O{{"round", V(1.0)}, {"origins", V(std::move(origins))},

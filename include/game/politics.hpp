@@ -48,21 +48,21 @@ bool alliesPossible(const Id& first, const Id& second);
 // attacks nobody, and one the KMT attacks joins the CCP at once instead.
 bool warlordAttackPossible(const Id& warlord, const Id& attacker);
 
-Id originalNation(const State&, const Id& zone);
-std::vector<Id> possessedLand(const State&, const Id& nation);
-std::vector<Id> originalLand(const State&, const Id& nation);
-bool passableLandBorder(const State&, const Id& from, const Id& to);
+Id originalNation(const State&, ZoneId zone);
+std::vector<ZoneId> possessedLand(const State&, const Id& nation);
+std::vector<ZoneId> originalLand(const State&, const Id& nation);
+bool passableLandBorder(const State&, ZoneId from, ZoneId to);
 bool controlledBy(const State&, const Id& minor, const Id& controller);
 bool atWarWithMajor(const State&, const Id& nation);
 bool politicallyFriendly(const State&, const Id& first, const Id& second);
-bool chineseHomeCountry(const State&, const Id& zone);
+bool chineseHomeCountry(const State&, ZoneId zone);
 // Until they evolve, CCP and KMT may only move or attack within Chinese Home
 // Country and the sea zones adjacent to it (RB 14.3.1): whether this nation may
 // enter this zone on that account. Every other nation may.
-bool chineseMovementAllowed(const State&, const Id& nation, const Id& zone);
+bool chineseMovementAllowed(const State&, const Id& nation, ZoneId zone);
 bool decentralizedProduction(const State&, const Id& nation);
 Id politicalPlayer(const State&, const Id& nation);
-void addPoliticalUnit(State&, const Id& nation, const Id& type, const Id& zone, int count = 1);
+void addPoliticalUnit(State&, const Id& nation, const Id& type, ZoneId zone, int count = 1);
 void removePoliticalUnits(State&, const std::set<Id>& units);
 void incorporateNation(State&, const Id& minor, const Id& recipient);
 void ensureDadao(State&);
@@ -70,15 +70,15 @@ void refreshPoliticalState(State&);
 // Recomputes each nation's allies list, which follows wars, alliances and the
 // Chinese Truce; refreshPoliticalState ends with it.
 void refreshAlliances(State&);
-void changePossession(State&, const Id& zone, const Id& recipient, PossessionCause,
+void changePossession(State&, ZoneId zone, const Id& recipient, PossessionCause,
                       const std::optional<Id>& conqueror = std::nullopt);
 // The withdrawal set is supplied by the movement module's route validator, never by a policy.
-void captureLand(State&, const Id& attacker, const Id& zone,
+void captureLand(State&, const Id& attacker, ZoneId zone,
                  const std::set<Id>& withdrawalEligibleRecipients = {});
 PoliticalPermission mayDeclareWar(const State&, const Id& actor, const Id& target,
                                   DeclarationMode = DeclarationMode::MajorPowerDeclaration);
 void declareWar(State&, const Id& actor, const Id& target, DeclarationMode);
-void recordLandAttack(State&, const Id& attacker, const Id& zone);
+void recordLandAttack(State&, const Id& attacker, ZoneId zone);
 void surrenderNation(State&, const Id& nation, const Id& attacker);
 
 // Shared decision/chance helpers keep continuations explicit in State, so

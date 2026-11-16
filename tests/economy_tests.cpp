@@ -85,10 +85,10 @@ void addUnit(State &s, const Id &id, const Id &type, const Id &nation, const Id 
     u.id = id;
     u.type = type;
     u.owner = nation;
-    u.zone = u.turnOrigin = zone;
+    u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.damage = damage;
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, damage, catalogContext(s, nation, zone)).movement;
+        s.definition->catalog->stats(type, damage, catalogContext(s, nation, zoneNumber(s, zone))).movement;
     s.units.emplace(id, std::move(u));
 }
 int paid(const State &s) {
@@ -103,14 +103,14 @@ void income() {
     check(evaluateIncome(s, "kmt").total == 6, "KMT initial income");
     check(evaluateIncome(s, "ccp").total == 2, "CCP initial income");
     check(!evaluateIncome(s, "mongolia").collectable, "Mongolia has no ordinary income");
-    s.territories.at(beiping).possessor = "japan";
+    s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
     check(evaluateIncome(s, "japan").total == 18, "Japan gets China bonus without Major war");
-    s.territories.at(beiping).flags["city_damage"] = 20;
-    s.territories.at(beiping).flags["city_ipp_lost"] = 1;
+    s.territories.at(zoneNumber(s, beiping)).flags["city_damage"] = 20;
+    s.territories.at(zoneNumber(s, beiping)).flags["city_ipp_lost"] = 1;
     check(evaluateIncome(s, "japan").total == 17, "City bombing changes territorial income");
-    s.territories.at(beiping).flags["city_damage"] = 0;
+    s.territories.at(zoneNumber(s, beiping)).flags["city_damage"] = 0;
     check(evaluateIncome(s, "japan").total == 17, "City repair does not restore permanent IPP");
-    s.territories.at(tokyo).possessor = "ccp";
+    s.territories.at(zoneNumber(s, tokyo)).possessor = "ccp";
     check(evaluateIncome(s, "japan").total == 0 && !evaluateIncome(s, "japan").collectable,
           "Capital loss prevents collection");
     refreshIncome(s);
@@ -208,8 +208,8 @@ void decentralizedAndMilitia() {
     while (offers(s, "economy_place"))
         applyEconomyAction(s, pick(s, "economy_place"));
     turn(s, "ccp");
-    s.territories.at(nanking).possessor = "ccp";
-    s.territories.at(nanking).flags["last_possession_change_turn"] =
+    s.territories.at(zoneNumber(s, nanking)).possessor = "ccp";
+    s.territories.at(zoneNumber(s, nanking)).flags["last_possession_change_turn"] =
         static_cast<int>(s.clock.playerTurnSerial);
     buy(s, "ccp_minor_infantry");
     s.clock.phase = Phase::PlaceUnits;
@@ -286,12 +286,12 @@ void constructionAndCapture() {
     check(!s.construction.contains(id), "Printed six-damage construction destruction example");
     auto c = fixture();
     c.facilities.at("setup_japan_tokyo_major_factory").damage = 12;
-    changePossession(c, tokyo, "ccp", PossessionCause::Capture, "ccp");
+    changePossession(c, zoneNumber(c, tokyo), "ccp", PossessionCause::Capture, "ccp");
     check(c.facilities.at("setup_japan_tokyo_major_factory").type == "minor_factory" &&
               c.facilities.at("setup_japan_tokyo_major_factory").damage == 12,
           "Captured Major Factory downgrades retaining original damage cap");
     c.validate();
-    changePossession(c, tokyo, "japan", PossessionCause::Liberation, "japan");
+    changePossession(c, zoneNumber(c, tokyo), "japan", PossessionCause::Liberation, "japan");
     check(c.facilities.at("setup_japan_tokyo_major_factory").type == "major_factory",
           "Original owner recovers factory tier");
     c.validate();
@@ -299,8 +299,8 @@ void constructionAndCapture() {
 void cityAndRailRepair() {
     auto s = fixture();
     s.nations.at("japan").treasury = 100;
-    s.territories.at(tokyo).flags["city_damage"] = 25;
-    s.territories.at(tokyo).flags["city_ipp_lost"] = 1;
+    s.territories.at(zoneNumber(s, tokyo)).flags["city_damage"] = 25;
+    s.territories.at(zoneNumber(s, tokyo)).flags["city_ipp_lost"] = 1;
     finishResearch(s);
     applyEconomyAction(s, pick(s, "economy_repair", [](const auto &a) {
                            return a.parameters.require("target").asString() == tokyo &&
@@ -309,12 +309,12 @@ void cityAndRailRepair() {
     s.validate();
     s.clock.phase = Phase::PlaceUnits;
     finishEconomyPlacement(s);
-    check(s.territories.at(tokyo).flags.at("city_damage") == 0 && effectiveTerritorialIpp(s, tokyo) == 1 &&
+    check(s.territories.at(zoneNumber(s, tokyo)).flags.at("city_damage") == 0 && effectiveTerritorialIpp(s, zoneNumber(s, tokyo)) == 1 &&
               *s.nations.at("japan").treasury == 75,
           "City repairs cost actual damage without restoring IPP");
     turn(s, "japan", Phase::Production, 1);
-    s.territories.at(tokyo).flags["city_destroyed"] = 1;
-    s.territories.at(tokyo).flags["city_damage"] = 60;
+    s.territories.at(zoneNumber(s, tokyo)).flags["city_destroyed"] = 1;
+    s.territories.at(zoneNumber(s, tokyo)).flags["city_damage"] = 60;
     finishResearch(s);
     check(!offers(s, "economy_repair",
                   [](const auto &a) { return a.parameters.require("target").asString() == tokyo; }),
@@ -323,12 +323,13 @@ void cityAndRailRepair() {
         return s.territories.at(item.second.endpointA).possessor == "japan";
     });
     check(rail != s.rails.end(), "Owned rail fixture");
-    const auto id = rail->first, own = rail->second.endpointA, other = rail->second.endpointB;
+    const auto id = rail->first;
+    const auto own = rail->second.endpointA, other = rail->second.endpointB;
     rail->second.damageByEndpoint[own] = 1;
     rail->second.damageByEndpoint[other] = 1;
     applyEconomyAction(s, pick(s, "economy_repair", [&](const auto &a) {
                            return a.parameters.require("target").asString() == id &&
-                                  a.parameters.require("endpoint").asString() == own;
+                                  a.parameters.require("endpoint").asString() == zoneName(s, own);
                        }));
     s.validate();
     s.clock.phase = Phase::PlaceUnits;
@@ -341,7 +342,7 @@ void ladaoLease() {
     auto s = fixture();
     s.construction.clear();
     ensureDadao(s);
-    s.territories.at(beiping).possessor = "dadao";
+    s.territories.at(zoneNumber(s, beiping)).possessor = "dadao";
     turn(s, "japan");
     s.nations.at("japan").treasury = 100;
     finishResearch(s);
@@ -364,8 +365,8 @@ void ladaoLease() {
     check(s.units.size() == count + 1 && !s.construction.contains(id),
           "RCL010 delivers in Dadao possessed Chinese HomeCountry");
     check(std::any_of(s.units.begin(), s.units.end(),
-                      [](const auto &x) {
-                          return x.second.owner == "dadao" && x.second.zone == beiping &&
+                      [&](const auto &x) {
+                          return x.second.owner == "dadao" && x.second.zone == zoneNumber(s, beiping) &&
                                  x.second.type == "infantry";
                       }),
           "Delivered unit has recipient identity");
@@ -382,7 +383,7 @@ void sharedShipyardRepair() {
             ++it;
     const auto seas = navalFacilitySeaZones(s, "facility_tokyo_major_shipyard");
     check(!seas.empty(), "Shipyard coast");
-    addUnit(s, "repair_carrier", "fleet_carrier", "japan", seas.front(), 1);
+    addUnit(s, "repair_carrier", "fleet_carrier", "japan", zoneName(s, seas.front()), 1);
     turn(s, "japan");
     finishResearch(s);
     applyEconomyAction(s, pick(s, "economy_repair", [](const auto &a) {
@@ -450,7 +451,7 @@ void foreignRailConsent() {
     s.nations.at("japan").treasury = 100;
     ensureDadao(s);
     const Id from = "land_manchuria_rehe", to = "land_china_suiyuan";
-    s.territories.at(to).possessor = "dadao";
+    s.territories.at(zoneNumber(s, to)).possessor = "dadao";
     turn(s, "japan");
     finishResearch(s);
     auto request = pick(s, "economy_request_rail", [&](const auto &a) {
@@ -497,13 +498,14 @@ void oneRailroadPerBorder() {
         without.rails.erase(item.first);
         return s.territories.at(item.second.endpointA).possessor == "japan" &&
                s.territories.at(item.second.endpointB).possessor == "japan" &&
-               railroadOffered(without, item.second.endpointA, item.second.endpointB);
+               railroadOffered(without, zoneName(s, item.second.endpointA), zoneName(s, item.second.endpointB));
     });
     check(rail != s.rails.end(), "A Japanese border railroad that could otherwise be built");
-    const auto id = rail->first, a = rail->second.endpointA, b = rail->second.endpointB;
+    const auto id = rail->first;
+    const auto a = zoneName(s, rail->second.endpointA), b = zoneName(s, rail->second.endpointB);
     check(id == railroadId(b, a) && a < b, "Setup railroads are named by their border");
     check(!railroadOffered(s, a, b), "No second railroad beside an undamaged one");
-    s.rails.at(id).damageByEndpoint[a] = 1;
+    s.rails.at(id).damageByEndpoint[zoneNumber(s, a)] = 1;
     check(!railroadOffered(s, a, b), "No second railroad beside a damaged one: repair it instead");
     check(offers(s, "economy_repair", [&](const Action &x) {
               return x.parameters.require("target").asString() == id &&
@@ -522,8 +524,8 @@ void oneRailroadPerBorder() {
     s.clock.phase = Phase::PlaceUnits;
     applyEconomyAction(s, pick(s, "economy_place"));
     const auto built = railroadId(zone, border);
-    check(s.rails.contains(built) && s.rails.at(built).endpointA == std::min(zone, border) &&
-              s.rails.at(built).endpointB == std::max(zone, border),
+    check(s.rails.contains(built) && zoneName(s, s.rails.at(built).endpointA) == std::min(zone, border) &&
+              zoneName(s, s.rails.at(built).endpointB) == std::max(zone, border),
           "A railroad built in play is named by its border");
     s.validate();
     turn(s, "japan", Phase::Production, 1);
@@ -548,7 +550,7 @@ void leaseCredits() {
     s.construction.clear();
     s.nations.at("japan").treasury = 100;
     ensureDadao(s);
-    s.territories.at(beiping).possessor = "dadao";
+    s.territories.at(zoneNumber(s, beiping)).possessor = "dadao";
     addUnit(s, "dadao_militia", "militia", "dadao", beiping);
     turn(s, "japan");
     finishResearch(s);
@@ -571,11 +573,11 @@ void leaseCredits() {
     r.construction.clear();
     r.nations.at("japan").treasury = 100;
     ensureDadao(r);
-    r.territories.at(beiping).possessor = "dadao";
+    r.territories.at(zoneNumber(r, beiping)).possessor = "dadao";
     FacilityState f;
     f.id = "dadao_damaged_base";
     f.type = "airbase";
-    f.zone = beiping;
+    f.zone = zoneNumber(r, beiping);
     f.damage = 2;
     r.facilities.emplace(f.id, f);
     turn(r, "japan");
@@ -713,7 +715,7 @@ void upgradesWaitAtSea() {
           "Upgrade offered to a unit aboard a ship at sea, which is in no land zone (RB 12.3)");
     s.validate();
     for (const Id id : {"ship", "sailor", "sailor_militia"})
-        s.units.at(id).zone = tokyo;
+        s.units.at(id).zone = zoneNumber(s, tokyo);
     s.units.at("ship").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
     check(offered("sailor", "motorized_infantry") && offered("sailor_militia", "infantry"),
           "Upgrade withheld from cargo aboard a ship in port, which stands in the port's land zone");
@@ -739,7 +741,7 @@ void replacementUpgradeAndEliteLease() {
     e.construction.clear();
     e.nations.at("japan").treasury = 100;
     ensureDadao(e);
-    e.territories.at(beiping).possessor = "dadao";
+    e.territories.at(zoneNumber(e, beiping)).possessor = "dadao";
     e.nations.at("japan").technologyStages["airborne_doctrine"] = 4;
     turn(e, "japan");
     finishResearch(e);
@@ -752,8 +754,8 @@ void replacementUpgradeAndEliteLease() {
                            return a.parameters.require("zone").asString() == beiping;
                        }));
     check(std::any_of(e.units.begin(), e.units.end(),
-                      [](const auto &item) {
-                          return item.second.owner == "dadao" && item.second.zone == beiping &&
+                      [&](const auto &item) {
+                          return item.second.owner == "dadao" && item.second.zone == zoneNumber(e, beiping) &&
                                  item.second.type == "airborne_infantry";
                       }),
           "Explicit RB47 EliteAirborne lend-lease exception downgrades for receiver without doctrine");

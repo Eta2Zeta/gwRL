@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game/names.hpp"
 #include "game/simple_json.hpp"
 
 #include <compare>
@@ -32,37 +33,46 @@ struct FactionDefinition {
     std::set<Id> homeCountry;
     bool homeCountryKnown {false};
     bool dormant {false};
+    // homeCountry as zone numbers. freezeDefinition fills it; never serialized.
+    NumberSet<ZoneId> homeZones;
 };
 
-// Derived solely from frozen map geometry. Source-order adjacency and lexical
-// node IDs retain the authoring data's traversal/output order. This shared view
-// is neither serialized nor part of the definition fingerprint.
+// The definition's tables of names held as numbers (include/game/names.hpp),
+// built by freezeDefinition from the definition's own data. Never serialized:
+// the names, not the numbers, are what a definition's fingerprint covers.
+struct Names {
+    NameTable<ZoneKind> zones;  // The keys of geography["nodes"].
+};
+
+// Derived solely from frozen map geometry, indexed by zone number. Neighbors
+// keep the authoring data's source order. This shared view is neither
+// serialized nor part of the definition fingerprint, and it is absent for a
+// map whose edges are incomplete (some foundation fixtures).
 struct IndexedGeography {
-    std::vector<Id> nodeIds;
-    std::unordered_map<Id, std::size_t> nodeIndices;
-    std::vector<char> land;  // Per node, in nodeIds order: whether its type is land.
-    std::vector<Id> landIds;  // The land nodes, in nodeIds order.
-    std::vector<std::vector<std::size_t>> adjacency;
-    std::vector<std::vector<int>> hopDistances;  // -1 means unreachable.
-    // Per node, in nodeIds order, for rules that read the map inside move
-    // generation: a copy of its JSON, its source-order neighbor IDs and the
+    std::vector<char> land;  // Per zone: whether its type is land.
+    std::vector<ZoneId> landZones;  // The land zones, in number order.
+    std::vector<std::vector<int>> hopDistances;  // [from][to]; -1 means unreachable.
+    // Per zone, for rules that read the map inside move generation: a copy of
+    // its JSON, its neighbors in source order (one entry per edge) and the
     // first edge to each neighbor. Edges point into nodes, so never copy this.
     std::vector<json::Value> nodes;
-    std::vector<std::vector<Id>> neighborIds;
-    std::vector<std::unordered_map<Id, const json::Value*>> edges;
+    std::vector<std::vector<ZoneId>> neighbors;
+    std::vector<std::vector<std::pair<ZoneId, const json::Value*>>> edges;
 
     IndexedGeography() = default;
     IndexedGeography(const IndexedGeography&) = delete;
     IndexedGeography& operator=(const IndexedGeography&) = delete;
-    std::set<Id> withinHops(const Id& origin, int range) const;
+    NumberSet<ZoneId> withinHops(ZoneId origin, int range) const;
 };
 
 struct Definition {
     Id scenarioId;
     std::string fingerprint;  // Computed by freezeDefinition, never a policy feature.
     json::Value geography;
-    // Rebuilt by freezeDefinition; absent for incomplete foundation fixtures.
+    // Rebuilt by freezeDefinition. The map index is absent for incomplete
+    // foundation fixtures; the name tables always exist once frozen.
     std::shared_ptr<const IndexedGeography> indexedGeography;
+    std::shared_ptr<const Names> names;
     json::Value rules;
     std::shared_ptr<const Catalog> catalog;
     std::map<Id, FactionDefinition> factions;
@@ -76,28 +86,37 @@ struct Definition {
 std::shared_ptr<const Definition> freezeDefinition(Definition definition);
 
 struct State;
+// The definition's name tables, and a zone's number and name.
+const Names& names(const State&);
+ZoneId zoneNumber(const State&, std::string_view name);  // Throws "Unknown zone: <name>".
+std::optional<ZoneId> findZone(const State&, std::string_view name);  // Empty for a name that is no zone.
+bool isZone(const State&, ZoneId);  // Whether the number names one of the definition's zones.
+const std::string& zoneName(const State&, ZoneId);
+std::vector<ZoneId> zoneNumbers(const State&, const std::vector<Id>& names);
+std::vector<Id> zoneNames(const State&, const std::vector<ZoneId>& zones);
+// A railroad's name from the two land zones it connects, in either order.
+Id railroadId(const State&, ZoneId a, ZoneId b);
 // Map reads for rule hot paths. Each matches reading the definition's map JSON
 // directly, including its errors, and uses the frozen index when it has one.
-const json::Value& mapNode(const State&, const Id& zone);  // Throws if unknown.
-const json::Value* findMapNode(const State&, const Id& zone);
-// First edge from one node to a neighbor, or null; throws if from is unknown.
-const json::Value* mapEdge(const State&, const Id& from, const Id& to);
-// Source-order neighbor IDs, borrowed from the index or read from the JSON.
-class NeighborIds {
+const json::Value& mapNode(const State&, ZoneId zone);
+// First edge from one zone to a neighbor, or null.
+const json::Value* mapEdge(const State&, ZoneId from, ZoneId to);
+// Source-order neighbors, one per edge, borrowed from the index or read from the JSON.
+class Neighbors {
   public:
-    static NeighborIds borrow(const std::vector<Id>& ids) { NeighborIds result; result.borrowed_ = &ids; return result; }
-    static NeighborIds own(std::vector<Id> ids) { NeighborIds result; result.owned_ = std::move(ids); return result; }
-    const std::vector<Id>& ids() const { return borrowed_ ? *borrowed_ : owned_; }
-    std::vector<Id>::const_iterator begin() const { return ids().begin(); }
-    std::vector<Id>::const_iterator end() const { return ids().end(); }
-    std::size_t size() const { return ids().size(); }
+    static Neighbors borrow(const std::vector<ZoneId>& zones) { Neighbors result; result.borrowed_ = &zones; return result; }
+    static Neighbors own(std::vector<ZoneId> zones) { Neighbors result; result.owned_ = std::move(zones); return result; }
+    const std::vector<ZoneId>& zones() const { return borrowed_ ? *borrowed_ : owned_; }
+    std::vector<ZoneId>::const_iterator begin() const { return zones().begin(); }
+    std::vector<ZoneId>::const_iterator end() const { return zones().end(); }
+    std::size_t size() const { return zones().size(); }
 
   private:
-    NeighborIds() = default;
-    const std::vector<Id>* borrowed_ {nullptr};
-    std::vector<Id> owned_;
+    Neighbors() = default;
+    const std::vector<ZoneId>* borrowed_ {nullptr};
+    std::vector<ZoneId> owned_;
 };
-NeighborIds mapNeighbors(const State&, const Id& zone);  // Throws if unknown.
+Neighbors mapNeighbors(const State&, ZoneId zone);
 
 struct NationState {
     std::optional<Id> controllerNation;
@@ -123,12 +142,12 @@ struct UnitState {
     Id id;
     Id type;
     Id owner;
-    Id zone;
+    ZoneId zone;
     // Null is reserved for catalog-free foundation fixtures, never zero movement.
     std::optional<int> movementRemaining;
     std::optional<int> movementAllowance;
-    Id turnOrigin;
-    std::vector<Id> route;
+    ZoneId turnOrigin;
+    std::vector<ZoneId> route;
     std::optional<Id> carriedBy;
     std::vector<Id> cargo;
     int damage {0};
@@ -140,17 +159,17 @@ struct UnitState {
 struct FacilityState {
     Id id;
     Id type;
-    Id zone;
+    ZoneId zone;
     int damage {0};
     std::map<Id, int> flags;
 };
 
 struct RailState {
-    Id id;  // railroadId(endpointA, endpointB)
-    Id endpointA;  // The two land zones it connects, endpointA < endpointB.
-    Id endpointB;
+    Id id;  // railroadId(names of endpointA and endpointB)
+    ZoneId endpointA;  // The two land zones it connects, endpointA < endpointB.
+    ZoneId endpointB;
     // Bombing can target one side; do not erase that distinction in state.
-    std::map<Id, int> damageByEndpoint;
+    std::map<ZoneId, int> damageByEndpoint;
 };
 
 // A border has at most one railroad (RCL-019), so a railroad is named by the
@@ -177,7 +196,7 @@ struct RepairJob {
     int remainingDamage {0};
     int remainingCost {0};
     bool restrictsAction {true};
-    std::optional<Id> endpoint;  // Railroad damage belongs to a selected land side.
+    std::optional<ZoneId> endpoint;  // Railroad damage belongs to a selected land side.
 };
 
 struct Action {
@@ -203,7 +222,7 @@ struct Decision {
 
 struct BattleState {
     Id id;
-    Id zone;
+    ZoneId zone;
     Id attacker;
     Id defender;
     std::string stage;
@@ -236,8 +255,8 @@ struct ChanceOutcome {
 };
 
 struct TurnSnapshot {
-    std::map<Id, std::optional<Id>> possessions;
-    std::map<Id, std::pair<Id, Id>> units;  // Stable unit ID -> (owner, zone).
+    NumberMap<ZoneId, std::optional<Id>> possessions;
+    std::map<Id, std::pair<Id, ZoneId>> units;  // Stable unit ID -> (owner, zone).
 };
 
 struct Clock {
@@ -257,7 +276,7 @@ struct PoliticalState {
     std::optional<Id> chinaInvader;
     std::map<Id, std::set<Id>> attackedWarlords;
     std::vector<Id> alignmentQueue;
-    std::map<Id, Id> capitals;
+    std::map<Id, ZoneId> capitals;
     std::set<Id> surrendered;
     std::set<Id> evolutionAwarded;
     std::map<Id, json::Value> pending;
@@ -324,7 +343,7 @@ class EventLog {
 struct State {
     std::shared_ptr<const Definition> definition;
     std::map<Id, NationState> nations;
-    std::map<Id, TerritoryState> territories;
+    NumberMap<ZoneId, TerritoryState> territories;
     std::map<Id, UnitState> units;
     std::map<Id, FacilityState> facilities;
     std::map<Id, RailState> rails;

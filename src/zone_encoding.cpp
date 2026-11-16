@@ -275,12 +275,29 @@ class Vocabulary {
         noteUnknown(family_, name);
         return other_;
     }
+    // The zone vocabulary lists the map's zones in name order, which is zone
+    // number order, so a zone's column is its number. numberByZones checks
+    // that when the context is built; only that vocabulary takes numbers.
+    void numberByZones(const NameTable<ZoneKind>& zones) {
+        if (names_ != zones.names() || other_ >= 0)
+            throw std::logic_error("Zone encoding's zone columns differ from the zone numbers");
+        zoneNumbered_ = true;
+    }
+    int find(ZoneId zone) const {
+        if (!zoneNumbered_) throw std::logic_error("Zone encoding " + family_ + " columns are not zone numbers");
+        return zone.valid() && zone.index() < names_.size() ? static_cast<int>(zone.index()) : -1;
+    }
+    int operator()(ZoneId zone) const {
+        if (const int index = find(zone); index >= 0) return index;
+        throw std::logic_error("Zone encoding has no zone with this number");
+    }
 
   private:
     std::string family_;
     std::vector<std::string> names_;
     std::unordered_map<std::string, int> index_;
     int other_{-1};
+    bool zoneNumbered_{false};
 };
 
 // A column list made of named families, each a grid over a few vocabularies.
@@ -510,6 +527,7 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     unitStats.insert(unitStats.end(), topFlags.begin(), topFlags.end());
 
     c->zones = Vocabulary("zone", mapIds(s), false);
+    c->zones.numberByZones(names(s).zones);
     c->nations = Vocabulary("nation", nations, false);
     std::vector<std::string> nationOrNone = nations;
     nationOrNone.push_back("~none");
@@ -897,7 +915,7 @@ std::shared_ptr<const Context> buildContext(const State& s) {
         for (const auto& terrain : terrainsOf(node.require("terrain"))) row[terrainBase + c->terrains(terrain)] = 1.0F;
         if (land) {
             try {
-                row[ownerBase + c->nations(originalNation(s, id))] = 1.0F;
+                row[ownerBase + c->nations(originalNation(s, ZoneId::fromIndex(static_cast<std::size_t>(zi))))] = 1.0F;
             } catch (const std::exception&) {
                 noteUnknown("original_owner", id);
             }
@@ -1086,13 +1104,15 @@ struct UnitRoles {
     std::unordered_map<std::string, int> rank;
 };
 
+// Zones appear by number: the signature only tells units apart.
 std::string unitSignature(const UnitState& u) {
-    std::string out = u.owner + '|' + u.type + '|' + u.zone + '|' + std::to_string(u.damage) + '|' +
+    const auto zoneText = [](ZoneId zone) { return zone.valid() ? std::to_string(zone.index()) : std::string(); };
+    std::string out = u.owner + '|' + u.type + '|' + zoneText(u.zone) + '|' + std::to_string(u.damage) + '|' +
                       std::to_string(u.movementRemaining.value_or(-1)) + '|' + std::to_string(u.movementAllowance.value_or(-1)) +
-                      '|' + u.carriedBy.value_or("") + '|' + u.turnOrigin + '|';
+                      '|' + u.carriedBy.value_or("") + '|' + zoneText(u.turnOrigin) + '|';
     for (const auto& id : u.cargo) out += id + ',';
     out += '|';
-    for (const auto& zone : u.route) out += zone + ',';
+    for (const auto zone : u.route) out += zoneText(zone) + ',';
     out += '|';
     for (const auto& name : u.commitments) out += name + ',';
     out += '|';
@@ -1120,7 +1140,7 @@ void unitFacts(const Context& c, const State& s, const UnitState& u, const UnitR
     if (u.carriedBy) emit(11, 1);
     if (!u.cargo.empty()) emit(12, static_cast<long>(u.cargo.size()));
     if (!u.route.empty()) emit(13, static_cast<long>(u.route.size()));
-    if (!u.turnOrigin.empty() && u.turnOrigin != u.zone) emit(14, 1);
+    if (u.turnOrigin.valid() && u.turnOrigin != u.zone) emit(14, 1);
     if (const auto found = roles.role.find(u.id); found != roles.role.end()) emit(found->second == 1 ? 15 : 16, 1);
     const auto resolve = [&](const std::string& argument, const FacilityState** facility) -> int {
         if (argument.empty()) return -1;
@@ -1151,9 +1171,9 @@ void unitFacts(const Context& c, const State& s, const UnitState& u, const UnitR
     for (const auto& name : u.commitments) flagged(name, 1);
     for (const auto& [name, value] : u.turnFlags) flagged(name, value);
     for (const auto& [name, value] : u.gameFlags) flagged(name, value);
-    if (!u.turnOrigin.empty() && u.turnOrigin != u.zone)
+    if (u.turnOrigin.valid() && u.turnOrigin != u.zone)
         place(c.refKinds.find("turn_origin"), c.zones.find(u.turnOrigin), nullptr);
-    for (const auto& zone : u.route) place(c.refKinds.find("route"), c.zones.find(zone), nullptr);
+    for (const auto zone : u.route) place(c.refKinds.find("route"), c.zones.find(zone), nullptr);
 }
 
 // The sea zones a facility opens onto, from its border flags.
@@ -1170,7 +1190,7 @@ void encodeUnits(const Context& c, const State& s, Builder& b, const UnitRoles& 
     for (const auto& [id, u] : s.units) {
         const int zone = c.zones.find(u.zone);
         if (zone < 0) {
-            noteUnknown("unit_zone", u.zone);
+            noteUnknown("unit_zone", id);
             continue;
         }
         const int nation = c.nations(u.owner);
@@ -1297,19 +1317,19 @@ void encodeRepairs(const Context& c, const State& s, Builder& b) {
         } else if (const auto f = s.facilities.find(r.target); f != s.facilities.end()) {
             zone = c.zones.find(f->second.zone);
             kind = "facility";
-        } else if (s.territories.contains(r.target)) {
-            zone = c.zones.find(r.target);
+        } else if (const auto city = findZone(s, r.target); city && s.territories.contains(*city)) {
+            zone = c.zones.find(*city);
             kind = "city";
         } else if (const auto p = s.construction.find(r.target); p != s.construction.end()) {
             if (p->second.site) {
                 const auto site = s.facilities.find(*p->second.site);
-                zone = c.zones.find(site != s.facilities.end() ? site->second.zone : *p->second.site);
+                zone = site != s.facilities.end() ? c.zones.find(site->second.zone) : c.zones.find(*p->second.site);
             }
             kind = "construction";
         } else if (const auto rail = s.rails.find(r.target); rail != s.rails.end()) {
             // A railroad repair mends one side: it is filed at that side's zone,
             // with the zone across the border.
-            const Id& side = r.endpoint ? *r.endpoint : rail->second.endpointA;
+            const ZoneId side = r.endpoint ? *r.endpoint : rail->second.endpointA;
             zone = c.zones.find(side);
             toward = c.zones.find(side == rail->second.endpointA ? rail->second.endpointB : rail->second.endpointA);
             kind = "rail";
@@ -1371,7 +1391,7 @@ void dataFacts(const Context& c, const State& s, Builder& b, const UnitRoles& ro
         } else if (const auto p = s.construction.find(text); p != s.construction.end()) {
             if (p->second.site) {
                 const auto site = s.facilities.find(*p->second.site);
-                const int where = c.zones.find(site != s.facilities.end() ? site->second.zone : *p->second.site);
+                const int where = site != s.facilities.end() ? c.zones.find(site->second.zone) : c.zones.find(*p->second.site);
                 if (where >= 0) b.zone(zone, c.zone.at(c.zBattleDataZone, {key, where}), 1);
             }
         } else if (const auto r = s.rails.find(text); r != s.rails.end()) {
@@ -1402,7 +1422,7 @@ void encodeBattles(const Context& c, const State& s, Builder& b, UnitRoles& role
     for (const auto& [id, battle] : s.battles) {
         const int zone = c.zones.find(battle.zone);
         if (zone < 0) {
-            noteUnknown("battle_zone", battle.zone);
+            noteUnknown("battle_zone", id);
             continue;
         }
         b.zone(zone, c.zone.at(c.zBattle, {}), 1);
@@ -1711,7 +1731,7 @@ void optionValue(const Context& c, const State& s, Builder& b, const UnitRoles& 
             for (const auto& side : {rail->second.endpointA, rail->second.endpointB}) {
                 const int where = c.zones.find(side);
                 if (where < 0) {
-                    noteUnknown("rail_endpoint", side);
+                    noteUnknown("rail_endpoint", rail->first);
                     continue;
                 }
                 b.option(c.action.at(c.aRailEndpoint, {role, where}), 1, role);

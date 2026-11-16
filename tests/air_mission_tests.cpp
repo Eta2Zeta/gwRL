@@ -37,9 +37,9 @@ State fixture(Phase phase = Phase::CombatMovement) {
   s.clock.playerTurnSerial = 2;
   s.clock.phase = phase;
   s.completedTurns["ccp"] = s.completedTurns["mongolia"] = 1;
-  s.territories.at(beiping).possessor = "japan";
-  s.territories.at(shantung).possessor = "japan";
-  s.territories.at(hopeh).possessor = "kmt";
+  s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
+  s.territories.at(zoneNumber(s, shantung)).possessor = "japan";
+  s.territories.at(zoneNumber(s, hopeh)).possessor = "kmt";
   s.nations.at("japan").atWarWith.insert("kmt");
   s.nations.at("kmt").atWarWith.insert("japan");
   s.captureTurnStart();
@@ -51,9 +51,9 @@ void add(State &s, const Id &id, const Id &type, const Id &owner,
   u.id = id;
   u.type = type;
   u.owner = owner;
-  u.zone = u.turnOrigin = zone;
+  u.zone = u.turnOrigin = zoneNumber(s, zone);
   u.movementAllowance = u.movementRemaining =
-      s.definition->catalog->stats(type, 0, catalogContext(s, owner, zone))
+      s.definition->catalog->stats(type, 0, catalogContext(s, owner, zoneNumber(s, zone)))
           .movement;
   s.units[id] = std::move(u);
 }
@@ -91,7 +91,7 @@ void declareRocket(Engine &e) {
 void rocketRadarBeforeDamage() {
   auto s = fixture();
   add(s, "rocket", "strategic_rocket", "japan", beiping);
-  s.facilities["factory"] = {"factory", "major_factory", hopeh, 0, {}};
+  s.facilities["factory"] = {"factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
   s.nations.at("kmt").technologyStages["radar"] = 4;
   Engine hit(s, rules());
   hit.setDiceTapeForTesting({1});
@@ -124,7 +124,7 @@ void rocketRadarBeforeDamage() {
 void rocketWithoutRadar() {
   auto s = fixture();
   add(s, "rocket", "strategic_rocket", "japan", beiping);
-  s.facilities["factory"] = {"factory", "major_factory", hopeh, 0, {}};
+  s.facilities["factory"] = {"factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
   Engine e(s, rules());
   e.setDiceTapeForTesting({4});
   declareRocket(e);
@@ -141,8 +141,8 @@ void selectedSurpriseBombingUsesFirstStrikeWithoutRemovingFacilityAA() {
   s.nations.at("japan").turnFlags["surprise_attack_target:kmt"]=1;
   add(s,"bomber","medium_bomber","japan",beiping);add(s,"escort","fighter","japan",beiping);
   add(s,"local","fighter","kmt",hopeh);add(s,"adjacent","fighter","kmt",shensi);
-  s.territories.at(shensi).possessor="kmt";s.facilities["base"]={"base","airbase",shensi,0,{}};
-  s.facilities["factory"]={"factory","major_factory",hopeh,0,{}};s.captureTurnStart();
+  s.territories.at(zoneNumber(s, shensi)).possessor="kmt";s.facilities["base"]={"base","airbase",zoneNumber(s, shensi),0,{}};
+  s.facilities["factory"]={"factory","major_factory",zoneNumber(s, hopeh),0,{}};s.captureTurnStart();
   Engine e(s,rules(),32);e.setDiceTapeForTesting({1,12,4,12,12});const auto checkpoint=e.serialize();
   choose(e,"land_select_surprise_zone",[](const auto& a){return a.parameters.require("zone").asString()==hopeh;});
   choose(e,"air_bomb",[](const auto& a){return a.parameters.require("target").asString()=="factory";});
@@ -165,12 +165,12 @@ void selectedSurpriseBombingUsesFirstStrikeWithoutRemovingFacilityAA() {
 }
 void rocketRangeIgnoresAircraftInterceptionAndRequiresNoTransport() {
   auto s=fixture();add(s,"rocket","strategic_rocket","japan",beiping);
-  add(s,"blocker","fighter","kmt",hopeh);s.facilities["factory"]={"factory","major_factory",shensi,0,{}};
-  s.territories.at(shensi).possessor="kmt";
+  add(s,"blocker","fighter","kmt",hopeh);s.facilities["factory"]={"factory","major_factory",zoneNumber(s, shensi),0,{}};
+  s.territories.at(zoneNumber(s, shensi)).possessor="kmt";
   const auto actions=AirRules{}.actions(s);
   check(std::any_of(actions.begin(),actions.end(),[](const auto& a){return a.kind=="air_rocket_attack"&&
       a.parameters.require("zone").asString()==shensi;}),"Enemy fighter transit incorrectly screened a rocket's range");
-  s.territories.at(hopeh).possessor="ccp";
+  s.territories.at(zoneNumber(s, hopeh)).possessor="ccp";
   const auto neutral=AirRules{}.actions(s);
   check(std::none_of(neutral.begin(),neutral.end(),[](const auto& a){return a.kind=="air_rocket_attack"&&
       a.parameters.require("zone").asString()==shensi;}),"A rocket fired over a nation neither at war nor Aligned");
@@ -184,11 +184,11 @@ void artilleryCityBombingStaysAdjacentAndBypassesAirDefence() {
     auto s=fixture();add(s,"gun",type,"japan",shantung);add(s,"lift","heavy_air_transport","japan",shantung);
     add(s,"interceptor","fighter","kmt",nanking);
     add(s,"aaa","anti_aircraft_artillery","kmt",nanking);
-    s.facilities["fort"]={"fort","fortification",nanking,0,{}};
+    s.facilities["fort"]={"fort","fortification",zoneNumber(s, nanking),0,{}};
     s.nations.at("kmt").technologyStages["radar"]=4;s.captureTurnStart();
     Engine e(s,rules(),77);e.setDiceTapeForTesting({6});const auto checkpoint=e.serialize();
     choose(e,"air_artillery_city_bomb");
-    check(e.state().units.at("gun").zone==shantung&&e.state().units.at("gun").movementRemaining==0&&
+    check(e.state().units.at("gun").zone == zoneNumber(e.state(), shantung)&&e.state().units.at("gun").movementRemaining==0&&
           e.state().units.at("gun").commitments.contains("attrition"),"City bombardment moved its artillery or retained movement");
     for(const auto& a:e.legalActions())check(a.kind!="air_artillery_city_bomb"&&
         !(a.kind=="land_declare_attrition"&&a.parameters.require("unit").asString()=="gun"),
@@ -198,8 +198,8 @@ void artilleryCityBombingStaysAdjacentAndBypassesAirDefence() {
           e.state().chance->dice.size()==1&&e.state().chance->dice.front().sides==6,
           "Artillery faced interception or rolled attrition hits instead of1D6 city damage");
     e.resolveChance();
-    check(e.state().territories.at(nanking).flags.at("city_damage")==6&&e.state().battles.empty()&&
-          !e.state().chance&&e.state().decisions.empty()&&e.state().units.at("gun").zone==shantung&&
+    check(e.state().territories.at(zoneNumber(e.state(), nanking)).flags.at("city_damage")==6&&e.state().battles.empty()&&
+          !e.state().chance&&e.state().decisions.empty()&&e.state().units.at("gun").zone == zoneNumber(e.state(), shantung)&&
           e.state().units.contains("interceptor")&&e.state().units.contains("aaa"),
           "Artillery bombardment used aircraft AAA, fort attrition reduction, or a landing phase");
     choose(e,"end_phase");for(const auto& a:e.legalActions())check(
@@ -213,7 +213,7 @@ void artilleryCityBombingStaysAdjacentAndBypassesAirDefence() {
 void artilleryCityBombingRequiresAnUnmovedStartingNeighbor() {
   for(int invalid=0;invalid<5;++invalid) {
     auto s=fixture();add(s,"gun",invalid==4?"artillery":"advanced_artillery","japan",shantung);s.captureTurnStart();
-    if(invalid==0)s.units.at("gun").route={shantung};
+    if(invalid==0)s.units.at("gun").route=zoneNumbers(s, {shantung});
     if(invalid==1)s.units.at("gun").turnFlags["placed_this_turn"]=1;
     if(invalid==2)s.turnStart.units.erase("gun");
     if(invalid==3)s.units.at("gun").commitments.insert("attrition");
@@ -227,10 +227,10 @@ void artilleryCityBombingRequiresAnUnmovedStartingNeighbor() {
 }
 void artilleryCityDestructionUsesTheExistingTechnologyChoice() {
   auto s=fixture();add(s,"gun","advanced_artillery","japan",shantung);s.captureTurnStart();
-  s.territories.at(nanking).flags["city_damage"]=44;s.nations.at("kmt").technologyStages["radar"]=1;
+  s.territories.at(zoneNumber(s, nanking)).flags["city_damage"]=44;s.nations.at("kmt").technologyStages["radar"]=1;
   Engine e(s,rules());e.setDiceTapeForTesting({1});choose(e,"air_artillery_city_bomb");
   choose(e,"end_phase");choose(e,"air_begin_bombing");e.resolveChance();
-  check(e.state().territories.at(nanking).flags.at("city_destroyed")==1&&
+  check(e.state().territories.at(zoneNumber(e.state(), nanking)).flags.at("city_destroyed")==1&&
         e.state().decisions.back().kind=="air_destroyed_city_technology","Artillery city destruction omitted technology loss");
   choose(e,"air_choose_technology_loss");
   check(e.state().nations.at("kmt").technologyStages.at("radar")==0&&e.state().battles.empty()&&
@@ -238,8 +238,8 @@ void artilleryCityDestructionUsesTheExistingTechnologyChoice() {
 }
 void destroyedCityTechnologyChoice() {
   auto s = fixture();
-  s.territories.at(nanking).possessor = "kmt";
-  s.territories.at(nanking).flags["city_damage"] = 44;
+  s.territories.at(zoneNumber(s, nanking)).possessor = "kmt";
+  s.territories.at(zoneNumber(s, nanking)).flags["city_damage"] = 44;
   s.nations.at("kmt").technologyStages["radar"] = 1;
   s.nations.at("kmt").technologyStages["improved_logistics"] = 2;
   add(s, "bomber", "medium_bomber", "japan", shantung);
@@ -255,7 +255,7 @@ void destroyedCityTechnologyChoice() {
   check(e.state().chance->purpose == "air_bomb_damage",
         "City damage did not begin");
   e.resolveChance();
-  check(e.state().territories.at(nanking).flags.at("city_destroyed") == 1 &&
+  check(e.state().territories.at(zoneNumber(e.state(), nanking)).flags.at("city_destroyed") == 1 &&
             !e.state().decisions.empty() &&
             e.state().decisionPlayer() == "axis",
         "City destruction did not give attacker technology-loss choice");
@@ -272,19 +272,19 @@ void destroyedCityTechnologyChoice() {
 }
 State scrambledFixture() {
   auto s = fixture(Phase::Combat);
-  s.territories.at(shensi).possessor = "kmt";
+  s.territories.at(zoneNumber(s, shensi)).possessor = "kmt";
   s.captureTurnStart();
   add(s, "attacker", "infantry", "japan", hopeh);
   add(s, "defender", "infantry", "kmt", hopeh);
   add(s, "scrambler", "fighter", "kmt", shensi);
-  s.facilities["base"] = {"base", "airbase", shensi, 0, {}};
-  const auto id = registerLandBattle(s, hopeh, "japan", {"attacker"},
-                                     {{"attacker", beiping}});
+  s.facilities["base"] = {"base", "airbase", zoneNumber(s, shensi), 0, {}};
+  const auto id = registerLandBattle(s, zoneNumber(s, hopeh), "japan", {"attacker"},
+                                     {{"attacker", zoneNumber(s, beiping)}});
   beginAirDefence(s, id);
   check(!s.decisions.empty(), "Scramble choice missing");
   const auto choice = select(s.decisions.back().options, "air_scramble");
   AirRules{}.apply(s, choice);
-  check(s.units.at("scrambler").zone == hopeh,
+  check(s.units.at("scrambler").zone == zoneNumber(s, hopeh),
         "Scrambled fighter did not reach defended battle");
   finishAirCombat(s, id);
   s.battles.clear();
@@ -294,11 +294,11 @@ State scrambledFixture() {
 void scrambleReturnAtPhaseEnd() {
   auto s = scrambledFixture();
   const int remaining = *s.units.at("scrambler").movementRemaining;
-  check(s.units.at("scrambler").zone == hopeh &&
+  check(s.units.at("scrambler").zone == zoneNumber(s, hopeh) &&
             s.units.at("scrambler").turnFlags.at("scrambled") == 1,
         "Scrambler returned before all Combat Phase battles ended");
   AirRules{}.finishPhase(s);
-  check(s.units.at("scrambler").zone == shensi &&
+  check(s.units.at("scrambler").zone == zoneNumber(s, shensi) &&
             s.units.at("scrambler").movementRemaining == remaining &&
             !s.units.at("scrambler").turnFlags.contains("scrambled"),
         "Surviving scrambler did not return without spending movement");
@@ -306,14 +306,14 @@ void scrambleReturnAtPhaseEnd() {
   applyFacilityBombDamage(bombed, "base", 1);
   AirRules{}.finishPhase(bombed);
   check(bombed.units.contains("scrambler") &&
-            bombed.units.at("scrambler").zone == shensi,
+            bombed.units.at("scrambler").zone == zoneNumber(bombed, shensi),
         "Scrambler could not return to friendly originating land after its "
         "base was damaged");
   auto captured = scrambledFixture();
-  changePossession(captured, shensi, "japan", PossessionCause::Capture,
+  changePossession(captured, zoneNumber(captured, shensi), "japan", PossessionCause::Capture,
                    "japan");
   check(captured.units.contains("scrambler") &&
-            captured.units.at("scrambler").zone == hopeh,
+            captured.units.at("scrambler").zone == zoneNumber(captured, hopeh),
         "Scrambler was resolved before Combat Phase ended");
   AirRules{}.finishPhase(captured);
   check(!captured.units.contains("scrambler"),
@@ -321,10 +321,10 @@ void scrambleReturnAtPhaseEnd() {
 }
 void immediatePatrolLandingLoss() {
   auto s = fixture(Phase::Combat);
-  s.territories.at(beiping).possessor = "kmt";
-  s.territories.at(nanking).possessor = "japan";
-  s.territories.at(shantung).possessor = "japan";
-  s.territories.at(hopeh).possessor = "japan";
+  s.territories.at(zoneNumber(s, beiping)).possessor = "kmt";
+  s.territories.at(zoneNumber(s, nanking)).possessor = "japan";
+  s.territories.at(zoneNumber(s, shantung)).possessor = "japan";
+  s.territories.at(zoneNumber(s, hopeh)).possessor = "japan";
   s.captureTurnStart();
   add(s, "patrol", "fighter", "kmt", "sea_p14");
   auto &patrol = s.units.at("patrol");
@@ -334,7 +334,7 @@ void immediatePatrolLandingLoss() {
   enforcePatrolLandingAvailability(s);
   check(s.units.contains("patrol"),
         "Patrol with held landing spot was eliminated");
-  changePossession(s, beiping, "japan", PossessionCause::Capture, "japan");
+  changePossession(s, zoneNumber(s, beiping), "japan", PossessionCause::Capture, "japan");
   check(!s.units.contains("patrol"),
         "Patrol survived immediate loss of its last landing spot");
 }
@@ -350,15 +350,15 @@ void pairedAircraftBlitz() {
                      [](const auto &a) { return a.kind == "air_blitz"; }),
         "Aircraft blitzed before paired armor moved");
   auto &armor = s.units.at("armor");
-  armor.zone = hopeh;
+  armor.zone = zoneNumber(s, hopeh);
   armor.commitments.insert("blitz_from:" + beiping);
   armor.commitments.insert("blitz_to:" + hopeh);
   const auto battle =
-      registerLandBattle(s, hopeh, "japan", {"armor"}, {{"armor", beiping}});
+      registerLandBattle(s, zoneNumber(s, hopeh), "japan", {"armor"}, {{"armor", zoneNumber(s, beiping)}});
   const auto remaining = *fighter.movementRemaining;
   const auto action = select(AirRules{}.actions(s), "air_blitz");
   AirRules{}.apply(s, action);
-  check(s.units.at("fighter").zone == hopeh &&
+  check(s.units.at("fighter").zone == zoneNumber(s, hopeh) &&
             s.units.at("fighter").movementRemaining == remaining - 1 &&
             !s.units.at("fighter").turnFlags.contains("blitz_eligible"),
         "Paired aircraft blitz did not consume its route and eligibility");

@@ -17,8 +17,8 @@ MovementMode parseMovementMode(const std::string &);
 // Terrain is directional. Node terrain lasts throughout combat; border terrain
 // and the river-crossing flag belong to this individual contingent's approach.
 struct BorderApproach {
-  Id from;
-  Id to;
+  ZoneId from;
+  ZoneId to;
   std::set<Id> nodeTerrain;
   std::set<Id> borderTerrain;
   bool river{false};
@@ -26,7 +26,7 @@ struct BorderApproach {
 };
 struct RouteRequest {
   Id unit;
-  std::vector<Id> path; // Includes the current zone and destination.
+  std::vector<ZoneId> path; // Includes the current zone and destination.
   MovementMode mode{MovementMode::Ordinary};
   bool combat{false};
   std::optional<Id> towed; // Paired Motorized Infantry towing, never cargo.
@@ -41,62 +41,62 @@ struct RouteResult {
 };
 struct SupplyRoute {
   bool connected{false};
-  std::vector<Id> zones;
+  std::vector<ZoneId> zones;
   std::vector<Id> facilities;
 };
 
 bool unitClass(const State &, const UnitState &, const Id &classification);
 bool movementController(const State &, const Id &nation);
-bool landAccess(const State &, const Id &nation, const Id &zone,
+bool landAccess(const State &, const Id &nation, ZoneId zone,
                 bool combat = false);
-bool aircraftFlightAccess(const State &, const Id &nation, const Id &zone,
+bool aircraftFlightAccess(const State &, const Id &nation, ZoneId zone,
                           bool combat);
-bool heldSinceTurnStart(const State &, const Id &nation, const Id &zone,
+bool heldSinceTurnStart(const State &, const Id &nation, ZoneId zone,
                         bool allowFriendly = true);
 // Land a unit may enter this turn outside combat: held since the turn began,
 // or handed over this turn by a minor's alignment (RB 4.6). RB 11.1 bars only
 // land captured this Player Turn. Strategic rail, supply and production still
 // require land held since the turn began.
-bool enterableThisTurn(const State &, const Id &nation, const Id &zone,
+bool enterableThisTurn(const State &, const Id &nation, ZoneId zone,
                        bool allowFriendly = true);
 // Defensive scrambling refers to the defender's last own turn, rather than the
 // active attacker's turn snapshot used by supply and current-turn movement.
-bool heldSinceNationTurnStart(const State &, const Id &nation, const Id &zone,
+bool heldSinceNationTurnStart(const State &, const Id &nation, ZoneId zone,
                               bool allowFriendly = true);
-BorderApproach borderApproach(const State &, const Id &from, const Id &to);
-bool railUndamaged(const State &, const Id &from, const Id &to,
+BorderApproach borderApproach(const State &, ZoneId from, ZoneId to);
+bool railUndamaged(const State &, ZoneId from, ZoneId to,
                    bool sinceTurnStart = false);
-bool riverRouteAvailable(const State &, const Id &nation, const Id &from,
-                         const Id &to);
-Id railRegion(const State &, const Id &zone);
+bool riverRouteAvailable(const State &, const Id &nation, ZoneId from,
+                         ZoneId to);
+Id railRegion(const State &, ZoneId zone);
 int regionalRailCapacity(const Id &region);
 RouteResult validateRoute(const State &, const RouteRequest &);
 RouteResult validateFactoryRailRoute(const State &, const Id &facility,
-                                     const std::vector<Id> &path);
-bool blitzPairValid(const State &, const UnitState &, const Id &from,
-                    const Id &to);
+                                     const std::vector<ZoneId> &path);
+bool blitzPairValid(const State &, const UnitState &, ZoneId from,
+                    ZoneId to);
 
-std::vector<Id> navalFacilitySeaZones(const State &, const Id &facility);
-bool seaBlockaded(const State &, const Id &nation, const Id &sea);
+std::vector<ZoneId> navalFacilitySeaZones(const State &, const Id &facility);
+bool seaBlockaded(const State &, const Id &nation, ZoneId sea);
 bool facilityBlockaded(const State &, const Id &nation, const Id &facility);
 bool navalFacilityUsable(const State &, const Id &nation, const Id &facility,
                          bool requireHeld = true);
-SupplyRoute supplyRoute(const State &, const Id &nation, const Id &zone);
+SupplyRoute supplyRoute(const State &, const Id &nation, ZoneId zone);
 SupplyRoute lendLeaseSupplyRoute(const State &, const Id &sender,
-                                 const Id &recipient, const Id &zone,
+                                 const Id &recipient, ZoneId zone,
                                  bool navalUnit = false);
-bool inSupply(const State &, const Id &nation, const Id &zone);
+bool inSupply(const State &, const Id &nation, ZoneId zone);
 bool burmaRoadOpen(const State &, bool ledo = false);
-bool ccpSovietRailConnected(const State &, const Id &zone);
+bool ccpSovietRailConnected(const State &, ZoneId zone);
 std::set<Id> withdrawalEligibleRecipients(const State &, const Id &attacker,
-                                          const Id &zone);
+                                          ZoneId zone);
 
 // Shared cargo bookkeeping; transport-specific loading/range rules stay in the
 // air/naval modules. Removing a carrier and its linked cargo is handled by the
 // shared political-unit removal function.
 void attachCargo(State &, const Id &transport, const Id &cargo);
 void detachCargo(State &, const Id &transport, const Id &cargo,
-                 const Id &destination);
+                 ZoneId destination);
 
 class MovementRules final : public Rules {
 public:

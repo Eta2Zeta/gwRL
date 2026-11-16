@@ -312,13 +312,13 @@ State navalFixture() {
     unit.id = id;
     unit.type = "destroyer";
     unit.owner = owner;
-    unit.zone = unit.turnOrigin = "sea_p15";
+    unit.zone = unit.turnOrigin = zoneNumber(state, "sea_p15");
     unit.movementAllowance = unit.movementRemaining =
-        state.definition->catalog->stats("destroyer", 0, catalogContext(state, owner, "sea_p15")).movement;
+        state.definition->catalog->stats("destroyer", 0, catalogContext(state, owner, zoneNumber(state, "sea_p15"))).movement;
     state.units.emplace(id, std::move(unit));
   }
   state.captureTurnStart();
-  registerNavalBattle(state, "sea_p15", "japan", {"attacker"}, {{"attacker", "sea_p14"}},
+  registerNavalBattle(state, zoneNumber(state, "sea_p15"), "japan", {"attacker"}, {{"attacker", zoneNumber(state, "sea_p14")}},
                       V(O{{"no_scramble", V(true)}}));
   return state;
 }

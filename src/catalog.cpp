@@ -198,12 +198,12 @@ void Catalog::requireComplete() const {const auto missing=unresolvedFields();req
 
 namespace {
 // Later flag maps override earlier ones and the derived flags override all.
-CatalogContext buildContext(const State& state,const Id& owner,const std::optional<Id>& zone,bool copyFlags) {
+CatalogContext buildContext(const State& state,const Id& owner,std::optional<ZoneId> zone,bool copyFlags) {
     require(state.definition!=nullptr,"Catalog context requires definition");const auto& n=state.nations.at(owner);CatalogContext c;c.nation=owner;c.powerStatus=n.powerStatus;const auto [y,m]=state.calendarDate();c.year=y;c.month=m;for(const auto& [id,stage]:n.technologyStages)if(stage==4)c.technologies.insert(id);
     if(copyFlags) for(const auto* list:{&state.flags,&n.gameFlags,&n.turnFlags})for(const auto& [id,v]:*list)c.flags[id]=v!=0;
     else c.flagSources={&n.turnFlags,&n.gameFlags,&state.flags};
     c.flags["owner_is_major_power"]=n.powerStatus=="major";
-    if(zone) {const auto& faction=state.definition->factions.at(owner);const bool home=faction.homeCountryKnown&&faction.homeCountry.contains(*zone);c.flags["movement_starts_in_owner_home_country"]=home;c.flags["movement_ends_in_owner_home_country"]=home;}
+    if(zone) {const auto& faction=state.definition->factions.at(owner);const bool home=faction.homeCountryKnown&&faction.homeZones.contains(*zone);c.flags["movement_starts_in_owner_home_country"]=home;c.flags["movement_ends_in_owner_home_country"]=home;}
     if(!state.nations.contains("ussr"))c.disabledFlags.insert("ccp_soviet_rail_production");
     // These source predicates cannot be satisfied by a generic supply flag in
     // the closed theatre. Geography/rail path evaluation belongs to the politics and movement modules.
@@ -212,10 +212,10 @@ CatalogContext buildContext(const State& state,const Id& owner,const std::option
     return c;
 }
 }
-CatalogContext catalogContext(const State& state,const Id& owner,const std::optional<Id>& zone) {
+CatalogContext catalogContext(const State& state,const Id& owner,std::optional<ZoneId> zone) {
     return buildContext(state,owner,zone,true);
 }
-CatalogStats catalogStats(const State& state,const Id& type,int damage,const Id& owner,const std::optional<Id>& zone) {
+CatalogStats catalogStats(const State& state,const Id& type,int damage,const Id& owner,std::optional<ZoneId> zone) {
     return state.definition->catalog->stats(type,damage,buildContext(state,owner,zone,false));
 }
 void initializeCatalogState(State& state) {

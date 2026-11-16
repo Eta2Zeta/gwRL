@@ -44,10 +44,10 @@ void releaseDecision(State& s,const Action& action) {
 }
 // A pending capital choice offers only land its nation still possesses. With
 // none left it is withdrawn, so a later evolution offers the land held then.
-void pruneCapitalChoices(State& s,const Id& nation,const Id& zone) {
+void pruneCapitalChoices(State& s,const Id& nation,ZoneId zone) {
     for(auto it=s.decisions.begin();it!=s.decisions.end();) {
         if(it->kind!="politics_evolution"||it->nation!=nation) {++it;continue;}
-        std::erase_if(it->options,[&](const Action& option){return option.parameters.require("zone").asString()==zone;});
+        std::erase_if(it->options,[&](const Action& option){return option.parameters.require("zone").asString()==zoneName(s,zone);});
         if(!it->options.empty()) {++it;continue;}
         erasePoliticalContinuation(s,it->continuation);s.flags.erase("evolution_pending_"+nation);it=s.decisions.erase(it);
     }
@@ -59,7 +59,7 @@ void chooseEvolution(State& s,const Id& nation) {
     std::vector<Action> options;
     for(const auto& zone:possessedLand(s,nation)) {
         for(bool factory:{false,true})options.push_back(politicalAction(s,nation,"politics_choose_capital",
-            V(O{{"zone",V(zone)},{"factory",V(factory)}})));
+            V(O{{"zone",V(zoneName(s,zone))},{"factory",V(factory)}})));
     }
     require(!options.empty(),"Evolving nation has no capital choice");
     s.flags[key]=1;
@@ -79,10 +79,9 @@ void queueObjectiveBonus(State& s) {
     ccp.gameFlags["one_china_bonus_awarded"]=1;
 }
 
-std::vector<Id> nearestFriendlyLand(const State& s,const Id& owner,const Id& origin) {
-    const auto& nodes=s.definition->geography.require("nodes");
-    std::deque<Id> queue{origin};std::map<Id,int> distances{{origin,0}};
-    std::vector<Id> destinations;int nearest=std::numeric_limits<int>::max();
+std::vector<ZoneId> nearestFriendlyLand(const State& s,const Id& owner,ZoneId origin) {
+    std::deque<ZoneId> queue{origin};std::map<ZoneId,int> distances{{origin,0}};
+    std::vector<ZoneId> destinations;int nearest=std::numeric_limits<int>::max();
     while(!queue.empty()) {
         const auto zone=queue.front();queue.pop_front();const int distance=distances.at(zone);
         if(distance>nearest)break;
@@ -91,20 +90,18 @@ std::vector<Id> nearestFriendlyLand(const State& s,const Id& owner,const Id& ori
             if(possessor&&politicallyFriendly(s,owner,*possessor)) {destinations.push_back(zone);nearest=distance;continue;}
         }
         if(distance>=nearest)continue;
-        for(const auto& edge:nodes.require(zone).require("neighbors").asArray()) {
-            const auto next=edge.require("neighbor_id").asString();
-            if(nodes.find(next)&&!distances.contains(next)) {distances[next]=distance+1;queue.push_back(next);}
-        }
+        for(const auto next:mapNeighbors(s,zone))
+            if(!distances.contains(next)) {distances[next]=distance+1;queue.push_back(next);}
     }
     std::sort(destinations.begin(),destinations.end());return destinations;
 }
-void relocateNeutralUnit(State& s,const Id& unit,const Id& destination) {
+void relocateNeutralUnit(State& s,const Id& unit,ZoneId destination) {
     auto& u=s.units.at(unit);u.zone=destination;
     // RB0.3 is a forced relocation, not a normal move or an aircraft flight.
     // Ownership, damage, cargo and the owner's unused movement remain intact.
     for(const auto& cargo:u.cargo)s.units.at(cargo).zone=destination;
 }
-void destroyUnrelocatableNeutralUnit(State& s,const Id& unit,const Id& origin) {
+void destroyUnrelocatableNeutralUnit(State& s,const Id& unit,ZoneId origin) {
     // RCL-015 is the adopted campaign consequence, not a printed destruction
     // rule. Use the shared removal path so cargo, repairs and battle references
     // cannot survive the destroyed unit.
@@ -118,18 +115,18 @@ void destroyUnrelocatableNeutralUnit(State& s,const Id& unit,const Id& origin) {
     for(const auto& id:removed) {
         const auto& u=s.units.at(id);
         destroyed.emplace_back(O{{"id",V(id)},{"type",V(u.type)},{"owner",V(u.owner)},
-            {"zone",V(u.zone)},{"carried_by",u.carriedBy?V(*u.carriedBy):V(nullptr)}});
+            {"zone",V(zoneName(s,u.zone))},{"carried_by",u.carriedBy?V(*u.carriedBy):V(nullptr)}});
     }
     removePoliticalUnits(s,removed);
     refreshPoliticalState(s);
     s.history.push_back(Event{"unit_destruction",V(O{{"rule",V(std::string("RCL-015"))},
         {"authority",V(std::string("user_adopted_campaign_interpretation"))},
         {"reason",V(std::string("no_friendly_land_destination"))},
-        {"origin",V(origin)},{"unit",V(unit)},{"units",V(std::move(destroyed))}}),s.planningKey()});
+        {"origin",V(zoneName(s,origin))},{"unit",V(unit)},{"units",V(std::move(destroyed))}}),s.planningKey()});
 }
 void continueNeutralRelocation(State& s,const Id& key) {
     auto context=s.politics.pending.at(key).asObject();auto units=context.at("units").asArray();
-    const auto origin=context.at("origin").asString();
+    const auto origin=zoneNumber(s,context.at("origin").asString());
     while(!units.empty()) {
         const auto id=units.front().asString();
         if(!s.units.contains(id)||s.units.at(id).zone!=origin) {units.erase(units.begin());continue;}
@@ -146,15 +143,15 @@ void continueNeutralRelocation(State& s,const Id& key) {
         context["units"]=V(units);s.politics.pending[key]=V(context);
         std::vector<Action> options;
         for(const auto& zone:destinations)options.push_back(politicalAction(s,owner,"politics_relocate_neutral",
-            V(O{{"relocation",V(key)},{"unit",V(id)},{"zone",V(zone)}})));
+            V(O{{"relocation",V(key)},{"unit",V(id)},{"zone",V(zoneName(s,zone))}})));
         queuePoliticalDecision(s,owner,"politics_neutral_relocation",std::move(options));return;
     }
     s.politics.pending.erase(key);
 }
-void queueNeutralRelocation(State& s,const Id& origin,const std::vector<Id>& units) {
+void queueNeutralRelocation(State& s,ZoneId origin,const std::vector<Id>& units) {
     if(units.empty())return;A pending;for(const auto& id:units)pending.emplace_back(id);
     const auto key=uniqueContinuation(s,"neutral_land_relocation");
-    s.politics.pending[key]=V(O{{"origin",V(origin)},{"units",V(pending)}});continueNeutralRelocation(s,key);
+    s.politics.pending[key]=V(O{{"origin",V(zoneName(s,origin))},{"units",V(pending)}});continueNeutralRelocation(s,key);
 }
 
 bool ownCapital(const State& s,const Id& nation) {
@@ -267,25 +264,26 @@ bool warlordAttackPossible(const Id& warlord,const Id& attacker) {
     return isWarlord(warlord)&&!isWarlord(attacker)&&attacker!="kmt";
 }
 
-Id originalNation(const State& s,const Id& zone) {
+Id originalNation(const State& s,ZoneId zone) {
+    const auto& name=zoneName(s,zone);
     const auto* index=s.definition->rules.find("faction_index");
-    if(index)return index->require("land_original_owners").require(zone).require("original_faction_id").asString();
-    const auto& original=s.definition->geography.require("nodes").require(zone).require("original_owner").asString();
+    if(index)return index->require("land_original_owners").require(name).require("original_faction_id").asString();
+    const auto& original=mapNode(s,zone).require("original_owner").asString();
     if(s.definition->factions.contains(original))return original;
     for(const auto& [id,f]:s.definition->factions)if(f.displayName==original)return id;
-    throw std::runtime_error("Unresolved original nationality: "+zone);
+    throw std::runtime_error("Unresolved original nationality: "+name);
 }
-std::vector<Id> possessedLand(const State& s,const Id& nation) {
-    std::vector<Id> out;for(const auto& [id,t]:s.territories)if(t.possessor==nation)out.push_back(id);return out;
+std::vector<ZoneId> possessedLand(const State& s,const Id& nation) {
+    std::vector<ZoneId> out;for(const auto& [id,t]:s.territories)if(t.possessor==nation)out.push_back(id);return out;
 }
-std::vector<Id> originalLand(const State& s,const Id& nation) {
-    std::vector<Id> out;for(const auto& [id,t]:s.territories)if(originalNation(s,id)==nation)out.push_back(id);return out;
+std::vector<ZoneId> originalLand(const State& s,const Id& nation) {
+    std::vector<ZoneId> out;for(const auto& [id,t]:s.territories)if(originalNation(s,id)==nation)out.push_back(id);return out;
 }
-bool passableLandBorder(const State& s,const Id& from,const Id& to) {
-    const auto& nodes=s.definition->geography.require("nodes");
+bool passableLandBorder(const State& s,ZoneId from,ZoneId to) {
     if(!s.territories.contains(from)||!s.territories.contains(to))return false;
-    for(const auto& edge:nodes.require(from).require("neighbors").asArray()) {
-        if(edge.require("neighbor_id").asString()!=to)continue;
+    const auto& target=zoneName(s,to);
+    for(const auto& edge:mapNode(s,from).require("neighbors").asArray()) {
+        if(edge.require("neighbor_id").asString()!=target)continue;
         if(const auto* passable=edge.find("passable"))if(passable->isBool()&&!passable->asBool())return false;
         const auto* terrain=edge.find("border_terrain");
         if(terrain&&terrain->isString()&&terrain->asString()=="impassable")return false;
@@ -317,16 +315,15 @@ bool politicallyFriendly(const State& s,const Id& a,const Id& b) {
     for(const auto& enemy:first.atWarWith)if(second.atWarWith.contains(enemy)&&s.nations.at(enemy).powerStatus=="major")return true;
     return false;
 }
-bool chineseHomeCountry(const State& s,const Id& zone) {
-    const auto& f=s.definition->factions.at("ccp");return f.homeCountryKnown&&f.homeCountry.contains(zone);
+bool chineseHomeCountry(const State& s,ZoneId zone) {
+    const auto& f=s.definition->factions.at("ccp");return f.homeCountryKnown&&f.homeZones.contains(zone);
 }
-bool chineseMovementAllowed(const State& s,const Id& nation,const Id& zone) {
+bool chineseMovementAllowed(const State& s,const Id& nation,ZoneId zone) {
     if(nation!="ccp"&&nation!="kmt")return true;
     const auto n=s.nations.find(nation);
     if(n==s.nations.end()||n->second.powerStatus=="major"||chineseHomeCountry(s,zone))return true;
-    const auto* node=s.definition->geography.require("nodes").find(zone);
-    if(!node||node->require("type").asString()!="sea")return false;
-    for(const auto& edge:node->require("neighbors").asArray())if(chineseHomeCountry(s,edge.require("neighbor_id").asString()))return true;
+    if(mapNode(s,zone).require("type").asString()!="sea")return false;
+    for(const auto next:mapNeighbors(s,zone))if(chineseHomeCountry(s,next))return true;
     return false;
 }
 bool decentralizedProduction(const State& s,const Id& nation) {
@@ -344,7 +341,7 @@ Id politicalPlayer(const State& s,const Id& nation) {
     }
     throw std::runtime_error("Political nation has no controlling player: "+nation);
 }
-void addPoliticalUnit(State& s,const Id& nation,const Id& type,const Id& zone,int count) {
+void addPoliticalUnit(State& s,const Id& nation,const Id& type,ZoneId zone,int count) {
     require(count>0&&s.territories.at(zone).possessor==nation,"Invalid political unit placement");
     for(int i=0;i<count;++i) {
         UnitState u;u.id=uniqueContinuation(s,"political_"+type);u.type=type;u.owner=nation;u.zone=zone;u.turnOrigin=zone;
@@ -446,7 +443,7 @@ void refreshPoliticalState(State& s) {
     }
     if(s.nations.contains("ccp")&&s.nations.contains("kmt")) {
         bool objective=true;
-        for(const auto& zone:possessedLand(s,"kmt"))if(chineseHomeCountry(s,zone)&&zone!="land_hainan"&&zone!="land_formosa")objective=false;
+        for(const auto zone:possessedLand(s,"kmt"))if(chineseHomeCountry(s,zone)&&zoneName(s,zone)!="land_hainan"&&zoneName(s,zone)!="land_formosa")objective=false;
         s.nations.at("ccp").gameFlags["objective_one_china"]=objective;
     }
     queueObjectiveBonus(s);
@@ -460,7 +457,7 @@ void refreshAlliances(State& s) {
     }
 }
 
-void changePossession(State& s,const Id& zone,const Id& recipient,PossessionCause cause,const std::optional<Id>& conqueror) {
+void changePossession(State& s,ZoneId zone,const Id& recipient,PossessionCause cause,const std::optional<Id>& conqueror) {
     require(s.nations.contains(recipient)&&!s.politics.surrendered.contains(recipient),"Invalid possession recipient");
     auto& territory=s.territories.at(zone);const auto old=territory.possessor;
     if(old==recipient)return;
@@ -476,7 +473,7 @@ void changePossession(State& s,const Id& zone,const Id& recipient,PossessionCaus
         }
         for(auto it=s.construction.begin();it!=s.construction.end();) {
             const auto& b=it->second;const bool facility=s.definition->catalog->facilities().contains(b.type);
-            if(facility&&b.site&&(b.site==zone||removed.contains(*b.site)))it=s.construction.erase(it);else ++it;
+            if(facility&&b.site&&(*b.site==zoneName(s,zone)||removed.contains(*b.site)))it=s.construction.erase(it);else ++it;
         }
         for(auto it=s.repairs.begin();it!=s.repairs.end();)if(removed.contains(it->second.target))it=s.repairs.erase(it);else ++it;
     }
@@ -487,7 +484,7 @@ void changePossession(State& s,const Id& zone,const Id& recipient,PossessionCaus
     refreshPoliticalState(s);
     if(s.definition->catalog)enforcePatrolLandingAvailability(s);
 }
-void captureLand(State& s,const Id& attacker,const Id& zone,const std::set<Id>& withdrawalEligibleRecipients) {
+void captureLand(State& s,const Id& attacker,ZoneId zone,const std::set<Id>& withdrawalEligibleRecipients) {
     require(s.nations.contains(attacker),"Unknown land conqueror");
     require(std::any_of(s.units.begin(),s.units.end(),[&](const auto& item){const auto& u=item.second;return u.owner==attacker&&u.zone==zone&&s.definition->catalog->unit(u.type).classes.contains("land");}),"Land capture requires a surviving attacking land unit");
     std::vector<Id> neutralNonparticipants;const auto previous=s.territories.at(zone).possessor;
@@ -502,11 +499,11 @@ void captureLand(State& s,const Id& attacker,const Id& zone,const std::set<Id>& 
     // Chinese faction; the CCP and KMT themselves simply keep what they conquer.
     if(recipient==attacker&&attacker!="ccp"&&attacker!="kmt"&&s.nations.at(attacker).powerStatus=="major"&&
        chineseHomeCountry(s,zone)&&original!=attacker) {
-        std::vector<Action> options{politicalAction(s,attacker,"politics_keep_capture",V(O{{"zone",V(zone)}}))};
+        std::vector<Action> options{politicalAction(s,attacker,"politics_keep_capture",V(O{{"zone",V(zoneName(s,zone))}}))};
         for(const auto& china:{"ccp","kmt"})if(!s.politics.surrendered.contains(china)
                 &&(politicallyFriendly(s,attacker,china)||withdrawalEligibleRecipients.contains(china)))
             options.push_back(politicalAction(s,attacker,"politics_give_capture",V(O{
-                {"zone",V(zone)},{"recipient",V(std::string(china))},
+                {"zone",V(zoneName(s,zone))},{"recipient",V(std::string(china))},
                 {"requires_withdrawal",V(!politicallyFriendly(s,attacker,china))}})));
         // An unaligned transfer needs an actual friendly retreat/transport path.
         // The movement module supplies that proof; a policy flag never substitutes for validation.
@@ -545,7 +542,7 @@ void declareWar(State& s,const Id& actor,const Id& target,DeclarationMode mode) 
     const auto permission=mayDeclareWar(s,actor,target,mode);require(permission.allowed,"Illegal declaration: "+permission.reason);
     commitDeclaration(s,actor,target);
 }
-void recordLandAttack(State& s,const Id& attacker,const Id& zone) {
+void recordLandAttack(State& s,const Id& attacker,ZoneId zone) {
     require(s.territories.contains(zone),"Land attack target is not land");
     const auto defender=s.territories.at(zone).possessor;
     require(defender!=attacker,"Cannot attack one's own possession");
@@ -644,10 +641,10 @@ void PoliticsRules::apply(State& s,const Action& a) const {
         return;
     }
     if(a.kind=="politics_choose_capital") {
-        const auto zone=a.parameters.require("zone").asString();require(s.territories.at(zone).possessor==a.nation,"Capital choice lost possession");
+        const auto zone=zoneNumber(s,a.parameters.require("zone").asString());require(s.territories.at(zone).possessor==a.nation,"Capital choice lost possession");
         releaseDecision(s,a);s.politics.capitals[a.nation]=zone;s.politics.evolutionAwarded.insert(a.nation);s.flags.erase("evolution_pending_"+a.nation);
         if(a.parameters.require("factory").asBool()) {
-            const auto& node=s.definition->geography.require("nodes").require(zone);const auto* city=node.find("is_city");
+            const auto& node=mapNode(s,zone);const auto* city=node.find("is_city");
             FacilityState facility;facility.id=uniqueContinuation(s,"evolution_factory");facility.zone=zone;facility.type=city&&city->asBool()?"major_factory":"medium_factory";
             facility.flags["placed_this_turn"]=1;s.facilities.emplace(facility.id,std::move(facility));
         }
@@ -655,10 +652,10 @@ void PoliticsRules::apply(State& s,const Action& a) const {
     }
     if(a.kind=="politics_relocate_neutral") {
         const auto key=a.parameters.require("relocation").asString();
-        const auto unit=a.parameters.require("unit").asString(),zone=a.parameters.require("zone").asString();
+        const auto unit=a.parameters.require("unit").asString();const auto zone=zoneNumber(s,a.parameters.require("zone").asString());
         require(s.politics.pending.contains(key)&&s.units.contains(unit),"Neutral relocation is no longer pending");
         const auto context=s.politics.pending.at(key);
-        const auto destinations=nearestFriendlyLand(s,s.units.at(unit).owner,context.require("origin").asString());
+        const auto destinations=nearestFriendlyLand(s,s.units.at(unit).owner,zoneNumber(s,context.require("origin").asString()));
         require(std::find(destinations.begin(),destinations.end(),zone)!=destinations.end(),"Neutral relocation destination is no longer nearest Friendly land");
         releaseDecision(s,a);relocateNeutralUnit(s,unit,zone);
         auto next=s.politics.pending.at(key).asObject();auto units=next.at("units").asArray();
@@ -668,7 +665,7 @@ void PoliticsRules::apply(State& s,const Action& a) const {
     if(a.kind=="politics_keep_capture"||a.kind=="politics_give_capture") {
         releaseDecision(s,a);
         if(a.kind=="politics_give_capture") {
-            const auto zone=a.parameters.require("zone").asString();
+            const auto zone=zoneNumber(s,a.parameters.require("zone").asString());
             if(a.parameters.require("requires_withdrawal").asBool())
                 for(auto& [id,u]:s.units)if(u.owner==a.nation&&u.zone==zone&&
                     s.definition->catalog->unit(u.type).classes.contains("land"))

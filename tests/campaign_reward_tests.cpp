@@ -49,9 +49,9 @@ State fixture(const Id& nation = "japan", Phase phase = Phase::Production, bool 
 }
 void add(State& s, const Id& id, const Id& type, const Id& owner, const Id& zone) {
     UnitState u;
-    u.id = id; u.type = type; u.owner = owner; u.zone = u.turnOrigin = zone;
+    u.id = id; u.type = type; u.owner = owner; u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, 0, catalogContext(s, owner, zone)).movement;
+        s.definition->catalog->stats(type, 0, catalogContext(s, owner, zoneNumber(s, zone))).movement;
     s.units.emplace(id, std::move(u));
 }
 Action pick(const Engine& e, const Id& kind,
@@ -183,14 +183,14 @@ void stagedShipsScoreOnlyPaidInstallments() {
 
 void bombingAndPaidRepairCannotCreateValue() {
     auto s = fixture("japan", Phase::CombatMovement, true);
-    s.territories.at(beiping).possessor = "japan";
-    s.territories.at(hopeh).possessor = "kmt";
+    s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
+    s.territories.at(zoneNumber(s, hopeh)).possessor = "kmt";
     s.nations.at("japan").atWarWith.insert("kmt");
     s.nations.at("kmt").atWarWith.insert("japan");
     s.nations.at("kmt").powerStatus = "major";
-    s.politics.capitals["kmt"] = "land_china_nanking";
+    s.politics.capitals["kmt"] = zoneNumber(s, "land_china_nanking");
     s.politics.evolutionAwarded.insert("kmt");
-    s.facilities["target_factory"] = {"target_factory", "major_factory", hopeh, 0, {}};
+    s.facilities["target_factory"] = {"target_factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
     add(s, "bomber", "medium_bomber", "japan", beiping);
     s.captureTurnStart();
     Engine e(s, campaignRules(), 83);
@@ -244,11 +244,11 @@ void bombingAndPaidRepairCannotCreateValue() {
 
 void conquestTransfersAssetsAndDoesNotRewardDeclarations() {
     auto s = fixture("japan", Phase::CombatMovement, true);
-    s.territories.at(beiping).possessor = "japan";
-    s.territories.at(hopeh).possessor = "kmt";
+    s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
+    s.territories.at(zoneNumber(s, hopeh)).possessor = "kmt";
     s.nations.at("japan").atWarWith.insert("kmt");
     s.nations.at("kmt").atWarWith.insert("japan");
-    s.facilities["captured_factory"] = {"captured_factory", "minor_factory", hopeh, 0, {}};
+    s.facilities["captured_factory"] = {"captured_factory", "minor_factory", zoneNumber(s, hopeh), 0, {}};
     add(s, "attacker", "infantry", "japan", beiping);
     s.captureTurnStart();
     Engine e(s, campaignRules(), 97);
@@ -265,7 +265,7 @@ void conquestTransfersAssetsAndDoesNotRewardDeclarations() {
     near(allianceWealth(e.state())[1].infrastructure, facilityValue, "Moving before combat stole the defender's factory");
     choose(e, "end_phase");
     choose(e, "land_begin_battle");
-    for (int i = 0; i < 20 && e.state().territories.at(hopeh).possessor != "japan"; ++i) {
+    for (int i = 0; i < 20 && e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor != "japan"; ++i) {
         if (e.state().chance) e.resolveChance();
         else if (offers(e, "politics_keep_capture")) choose(e, "politics_keep_capture");
         else if (offers(e, "land_progress_battle")) choose(e, "land_progress_battle");
@@ -275,7 +275,7 @@ void conquestTransfersAssetsAndDoesNotRewardDeclarations() {
             throw std::runtime_error("Uncontested capture did not finish; offered " + kinds);
         }
     }
-    check(e.state().territories.at(hopeh).possessor == "japan", "Undefended enemy land was not captured");
+    check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "japan", "Undefended enemy land was not captured");
     const auto captured = allianceWealth(e.state());
     near(captured[0].infrastructure, before[0].infrastructure + facilityValue, "Captured factory was not credited to its possessor");
     near(captured[1].infrastructure, 0, "Former owner retained captured infrastructure value");

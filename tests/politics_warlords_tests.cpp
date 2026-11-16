@@ -75,11 +75,11 @@ State fixture(const std::vector<std::pair<Id, Id>>& links = {}, bool withDadao =
     }
     state.nations.at("ccp").atWarWith.insert("kmt");
     state.nations.at("kmt").atWarWith.insert("ccp");
-    for (const auto& [zone, owner] : original) state.territories[zone] = TerritoryState{owner, {}};
-    state.territories.at("w2").possessor = secondActive ? secondWarlord : Id("japan");
+    for (const auto& [zone, owner] : original) state.territories[zoneNumber(state, zone)] = TerritoryState{owner, {}};
+    state.territories.at(zoneNumber(state, "w2")).possessor = secondActive ? secondWarlord : Id("japan");
     if (withDadao) {
         ensureDadao(state);
-        state.territories.at("dadao_home").possessor = "dadao";
+        state.territories.at(zoneNumber(state, "dadao_home")).possessor = "dadao";
     }
     for (const auto& [id, type, owner, zone] : std::vector<std::tuple<Id, Id, Id, Id>>{
             {"ccp_guard", "infantry", "ccp", "ccp_home"},
@@ -87,8 +87,8 @@ State fixture(const std::vector<std::pair<Id, Id>>& links = {}, bool withDadao =
             {"w1_guard_a", "infantry", firstWarlord, "w1a"},
             {"w1_guard_b", "militia", firstWarlord, "w1b"}}) {
         UnitState unit;
-        unit.id = id; unit.type = type; unit.owner = owner; unit.zone = zone;
-        unit.turnOrigin = zone; unit.movementAllowance = type == "militia" ? 0 : 1; unit.movementRemaining = unit.movementAllowance;
+        unit.id = id; unit.type = type; unit.owner = owner; unit.zone = zoneNumber(state, zone);
+        unit.turnOrigin = zoneNumber(state, zone); unit.movementAllowance = type == "militia" ? 0 : 1; unit.movementRemaining = unit.movementAllowance;
         state.units.emplace(id, std::move(unit));
     }
     state.clock.nationIndex = 2;
@@ -119,8 +119,8 @@ Action option(const State& state, const Id& kind) {
 }
 void addUnit(State& state, const Id& id, const Id& type, const Id& owner, const Id& zone) {
     UnitState unit;
-    unit.id = id; unit.type = type; unit.owner = owner; unit.zone = zone;
-    unit.turnOrigin = zone; unit.movementAllowance = 1; unit.movementRemaining = 1;
+    unit.id = id; unit.type = type; unit.owner = owner; unit.zone = zoneNumber(state, zone);
+    unit.turnOrigin = zoneNumber(state, zone); unit.movementAllowance = 1; unit.movementRemaining = 1;
     state.units.emplace(id, std::move(unit));
 }
 
@@ -128,14 +128,14 @@ void wholeWarlordTable() {
     for (const auto& [roll, recipient] : std::vector<std::pair<int, Id>>{
             {1, "ccp"}, {5, "ccp"}, {6, "kmt"}, {10, "kmt"}, {11, "dadao"}, {12, "dadao"}}) {
         auto state = fixture({{"w1a", "ccp_home"}, {"w1b", "dadao_home"}}, true);
-        const auto originalIdentity = originalNation(state, "w1a");
+        const auto originalIdentity = originalNation(state, zoneNumber(state, "w1a"));
         startForeignResolution(state);
         require(state.chance && state.chance->dice.size() == 1, "Two-zone warlord received more than one die");
         require(state.politics.alignmentQueue == std::vector<Id>{firstWarlord}, "Queue contains territories rather than factions");
         resolve(state, {roll});
-        for (const auto& zone : {"w1a", "w1b"}) require(state.territories.at(zone).possessor == recipient, "Whole-warlord territory result split");
+        for (const auto& zone : {"w1a", "w1b"}) require(state.territories.at(zoneNumber(state, zone)).possessor == recipient, "Whole-warlord territory result split");
         for (const auto& id : {"w1_guard_a", "w1_guard_b"}) require(state.units.at(id).owner == recipient, "Whole-warlord units did not follow result");
-        require(state.nations.contains(firstWarlord) && originalNation(state, "w1a") == originalIdentity,
+        require(state.nations.contains(firstWarlord) && originalNation(state, zoneNumber(state, "w1a")) == originalIdentity,
                 "Alignment erased original national identity");
         require(state.nations.at(firstWarlord).gameFlags.at("incorporated") == 1, "Incorporated identity remained active");
     }
@@ -143,11 +143,11 @@ void wholeWarlordTable() {
         auto state = fixture({{"w1a", neighbor + "_home"}}, true);
         startForeignResolution(state);
         resolve(state, {roll});
-        require(state.territories.at("w1b").possessor == (roll == 6 ? neighbor : Id("kmt")), "Single-neighbor boundary wrong");
+        require(state.territories.at(zoneNumber(state, "w1b")).possessor == (roll == 6 ? neighbor : Id("kmt")), "Single-neighbor boundary wrong");
     }
     auto isolated = fixture({{"w1a", "ccp_home"}}, false, false, true);
     startForeignResolution(isolated);
-    require(!isolated.chance && isolated.territories.at("w1a").possessor == "kmt", "Impassable adjacency produced an alignment roll");
+    require(!isolated.chance && isolated.territories.at(zoneNumber(isolated, "w1a")).possessor == "kmt", "Impassable adjacency produced an alignment roll");
 }
 
 void frozenNeighborsAndCheckpoint() {
@@ -158,10 +158,10 @@ void frozenNeighborsAndCheckpoint() {
     auto clone = state.clone();
     require(clone.planningKey() == restored.planningKey(), "Pending alignment was omitted from snapshot");
     resolve(state, {1});
-    require(state.territories.at("w1b").possessor == "ccp", "First table result wrong");
-    require(state.territories.at("w2").possessor == "kmt" && !state.chance,
+    require(state.territories.at(zoneNumber(state, "w1b")).possessor == "ccp", "First table result wrong");
+    require(state.territories.at(zoneNumber(state, "w2")).possessor == "kmt" && !state.chance,
             "Earlier alignment changed a later warlord's frozen neighbor category");
-    require(restored.territories.at("w1a").possessor == firstWarlord, "Clone/checkpoint state mutated with original");
+    require(restored.territories.at(zoneNumber(restored, "w1a")).possessor == firstWarlord, "Clone/checkpoint state mutated with original");
     resolve(restored, {1});
     require(restored.serialize() == state.serialize(), "Checkpoint changed alignment continuation result");
 }
@@ -171,8 +171,8 @@ void attacksAndDefeatedKmt() {
         auto state = fixture({}, true, true);
         state.politics.attackedWarlords[firstWarlord].insert(attacker);
         beginCombatPoliticalResolution(state);
-        require(!state.chance && state.territories.at("w1a").possessor == "kmt", "Chinese attack used foreign-invasion dice");
-        require(state.territories.at("w2").possessor == secondWarlord, "Chinese attack aligned unrelated warlords");
+        require(!state.chance && state.territories.at(zoneNumber(state, "w1a")).possessor == "kmt", "Chinese attack used foreign-invasion dice");
+        require(state.territories.at(zoneNumber(state, "w2")).possessor == secondWarlord, "Chinese attack aligned unrelated warlords");
         require(state.units.at("w1_guard_b").owner == "kmt", "Attacked warlord did not transfer its surviving units");
     }
     for (const auto& attacker : {Id("ccp"), Id("dadao")}) {
@@ -180,7 +180,7 @@ void attacksAndDefeatedKmt() {
         surrenderNation(defeated, "kmt", "ccp");
         defeated.politics.attackedWarlords[firstWarlord].insert(attacker);
         beginCombatPoliticalResolution(defeated);
-        require(defeated.territories.at("w1a").possessor == firstWarlord
+        require(defeated.territories.at(zoneNumber(defeated, "w1a")).possessor == firstWarlord
                 && defeated.politics.surrendered.contains("kmt"), "Chinese attack revived surrendered KMT");
     }
     // Automatic KMT and both single-neighbor KMT boundary outcomes retain the
@@ -195,14 +195,14 @@ void attacksAndDefeatedKmt() {
         const auto oldFacilities = defeated.facilities.size();
         startForeignResolution(defeated);
         if (roll) resolve(defeated, {roll});
-        require(defeated.territories.at("w1a").possessor == "kmt"
-                && defeated.territories.at("w1b").possessor == "kmt"
+        require(defeated.territories.at(zoneNumber(defeated, "w1a")).possessor == "kmt"
+                && defeated.territories.at(zoneNumber(defeated, "w1b")).possessor == "kmt"
                 && defeated.units.at("w1_guard_a").owner == "kmt"
                 && defeated.units.at("w1_guard_b").owner == "kmt", "Foreign table did not award the surviving warlord to KMT");
         require(!defeated.politics.surrendered.contains("kmt")
                 && !defeated.nations.at("kmt").gameFlags.contains("surrendered"), "Foreign table left KMT inactive");
-        require(!defeated.territories.at("kmt_home").possessor
-                && !defeated.territories.at("separated").possessor
+        require(!defeated.territories.at(zoneNumber(defeated, "kmt_home")).possessor
+                && !defeated.territories.at(zoneNumber(defeated, "separated")).possessor
                 && !defeated.units.contains("kmt_guard") && defeated.nations.at("kmt").treasury == 0,
                 "KMT's pre-surrender assets or cash were restored");
         require(defeated.politics.capitals == oldCapitals && defeated.politics.evolutionAwarded == oldAwards
@@ -214,8 +214,8 @@ void attacksAndDefeatedKmt() {
     refreshPoliticalState(revival);
     revival.clock.nationIndex = 3;
     revival.clock.phase = Phase::CombatMovement;
-    recordLandAttack(revival, "kmt", "w1a");
-    require(revival.territories.at("w1b").possessor == "ccp" && revival.units.at("w1_guard_a").owner == "ccp",
+    recordLandAttack(revival, "kmt", zoneNumber(revival, "w1a"));
+    require(revival.territories.at(zoneNumber(revival, "w1b")).possessor == "ccp" && revival.units.at("w1_guard_a").owner == "ccp",
             "KMT attack did not immediately revive CCP through the whole warlord");
     require(!revival.politics.surrendered.contains("ccp") && revival.nations.at("ccp").gameFlags.at("civil_war_eliminated") == 0,
             "CCP elimination was treated as permanent surrender");
@@ -225,18 +225,18 @@ void dadaoAlignment() {
     auto chineseAttack = fixture({}, true);
     chineseAttack.politics.pending["dadao_attacked_by"] = V(std::string("ccp"));
     beginCombatPoliticalResolution(chineseAttack);
-    require(chineseAttack.territories.at("dadao_home").possessor == "dadao", "CCP attack incorrectly incorporated Dadao into Japan");
+    require(chineseAttack.territories.at(zoneNumber(chineseAttack, "dadao_home")).possessor == "dadao", "CCP attack incorrectly incorporated Dadao into Japan");
     auto foreignAttack = fixture({}, true);
     addUnit(foreignAttack, "dadao_guard", "infantry", "dadao", "dadao_home");
     foreignAttack.politics.pending["dadao_attacked_by"] = V(std::string("mongolia"));
     beginCombatPoliticalResolution(foreignAttack);
-    require(foreignAttack.territories.at("dadao_home").possessor == "japan"
+    require(foreignAttack.territories.at(zoneNumber(foreignAttack, "dadao_home")).possessor == "japan"
             && foreignAttack.units.at("dadao_guard").owner == "japan", "Foreign attack failed Dadao alignment trigger");
     auto twoWars = fixture({}, true);
     twoWars.nations.at("japan").atWarWith = {"ccp", "kmt"};
     twoWars.nations.at("kmt").powerStatus = "major";
     beginCombatPoliticalResolution(twoWars);
-    require(twoWars.territories.at("dadao_home").possessor == "japan", "Japan at war with China and a Major did not align Dadao");
+    require(twoWars.territories.at(zoneNumber(twoWars, "dadao_home")).possessor == "japan", "Japan at war with China and a Major did not align Dadao");
 }
 
 void truceConsentAndTiming() {
@@ -286,7 +286,7 @@ void lowMoraleAndSharedBattles() {
     state.politics.chineseTruce = true;
     state.clock.nationIndex = 3;
     state.completedTurns.at("japan") = 1;
-    state.units.at("kmt_guard").zone = "ccp_home";
+    state.units.at("kmt_guard").zone = zoneNumber(state, "ccp_home");
     addUnit(state, "kmt_cavalry", "cavalry", "kmt", "ccp_home");
     addUnit(state, "kmt_militia", "militia", "kmt", "ccp_home");
     addUnit(state, "kmt_separated", "infantry", "kmt", "separated");
@@ -308,7 +308,7 @@ void lowMoraleAndSharedBattles() {
 
     auto evolution = fixture();
     evolution.politics.chineseTruce = true;
-    evolution.units.at("kmt_guard").zone = "ccp_home";
+    evolution.units.at("kmt_guard").zone = zoneNumber(evolution, "ccp_home");
     evolution.nations.at("kmt").powerStatus = "major";
     terminateChineseTruce(evolution, "kmt", true);
     require(!evolution.chance && evolution.units.contains("kmt_guard") && evolution.battleOrder.size() == 1
@@ -317,7 +317,7 @@ void lowMoraleAndSharedBattles() {
             "Major KMT received the minor-only Low Morale elimination flag");
     auto minorAttacking = fixture();
     minorAttacking.politics.chineseTruce = true;
-    minorAttacking.units.at("kmt_guard").zone = "ccp_home";
+    minorAttacking.units.at("kmt_guard").zone = zoneNumber(minorAttacking, "ccp_home");
     minorAttacking.nations.at("ccp").powerStatus = "major";
     terminateChineseTruce(minorAttacking, "ccp", true);
     require(!minorAttacking.chance && minorAttacking.units.contains("kmt_guard") &&
@@ -335,7 +335,7 @@ void invasionAlignsEveryWarlordBeforeTruce() {
     beforeInvasion.clock.phase = Phase::PlaceUnits;
     require(!influenceActions(beforeInvasion).empty(), "Pre-invasion fixture has no qualifying Japanese influence target");
     state.clock.phase = Phase::CombatMovement;
-    recordLandAttack(state, "japan", "w1a");
+    recordLandAttack(state, "japan", zoneNumber(state, "w1a"));
     state.clock.phase = Phase::Combat;
     beginCombatPoliticalResolution(state);
     require(state.chance && state.decisions.empty() && !state.politics.chineseTruce,
@@ -368,15 +368,15 @@ void temporaryWarlordDefenseDoesNotGrantControl() {
     for(const auto& attacker:{Id("japan"),Id("ccp"),Id("dadao")}) {
         auto state=fixture({{"w1a","japan_home"},{"w1a","ccp_home"}},true);
         if(attacker=="ccp") {state.clock.nationIndex=0;state.clock.playerTurnSerial=0;for(auto& [id,turns]:state.completedTurns)turns=0;}
-        state.clock.phase=Phase::CombatMovement;recordLandAttack(state,attacker,"w1a");
+        state.clock.phase=Phase::CombatMovement;recordLandAttack(state,attacker,zoneNumber(state, "w1a"));
         const auto& neutral=state.nations.at(firstWarlord);
         require(politicalPlayer(state,firstWarlord)=="allies"&&!neutral.player&&!neutral.controllerNation&&!neutral.alliance,
                 "Temporary defense changed independent warlord control, alliance, or asset attribution");
-        require(state.territories.at("w1a").possessor==firstWarlord&&state.units.at("w1_guard_a").owner==firstWarlord,
+        require(state.territories.at(zoneNumber(state, "w1a")).possessor==firstWarlord&&state.units.at("w1_guard_a").owner==firstWarlord,
                 "Warlord was incorporated before combat");
-        addUnit(state,"invader","infantry",attacker,"w1a");state.units.at("invader").turnOrigin=attacker=="ccp"?"ccp_home":"japan_home";
+        addUnit(state,"invader","infantry",attacker,"w1a");state.units.at("invader").turnOrigin=zoneNumber(state, attacker=="ccp"?"ccp_home":"japan_home");
         state.units.at("invader").commitments.insert("combat_move");state.clock.phase=Phase::Combat;
-        registerLandBattle(state,"w1a",attacker,{"invader"},{{"invader",state.units.at("invader").turnOrigin}});
+        registerLandBattle(state,zoneNumber(state, "w1a"),attacker,{"invader"},{{"invader",state.units.at("invader").turnOrigin}});
         Engine engine(state,integratedRules());engine.setDiceTapeForTesting({1,12});const auto checkpoint=engine.serialize();
         engine.step(engineOption(engine,"land_begin_battle"));engine.resolveChance();
         require(engine.state().decisionPlayer()=="allies"&&engine.state().decisions.back().nation==firstWarlord,
@@ -389,7 +389,7 @@ void temporaryWarlordDefenseDoesNotGrantControl() {
         require(replayed.exactReplayIdentity()==engine.exactReplayIdentity(),"Temporary neutral defense replay diverged");
     }
     auto defeated=fixture({},true);defeated.politics.surrendered.insert("kmt");defeated.clock.phase=Phase::CombatMovement;
-    recordLandAttack(defeated,"dadao","w1a");require(politicalPlayer(defeated,firstWarlord)=="allies","KMT's surrender erased the defensive alliance policy");
+    recordLandAttack(defeated,"dadao",zoneNumber(defeated, "w1a"));require(politicalPlayer(defeated,firstWarlord)=="allies","KMT's surrender erased the defensive alliance policy");
     defeated.clock.phase=Phase::Combat;beginCombatPoliticalResolution(defeated);
     require(!defeated.politics.pending.contains("warlord_defense_player:"+firstWarlord)&&
             !defeated.nations.at(firstWarlord).player&&!defeated.nations.at(firstWarlord).controllerNation,
@@ -397,10 +397,10 @@ void temporaryWarlordDefenseDoesNotGrantControl() {
 }
 void incorporationDoesNotCreateWarWithDadaosController() {
     auto state=fixture({{"w1a","dadao_home"}},true);
-    state.clock.phase=Phase::CombatMovement;recordLandAttack(state,"japan","w1a");
+    state.clock.phase=Phase::CombatMovement;recordLandAttack(state,"japan",zoneNumber(state, "w1a"));
     state.nations.at(firstWarlord).atWarWith.insert("ccp");state.nations.at("ccp").atWarWith.insert(firstWarlord);
     state.clock.phase=Phase::Combat;beginCombatPoliticalResolution(state);resolve(state,{1});
-    require(state.territories.at("w1a").possessor=="dadao"&&controlledBy(state,"dadao","japan"),"Fixture did not align invaded warlord to Dadao");
+    require(state.territories.at(zoneNumber(state, "w1a")).possessor=="dadao"&&controlledBy(state,"dadao","japan"),"Fixture did not align invaded warlord to Dadao");
     require(!state.nations.at("dadao").atWarWith.contains("japan")&&!state.nations.at("japan").atWarWith.contains("dadao"),
             "Incorporation made Dadao fight its Japanese controller");
     require(state.nations.at("dadao").atWarWith.contains("ccp")&&state.nations.at("ccp").atWarWith.contains("dadao"),
@@ -411,10 +411,10 @@ void incorporationDoesNotCreateWarWithDadaosController() {
 void neutralNonparticipantsRelocateToNearestFriendlyLand() {
     auto state=fixture({{"kmt_home","ccp_home"},{"kmt_home","separated"},{"kmt_home","japan_home"}},true);
     state.politics.chineseTruce=true;state.nations.at("dadao").atWarWith.insert("kmt");state.nations.at("kmt").atWarWith.insert("dadao");
-    state.units.erase("kmt_guard");state.units.at("ccp_guard").zone="kmt_home";
+    state.units.erase("kmt_guard");state.units.at("ccp_guard").zone = zoneNumber(state, "kmt_home");
     addUnit(state,"neutral_plane","fighter","ccp","kmt_home");addUnit(state,"captor","infantry","dadao","kmt_home");
-    captureLand(state,"dadao","kmt_home");
-    require(state.territories.at("kmt_home").possessor=="dadao"&&state.decisionPlayer()=="comintern",
+    captureLand(state,"dadao",zoneNumber(state, "kmt_home"));
+    require(state.territories.at(zoneNumber(state, "kmt_home")).possessor=="dadao"&&state.decisionPlayer()=="comintern",
             "Conquest did not give neutral CCP its relocation choice");
     Engine engine(state,integratedRules());const auto checkpoint=engine.serialize();
     auto restored=Engine::restore(state.definition,integratedRules(),checkpoint);
@@ -426,7 +426,7 @@ void neutralNonparticipantsRelocateToNearestFriendlyLand() {
     for(const auto& unit:{Id("ccp_guard"),Id("neutral_plane")}) {
         auto choice=engineOption(engine,"politics_relocate_neutral",unit);
         const auto destination=choice.parameters.require("zone").asString();engine.step(choice);
-        require(engine.state().units.at(unit).zone==destination&&engine.state().units.at(unit).owner=="ccp",
+        require(engine.state().units.at(unit).zone==zoneNumber(engine.state(), destination)&&engine.state().units.at(unit).owner=="ccp",
                 "Neutral relocation lost unit identity or ignored chosen nearest location");
     }
     require(engine.state().decisions.empty()&&std::none_of(engine.state().politics.pending.begin(),engine.state().politics.pending.end(),[](const auto& item){
@@ -435,31 +435,31 @@ void neutralNonparticipantsRelocateToNearestFriendlyLand() {
     auto replayed=Engine::replay(state.definition,integratedRules(),checkpoint,engine.state().history);
     require(replayed.exactReplayIdentity()==engine.exactReplayIdentity(),"Neutral relocation choice replay diverged");
     auto distant=fixture({{"kmt_home","w1a"},{"w1a","ccp_home"}},true);
-    distant.politics.chineseTruce=true;distant.territories.at("separated").possessor="japan";
+    distant.politics.chineseTruce=true;distant.territories.at(zoneNumber(distant, "separated")).possessor="japan";
     distant.nations.at("dadao").atWarWith.insert("kmt");distant.nations.at("kmt").atWarWith.insert("dadao");distant.units.erase("kmt_guard");
-    distant.units.at("ccp_guard").zone="kmt_home";addUnit(distant,"captor","infantry","dadao","kmt_home");const auto movement=distant.units.at("ccp_guard").movementRemaining;
-    captureLand(distant,"dadao","kmt_home");
-    require(distant.units.at("ccp_guard").zone=="ccp_home"&&distant.units.at("ccp_guard").movementRemaining==movement,
+    distant.units.at("ccp_guard").zone = zoneNumber(distant, "kmt_home");addUnit(distant,"captor","infantry","dadao","kmt_home");const auto movement=distant.units.at("ccp_guard").movementRemaining;
+    captureLand(distant,"dadao",zoneNumber(distant, "kmt_home"));
+    require(distant.units.at("ccp_guard").zone == zoneNumber(distant, "ccp_home")&&distant.units.at("ccp_guard").movementRemaining==movement,
             "Forced relocation incorrectly required an ordinary move through intervening territory");
 }
 void neutralRelocationWithoutFriendlyLandUsesAdoptedElimination() {
     auto state=fixture({},true);state.politics.chineseTruce=true;
-    state.territories.at("ccp_home").possessor="japan";state.territories.at("separated").possessor="japan";
-    state.units.at("ccp_guard").zone="kmt_home";state.nations.at("dadao").atWarWith.insert("kmt");state.nations.at("kmt").atWarWith.insert("dadao");
+    state.territories.at(zoneNumber(state, "ccp_home")).possessor="japan";state.territories.at(zoneNumber(state, "separated")).possessor="japan";
+    state.units.at("ccp_guard").zone = zoneNumber(state, "kmt_home");state.nations.at("dadao").atWarWith.insert("kmt");state.nations.at("kmt").atWarWith.insert("dadao");
     addUnit(state,"neutral_plane","fighter","ccp","kmt_home");
     addUnit(state,"neutral_transport","air_transport","ccp","kmt_home");
     addUnit(state,"neutral_cargo","infantry","ccp","kmt_home");
     state.units.at("neutral_transport").cargo={"neutral_cargo"};state.units.at("neutral_cargo").carriedBy="neutral_transport";
     RepairJob repair;repair.id="neutral_repair";repair.owner="ccp";repair.target="neutral_plane";
     state.repairs.emplace(repair.id,repair);
-    addUnit(state,"captor","infantry","dadao","kmt_home");state.units.at("captor").turnOrigin="dadao_home";
-    registerLandBattle(state,"kmt_home","dadao",{"captor"},{{"captor","dadao_home"}});
+    addUnit(state,"captor","infantry","dadao","kmt_home");state.units.at("captor").turnOrigin = zoneNumber(state, "dadao_home");
+    registerLandBattle(state,zoneNumber(state, "kmt_home"),"dadao",{"captor"},{{"captor",zoneNumber(state, "dadao_home")}});
     Engine engine(state,integratedRules());engine.setDiceTapeForTesting({1,12});const auto checkpoint=engine.serialize();
     engine.step(engineOption(engine,"land_begin_battle"));engine.resolveChance();engine.step(engineOption(engine,"land_take_casualty","kmt_guard"));
     const auto beforeResolution=engine.serialize();const auto historyOffset=engine.state().history.size();
     auto restoredPending=Engine::restore(state.definition,integratedRules(),beforeResolution);engine.resolveChance();restoredPending.resolveChance();
     require(restoredPending.exactReplayIdentity()==engine.exactReplayIdentity(),"No-destination destruction lost pending chance/RNG checkpoint identity");
-    require(engine.state().territories.at("kmt_home").possessor=="dadao"&&engine.state().units.contains("captor"),"Adopted relocation consequence rolled back the conquest");
+    require(engine.state().territories.at(zoneNumber(engine.state(), "kmt_home")).possessor=="dadao"&&engine.state().units.contains("captor"),"Adopted relocation consequence rolled back the conquest");
     for(const auto& id:{"ccp_guard","neutral_plane","neutral_transport","neutral_cargo"})
         require(!engine.state().units.contains(id),"No-destination neutral unit or linked cargo survived");
     require(!engine.state().repairs.contains("neutral_repair")&&engine.state().decisions.empty()&&!engine.state().chance,
@@ -496,10 +496,10 @@ void neutralRelocationWithoutFriendlyLandUsesAdoptedElimination() {
 }
 void neutralRelocationDoesNotTreatDisconnectedFriendlyLandAsAbsent() {
     auto state=fixture({},true);state.politics.chineseTruce=true;
-    state.territories.at("separated").possessor="japan";state.units.at("ccp_guard").zone="kmt_home";
+    state.territories.at(zoneNumber(state, "separated")).possessor="japan";state.units.at("ccp_guard").zone = zoneNumber(state, "kmt_home");
     state.nations.at("dadao").atWarWith.insert("kmt");state.nations.at("kmt").atWarWith.insert("dadao");
-    addUnit(state,"captor","infantry","dadao","kmt_home");state.units.at("captor").turnOrigin="dadao_home";
-    registerLandBattle(state,"kmt_home","dadao",{"captor"},{{"captor","dadao_home"}});
+    addUnit(state,"captor","infantry","dadao","kmt_home");state.units.at("captor").turnOrigin = zoneNumber(state, "dadao_home");
+    registerLandBattle(state,zoneNumber(state, "kmt_home"),"dadao",{"captor"},{{"captor",zoneNumber(state, "dadao_home")}});
     Engine engine(state,integratedRules());engine.setDiceTapeForTesting({1,12});
     engine.step(engineOption(engine,"land_begin_battle"));engine.resolveChance();engine.step(engineOption(engine,"land_take_casualty","kmt_guard"));
     const auto before=engine.serialize();rejects([&]{engine.resolveChance();},"Disconnected map was treated as an absence of Friendly possessions");

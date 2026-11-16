@@ -31,7 +31,7 @@ bool quietPlacement(const State& state) {
         && state.decisions.empty() && state.battles.empty() && state.battleOrder.empty();
 }
 
-bool controlsZone(const State& state, const Id& actor, const Id& zone) {
+bool controlsZone(const State& state, const Id& actor, ZoneId zone) {
     const auto& owner = state.territories.at(zone).possessor;
     return owner && (*owner == actor || (actor == "japan" && controlledBy(state, *owner, actor)));
 }
@@ -39,7 +39,7 @@ bool controlsZone(const State& state, const Id& actor, const Id& zone) {
 // RB p6 requires a unit since the beginning of this Player Turn, not a unit
 // newly moved/placed into the zone. The snapshot keeps stable identity even if
 // its owner changes. A departed-and-returned unit cannot establish this fact.
-bool influencingGarrison(const State& state, const Id& zone) {
+bool influencingGarrison(const State& state, ZoneId zone) {
     for (const auto& [id, beginning] : state.turnStart.units) {
         if (beginning.second != zone) continue;
         const auto current = state.units.find(id);
@@ -71,7 +71,7 @@ InfluenceTarget influenceTarget(const State& state, const Id& actor, const Id& t
             || flagged(nation.gameFlags, "incorporated")) return result;
     const auto remaining = possessedLand(state, target);
     if (remaining.empty()) return result;
-    std::set<Id> adjacent;
+    std::set<ZoneId> adjacent;
     for (const auto& [zone, territory] : state.territories) {
         if (!controlsZone(state, actor, zone)) continue;
         for (const auto& other : remaining) {
@@ -95,11 +95,12 @@ bool canInfluence(const State& state, const Id& actor) {
         && nation.treasury.has_value();
 }
 
-bool offshore(const State& state, const Id& zone) {
+bool offshore(const State& state, ZoneId zone) {
     const auto* politics = state.definition->rules.find("politics");
     const auto* zones = politics ? politics->find("offshore_land_zone_ids") : nullptr;
     require(zones != nullptr, "Recruitment requires reviewed offshore classification");
-    for (const auto& id : zones->asArray()) if (id.asString() == zone) return true;
+    const auto& name = zoneName(state, zone);
+    for (const auto& id : zones->asArray()) if (id.asString() == name) return true;
     return false;
 }
 
@@ -130,8 +131,8 @@ int recruitmentThreshold(const State& state, const Id& minor) {
     return count;
 }
 
-std::vector<Id> recruitmentZones(const State& state, const Id& minor) {
-    std::vector<Id> zones;
+std::vector<ZoneId> recruitmentZones(const State& state, const Id& minor) {
+    std::vector<ZoneId> zones;
     for (const auto& zone : possessedLand(state, minor)) {
         const auto beginning = state.turnStart.possessions.find(zone);
         if (beginning == state.turnStart.possessions.end() || beginning->second != minor) continue;
@@ -156,13 +157,13 @@ std::vector<Action> recruitmentChoices(const State& state, const Id& minor) {
     std::vector<Action> choices;
     const auto zones = recruitmentZones(state, minor);
     for (const auto& zone : zones) choices.push_back(politicalAction(state, minor,
-        "recruitment_place_infantry", V(O{{"beneficiary", V(minor)}, {"zone", V(zone)}})));
+        "recruitment_place_infantry", V(O{{"beneficiary", V(minor)}, {"zone", V(zoneName(state, zone))}})));
     // The two militia may be split. These are recruitment pieces, so purchased
     // militia's per-zone placement quota does not consume or limit them (RB79).
     for (std::size_t first = 0; first < zones.size(); ++first)
         for (std::size_t second = first; second < zones.size(); ++second)
             choices.push_back(politicalAction(state, minor, "recruitment_place_militia",
-                V(O{{"beneficiary", V(minor)}, {"zones", V(A{V(zones[first]), V(zones[second])})}})));
+                V(O{{"beneficiary", V(minor)}, {"zones", V(A{V(zoneName(state, zones[first])), V(zoneName(state, zones[second]))})}})));
     if (minor == "ccp") return choices;
     for (const auto& [id, project] : state.construction)
         if (unfinishedShip(state, project, minor)) choices.push_back(politicalAction(state, minor,
@@ -201,11 +202,11 @@ void applyRecruitmentChoice(State& state, const Action& action) {
     state.decisions.pop_back();
     erasePoliticalContinuation(state, decision.continuation);
     if (action.kind == "recruitment_place_infantry") {
-        addPoliticalUnit(state, minor, "infantry", action.parameters.require("zone").asString());
+        addPoliticalUnit(state, minor, "infantry", zoneNumber(state, action.parameters.require("zone").asString()));
     } else if (action.kind == "recruitment_place_militia") {
         const auto& zones = action.parameters.require("zones").asArray();
         require(zones.size() == 2, "Recruitment requires exactly two militia");
-        for (const auto& zone : zones) addPoliticalUnit(state, minor, "militia", zone.asString());
+        for (const auto& zone : zones) addPoliticalUnit(state, minor, "militia", zoneNumber(state, zone.asString()));
     } else if (action.kind == "recruitment_advance_ship") {
         auto& project = state.construction.at(action.parameters.require("project").asString());
         require(unfinishedShip(state, project, minor), "Recruitment ship no longer eligible");

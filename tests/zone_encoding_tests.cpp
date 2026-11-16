@@ -231,12 +231,12 @@ void railroadRepairNamesItsBorder() {
     const auto id = railroadId(northern, western);
     require(s.rails.contains(id), "Manchuria Northern and Western share a railroad");
     const auto other = std::find_if(s.rails.begin(), s.rails.end(), [&](const auto& item) {
-        return item.first != id && (item.second.endpointA == western || item.second.endpointB == western);
+        return item.first != id && (item.second.endpointA == zoneNumber(s, western) || item.second.endpointB == zoneNumber(s, western));
     });
     require(other != s.rails.end(), "Manchuria Western has a second railroad");
-    s.rails.at(id).damageByEndpoint[northern] = 1;
-    s.rails.at(id).damageByEndpoint[western] = 1;
-    s.rails.at(other->first).damageByEndpoint[western] = 1;
+    s.rails.at(id).damageByEndpoint[zoneNumber(s, northern)] = 1;
+    s.rails.at(id).damageByEndpoint[zoneNumber(s, western)] = 1;
+    s.rails.at(other->first).damageByEndpoint[zoneNumber(s, western)] = 1;
     const auto spec = zoneEncodingSpec(s);
     const std::vector<Action> repairs{railRepairOf(id, western), railRepairOf(other->first, western)};
     zoneEncodingUnknowns(true);
@@ -267,7 +267,7 @@ void railroadRepairNamesItsBorder() {
     job.target = id;
     job.remainingDamage = 1;
     job.restrictsAction = false;
-    job.endpoint = western;
+    job.endpoint = zoneNumber(s, western);
     s.repairs.emplace(job.id, job);
     const auto row = zoneAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}), western);
     require(row.at("repair:japan:rail:count") == 1 && row.at("rail_repair_toward:land_manchuria_northern") == 1 &&
@@ -481,10 +481,10 @@ void battleNotesKeepTheirWords() {
     const Id zone = "land_china_beiping", victim = "setup_warlord_beiping_hopeh_land_china_beiping_infantry_1";
     require(s.units.contains(victim), "Beiping holds a warlord infantry");
     const Id lost = "setup_zone_test_lost_unit";
-    s.turnStart.units.emplace(lost, std::pair{Id("kmt"), zone});
+    s.turnStart.units.emplace(lost, std::pair{Id("kmt"), zoneNumber(s, zone)});
     BattleState battle;
     battle.id = "land_battle_test";
-    battle.zone = zone;
+    battle.zone = zoneNumber(s, zone);
     battle.attacker = "japan";
     battle.defender = "warlord_beiping_hopeh";
     battle.stage = "choose_hits";

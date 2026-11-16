@@ -73,7 +73,7 @@ void remember(State& state, const Id& key, const V& value) {
 // Their readable values are retained, rather than an opaque planning identity.
 V configuration(const State& state) {
     O raiders, aircraft, carriers;
-    std::set<Id> deckZones;
+    std::set<ZoneId> deckZones;
     for (const auto& [id, unit] : state.units) {
         if (unitClass(state, unit, "carrier")) deckZones.insert(unit.zone);
         if (unit.type == "battlecruiser" && movementController(state, unit.owner)) {
@@ -84,13 +84,13 @@ V configuration(const State& state) {
             raiders.emplace(id, V(std::move(roles)));
         }
     }
-    std::set<Id> relevantZones;
+    std::set<ZoneId> relevantZones;
     for (const auto& [id, unit] : state.units)
         if (isAircraft(state, unit) && movementController(state, unit.owner) && deckZones.contains(unit.zone)) {
             relevantZones.insert(unit.zone);
-            aircraft.emplace(id, V(O{{"zone", V(unit.zone)},
+            aircraft.emplace(id, V(O{{"zone", V(zoneName(state, unit.zone))},
                 {"carried_by", unit.carriedBy ? V(*unit.carriedBy) : V(nullptr)},
-                {"route", ids(unit.route)}, {"movement_allowance", optionalNumber(unit.movementAllowance)},
+                {"route", ids(zoneNames(state, unit.route))}, {"movement_allowance", optionalNumber(unit.movementAllowance)},
                 {"movement_remaining", optionalNumber(unit.movementRemaining)},
                 {"turn_flags", flags(unit.turnFlags)}}));
         }
@@ -107,7 +107,7 @@ bool reversibleConfigurationAction(const State& state, const Action& action) {
     const auto& unit = state.units.at(action.parameters.require("unit").asString());
     const auto destination = action.parameters.require("destination").asString();
     const auto carrier = state.units.find(destination);
-    const auto zone = carrier != state.units.end() ? carrier->second.zone : destination;
+    const auto zone = carrier != state.units.end() ? carrier->second.zone : zoneNumber(state, destination);
     if (unit.zone != zone) return false;
     // A carrier at a port also permits a zero-distance deck -> land -> deck
     // assignment. Real inland returns without a nearby carrier remain ordinary
@@ -124,7 +124,7 @@ bool visited(const State& state, const V& current, const V& candidate) {
 
 V railSignature(const State& state, const Action& action) {
     const auto& border = action.parameters.require("border").asString();
-    const auto recipient = state.territories.at(border).possessor;
+    const auto recipient = state.territories.at(zoneNumber(state, border)).possessor;
     require(recipient.has_value(), "Railroad consent has no recipient");
     return V(O{{"sender", V(action.nation)}, {"recipient", V(*recipient)},
                {"parameters", action.parameters}});
@@ -350,10 +350,12 @@ void validateTrainingActionState(const State& state) {
         else exactKeys(parameters, {"row", "price", "zone", "border"}, "railroad parameters");
         for (const auto& [field, value] : parameters.asObject())
             require(value.isString() && !value.asString().empty(), "Invalid railroad request parameter");
-        for (const auto* field : {"zone", "border"})
-            require(state.territories.contains(parameters.require(field).asString()), "Invalid railroad request endpoint");
+        for (const auto* field : {"zone", "border"}) {
+            const auto zone = findZone(state, parameters.require(field).asString());
+            require(zone && state.territories.contains(*zone), "Invalid railroad request endpoint");
+        }
         require(request.require("sender").asString() == state.currentNation() &&
-                state.territories.at(parameters.require("border").asString()).possessor ==
+                state.territories.at(zoneNumber(state, parameters.require("border").asString())).possessor ==
                     std::optional<Id>(request.require("recipient").asString()) &&
                 request.require("sender").asString() != request.require("recipient").asString(),
                 "Railroad request belongs to a different decision context");

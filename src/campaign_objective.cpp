@@ -24,7 +24,7 @@ std::optional<std::size_t> recipient(const State& s, const std::optional<Id>& na
 }
 
 int prepaidRepair(const State& s, const Id& target, const Id& owner,
-                  const std::optional<Id>& endpoint = std::nullopt) {
+                  std::optional<ZoneId> endpoint = std::nullopt) {
     int damage = 0;
     for (const auto& [id, job] : s.repairs)
         if (job.target == target && job.owner == owner && job.endpoint == endpoint && job.remainingCost == 0)
@@ -88,7 +88,7 @@ std::array<WealthComponents, 3> allianceWealth(const State& s) {
             const int remainingDamage = std::max(0, facility.damage - prepaidRepair(s, id, owner));
             values[*i].infrastructure += type.assetValue - remainingDamage * type.repairCost.value_or(0);
         }
-    std::set<std::pair<Id, Id>> borders;
+    std::set<std::pair<ZoneId, ZoneId>> borders;
     for (const auto& [id, rail] : s.rails) {
         const auto border = std::minmax(rail.endpointA, rail.endpointB);
         if (!borders.emplace(border.first, border.second).second)

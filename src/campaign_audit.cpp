@@ -25,9 +25,9 @@ int value(const std::map<Id,int> &flags, const Id &key) {
 bool has(const State &s,const UnitState &u,const Id &c) {
     return s.definition->catalog->unit(u.type).classes.contains(c);
 }
-V unitJson(const UnitState &u) {
+V unitJson(const State &s,const UnitState &u) {
     A cargo;for(const auto&id:u.cargo)cargo.emplace_back(id);
-    return V(O{{"id",V(u.id)},{"type",V(u.type)},{"owner",V(u.owner)},{"zone",V(u.zone)},
+    return V(O{{"id",V(u.id)},{"type",V(u.type)},{"owner",V(u.owner)},{"zone",V(zoneName(s,u.zone))},
         {"damage",n(u.damage)},{"movement",u.movementRemaining?n(*u.movementRemaining):V(nullptr)},
         {"carried_by",u.carriedBy?V(*u.carriedBy):V(nullptr)},{"cargo",V(cargo)}});
 }
@@ -105,9 +105,9 @@ double actionScore(const State&s,const Action&a,int phaseCount,std::uint64_t see
     if(k=="movement_route") {
         const auto*path=a.parameters.find("path");
         if(path&&!path->asArray().empty()) {
-            const auto zone=path->asArray().back().asString();
-            if(s.territories.contains(zone)&&s.territories.at(zone).possessor&&
-               s.territories.at(zone).possessor!=a.nation) {
+            const auto zone=findZone(s,path->asArray().back().asString());
+            if(zone&&s.territories.contains(*zone)&&s.territories.at(*zone).possessor&&
+               s.territories.at(*zone).possessor!=a.nation) {
                 // Keep Japan's first turn available for Dadao influence.
                 if(a.nation=="japan"&&s.clock.roundIndex==0)return -30+jitter;
                 return 600+jitter;
@@ -215,11 +215,11 @@ void requireCampaignInvariants(const State&s) {
 }
 V campaignSnapshot(const State&s) {
     O units,land,cash,income,status,turns;A battles,decisions;
-    for(const auto&[id,u]:s.units)units[id]=unitJson(u);
-    for(const auto&[id,t]:s.territories)land[id]=t.possessor?V(*t.possessor):V(nullptr);
+    for(const auto&[id,u]:s.units)units[id]=unitJson(s,u);
+    for(const auto&[id,t]:s.territories)land[zoneName(s,id)]=t.possessor?V(*t.possessor):V(nullptr);
     for(const auto&[id,t]:s.nations){cash[id]=t.treasury?n(*t.treasury):V(nullptr);income[id]=n(evaluateIncome(s,id).total);status[id]=V(t.powerStatus);}
     for(const auto&[id,c]:s.completedTurns)turns[id]=n(c);
-    for(const auto&[id,b]:s.battles)battles.emplace_back(O{{"id",V(id)},{"zone",V(b.zone)},{"attacker",V(b.attacker)},{"defender",V(b.defender)},{"stage",V(b.stage)}});
+    for(const auto&[id,b]:s.battles)battles.emplace_back(O{{"id",V(id)},{"zone",V(zoneName(s,b.zone))},{"attacker",V(b.attacker)},{"defender",V(b.defender)},{"stage",V(b.stage)}});
     for(const auto&d:s.decisions)decisions.emplace_back(O{{"kind",V(d.kind)},{"nation",V(d.nation)}});
     return V(O{{"clock",clockJson(s)},{"units",V(units)},{"territories",V(land)},{"treasuries",V(cash)},
         {"incomes",V(income)},{"power_status",V(status)},{"completed_turns",V(turns)},
@@ -257,10 +257,10 @@ void CampaignAuditLog::record(const State&before,const Engine&e,const std::strin
                 authorized=before.units.contains(ship)&&u.type=="militia"&&before.units.at(ship).owner==u.owner&&before.units.at(ship).zone==u.zone;
             }
             if(!authorized)throw std::runtime_error("Unit creation lacks a completed placement, recruitment choice, or ship-crew source: "+id);
-            seenUnitIds_.insert(id);added.push_back(unitJson(u));
-        } else if(canonicalJson(unitJson(before.units.at(id)))!=canonicalJson(unitJson(u)))changed.push_back(unitJson(u));
+            seenUnitIds_.insert(id);added.push_back(unitJson(after,u));
+        } else if(canonicalJson(unitJson(before,before.units.at(id)))!=canonicalJson(unitJson(after,u)))changed.push_back(unitJson(after,u));
     }
-    for(const auto&[id,u]:before.units)if(!after.units.contains(id))removed.push_back(unitJson(u));
+    for(const auto&[id,u]:before.units)if(!after.units.contains(id))removed.push_back(unitJson(before,u));
     if(command=="economy_purchase"||command=="economy_advance") {
         const auto nation=text(input,"nation");int paid=0;
         for(const auto&[id,p]:after.construction)if(p.owner==nation)
@@ -271,7 +271,7 @@ void CampaignAuditLog::record(const State&before,const Engine&e,const std::strin
     }
     if(!removed.empty()&&(command=="economy_purchase"||command=="economy_advance"||command=="economy_research"||command=="economy_finish_research"||command=="influence_roll"||command=="recruitment_roll"))
         throw std::runtime_error("Financial/roll-declaration action removed deployed units: "+command);
-    for(const auto&[id,t]:after.territories)if(before.territories.at(id).possessor!=t.possessor)possessions[id]=t.possessor?V(*t.possessor):V(nullptr);
+    for(const auto&[id,t]:after.territories)if(before.territories.at(id).possessor!=t.possessor)possessions[zoneName(after,id)]=t.possessor?V(*t.possessor):V(nullptr);
     for(const auto&[id,nation]:after.nations)if(!before.nations.contains(id)||before.nations.at(id).treasury!=nation.treasury)cash[id]=nation.treasury?n(*nation.treasury):V(nullptr);
     auto snapshot=campaignSnapshot(after).asObject();snapshot.erase("units");
     transitions_.emplace_back(O{{"index",n(static_cast<int>(transitions_.size()))},{"kind",V(kind)},{"input",input},
@@ -325,7 +325,7 @@ void runCampaignTrace(Engine&e,CampaignAuditLog&log,const CampaignTraceOptions&o
             if(options.delayedJapaneseWar&&(i->nation=="kmt"||i->nation=="ccp")&&!before.nations.at("japan").atWarWith.contains(i->nation)) {
                 auto target=text(i->parameters,"zone");
                 if(const auto*path=i->parameters.find("path");path&&!path->asArray().empty())target=path->asArray().back().asString();
-                if((before.territories.contains(target)&&before.territories.at(target).possessor=="japan")||i->kind=="naval_air_attack"||i->kind=="naval_port_attack")score-=5000;
+                const auto targetZone=findZone(before,target);if((targetZone&&before.territories.contains(*targetZone)&&before.territories.at(*targetZone).possessor=="japan")||i->kind=="naval_air_attack"||i->kind=="naval_port_attack")score-=5000;
             }
             const auto key=i->kind+":"+canonicalJson(i->parameters);
             score-=choices[key]*10000;

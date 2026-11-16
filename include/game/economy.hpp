@@ -10,7 +10,7 @@ struct IncomeBreakdown {
     bool collectable{false};
 };
 
-int effectiveTerritorialIpp(const State &, const Id &zone);
+int effectiveTerritorialIpp(const State &, ZoneId zone);
 // Whether upgrading this unit to `type` leaves its transport, if it is aboard
 // one, with cargo it may carry. An upgrade that would not waits on the build
 // queue (user ruling RCL-021; RB 12.3).
@@ -36,7 +36,7 @@ IncomeBreakdown evaluateIncome(const State &, const Id &nation);
 // does this at the end of every transition, so a recorded position never
 // carries an income from before land changed hands.
 void refreshIncome(State &);
-void reconcileCapturedFacilities(State &, const Id &zone, const std::optional<Id> &oldOwner,
+void reconcileCapturedFacilities(State &, ZoneId zone, const std::optional<Id> &oldOwner,
                                  const Id &newOwner);
 bool lendLeasePermitted(const State &, const Id &sender, const Id &recipient);
 std::vector<Action> lendLeaseActions(const State &);

@@ -32,8 +32,8 @@ State fixture(Phase phase = Phase::CombatMovement) {
     s.clock.playerTurnSerial = 2;
     s.clock.phase = phase;
     s.completedTurns["ccp"] = s.completedTurns["mongolia"] = 1;
-    s.territories.at(beiping).possessor = "japan";
-    s.territories.at(shantung).possessor = "japan";
+    s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
+    s.territories.at(zoneNumber(s, shantung)).possessor = "japan";
     s.captureTurnStart();
     return s;
 }
@@ -42,9 +42,9 @@ void add(State &s, const Id &id, const Id &type, const Id &zone, const Id &owner
     u.id = id;
     u.type = type;
     u.owner = owner;
-    u.zone = u.turnOrigin = zone;
+    u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, 0, catalogContext(s, owner, zone)).movement;
+        s.definition->catalog->stats(type, 0, catalogContext(s, owner, zoneNumber(s, zone))).movement;
     s.units[id] = std::move(u);
 }
 bool offered(const State &s, const Id &kind) {
@@ -81,38 +81,38 @@ void endPatrolOnlyNoncombat() {
 void controlPermitsOverflightOnly() {
     auto s = fixture();
     ensureDadao(s);
-    s.territories.at(shantung).possessor = "dadao";
+    s.territories.at(zoneNumber(s, shantung)).possessor = "dadao";
     s.captureTurnStart();
     add(s, "aircraft", "fighter", beiping);
     check(controlledBy(s, "dadao", "japan"), "Fixture lost Dadao control");
-    check(aircraftFlightAccess(s, "japan", shantung, false), "Controlling nation cannot overfly its minor");
+    check(aircraftFlightAccess(s, "japan", zoneNumber(s, shantung), false), "Controlling nation cannot overfly its minor");
     check(!airLandingAvailable(s, "aircraft", shantung),
           "Control alone granted landing permission in minor's land");
 }
 void baseMovementNeedsSupplyAndAge() {
     auto isolated = fixture();
     add(isolated, "aircraft", "fighter", beiping);
-    isolated.facilities["base"] = {"base", "airbase", beiping, 0, {}};
+    isolated.facilities["base"] = {"base", "airbase", zoneNumber(isolated, beiping), 0, {}};
     const int ordinary = *isolated.units.at("aircraft").movementRemaining;
-    check(!inSupply(isolated, "japan", beiping), "Isolated-base fixture accidentally has supply");
+    check(!inSupply(isolated, "japan", zoneNumber(isolated, beiping)), "Isolated-base fixture accidentally has supply");
     AirRules{}.beginTurn(isolated);
     check(isolated.units.at("aircraft").movementRemaining == ordinary,
           "Unsupplied airbase granted movement bonus");
     auto supplied = fixture();
     add(supplied, "aircraft", "fighter", honshu);
-    supplied.facilities["base"] = {"base", "airbase", honshu, 0, {}};
+    supplied.facilities["base"] = {"base", "airbase", zoneNumber(supplied, honshu), 0, {}};
     AirRules{}.beginTurn(supplied);
     check(supplied.units.at("aircraft").movementRemaining == ordinary + 1,
           "Held supplied airbase failed movement bonus");
     auto newBase = fixture();
     add(newBase, "aircraft", "fighter", honshu);
-    newBase.facilities["base"] = {"base", "airbase", honshu, 0, {{"placed_this_turn", 1}}};
+    newBase.facilities["base"] = {"base", "airbase", zoneNumber(newBase, honshu), 0, {{"placed_this_turn", 1}}};
     AirRules{}.beginTurn(newBase);
     check(newBase.units.at("aircraft").movementRemaining == ordinary,
           "Newly placed airbase granted immediate movement bonus");
     auto damaged = fixture();
     add(damaged, "aircraft", "fighter", honshu);
-    damaged.facilities["base"] = {"base", "airbase", honshu, 1, {}};
+    damaged.facilities["base"] = {"base", "airbase", zoneNumber(damaged, honshu), 1, {}};
     AirRules{}.beginTurn(damaged);
     check(damaged.units.at("aircraft").movementRemaining == ordinary,
           "Damaged airbase granted movement bonus");
@@ -166,14 +166,14 @@ void jointLandingUsesWeightedCarrierAssignments() {
 }
 void scrambledAircraftReserveTheirOriginalCarrierSeats() {
     auto s=fixture(Phase::Combat);s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");
-    s.territories.at("land_china_hopeh").possessor="kmt";
+    s.territories.at(zoneNumber(s, "land_china_hopeh")).possessor="kmt";
     add(s,"carrier","heavy_fleet_carrier","sea_p14","kmt");
     for(const auto& id:{Id("a_scrambler"),Id("b_deck"),Id("c_deck")}){
         add(s,id,"fighter","sea_p14","kmt");attachCargo(s,"carrier",id);
     }
     add(s,"attacker","infantry","land_china_hopeh");add(s,"defender","militia","land_china_hopeh","kmt");
     s.nations.at("kmt").technologyStages["radar"]=4;s.captureTurnStart();
-    const auto battle=registerLandBattle(s,"land_china_hopeh","japan",{"attacker"},{{"attacker",beiping}});
+    const auto battle=registerLandBattle(s,zoneNumber(s, "land_china_hopeh"),"japan",{"attacker"},{{"attacker",zoneNumber(s, beiping)}});
     beginAirDefence(s,battle);
     auto choice=std::find_if(s.decisions.back().options.begin(),s.decisions.back().options.end(),[](const auto& a){return a.kind=="air_scramble";});
     check(choice!=s.decisions.back().options.end(),"Radar heavy carrier did not offer its fighter scramble");
@@ -206,7 +206,7 @@ void landingChoicesPreserveOtherAircraftsOnlyCarrierSlot() {
             x.parameters.require("unit").asString()==unit&&x.parameters.require("destination").asString()==destination;});
         check(a!=actions.end(),"Missing noncombat carrier/land landing choice");AirRules{}.apply(s,*a);};
     landAt("flexible","land_jap_tokyo");landAt("constrained","carrier");
-    check(s.units.at("flexible").zone=="land_jap_tokyo"&&s.units.at("constrained").carriedBy=="carrier",
+    check(s.units.at("flexible").zone == zoneNumber(s, "land_jap_tokyo")&&s.units.at("constrained").carriedBy=="carrier",
           "Joint landing choices did not complete their feasible plan");
 }
 void carriedAircraftAbleToFlyAshoreFreeTheirSeats() {
@@ -224,7 +224,7 @@ void carriedAircraftAbleToFlyAshoreFreeTheirSeats() {
 // only while the two carriers can still swap zones.
 State fiveThousandNinety(bool lightCarrierCanSail) {
     auto s=fixture();
-    for(const auto& zone:{beiping,shantung,Id("land_china_hopeh")})s.territories.at(zone).possessor="kmt";
+    for(const auto& zone:{beiping,shantung,Id("land_china_hopeh")})s.territories.at(zoneNumber(s, zone)).possessor="kmt";
     s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");s.captureTurnStart();
     add(s,"light","light_carrier","sea_p14");add(s,"fleet","fleet_carrier","sea_p15");
     if(!lightCarrierCanSail)s.units.at("light").turnFlags["naval_movement_spent"]=99;
@@ -236,7 +236,7 @@ State fiveThousandNinety(bool lightCarrierCanSail) {
     return s;
 }
 void secondBomberCannotTakeTheAttackersOnlySeat() {
-    const std::vector<Id> back{"land_manchuria_rehe","sea_p14"};
+    const std::vector<Id> back{"land_manchuria_rehe","sea_p14"};  // Zone names; zoneNumbers converts them.
     for(const bool swap:{false,true}) {
         auto s=fiveThousandNinety(swap);
         check(airLandingPlanAvailable(s)&&airLandingPlanReachable(s),"The seed 5090 position lacked its landing plan");
@@ -246,24 +246,24 @@ void secondBomberCannotTakeTheAttackersOnlySeat() {
                 ?a.parameters.require("path").asArray().back().asString()==place:a.parameters.require("destination").asString()==place);});};
         check(offeredFor("air_land_noncombat","land_manchuria_rehe"),"The second bomber lost its landing ashore");
         // Combat Movement offers no plain flight (RB 9.1); the planner still judges one.
-        check(!offeredFor("air_fly","sea_p14")&&airFlightKeepsLandings(s,"returning",back)==swap,
+        check(!offeredFor("air_fly","sea_p14")&&airFlightKeepsLandings(s,"returning",zoneNumbers(s,back))==swap,
               swap?"The carriers could not swap zones to seat both bombers and the fighter"
                   :"A second bomber took the only seat an attacking bomber can reach");
     }
     // Once the bomber is back over P14, either carrier may begin the swap.
     auto s=fiveThousandNinety(true);
     auto& returning=s.units.at("returning");
-    returning.route={"sea_p14"};returning.zone="sea_p14";returning.movementRemaining=0;
+    returning.route=zoneNumbers(s, {"sea_p14"});returning.zone = zoneNumber(s, "sea_p14");returning.movementRemaining=0;
     returning.commitments.insert("combat_move");
-    check(validateNavalRoute(s,{{"light"},{"sea_p14","sea_p15"},true}).allowed&&
-              validateNavalRoute(s,{{"fleet"},{"sea_p15","sea_p14"},true}).allowed,
+    check(validateNavalRoute(s,{{"light"},zoneNumbers(s, {"sea_p14", "sea_p15"}),true}).allowed&&
+              validateNavalRoute(s,{{"fleet"},zoneNumbers(s, {"sea_p15", "sea_p14"}),true}).allowed,
           "Either carrier could not begin the swap that seats all three aircraft");
 }
 void attacksMayPrecedeTheCarrierTheyReturnTo() {
-    auto s=fixture();for(const auto& zone:{beiping,shantung,Id("land_china_hopeh")})s.territories.at(zone).possessor="kmt";
+    auto s=fixture();for(const auto& zone:{beiping,shantung,Id("land_china_hopeh")})s.territories.at(zoneNumber(s, zone)).possessor="kmt";
     s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");
     add(s,"cv","fleet_carrier","sea_p15");add(s,"f","fighter","land_jap_tokyo");
-    s.facilities["base"]={"base","airbase","land_jap_tokyo",0,{}};s.captureTurnStart();AirRules{}.beginTurn(s);
+    s.facilities["base"]={"base","airbase",zoneNumber(s, "land_jap_tokyo"),0,{}};s.captureTurnStart();AirRules{}.beginTurn(s);
     auto actions=AirRules{}.actions(s);
     auto attack=std::find_if(actions.begin(),actions.end(),[](const auto& a){return a.kind=="air_ground_attack"&&
         a.parameters.require("unit").asString()=="f"&&a.parameters.require("path").asArray().back().asString()=="land_china_hopeh";});
@@ -271,8 +271,8 @@ void attacksMayPrecedeTheCarrierTheyReturnTo() {
     AirRules{}.apply(s,*attack);
     check(!airLandingPlanAvailable(s)&&airLandingPlanReachable(s)&&!AirRules{}.phaseComplete(s),
           "The attack's later carrier landing was not left to a ship move");
-    check(validateNavalRoute(s,{{"cv"},{"sea_p15","sea_p14"},true}).allowed&&
-              !validateNavalRoute(s,{{"cv"},{"sea_p15","sea_p16"},true}).allowed,
+    check(validateNavalRoute(s,{{"cv"},zoneNumbers(s, {"sea_p15", "sea_p14"}),true}).allowed&&
+              !validateNavalRoute(s,{{"cv"},zoneNumbers(s, {"sea_p15", "sea_p16"}),true}).allowed,
           "The carrier the attacker relies on could sail away from it");
 }
 void otherNationsPatrolsDoNotHoldTheMoversPlan() {
@@ -305,7 +305,7 @@ void aSailingCarriersAircraftMayUseAnyCarrier() {
 void aControlledMinorsAircraftKeepTheirLandings() {
     // Japan moves Dadao's units, so a Dadao fighter's flights must keep its
     // landing. It may land only on Dadao land, not Japan's.
-    auto s=fixture(Phase::NonCombatMovement);ensureDadao(s);s.territories.at("land_china_hopeh").possessor="dadao";s.captureTurnStart();
+    auto s=fixture(Phase::NonCombatMovement);ensureDadao(s);s.territories.at(zoneNumber(s, "land_china_hopeh")).possessor="dadao";s.captureTurnStart();
     add(s,"leased","fighter","land_china_hopeh","dadao");s.units.at("leased").movementRemaining=2;
     const auto actions=AirRules{}.actions(s);
     std::vector<int> fuels;
@@ -321,7 +321,7 @@ void aircraftThatCannotLandDoNotBlockOtherMoves() {
     // seat, and Combat Movement may end at once.
     auto s=fixture();
     for(const Id zone:{"land_china_hopeh","land_china_shensi","land_china_suiyuan","land_china_szechwan","land_china_tsinghai"})
-        s.territories.at(zone).possessor="kmt";
+        s.territories.at(zoneNumber(s, zone)).possessor="kmt";
     s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");s.captureTurnStart();
     add(s,"cv","light_carrier","sea_p16");
     for(const Id id:{"p1","p2"}){
@@ -330,7 +330,7 @@ void aircraftThatCannotLandDoNotBlockOtherMoves() {
     }
     // A carrier with one zone of movement left, too far to bring a second seat.
     add(s,"other","light_carrier","sea_p32");
-    for(int spent=1;spent<12&&validateNavalRoute(s,{{"other"},{"sea_p32","sea_p15","sea_p16"},true}).reason!=
+    for(int spent=1;spent<12&&validateNavalRoute(s,{{"other"},zoneNumbers(s, {"sea_p32","sea_p15","sea_p16"}),true}).reason!=
                           "Insufficient naval movement";++spent)
         s.units.at("other").turnFlags["naval_movement_spent"]=spent;
     add(s,"bomber","tactical_bomber",beiping);add(s,"defender","infantry","land_china_hopeh","kmt");
@@ -342,8 +342,8 @@ void aircraftThatCannotLandDoNotBlockOtherMoves() {
                    a.parameters.require("unit").asString()==unit&&a.parameters.require("path").asArray().back().asString()==target;});
     };
     check(attacks(s,"bomber","land_china_hopeh"),"A patrol that cannot land blocked an unrelated attack");
-    check(validateNavalRoute(s,{{"other"},{"sea_p32","sea_p33"},true}).allowed,"A patrol that cannot land blocked an unrelated carrier");
-    check(!validateNavalRoute(s,{{"cv"},{"sea_p16","sea_p15","sea_p33"},true}).allowed,"A carrier abandoned the patrol it can still seat");
+    check(validateNavalRoute(s,{{"other"},zoneNumbers(s, {"sea_p32", "sea_p33"}),true}).allowed,"A patrol that cannot land blocked an unrelated carrier");
+    check(!validateNavalRoute(s,{{"cv"},zoneNumbers(s, {"sea_p16","sea_p15","sea_p33"}),true}).allowed,"A carrier abandoned the patrol it can still seat");
     check(givenUp(s)==std::set<Id>{"p1","p2"}&&!AirRules{}.phaseComplete(s),
           "The owner could not choose which of two patrols for one seat is lost");
     // A fighter in flight may attack only if it can still land afterwards, even
@@ -361,7 +361,7 @@ void aircraftThatCannotLandDoNotBlockOtherMoves() {
     waiting.units.at("late").turnFlags["air_in_flight"]=1;waiting.units.at("late").commitments.insert("air_combat");
     check(airLandingShortfall(waiting)==1&&!AirRules{}.phaseComplete(waiting)&&!givenUp(waiting).contains("late"),
           "Combat Movement ended, or offered to give up an attacker, while a carrier could still sail to it");
-    waiting.units.at("other").zone="sea_p33";
+    waiting.units.at("other").zone = zoneNumber(waiting, "sea_p33");
     check(!AirRules{}.phaseComplete(waiting),"Combat Movement ended before the owner gave up the patrol that cannot land");
     giveUp(waiting,"p1");
     check(AirRules{}.phaseComplete(waiting),"Combat Movement stayed open with every remaining aircraft able to land");
@@ -418,7 +418,7 @@ void givingUpAMissionsLastBomberEndsTheMission() {
         s.units.at(id).commitments.insert("air_combat");
     }
     add(s,"esc","fighter",beiping);s.units.at("esc").turnFlags["air_in_flight"]=1;s.units.at("esc").commitments.insert("air_combat");
-    BattleState mission;mission.id="mission";mission.zone="land_china_hopeh";mission.attacker="japan";mission.defender="kmt";
+    BattleState mission;mission.id="mission";mission.zone = zoneNumber(s, "land_china_hopeh");mission.attacker="japan";mission.defender="kmt";
     mission.stage="air_declared";mission.flags["air_mission"]=1;mission.attackers={"a","esc"};
     s.battles.emplace(mission.id,mission);s.battleOrder.push_back(mission.id);
     giveUp(s,"a");
@@ -426,12 +426,12 @@ void givingUpAMissionsLastBomberEndsTheMission() {
           "A bombing mission kept its escort after losing its only bomber");
 }
 void attackDeclarationsRequireACombinedReturnPlan() {
-    auto s=fixture();s.territories.at(beiping).possessor="kmt";s.territories.at(shantung).possessor="kmt";
-    s.territories.at("land_china_hopeh").possessor="kmt";
+    auto s=fixture();s.territories.at(zoneNumber(s, beiping)).possessor="kmt";s.territories.at(zoneNumber(s, shantung)).possessor="kmt";
+    s.territories.at(zoneNumber(s, "land_china_hopeh")).possessor="kmt";
     s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");
     add(s,"carrier","fleet_carrier","sea_p14");
     for(const auto& id:{Id("a"),Id("b"),Id("c")})add(s,id,"fighter","land_jap_tokyo");
-    s.facilities["base"]={"base","airbase","land_jap_tokyo",0,{}};s.captureTurnStart();AirRules{}.beginTurn(s);
+    s.facilities["base"]={"base","airbase",zoneNumber(s, "land_jap_tokyo"),0,{}};s.captureTurnStart();AirRules{}.beginTurn(s);
     auto attack=[&](const Id& unit,const Id& kind){auto actions=AirRules{}.actions(s);
         auto a=std::find_if(actions.begin(),actions.end(),[&](const auto& x){return x.kind==kind&&
             x.parameters.require("unit").asString()==unit&&x.parameters.require("path").asArray().back().asString()=="land_china_hopeh";});
@@ -476,7 +476,7 @@ void groundedLandingCannotRepeatWithoutChangingState() {
     });
     check(moved != options.end(), "No-op filtering removed a real noncombat flight and landing");
     AirRules{}.apply(s, *moved);
-    check(s.units.at("grounded").zone == "land_jap_tokyo" && !s.units.at("grounded").route.empty() &&
+    check(s.units.at("grounded").zone == zoneNumber(s, "land_jap_tokyo") && !s.units.at("grounded").route.empty() &&
           !s.units.at("grounded").turnFlags.contains("air_in_flight"), "Real noncombat relocation failed");
 }
 void sameZoneLandingsRetainActualReturnEffects() {

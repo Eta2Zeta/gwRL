@@ -59,11 +59,11 @@ std::vector<Id> readIds(const V &x) {
         v.push_back(a.asString());
     return v;
 }
-const V &node(const State &s, const Id &id) {
-    return mapNode(s, id);
+const V &node(const State &s, ZoneId zone) {
+    return mapNode(s, zone);
 }
-const V *edge(const State &s, const Id &from, const Id &to) {
-    if (from.empty()) return nullptr; // Shared-zone battles have no entry edge.
+const V *edge(const State &s, ZoneId from, ZoneId to) {
+    if (!from.valid()) return nullptr; // Shared-zone battles have no entry edge.
     return mapEdge(s, from, to);
 }
 std::set<Id> terrain(const V *value) {
@@ -134,17 +134,20 @@ std::vector<Id> living(const State &s, const BattleState &b, bool attacker) {
 bool opposing(const State &s, const Id &a, const Id &b) {
     return a != b && s.nations.at(a).atWarWith.contains(b);
 }
-Id approach(const BattleState &b, const Id &id) {
+// The zone a unit entered the battle from, or no zone for one that did not.
+ZoneId approach(const State &s, const BattleState &b, const Id &id) {
     const auto o = object(b, "origins");
-    return o.contains(id) ? o.at(id).asString() : Id{};
+    if (!o.contains(id)) return ZoneId {};
+    return findZone(s, o.at(id).asString()).value_or(ZoneId {});
 }
-bool city(const State &s, const Id &zone) {
+bool city(const State &s, ZoneId zone) {
     const auto *c = node(s, zone).find("is_city");
     return c && c->isBool() && c->asBool();
 }
-bool fortBorder(const State &s, const FacilityState &f, const Id &from) {
-    if (f.type != "fortification" || f.damage || marked(f.flags, "under_construction"))
+bool fortBorder(const State &s, const FacilityState &f, ZoneId fromZone) {
+    if (f.type != "fortification" || f.damage || marked(f.flags, "under_construction") || !fromZone.valid())
         return false;
+    const auto &from = zoneName(s, fromZone);
     if (marked(f.flags, "border_" + from) || marked(f.flags, "towards_" + from) ||
         marked(f.flags, "border:" + from))
         return true;
@@ -166,7 +169,7 @@ bool fortBorder(const State &s, const FacilityState &f, const Id &from) {
 std::vector<Id> protectedAttackers(const State &s, const BattleState &b, const FacilityState &f) {
     std::vector<Id> out;
     for (const auto &id : living(s, b, true))
-        if (fortBorder(s, f, approach(b, id)))
+        if (fortBorder(s, f, approach(s, b, id)))
             out.push_back(id);
     return out;
 }
@@ -278,7 +281,7 @@ bool pendingDead(const BattleState &b, const Id &id) {
     }
     return false;
 }
-void retreatUnit(State &s, BattleState &battle, const Id &id, const Id &to) {
+void retreatUnit(State &s, BattleState &battle, const Id &id, ZoneId to) {
     auto &u = s.units.at(id);
     u.zone = to;
     u.movementRemaining = 0;
@@ -798,7 +801,7 @@ void retreatDecision(State &s, BattleState &b, bool forced) {
             if (roundsBattle != b.id)
                 roundsBattle = b.id, roundsWithoutPause = 0;
             if (++roundsWithoutPause > 3)
-                throw std::runtime_error("Land battle " + b.id + " in " + b.zone +
+                throw std::runtime_error("Land battle " + b.id + " in " + zoneName(s, b.zone) +
                                          " cannot end: rounds pass with no dice and no choice");
             put(b, "round", num(integer(b, "round", 1) + 1));
             put(b, "after_pairing", V(std::string("attacker_fire")));
@@ -825,7 +828,7 @@ void assignRetreat(State &s, BattleState &b) {
         std::vector<Action> options;
         for (const auto &to : origins)
             options.push_back(action(s, b.attacker, "land_retreat_unit",
-                                     {{"battle", V(b.id)}, {"unit", V(id)}, {"zone", V(to)}}));
+                                     {{"battle", V(b.id)}, {"unit", V(id)}, {"zone", V(zoneName(s, to))}}));
         if (options.empty()) {
             const auto* forced = b.data.find("forced_retreat");
             require(forced && forced->asBool(), "Optional retreat cannot eliminate stranded land units");
@@ -974,8 +977,8 @@ void advance(State &s, BattleState &b) {
         auto t = terrain(node(s, b.zone).find("terrain"));
         if (integer(b, "round", 1) == 1)
             for (const auto &id : living(s, b, true))
-                if (edge(s, approach(b, id), b.zone)) {
-                    auto border = borderApproach(s, approach(b, id), b.zone).borderTerrain;
+                if (edge(s, approach(s, b, id), b.zone)) {
+                    auto border = borderApproach(s, approach(s, b, id), b.zone).borderTerrain;
                     t.insert(border.begin(), border.end());
                 }
         bool forced = (city(s, b.zone) && integer(b, "round", 1) >= 3 &&
@@ -988,12 +991,11 @@ void advance(State &s, BattleState &b) {
 }
 } // namespace
 
-bool citySurrounded(const State &s, const Id &zone, const Id &defender) {
+bool citySurrounded(const State &s, ZoneId zone, const Id &defender) {
     if (!city(s, zone))
         return false;
     bool landNeighbor = false;
-    for (const auto &e : node(s, zone).require("neighbors").asArray()) {
-        auto id = e.require("neighbor_id").asString();
+    for (const auto id : mapNeighbors(s, zone)) {
         if (!s.territories.contains(id))
             continue;
         landNeighbor = true;
@@ -1054,14 +1056,14 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
             negative = std::min(negative, n);
     };
     auto t = terrain(node(s, b.zone).find("terrain"));
-    if (round == 1 && attacking && edge(s, approach(b, id), b.zone)) {
-        auto border = borderApproach(s, approach(b, id), b.zone).borderTerrain;
+    if (round == 1 && attacking && edge(s, approach(s, b, id), b.zone)) {
+        auto border = borderApproach(s, approach(s, b, id), b.zone).borderTerrain;
         t.insert(border.begin(), border.end());
     }
     if (round == 1 && !attacking)
         for (const auto &attacker : living(s, b, true))
-            if (edge(s, approach(b, attacker), b.zone)) {
-                auto border = borderApproach(s, approach(b, attacker), b.zone).borderTerrain;
+            if (edge(s, approach(s, b, attacker), b.zone)) {
+                auto border = borderApproach(s, approach(s, b, attacker), b.zone).borderTerrain;
                 t.insert(border.begin(), border.end());
             }
     bool mountain =
@@ -1084,7 +1086,7 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
         if (t.contains("jungle") && attacking && u.type == "gurkha")
             bonus(1);
         if (attacking && round == 1 && !has(s, u, "artillery_class") && u.type != "marine" && !airborne(u)) {
-            if (edge(s, approach(b, id), b.zone) && borderApproach(s, approach(b, id), b.zone).river)
+            if (edge(s, approach(s, b, id), b.zone) && borderApproach(s, approach(s, b, id), b.zone).river)
                 bonus(-1);
         }
     }
@@ -1105,7 +1107,7 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
     if (!attacking && round == 1 && has(s, u, "infantry_class") && fortActive(s, b))
         bonus(2);
     if (!attacking && u.owner == "japan" && has(s, u, "infantry_class") &&
-        s.definition->factions.at("japan").homeCountry.contains(b.zone))
+        s.definition->factions.at("japan").homeZones.contains(b.zone))
         extra += 1;
     if (!attacking && round == 1 && marked(b.flags, "japanese_surprise_attack"))
         extra -= 1;
@@ -1125,8 +1127,8 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
     return result;
 }
 
-Id registerLandBattle(State &s, const Id &zone, const Id &attacker, const std::vector<Id> &units,
-                      const std::map<Id, Id> &origins) {
+Id registerLandBattle(State &s, ZoneId zone, const Id &attacker, const std::vector<Id> &units,
+                      const std::map<Id, ZoneId> &origins) {
     require(s.territories.contains(zone) && s.nations.contains(attacker) && !units.empty(),
             "Invalid land battle registration");
     for (const auto &id : units) {
@@ -1145,9 +1147,9 @@ Id registerLandBattle(State &s, const Id &zone, const Id &attacker, const std::v
                 require(s.units.at(unit).zone == zone, "Attacker is not at battle zone");
                 if (std::find(b.attackers.begin(), b.attackers.end(), unit) == b.attackers.end())
                     b.attackers.push_back(unit);
-                o[unit] = V(origins.at(unit));
+                o[unit] = V(zoneName(s, origins.at(unit)));
                 if (ground(s, s.units.at(unit)) && !airborne(s.units.at(unit)) &&
-                    !amphibious(s.units.at(unit))) landEntries.emplace_back(origins.at(unit));
+                    !amphibious(s.units.at(unit))) landEntries.emplace_back(zoneName(s, origins.at(unit)));
             }
             put(b, "origins", V(o));
             put(b, "land_entry_origins", V(std::move(landEntries)));
@@ -1170,8 +1172,8 @@ Id registerLandBattle(State &s, const Id &zone, const Id &attacker, const std::v
         const auto &u = s.units.at(id);
         require(u.zone == zone, "Attacker is not at battle zone");
         require(u.owner == attacker, "Separate nations cannot combine attacking forces");
-        o[id] = V(origins.at(id));
-        if (ground(s, u) && !airborne(u) && !amphibious(u)) landEntries.emplace_back(origins.at(id));
+        o[id] = V(zoneName(s, origins.at(id)));
+        if (ground(s, u) && !airborne(u) && !amphibious(u)) landEntries.emplace_back(zoneName(s, origins.at(id)));
         if (airborne(u))
             b.flags["airborne_assault"] = 1;
         if (amphibious(u))
@@ -1196,9 +1198,9 @@ Id registerLandBattle(State &s, const Id &zone, const Id &attacker, const std::v
     eliminateUnsupportedRockets(s,s.battles.at(id));
     return id;
 }
-Id registerAttritionBattle(State &s, const Id &zone, const Id &attacker, const std::vector<Id> &units) {
+Id registerAttritionBattle(State &s, ZoneId zone, const Id &attacker, const std::vector<Id> &units) {
     require(!units.empty(), "Attrition attack has no artillery");
-    std::map<Id, Id> origins;
+    std::map<Id, ZoneId> origins;
     for (const auto &id : units) {
         auto &u = s.units.at(id);
         require(u.owner == attacker &&
@@ -1228,7 +1230,7 @@ Id registerAttritionBattle(State &s, const Id &zone, const Id &attacker, const s
             b.defenders.push_back(id);
     O o;
     for (const auto &[id, from] : origins)
-        o[id] = V(from);
+        o[id] = V(zoneName(s, from));
     put(b, "origins", V(o));
     put(b, "round", num(1));
     auto id = b.id;
@@ -1258,7 +1260,7 @@ void beginLandBattle(State &s, const Id &id) {
         return;
     }
     preparePortLandDefence(s, id);
-    if (b.attacker == "japan" && marked(s.nations.at("japan").turnFlags, "surprise_attack_zone:" + b.zone) &&
+    if (b.attacker == "japan" && marked(s.nations.at("japan").turnFlags, "surprise_attack_zone:" + zoneName(s, b.zone)) &&
         !marked(s.nations.at("japan").turnFlags, "surprise_attack_used")) {
         b.flags["japanese_surprise_attack"] = 1;
         s.nations.at("japan").turnFlags["surprise_attack_used"] = 1;
@@ -1267,10 +1269,12 @@ void beginLandBattle(State &s, const Id &id) {
     beginAirDefence(s, id);
     advance(s, b);
 }
-std::set<Id> landRetreatOrigins(const State &s, const BattleState &b) {
-    std::set<Id> out;
+std::set<ZoneId> landRetreatOrigins(const State &s, const BattleState &b) {
+    std::set<ZoneId> out;
     for (const auto& from : array(b, "land_entry_origins")) {
-        const auto zone = from.asString();
+        const auto found = findZone(s, from.asString());
+        if (!found) continue;
+        const auto zone = *found;
         if (!s.territories.contains(zone) || !passableLandBorder(s, b.zone, zone)) continue;
         const auto owner = s.territories.at(zone).possessor;
         if (owner && politicallyFriendly(s, b.attacker, *owner)) out.insert(zone);
@@ -1329,7 +1333,7 @@ std::vector<Action> LandCombatRules::actions(const State &s) const {
             for (const auto &[zone, t] : s.territories)
                 if (t.possessor &&
                     marked(s.nations.at("japan").turnFlags, "surprise_attack_target:" + *t.possessor))
-                    out.push_back(action(s, "japan", "land_select_surprise_zone", {{"zone", V(zone)}}));
+                    out.push_back(action(s, "japan", "land_select_surprise_zone", {{"zone", V(zoneName(s, zone))}}));
     }
     if (s.clock.phase == Phase::CombatMovement) {
         for (const auto &[id, u] : s.units)
@@ -1337,13 +1341,12 @@ std::vector<Action> LandCombatRules::actions(const State &s) const {
                 (u.type == "advanced_artillery" || u.type == "advanced_self_propelled_artillery") &&
                 u.route.empty() && !u.commitments.contains("attrition") &&
                 !u.commitments.contains("combat") && s.turnStart.units.contains(id))
-                for (const auto &e : node(s, u.zone).require("neighbors").asArray()) {
-                    auto zone = e.require("neighbor_id").asString();
+                for (const auto zone : mapNeighbors(s, u.zone)) {
                     if (s.territories.contains(zone) && s.territories.at(zone).possessor &&
                         opposing(s, u.owner, *s.territories.at(zone).possessor) &&
                         passableLandBorder(s, u.zone, zone))
                         out.push_back(action(s, s.currentNation(), "land_declare_attrition",
-                                             {{"unit", V(id)}, {"zone", V(zone)}}));
+                                             {{"unit", V(id)}, {"zone", V(zoneName(s, zone))}}));
                 }
     }
     const bool immediate = marked(s.flags, "immediate_land_battles");
@@ -1401,7 +1404,7 @@ void LandCombatRules::apply(State &s, const Action &a) const {
     }
     if (a.kind == "land_declare_attrition") {
         auto id = a.parameters.require("unit").asString();
-        registerAttritionBattle(s, a.parameters.require("zone").asString(), s.units.at(id).owner, {id});
+        registerAttritionBattle(s, zoneNumber(s, a.parameters.require("zone").asString()), s.units.at(id).owner, {id});
         return;
     }
     const auto id = a.parameters.require("battle").asString();
@@ -1542,7 +1545,7 @@ void LandCombatRules::apply(State &s, const Action &a) const {
     }
     if (a.kind == "land_retreat_unit") {
         release(s, a);
-        retreatUnit(s, b, a.parameters.require("unit").asString(), a.parameters.require("zone").asString());
+        retreatUnit(s, b, a.parameters.require("unit").asString(), zoneNumber(s, a.parameters.require("zone").asString()));
         assignRetreat(s, b);
         return;
     }
@@ -1606,7 +1609,7 @@ void LandCombatRules::applyChance(State &s, const ChanceRequest &request,
                 // as one landed from the sea (RB 10.8.3), is eliminated, as are
                 // attackers that must retreat but cannot in RB 1.7.5 and 1.7.7
                 // (user ruling RCL-016).
-                const auto from = approach(b, unit);
+                const auto from = approach(s, b, unit);
                 if (s.territories.contains(from) && passableLandBorder(s, b.zone, from) &&
                     s.territories.at(from).possessor &&
                     politicallyFriendly(s, s.units.at(unit).owner, *s.territories.at(from).possessor))

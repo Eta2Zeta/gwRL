@@ -48,9 +48,9 @@ void add(State &state, const Id &id, const Id &type, const Id &zone,
   unit.id = id;
   unit.type = type;
   unit.owner = owner;
-  unit.zone = unit.turnOrigin = zone;
+  unit.zone = unit.turnOrigin = zoneNumber(state, zone);
   unit.movementAllowance = unit.movementRemaining =
-      state.definition->catalog->stats(type, 0, catalogContext(state, owner, zone))
+      state.definition->catalog->stats(type, 0, catalogContext(state, owner, zoneNumber(state, zone)))
           .movement;
   state.units.emplace(id, std::move(unit));
 }
@@ -211,7 +211,7 @@ void exhaustedAndZeroRouteStartsAreAbsentButPortExitRemains() {
   choose(port, "naval_route", [&](const Action &candidate) {
     return candidate.parameters.require("request").require("path").asArray().size() == 1;
   });
-  check(port.state().units.at("in_port").zone == p16,
+  check(port.state().units.at("in_port").zone == zoneNumber(port.state(), p16),
         "A zero-cost legal port sortie was removed with exhausted movement");
 }
 
@@ -223,23 +223,23 @@ void landingFailureAtAnIntermediateDestinationDoesNotHideLongerRoutes() {
   state.units.at("plane").movementRemaining = 0;
   // RB 9.3 needs the seat only when movement ends, so a first leg that keeps
   // the waiting aircraft within the carrier's remaining reach is legal.
-  check(validateNavalRoute(state, {{"carrier"}, {p16, p15}}).allowed &&
-            validateNavalRoute(state, {{"carrier"}, {p16, p15, p14}}).allowed,
+  check(validateNavalRoute(state, {{"carrier"}, zoneNumbers(state, {p16, p15})}).allowed &&
+            validateNavalRoute(state, {{"carrier"}, zoneNumbers(state, {p16, p15, p14})}).allowed,
         "A carrier leg that can still reach a waiting aircraft was refused");
   // With movement for one leg only, the aircraft beyond reach is lost already,
   // and stopping short strands one waiting beside the carrier.
   auto oneLeg = state.clone();
   for (int spent = 1; spent < 12 &&
-                      validateNavalRoute(oneLeg, {{"carrier"}, {p16, p15, p14}}).allowed;
+                      validateNavalRoute(oneLeg, {{"carrier"}, zoneNumbers(oneLeg, {p16, p15, p14})}).allowed;
        ++spent)
     oneLeg.units.at("carrier").turnFlags["naval_movement_spent"] = spent;
   add(oneLeg, "beside", "fighter", p16);
   oneLeg.units.at("beside").turnFlags["air_in_flight"] = 1;
   oneLeg.units.at("beside").movementRemaining = 0;
-  const auto shortLeg = validateNavalRoute(oneLeg, {{"carrier"}, {p16, p15}});
+  const auto shortLeg = validateNavalRoute(oneLeg, {{"carrier"}, zoneNumbers(oneLeg, {p16, p15})});
   check(!shortLeg.allowed &&
             shortLeg.reason == "Carrier movement leaves aircraft without a joint landing plan" &&
-            validateNavalRoute(oneLeg, {{"carrier"}, {p16, p15, p14}}).reason == "Insufficient naval movement",
+            validateNavalRoute(oneLeg, {{"carrier"}, zoneNumbers(oneLeg, {p16, p15, p14})}).reason == "Insufficient naval movement",
         "Landing-prefix fixture does not distinguish the two destinations");
   for (const auto &rules : {campaignRules(), trainingCampaignRules()}) {
     Engine engine(state, rules);
@@ -248,7 +248,7 @@ void landingFailureAtAnIntermediateDestinationDoesNotHideLongerRoutes() {
       return canonicalJson(candidate.parameters.require("request").require("path")) ==
              canonicalJson(V(V::Array{V(p16), V(p15), V(p14)}));
     });
-    check(engine.state().units.at("carrier").zone == p14,
+    check(engine.state().units.at("carrier").zone == zoneNumber(engine.state(), p14),
           "A landing-only prefix rejection hid a legal longer route");
   }
 }
@@ -264,14 +264,14 @@ void carriersMayJoinWaitingAircraftOneAtATime() {
     state.units.at(id).turnFlags["air_in_flight"] = 1;
     state.units.at(id).movementRemaining = 0;
   }
-  check(validateNavalRoute(state, {{"a"}, {p16, p15, p14}}).allowed &&
-            validateNavalRoute(state, {{"a", "b", "c"}, {p16, p15, p14}}).allowed,
+  check(validateNavalRoute(state, {{"a"}, zoneNumbers(state, {p16, p15, p14})}).allowed &&
+            validateNavalRoute(state, {{"a", "b", "c"}, zoneNumbers(state, {p16, p15, p14})}).allowed,
         "A carrier could not sail toward aircraft the other carriers can still seat");
   // Two carriers can seat only two of the three, so one aircraft is lost
   // whatever they do; each may still sail to save the others.
   auto twoSeats = state.clone();
   twoSeats.units.erase("c");
-  check(airLandingShortfall(twoSeats) == 1 && validateNavalRoute(twoSeats, {{"a"}, {p16, p15, p14}}).allowed,
+  check(airLandingShortfall(twoSeats) == 1 && validateNavalRoute(twoSeats, {{"a"}, zoneNumbers(twoSeats, {p16, p15, p14})}).allowed,
         "A carrier could not sail to save two of three aircraft that two seats can hold");
   Engine engine(state, trainingCampaignRules());
   for (const auto &id : {"a", "b", "c"}) {
@@ -281,9 +281,9 @@ void carriersMayJoinWaitingAircraftOneAtATime() {
              canonicalJson(V(V::Array{V(p16), V(p15), V(p14)}));
     });
   }
-  check(engine.state().units.at("a").zone == p14 &&
-            engine.state().units.at("b").zone == p14 &&
-            engine.state().units.at("c").zone == p14,
+  check(engine.state().units.at("a").zone == zoneNumber(engine.state(), p14) &&
+            engine.state().units.at("b").zone == zoneNumber(engine.state(), p14) &&
+            engine.state().units.at("c").zone == zoneNumber(engine.state(), p14),
         "Carriers joining one at a time failed to execute");
 }
 
@@ -305,10 +305,10 @@ void screeningRetainsAllNonemptySubsetsAndItsRealContinuationChoice() {
            canonicalJson(V(V::Array{V(p16), V(p15)}));
   });
   check(engine.state().decisions.back().kind == "naval_screening_force" &&
-            engine.state().units.at("a").zone == tokyo,
+            engine.state().units.at("a").zone == zoneNumber(engine.state(), tokyo),
         "Blocked fleet left port before its screening battle: " +
             engine.state().decisions.back().kind + " / " +
-            engine.state().units.at("a").zone);
+            zoneName(engine.state(), engine.state().units.at("a").zone));
   std::set<Id> subsets;
   std::function<void(const Engine &, unsigned)> walk =
       [&](const Engine &draft, unsigned depth) {
@@ -333,8 +333,8 @@ void screeningRetainsAllNonemptySubsetsAndItsRealContinuationChoice() {
   check(subsets.size() == 7, "Screen construction lost a legal force subset");
   chooseUnit(engine, "naval_screen_add", "a");
   choose(engine, "naval_screen_confirm");
-  check(engine.state().units.at("a").zone == p16 &&
-            engine.state().units.at("b").zone == tokyo,
+  check(engine.state().units.at("a").zone == zoneNumber(engine.state(), p16) &&
+            engine.state().units.at("b").zone == zoneNumber(engine.state(), tokyo),
         "Selecting a screen incorrectly moved the waiting ships");
   auto after = engine.state().clone();
   const auto battle = after.battles.begin()->first;
@@ -428,7 +428,7 @@ void laterBlockingSeasStartAFreshScreenSelection() {
     check(after.decisions.back().kind == "naval_screening_force",
           "Second blocking sea did not require its own screening choice");
     const auto &next = after.battles.at(after.decisions.back().continuation);
-    check(next.zone == "sea_p32" && next.data.require("screening").asArray().empty(),
+    check(next.zone == zoneNumber(after, "sea_p32") && next.data.require("screening").asArray().empty(),
           "Second screen inherited ships committed at the previous sea");
     for (const auto &candidate : after.decisions.back().options) {
       check(candidate.kind != "naval_screen_confirm",

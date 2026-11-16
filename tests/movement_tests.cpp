@@ -109,10 +109,10 @@ struct Puzzle {
     s.flags.clear();
     s.history.clear();
     s.politics = PoliticalState{};
-    s.politics.capitals["japan"] = "a";
+    s.politics.capitals["japan"] = zoneNumber(s, "a");
     s.territories.clear();
     for (const auto &[id, owner] : owners)
-      s.territories[id].possessor = owner.asString();
+      s.territories[zoneNumber(s, id)].possessor = owner.asString();
     s.clock.nationIndex = 2;
     s.clock.playerTurnSerial = 2;
     s.clock.phase = phase;
@@ -132,11 +132,11 @@ void unit(State &s, const Id &id, const Id &zone, const Id &type = "infantry",
   u.id = id;
   u.owner = owner;
   u.type = type;
-  u.zone = u.turnOrigin = zone;
+  u.zone = u.turnOrigin = zoneNumber(s, zone);
   u.movementAllowance = u.movementRemaining =
       movement >= 0 ? std::optional<int>(movement)
                     : s.definition->catalog
-                          ->stats(type, 0, catalogContext(s, owner, zone))
+                          ->stats(type, 0, catalogContext(s, owner, zoneNumber(s, zone)))
                           .movement;
   s.units[id] = std::move(u);
 }
@@ -145,7 +145,7 @@ void port(State &s, const Id &id, const Id &zone, const std::vector<Id> &seas,
   FacilityState f;
   f.id = id;
   f.type = type;
-  f.zone = zone;
+  f.zone = zoneNumber(s, zone);
   for (const auto &sea : seas)
     f.flags["border:" + sea] = 1;
   s.facilities[id] = std::move(f);
@@ -175,21 +175,21 @@ void directionalTerrain() {
   auto s = p.state();
   unit(s, "tank", "b", "light_armor");
   const auto entered =
-      validateRoute(s, {"tank", {"b", "c"}, MovementMode::Ordinary, false});
+      validateRoute(s, {"tank", zoneNumbers(s, {"b", "c"}), MovementMode::Ordinary, false});
   check(entered.allowed && entered.exhaustsMovement && entered.approach.river,
         "Directional mountain/river entry lost");
   check(!validateRoute(s,
-                       {"tank", {"b", "c", "d"}, MovementMode::Ordinary, false})
+                       {"tank", zoneNumbers(s, {"b", "c", "d"}), MovementMode::Ordinary, false})
              .allowed,
         "Tank traversed terrain that ends movement");
   unit(s, "reverse", "c", "light_armor");
   check(validateRoute(
-            s, {"reverse", {"c", "b", "a"}, MovementMode::Ordinary, false})
+            s, {"reverse", zoneNumbers(s, {"c", "b", "a"}), MovementMode::Ordinary, false})
             .allowed,
         "Origin terrain leaked into reverse entry");
   unit(s, "horse", "b", "cavalry");
   check(validateRoute(s,
-                      {"horse", {"b", "c", "d"}, MovementMode::Ordinary, false})
+                      {"horse", zoneNumbers(s, {"b", "c", "d"}), MovementMode::Ordinary, false})
             .allowed,
         "Cavalry mountain movement exemption missing");
   auto def = *s.definition;
@@ -202,7 +202,7 @@ void directionalTerrain() {
   def.geography = V(std::move(g));
   s.definition = freezeDefinition(std::move(def));
   check(!validateRoute(
-             s, {"horse", {"b", "c", "d"}, MovementMode::Ordinary, false})
+             s, {"horse", zoneNumbers(s, {"b", "c", "d"}), MovementMode::Ordinary, false})
              .allowed,
         "Cavalry mountain exemption incorrectly erased desert");
 }
@@ -217,7 +217,7 @@ void hostileStopsAndOrigins() {
   unit(s, "north", "c", "infantry");
   check(
       !validateRoute(
-           s, {"west", {"a", "b", "enemy", "d"}, MovementMode::Ordinary, true})
+           s, {"west", zoneNumbers(s, {"a", "b", "enemy", "d"}), MovementMode::Ordinary, true})
            .allowed,
       "Unresolved enemy zone did not stop movement");
   MovementRules rules;
@@ -232,10 +232,10 @@ void hostileStopsAndOrigins() {
   check(origins.require("west").asString() == "b" &&
             origins.require("north").asString() == "c",
         "Approach origins collapsed to one source");
-  check(s.units.at("west").turnOrigin == "a" &&
+  check(s.units.at("west").turnOrigin == zoneNumber(s, "a") &&
             s.units.at("west").movementRemaining == 1,
         "Turn origin or exact movement lost");
-  check(!validateRoute(s, {"west", {"enemy", "d"}, MovementMode::Ordinary, true}).allowed,
+  check(!validateRoute(s, {"west", zoneNumbers(s, {"enemy", "d"}), MovementMode::Ordinary, true}).allowed,
         "Segmenting public actions bypassed the unresolved hostile-zone stop");
   const auto following = rules.actions(s);
   check(std::none_of(following.begin(), following.end(), [](const Action &a) {
@@ -254,22 +254,22 @@ void railGaugeDamageCapacity() {
   auto s = p.state();
   unit(s, "one", "a");
   unit(s, "two", "a");
-  s.rails["ab"] = {"ab", "a", "b", {}};
-  s.rails["bc"] = {"bc", "b", "c", {}};
+  s.rails["ab"] = {"ab", zoneNumber(s, "a"), zoneNumber(s, "b"), {}};
+  s.rails["bc"] = {"bc", zoneNumber(s, "b"), zoneNumber(s, "c"), {}};
   check(!validateRoute(
-             s, {"one", {"a", "b", "c"}, MovementMode::StrategicRail, false})
+             s, {"one", zoneNumbers(s, {"a", "b", "c"}), MovementMode::StrategicRail, false})
              .allowed,
         "Gauge change accepted without technology");
   s.nations.at("japan").technologyStages["improved_logistics"] = 4;
   const auto route = validateRoute(
-      s, {"one", {"a", "b", "c"}, MovementMode::StrategicRail, false});
+      s, {"one", zoneNumbers(s, {"a", "b", "c"}), MovementMode::StrategicRail, false});
   check(route.allowed && route.regions.size() == 2,
         "Improved Logistics or cross-region accounting missing");
   MovementRules rules;
   rules.apply(s, offered(rules, s, "one", {"a", "b", "c"},
                          MovementMode::StrategicRail));
   check(
-      validateRoute(s, {"two", {"a", "b"}, MovementMode::StrategicRail, false})
+      validateRoute(s, {"two", zoneNumbers(s, {"a", "b"}), MovementMode::StrategicRail, false})
           .allowed,
       "Improved Logistics did not add one regional move");
   // Unit two reaches b by an ordinary move, so its rail move there is not
@@ -284,24 +284,24 @@ void railGaugeDamageCapacity() {
   rules.apply(s, rail);
   unit(s, "three", "a");
   check(!validateRoute(
-             s, {"three", {"a", "b"}, MovementMode::StrategicRail, false})
+             s, {"three", zoneNumbers(s, {"a", "b"}), MovementMode::StrategicRail, false})
              .allowed,
         "Asia capacity did not apply after crossing regions");
   auto bombed = p.state();
   unit(bombed, "u", "a");
-  bombed.rails["ab"] = {"ab", "a", "b", {{"b", 1}}};
-  check(!inSupply(bombed, "japan", "b"), "Bombed rail remained a Supply Path");
+  bombed.rails["ab"] = {"ab", zoneNumber(bombed, "a"), zoneNumber(bombed, "b"), {{zoneNumber(bombed, "b"), 1}}};
+  check(!inSupply(bombed, "japan", zoneNumber(bombed, "b")), "Bombed rail remained a Supply Path");
   check(!validateRoute(bombed,
-                       {"u", {"a", "b"}, MovementMode::StrategicRail, false})
+                       {"u", zoneNumbers(bombed, {"a", "b"}), MovementMode::StrategicRail, false})
              .allowed,
         "Bombed rail remained usable for strategic movement");
   bombed.rails.at("ab").damageByEndpoint.clear();
   bombed.flags["logistics_damaged_turn:ab"] = 3;
-  check(!inSupply(bombed, "japan", "b"),
+  check(!inSupply(bombed, "japan", zoneNumber(bombed, "b")),
         "Repair this turn restored continuously undamaged supply");
   check(
       validateRoute(bombed,
-                    {"u", {"a", "b"}, MovementMode::StrategicRail, false})
+                    {"u", zoneNumbers(bombed, {"a", "b"}), MovementMode::StrategicRail, false})
           .allowed,
       "Current undamaged rail incorrectly barred ordinary strategic rail use");
 }
@@ -312,35 +312,35 @@ void immobileRailAndContinuousPossession() {
   unit(s, "militia", "a", "militia");
   s.units.at("militia").movementRemaining = 0;
   check(validateRoute(
-            s, {"militia", {"a", "b"}, MovementMode::StrategicRail, false})
+            s, {"militia", zoneNumbers(s, {"a", "b"}), MovementMode::StrategicRail, false})
                 .allowed == false,
         "Militia Home Country endpoint restriction missing");
   auto def = *s.definition;
   def.factions.at("japan").homeCountry.insert("b");
   s.definition = freezeDefinition(std::move(def));
   check(validateRoute(
-            s, {"militia", {"a", "b"}, MovementMode::StrategicRail, false})
+            s, {"militia", zoneNumbers(s, {"a", "b"}), MovementMode::StrategicRail, false})
             .allowed,
         "Zero ordinary movement prevented strategic rail");
   s.units.at("militia").commitments.insert("attrition");
   check(!validateRoute(
-             s, {"militia", {"a", "b"}, MovementMode::StrategicRail, false})
+             s, {"militia", zoneNumbers(s, {"a", "b"}), MovementMode::StrategicRail, false})
              .allowed,
         "Attrition unit moved by strategic rail");
   s.units.at("militia").commitments.clear();
-  s.territories.at("b").flags["last_possession_change_turn"] = 2;
-  check(!heldSinceTurnStart(s, "japan", "b") &&
+  s.territories.at(zoneNumber(s, "b")).flags["last_possession_change_turn"] = 2;
+  check(!heldSinceTurnStart(s, "japan", zoneNumber(s, "b")) &&
             !validateRoute(
-                 s, {"militia", {"a", "b"}, MovementMode::StrategicRail, false})
+                 s, {"militia", zoneNumbers(s, {"a", "b"}), MovementMode::StrategicRail, false})
                  .allowed,
         "Recaptured territory passed possession timing");
-  check(!heldSinceNationTurnStart(s, "japan", "b"),
+  check(!heldSinceNationTurnStart(s, "japan", zoneNumber(s, "b")),
         "Captured base became eligible before first own turn");
   s.nations.at("japan").gameFlags["logistics_last_turn_start"] = 3;
-  check(!heldSinceNationTurnStart(s, "japan", "b"),
+  check(!heldSinceNationTurnStart(s, "japan", zoneNumber(s, "b")),
         "Same-turn capture satisfied own-turn age");
   s.nations.at("japan").gameFlags["logistics_last_turn_start"] = 7;
-  check(heldSinceNationTurnStart(s, "japan", "b"),
+  check(heldSinceNationTurnStart(s, "japan", zoneNumber(s, "b")),
         "Base held across next own turn stayed unavailable");
 }
 void riverBanksAndImpassableRoads() {
@@ -351,19 +351,19 @@ void riverBanksAndImpassableRoads() {
          {{"passable", V(false)}, {"border_terrain", str("impassable")}});
   auto s = p.state();
   unit(s, "u", "a");
-  check(!riverRouteAvailable(s, "japan", "a", "b") &&
-            !inSupply(s, "japan", "b"),
+  check(!riverRouteAvailable(s, "japan", zoneNumber(s, "a"), zoneNumber(s, "b")) &&
+            !inSupply(s, "japan", zoneNumber(s, "b")),
         "Enemy river bank did not cut supply");
   check(
-      !validateRoute(s, {"u", {"a", "b"}, MovementMode::StrategicRiver, false})
+      !validateRoute(s, {"u", zoneNumbers(s, {"a", "b"}), MovementMode::StrategicRiver, false})
            .allowed,
       "Enemy bank allowed strategic river move");
   s.nations.at("japan").atWarWith.clear();
   s.nations.at("kmt").atWarWith.clear();
-  check(riverRouteAvailable(s, "japan", "a", "b") && inSupply(s, "japan", "b"),
+  check(riverRouteAvailable(s, "japan", zoneNumber(s, "a"), zoneNumber(s, "b")) && inSupply(s, "japan", zoneNumber(s, "b")),
         "Neutral bank incorrectly prevented river use");
   unit(s, "v", "b");
-  check(!validateRoute(s, {"v", {"b", "c"}, MovementMode::Ordinary, false})
+  check(!validateRoute(s, {"v", zoneNumbers(s, {"b", "c"}), MovementMode::Ordinary, false})
              .allowed,
         "Impassable/supply-only road became ordinary land adjacency");
 }
@@ -376,25 +376,25 @@ void seaRangeRefreshAndSharedPorts() {
   auto s = p.state();
   port(s, "source", "a", {"s0"});
   port(s, "destination", "b", {"s3"});
-  check(!inSupply(s, "japan", "b"), "Minor port exceeded range two");
+  check(!inSupply(s, "japan", zoneNumber(s, "b")), "Minor port exceeded range two");
   s.nations.at("japan").technologyStages["improved_logistics"] = 4;
-  check(inSupply(s, "japan", "b"),
+  check(inSupply(s, "japan", zoneNumber(s, "b")),
         "Improved Logistics did not extend supply by one");
   s.nations.at("japan").technologyStages.clear();
   port(s, "refresh", "c", {"s2"});
-  check(inSupply(s, "japan", "b"),
+  check(inSupply(s, "japan", zoneNumber(s, "b")),
         "Naval facility failed to refresh sea supply range");
   s.facilities.at("refresh").damage = 1;
-  check(!inSupply(s, "japan", "b"), "Damaged port refreshed supply");
+  check(!inSupply(s, "japan", zoneNumber(s, "b")), "Damaged port refreshed supply");
   s.facilities.at("refresh").damage = 0;
   s.facilities.at("refresh").flags["placed_this_turn"] = 1;
-  check(!inSupply(s, "japan", "b"), "New port immediately supplied route");
+  check(!inSupply(s, "japan", zoneNumber(s, "b")), "New port immediately supplied route");
   s.facilities.at("refresh").flags.clear();
   s.facilities.at("refresh").flags["border:s2"] = 1;
   s.facilities.at("refresh").flags["border:s5"] = 1;
   s.facilities.at("destination").flags.clear();
   s.facilities.at("destination").flags["border:s5"] = 1;
-  check(!inSupply(s, "japan", "b"),
+  check(!inSupply(s, "japan", zoneNumber(s, "b")),
         "Shared port teleported supply between unconnected sea accesses");
 }
 void noSecondSeaLeg() {
@@ -407,8 +407,8 @@ void noSecondSeaLeg() {
   port(s, "landfall", "b", {"s0"});
   port(s, "second_departure", "c", {"s1"});
   port(s, "destination", "d", {"s1"});
-  check(inSupply(s, "japan", "c"), "Land route after landfall missing");
-  check(!inSupply(s, "japan", "d"), "Supply returned to sea after landfall");
+  check(inSupply(s, "japan", zoneNumber(s, "c")), "Land route after landfall missing");
+  check(!inSupply(s, "japan", zoneNumber(s, "d")), "Supply returned to sea after landfall");
 }
 void blockadeSurfaceOnly() {
   Puzzle p;
@@ -419,12 +419,12 @@ void blockadeSurfaceOnly() {
   for (int i = 0; i < 3; ++i)
     unit(s, "blockader" + std::to_string(i), "s0", "destroyer");
   unit(s, "sub", "s0", "submarine", "kmt");
-  check(seaBlockaded(s, "kmt", "s0"),
+  check(seaBlockaded(s, "kmt", zoneNumber(s, "s0")),
         "Enemy submarine incorrectly prevented surface blockade");
   check(!facilityBlockaded(s, "kmt", "shared"),
         "One access incorrectly blockaded shared facility");
   unit(s, "surface", "s0", "destroyer", "kmt");
-  check(!seaBlockaded(s, "kmt", "s0"),
+  check(!seaBlockaded(s, "kmt", zoneNumber(s, "s0")),
         "Enemy surface warship did not prevent blockade");
   s.units.erase("surface");
   for (int i = 3; i < 6; ++i)
@@ -448,21 +448,21 @@ void narrowCrossings() {
   unit(s, "one", "a");
   unit(s, "two", "a");
   MovementRules rules;
-  check(!validateRoute(s, {"one", {"a", "b"}, MovementMode::Ordinary, false})
+  check(!validateRoute(s, {"one", zoneNumbers(s, {"a", "b"}), MovementMode::Ordinary, false})
              .allowed,
         "Narrow crossing treated as ordinary land edge");
   rules.apply(
       s, offered(rules, s, "one", {"a", "b"}, MovementMode::NarrowCrossing));
   check(s.units.at("one").movementRemaining == 0 &&
             !validateRoute(
-                 s, {"two", {"a", "b"}, MovementMode::NarrowCrossing, false})
+                 s, {"two", zoneNumbers(s, {"a", "b"}), MovementMode::NarrowCrossing, false})
                  .allowed,
         "Crossing capacity or full-move cost missing");
   auto blocked = p.state();
   unit(blocked, "u", "a");
   unit(blocked, "enemy_ship", "s0", "destroyer", "kmt");
   check(!validateRoute(blocked,
-                       {"u", {"a", "b"}, MovementMode::NarrowCrossing, false})
+                       {"u", zoneNumbers(blocked, {"a", "b"}), MovementMode::NarrowCrossing, false})
              .allowed,
         "Enemy ship did not close narrow crossing");
 }
@@ -470,20 +470,20 @@ void sourceOverlayAndClosedBoundary() {
   auto s = baseline().clone();
   s.captureTurnStart();
   for (const auto &[a, n] : s.definition->geography.require("nodes").asObject())
-    if (s.territories.contains(a)) {
-      check(railRegion(s, a) == "asia",
+    if (s.territories.contains(zoneNumber(s, a))) {
+      check(railRegion(s, zoneNumber(s, a)) == "asia",
             "Included territory assigned outside Asia");
       for (const auto &e : n.require("neighbors").asArray())
-        if (s.territories.contains(e.require("neighbor_id").asString()))
-          check(borderApproach(s, a, e.require("neighbor_id").asString())
+        if (s.territories.contains(zoneNumber(s, e.require("neighbor_id").asString())))
+          check(borderApproach(s, zoneNumber(s, a), zoneNumber(s, e.require("neighbor_id").asString()))
                     .riverKnown,
                 "Unreviewed retained river approach");
     }
   check(!burmaRoadOpen(s) && !burmaRoadOpen(s, true) &&
-            !ccpSovietRailConnected(s, "land_china_shensi"),
+            !ccpSovietRailConnected(s, zoneNumber(s, "land_china_shensi")),
         "Closed map fabricated Burma/Ledo/USSR connection");
-  check(inSupply(s, "japan", "land_jap_tokyo") &&
-            inSupply(s, "japan", "land_korea"),
+  check(inSupply(s, "japan", zoneNumber(s, "land_jap_tokyo")) &&
+            inSupply(s, "japan", zoneNumber(s, "land_korea")),
         "Retained Japanese home/coastal supply failed");
 }
 void unevolvedChinaStaysHome() {
@@ -495,22 +495,22 @@ void unevolvedChinaStaysHome() {
   s.clock.nationIndex = 3;
   s.nations.at("japan").atWarWith.insert("kmt");
   s.nations.at("kmt").atWarWith.insert("japan");
-  s.territories.at("land_manchuria_rehe").possessor = "kmt";
-  s.territories.at("land_manchuria_eastern").possessor = "japan";
-  s.territories.at("land_korea").possessor = "japan";
+  s.territories.at(zoneNumber(s, "land_manchuria_rehe")).possessor = "kmt";
+  s.territories.at(zoneNumber(s, "land_manchuria_eastern")).possessor = "japan";
+  s.territories.at(zoneNumber(s, "land_korea")).possessor = "japan";
   s.captureTurnStart();
   unit(s, "i", "land_manchuria_rehe", "infantry", "kmt");
   const auto attack = [&](const Id &zone) {
-    return validateRoute(s, {"i", {"land_manchuria_rehe", zone}, MovementMode::Ordinary, true});
+    return validateRoute(s, {"i", zoneNumbers(s, {"land_manchuria_rehe", zone}), MovementMode::Ordinary, true});
   };
   check(attack("land_manchuria_eastern").allowed, "KMT could not attack within Chinese Home Country");
   check(attack("land_korea").reason == "Unevolved CCP and KMT stay within Chinese Home Country",
         "Unevolved KMT attacked Korea");
-  check(aircraftFlightAccess(s, "kmt", "sea_p14", true) && !aircraftFlightAccess(s, "kmt", "sea_p15", true),
+  check(aircraftFlightAccess(s, "kmt", zoneNumber(s, "sea_p14"), true) && !aircraftFlightAccess(s, "kmt", zoneNumber(s, "sea_p15"), true),
         "Unevolved KMT aircraft were not kept beside Chinese Home Country");
-  check(aircraftFlightAccess(s, "japan", "sea_p15", true), "The limit applied beyond CCP and KMT");
+  check(aircraftFlightAccess(s, "japan", zoneNumber(s, "sea_p15"), true), "The limit applied beyond CCP and KMT");
   s.nations.at("kmt").powerStatus = "major";
-  check(attack("land_korea").allowed && aircraftFlightAccess(s, "kmt", "sea_p15", true),
+  check(attack("land_korea").allowed && aircraftFlightAccess(s, "kmt", zoneNumber(s, "sea_p15"), true),
         "Evolved KMT still kept to Chinese Home Country");
 }
 void cargoAndWithdrawal() {
@@ -524,24 +524,24 @@ void cargoAndWithdrawal() {
   unit(s, "inf3", "a");
   for (auto &[id, u] : s.units)
     u.movementRemaining = 0;
-  check(withdrawalEligibleRecipients(s, "japan", "a").empty(),
+  check(withdrawalEligibleRecipients(s, "japan", zoneNumber(s, "a")).empty(),
         "Immobile conquering units received unproved withdrawal permission");
   unit(s, "ship", "s0", "naval_transport");
-  check(withdrawalEligibleRecipients(s, "japan", "a").empty(),
+  check(withdrawalEligibleRecipients(s, "japan", zoneNumber(s, "a")).empty(),
         "Transport capacity not shared among withdrawing units");
   s.units.erase("inf3");
-  check(withdrawalEligibleRecipients(s, "japan", "a").size() == 2,
+  check(withdrawalEligibleRecipients(s, "japan", zoneNumber(s, "a")).size() == 2,
         "Adjacent two-slot transport failed withdrawal proof");
   attachCargo(s, "ship", "inf1");
-  check(s.units.at("inf1").zone == "s0" &&
+  check(s.units.at("inf1").zone == zoneNumber(s, "s0") &&
             s.units.at("inf1").carriedBy == "ship",
         "Cargo not linked to carrier location");
   rejects([&] { attachCargo(s, "ship", "inf1"); }, "Duplicate cargo accepted");
   auto restored = State::fromJson(s.definition, s.toJson());
   check(restored.planningKey() == s.planningKey(),
         "Cargo checkpoint changed state");
-  detachCargo(s, "ship", "inf1", "b");
-  check(!s.units.at("inf1").carriedBy && s.units.at("inf1").zone == "b",
+  detachCargo(s, "ship", "inf1", zoneNumber(s, "b"));
+  check(!s.units.at("inf1").carriedBy && s.units.at("inf1").zone == zoneNumber(s, "b"),
         "Cargo unloading failed");
 }
 void giftWithdrawalRequiresExecutableSharedLoading() {
@@ -552,23 +552,23 @@ void giftWithdrawalRequiresExecutableSharedLoading() {
   unit(s, "inf", "a");
   unit(s, "ship", "s0", "naval_transport");
   auto &inf = s.units.at("inf");
-  inf.route = {"enemy", "a"};
+  inf.route = zoneNumbers(s, {"enemy", "a"});
   inf.commitments.insert("combat_move");
   inf.commitments.insert("combat");
   inf.movementRemaining = 0;
-  check(withdrawalEligibleRecipients(s, "japan", "a").size() == 2,
+  check(withdrawalEligibleRecipients(s, "japan", zoneNumber(s, "a")).size() == 2,
         "Gift's printed noncombat exception did not allow boarding a fresh transport");
   auto unloaded = s;
   unloaded.units.at("ship").turnFlags["naval_unloaded"] = 1;
-  check(withdrawalEligibleRecipients(unloaded, "japan", "a").empty(),
+  check(withdrawalEligibleRecipients(unloaded, "japan", zoneNumber(unloaded, "a")).empty(),
         "Transport already unloaded this turn falsely proved Chinese gift withdrawal");
   auto amphibious = s;
   amphibious.units.at("inf").turnFlags["naval_unloaded"] = 1;
   amphibious.units.at("inf").commitments.insert("transport_unloaded");
-  check(withdrawalEligibleRecipients(amphibious, "japan", "a").empty(),
+  check(withdrawalEligibleRecipients(amphibious, "japan", zoneNumber(amphibious, "a")).empty(),
         "Amphibiously unloaded cargo falsely proved another movement after debarking");
   s.clock.phase = Phase::NonCombatMovement;
-  s.territories.at("a").possessor = "ccp";
+  s.territories.at(zoneNumber(s, "a")).possessor = "ccp";
   s.units.at("inf").turnFlags["must_withdraw_from_chinese_gift"] = 1;
   check(navalLoadAllowed(s, "ship", "inf"), "Proved loading became impossible after the unaligned gift");
   const auto actions = navalMovementActions(s);
@@ -591,11 +591,11 @@ void pendingGiftsShareTheSameTransportCapacity() {
   for (const auto &id : {"old1", "old2", "new"}) s.units.at(id).movementRemaining = 0;
   s.units.at("old1").turnFlags["must_withdraw_from_chinese_gift"] = 1;
   s.units.at("old2").turnFlags["must_withdraw_from_chinese_gift"] = 1;
-  check(withdrawalEligibleRecipients(s, "japan", "b").empty(),
+  check(withdrawalEligibleRecipients(s, "japan", zoneNumber(s, "b")).empty(),
         "Two Chinese gifts double-booked the same physical transport slots");
   s.units.erase("new");
   s.clock.phase = Phase::NonCombatMovement;
-  s.territories.at("a").possessor = "ccp";
+  s.territories.at(zoneNumber(s, "a")).possessor = "ccp";
   MovementRules rules(std::make_shared<NavalRules>());
   const auto actions = rules.actions(s);
   check(std::any_of(actions.begin(), actions.end(), [](const Action &a) { return a.kind == "naval_load"; }),
@@ -618,7 +618,7 @@ void giftWithdrawalsKeepEachOthersTransportPlaces() {
     s.units.at(id).turnFlags["must_withdraw_from_chinese_gift"] = 1;
   }
   s.units.at("stuck1").movementRemaining = s.units.at("stuck2").movementRemaining = 0;
-  s.territories.at("a").possessor = "ccp";
+  s.territories.at(zoneNumber(s, "a")).possessor = "ccp";
   MovementRules rules(std::make_shared<NavalRules>());
   const auto offers = [&](const State &state, const Id &kind, const Id &unit) {
     const auto actions = rules.actions(state);
@@ -648,13 +648,13 @@ void pairedBlitz() {
   s.units.at("support").turnFlags["blitz_eligible"] = 1;
   s.units.at("support").commitments.insert("blitz_with:armor");
   check(
-      !validateRoute(s, {"support", {"a", "enemy"}, MovementMode::Blitz, true})
+      !validateRoute(s, {"support", zoneNumbers(s, {"a", "enemy"}), MovementMode::Blitz, true})
            .allowed,
       "Companion blitzed independently before armor");
   MovementRules rules;
   rules.apply(s,
               offered(rules, s, "armor", {"a", "enemy"}, MovementMode::Blitz));
-  check(validateRoute(s, {"support", {"a", "enemy"}, MovementMode::Blitz, true})
+  check(validateRoute(s, {"support", zoneNumbers(s, {"a", "enemy"}), MovementMode::Blitz, true})
             .allowed,
         "Paired support could not follow armor approach");
 }
@@ -668,16 +668,16 @@ void factoryRelocation() {
   FacilityState f;
   f.id = "factory";
   f.type = "major_factory";
-  f.zone = "a";
+  f.zone = zoneNumber(s, "a");
   f.damage = 2;
   s.facilities[f.id] = f;
-  check(!validateFactoryRailRoute(s, "factory", {"a", "b"}).allowed,
+  check(!validateFactoryRailRoute(s, "factory", zoneNumbers(s, {"a", "b"})).allowed,
         "Factory moved without Improved Logistics");
   s.nations.at("japan").technologyStages["improved_logistics"] = 4;
-  check(validateFactoryRailRoute(s, "factory", {"a", "b"}).allowed,
+  check(validateFactoryRailRoute(s, "factory", zoneNumbers(s, {"a", "b"})).allowed,
         "Eligible damaged factory could not relocate");
   s.facilities.at("factory").flags["researched_this_turn"] = 1;
-  check(!validateFactoryRailRoute(s, "factory", {"a", "b"}).allowed,
+  check(!validateFactoryRailRoute(s, "factory", zoneNumbers(s, {"a", "b"})).allowed,
         "Research factory moved in same turn");
   s.facilities.at("factory").flags.clear();
   MovementRules rules;
@@ -688,12 +688,12 @@ void factoryRelocation() {
       });
   check(a != options.end(), "Factory rail action missing");
   rules.apply(s, *a);
-  check(s.facilities.at("factory").zone == "b" &&
+  check(s.facilities.at("factory").zone == zoneNumber(s, "b") &&
             s.facilities.at("factory").damage == 2 &&
             s.facilities.at("factory").flags.at("moved_this_turn") == 1,
         "Factory relocation lost damage or restriction");
   unit(s, "u", "a");
-  check(!validateRoute(s, {"u", {"a", "b"}, MovementMode::StrategicRail, false})
+  check(!validateRoute(s, {"u", zoneNumbers(s, {"a", "b"}), MovementMode::StrategicRail, false})
              .allowed,
         "Major factory failed to consume two rail moves");
 }
@@ -722,7 +722,7 @@ void pairedTowingMovesWithoutChangingCatalogStats() {
   MovementRules rules;
   const auto action = offeredTow(rules, s, "motor", "gun", {"a", "b", "c"});
   rules.apply(s, action);
-  check(s.units.at("motor").zone == "c" && s.units.at("gun").zone == "c" &&
+  check(s.units.at("motor").zone == zoneNumber(s, "c") && s.units.at("gun").zone == zoneNumber(s, "c") &&
             s.units.at("motor").movementRemaining == 0 &&
             s.units.at("gun").movementRemaining == 0,
         "Two-zone towing failed to move/exhaust both partners");
@@ -742,12 +742,12 @@ void segmentedTowBudgetAndOneToOnePairing() {
   unit(s, "gun", "a", "anti_aircraft_artillery");
   MovementRules rules;
   rules.apply(s, offeredTow(rules, s, "motor", "gun", {"a", "b"}));
-  check(!validateRoute(s, {"gun", {"b", "c"}, MovementMode::Ordinary, false})
+  check(!validateRoute(s, {"gun", zoneNumbers(s, {"b", "c"}), MovementMode::Ordinary, false})
              .allowed,
         "Towed gun used boosted remaining movement without its partner");
   check(
       !validateRoute(
-           s, {"second", {"b", "c"}, MovementMode::Ordinary, false, Id("gun")})
+           s, {"second", zoneNumbers(s, {"b", "c"}), MovementMode::Ordinary, false, Id("gun")})
            .allowed,
       "Gun changed towing partner during same turn");
   rules.apply(s, offeredTow(rules, s, "motor", "gun", {"b", "c"}));
@@ -765,7 +765,7 @@ void towingRespectsTerrainAndCommitments() {
   check(
       !validateRoute(
            s,
-           {"motor", {"a", "b", "c"}, MovementMode::Ordinary, false, Id("gun")})
+           {"motor", zoneNumbers(s, {"a", "b", "c"}), MovementMode::Ordinary, false, Id("gun")})
            .allowed,
       "Towing crossed terrain that ends movement");
   MovementRules rules;
@@ -781,7 +781,7 @@ void towingRespectsTerrainAndCommitments() {
     t.units.at("gun").commitments.insert(commitment);
     check(
         !validateRoute(
-             t, {"motor", {"a", "b"}, MovementMode::Ordinary, false, Id("gun")})
+             t, {"motor", zoneNumbers(t, {"a", "b"}), MovementMode::Ordinary, false, Id("gun")})
              .allowed,
         "Towing bypassed committed artillery restriction");
   }
@@ -872,12 +872,12 @@ void alignedLandOpensAtOnce() {
   check(enters(aligned) && airLandingAvailable(aligned, "fighter", "w"),
         "Land that joined Japan this turn could not be entered or landed on");
   auto captured = before.clone();
-  changePossession(captured, "w", "japan", PossessionCause::Capture, Id("japan"));
+  changePossession(captured, zoneNumber(captured, "w"), "japan", PossessionCause::Capture, Id("japan"));
   check(!enters(captured) && !airLandingAvailable(captured, "fighter", "w"),
         "Land captured this turn was entered or landed on");
   auto joinedThenCaptured = before.clone();
   incorporateNation(joinedThenCaptured, "warlord_suiyuan", "kmt");
-  changePossession(joinedThenCaptured, "w", "japan", PossessionCause::Capture, Id("japan"));
+  changePossession(joinedThenCaptured, zoneNumber(joinedThenCaptured, "w"), "japan", PossessionCause::Capture, Id("japan"));
   check(!enters(joinedThenCaptured) && !airLandingAvailable(joinedThenCaptured, "fighter", "w"),
         "Land captured after aligning this turn was entered or landed on");
 }
@@ -890,14 +890,14 @@ void lendLeaseDestinationException() {
   s.nations.at("kmt").atWarWith.clear();
   port(s, "source", "b", {"s0"});
   port(s, "recipient", "enemy", {"s0"});
-  check(!inSupply(s, "japan", "enemy"),
+  check(!inSupply(s, "japan", zoneNumber(s, "enemy")),
         "Ordinary supply gained neutral recipient facility permission");
-  check(lendLeaseSupplyRoute(s, "japan", "kmt", "enemy").connected,
+  check(lendLeaseSupplyRoute(s, "japan", "kmt", zoneNumber(s, "enemy")).connected,
         "Lend-lease final-recipient facility exception missing");
-  check(!lendLeaseSupplyRoute(s, "japan", "kmt", "enemy", true).connected,
+  check(!lendLeaseSupplyRoute(s, "japan", "kmt", zoneNumber(s, "enemy"), true).connected,
         "Naval lend-lease traveled over inland rail");
   port(s, "home_port", "a", {"s0"});
-  check(lendLeaseSupplyRoute(s, "japan", "kmt", "enemy", true).connected,
+  check(lendLeaseSupplyRoute(s, "japan", "kmt", zoneNumber(s, "enemy"), true).connected,
         "Naval lend-lease could not leave Home Country port");
 }
 } // namespace
@@ -912,7 +912,7 @@ void railOnlyBeyondOrdinaryReach() {
   auto s = p.state();
   for (const auto &[id, from, to] :
        std::vector<std::tuple<Id, Id, Id>>{{"ab", "a", "b"}, {"bc", "b", "c"}, {"cd", "c", "d"}})
-    s.rails[id] = {id, from, to, {}};
+    s.rails[id] = {id, zoneNumber(s, from), zoneNumber(s, to), {}};
   unit(s, "slow", "a", "infantry", "japan", 1);
   unit(s, "fast", "a", "infantry", "japan", 2);
   MovementRules rules;
@@ -932,7 +932,7 @@ void railOnlyBeyondOrdinaryReach() {
   check(railTo("fast") == std::set<Id>{"d"},
         "Rail offered within a two-move unit's ordinary reach");
   rules.apply(s, offered(rules, s, "slow", {"a", "b", "c"}, MovementMode::StrategicRail));
-  check(s.units.at("slow").zone == "c", "Offered rail move did not apply");
+  check(s.units.at("slow").zone == zoneNumber(s, "c"), "Offered rail move did not apply");
 }
 int main() {
   try {

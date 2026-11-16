@@ -47,8 +47,8 @@ State initialState() {
         state.nations[id] = nation;
         state.completedTurns[id] = 0;
     }
-    state.territories["land_a"] = TerritoryState{"ccp", {}};
-    state.territories["land_b"] = TerritoryState{"japan", {}};
+    state.territories[zoneNumber(state, "land_a")] = TerritoryState{"ccp", {}};
+    state.territories[zoneNumber(state, "land_b")] = TerritoryState{"japan", {}};
     state.captureTurnStart();
     state.validate();
     return state;
@@ -135,7 +135,7 @@ class FixtureRules : public Rules {
             state.decisions.push_back(reaction("japan", "axis"));
             BattleState battle;
             battle.id = "final_battle";
-            battle.zone = "land_b";
+            battle.zone = zoneNumber(state, "land_b");
             battle.attacker = "kmt";
             battle.defender = "japan";
             battle.stage = "fixture_pending";
@@ -146,12 +146,12 @@ class FixtureRules : public Rules {
     void beginTurn(State& state) const override {
         ++state.flags["began:" + state.currentNation()];
         if (moveOnInitialBegin && state.currentNation() == "ccp") {
-            state.territories.at("land_a").possessor = "kmt";
-            state.units.at("ccp_unit").zone = "land_b";
+            state.territories.at(zoneNumber(state, "land_a")).possessor = "kmt";
+            state.units.at("ccp_unit").zone = zoneNumber(state, "land_b");
         }
         if (moveOnBegin && state.currentNation() == "mongolia") {
-            state.territories.at("land_a").possessor = "mongolia";
-            state.units.at("mongolian_unit").zone = "land_b";
+            state.territories.at(zoneNumber(state, "land_a")).possessor = "mongolia";
+            state.units.at("mongolian_unit").zone = zoneNumber(state, "land_b");
         }
     }
 };
@@ -403,26 +403,26 @@ void freshCampaignStartAndRestoreBoundary() {
     auto state = initialState();
     UnitState unit;
     unit.id = "ccp_unit"; unit.owner = "ccp"; unit.type = "fixture_unit";
-    unit.zone = "land_a"; unit.turnOrigin = "land_b"; unit.route = {"land_b", "land_a"};
+    unit.zone = zoneNumber(state, "land_a"); unit.turnOrigin = zoneNumber(state, "land_b"); unit.route = zoneNumbers(state, {"land_b", "land_a"});
     unit.movementAllowance = 3; unit.movementRemaining = 0;
     unit.turnFlags["used"] = 1; unit.commitments.insert("spent");
     state.units[unit.id] = unit;
     state.nations.at("ccp").turnFlags["used"] = 1;
-    state.territories.at("land_b").flags["aligned_turn"] = 0;
-    state.territories.at("land_b").flags["kept"] = 1;
+    state.territories.at(zoneNumber(state, "land_b")).flags["aligned_turn"] = 0;
+    state.territories.at(zoneNumber(state, "land_b")).flags["kept"] = 1;
     auto engine = Engine::start(state, rules, 42);
     require(engine.state().flags.at("began:ccp") == 1, "Fresh initial nation did not begin once");
-    require(!engine.state().territories.at("land_b").flags.contains("aligned_turn")
-            && engine.state().territories.at("land_b").flags.at("kept") == 1,
+    require(!engine.state().territories.at(zoneNumber(engine.state(), "land_b")).flags.contains("aligned_turn")
+            && engine.state().territories.at(zoneNumber(engine.state(), "land_b")).flags.at("kept") == 1,
             "A new turn kept an old alignment mark or lost another territory flag");
-    require(engine.state().turnStart.possessions.at("land_a") == "ccp"
-            && engine.state().turnStart.units.at(unit.id).second == "land_a", "Initial snapshot followed hook effects");
-    require(engine.state().territories.at("land_a").possessor == "kmt"
-            && engine.state().units.at(unit.id).zone == "land_b", "Initial beginTurn effects were skipped");
+    require(engine.state().turnStart.possessions.at(zoneNumber(engine.state(), "land_a")) == "ccp"
+            && engine.state().turnStart.units.at(unit.id).second == zoneNumber(engine.state(), "land_a"), "Initial snapshot followed hook effects");
+    require(engine.state().territories.at(zoneNumber(engine.state(), "land_a")).possessor == "kmt"
+            && engine.state().units.at(unit.id).zone == zoneNumber(engine.state(), "land_b"), "Initial beginTurn effects were skipped");
     require(engine.state().units.at(unit.id).movementRemaining == 3
             && engine.state().units.at(unit.id).turnFlags.empty()
             && engine.state().units.at(unit.id).commitments.empty(), "Initial active turn state was not reset");
-    require(!state.flags.contains("began:ccp") && state.units.at(unit.id).zone == "land_a", "Start mutated its input state");
+    require(!state.flags.contains("began:ccp") && state.units.at(unit.id).zone == zoneNumber(state, "land_a"), "Start mutated its input state");
     auto restored = Engine::restore(engine.state().definition, rules, engine.serialize());
     auto replayed = Engine::replay(engine.state().definition, rules, engine.serialize(), {});
     auto clone = engine.clone();
@@ -458,7 +458,7 @@ void accountingFailureAndTurnStartSnapshot() {
     state.clock.phase = Phase::PlaceUnits;
     UnitState unit;
     unit.id = "mongolian_unit"; unit.owner = "mongolia"; unit.type = "fixture_unit";
-    unit.zone = "land_a"; unit.turnOrigin = "land_a"; unit.route = {"land_a"};
+    unit.zone = zoneNumber(state, "land_a"); unit.turnOrigin = zoneNumber(state, "land_a"); unit.route = zoneNumbers(state, {"land_a"});
     unit.movementAllowance = 2; unit.movementRemaining = 0;
     unit.turnFlags["used"] = 1; unit.gameFlags["keep"] = 1; unit.commitments.insert("spent");
     state.units[unit.id] = unit;
@@ -472,10 +472,10 @@ void accountingFailureAndTurnStartSnapshot() {
     rules->moveOnBegin = true;
     endPhase(engine);
     require(engine.state().currentNation() == "mongolia", "Next national slot wrong");
-    require(engine.state().turnStart.possessions.at("land_a") == "ccp"
-            && engine.state().turnStart.units.at(unit.id).second == "land_a", "Snapshot was taken after beginTurn effects");
+    require(engine.state().turnStart.possessions.at(zoneNumber(engine.state(), "land_a")) == "ccp"
+            && engine.state().turnStart.units.at(unit.id).second == zoneNumber(engine.state(), "land_a"), "Snapshot was taken after beginTurn effects");
     const auto& reset = engine.state().units.at(unit.id);
-    require(reset.zone == "land_b" && reset.movementRemaining == 2 && reset.turnFlags.empty()
+    require(reset.zone == zoneNumber(state, "land_b") && reset.movementRemaining == 2 && reset.turnFlags.empty()
             && reset.commitments.empty() && reset.route.empty() && reset.gameFlags.at("keep") == 1, "Per-turn unit reset lost persistent state");
 }
 

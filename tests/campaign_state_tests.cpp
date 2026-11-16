@@ -31,20 +31,21 @@ State fixture() {
     s.nations.at("warlord").powerStatus="unaligned_warlord";
     s.nations.at("kmt").atWarWith={"ccp"};s.nations.at("ccp").atWarWith={"kmt"};
     s.nations.at("japan").incomeComponents={{"land",9},{"penalty",-1}};s.nations.at("japan").incomeKnown=true;s.nations.at("japan").technologyStages={{"radar",2}};s.nations.at("japan").turnFlags={{"research",1}};s.nations.at("japan").gameFlags={{"event",1}};
-    s.territories={{"a",TerritoryState{"japan",{{"occupied",1}}}},{"b",TerritoryState{"mongolia",{}}}};
-    UnitState carrier;carrier.id="carrier";carrier.type="transport";carrier.owner="japan";carrier.zone="sea";carrier.turnOrigin="sea";carrier.movementRemaining=1;carrier.movementAllowance=2;carrier.cargo={"cargo"};carrier.route={"sea"};carrier.damage=1;carrier.commitments={"reserved"};carrier.turnFlags={{"moved",1}};carrier.gameFlags={{"veteran",1}};
-    UnitState cargo;cargo.id="cargo";cargo.type="infantry";cargo.owner="kmt";cargo.zone="sea";cargo.turnOrigin="b";cargo.carriedBy="carrier";cargo.route={"b","sea"};
-    UnitState defender;defender.id="defender";defender.type="militia";defender.owner="mongolia";defender.zone="b";defender.turnOrigin="b";
+    const auto a=zoneNumber(s,"a"),b=zoneNumber(s,"b"),sea=zoneNumber(s,"sea");
+    s.territories.emplace(a,TerritoryState{"japan",{{"occupied",1}}});s.territories.emplace(b,TerritoryState{"mongolia",{}});
+    UnitState carrier;carrier.id="carrier";carrier.type="transport";carrier.owner="japan";carrier.zone=sea;carrier.turnOrigin=sea;carrier.movementRemaining=1;carrier.movementAllowance=2;carrier.cargo={"cargo"};carrier.route={sea};carrier.damage=1;carrier.commitments={"reserved"};carrier.turnFlags={{"moved",1}};carrier.gameFlags={{"veteran",1}};
+    UnitState cargo;cargo.id="cargo";cargo.type="infantry";cargo.owner="kmt";cargo.zone=sea;cargo.turnOrigin=b;cargo.carriedBy="carrier";cargo.route={b,sea};
+    UnitState defender;defender.id="defender";defender.type="militia";defender.owner="mongolia";defender.zone=b;defender.turnOrigin=b;
     s.units={{carrier.id,carrier},{cargo.id,cargo},{defender.id,defender}};
-    s.facilities.emplace("port",FacilityState{"port","major_port","a",1,{{"blocked",1}}});
-    s.rails.emplace("rail_a__b",RailState{"rail_a__b","a","b",{{"a",1},{"b",0}}});
+    s.facilities.emplace("port",FacilityState{"port","major_port",a,1,{{"blocked",1}}});
+    s.rails.emplace("rail_a__b",RailState{"rail_a__b",a,b,{{a,1},{b,0}}});
     s.construction.emplace("ship",BuildProject{"ship","japan","fleet_carrier",std::optional<Id>("port"),3,5,{5,5},{{"national_queue",1}}});
     s.repairs.emplace("repair",RepairJob{"repair","japan","carrier",1,3,true});
-    s.repairs.emplace("rail_repair",RepairJob{"rail_repair","japan","rail_a__b",1,1,true,std::optional<Id>("a")});
-    s.completedTurns={{"ccp",0},{"mongolia",0},{"japan",0},{"kmt",0}};s.captureTurnStart();s.turnStart.units.emplace("historical_destroyed",std::pair{Id("kmt"),Id("a")});
+    s.repairs.emplace("rail_repair",RepairJob{"rail_repair","japan","rail_a__b",1,1,true,a});
+    s.completedTurns={{"ccp",0},{"mongolia",0},{"japan",0},{"kmt",0}};s.captureTurnStart();s.turnStart.units.emplace("historical_destroyed",std::pair{Id("kmt"),a});
     s.clock.playerTurnSerial=std::numeric_limits<std::uint64_t>::max();s.flags={{"rule_gate",1}};
     Decision d;d.id="reaction";d.kind="scramble";d.nation="mongolia";d.reaction=true;d.continuation="resume_battle";d.options.push_back(Action{"decline","decline","comintern","mongolia",std::optional<Id>("reaction"),V(O{{"choice",V(std::string("no\n\"scramble\""))}})});s.decisions.push_back(d);
-    s.battles.emplace("battle",BattleState{"battle","b","japan","mongolia","defender_reaction",{"carrier"},{"defender"},{{"defender",1}},{{"round",2}}});s.battleOrder={"battle"};s.battles.at("battle").data=V(O{{"origin",V(std::string("a"))},{"stage_queue",V(V::Array{V(std::string("first_strike")),V(std::string("ordinary"))})}});
+    s.battles.emplace("battle",BattleState{"battle",b,"japan","mongolia","defender_reaction",{"carrier"},{"defender"},{{"defender",1}},{{"round",2}}});s.battleOrder={"battle"};s.battles.at("battle").data=V(O{{"origin",V(std::string("a"))},{"stage_queue",V(V::Array{V(std::string("first_strike")),V(std::string("ordinary"))})}});
     s.chance=ChanceRequest{"roll","bombing","japan","resume_bombing",{{6,1,{1},1},{12,-1,{},0}}};
     s.history.push_back(Event{"fixture",V(O{{"text",V(std::string("歴史"))}}),"previous"});s.validate();return s;
 }
@@ -95,9 +96,9 @@ void cloneIsolationAndKeys() {
     const auto original=fixture();const auto before=original.serialize();const auto key=original.planningKey();auto copy=original.clone();check(copy.definition.get()==original.definition.get(),"Clone copied definition");
     const std::vector<std::function<void(State&)>> changes={
         [](State&s){s.nations.at("japan").treasury=14;},[](State&s){s.nations.at("mongolia").player="allies";},[](State&s){s.nations.at("japan").incomeComponents["land"]=8;},[](State&s){s.nations.at("japan").incomeKnown=false;},[](State&s){s.nations.at("japan").technologyStages["radar"]=3;},[](State&s){s.nations.at("japan").gameFlags["event"]=0;},
-        [](State&s){s.territories.at("a").possessor="kmt";},[](State&s){s.units.at("carrier").movementRemaining=0;},[](State&s){s.units.at("carrier").route.push_back("a");},[](State&s){s.units.at("carrier").commitments.insert("another");},[](State&s){s.units.at("cargo").owner="japan";},[](State&s){s.units.at("carrier").damage=0;},
-        [](State&s){s.facilities.at("port").flags["blocked"]=0;},[](State&s){s.rails.at("rail_a__b").damageByEndpoint["b"]=1;},[](State&s){s.construction.at("ship").remainingPayments[0]=4;},[](State&s){s.repairs.at("repair").restrictsAction=false;},[](State&s){s.repairs.at("rail_repair").endpoint="b";},
-        [](State&s){s.clock.incomeCollected=true;},[](State&s){s.completedTurns.at("ccp")=1;},[](State&s){s.turnStart.possessions.at("a")="kmt";},[](State&s){s.turnStart.units.at("cargo").first="japan";},
+        [](State&s){s.territories.at(zoneNumber(s,"a")).possessor="kmt";},[](State&s){s.units.at("carrier").movementRemaining=0;},[](State&s){s.units.at("carrier").route.push_back(zoneNumber(s,"a"));},[](State&s){s.units.at("carrier").commitments.insert("another");},[](State&s){s.units.at("cargo").owner="japan";},[](State&s){s.units.at("carrier").damage=0;},
+        [](State&s){s.facilities.at("port").flags["blocked"]=0;},[](State&s){s.rails.at("rail_a__b").damageByEndpoint[zoneNumber(s,"b")]=1;},[](State&s){s.construction.at("ship").remainingPayments[0]=4;},[](State&s){s.repairs.at("repair").restrictsAction=false;},[](State&s){s.repairs.at("rail_repair").endpoint=zoneNumber(s,"b");},
+        [](State&s){s.clock.incomeCollected=true;},[](State&s){s.completedTurns.at("ccp")=1;},[](State&s){s.turnStart.possessions.at(zoneNumber(s,"a"))="kmt";},[](State&s){s.turnStart.units.at("cargo").first="japan";},
         [](State&s){s.decisions.back().continuation="different";},[](State&s){s.decisions.back().options[0].parameters=V(O{{"choice",V(true)}});},[](State&s){s.battles.at("battle").pendingHits["defender"]=2;},[](State&s){s.battles.at("battle").data=V(O{{"origin",V(std::string("b"))}});},[](State&s){s.chance->dice[0].modifier=2;},[](State&s){s.flags["rule_gate"]=2;}
     };
     for(const auto& change:changes){copy=original.clone();change(copy);check(copy.planningKey()!=key,"Planning key omitted a mutable decision/outcome field");check(original.serialize()==before,"Clone mutation changed original");}
@@ -107,9 +108,9 @@ void cloneIsolationAndKeys() {
 }
 void invalidReferencesAndCargo() {
     const auto original=fixture();const std::vector<std::function<void(State&)>> bad={
-        [](State&s){s.nations.erase("warlord");},[](State&s){s.nations.at("mongolia").controllerNation="comintern";},[](State&s){s.nations.at("japan").player="missing";},[](State&s){s.nations.at("japan").treasury=-1;},[](State&s){s.territories.erase("a");},[](State&s){s.territories.at("a").possessor="missing";},
-        [](State&s){s.units.at("cargo").owner="missing";},[](State&s){s.units.at("cargo").zone="b";},[](State&s){s.units.at("carrier").cargo.clear();},[](State&s){s.units.at("carrier").cargo.push_back("cargo");},[](State&s){s.units.at("carrier").carriedBy="cargo";s.units.at("cargo").cargo={"carrier"};},[](State&s){s.units.at("carrier").movementRemaining=3;},
-        [](State&s){s.facilities.at("port").zone="sea";},[](State&s){s.rails.at("rail_a__b").damageByEndpoint["sea"]=1;},[](State&s){auto r=s.rails.at("rail_a__b");s.rails.erase("rail_a__b");r.id="rail";s.rails.emplace(r.id,r);s.repairs.erase("rail_repair");},[](State&s){s.repairs.at("rail_repair").endpoint.reset();},[](State&s){s.construction.at("ship").site="missing";},[](State&s){s.repairs.at("repair").target="missing";},[](State&s){s.repairs.at("rail_repair").endpoint="sea";},
+        [](State&s){s.nations.erase("warlord");},[](State&s){s.nations.at("mongolia").controllerNation="comintern";},[](State&s){s.nations.at("japan").player="missing";},[](State&s){s.nations.at("japan").treasury=-1;},[](State&s){s.territories.erase(zoneNumber(s,"a"));},[](State&s){s.territories.at(zoneNumber(s,"a")).possessor="missing";},
+        [](State&s){s.units.at("cargo").owner="missing";},[](State&s){s.units.at("cargo").zone=zoneNumber(s,"b");},[](State&s){s.units.at("defender").zone=ZoneId{};},[](State&s){s.units.at("cargo").route.push_back(ZoneId::fromIndex(99));},[](State&s){s.units.at("carrier").cargo.clear();},[](State&s){s.units.at("carrier").cargo.push_back("cargo");},[](State&s){s.units.at("carrier").carriedBy="cargo";s.units.at("cargo").cargo={"carrier"};},[](State&s){s.units.at("carrier").movementRemaining=3;},
+        [](State&s){s.facilities.at("port").zone=zoneNumber(s,"sea");},[](State&s){s.rails.at("rail_a__b").damageByEndpoint[zoneNumber(s,"sea")]=1;},[](State&s){auto r=s.rails.at("rail_a__b");s.rails.erase("rail_a__b");r.id="rail";s.rails.emplace(r.id,r);s.repairs.erase("rail_repair");},[](State&s){s.repairs.at("rail_repair").endpoint.reset();},[](State&s){s.construction.at("ship").site="missing";},[](State&s){s.repairs.at("repair").target="missing";},[](State&s){s.repairs.at("rail_repair").endpoint=zoneNumber(s,"sea");},
         [](State&s){s.clock.nationIndex=4;},[](State&s){s.clock.roundIndex=11;},
         [](State&s){s.clock.completedRounds=1;},
         [](State&s){s.completedTurns.erase("ccp");},
@@ -145,7 +146,7 @@ void consistentClockProgression() {
 void nationalityRoutingCalendarAndSnapshot() {
     auto s=fixture();check(!s.decisionPlayer(),"Chance request exposed player action");s.chance.reset();check(s.currentNation()=="ccp"&&s.decisionPlayer()==std::optional<Id>("comintern"),"Reaction routing wrong");s.decisions.back().nation="kmt";s.decisions.back().options.clear();check(s.decisionPlayer()==std::optional<Id>("allies"),"Defender not routed independently of player turn");s.decisions.clear();s.clock.nationIndex=1;check(s.currentNation()=="mongolia"&&s.decisionPlayer()==std::optional<Id>("comintern"),"Mongolia nationality merged with player");check(!s.nations.contains("ussr")&&!s.nations.contains("comintern"),"Player/source controller became a nation");
     check(s.calendarDate()==std::pair{1936,7},"Initial calendar date");s.clock.roundIndex=1;check(s.calendarDate()==std::pair{1937,1},"Half-year rollover");s.clock.roundIndex=10;check(s.calendarDate()==std::pair{1941,7},"Final round date");
-    s.captureTurnStart();s.territories.at("a").possessor="kmt";s.units.erase("defender");check(s.turnStart.possessions.at("a")=="japan"&&s.turnStart.units.contains("defender"),"Beginning-turn snapshot changed with mutable state");
+    s.captureTurnStart();s.territories.at(zoneNumber(s,"a")).possessor="kmt";s.units.erase("defender");check(s.turnStart.possessions.at(zoneNumber(s,"a"))=="japan"&&s.turnStart.units.contains("defender"),"Beginning-turn snapshot changed with mutable state");
     s.battles.clear();s.battleOrder.clear();s.clock.completedRounds=11;s.clock.incomeCollected=true;s.clock.nationIndex=3;s.clock.phase=Phase::PlaceUnits;for(const auto& id:s.definition->turnOrder)s.completedTurns[id]=11;s.terminal=true;s.validate();auto incomplete=s.clone();incomplete.completedTurns["ccp"]=10;rejects([&]{incomplete.validate();},"Premature national-turn completion accepted");check(!s.decisionPlayer(),"Terminal state still exposes actor");
 }
 std::set<Id> referenceGeometry(const Definition& definition,const Id& start,int range) {
@@ -161,6 +162,10 @@ std::set<Id> referenceGeometry(const Definition& definition,const Id& start,int 
     }
     return zones;
 }
+// A set of zone numbers as the names of those zones.
+std::set<Id> named(const Definition& definition,const NumberSet<ZoneId>& zones) {
+    std::set<Id> out;for(const auto zone:zones)out.insert(definition.names->zones.name(zone));return out;
+}
 void immutableIndexedGeometry() {
     auto source=definition();
     O nodes;
@@ -173,50 +178,62 @@ void immutableIndexedGeometry() {
     const auto frozen=freezeDefinition(source);
     check(frozen->indexedGeography!=nullptr,"Complete geography was not indexed");
     const auto& index=*frozen->indexedGeography;
-    check(index.nodeIds==std::vector<Id>({"a","b","c","d","isolated","sea"}),"Dense IDs lost lexical ordering");
-    std::vector<Id> adjacent;for(auto next:index.adjacency.at(index.nodeIndices.at("a")))adjacent.push_back(index.nodeIds.at(next));
-    check(adjacent==links.at("a"),"Dense adjacency changed source order or duplicate edges");
+    const auto& zones=frozen->names->zones;
+    check(zones.names()==std::vector<std::string>({"a","b","c","d","isolated","sea"}),"Zone numbers lost lexical ordering");
+    std::vector<Id> adjacent;for(auto next:index.neighbors.at(zones.number("a").index()))adjacent.push_back(zones.name(next));
+    check(adjacent==links.at("a"),"Indexed neighbors changed source order or duplicate edges");
     for(const auto& [start,neighbors]:links)for(int range=-2;range<=8;++range)
-        check(index.withinHops(start,range)==referenceGeometry(*frozen,start,range),"Indexed directed reachability differs from reference BFS");
-    check(!index.withinHops("sea",8).contains("a"),"Directed geometry became undirected");
-    auto unchanged=*frozen;unchanged.indexedGeography.reset();
+        check(named(*frozen,index.withinHops(zones.number(start),range))==referenceGeometry(*frozen,start,range),"Indexed directed reachability differs from reference BFS");
+    check(!index.withinHops(zones.number("sea"),8).contains(zones.number("a")),"Directed geometry became undirected");
+    auto unchanged=*frozen;unchanged.indexedGeography.reset();unchanged.names.reset();
     check(freezeDefinition(unchanged)->fingerprint==frozen->fingerprint,"Derived geometry changed definition identity");
     auto edited=*frozen;
     auto a=nodes.at("a").asObject();a["neighbors"]=V(V::Array{});nodes["a"]=V(a);edited.geography=V(O{{"nodes",V(nodes)}});
     const auto refrozen=freezeDefinition(edited);
     check(refrozen->indexedGeography.get()!=frozen->indexedGeography.get(),"Re-freeze reused a potentially stale geometry view");
-    check(refrozen->indexedGeography->withinHops("a",8)==std::set<Id>{"a"} && index.withinHops("a",8).contains("sea"),"Edited geometry corrupted or reused prior distances");
-    check(!freezeDefinition(definition())->indexedGeography,"Incomplete foundation map received invented adjacency");
+    check(named(*refrozen,refrozen->indexedGeography->withinHops(zones.number("a"),8))==std::set<Id>{"a"} &&
+              index.withinHops(zones.number("a"),8).contains(zones.number("sea")),"Edited geometry corrupted or reused prior distances");
+    const auto incomplete=freezeDefinition(definition());
+    check(!incomplete->indexedGeography,"Incomplete foundation map received invented adjacency");
+    check(incomplete->names && incomplete->names->zones.names()==std::vector<std::string>({"a","b","sea"}),
+          "A map without edges has no zone numbers");
     const auto actual=loadScenario(std::filesystem::path(GWRL_SOURCE_DIR)/"game_content/scenarios/japan_china_1936");
     check(actual.definition->indexedGeography!=nullptr,"Campaign geography has no dense view");
-    for(const auto& start:actual.definition->indexedGeography->nodeIds)for(int range=-1;range<=10;++range)
-        check(actual.definition->indexedGeography->withinHops(start,range)==referenceGeometry(*actual.definition,start,range),"Campaign geometry differs from reference BFS");
+    for(const auto start:actual.definition->names->zones.numbers())for(int range=-1;range<=10;++range)
+        check(named(*actual.definition,actual.definition->indexedGeography->withinHops(start,range))==
+                  referenceGeometry(*actual.definition,zoneName(actual,start),range),"Campaign geometry differs from reference BFS");
     // Map reads through the index match reading the JSON, duplicates and all.
     const auto sameReads=[](const State& state) {
+        const auto& zones=names(state).zones;
         for(const auto& [id,node]:state.definition->geography.require("nodes").asObject()) {
-            check(findMapNode(state,id) && canonicalJson(mapNode(state,id))==canonicalJson(node),"Indexed node differs from its JSON");
+            const auto zone=zoneNumber(state,id);
+            check(zoneName(state,zone)==id&&canonicalJson(mapNode(state,zone))==canonicalJson(node),"Indexed node differs from its JSON");
             std::vector<Id> expected;
             for(const auto& edge:node.require("neighbors").asArray())expected.push_back(edge.require("neighbor_id").asString());
-            check(mapNeighbors(state,id).ids()==expected,"Indexed neighbors changed source order or duplicates");
+            check(zoneNames(state,mapNeighbors(state,zone).zones())==expected,"Indexed neighbors changed source order or duplicates");
             for(const auto& next:expected) {
                 const V* first=nullptr;
                 for(const auto& edge:node.require("neighbors").asArray())
                     if(!first && edge.require("neighbor_id").asString()==next)first=&edge;
-                check(mapEdge(state,id,next) && canonicalJson(*mapEdge(state,id,next))==canonicalJson(*first),"Indexed edge is not the first edge to its neighbor");
+                const auto* found=mapEdge(state,zone,zoneNumber(state,next));
+                check(found && canonicalJson(*found)==canonicalJson(*first),"Indexed edge is not the first edge to its neighbor");
             }
-            check(!mapEdge(state,id,"missing"),"Indexed edge invented a neighbor");
+            for(const auto other:zones.numbers())
+                if(std::find(expected.begin(),expected.end(),zones.name(other))==expected.end())
+                    check(!mapEdge(state,zone,other),"Indexed edge invented a neighbor");
         }
-        check(!findMapNode(state,"missing"),"Unknown node found");
-        rejects([&]{mapNode(state,"missing");},"Unknown node read");
-        rejects([&]{mapNeighbors(state,"missing");},"Unknown node neighbors listed");
-        rejects([&]{mapEdge(state,"missing","a");},"Unknown node edge read");
+        check(!findZone(state,"missing"),"Unknown zone found");
+        rejects([&]{zoneNumber(state,"missing");},"Unknown zone numbered");
+        rejects([&]{mapNode(state,ZoneId{});},"A number naming no zone read");
+        rejects([&]{mapNeighbors(state,ZoneId{});},"A number naming no zone listed neighbors");
+        rejects([&]{mapEdge(state,ZoneId{},zoneNumber(state,zones.names().front()));},"A number naming no zone gave an edge");
     };
     State indexed;indexed.definition=frozen;
     sameReads(indexed);sameReads(actual);
     const auto bare=fixture();
-    check(!bare.definition->indexedGeography && canonicalJson(mapNode(bare,"a"))==canonicalJson(bare.definition->geography.require("nodes").require("a")),
+    check(!bare.definition->indexedGeography && canonicalJson(mapNode(bare,zoneNumber(bare,"a")))==canonicalJson(bare.definition->geography.require("nodes").require("a")),
           "Unindexed node read differs from its JSON");
-    rejects([&]{mapNeighbors(bare,"a");},"Unindexed node without edges listed neighbors");
+    rejects([&]{mapNeighbors(bare,zoneNumber(bare,"a"));},"Unindexed node without edges listed neighbors");
 }
 V nestedNumber(double number) {
     return V(O{{"outer",V(V::Array{V(nullptr),V(true),V("opaque\n中国"),V(O{{"number",V(number)}})})}});
@@ -250,7 +267,7 @@ void everyFreeFormPayloadRetainsFiniteValidation() {
     auto state=loadScenario(std::filesystem::path(GWRL_SOURCE_DIR)/"game_content/scenarios/japan_china_1936");
     state.units.clear();
     UnitState unit;unit.id="finite_raider";unit.type="battlecruiser";unit.owner=state.currentNation();
-    unit.zone=unit.turnOrigin="sea_p15";unit.movementAllowance=unit.movementRemaining=0;unit.gameFlags["raider"]=0;
+    unit.zone=unit.turnOrigin=zoneNumber(state,"sea_p15");unit.movementAllowance=unit.movementRemaining=0;unit.gameFlags["raider"]=0;
     state.units.emplace(unit.id,unit);
     auto configuration=[&](double number) {
         // Built in steps: MSVC runs out of memory resolving it as one nested initializer.

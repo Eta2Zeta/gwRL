@@ -21,7 +21,7 @@ void authoritativeInitialStateAndDomainDiagnostics() {
     broken=s.clone();
     const auto i=std::find_if(broken.units.begin(),broken.units.end(),[&](const auto&p){return broken.definition->catalog->unit(p.second.type).classes.contains("land");});
     check(i!=broken.units.end(),"No land unit in setup");
-    i->second.zone="sea_p14";
+    i->second.zone = zoneNumber(broken, "sea_p14");
     const auto cargoFailures=campaignInvariantFailures(broken);
     check(std::find(cargoFailures.begin(),cargoFailures.end(),"untransported land unit at sea: "+i->first)!=cargoFailures.end(),"Untransported land unit at sea escaped audit");
     broken=s.clone();auto&carrier=broken.units.at("japan_light_carrier_p15_setup_1");
@@ -40,7 +40,7 @@ void authoritativeInitialStateAndDomainDiagnostics() {
     check(std::find(capacityFailures.begin(),capacityFailures.end(),"facility capacity exceeded: "+factory)!=capacityFailures.end(),"Excess facility use escaped audit");
     const auto started=Engine::start(initial(),campaignRules(),1936).state().clone();
     check(started.nations.at("japan").incomeKnown&&campaignInvariantFailures(started).empty(),"A new campaign's first position has no evaluated income");
-    broken=started.clone();broken.territories.at("land_china_nanking").possessor="japan";
+    broken=started.clone();broken.territories.at(zoneNumber(broken, "land_china_nanking")).possessor="japan";
     const auto incomeFailures=campaignInvariantFailures(broken);
     check(std::find(incomeFailures.begin(),incomeFailures.end(),"stale income: japan")!=incomeFailures.end()&&
           std::find(incomeFailures.begin(),incomeFailures.end(),"stale income: kmt")!=incomeFailures.end(),"A stored income that no longer matches the land held escaped audit");
@@ -67,10 +67,10 @@ void carpetBombingParticipatesOnceAndCannotBeHitByInfantry() {
     s.completedTurns["ccp"]=s.completedTurns["mongolia"]=1;
     s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");
     const Id origin="land_china_beiping",target="land_china_hopeh";
-    s.territories.at(origin).possessor="japan";s.territories.at(target).possessor="kmt";
+    s.territories.at(zoneNumber(s, origin)).possessor="japan";s.territories.at(zoneNumber(s, target)).possessor="kmt";
     auto add=[&](const Id&id,const Id&type,const Id&owner,const Id&zone){
-        UnitState u;u.id=id;u.type=type;u.owner=owner;u.zone=u.turnOrigin=zone;
-        u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(type,0,catalogContext(s,owner,zone)).movement;s.units[id]=u;
+        UnitState u;u.id=id;u.type=type;u.owner=owner;u.zone=u.turnOrigin = zoneNumber(s, zone);
+        u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(type,0,catalogContext(s,owner,zoneNumber(s, zone))).movement;s.units[id]=u;
     };
     add("carpet_bomber","heavy_strategic_bomber","japan",origin);
     add("ordinary_aircraft","tactical_bomber","japan",origin);
@@ -111,14 +111,14 @@ void carpetBombingParticipatesOnceAndCannotBeHitByInfantry() {
     const auto clone=e.clone();const auto restored=Engine::restore(s.definition,rules,returning);
     check(clone.exactReplayIdentity()==e.exactReplayIdentity()&&restored.exactReplayIdentity()==e.exactReplayIdentity(),"Pending first-round carpet return lost clone/checkpoint/RNG identity");
     choose("air_land","carpet_bomber");
-    check(e.state().units.at("carpet_bomber").zone==origin&&e.state().units.at("ordinary_aircraft").zone==target,"Carpet return moved other aircraft or waited for battle end");
+    check(e.state().units.at("carpet_bomber").zone==zoneNumber(e.state(), origin)&&e.state().units.at("ordinary_aircraft").zone==zoneNumber(e.state(), target),"Carpet return moved other aircraft or waited for battle end");
     choose("land_progress_battle");choose("land_continue_fighting");
     check(e.state().chance&&e.state().chance->dice.size()==2,"Round2 did not retain ordinary infantry/aircraft while excluding carpet bombing");
     check(std::find(e.state().battles.at(battle).attackers.begin(),e.state().battles.at(battle).attackers.end(),"carpet_bomber")==e.state().battles.at(battle).attackers.end(),"Carpet bomber remained a round2 combat participant");
     chance();chance();choose("land_retreat_begin");choose("land_retreat_unit","attacker_b");
     choose("air_land","ordinary_aircraft");
     for(int count=0;count<3&&!e.state().battles.empty();++count)choose("land_progress_battle");
-    check(e.state().battles.empty()&&e.state().units.at("carpet_bomber").zone==origin&&e.state().territories.at(target).possessor=="kmt","Conditional carpet combat did not return the bomber and preserve uncaptured land");
+    check(e.state().battles.empty()&&e.state().units.at("carpet_bomber").zone==zoneNumber(e.state(), origin)&&e.state().territories.at(zoneNumber(e.state(), target)).possessor=="kmt","Conditional carpet combat did not return the bomber and preserve uncaptured land");
     const auto replay=Engine::replay(s.definition,rules,checkpoint,e.state().history);
     check(replay.exactReplayIdentity()==e.exactReplayIdentity(),"Carpet bombing combined-engine trace replay diverged");
 }

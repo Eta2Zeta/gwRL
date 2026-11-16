@@ -23,8 +23,8 @@ State fixture(){
     s.captureTurnStart();return s;
 }
 void add(State& s,const Id& id,const Id& type,const Id& owner,const Id& zone=sea){
-    UnitState u;u.id=id;u.type=type;u.owner=owner;u.zone=u.turnOrigin=zone;
-    u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(type,0,catalogContext(s,owner,zone)).movement;
+    UnitState u;u.id=id;u.type=type;u.owner=owner;u.zone=u.turnOrigin = zoneNumber(s, zone);
+    u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(type,0,catalogContext(s,owner,zoneNumber(s, zone))).movement;
     s.units[id]=u;
 }
 std::shared_ptr<const Rules> rules(){return std::make_shared<NavalRules>(std::make_shared<AirRules>(std::make_shared<EconomyRules>()));}
@@ -36,8 +36,8 @@ void choose(Engine& e,const Id& kind,const Id& unit=""){
     e.step(pick(e,kind,[&](const Action& a){return unit.empty()||(a.parameters.find("unit")&&a.parameters.require("unit").asString()==unit);}));
 }
 Id battle(State& s,const std::vector<Id>& attackers,const O& extra={}){
-    O options=extra;options["no_scramble"]=V(true);std::map<Id,Id> origins;for(const auto& id:attackers)origins[id]=from;
-    return registerNavalBattle(s,sea,"japan",attackers,origins,V(options));
+    O options=extra;options["no_scramble"]=V(true);std::map<Id,ZoneId> origins;for(const auto& id:attackers)origins[id]=zoneNumber(s, from);
+    return registerNavalBattle(s,zoneNumber(s, sea),"japan",attackers,origins,V(options));
 }
 void finish(Engine& e){
     for(int i=0;i<100&&!e.state().battles.empty();++i){
@@ -62,9 +62,9 @@ void capitalHitsAndDamageValues(){
     check(e.state().units.at("d").damage==1&&e.state().units.at("d").movementRemaining==1,"First battleship hit did not reduce damage/movement once");
     choose(e,"naval_take_casualty","d");check(e.state().chance&&e.state().units.contains("d"),"Sunk capital ship did not receive ordinary return fire");e.resolveChance();finish(e);
     check(!e.state().units.contains("d"),"Second battleship hit failed to sink");
-    auto c=s.definition->catalog->stats("heavy_battleship",2,catalogContext(s,"japan",sea));
+    auto c=s.definition->catalog->stats("heavy_battleship",2,catalogContext(s,"japan",zoneNumber(s, sea)));
     check(c.attack==6&&c.defense==6&&c.movement==2,"User-confirmed capital damage matrix changed");
-    auto carrier=s.definition->catalog->stats("fleet_carrier",1,catalogContext(s,"japan",sea));check(carrier.defense==1,"Damaged carrier defense incorrect");
+    auto carrier=s.definition->catalog->stats("fleet_carrier",1,catalogContext(s,"japan",zoneNumber(s, sea)));check(carrier.defense==1,"Damaged carrier defense incorrect");
 }
 void submarineFirstStrikeAndDestroyer(){
     auto s=fixture();add(s,"a","submarine","japan");add(s,"d","heavy_cruiser","kmt");battle(s,{"a"});Engine e(s,rules());e.setDiceTapeForTesting({2});choose(e,"naval_begin_battle");e.resolveChance();choose(e,"naval_take_casualty","d");
@@ -101,7 +101,7 @@ void aswTransportDefendsOnlySubmarines(){
 void retreatUsesActualShipEntry(){
     auto s=fixture();add(s,"a","destroyer","japan");add(s,"d","destroyer","kmt");auto id=battle(s,{"a"});Engine e(s,rules());e.setDiceTapeForTesting({12,12});choose(e,"naval_begin_battle");e.resolveChance();e.resolveChance();choose(e,"naval_retreat_begin");
     for(const auto& a:e.legalActions())check(a.parameters.require("zone").asString()==from,"Naval retreat offered unused entry sea");choose(e,"naval_retreat_unit","a");
-    check(e.state().units.at("a").zone==from&&e.state().units.at("a").movementRemaining==0,"Naval retreat did not exhaust movement");finish(e);
+    check(e.state().units.at("a").zone == zoneNumber(e.state(), from)&&e.state().units.at("a").movementRemaining==0,"Naval retreat did not exhaust movement");finish(e);
 }
 void carrierLossRescuesDefendingAircraft(){
     auto s=fixture();add(s,"a","submarine","japan");add(s,"c","light_carrier","kmt");add(s,"p","fighter","kmt");add(s,"other","fleet_carrier","kmt");attachCargo(s,"c","p");
@@ -113,7 +113,7 @@ void carrierLossRescuesDefendingAircraft(){
 }
 void defendingAircraftReturnToTheirIntactCarrier(){
     auto s=fixture();add(s,"a","destroyer","japan");add(s,"c","fleet_carrier","kmt");add(s,"p","fighter","kmt");attachCargo(s,"c","p");
-    registerNavalBattle(s,sea,"japan",{"a"},{{"a",from}});Engine e(s,rules());e.setDiceTapeForTesting({12,12,12});choose(e,"naval_begin_battle");choose(e,"air_defend","p");
+    registerNavalBattle(s,zoneNumber(s, sea),"japan",{"a"},{{"a",zoneNumber(s, from)}});Engine e(s,rules());e.setDiceTapeForTesting({12,12,12});choose(e,"naval_begin_battle");choose(e,"air_defend","p");
     check(!e.state().units.at("p").carriedBy&&e.state().units.at("p").commitments.contains("air_defending_carrier:c"),"Defending carrier aircraft did not preserve its source");
     choose(e,"naval_progress_battle");e.resolveChance();e.resolveChance();e.resolveChance();choose(e,"naval_retreat_begin");choose(e,"naval_retreat_unit","a");
     check(e.state().units.at("p").carriedBy=="c"&&e.state().units.at("p").movementRemaining==4&&
@@ -121,15 +121,15 @@ void defendingAircraftReturnToTheirIntactCarrier(){
 }
 void declaredAircraftMergeAndAttackOriginsStayNaval(){
     auto s=fixture();add(s,"a","destroyer","japan");add(s,"p","fighter","japan");add(s,"d","destroyer","kmt");auto first=battle(s,{"a"});
-    auto second=registerNavalBattle(s,sea,"japan",{"p"},{{"p",other}},V(O{{"context",V(std::string("standard"))}}));
+    auto second=registerNavalBattle(s,zoneNumber(s, sea),"japan",{"p"},{{"p",zoneNumber(s, other)}},V(O{{"context",V(std::string("standard"))}}));
     check(first==second&&s.battles.size()==1&&s.battles.at(first).attackers.size()==2,"Same nation's naval aircraft did not join its declared sea battle");
     check(s.battles.at(first).data.require("naval_entry_origins").asArray().size()==1,"Aircraft approach created a naval retreat origin");
 }
 void portAttackStillGetsFacilityAaAfterShipLoss(){
-    auto s=fixture();s.territories.at(tokyo).possessor="kmt";s.captureTurnStart();
-    FacilityState f;f.id="port";f.type="major_port";f.zone=tokyo;s.facilities[f.id]=f;
+    auto s=fixture();s.territories.at(zoneNumber(s, tokyo)).possessor="kmt";s.captureTurnStart();
+    FacilityState f;f.id="port";f.type="major_port";f.zone = zoneNumber(s, tokyo);s.facilities[f.id]=f;
     add(s,"a","fighter","japan");add(s,"d","destroyer","kmt",tokyo);s.units.at("d").gameFlags["in_port:port"]=1;
-    auto id=registerNavalBattle(s,sea,"japan",{"a"},{{"a",from}},V(O{{"context",V(std::string("port_attack"))},{"facility",V(std::string("port"))},{"defenders",V(A{V(std::string("d"))})},{"no_scramble",V(true)}}));
+    auto id=registerNavalBattle(s,zoneNumber(s, sea),"japan",{"a"},{{"a",zoneNumber(s, from)}},V(O{{"context",V(std::string("port_attack"))},{"facility",V(std::string("port"))},{"defenders",V(A{V(std::string("d"))})},{"no_scramble",V(true)}}));
     Engine e(s,rules());e.setDiceTapeForTesting({1,1});choose(e,"naval_begin_battle");e.resolveChance();choose(e,"naval_take_casualty","d");
     check(e.state().chance&&e.state().chance->purpose=="naval_port_aa","Port facility lost its AA merely because its last ship was sunk");e.resolveChance();choose(e,"naval_take_casualty","a");
     check(!e.state().units.contains("a")&&!e.state().units.contains("d"),"Port attack AA or ship casualty wrong");finish(e);
@@ -145,7 +145,7 @@ void raiderDiscoveryTiesAndSlipStayInSea(){
     auto s=fixture();add(s,"a","destroyer","japan");add(s,"d","battlecruiser","kmt");s.units.at("d").gameFlags["raider"]=1;auto id=battle(s,{"a"});
     Engine e(s,rules());e.setDiceTapeForTesting({1,6,12,1});const auto checkpoint=e.serialize();choose(e,"naval_begin_battle");choose(e,"naval_discover_raider");e.resolveChance();
     check(e.state().chance&&e.state().chance->purpose=="naval_raider_discovery","Equal modified raider dice did not reroll");e.resolveChance();
-    check(e.state().decisions.back().nation=="kmt","Winning raider slip choice went to attacker");choose(e,"naval_raider_slip");check(e.state().units.at("d").zone==sea,"Slipping defending raider teleported to another sea");finish(e);
+    check(e.state().decisions.back().nation=="kmt","Winning raider slip choice went to attacker");choose(e,"naval_raider_slip");check(e.state().units.at("d").zone == zoneNumber(e.state(), sea),"Slipping defending raider teleported to another sea");finish(e);
     auto replayed=Engine::replay(s.definition,rules(),checkpoint,e.state().history);check(replayed.exactReplayIdentity()==e.exactReplayIdentity(),"Raider tie/slip replay diverged");
     auto t=fixture();add(t,"a","destroyer","japan");add(t,"d","battlecruiser","kmt");t.units.at("d").gameFlags["raider"]=1;auto bid=battle(t,{"a"});Engine f(t,rules());f.setDiceTapeForTesting({1,12,12,12});choose(f,"naval_begin_battle");choose(f,"naval_discover_raider");f.resolveChance();f.resolveChance();f.resolveChance();
     check(f.state().battles.at(bid).flags.at("finished")&&f.state().battles.at(bid).data.require("round").asInt()==1,"Lone defending raider exceeded one round");finish(f);
@@ -158,19 +158,19 @@ void jointDefenseDisputeUsesEntitledPlayers(){
     check(e.state().chance&&e.state().chance->dice.size()==2,"Disputed ordinary casualty lost its normal return fire");
 }
 void shipScrambleAndSkeletonCrewExclusion(){
-    auto s=fixture();s.territories.at(tokyo).possessor="kmt";FacilityState port;port.id="scramble_port";port.type="major_port";port.zone=tokyo;port.flags["border:"+sea]=1;s.facilities[port.id]=port;
+    auto s=fixture();s.territories.at(zoneNumber(s, tokyo)).possessor="kmt";FacilityState port;port.id="scramble_port";port.type="major_port";port.zone = zoneNumber(s, tokyo);port.flags["border:"+sea]=1;s.facilities[port.id]=port;
     add(s,"a","destroyer","japan");add(s,"d","destroyer","kmt");add(s,"scramble","destroyer","kmt",tokyo);add(s,"locked","heavy_cruiser","kmt",tokyo);
     s.units.at("scramble").gameFlags["in_port:scramble_port"]=1;s.units.at("locked").gameFlags["in_port:scramble_port"]=1;s.units.at("locked").gameFlags["skeleton_crew_until_own_turn"]=1;s.captureTurnStart();
-    registerNavalBattle(s,sea,"japan",{"a"},{{"a",from}});Engine e(s,rules());choose(e,"naval_begin_battle");
+    registerNavalBattle(s,zoneNumber(s, sea),"japan",{"a"},{{"a",zoneNumber(s, from)}});Engine e(s,rules());choose(e,"naval_begin_battle");
     for(const auto& a:e.legalActions())check(a.parameters.require("unit").asString()=="scramble","Skeleton crew was allowed to scramble");choose(e,"naval_scramble","scramble");
-    check(e.state().units.at("scramble").zone==sea&&e.state().units.at("scramble").commitments.contains("naval_scramble_origin:scramble_port"),"Ship scramble lost physical source");
+    check(e.state().units.at("scramble").zone == zoneNumber(e.state(), sea)&&e.state().units.at("scramble").commitments.contains("naval_scramble_origin:scramble_port"),"Ship scramble lost physical source");
 }
 void scrambledCarrierTakesItsAircraft(){
-    auto s=fixture();s.territories.at(tokyo).possessor="kmt";FacilityState port;port.id="scramble_port";port.type="major_port";port.zone=tokyo;port.flags["border:"+sea]=1;s.facilities[port.id]=port;
+    auto s=fixture();s.territories.at(zoneNumber(s, tokyo)).possessor="kmt";FacilityState port;port.id="scramble_port";port.type="major_port";port.zone = zoneNumber(s, tokyo);port.flags["border:"+sea]=1;s.facilities[port.id]=port;
     add(s,"a","destroyer","japan");add(s,"d","destroyer","kmt");add(s,"carrier","fleet_carrier","kmt",tokyo);add(s,"plane","fighter","kmt",tokyo);
     s.units.at("carrier").gameFlags["in_port:scramble_port"]=1;attachCargo(s,"carrier","plane");s.captureTurnStart();
-    registerNavalBattle(s,sea,"japan",{"a"},{{"a",from}});Engine e(s,rules());choose(e,"naval_begin_battle");choose(e,"naval_scramble","carrier");
-    check(e.state().units.at("carrier").zone==sea&&e.state().units.at("plane").zone==sea,"Scrambled Carrier left its aircraft in port");
+    registerNavalBattle(s,zoneNumber(s, sea),"japan",{"a"},{{"a",zoneNumber(s, from)}});Engine e(s,rules());choose(e,"naval_begin_battle");choose(e,"naval_scramble","carrier");
+    check(e.state().units.at("carrier").zone==zoneNumber(e.state(), sea)&&e.state().units.at("plane").zone==zoneNumber(e.state(), sea),"Scrambled Carrier left its aircraft in port");
 }
 // RB 9.3.1 and 9.4 (RCL-020): a patrol plane is not a carrier's aircraft. It
 // chooses first, before any scramble; staying out costs it nothing and leaves
@@ -178,23 +178,23 @@ void scrambledCarrierTakesItsAircraft(){
 // attack it are present.
 void patrolPlaneChoosesBeforeScrambles(){
     const auto setup=[](bool armed,bool escort){
-        auto s=fixture();s.territories.at(tokyo).possessor="kmt";
-        FacilityState port;port.id="scramble_port";port.type="major_port";port.zone=tokyo;port.flags["border:"+sea]=1;s.facilities[port.id]=port;
+        auto s=fixture();s.territories.at(zoneNumber(s, tokyo)).possessor="kmt";
+        FacilityState port;port.id="scramble_port";port.type="major_port";port.zone = zoneNumber(s, tokyo);port.flags["border:"+sea]=1;s.facilities[port.id]=port;
         add(s,"a","destroyer","japan");add(s,"patrol","fighter","kmt");add(s,"scramble","destroyer","kmt",tokyo);
         auto& p=s.units.at("patrol");p.gameFlags["on_map"]=1;p.gameFlags["map_range"]=1;p.commitments.insert("maritime_air_patrol");
         s.units.at("scramble").gameFlags["in_port:scramble_port"]=1;
         std::vector<Id> attackers{"a"};
         if(armed){add(s,"f","fighter","japan");attackers.push_back("f");}
         if(escort)add(s,"d","destroyer","kmt");
-        s.captureTurnStart();std::map<Id,Id> origins;for(const auto& id:attackers)origins[id]=from;
-        const auto id=registerNavalBattle(s,sea,"japan",attackers,origins);return std::make_pair(s,id);
+        s.captureTurnStart();std::map<Id,ZoneId> origins;for(const auto& id:attackers)origins[id]=zoneNumber(s, from);
+        const auto id=registerNavalBattle(s,zoneNumber(s, sea),"japan",attackers,origins);return std::make_pair(s,id);
     };
     const auto kinds=[](Engine& e){std::set<Id> out;for(const auto& a:e.legalActions())out.insert(a.kind);return out;};
     {
         auto [s,id]=setup(false,false);Engine e(s,rules());const auto checkpoint=e.serialize();choose(e,"naval_begin_battle");
         check(kinds(e)==std::set<Id>{"naval_patrol_engage","naval_patrol_decline"},"The patrol plane was not asked first, before any scramble");
         choose(e,"naval_patrol_decline");
-        check(e.state().battles.at(id).flags.contains("finished")&&!e.state().chance&&e.state().units.at("scramble").zone==tokyo,
+        check(e.state().battles.at(id).flags.contains("finished")&&!e.state().chance&&e.state().units.at("scramble").zone==zoneNumber(e.state(), tokyo),
               "A battle went on, or a ship scrambled, after its only defender stayed out");
         finish(e);
         check(e.state().units.contains("patrol")&&e.state().units.at("patrol").gameFlags.contains("on_map"),
@@ -226,7 +226,7 @@ void patrolPlaneChoosesBeforeScrambles(){
 }
 void seaplaneAswBonusTargetsSubmarines(){
     auto s=fixture();add(s,"a","seaplane","japan");add(s,"d","submarine","kmt");s.nations.at("japan").technologyStages["anti_submarine_warfare"]=4;
-    s.units.at("a").gameFlags["on_map"]=1;s.units.at("a").gameFlags["map_range"]=2;const auto base=s.definition->catalog->stats("seaplane",0,catalogContext(s,"japan",sea)).attack.value();battle(s,{"a"});
+    s.units.at("a").gameFlags["on_map"]=1;s.units.at("a").gameFlags["map_range"]=2;const auto base=s.definition->catalog->stats("seaplane",0,catalogContext(s,"japan",zoneNumber(s, sea))).attack.value();battle(s,{"a"});
     Engine e(s,rules());e.setDiceTapeForTesting({base+1});choose(e,"naval_begin_battle");choose(e,"naval_sub_protected");e.resolveChance();choose(e,"naval_take_casualty","d");check(!e.state().units.contains("d"),"Seaplane MAP ASW bonus did not hit submarine");finish(e);
 }
 } // namespace

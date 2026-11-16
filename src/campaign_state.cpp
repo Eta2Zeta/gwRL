@@ -84,41 +84,38 @@ V definitionJson(const Definition& d) {
     O factions; for (const auto& [k,f]:d.factions) factions.emplace(k,V(O{{"id",V(f.id)},{"display_name",V(f.displayName)},{"home_country",strings(f.homeCountry)},{"home_country_known",V(f.homeCountryKnown)},{"dormant",V(f.dormant)}}));
     return V(O{{"scenario_id",V(d.scenarioId)},{"geography",d.geography},{"rules",d.rules},{"factions",V(std::move(factions))},{"turn_order",strings(d.turnOrder)},{"players",strings(d.players)},{"start_year",number(d.startYear)},{"start_month",number(d.startMonth)},{"calendar_rounds",number(d.calendarRounds)}});
 }
-std::shared_ptr<const IndexedGeography> indexGeography(const V::Object& nodes) {
+std::shared_ptr<const IndexedGeography> indexGeography(const V::Object& nodes,const NameTable<ZoneKind>& zones) {
     auto index=std::make_shared<IndexedGeography>();
-    index->nodeIds.reserve(nodes.size());
-    index->nodeIndices.reserve(nodes.size());
+    // The node object lists zones by name, which is zone number order.
+    index->land.reserve(nodes.size());
+    index->nodes.reserve(nodes.size());
     for(const auto& [id,node]:nodes) {
-        index->nodeIndices.emplace(id,index->nodeIds.size());
-        index->nodeIds.push_back(id);
         const auto* type=node.find("type");
         const bool land=type && type->isString() && type->asString()=="land";
         index->land.push_back(land);
-        if(land)index->landIds.push_back(id);
+        if(land)index->landZones.push_back(ZoneId::fromIndex(index->nodes.size()));
+        index->nodes.push_back(node);
     }
-    index->adjacency.resize(nodes.size());
-    index->nodes.reserve(nodes.size());
-    for(const auto& [id,node]:nodes) index->nodes.push_back(node);
-    index->neighborIds.resize(nodes.size());
+    index->neighbors.resize(nodes.size());
     index->edges.resize(nodes.size());
-    for(const auto& [id,node]:nodes) {
+    for(std::size_t at=0;at<index->nodes.size();++at) {
         // Some catalog-free state fixtures deliberately omit physical edges.
         // Preserve their validation/late-error behavior rather than inventing
         // an empty map or imposing an additional definition requirement.
-        const auto* neighbors=node.find("neighbors");
+        const auto* neighbors=index->nodes[at].find("neighbors");
         if(!neighbors || !neighbors->isArray()) return nullptr;
-        const auto at=index->nodeIndices.at(id);
-        auto& adjacent=index->adjacency[at];
+        auto& adjacent=index->neighbors[at];
+        auto& firstEdges=index->edges[at];
         adjacent.reserve(neighbors->asArray().size());
-        for(const auto& edge:index->nodes[at].require("neighbors").asArray()) {
+        for(const auto& edge:neighbors->asArray()) {
             if(!edge.isObject()) return nullptr;
             const auto* neighbor=edge.find("neighbor_id");
             if(!neighbor || !neighbor->isString()) return nullptr;
-            const auto found=index->nodeIndices.find(neighbor->asString());
-            if(found==index->nodeIndices.end()) return nullptr;
-            adjacent.push_back(found->second);
-            index->neighborIds[at].push_back(neighbor->asString());
-            index->edges[at].emplace(neighbor->asString(),&edge);
+            const auto found=zones.find(neighbor->asString());
+            if(!found) return nullptr;
+            adjacent.push_back(*found);
+            if(std::none_of(firstEdges.begin(),firstEdges.end(),[&](const auto& known){return known.first==*found;}))
+                firstEdges.emplace_back(*found,&edge);
         }
     }
     index->hopDistances.assign(nodes.size(),std::vector<int>(nodes.size(),-1));
@@ -128,32 +125,33 @@ std::shared_ptr<const IndexedGeography> indexGeography(const V::Object& nodes) {
         std::deque<std::size_t> pending{origin};
         while(!pending.empty()) {
             const auto from=pending.front(); pending.pop_front();
-            for(const auto to:index->adjacency[from]) if(distances[to]<0) {
-                distances[to]=distances[from]+1;
-                pending.push_back(to);
+            for(const auto to:index->neighbors[from]) if(distances[to.index()]<0) {
+                distances[to.index()]=distances[from]+1;
+                pending.push_back(to.index());
             }
         }
     }
     return index;
 }
-V politicsJson(const PoliticalState& p) {
-    O attacks, pending;
+V politicsJson(const NameTable<ZoneKind>& zones,const PoliticalState& p) {
+    O attacks, pending, capitals;
+    for(const auto& [id,capital]:p.capitals)capitals.emplace(id,V(zones.name(capital)));
     for(const auto& [id,actors]:p.attackedWarlords)attacks.emplace(id,strings(actors));
     for(const auto& [id,value]:p.pending)pending.emplace(id,value);
     return V(fields({{"chinese_truce",V(p.chineseTruce)}, {"truce_permanently_ended",V(p.trucePermanentlyEnded)},
         {"foreign_china_war_pending",V(p.foreignChinaWarPending)}, {"truce_offer_pending",V(p.truceOfferPending)},
         {"china_invader",optionalId(p.chinaInvader)}, {"attacked_warlords",V(std::move(attacks))},
-        {"alignment_queue",strings(p.alignmentQueue)}, {"capitals",idMap(p.capitals)},
+        {"alignment_queue",strings(p.alignmentQueue)}, {"capitals",V(std::move(capitals))},
         {"surrendered",strings(p.surrendered)}, {"evolution_awarded",strings(p.evolutionAwarded)},
         {"pending",V(std::move(pending))}}));
 }
-PoliticalState readPolitics(const V& v) {
+PoliticalState readPolitics(const NameTable<ZoneKind>& zones,const V& v) {
     PoliticalState p;
     p.chineseTruce=v.require("chinese_truce").asBool();p.trucePermanentlyEnded=v.require("truce_permanently_ended").asBool();
     p.foreignChinaWarPending=v.require("foreign_china_war_pending").asBool();p.truceOfferPending=v.require("truce_offer_pending").asBool();
     p.chinaInvader=readOptionalId(v.require("china_invader"));
     for(const auto& [id,actors]:v.require("attacked_warlords").asObject())p.attackedWarlords.emplace(id,readSet(actors));
-    p.alignmentQueue=readStrings(v.require("alignment_queue"));p.capitals=readIdMap(v.require("capitals"));
+    p.alignmentQueue=readStrings(v.require("alignment_queue"));for(const auto& [id,x]:v.require("capitals").asObject())p.capitals.emplace(id,zones.number(x.asString()));
     p.surrendered=readSet(v.require("surrendered"));p.evolutionAwarded=readSet(v.require("evolution_awarded"));
     p.pending=v.require("pending").asObject();return p;
 }
@@ -175,8 +173,12 @@ template<class C> void writeStrings(std::string& out,const C& values) { out+='['
 void writeInts(std::string& out,const std::vector<int>& values) { out+='['; bool first=true; for(int v:values) { if(!first)out+=','; first=false; writeInt(out,v); } out+=']'; }
 void writeIntMap(std::string& out,const std::map<Id,int>& values) { out+='{'; bool first=true; for(const auto& [k,v]:values) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; writeInt(out,v); } out+='}'; }
 template<class M,class F> void writeEntries(std::string& out,const M& entries,F&& write) { out+='{'; bool first=true; for(const auto& [k,v]:entries) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; write(v); } out+='}'; }
+// The same for entries keyed by zone number, written under the zones' names.
+template<class M,class F> void writeZoneEntries(std::string& out,const NameTable<ZoneKind>& zones,const M& entries,F&& write) { out+='{'; bool first=true; for(const auto& [k,v]:entries) { if(!first)out+=','; first=false; writeString(out,zones.name(k)); out+=':'; write(v); } out+='}'; }
+void writeZones(std::string& out,const NameTable<ZoneKind>& zones,const std::vector<ZoneId>& values) { out+='['; bool first=true; for(const auto zone:values) { if(!first)out+=','; first=false; writeString(out,zones.name(zone)); } out+=']'; }
 void writeState(std::string& out,const State& s,bool includeHistory) {
     require(s.definition!=nullptr,"State has no definition");
+    const auto& zones=names(s).zones;
     const bool interface=!s.actionInterface.asObject().empty();
     if(interface) { writeKey(out,"action_interface",true); writeJson(out,s.actionInterface); }
     writeKey(out,"battle_order",!interface); writeStrings(out,s.battleOrder);
@@ -185,7 +187,7 @@ void writeState(std::string& out,const State& s,bool includeHistory) {
         writeKey(out,"data"); writeJson(out,x.data); writeKey(out,"defender"); writeString(out,x.defender);
         writeKey(out,"defenders"); writeStrings(out,x.defenders); writeKey(out,"flags"); writeIntMap(out,x.flags);
         writeKey(out,"id"); writeString(out,x.id); writeKey(out,"pending_hits"); writeIntMap(out,x.pendingHits);
-        writeKey(out,"stage"); writeString(out,x.stage); writeKey(out,"zone"); writeString(out,x.zone); out+='}'; });
+        writeKey(out,"stage"); writeString(out,x.stage); writeKey(out,"zone"); writeString(out,zones.name(x.zone)); out+='}'; });
     writeKey(out,"chance"); if(s.chance)writeJson(out,chanceJson(*s.chance)); else out+="null";
     writeKey(out,"clock"); writeKey(out,"completed_rounds",true); writeInt(out,s.clock.completedRounds);
     writeKey(out,"income_collected"); writeBool(out,s.clock.incomeCollected); writeKey(out,"nation_index"); writeInt(out,s.clock.nationIndex);
@@ -201,7 +203,7 @@ void writeState(std::string& out,const State& s,bool includeHistory) {
     writeKey(out,"definition_fingerprint"); writeString(out,s.definition->fingerprint);
     writeKey(out,"facilities"); writeEntries(out,s.facilities,[&](const FacilityState& x) {
         writeKey(out,"damage",true); writeInt(out,x.damage); writeKey(out,"flags"); writeIntMap(out,x.flags); writeKey(out,"id"); writeString(out,x.id);
-        writeKey(out,"type"); writeString(out,x.type); writeKey(out,"zone"); writeString(out,x.zone); out+='}'; });
+        writeKey(out,"type"); writeString(out,x.type); writeKey(out,"zone"); writeString(out,zones.name(x.zone)); out+='}'; });
     writeKey(out,"flags"); writeIntMap(out,s.flags);
     if(includeHistory) {
         writeKey(out,"history"); out+='['; bool first=true;
@@ -219,31 +221,33 @@ void writeState(std::string& out,const State& s,bool includeHistory) {
         writeKey(out,"income_known"); writeBool(out,x.incomeKnown); writeKey(out,"player"); writeOptionalId(out,x.player);
         writeKey(out,"power_status"); writeString(out,x.powerStatus); writeKey(out,"technology_stages"); writeIntMap(out,x.technologyStages);
         writeKey(out,"treasury"); writeOptionalInt(out,x.treasury); writeKey(out,"turn_flags"); writeIntMap(out,x.turnFlags); out+='}'; });
-    writeKey(out,"politics"); writeJson(out,politicsJson(s.politics));
+    writeKey(out,"politics"); writeJson(out,politicsJson(zones,s.politics));
     writeKey(out,"rails"); writeEntries(out,s.rails,[&](const RailState& x) {
-        writeKey(out,"damage_by_endpoint",true); writeIntMap(out,x.damageByEndpoint); writeKey(out,"endpoint_a"); writeString(out,x.endpointA);
-        writeKey(out,"endpoint_b"); writeString(out,x.endpointB); writeKey(out,"id"); writeString(out,x.id); out+='}'; });
+        writeKey(out,"damage_by_endpoint",true); writeZoneEntries(out,zones,x.damageByEndpoint,[&](int damage) { writeInt(out,damage); });
+        writeKey(out,"endpoint_a"); writeString(out,zones.name(x.endpointA));
+        writeKey(out,"endpoint_b"); writeString(out,zones.name(x.endpointB)); writeKey(out,"id"); writeString(out,x.id); out+='}'; });
     writeKey(out,"repairs"); writeEntries(out,s.repairs,[&](const RepairJob& x) {
-        writeKey(out,"endpoint",true); writeOptionalId(out,x.endpoint); writeKey(out,"id"); writeString(out,x.id); writeKey(out,"owner"); writeString(out,x.owner);
+        writeKey(out,"endpoint",true); if(x.endpoint)writeString(out,zones.name(*x.endpoint)); else out+="null";
+        writeKey(out,"id"); writeString(out,x.id); writeKey(out,"owner"); writeString(out,x.owner);
         writeKey(out,"remaining_cost"); writeInt(out,x.remainingCost); writeKey(out,"remaining_damage"); writeInt(out,x.remainingDamage);
         writeKey(out,"restricts_action"); writeBool(out,x.restrictsAction); writeKey(out,"target"); writeString(out,x.target); out+='}'; });
     writeKey(out,"schema_version"); out+='1';
     writeKey(out,"terminal"); writeBool(out,s.terminal);
-    writeKey(out,"territories"); writeEntries(out,s.territories,[&](const TerritoryState& x) {
+    writeKey(out,"territories"); writeZoneEntries(out,zones,s.territories,[&](const TerritoryState& x) {
         writeKey(out,"flags",true); writeIntMap(out,x.flags); writeKey(out,"possessor"); writeOptionalId(out,x.possessor); out+='}'; });
     writeKey(out,"turn_start"); writeKey(out,"possessions",true);
-    writeEntries(out,s.turnStart.possessions,[&](const std::optional<Id>& owner) { writeOptionalId(out,owner); });
-    writeKey(out,"units"); writeEntries(out,s.turnStart.units,[&](const std::pair<Id,Id>& entry) {
-        out+='['; writeString(out,entry.first); out+=','; writeString(out,entry.second); out+=']'; });
+    writeZoneEntries(out,zones,s.turnStart.possessions,[&](const std::optional<Id>& owner) { writeOptionalId(out,owner); });
+    writeKey(out,"units"); writeEntries(out,s.turnStart.units,[&](const std::pair<Id,ZoneId>& entry) {
+        out+='['; writeString(out,entry.first); out+=','; writeString(out,zones.name(entry.second)); out+=']'; });
     out+='}';
     writeKey(out,"units"); writeEntries(out,s.units,[&](const UnitState& x) {
         writeKey(out,"cargo",true); writeStrings(out,x.cargo); writeKey(out,"carried_by"); writeOptionalId(out,x.carriedBy);
         writeKey(out,"commitments"); writeStrings(out,x.commitments); writeKey(out,"damage"); writeInt(out,x.damage);
         writeKey(out,"game_flags"); writeIntMap(out,x.gameFlags); writeKey(out,"id"); writeString(out,x.id);
         writeKey(out,"movement_allowance"); writeOptionalInt(out,x.movementAllowance); writeKey(out,"movement_remaining"); writeOptionalInt(out,x.movementRemaining);
-        writeKey(out,"owner"); writeString(out,x.owner); writeKey(out,"route"); writeStrings(out,x.route);
-        writeKey(out,"turn_flags"); writeIntMap(out,x.turnFlags); writeKey(out,"turn_origin"); writeString(out,x.turnOrigin);
-        writeKey(out,"type"); writeString(out,x.type); writeKey(out,"zone"); writeString(out,x.zone); out+='}'; });
+        writeKey(out,"owner"); writeString(out,x.owner); writeKey(out,"route"); writeZones(out,zones,x.route);
+        writeKey(out,"turn_flags"); writeIntMap(out,x.turnFlags); writeKey(out,"turn_origin"); writeString(out,zones.name(x.turnOrigin));
+        writeKey(out,"type"); writeString(out,x.type); writeKey(out,"zone"); writeString(out,zones.name(x.zone)); out+='}'; });
     out+='}';
 }
 }
@@ -314,59 +318,77 @@ std::shared_ptr<const Definition> freezeDefinition(Definition d) {
     std::set<Id> turns; for(const auto& id:d.turnOrder) require(d.factions.contains(id)&&turns.insert(id).second,"Invalid/duplicate national turn order"); for(const auto& id:d.players)require(!id.empty(),"Empty player identity");
     require(d.startYear>0&&(d.startMonth==1||d.startMonth==7)&&d.calendarRounds>0,"Invalid half-year calendar");
     // Always rebuild: callers can copy a definition and edit its source map.
-    d.indexedGeography=indexGeography(nodes);
+    std::vector<std::string> zoneList; zoneList.reserve(nodes.size());
+    for(const auto& [id,node]:nodes)zoneList.push_back(id);
+    auto names=std::make_shared<Names>();
+    names->zones=NameTable<ZoneKind>(std::move(zoneList));
+    for(auto& [id,f]:d.factions) { f.homeZones.clear(); for(const auto& zone:f.homeCountry)f.homeZones.insert(names->zones.number(zone)); }
+    d.indexedGeography=indexGeography(nodes,names->zones);
+    d.names=std::move(names);
     auto encoded=definitionJson(d).asObject();
     if(d.catalog) { d.catalog->requireComplete(); encoded.emplace("catalog_fingerprint",V(d.catalog->fingerprint())); }
     d.fingerprint=contentDigest(canonicalJson(V(std::move(encoded)))); return std::make_shared<const Definition>(std::move(d));
 }
 
-std::set<Id> IndexedGeography::withinHops(const Id& origin,int range) const {
-    const auto& distances=hopDistances.at(nodeIndices.at(origin));
-    std::set<Id> zones;
+NumberSet<ZoneId> IndexedGeography::withinHops(ZoneId origin,int range) const {
+    const auto& distances=hopDistances.at(origin.index());
+    NumberSet<ZoneId> zones;
     // The original search always included its origin, even with negative fuel.
     const int bound=std::max(range,0);
-    for(std::size_t to=0;to<nodeIds.size();++to)
+    for(std::size_t to=0;to<distances.size();++to)
         if(distances[to]>=0 && distances[to]<=bound)
-            zones.emplace_hint(zones.end(),nodeIds[to]);
+            zones.insert(ZoneId::fromIndex(to));
     return zones;
 }
 
+const Names& names(const State& s) {
+    if(!s.definition || !s.definition->names) throw std::runtime_error("State has no frozen definition");
+    return *s.definition->names;
+}
+ZoneId zoneNumber(const State& s,std::string_view name) { return names(s).zones.number(name); }
+std::optional<ZoneId> findZone(const State& s,std::string_view name) { return names(s).zones.find(name); }
+bool isZone(const State& s,ZoneId zone) { return zone.valid() && zone.index()<names(s).zones.size(); }
+const std::string& zoneName(const State& s,ZoneId zone) { return names(s).zones.name(zone); }
+std::vector<ZoneId> zoneNumbers(const State& s,const std::vector<Id>& list) {
+    const auto& zones=names(s).zones; std::vector<ZoneId> out; out.reserve(list.size());
+    for(const auto& name:list)out.push_back(zones.number(name));
+    return out;
+}
+std::vector<Id> zoneNames(const State& s,const std::vector<ZoneId>& list) {
+    const auto& zones=names(s).zones; std::vector<Id> out; out.reserve(list.size());
+    for(const auto zone:list)out.push_back(zones.name(zone));
+    return out;
+}
+Id railroadId(const State& s,ZoneId a,ZoneId b) { return railroadId(zoneName(s,a),zoneName(s,b)); }
+
 namespace {
 const IndexedGeography* geographyIndex(const State& s) { return s.definition->indexedGeography.get(); }
-const std::size_t* indexedNode(const IndexedGeography* index,const Id& zone) {
-    if(!index) return nullptr;
-    const auto found=index->nodeIndices.find(zone);
-    return found==index->nodeIndices.end()?nullptr:&found->second;
-}
+const V& sourceNode(const State& s,ZoneId zone) { return s.definition->geography.require("nodes").require(zoneName(s,zone)); }
 }
 
-const V& mapNode(const State& s,const Id& zone) {
+const V& mapNode(const State& s,ZoneId zone) {
     const auto* index=geographyIndex(s);
-    if(const auto* at=indexedNode(index,zone)) return index->nodes[*at];
-    return s.definition->geography.require("nodes").require(zone);
+    if(index && zone.valid() && zone.index()<index->nodes.size()) return index->nodes[zone.index()];
+    return sourceNode(s,zone);
 }
-const V* findMapNode(const State& s,const Id& zone) {
+const V* mapEdge(const State& s,ZoneId from,ZoneId to) {
     const auto* index=geographyIndex(s);
-    if(index) { const auto* at=indexedNode(index,zone); return at?&index->nodes[*at]:nullptr; }
-    return s.definition->geography.require("nodes").find(zone);
-}
-const V* mapEdge(const State& s,const Id& from,const Id& to) {
-    const auto* index=geographyIndex(s);
-    if(const auto* at=indexedNode(index,from)) {
-        const auto found=index->edges[*at].find(to);
-        return found==index->edges[*at].end()?nullptr:found->second;
+    if(index && from.valid() && from.index()<index->edges.size()) {
+        for(const auto& [neighbor,edge]:index->edges[from.index()]) if(neighbor==to) return edge;
+        return nullptr;
     }
-    for(const auto& edge:s.definition->geography.require("nodes").require(from).require("neighbors").asArray())
-        if(edge.require("neighbor_id").asString()==to) return &edge;
+    const auto& target=zoneName(s,to);
+    for(const auto& edge:sourceNode(s,from).require("neighbors").asArray())
+        if(edge.require("neighbor_id").asString()==target) return &edge;
     return nullptr;
 }
-NeighborIds mapNeighbors(const State& s,const Id& zone) {
+Neighbors mapNeighbors(const State& s,ZoneId zone) {
     const auto* index=geographyIndex(s);
-    if(const auto* at=indexedNode(index,zone)) return NeighborIds::borrow(index->neighborIds[*at]);
-    std::vector<Id> ids;
-    for(const auto& edge:s.definition->geography.require("nodes").require(zone).require("neighbors").asArray())
-        ids.push_back(edge.require("neighbor_id").asString());
-    return NeighborIds::own(std::move(ids));
+    if(index && zone.valid() && zone.index()<index->neighbors.size()) return Neighbors::borrow(index->neighbors[zone.index()]);
+    std::vector<ZoneId> zones;
+    for(const auto& edge:sourceNode(s,zone).require("neighbors").asArray())
+        zones.push_back(zoneNumber(s,edge.require("neighbor_id").asString()));
+    return Neighbors::own(std::move(zones));
 }
 
 V actionJson(const Action& a) { return V(fields({{"id",V(a.id)},{"kind",V(a.kind)},{"player",V(a.player)},{"nation",V(a.nation)},{"decision",optionalId(a.decision)},{"parameters",a.parameters}})); }
@@ -381,18 +403,22 @@ std::pair<int,int> State::calendarDate() const { require(definition!=nullptr,"St
 void State::captureTurnStart() { turnStart={};for(const auto& [id,t]:territories)turnStart.possessions.emplace(id,t.possessor);for(const auto& [id,u]:units)turnStart.units.emplace(id,std::pair{u.owner,u.zone}); }
 
 V State::toJson(bool includeHistory) const {
-    require(definition!=nullptr,"State has no definition"); O n,t,u,f,r,b,j,bs; A ds,events; O snapshotUnits;
+    require(definition!=nullptr,"State has no definition"); O n,t,u,f,r,b,j,bs; A ds,events; O snapshotUnits,snapshotPossessions;
+    const auto& zones=names(*this).zones;
+    const auto zoneValue=[&](ZoneId zone){return V(zones.name(zone));};
     for(const auto& [id,x]:nations)n.emplace(id,V(fields({{"controller_nation",optionalId(x.controllerNation)},{"player",optionalId(x.player)},{"alliance",optionalId(x.alliance)},{"power_status",V(x.powerStatus)},{"treasury",optionalInt(x.treasury)},{"income_components",intMap(x.incomeComponents)},{"income_known",V(x.incomeKnown)},{"technology_stages",intMap(x.technologyStages)},{"at_war_with",strings(x.atWarWith)},{"allies",strings(x.allies)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}})));
-    for(const auto& [id,x]:territories)t.emplace(id,V(fields({{"possessor",optionalId(x.possessor)},{"flags",intMap(x.flags)}})));
-    for(const auto& [id,x]:units)u.emplace(id,V(fields({{"id",V(x.id)},{"type",V(x.type)},{"owner",V(x.owner)},{"zone",V(x.zone)},{"movement_remaining",optionalInt(x.movementRemaining)},{"movement_allowance",optionalInt(x.movementAllowance)},{"turn_origin",V(x.turnOrigin)},{"route",strings(x.route)},{"carried_by",optionalId(x.carriedBy)},{"cargo",strings(x.cargo)},{"damage",number(x.damage)},{"commitments",strings(x.commitments)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}})));
-    for(const auto& [id,x]:facilities)f.emplace(id,V(fields({{"id",V(x.id)},{"type",V(x.type)},{"zone",V(x.zone)},{"damage",number(x.damage)},{"flags",intMap(x.flags)}})));
-    for(const auto& [id,x]:rails)r.emplace(id,V(fields({{"id",V(x.id)},{"endpoint_a",V(x.endpointA)},{"endpoint_b",V(x.endpointB)},{"damage_by_endpoint",intMap(x.damageByEndpoint)}})));
+    for(const auto& [id,x]:territories)t.emplace(zones.name(id),V(fields({{"possessor",optionalId(x.possessor)},{"flags",intMap(x.flags)}})));
+    for(const auto& [id,x]:units)u.emplace(id,V(fields({{"id",V(x.id)},{"type",V(x.type)},{"owner",V(x.owner)},{"zone",zoneValue(x.zone)},{"movement_remaining",optionalInt(x.movementRemaining)},{"movement_allowance",optionalInt(x.movementAllowance)},{"turn_origin",zoneValue(x.turnOrigin)},{"route",strings(zoneNames(*this,x.route))},{"carried_by",optionalId(x.carriedBy)},{"cargo",strings(x.cargo)},{"damage",number(x.damage)},{"commitments",strings(x.commitments)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}})));
+    for(const auto& [id,x]:facilities)f.emplace(id,V(fields({{"id",V(x.id)},{"type",V(x.type)},{"zone",zoneValue(x.zone)},{"damage",number(x.damage)},{"flags",intMap(x.flags)}})));
+    for(const auto& [id,x]:rails) { O damage; for(const auto& [endpoint,value]:x.damageByEndpoint)damage.emplace(zones.name(endpoint),number(value));
+        r.emplace(id,V(fields({{"id",V(x.id)},{"endpoint_a",zoneValue(x.endpointA)},{"endpoint_b",zoneValue(x.endpointB)},{"damage_by_endpoint",V(std::move(damage))}}))); }
     for(const auto& [id,x]:construction)b.emplace(id,V(fields({{"id",V(x.id)},{"owner",V(x.owner)},{"type",V(x.type)},{"site",optionalId(x.site)},{"queue_position",number(x.queuePosition)},{"paid_ipp",number(x.paidIpp)},{"remaining_payments",ints(x.remainingPayments)},{"flags",intMap(x.flags)}})));
-    for(const auto& [id,x]:repairs)j.emplace(id,V(fields({{"id",V(x.id)},{"owner",V(x.owner)},{"target",V(x.target)},{"remaining_damage",number(x.remainingDamage)},{"remaining_cost",number(x.remainingCost)},{"restricts_action",V(x.restrictsAction)},{"endpoint",optionalId(x.endpoint)}})));
-    for(const auto& [id,x]:battles)bs.emplace(id,V(fields({{"id",V(x.id)},{"zone",V(x.zone)},{"attacker",V(x.attacker)},{"defender",V(x.defender)},{"stage",V(x.stage)},{"attackers",strings(x.attackers)},{"defenders",strings(x.defenders)},{"pending_hits",intMap(x.pendingHits)},{"flags",intMap(x.flags)},{"data",x.data}})));
+    for(const auto& [id,x]:repairs)j.emplace(id,V(fields({{"id",V(x.id)},{"owner",V(x.owner)},{"target",V(x.target)},{"remaining_damage",number(x.remainingDamage)},{"remaining_cost",number(x.remainingCost)},{"restricts_action",V(x.restrictsAction)},{"endpoint",x.endpoint?zoneValue(*x.endpoint):V(nullptr)}})));
+    for(const auto& [id,x]:battles)bs.emplace(id,V(fields({{"id",V(x.id)},{"zone",zoneValue(x.zone)},{"attacker",V(x.attacker)},{"defender",V(x.defender)},{"stage",V(x.stage)},{"attackers",strings(x.attackers)},{"defenders",strings(x.defenders)},{"pending_hits",intMap(x.pendingHits)},{"flags",intMap(x.flags)},{"data",x.data}})));
     for(const auto& d:decisions)ds.push_back(decisionJson(d));
-    for(const auto& [id,pair]:turnStart.units)snapshotUnits.emplace(id,V(A{V(pair.first),V(pair.second)}));
-    O result=fields({{"schema_version",number(1)},{"definition_fingerprint",V(definition->fingerprint)},{"nations",V(std::move(n))},{"territories",V(std::move(t))},{"units",V(std::move(u))},{"facilities",V(std::move(f))},{"rails",V(std::move(r))},{"construction",V(std::move(b))},{"repairs",V(std::move(j))},{"clock",V(fields({{"round_index",number(clock.roundIndex)},{"nation_index",number(clock.nationIndex)},{"phase",V(toString(clock.phase))},{"completed_rounds",number(clock.completedRounds)},{"player_turn_serial",V(std::to_string(clock.playerTurnSerial))},{"income_collected",V(clock.incomeCollected)}}))},{"turn_start",V(fields({{"possessions",optionalIdMap(turnStart.possessions)},{"units",V(std::move(snapshotUnits))}}))},{"politics",politicsJson(politics)},{"completed_turns",intMap(completedTurns)},{"decisions",V(std::move(ds))},{"battles",V(std::move(bs))},{"battle_order",strings(battleOrder)},{"chance",chance?chanceJson(*chance):V(nullptr)},{"flags",intMap(flags)},{"terminal",V(terminal)}});
+    for(const auto& [id,pair]:turnStart.units)snapshotUnits.emplace(id,V(A{V(pair.first),zoneValue(pair.second)}));
+    for(const auto& [zone,owner]:turnStart.possessions)snapshotPossessions.emplace(zones.name(zone),optionalId(owner));
+    O result=fields({{"schema_version",number(1)},{"definition_fingerprint",V(definition->fingerprint)},{"nations",V(std::move(n))},{"territories",V(std::move(t))},{"units",V(std::move(u))},{"facilities",V(std::move(f))},{"rails",V(std::move(r))},{"construction",V(std::move(b))},{"repairs",V(std::move(j))},{"clock",V(fields({{"round_index",number(clock.roundIndex)},{"nation_index",number(clock.nationIndex)},{"phase",V(toString(clock.phase))},{"completed_rounds",number(clock.completedRounds)},{"player_turn_serial",V(std::to_string(clock.playerTurnSerial))},{"income_collected",V(clock.incomeCollected)}}))},{"turn_start",V(fields({{"possessions",V(std::move(snapshotPossessions))},{"units",V(std::move(snapshotUnits))}}))},{"politics",politicsJson(zones,politics)},{"completed_turns",intMap(completedTurns)},{"decisions",V(std::move(ds))},{"battles",V(std::move(bs))},{"battle_order",strings(battleOrder)},{"chance",chance?chanceJson(*chance):V(nullptr)},{"flags",intMap(flags)},{"terminal",V(terminal)}});
     if(!actionInterface.asObject().empty()) result.emplace("action_interface",actionInterface);
     if(includeHistory) { for(const auto& e:history)events.emplace_back(O{{"kind",V(e.kind)},{"payload",e.payload},{"after_state_key",V(e.afterStateKey)}});result.emplace("history",V(std::move(events))); }
     return V(std::move(result));
@@ -400,19 +426,23 @@ V State::toJson(bool includeHistory) const {
 
 State State::fromJson(std::shared_ptr<const Definition> definition,const V& v) {
     require(definition!=nullptr,"Restore requires a definition");require(v.require("schema_version").asInt()==1,"Unsupported state schema");require(v.require("definition_fingerprint").asString()==definition->fingerprint,"State definition fingerprint mismatch");State s;s.definition=std::move(definition);
+    const auto& zones=names(s).zones;
+    const auto zoneOf=[&](const V& x){return zones.number(x.asString());};
     for(const auto& [id,x]:v.require("nations").asObject()) { NationState n;n.controllerNation=readOptionalId(x.require("controller_nation"));n.player=readOptionalId(x.require("player"));n.alliance=readOptionalId(x.require("alliance"));n.powerStatus=x.require("power_status").asString();n.treasury=readOptionalInt(x.require("treasury"));n.incomeComponents=readIntMap(x.require("income_components"));n.incomeKnown=x.require("income_known").asBool();n.technologyStages=readIntMap(x.require("technology_stages"));n.atWarWith=readSet(x.require("at_war_with"));n.allies=readSet(x.require("allies"));n.turnFlags=readIntMap(x.require("turn_flags"));n.gameFlags=readIntMap(x.require("game_flags"));s.nations.emplace(id,std::move(n)); }
-    for(const auto& [id,x]:v.require("territories").asObject())s.territories.emplace(id,TerritoryState{readOptionalId(x.require("possessor")),readIntMap(x.require("flags"))});
-    for(const auto& [id,x]:v.require("units").asObject()) { UnitState u;u.id=x.require("id").asString();u.type=x.require("type").asString();u.owner=x.require("owner").asString();u.zone=x.require("zone").asString();u.movementRemaining=readOptionalInt(x.require("movement_remaining"));u.movementAllowance=readOptionalInt(x.require("movement_allowance"));u.turnOrigin=x.require("turn_origin").asString();u.route=readStrings(x.require("route"));u.carriedBy=readOptionalId(x.require("carried_by"));u.cargo=readStrings(x.require("cargo"));u.damage=x.require("damage").asInt();u.commitments=readSet(x.require("commitments"));u.turnFlags=readIntMap(x.require("turn_flags"));u.gameFlags=readIntMap(x.require("game_flags"));s.units.emplace(id,std::move(u)); }
-    for(const auto& [id,x]:v.require("facilities").asObject())s.facilities.emplace(id,FacilityState{x.require("id").asString(),x.require("type").asString(),x.require("zone").asString(),x.require("damage").asInt(),readIntMap(x.require("flags"))});
-    for(const auto& [id,x]:v.require("rails").asObject())s.rails.emplace(id,RailState{x.require("id").asString(),x.require("endpoint_a").asString(),x.require("endpoint_b").asString(),readIntMap(x.require("damage_by_endpoint"))});
+    for(const auto& [id,x]:v.require("territories").asObject())s.territories.emplace(zones.number(id),TerritoryState{readOptionalId(x.require("possessor")),readIntMap(x.require("flags"))});
+    for(const auto& [id,x]:v.require("units").asObject()) { UnitState u;u.id=x.require("id").asString();u.type=x.require("type").asString();u.owner=x.require("owner").asString();u.zone=zoneOf(x.require("zone"));u.movementRemaining=readOptionalInt(x.require("movement_remaining"));u.movementAllowance=readOptionalInt(x.require("movement_allowance"));u.turnOrigin=zoneOf(x.require("turn_origin"));u.route=zoneNumbers(s,readStrings(x.require("route")));u.carriedBy=readOptionalId(x.require("carried_by"));u.cargo=readStrings(x.require("cargo"));u.damage=x.require("damage").asInt();u.commitments=readSet(x.require("commitments"));u.turnFlags=readIntMap(x.require("turn_flags"));u.gameFlags=readIntMap(x.require("game_flags"));s.units.emplace(id,std::move(u)); }
+    for(const auto& [id,x]:v.require("facilities").asObject())s.facilities.emplace(id,FacilityState{x.require("id").asString(),x.require("type").asString(),zoneOf(x.require("zone")),x.require("damage").asInt(),readIntMap(x.require("flags"))});
+    for(const auto& [id,x]:v.require("rails").asObject()) { std::map<ZoneId,int> damage; for(const auto& [endpoint,value]:x.require("damage_by_endpoint").asObject())damage.emplace(zones.number(endpoint),value.asInt());
+        s.rails.emplace(id,RailState{x.require("id").asString(),zoneOf(x.require("endpoint_a")),zoneOf(x.require("endpoint_b")),std::move(damage)}); }
     for(const auto& [id,x]:v.require("construction").asObject())s.construction.emplace(id,BuildProject{x.require("id").asString(),x.require("owner").asString(),x.require("type").asString(),readOptionalId(x.require("site")),x.require("queue_position").asInt(),x.require("paid_ipp").asInt(),readInts(x.require("remaining_payments")),readIntMap(x.require("flags"))});
-    for(const auto& [id,x]:v.require("repairs").asObject())s.repairs.emplace(id,RepairJob{x.require("id").asString(),x.require("owner").asString(),x.require("target").asString(),x.require("remaining_damage").asInt(),x.require("remaining_cost").asInt(),x.require("restricts_action").asBool(),x.find("endpoint")?readOptionalId(x.require("endpoint")):std::nullopt});
+    for(const auto& [id,x]:v.require("repairs").asObject())s.repairs.emplace(id,RepairJob{x.require("id").asString(),x.require("owner").asString(),x.require("target").asString(),x.require("remaining_damage").asInt(),x.require("remaining_cost").asInt(),x.require("restricts_action").asBool(),x.find("endpoint")&&!x.require("endpoint").isNull()?std::optional<ZoneId>(zoneOf(x.require("endpoint"))):std::nullopt});
     const auto& c=v.require("clock");s.clock={c.require("round_index").asInt(),c.require("nation_index").asInt(),parsePhase(c.require("phase").asString()),c.require("completed_rounds").asInt(),readCounter(c.require("player_turn_serial")),c.require("income_collected").asBool()};
-    const auto& snapshot=v.require("turn_start");s.turnStart.possessions=readOptionalIdMap(snapshot.require("possessions"));for(const auto& [id,x]:snapshot.require("units").asObject()) { const auto& a=x.asArray();require(a.size()==2,"Snapshot unit needs owner and zone");s.turnStart.units.emplace(id,std::pair{a[0].asString(),a[1].asString()}); }
-    if(const auto* p=v.find("politics"))s.politics=readPolitics(*p);
+    const auto& snapshot=v.require("turn_start");for(const auto& [id,x]:snapshot.require("possessions").asObject())s.turnStart.possessions.emplace(zones.number(id),readOptionalId(x));
+    for(const auto& [id,x]:snapshot.require("units").asObject()) { const auto& a=x.asArray();require(a.size()==2,"Snapshot unit needs owner and zone");s.turnStart.units.emplace(id,std::pair{a[0].asString(),zoneOf(a[1])}); }
+    if(const auto* p=v.find("politics"))s.politics=readPolitics(zones,*p);
     if(const auto* p=v.find("action_interface"))s.actionInterface=*p;
     s.completedTurns=readIntMap(v.require("completed_turns"));for(const auto& x:v.require("decisions").asArray())s.decisions.push_back(readDecision(x));
-    for(const auto& [id,x]:v.require("battles").asObject())s.battles.emplace(id,BattleState{x.require("id").asString(),x.require("zone").asString(),x.require("attacker").asString(),x.require("defender").asString(),x.require("stage").asString(),readStrings(x.require("attackers")),readStrings(x.require("defenders")),readIntMap(x.require("pending_hits")),readIntMap(x.require("flags")),x.find("data")?x.require("data"):V(O{})});
+    for(const auto& [id,x]:v.require("battles").asObject())s.battles.emplace(id,BattleState{x.require("id").asString(),zoneOf(x.require("zone")),x.require("attacker").asString(),x.require("defender").asString(),x.require("stage").asString(),readStrings(x.require("attackers")),readStrings(x.require("defenders")),readIntMap(x.require("pending_hits")),readIntMap(x.require("flags")),x.find("data")?x.require("data"):V(O{})});
     s.battleOrder=readStrings(v.require("battle_order"));if(!v.require("chance").isNull())s.chance=readChance(v.require("chance"));s.flags=readIntMap(v.require("flags"));s.terminal=v.require("terminal").asBool();
     if(const auto* events=v.find("history"))for(const auto& x:events->asArray())s.history.push_back(Event{x.require("kind").asString(),x.require("payload"),x.require("after_state_key").asString()});
     s.validate();return s;
@@ -430,25 +460,22 @@ void State::validate(std::size_t historyFrom) const {
     // when there is one, which gives the same answers as the map's JSON, and
     // builds an error message only for a check that fails.
     const auto* mapIndex=definition->indexedGeography.get();
-    const auto zone=[&](const Id& id){if(!(mapIndex?mapIndex->nodeIndices.contains(id):nodes.contains(id)))throw std::runtime_error("Unknown zone: "+id);};
-    const auto land=[&](const Id& id) {
-        if(mapIndex) {
-            const auto found=mapIndex->nodeIndices.find(id);
-            if(found==mapIndex->nodeIndices.end())throw std::runtime_error("Unknown zone: "+id);
-            if(!mapIndex->land[found->second])throw std::runtime_error("Expected land zone: "+id);
-            return;
-        }
-        zone(id);if(nodes.at(id).require("type").asString()!="land")throw std::runtime_error("Expected land zone: "+id);
+    const auto& zones=names(*this).zones;
+    const auto zone=[&](ZoneId id){if(!id.valid()||id.index()>=zones.size())throw std::runtime_error("A zone number names no zone");};
+    const auto land=[&](ZoneId id) {
+        zone(id);
+        if(mapIndex) { if(!mapIndex->land[id.index()])throw std::runtime_error("Expected land zone: "+zones.name(id)); return; }
+        if(nodes.at(zones.name(id)).require("type").asString()!="land")throw std::runtime_error("Expected land zone: "+zones.name(id));
     };
     const auto nation=[&](const Id& id){if(!nations.contains(id))throw std::runtime_error("Unknown nation: "+id);};
     const auto unique=[](const std::vector<Id>& ids,const std::string& message){require(ids.size()<2||std::set<Id>(ids.begin(),ids.end()).size()==ids.size(),message);};
     for(const auto& [id,f]:definition->factions)require(f.dormant||nations.contains(id),"State faction inventory differs from definition");
     for(const auto& [id,n]:nations) { if(!definition->factions.contains(id))throw std::runtime_error("Undefined national identity: "+id);if(n.controllerNation)nation(*n.controllerNation);if(n.player)require(definition->players.contains(*n.player),"Unknown controlling player");if(n.alliance)require(!n.alliance->empty(),"Empty alliance identity");require(!n.powerStatus.empty(),"Missing power status");if(n.treasury)require(*n.treasury>=0,"Negative treasury");for(const auto& [tech,stage]:n.technologyStages){require(!tech.empty()&&stage>=0,"Invalid technology stage");if(definition->catalog)require(stage<=4&&definition->catalog->technologies().contains(tech),"Unknown catalog technology/stage");}for(const auto& other:n.atWarWith){nation(other);require(other!=id,"Nation cannot be at war with itself");}for(const auto& other:n.allies){nation(other);require(other!=id,"Nation cannot ally with itself");} }
-    if(mapIndex) { for(const auto& id:mapIndex->landIds)if(!territories.contains(id))throw std::runtime_error("Missing retained territory: "+id); }
-    else for(const auto& [id,node]:nodes)if(node.require("type").asString()=="land"&&!territories.contains(id))throw std::runtime_error("Missing retained territory: "+id);
+    if(mapIndex) { for(const auto id:mapIndex->landZones)if(!territories.contains(id))throw std::runtime_error("Missing retained territory: "+zones.name(id)); }
+    else for(const auto& [id,node]:nodes)if(node.require("type").asString()=="land"&&!territories.contains(zones.number(id)))throw std::runtime_error("Missing retained territory: "+id);
     for(const auto& [id,t]:territories){land(id);if(t.possessor)nation(*t.possessor);}
     for(const auto& [id,u]:units) {
-        require(!id.empty()&&id==u.id&&!u.type.empty(),"Invalid unit identity/type");nation(u.owner);zone(u.zone);zone(u.turnOrigin);for(const auto& routeZone:u.route)zone(routeZone);require(u.damage>=0,"Negative unit damage");
+        require(!id.empty()&&id==u.id&&!u.type.empty(),"Invalid unit identity/type");nation(u.owner);zone(u.zone);zone(u.turnOrigin);for(const auto routeZone:u.route)zone(routeZone);require(u.damage>=0,"Negative unit damage");
         if(definition->catalog) {
             const auto& type=definition->catalog->unit(u.type);
             require(type.states.contains(u.damage),"Unknown surviving unit damage state");
@@ -460,9 +487,9 @@ void State::validate(std::size_t historyFrom) const {
         if(u.carriedBy){std::set<Id> chain{id};auto parent=u.carriedBy;while(parent){require(chain.insert(*parent).second,"Cargo cycle");require(units.contains(*parent),"Unknown carrier");parent=units.at(*parent).carriedBy;}}
     }
     for(const auto& [id,f]:facilities){require(!id.empty()&&id==f.id&&!f.type.empty(),"Invalid facility identity/type");land(f.zone);require(f.damage>=0,"Negative facility damage");require(!units.contains(id),"Unit/facility identity collision");if(definition->catalog){const auto& type=definition->catalog->facility(f.type);const auto captured=f.flags.find("captured_max_damage");const int maximum=captured==f.flags.end()?type.maxDamage.value_or(f.damage):captured->second;require(maximum>=0&&f.damage<=maximum,"Facility damage exceeds maximum");}}
-    for(const auto& [id,r]:rails){require(!id.empty()&&id==r.id&&r.endpointA<r.endpointB,"Invalid railway identity/endpoints");require(id==railroadId(r.endpointA,r.endpointB),"A railroad is named by its border (one railroad per border)");land(r.endpointA);land(r.endpointB);require(!units.contains(id)&&!facilities.contains(id),"Ambiguous repair target identity");for(const auto& [endpoint,damage]:r.damageByEndpoint)require((endpoint==r.endpointA||endpoint==r.endpointB)&&damage>=0,"Invalid railway damage endpoint");}
-    for(const auto& [id,b]:construction){require(!id.empty()&&id==b.id&&!b.type.empty(),"Invalid construction identity/type");nation(b.owner);if(b.site)require(nodes.contains(*b.site)||facilities.contains(*b.site),"Unknown construction site");require(b.queuePosition>=1&&b.paidIpp>=0,"Invalid build stage/payment");for(auto payment:b.remainingPayments)require(payment>=0,"Negative remaining build payment");if(definition->catalog)require(definition->catalog->units().contains(b.type)||definition->catalog->facilities().contains(b.type),"Unknown construction type");}
-    for(const auto& [id,r]:repairs){require(!id.empty()&&id==r.id,"Invalid repair identity");nation(r.owner);require(units.contains(r.target)||facilities.contains(r.target)||rails.contains(r.target)||territories.contains(r.target)||construction.contains(r.target),"Unknown repair target");require(r.remainingDamage>=0&&r.remainingCost>=0,"Negative repair work/cost");require(!rails.contains(r.target)||r.endpoint,"Railroad repair names its side");if(r.endpoint){require(rails.contains(r.target),"Only railroad repair has an endpoint");const auto& rail=rails.at(r.target);require(*r.endpoint==rail.endpointA||*r.endpoint==rail.endpointB,"Repair endpoint not on border");}}
+    for(const auto& [id,r]:rails){require(!id.empty()&&id==r.id&&r.endpointA<r.endpointB,"Invalid railway identity/endpoints");land(r.endpointA);land(r.endpointB);require(id==railroadId(*this,r.endpointA,r.endpointB),"A railroad is named by its border (one railroad per border)");require(!units.contains(id)&&!facilities.contains(id),"Ambiguous repair target identity");for(const auto& [endpoint,damage]:r.damageByEndpoint)require((endpoint==r.endpointA||endpoint==r.endpointB)&&damage>=0,"Invalid railway damage endpoint");}
+    for(const auto& [id,b]:construction){require(!id.empty()&&id==b.id&&!b.type.empty(),"Invalid construction identity/type");nation(b.owner);if(b.site)require(zones.contains(*b.site)||facilities.contains(*b.site),"Unknown construction site");require(b.queuePosition>=1&&b.paidIpp>=0,"Invalid build stage/payment");for(auto payment:b.remainingPayments)require(payment>=0,"Negative remaining build payment");if(definition->catalog)require(definition->catalog->units().contains(b.type)||definition->catalog->facilities().contains(b.type),"Unknown construction type");}
+    for(const auto& [id,r]:repairs){require(!id.empty()&&id==r.id,"Invalid repair identity");nation(r.owner);const auto targetZone=zones.find(r.target);require(units.contains(r.target)||facilities.contains(r.target)||rails.contains(r.target)||(targetZone&&territories.contains(*targetZone))||construction.contains(r.target),"Unknown repair target");require(r.remainingDamage>=0&&r.remainingCost>=0,"Negative repair work/cost");require(!rails.contains(r.target)||r.endpoint,"Railroad repair names its side");if(r.endpoint){require(rails.contains(r.target),"Only railroad repair has an endpoint");const auto& rail=rails.at(r.target);require(*r.endpoint==rail.endpointA||*r.endpoint==rail.endpointB,"Repair endpoint not on border");}}
     require(clock.roundIndex>=0&&clock.roundIndex<definition->calendarRounds,"Invalid calendar round");require(clock.completedRounds>=0&&clock.completedRounds<=definition->calendarRounds,"Invalid completed-round count");(void)currentNation();(void)toString(clock.phase);
     require(clock.completedRounds == clock.roundIndex + (terminal ? 1 : 0),
             "Completed rounds disagree with calendar cursor");

@@ -34,11 +34,10 @@ bool has(const State &s, const UnitState &u, const Id &cls) {
 bool hostile(const State &s, const Id &n, const Id &other) {
   return n != other && s.nations.at(n).atWarWith.contains(other);
 }
-bool sea(const State &s, const Id &zone) {
-  const auto *n = findMapNode(s, zone);
-  return n && n->require("type").asString() == "sea";
+bool sea(const State &s, ZoneId zone) {
+  return zone.valid() && mapNode(s, zone).require("type").asString() == "sea";
 }
-bool adjacent(const State &s, const Id &a, const Id &b) {
+bool adjacent(const State &s, ZoneId a, ZoneId b) {
   const auto *e = mapEdge(s, a, b);
   return e && (!e->find("passable") || e->require("passable").asBool());
 }
@@ -145,10 +144,10 @@ void erasePlan(State &s, const Id &id) {
   std::erase(s.battleOrder, removed);
   refreshImmediate(s);
 }
-NavalRouteRequest readRequest(const V &v) {
+NavalRouteRequest readRequest(const State &s, const V &v) {
   NavalRouteRequest r;
   r.units = readIds(v.require("units"));
-  r.path = readIds(v.require("path"));
+  r.path = zoneNumbers(s, readIds(v.require("path")));
   r.combat = v.require("combat").asBool();
   r.strategic = v.require("strategic").asBool();
   if (auto f = v.find("origin_facility"); f && !f->isNull())
@@ -157,22 +156,22 @@ NavalRouteRequest readRequest(const V &v) {
     r.destinationFacility = f->asString();
   return r;
 }
-V requestJson(const NavalRouteRequest &r) {
+V requestJson(const State &s, const NavalRouteRequest &r) {
   return V(O{
       {"units", V(ids(r.units))},
-      {"path", V(ids(r.path))},
+      {"path", V(ids(zoneNames(s, r.path)))},
       {"combat", V(r.combat)},
       {"strategic", V(r.strategic)},
       {"origin_facility", r.originFacility ? V(*r.originFacility) : V(nullptr)},
       {"destination_facility",
        r.destinationFacility ? V(*r.destinationFacility) : V(nullptr)}});
 }
-std::vector<Id> seasAt(const State &s, const Id &id) {
+std::vector<ZoneId> seasAt(const State &s, const Id &id) {
   if (!port(s.units.at(id)).empty())
     return navalFacilitySeaZones(s, port(s.units.at(id)));
   return {s.units.at(id).zone};
 }
-bool atSeaStart(const State &s, const UnitState &u, const Id &z) {
+bool atSeaStart(const State &s, const UnitState &u, ZoneId z) {
   if (port(u).empty())
     return u.zone == z;
   const auto access = navalFacilitySeaZones(s, port(u));
@@ -206,19 +205,19 @@ bool available(const State &s, const UnitState &u, bool combat) {
 }
 // A ship's movement before the bonus a Japanese surprise attack gives for its
 // own target zone, which alone depends on where the move goes; it may be negative.
-int allowanceBeforeSurprise(const State &s, const UnitState &u, const Id &routeStart) {
+int allowanceBeforeSurprise(const State &s, const UnitState &u, ZoneId routeStart) {
   int total =
       catalogStats(s, u.type, u.damage, u.owner, u.zone).movement.value_or(0);
-  Id start = u.turnOrigin;
+  ZoneId start = u.turnOrigin;
   if (!sea(s, start)) {
     for (const auto &[key, v] : u.turnFlags)
       if (v && key.rfind("naval_start_sea:", 0) == 0)
-        start = key.substr(16);
+        start = findZone(s, std::string_view(key).substr(16)).value_or(ZoneId {});
     if (!sea(s, start)) {
       const auto access = seasAt(s, u.id);
-      start = !routeStart.empty() ? routeStart
-              : access.empty()    ? Id{}
-                                  : access.front();
+      start = routeStart.valid() ? routeStart
+              : access.empty()   ? ZoneId {}
+                                 : access.front();
     }
   }
   bool facilityBonus = false;
@@ -241,24 +240,24 @@ int allowanceBeforeSurprise(const State &s, const UnitState &u, const Id &routeS
     ++total;
   if (has(s, u, "surface_ship") &&
       s.nations.at(u.owner).powerStatus == "major" && !raider(u) &&
-      !start.empty() && !inSupply(s, u.owner, start))
+      start.valid() && !inSupply(s, u.owner, start))
     --total;
   if (u.owner == "japan" && u.type == "destroyer" && !u.cargo.empty())
     --total;
   return total;
 }
-int surpriseBonus(const State &s, const UnitState &u, bool combat, const Id &target) {
-  return combat && u.owner == "japan" &&
-                 marked(s.nations.at("japan").turnFlags, "surprise_attack_zone:" + target)
+int surpriseBonus(const State &s, const UnitState &u, bool combat, ZoneId target) {
+  return combat && u.owner == "japan" && target.valid() &&
+                 marked(s.nations.at("japan").turnFlags, "surprise_attack_zone:" + zoneName(s, target))
              ? 1
              : 0;
 }
 int allowanceNow(const State &s, const UnitState &u, bool combat,
-                 const Id &target, const Id &routeStart) {
+                 ZoneId target, ZoneId routeStart) {
   return std::max(0, allowanceBeforeSurprise(s, u, routeStart) + surpriseBonus(s, u, combat, target));
 }
-int allowance(const State &s, const UnitState &u, bool combat, const Id &target,
-              const Id &routeStart = {}) {
+int allowance(const State &s, const UnitState &u, bool combat, ZoneId target,
+              ZoneId routeStart = {}) {
   // Route validation asks again for every route with the same unit and origin,
   // whatever its destination. Reuse the answer only for this position's own unit.
   const auto found = s.units.find(u.id);
@@ -267,8 +266,8 @@ int allowance(const State &s, const UnitState &u, bool combat, const Id &target,
                     : nullptr;
   if (!facts)
     return allowanceNow(s, u, combat, target, routeStart);
-  const int before = facts->number(PositionFacts::Fact::NavalAllowance, u.id + '\n' + routeStart,
-                                   [&] { return allowanceBeforeSurprise(s, u, routeStart); });
+  const int before = facts->numberAt(PositionFacts::Fact::NavalAllowance, u.id, routeStart,
+                                     [&] { return allowanceBeforeSurprise(s, u, routeStart); });
   return std::max(0, before + surpriseBonus(s, u, combat, target));
 }
 int spent(const State &s, const UnitState &u) {
@@ -280,12 +279,12 @@ int spent(const State &s, const UnitState &u) {
 void endVoyage(State &s, const std::vector<Id> &ships) {
   for (const auto &ship : ships) {
     auto &u = s.units.at(ship);
-    const int most = allowance(s, u, true, Id{}, u.zone) + 1;
+    const int most = allowance(s, u, true, ZoneId {}, u.zone) + 1;
     u.turnFlags["naval_movement_spent"] = std::max(spent(s, u), most);
     u.movementRemaining = 0;
   }
 }
-std::vector<Id> blockers(const State &s, const Id &n, const Id &z,
+std::vector<Id> blockers(const State &s, const Id &n, ZoneId z,
                          bool includeOptional = false) {
   std::vector<Id> out;
   for (const auto &[id, u] : s.units)
@@ -297,7 +296,7 @@ std::vector<Id> blockers(const State &s, const Id &n, const Id &z,
         out.push_back(id);
   return out;
 }
-bool anyEnemy(const State &s, const Id &n, const Id &z) {
+bool anyEnemy(const State &s, const Id &n, ZoneId z) {
   for (const auto &[id, u] : s.units)
     if (u.zone == z && !u.carriedBy && hostile(s, n, u.owner) &&
         port(u).empty())
@@ -307,7 +306,7 @@ bool anyEnemy(const State &s, const Id &n, const Id &z) {
 // Whether these ships, having sailed into Enemy units, stay in their zone for
 // a battle: any Enemy unit at sea there holds them but a patrol plane that let
 // them pass, which they may leave as well as attack anew (RB 0.3).
-bool battleHolds(const State &s, const Id &n, const Id &z,
+bool battleHolds(const State &s, const Id &n, ZoneId z,
                  const std::vector<Id> &ships) {
   for (const auto &[id, u] : s.units)
     if (u.zone == z && !u.carriedBy && hostile(s, n, u.owner) &&
@@ -320,7 +319,7 @@ bool battleHolds(const State &s, const Id &n, const Id &z,
 // combat move is made against it (RB 0.3) and does not count against their
 // screening (RB 9.4.2). One that fought them for a single round as they
 // entered is among them and chooses again whether to fight (RCL-020).
-std::vector<Id> fightingBlockers(const State &s, const Id &n, const Id &z,
+std::vector<Id> fightingBlockers(const State &s, const Id &n, ZoneId z,
                                  const std::vector<Id> &ships) {
   auto out = blockers(s, n, z);
   std::erase_if(out, [&](const Id &unit) {
@@ -346,7 +345,7 @@ bool fighterBarsWayOn(const State &s, const UnitState &u,
 // patrol planes that have already reacted to them here by letting them pass or
 // fighting a single round. On a route that goes on, a Fighter that fought them
 // still stops them (fighterBarsWayOn). Submarines alone pass them all.
-std::vector<Id> barring(const State &s, const Id &n, const Id &z,
+std::vector<Id> barring(const State &s, const Id &n, ZoneId z,
                         const std::vector<Id> &ships,
                         const std::vector<Id> &reacted, bool onward) {
   const bool surface = std::any_of(ships.begin(), ships.end(), [&](const Id &id) {
@@ -363,7 +362,7 @@ std::vector<Id> barring(const State &s, const Id &n, const Id &z,
   });
   return out;
 }
-bool passage(const State &s, const UnitState &u, const Id &from, const Id &to,
+bool passage(const State &s, const UnitState &u, ZoneId from, ZoneId to,
              bool strategic) {
   const auto *e = mapEdge(s, from, to);
   if (!e)
@@ -375,7 +374,7 @@ bool passage(const State &s, const UnitState &u, const Id &from, const Id &to,
   }
   return !e->find("passable") || e->require("passable").asBool();
 }
-void detachAircraft(State &s, const std::vector<Id> &fleet, const Id &seaZone) {
+void detachAircraft(State &s, const std::vector<Id> &fleet, ZoneId seaZone) {
   for (const auto &ship : fleet) {
     const auto cargo = s.units.at(ship).cargo;
     for (const auto &id : cargo)
@@ -386,15 +385,15 @@ void detachAircraft(State &s, const std::vector<Id> &fleet, const Id &seaZone) {
       }
   }
 }
-void moveTo(State &s, const std::vector<Id> &fleet, const Id &zone, int cost,
+void moveTo(State &s, const std::vector<Id> &fleet, ZoneId zone, int cost,
             bool combat) {
   for (const auto &id : fleet)
     if (s.units.contains(id)) {
       auto &u = s.units.at(id);
       if (!port(u).empty())
-        u.turnFlags["naval_start_sea:" + zone] = 1;
+        u.turnFlags["naval_start_sea:" + zoneName(s, zone)] = 1;
       if (sea(s, u.zone) && u.zone != zone)
-        u.turnFlags["naval_last_origin:" + u.zone] =
+        u.turnFlags["naval_last_origin:" + zoneName(s, u.zone)] =
             static_cast<int>(s.clock.playerTurnSerial + 1);
       if (u.zone != zone)
         u.turnFlags.erase("map_declined_combat");
@@ -419,8 +418,8 @@ void routeChoices(State &, BattleState &);
 bool canLoad(const State &, const Id &, const Id &);
 void continueRoute(State &, const Id &);
 void encounter(State &, const Id &);
-bool peaceEntryWindow(State &s, BattleState &b, const Id &zone) {
-  const auto r = readRequest(b.data.require("request"));
+bool peaceEntryWindow(State &s, BattleState &b, ZoneId zone) {
+  const auto r = readRequest(s, b.data.require("request"));
   if (!r.combat || r.strategic)
     return false;
   const auto processed = b.data.find("entry_processed")
@@ -441,7 +440,7 @@ bool peaceEntryWindow(State &s, BattleState &b, const Id &zone) {
     return false;
   const auto target = *nations.begin();
   put(b, "entry_nation", V(target));
-  put(b, "entry_zone", V(zone));
+  put(b, "entry_zone", V(zoneName(s, zone)));
   std::vector<Action> options;
   if (mayDeclareWar(s, b.attacker, target).allowed)
     options.push_back(
@@ -471,11 +470,11 @@ void beginBattleFromPlan(State &s, const Id &planId,
                          const std::vector<Id> &defenders, const Id &context,
                          const std::vector<Id> &continuing = {}) {
   const auto plan = s.battles.at(planId);
-  const auto r = readRequest(plan.data.require("request"));
+  const auto r = readRequest(s, plan.data.require("request"));
   for (const auto &ship : attackers)
     if (!port(s.units.at(ship)).empty())
       moveTo(s, {ship}, plan.zone, 0, r.combat);
-  std::map<Id, Id> origins;
+  std::map<Id, ZoneId> origins;
   for (const auto &id : attackers) {
     auto &u = s.units.at(id);
     u.turnFlags.erase("naval_screening_continuing");
@@ -526,7 +525,7 @@ void reaction(State &s, BattleState &b, const std::vector<Id> &candidates,
   // RB 9.3.1 and 9.4: patrol planes may not let surface ships pass while the
   // Attacker has aircraft with an attack value present. Aircraft on a carrier
   // only act as if on patrol, by choice, and keep theirs.
-  const auto r = readRequest(b.data.require("request"));
+  const auto r = readRequest(s, b.data.require("request"));
   const bool surface = std::any_of(r.units.begin(), r.units.end(), [&](const Id &id) {
     return s.units.contains(id) && has(s, s.units.at(id), "surface_ship");
   });
@@ -536,13 +535,13 @@ void reaction(State &s, BattleState &b, const std::vector<Id> &candidates,
         return onMaritimeAirPatrol(s, s.units.at(id));
       }) &&
       attackAircraftPresent(s, b.attacker, b.zone);
-  if ((text(b, "entry_compelled") != n || text(b, "entry_zone") != b.zone) && !held)
+  if ((text(b, "entry_compelled") != n || text(b, "entry_zone") != zoneName(s, b.zone)) && !held)
     options.push_back(
         action(s, n, "naval_reaction_decline", {{"plan", V(b.id)}}));
   decision(s, b, n, "naval_movement_reaction", std::move(options));
 }
 void screenChoice(State &s, BattleState &b) {
-  const auto r = readRequest(b.data.require("request"));
+  const auto r = readRequest(s, b.data.require("request"));
   auto selected = b.data.find("screening")
                       ? readIds(b.data.require("screening"))
                       : std::vector<Id>{};
@@ -570,7 +569,7 @@ void screenChoice(State &s, BattleState &b) {
 }
 void encounter(State &s, const Id &id) {
   auto &b = s.battles.at(id);
-  auto r = readRequest(b.data.require("request"));
+  auto r = readRequest(s, b.data.require("request"));
   r.units = live(s, r.units);
   if (r.units.empty()) {
     erasePlan(s, id);
@@ -660,7 +659,7 @@ void encounter(State &s, const Id &id) {
 }
 // Militia may end their move in this land zone from a ship: in their Home
 // Country, friendly and enterable this turn (RB).
-bool militiaLandsAt(const State &s, const UnitState &militia, const Id &zone) {
+bool militiaLandsAt(const State &s, const UnitState &militia, ZoneId zone) {
   const auto t = s.territories.find(zone);
   return t != s.territories.end() && t->second.possessor &&
          politicallyFriendly(s, militia.owner, *t->second.possessor) &&
@@ -668,7 +667,7 @@ bool militiaLandsAt(const State &s, const UnitState &militia, const Id &zone) {
          militiaAllowedIn(s, militia, zone);
 }
 bool strategicPickup(State &s, BattleState &b) {
-  const auto r = readRequest(b.data.require("request"));
+  const auto r = readRequest(s, b.data.require("request"));
   std::vector<Action> options;
   if (value(s.nations.at(b.attacker).turnFlags, "strategic_naval_used") <
       strategicNavalCapacity(s, b.attacker))
@@ -703,7 +702,7 @@ bool strategicPickup(State &s, BattleState &b) {
 }
 void continueRoute(State &s, const Id &id) {
   auto &b = s.battles.at(id);
-  auto r = readRequest(b.data.require("request"));
+  auto r = readRequest(s, b.data.require("request"));
   r.units = live(s, r.units);
   if (r.units.empty()) {
     erasePlan(s, id);
@@ -768,7 +767,7 @@ void execute(State &s, const NavalRouteRequest &r) {
   b.attackers = r.units;
   b.flags["naval_movement_plan"] = 1;
   b.flags["naval_movement_immediate"] = 1;
-  b.data = V(O{{"request", requestJson(r)},
+  b.data = V(O{{"request", requestJson(s, r)},
                {"cursor", number(0)},
                {"declined", V(A{})}});
   if (blockedSortie)
@@ -848,7 +847,7 @@ bool canLoad(const State &s, const Id &ship, const Id &cargo) {
 }
 const char *const militiaStranded = "Militia aboard could not land in their Home Country";
 bool canUnload(const State &s, const Id &ship, const Id &cargo,
-               const Id &destination) {
+               ZoneId destination) {
   if (!s.units.contains(ship) || !s.units.contains(cargo) ||
       !s.territories.contains(destination) ||
       s.clock.phase != Phase::NonCombatMovement)
@@ -897,8 +896,8 @@ bool visitNavalRoutes(const State &s, const std::vector<Id> &selected,
         return has(s, unit, "naval_transport") && unit.route.empty() &&
                !unit.commitments.contains("combat_move");
       });
-  for (const auto &start : seasAt(s, selected.front())) {
-      std::function<bool(std::vector<Id>)> visit = [&](std::vector<Id> path) {
+  for (const auto start : seasAt(s, selected.front())) {
+      std::function<bool(std::vector<ZoneId>)> visit = [&](std::vector<ZoneId> path) {
         NavalRouteRequest r{
             selected, path,         s.clock.phase != Phase::NonCombatMovement,
             false,    std::nullopt, std::nullopt};
@@ -920,7 +919,7 @@ bool visitNavalRoutes(const State &s, const std::vector<Id> &selected,
         }
         if (path.size() > 8)
           return false;
-        for (const auto &next : mapNeighbors(s, path.back())) {
+        for (const auto next : mapNeighbors(s, path.back())) {
           if (!sea(s, next) ||
               std::find(path.begin(), path.end(), next) != path.end())
             continue;
@@ -939,8 +938,8 @@ bool visitNavalRoutes(const State &s, const std::vector<Id> &selected,
             const auto access = navalFacilitySeaZones(s, origin);
             if (std::find(access.begin(), access.end(), start) == access.end())
               continue;
-            std::function<bool(std::vector<Id>)> strategic =
-                [&](std::vector<Id> path) {
+            std::function<bool(std::vector<ZoneId>)> strategic =
+                [&](std::vector<ZoneId> path) {
                   for (const auto &[dest, end] : s.facilities) {
                     NavalRouteRequest r{selected, path,   false,
                                         true,     origin, dest};
@@ -956,7 +955,7 @@ bool visitNavalRoutes(const State &s, const std::vector<Id> &selected,
                           4 +
                           (tech(s, nation, "improved_logistics") ? 1 : 0)))
                     return false;
-                  for (const auto &next : mapNeighbors(s, path.back())) {
+                  for (const auto next : mapNeighbors(s, path.back())) {
                     if (!sea(s, next) ||
                         std::find(path.begin(), path.end(), next) != path.end())
                       continue;
@@ -989,7 +988,7 @@ bool landingsAtStake(const State &s, const std::vector<Id> &ships) {
          (std::any_of(ships.begin(), ships.end(), carrier) && movingSideAirborne(s));
 }
 // Unloading ends the ship's move as well as the cargo's.
-void unloadCargo(State &s, const Id &ship, const Id &cargo, const Id &zone) {
+void unloadCargo(State &s, const Id &ship, const Id &cargo, ZoneId zone) {
   detachCargo(s, ship, cargo, zone);
   s.units.at(cargo).turnFlags["naval_unloaded"] = 1;
   s.units.at(cargo).route.push_back(zone);
@@ -999,7 +998,7 @@ void unloadCargo(State &s, const Id &ship, const Id &cargo, const Id &zone) {
 }
 // Engaging holds the selected ships in battle where they are and launches
 // their own aircraft there, so it must keep the aircraft's landing plan.
-bool engagementKeepsLanding(const State &s, const std::vector<Id> &selected, const Id &zone) {
+bool engagementKeepsLanding(const State &s, const std::vector<Id> &selected, ZoneId zone) {
   if (!landingsAtStake(s, selected))
     return true;
   State probe = s.clone();
@@ -1095,7 +1094,7 @@ void routeChoices(State &s, BattleState &b) {
     visitNavalRoutes(s, selected, [&](const NavalRouteRequest &request) {
       options.push_back(action(s, b.attacker, "naval_route",
                                {{"plan", V(b.id)},
-                                {"request", requestJson(request)}}));
+                                {"request", requestJson(s, request)}}));
       return false;
     });
   }
@@ -1103,21 +1102,21 @@ void routeChoices(State &s, BattleState &b) {
 }
 } // namespace
 
-bool militiaAllowedIn(const State &s, const UnitState &unit, const Id &zone) {
+bool militiaAllowedIn(const State &s, const UnitState &unit, ZoneId zone) {
   if (unit.type != "militia")
     return true;
   const auto faction = s.definition->factions.find(unit.owner);
   return faction != s.definition->factions.end() &&
-         faction->second.homeCountry.contains(zone);
+         faction->second.homeZones.contains(zone);
 }
 bool militiaCanLandFrom(const State &s, const std::vector<Id> &ships,
-                        const std::vector<Id> &zones) {
+                        const std::vector<ZoneId> &zones) {
   for (const auto &ship : ships)
     for (const auto &cargo : s.units.at(ship).cargo) {
       const auto &c = s.units.at(cargo);
       if (c.type == "militia" &&
           (s.clock.phase != Phase::NonCombatMovement ||
-           std::none_of(zones.begin(), zones.end(), [&](const Id &zone) {
+           std::none_of(zones.begin(), zones.end(), [&](ZoneId zone) {
              return militiaLandsAt(s, c, zone);
            })))
         return false;
@@ -1354,7 +1353,7 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
              std::any_of(
                  r.units.begin(), r.units.end(),
                  [&](const Id &id) { return raider(s.units.at(id)); }) &&
-             std::any_of(r.path.begin(), r.path.end(), [&](const Id &z) {
+             std::any_of(r.path.begin(), r.path.end(), [&](ZoneId z) {
                return !blockers(s, n, z).empty();
              }))
     return fail(
@@ -1415,7 +1414,7 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
     const bool surface =
         std::any_of(r.units.begin(), r.units.end(),
                     [&](const Id &id) { return has(s, s.units.at(id), "surface_ship"); });
-    const auto canStop = [&](const Id &zone) {
+    const auto canStop = [&](ZoneId zone) {
       const auto opposing = blockers(s, n, zone);
       if (surface && std::any_of(opposing.begin(), opposing.end(), [&](const Id &id) {
             return has(s, s.units.at(id), "surface_warship");
@@ -1448,7 +1447,7 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
         for (const auto &id : r.units) {
           auto &u = probe.units.at(id);
           if (!port(u).empty())
-            u.turnFlags["naval_start_sea:" + r.path.front()] = 1;
+            u.turnFlags["naval_start_sea:" + zoneName(s, r.path.front())] = 1;
           for (auto i = u.gameFlags.begin(); i != u.gameFlags.end();)
             i = i->first.rfind("in_port:", 0) == 0 ? u.gameFlags.erase(i) : std::next(i);
           u.zone = r.path[static_cast<std::size_t>(stop)];
@@ -1471,11 +1470,11 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
   }
   // Militia aboard must still be able to land in their Home Country from where
   // the move ends: the port's land zone, or the land beside the final sea.
-  std::vector<Id> shore;
+  std::vector<ZoneId> shore;
   if (r.destinationFacility)
     shore.push_back(s.facilities.at(*r.destinationFacility).zone);
   else
-    for (const auto &zone : mapNeighbors(s, r.path.back()))
+    for (const auto zone : mapNeighbors(s, r.path.back()))
       if (s.territories.contains(zone))
         shore.push_back(zone);
   if (!militiaCanLandFrom(s, r.units, shore))
@@ -1485,9 +1484,9 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
   result.cost = totalCost;
   return result;
 }
-std::set<Id> navalEndZones(const State &s, const Id &ship) {
+NumberSet<ZoneId> navalEndZones(const State &s, const Id &ship) {
   auto compute = [&] {
-    std::set<Id> out;
+    NumberSet<ZoneId> out;
     if (!s.units.contains(ship))
       return out;
     const auto &u = s.units.at(ship);
@@ -1504,7 +1503,7 @@ std::set<Id> navalEndZones(const State &s, const Id &ship) {
     // fought; neutral units, which raise a peace entry, nowhere. Units of the
     // ship's own alliance do neither, as with Dadao's under Japanese control.
     const auto &alliance = s.nations.at(u.owner).alliance;
-    const auto unfriendly = [&](const Id &zone, bool enemiesAllowed) {
+    const auto unfriendly = [&](ZoneId zone, bool enemiesAllowed) {
       for (const auto &[id, other] : s.units)
         if (other.zone == zone && !other.carriedBy && other.owner != u.owner &&
             !politicallyFriendly(s, u.owner, other.owner) &&
@@ -1515,15 +1514,15 @@ std::set<Id> navalEndZones(const State &s, const Id &ship) {
       return false;
     };
     const bool inPort = !port(u).empty();
-    for (const auto &start : seasAt(s, ship)) {
+    for (const auto start : seasAt(s, ship)) {
       // Leaving port enters the first sea zone, where blockers force a screen.
       if (inPort && unfriendly(start, false))
         continue;
       // A Japanese surprise attack adds one point for its own target zone.
       const int reach =
-          std::max(0, allowance(s, u, combat, Id{}, start) + 1 - spent(s, u));
-      std::map<Id, int> distance{{start, 0}};
-      std::deque<Id> queue{start};
+          std::max(0, allowance(s, u, combat, ZoneId {}, start) + 1 - spent(s, u));
+      std::map<ZoneId, int> distance{{start, 0}};
+      std::deque<ZoneId> queue{start};
       while (!queue.empty()) {
         const auto zone = queue.front();
         queue.pop_front();
@@ -1535,7 +1534,7 @@ std::set<Id> navalEndZones(const State &s, const Id &ship) {
           out.insert(zone);
         if (steps >= reach || (entered && unfriendly(zone, false)))
           continue;
-        for (const auto &next : mapNeighbors(s, zone))
+        for (const auto next : mapNeighbors(s, zone))
           if (sea(s, next) && !distance.contains(next) &&
               passage(s, u, zone, next, false)) {
             distance.emplace(next, steps + 1);
@@ -1588,7 +1587,7 @@ std::vector<Action> navalMovementActions(const State &s) {
           if (canUnload(s, id, cargo, zone))
             out.push_back(action(
                 s, c.owner, "naval_unload",
-                {{"transport", V(id)}, {"unit", V(cargo)}, {"zone", V(zone)}}));
+                {{"transport", V(id)}, {"unit", V(cargo)}, {"zone", V(zoneName(s, zone))}}));
     }
   }
   return out;
@@ -1604,7 +1603,7 @@ bool applyNavalMovementAction(State &s, const Action &a) {
       // their move there (RB 9.3.1).
       const auto &b = s.battles.at(plan);
       if (b.stage == "naval_screen_selection")
-        endVoyage(s, live(s, readRequest(b.data.require("request")).units));
+        endVoyage(s, live(s, readRequest(s, b.data.require("request")).units));
       erasePlan(s, plan);
     } else
       encounter(s, plan);
@@ -1650,8 +1649,8 @@ bool applyNavalMovementAction(State &s, const Action &a) {
   }
   if (a.kind == "naval_unload") {
     const auto ship = p.require("transport").asString(),
-               cargo = p.require("unit").asString(),
-               zone = p.require("zone").asString();
+               cargo = p.require("unit").asString();
+    const auto zone = zoneNumber(s, p.require("zone").asString());
     require(canUnload(s, ship, cargo, zone), "Illegal naval unloading");
     unloadCargo(s, ship, cargo, zone);
     return true;
@@ -1690,7 +1689,7 @@ bool applyNavalMovementAction(State &s, const Action &a) {
             "Engaging leaves aircraft without a joint landing plan");
     require(anyEnemy(s, b.attacker, b.zone), "No enemy here for these ships to attack");
     detachAircraft(s, selected, b.zone);
-    std::map<Id, Id> origins;
+    std::map<Id, ZoneId> origins;
     std::vector<Id> enemies;
     for (const auto &ship : selected) {
       const auto &u = s.units.at(ship);
@@ -1723,7 +1722,7 @@ bool applyNavalMovementAction(State &s, const Action &a) {
       return true;
     }
     if (a.kind == "naval_route") {
-      const auto r = readRequest(p.require("request"));
+      const auto r = readRequest(s, p.require("request"));
       erasePlan(s, plan);
       execute(s, r);
       return true;
@@ -1748,7 +1747,7 @@ bool applyNavalMovementAction(State &s, const Action &a) {
                         ? readIds(b.data.require("screening"))
                         : std::vector<Id>{};
     if (a.kind == "naval_screen_confirm") {
-      const auto r = readRequest(b.data.require("request"));
+      const auto r = readRequest(s, b.data.require("request"));
       auto continuing = r.units;
       for (const auto &unit : selected)
         std::erase(continuing, unit);
@@ -1792,7 +1791,7 @@ bool applyNavalMovementAction(State &s, const Action &a) {
     release(s, a);
     auto &b = s.battles.at(plan);
     const auto defenders = readIds(b.data.require("reaction_units"));
-    const auto r = readRequest(b.data.require("request"));
+    const auto r = readRequest(s, b.data.require("request"));
     // The ships a patrol plane lets pass carry the mark while they stay in its
     // zone (patrolLetPass); the ships it fights for a single round do not.
     if (text(b, "reaction_context") == "movement_map")
@@ -1823,7 +1822,7 @@ bool applyNavalMovementChance(State &s, const ChanceRequest &request,
     return false;
   const auto rolls = effectiveResults(request, outcome);
   auto &b = s.battles.at(request.continuation);
-  const auto r = readRequest(b.data.require("request"));
+  const auto r = readRequest(s, b.data.require("request"));
   const auto enemies = blockers(s, b.attacker, b.zone);
   int opponent = 0;
   bool radar = false;
@@ -1868,7 +1867,7 @@ void continueNavalMovement(State &s, const Id &id) {
   if (!continuation)
     return;
   auto data = continuation->asObject();
-  auto r = readRequest(data.at("request"));
+  auto r = readRequest(s, data.at("request"));
   const auto kind = data.at("kind").asString();
   auto continuing = kind == "screening" && data.contains("continuing")
                         ? readIds(data.at("continuing"))
@@ -1893,7 +1892,7 @@ void continueNavalMovement(State &s, const Id &id) {
       return;
     for (const auto &unit : continuing) {
       auto &u = s.units.at(unit);
-      Id from = u.route.size() > 1 ? u.route[u.route.size() - 2] : u.turnOrigin;
+      const ZoneId from = u.route.size() > 1 ? u.route[u.route.size() - 2] : u.turnOrigin;
       require(sea(s, from) && adjacent(s, from, b.zone),
               "Failed screening requires its actual adjacent entry sea");
       u.zone = from;
@@ -1914,7 +1913,7 @@ void continueNavalMovement(State &s, const Id &id) {
   if (kind == "screening")
     for (const auto &unit : continuing)
       s.units.at(unit).turnFlags["naval_screening_continuing"] = 1;
-  data["request"] = requestJson(r);
+  data["request"] = requestJson(s, r);
   if (!data.contains("declined"))
     data["declined"] = V(A{});
   auto declined = readIds(data.at("declined"));

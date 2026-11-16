@@ -50,8 +50,8 @@ void addUnits(State& state, const Id& owner, const Id& zone, const json::Value& 
             UnitState unit;
             unit.type = type;
             unit.owner = owner;
-            unit.zone = zone;
-            unit.turnOrigin = zone;
+            unit.zone = zoneNumber(state, zone);
+            unit.turnOrigin = unit.zone;
             unit.damage = integerOr(row, "damage_points", 0);
             unit.carriedBy = optionalId(row.find("embarked_on"));
             if (explicitId) unit.id = *explicitId;
@@ -186,7 +186,7 @@ State loadScenario(const std::filesystem::path& directory) {
 
     State state;
     state.definition = freezeDefinition(std::move(definition));
-    state.politics.capitals["japan"]="land_jap_tokyo";
+    state.politics.capitals["japan"]=zoneNumber(state,"land_jap_tokyo");
     for (const auto& [id, source] : index.document.require("factions").asObject()) {
         NationState nation;
         const auto& control = source.require("initial_control");
@@ -228,11 +228,11 @@ State loadScenario(const std::filesystem::path& directory) {
         if (original.require("source_original_owner").asString() != node.require("original_owner").asString()) {
             throw std::runtime_error("Original owner differs from faction index: " + zone);
         }
-        state.territories.emplace(zone, TerritoryState {original.require("original_faction_id").asString(), {}});
+        state.territories.emplace(zoneNumber(state, zone), TerritoryState {original.require("original_faction_id").asString(), {}});
     }
     for (const auto& [id, source] : map.document.require("facilities").asObject()) {
         state.facilities.emplace(id, FacilityState {
-            id, source.require("type").asString(), source.require("land_id").asString(), 0, {}});
+            id, source.require("type").asString(), zoneNumber(state, source.require("land_id").asString()), 0, {}});
     }
     for (const auto& [zone, node] : nodes) {
         if (node.require("type").asString() != "land") continue;
@@ -243,9 +243,9 @@ State loadScenario(const std::filesystem::path& directory) {
                     || nodes.at(other).require("type").asString() != "land") continue;
             RailState rail;
             rail.id = railroadId(zone, other);
-            rail.endpointA = zone;
-            rail.endpointB = other;
-            rail.damageByEndpoint = {{zone, 0}, {other, 0}};
+            rail.endpointA = zoneNumber(state, zone);
+            rail.endpointB = zoneNumber(state, other);
+            rail.damageByEndpoint = {{rail.endpointA, 0}, {rail.endpointB, 0}};
             state.rails.emplace(rail.id, std::move(rail));
         }
     }
@@ -259,7 +259,7 @@ State loadScenario(const std::filesystem::path& directory) {
             FacilityState facility;
             facility.id = source.require("id").asString();
             facility.type = source.require("type").asString();
-            facility.zone = zone;
+            facility.zone = zoneNumber(state, zone);
             facility.damage = integerOr(source, "damage_points", 0);
             if (!state.facilities.emplace(facility.id, facility).second) {
                 throw std::runtime_error("Duplicate setup facility: " + facility.id);
@@ -268,7 +268,7 @@ State loadScenario(const std::filesystem::path& directory) {
     }
     for (const auto& row : china.document.require("territories").asArray()) {
         const Id zone = row.require("node_id").asString();
-        state.territories.at(zone).possessor = row.require("owner_id").asString();
+        state.territories.at(zoneNumber(state, zone)).possessor = row.require("owner_id").asString();
         addUnits(state, row.require("owner_id").asString(), zone, row.require("units"));
         // Existing facility references are provenance, not new instances.
         for (const auto& facility : row.require("facilities").asArray()) {

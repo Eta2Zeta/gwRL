@@ -57,6 +57,7 @@ the first learning stage.
 | 16 Nov | [What limits self-play within nine cores](records/self_play_limits_2026_11_16.md) | The 9 cores are full and the game processes do 90% of the work, 80% of it in the engine, where comparing names, allocating and copying take 59%; the coordinator, busy 90%, caps what a faster engine alone can add at 12% to 40%; the Mac's other work pushed 27% to 29% of the game processes' time onto efficiency cores. |
 | 16 Nov | [Playing a move without checking it twice](records/move_checks_2026_11_16.md) | Identical play in 300 random games; playing a move takes 29% fewer instructions, and game processes 10.6% fewer per decision in training batches, but with a quiet Mac the coordinator set the pace and decisions per hour did not rise. |
 | 16 Nov | [The naval-route and landing checks](records/naval_route_checks_2026_11_16.md) | They spend most of their time on copies of the position, each working out supply and the carriers' reach again; the one exact saving, a ship's allowance worked out once for all destinations, cuts 1% of a searched game's instructions. |
+| 16 Nov | [Zones held as numbers](records/zone_numbers_2026_11_16.md) | Identical play in 300 random games and 4 searched games; listing a position's moves takes 13.0% fewer instructions and a searched game 7.2% to 7.9% fewer. |
 
 ### The engine
 
