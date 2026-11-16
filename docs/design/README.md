@@ -1496,12 +1496,11 @@ whatever its size
 ([record](../archive/records/coordinator_one_pass_2026_11_14.md#where-the-coordinators-time-went)).
 Most of that fixed cost is Python's and PyTorch's own work for each of the pass's
 hundreds of operations. Of the arithmetic, the GELU curve (section 6.2) takes the
-most, mostly in the border messages (section 6.6). The coordinator is busy about
-90% of the time, so it limits the layout: a round costs about the same whatever
-it holds, and with 24 games in flight a round holds about 4.9 positions.
-Inferred: further speed needs a coordinator that answers more positions a round
-for the same cost, and less engine work per move, which frees the most CPU
-([record](../archive/records/nine_core_layouts_2026_11_15.md#what-this-does-and-does-not-show)).
+most, mostly in the border messages (section 6.6). With one pass per round, the
+positions now cost most of a round. In a profiled batch with 24 games in flight, a
+round held 4.4 positions on average and cost about 0.26 ms plus 0.23 ms for each
+position, and the coordinator was busy 90% of the time
+([record](../archive/records/self_play_limits_2026_11_16.md#the-coordinator)).
 
 **What the cores and the GPU do.** In the Mac profile the GPU does nothing, and
 all the cores work at the same time. A game thread works in the engine and the
@@ -1514,6 +1513,16 @@ four games: in a 15 November batch a game thread computed about a third of the
 time, yet the 24 game threads and the coordinator kept about 9 cores busy. The
 coordinator, on a core of its own, answers round after round.
 
+The M4 Max has 10 performance cores and 4 efficiency cores. An efficiency core
+runs at 2.6 GHz instead of 3.8 and, in the game processes, does about 42% of a
+performance core's work in a second. The allowance leaves one performance core for
+the Mac's other work. When that work needs more, the training no longer fits on
+the performance cores. In two profiled batches on 16 November other work kept
+about 4 cores busy. macOS then ran 27% to 29% of the game processes' CPU time on
+the efficiency cores. The game processes waited for a free core half to three
+quarters as long as they computed, and the coordinator a tenth to a fifth as long
+([record](../archive/records/self_play_limits_2026_11_16.md#the-two-batches)).
+
 ![A schematic timeline. The four game threads of one game process take turns: each works in the engine, listing moves, playing a move on a copy of the game and building the network's input, then sends a request and waits until the coordinator answers it in its next round, then works again. While one thread waits, others work. Five more game processes do the same. The coordinator, on one core, runs round after round: one network pass on the CPU for all waiting requests. The GPU is idle.](figures/self_play_timeline.svg)
 
 **Why the network runs on the CPU.** A pass on the Mac's GPU has a larger fixed
@@ -1521,7 +1530,7 @@ cost than a pass on one CPU core. A pass of the 64×2 network over one position
 takes 2.1 ms on the GPU and 0.46 ms on one core, and over 16 positions 4.7 ms
 and 2.7 ms
 ([record](../archive/records/network_and_search_cost_2026_11_14.md#the-network)).
-A round holds about six positions, so one core answers it sooner. The GPU is
+A round holds four to five positions, so one core answers it sooner. The GPU is
 faster only for larger networks and many positions per pass
 ([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). The GPU has
 never limited self-play. When the coordinator ran its passes there, up to the
@@ -1529,23 +1538,46 @@ night of 2 November, a network with five times the parameters played about as
 many decisions per hour as the small one on the CPU (table below): the engine
 and each pass's fixed costs set the pace, not the GPU's arithmetic.
 
-**The game processes** do about 90% of the CPU work. In a profile on 13 November,
-two thirds of it went to two engine calls of about a millisecond each: listing a
-position's legal moves and playing a move
-([record](../archive/records/game_processes_2026_11_13.md)). Inside the engine a
-few rule checks take the most: searching the map for a nation's Supply Path to a
-zone, enumerating every route a naval force could sail, listing the economy's
-options, and finding landing plans for aircraft in flight. While the engine lists
-a position's legal moves, it keeps a cache of facts about that position, such as
-whether a zone is in supply for a nation, so that each is worked out once
-(`PositionScope` in `include/game/position_facts.hpp`). Playing a move opens the
-same cache for the checks it makes while the position is still unchanged, such as
-whether a fleet's chosen route is legal, and closes it before the move changes
-anything. The supply search also works out only once per search which naval
-facilities it may use. Since these two changes, playing a move takes about 0.6 ms
-in random play instead of 1.1 ms, and the game processes use 16% less CPU per
-decision in training batches, about 117 ms
+**The game processes** do about 90% of the CPU work, about 133 ms per decision.
+In a profiled batch on 16 November the engine and its encoding of positions for
+the network took 80% of the game threads' CPU time. Listing a position's legal
+moves took 37%, about 1.0 ms a call. Playing a move took 22% (0.6 ms), encoding a
+position 10% (0.26 ms), copying the game for the search 5% and rolling dice 4%.
+The search's and the adapter's Python and the requests to the coordinator took
+the rest
+([record](../archive/records/self_play_limits_2026_11_16.md#a-game-threads-time)).
+Inside the engine a few rule checks take the most. Enumerating and checking the
+routes a naval force could sail takes about a quarter of the engine's time.
+Finding landing plans for aircraft in flight takes a seventh. The economy's
+options, movement allowances and Supply Paths take about a tenth each. By kind
+of work, 59% of the engine's time goes to comparing names, allocating memory,
+looking up maps and copying memory, and 41% to the rules' own logic. The position
+keeps its zones, units, facilities and nations in maps keyed by name, and every
+rule check names them as strings
+([record](../archive/records/self_play_limits_2026_11_16.md#inside-the-engine)).
+While the engine lists a position's legal moves, it keeps a cache of facts about
+that position, such as whether a zone is in supply for a nation, so that each is
+worked out once (`PositionScope` in `include/game/position_facts.hpp`). Playing a
+move opens the same cache for the checks it makes while the position is still
+unchanged, such as whether a fleet's chosen route is legal, and closes it before
+the move changes anything. The supply search also works out only once per search
+which naval facilities it may use. Since these two changes, playing a move takes
+about 0.6 ms in random play instead of 1.1 ms
 ([record](../archive/records/supply_cache_2026_11_14.md)).
+
+**What limits self-play.** Inferred from the 16 November batches, the first limit
+is the 9 cores. The training kept them busy and spent about 148 ms of CPU per
+decision. At that load that makes about 222,500 decisions an hour, close to the
+213,600 the batch played. More decisions an hour within the allowance therefore
+need less CPU per decision, and 90% of that CPU is the game processes'. The
+coordinator is the next limit. Busy all the time, at 0.26 ms a round plus 0.23 ms
+a position, it would answer about 240,000 decisions an hour with rounds of 4.4
+positions, and about 301,000 with rounds of any size. A cheaper engine leaves
+more positions waiting for each round, so rounds grow. A faster engine alone can
+therefore add at most about 12% to 40%, and about a quarter with rounds of 8 to
+12 positions. Beyond that, the coordinator's cost per position, mostly the
+network's arithmetic, has to fall too
+([record](../archive/records/self_play_limits_2026_11_16.md#what-limits-self-play)).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept sample was drawn 8 to 12 times
@@ -1733,7 +1765,8 @@ to about 3.4 times at 64×2, about 1.5 times at 256×8 and not at all from 384×
 on, where the GPU already limits; larger passes would raise the 256×8 figure to at
 most about 2.2 times, with four times the games in flight. With the network on one
 core, as today, the coordinator is already busy about 90% of the time (section
-9.2), so a cheaper engine alone would gain little even at 64×2. A change to the
+9.2), so a cheaper engine alone would gain at most about 12% to 40% at 64×2. A
+change to the
 network's passes changes the network's rate and matters only where the network
 limits.
 
@@ -1891,17 +1924,19 @@ measured and what would settle it.
   pair a nation, or the game as a whole, with a mark that only units or
   territories carry
   ([what is still asked](network_input.md#what-the-position-asks-about-a-nation)).
-- **Self-play on the Mac is close to two limits.** The coordinator is busy about
-  85% of the time, and the game processes and the coordinator use about 9.9 of
-  the 11 training cores
-  ([record](../archive/records/coordinator_one_pass_2026_11_14.md)). The game
-  processes do 90% of the CPU work, so less engine work per move frees the most,
-  but the coordinator then has to keep up: laying a round's positions out takes
-  a seventh of its time. Within the engine, listing a position's legal moves now
-  costs more per call than playing a move, and enumerating naval routes and
-  listing the economy's options each take about 15% of the engine's time, more
-  than the supply search
-  ([record](../archive/records/supply_cache_2026_11_14.md)).
+- **Self-play on the Mac is close to two limits.** The training keeps its 9
+  cores busy, and the coordinator is busy about 90% of the time. The game
+  processes do 90% of the CPU work, so less engine work per move frees the most.
+  But a faster engine alone can add at most about 12% to 40% before the
+  coordinator is busy all the time. Within the engine, listing a position's legal
+  moves costs the most, about 1.0 ms a call, and 59% of the engine's time goes to
+  comparing names, allocating memory, looking up maps and copying memory. Some
+  work is repeated: playing an economy move lists the economy's menu again, and
+  checking a naval route copies the whole position. Every move and every dice
+  roll also writes out the whole position, for its planning key, and checks all
+  of it. When the Mac's other work needs
+  more than one core, part of the training runs on the efficiency cores
+  ([record](../archive/records/self_play_limits_2026_11_16.md)).
 
 ### Open design questions
 

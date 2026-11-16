@@ -1,0 +1,861 @@
+{
+ "date": "2026-11-16",
+ "question": "What limits self-play on the Mac within the 9-core allowance, and where the CPU time goes",
+ "code": "main at fade51b (engine and trainer as at e62e01b)",
+ "machine": "Apple M4 Max: 10 performance and 4 efficiency cores, 36 GB",
+ "layout": "the Mac profile: 6 game processes of 4 games, one coordinator evaluating on the CPU",
+ "commands": {
+  "batch_arguments": "--calendar-rounds 11 --complete-episodes --batches 1 --simulations 64 --max-depth 16 --hidden-dim 64 --message-layers 2 --batch-size 32 --epochs 50 --replay-capacity 8000 --sample-fraction 0.05 --transitions-per-batch 20000 --seed 20261104",
+  "game_process_profile": "env -u MallocNanoZone .venv/bin/python tools/profile_game_process_cpu.py --output OUT/game.json --profile mac --control-dir OUT/game-control --run-dir OUT/game-run --seconds 1800 --sample-at 120,240,360 -- BATCH_ARGUMENTS",
+  "coordinator_profile": "env -u MallocNanoZone .venv/bin/python tools/profile_coordinator.py --output OUT/coord.json --profile mac --control-dir OUT/coord-control --run-dir OUT/coord-run --seconds 1800 --save-every 200 --sample-at 150,330 -- BATCH_ARGUMENTS",
+  "load": "tools/log_process_load.py record --pid PROFILER_PID --interval 5 beside each batch, then summarize"
+ },
+ "batches": {
+  "game_process_profile": {
+   "games": 24,
+   "decisions": 26339,
+   "playing_seconds": 542.2,
+   "decisions_per_hour_while_playing": 174880,
+   "games_per_hour_while_playing": 159.4,
+   "evaluations": 1362691,
+   "serving_rounds": 332933,
+   "positions_per_round": 4.09,
+   "coordinator_busy_share": 0.874,
+   "evaluations_per_decision": 51.7,
+   "peak_memory_bytes": 4404070152,
+   "status": "completed",
+   "load": {
+    "seconds_with_game_processes": 540.4,
+    "batch_cores": {
+     "mean_window": 7.71,
+     "median_window": 7.73,
+     "highest_window": 10.46
+    },
+    "other_work_cores": {
+     "mean_window": 4.64,
+     "median_window": 4.8
+    },
+    "windows": [
+     {
+      "batch_cores": 9.85,
+      "other_cores": 2.98
+     },
+     {
+      "batch_cores": 10.46,
+      "other_cores": 2.58
+     },
+     {
+      "batch_cores": 8.95,
+      "other_cores": 3.91
+     },
+     {
+      "batch_cores": 7.64,
+      "other_cores": 5.28
+     },
+     {
+      "batch_cores": 7.62,
+      "other_cores": 5.35
+     },
+     {
+      "batch_cores": 6.18,
+      "other_cores": 6.61
+     },
+     {
+      "batch_cores": 5.56,
+      "other_cores": 7.19
+     },
+     {
+      "batch_cores": 6.36,
+      "other_cores": 6.55
+     },
+     {
+      "batch_cores": 7.11,
+      "other_cores": 5.54
+     },
+     {
+      "batch_cores": 9.12,
+      "other_cores": 4.06
+     },
+     {
+      "batch_cores": 7.9,
+      "other_cores": 5.15
+     },
+     {
+      "batch_cores": 7.47,
+      "other_cores": 5.27
+     },
+     {
+      "batch_cores": 7.19,
+      "other_cores": 5.21
+     },
+     {
+      "batch_cores": 8.61,
+      "other_cores": 4.19
+     },
+     {
+      "batch_cores": 8.13,
+      "other_cores": 4.44
+     },
+     {
+      "batch_cores": 9.4,
+      "other_cores": 3.64
+     },
+     {
+      "batch_cores": 7.82,
+      "other_cores": 3.23
+     },
+     {
+      "batch_cores": 3.37,
+      "other_cores": 2.4
+     }
+    ],
+    "processes": {
+     "supervisor and helpers": {
+      "count": 6,
+      "cpu_seconds": 21.7,
+      "performance_core_share": 0.977,
+      "waiting_for_a_core_seconds": 1.2,
+      "waiting_per_cpu_second": 0.056,
+      "instructions": 192975800783,
+      "cycles": 82964450613,
+      "instructions_per_cycle": {
+       "performance": 2.34,
+       "efficiency": 1.4
+      },
+      "gigahertz": {
+       "performance": 3.86,
+       "efficiency": 2.59
+      },
+      "efficiency_core_work_rate_vs_performance": 0.403,
+      "performance_core_equivalent_cpu_seconds": 21.4,
+      "qos_cpu_seconds": {
+       "default": 20.0,
+       "legacy": 1.7
+      }
+     },
+     "coordinator": {
+      "count": 1,
+      "cpu_seconds": 426.3,
+      "performance_core_share": 0.909,
+      "waiting_for_a_core_seconds": 90.9,
+      "waiting_per_cpu_second": 0.213,
+      "instructions": 5027671451033,
+      "cycles": 1524917223263,
+      "instructions_per_cycle": {
+       "performance": 3.43,
+       "efficiency": 1.46
+      },
+      "gigahertz": {
+       "performance": 3.68,
+       "efficiency": 2.58
+      },
+      "efficiency_core_work_rate_vs_performance": 0.299,
+      "performance_core_equivalent_cpu_seconds": 399.3,
+      "qos_cpu_seconds": {
+       "legacy": 426.3
+      }
+     },
+     "game processes": {
+      "count": 6,
+      "cpu_seconds": 3716.8,
+      "performance_core_share": 0.725,
+      "waiting_for_a_core_seconds": 2804.2,
+      "waiting_per_cpu_second": 0.754,
+      "instructions": 33860461875599,
+      "cycles": 12932122820644,
+      "instructions_per_cycle": {
+       "performance": 2.83,
+       "efficiency": 1.78
+      },
+      "gigahertz": {
+       "performance": 3.82,
+       "efficiency": 2.59
+      },
+      "efficiency_core_work_rate_vs_performance": 0.426,
+      "performance_core_equivalent_cpu_seconds": 3131.2,
+      "qos_cpu_seconds": {
+       "legacy": 3716.8
+      }
+     }
+    }
+   },
+   "cpu_ms_per_decision": {
+    "supervisor and helpers": 0.8,
+    "coordinator": 16.2,
+    "game processes": 141.1
+   },
+   "performance_core_equivalent_ms_per_decision": {
+    "supervisor and helpers": 0.8,
+    "coordinator": 15.2,
+    "game processes": 118.9
+   },
+   "instructions_per_decision_millions": {
+    "supervisor and helpers": 7,
+    "coordinator": 191,
+    "game processes": 1286
+   }
+  },
+  "coordinator_profile": {
+   "games": 24,
+   "decisions": 26356,
+   "playing_seconds": 444.1,
+   "decisions_per_hour_while_playing": 213644,
+   "games_per_hour_while_playing": 194.5,
+   "evaluations": 1363143,
+   "serving_rounds": 307266,
+   "positions_per_round": 4.44,
+   "coordinator_busy_share": 0.897,
+   "evaluations_per_decision": 51.7,
+   "peak_memory_bytes": 5567499792,
+   "status": "completed",
+   "load": {
+    "seconds_with_game_processes": 435.4,
+    "batch_cores": {
+     "mean_window": 9.13,
+     "median_window": 9.13,
+     "highest_window": 10.2
+    },
+    "other_work_cores": {
+     "mean_window": 3.86,
+     "median_window": 3.99
+    },
+    "windows": [
+     {
+      "batch_cores": 10.2,
+      "other_cores": 3.02
+     },
+     {
+      "batch_cores": 10.1,
+      "other_cores": 3.08
+     },
+     {
+      "batch_cores": 9.48,
+      "other_cores": 3.8
+     },
+     {
+      "batch_cores": 9.5,
+      "other_cores": 3.88
+     },
+     {
+      "batch_cores": 8.86,
+      "other_cores": 3.96
+     },
+     {
+      "batch_cores": 8.74,
+      "other_cores": 3.35
+     },
+     {
+      "batch_cores": 9.55,
+      "other_cores": 3.66
+     },
+     {
+      "batch_cores": 9.28,
+      "other_cores": 4.07
+     },
+     {
+      "batch_cores": 9.26,
+      "other_cores": 4.03
+     },
+     {
+      "batch_cores": 9.0,
+      "other_cores": 4.17
+     },
+     {
+      "batch_cores": 8.81,
+      "other_cores": 4.34
+     },
+     {
+      "batch_cores": 8.34,
+      "other_cores": 4.28
+     },
+     {
+      "batch_cores": 8.96,
+      "other_cores": 4.04
+     },
+     {
+      "batch_cores": 7.69,
+      "other_cores": 4.34
+     }
+    ],
+    "processes": {
+     "supervisor and helpers": {
+      "count": 5,
+      "cpu_seconds": 8.3,
+      "performance_core_share": 0.927,
+      "waiting_for_a_core_seconds": 0.5,
+      "waiting_per_cpu_second": 0.066,
+      "instructions": 67266716087,
+      "cycles": 31188850704,
+      "instructions_per_cycle": {
+       "performance": 2.19,
+       "efficiency": 1.5
+      },
+      "gigahertz": {
+       "performance": 3.86,
+       "efficiency": 2.59
+      },
+      "efficiency_core_work_rate_vs_performance": 0.458,
+      "performance_core_equivalent_cpu_seconds": 7.9,
+      "qos_cpu_seconds": {
+       "default": 6.9,
+       "legacy": 1.4
+      }
+     },
+     "coordinator": {
+      "count": 1,
+      "cpu_seconds": 378.8,
+      "performance_core_share": 0.956,
+      "waiting_for_a_core_seconds": 39.4,
+      "waiting_per_cpu_second": 0.104,
+      "instructions": 5013940476298,
+      "cycles": 1372143553874,
+      "instructions_per_cycle": {
+       "performance": 3.72,
+       "efficiency": 1.5
+      },
+      "gigahertz": {
+       "performance": 3.67,
+       "efficiency": 2.58
+      },
+      "efficiency_core_work_rate_vs_performance": 0.284,
+      "performance_core_equivalent_cpu_seconds": 366.8,
+      "qos_cpu_seconds": {
+       "legacy": 378.8
+      }
+     },
+     "game processes": {
+      "count": 6,
+      "cpu_seconds": 3505.2,
+      "performance_core_share": 0.708,
+      "waiting_for_a_core_seconds": 1772.3,
+      "waiting_per_cpu_second": 0.506,
+      "instructions": 33366374528128,
+      "cycles": 12133130468301,
+      "instructions_per_cycle": {
+       "performance": 3.0,
+       "efficiency": 1.84
+      },
+      "gigahertz": {
+       "performance": 3.82,
+       "efficiency": 2.59
+      },
+      "efficiency_core_work_rate_vs_performance": 0.415,
+      "performance_core_equivalent_cpu_seconds": 2906.6,
+      "qos_cpu_seconds": {
+       "legacy": 3505.2
+      }
+     }
+    }
+   },
+   "cpu_ms_per_decision": {
+    "supervisor and helpers": 0.3,
+    "coordinator": 14.4,
+    "game processes": 133.0
+   },
+   "performance_core_equivalent_ms_per_decision": {
+    "supervisor and helpers": 0.3,
+    "coordinator": 13.9,
+    "game processes": 110.3
+   },
+   "instructions_per_decision_millions": {
+    "supervisor and helpers": 3,
+    "coordinator": 190,
+    "game processes": 1266
+   }
+  }
+ },
+ "game_threads": {
+  "decisions_per_game": 1097.4583333333333,
+  "chance_events_per_game": 144.91666666666666,
+  "evaluations_per_game": 56778.791666666664,
+  "thread_cpu_seconds_per_game": 154.98054809558332,
+  "thread_cpu_ms_per_decision": 141.21770584661527,
+  "seconds_per_game": {
+   "search": 9.657506413,
+   "engine": 108.06254334291667,
+   "encode": 15.050243118291668,
+   "adapter": 8.8943191445,
+   "input": 1.8123728588333334,
+   "messaging": 4.5929438175833335,
+   "game loop": 6.910619400458333
+  },
+  "share_of_thread_cpu": {
+   "search": 0.06231431319396155,
+   "engine": 0.6972652030903242,
+   "encode": 0.0971105296969883,
+   "adapter": 0.05738990637079489,
+   "input": 0.011694195698130861,
+   "messaging": 0.029635614753089293,
+   "game loop": 0.04459023719671097
+  },
+  "estimated_instrumentation_seconds_per_game": 1.5990706830379968,
+  "searches_per_game": {
+   "all": 1097.4583333333333,
+   "one legal move": 222.04166666666666
+  },
+  "evaluations_by_menu_size": {
+   "0": 9.25,
+   "1": 9692.375,
+   "2+": 47077.166666666664
+  },
+  "wall_seconds_per_game": 494.4380918906051,
+  "wall_share": {
+   "own CPU": 0.3134478322715332,
+   "waiting for the coordinator": 0.5184551456798231,
+   "other, mostly the interpreter lock": 0.16809702204864374
+  },
+  "seconds_per_game_by_call": {
+   "engine/legal_actions": 56.95,
+   "engine/apply_action": 34.82,
+   "encode/zone_input": 14.54,
+   "search": 9.66,
+   "engine/resolve_chance": 5.99,
+   "engine/clone_for_search": 5.81,
+   "game loop": 5.34,
+   "adapter/legal_actions": 3.43,
+   "messaging/recv": 1.88,
+   "input/prepare_into": 1.62,
+   "messaging/send": 1.54,
+   "engine/clone_for_search_continuing": 1.52,
+   "game loop/make_env": 1.44,
+   "engine/planning_key": 1.41,
+   "adapter/planning_key": 1.31,
+   "messaging/evaluate": 1.18,
+   "engine/legal_interrupts": 1.01,
+   "adapter/clone_for_search": 0.99,
+   "adapter/zone_input": 0.78,
+   "adapter/decision_kind": 0.78,
+   "adapter/apply_action": 0.72,
+   "encode/arrays": 0.51,
+   "engine/is_terminal": 0.33,
+   "adapter/current_decision_player": 0.3,
+   "adapter/is_terminal": 0.26,
+   "adapter/clone_for_search_continuing": 0.21,
+   "input/make_zone_input": 0.2,
+   "game loop/_decide": 0.12,
+   "adapter/resolve_chance": 0.12,
+   "engine/current_decision_player": 0.1,
+   "engine/decision_kind": 0.09
+  },
+  "calls_per_game": {
+   "adapter/apply_action": 55950,
+   "adapter/clone_for_search": 56847,
+   "adapter/clone_for_search_continuing": 18074,
+   "adapter/current_decision_player": 133020,
+   "adapter/decision_kind": 96831,
+   "adapter/is_terminal": 191179,
+   "adapter/legal_actions": 58964,
+   "adapter/planning_key": 78726,
+   "adapter/resolve_chance": 19339,
+   "adapter/zone_input": 57876,
+   "encode/arrays": 56779,
+   "encode/zone_input": 56999,
+   "engine/apply_action": 55904,
+   "engine/clone_for_search": 56847,
+   "engine/clone_for_search_continuing": 18074,
+   "engine/current_decision_player": 75245,
+   "engine/decision_kind": 75290,
+   "engine/is_terminal": 324344,
+   "engine/legal_actions": 56957,
+   "engine/legal_interrupts": 45682,
+   "engine/planning_key": 706478,
+   "engine/resolve_chance": 19339,
+   "game loop/_decide": 1097,
+   "game loop/make_env": 1,
+   "input/make_zone_input": 57876,
+   "input/prepare_into": 56779,
+   "messaging/evaluate": 56779,
+   "messaging/recv": 56779,
+   "messaging/send": 56779,
+   "search": 1097
+  },
+  "microseconds_per_call": {
+   "adapter/apply_action": 12.9,
+   "adapter/clone_for_search": 17.5,
+   "adapter/clone_for_search_continuing": 11.7,
+   "adapter/current_decision_player": 2.2,
+   "adapter/decision_kind": 8.0,
+   "adapter/is_terminal": 1.4,
+   "adapter/legal_actions": 58.1,
+   "adapter/planning_key": 16.6,
+   "adapter/resolve_chance": 6.4,
+   "adapter/zone_input": 13.5,
+   "encode/arrays": 9.0,
+   "encode/zone_input": 255.0,
+   "engine/apply_action": 622.9,
+   "engine/clone_for_search": 102.3,
+   "engine/clone_for_search_continuing": 84.1,
+   "engine/current_decision_player": 1.4,
+   "engine/decision_kind": 1.3,
+   "engine/is_terminal": 1.0,
+   "engine/legal_actions": 999.9,
+   "engine/legal_interrupts": 22.1,
+   "engine/planning_key": 2.0,
+   "engine/resolve_chance": 309.8,
+   "game loop/_decide": 113.5,
+   "game loop/make_env": 1442685.6,
+   "input/make_zone_input": 3.4,
+   "input/prepare_into": 28.5,
+   "messaging/evaluate": 20.8,
+   "messaging/recv": 33.1,
+   "messaging/send": 27.1,
+   "search": 8799.9
+  },
+  "setup": "tools/profile_game_process_cpu.py, the game-process profile batch: each game thread's CPU time charged to the innermost instrumented call"
+ },
+ "game_thread_wall_samples": {
+  "setup": "the same native samples, every game thread's samples by its innermost frame, blocked or not",
+  "samples": 142120,
+  "shares": {
+   "wait: pipe (coordinator)": 0.453,
+   "engine: legal moves": 0.153,
+   "wait: GIL around an engine call": 0.116,
+   "engine: play a move": 0.093,
+   "python": 0.084,
+   "engine: zone encoding": 0.042,
+   "engine: dice": 0.023,
+   "engine: copies": 0.019,
+   "engine: other calls": 0.01,
+   "wait: GIL": 0.005,
+   "engine: planning key": 0.001,
+   "wait: other": 0.0
+  }
+ },
+ "engine_native_samples": {
+  "setup": "macOS /usr/bin/sample, 20 s at 1 ms intervals of one game process at 120, 240 and 360 s into the game-process profile batch (a different process each time); shares of on-CPU samples inside engine calls (pybind11 dispatcher), samples blocked in the interpreter lock or a pipe read excluded",
+  "engine_samples": 48339,
+  "by_kind_of_innermost_work": {
+   "the rules' own code": 0.408,
+   "string comparisons": 0.225,
+   "allocating and freeing memory": 0.189,
+   "map and hash-table lookups": 0.092,
+   "copying and filling memory": 0.068,
+   "scenario JSON lookups": 0.017
+  },
+  "by_rule_check_inclusive_overlapping": {
+   "naval routes: enumerating and validating": 0.256,
+   "aircraft landing plans": 0.147,
+   "zone encoding": 0.114,
+   "naval orders that can still be completed": 0.109,
+   "economy menu": 0.107,
+   "movement allowance": 0.107,
+   "supply paths": 0.093,
+   "whole-state copies": 0.09,
+   "factory capacity": 0.088,
+   "planning key": 0.085,
+   "whole-state validation": 0.06,
+   "political refresh": 0.019,
+   "combat dice": 0.013,
+   "income refresh": 0.004
+  },
+  "entry_samples_including_core_waits": {
+   "listing legal moves": 21689,
+   "playing a move": 13280,
+   "rolling dice": 3275
+  },
+  "inside_each_engine_call_inclusive": {
+   "listing legal moves": {
+    "Engine::legalActions() const": 1.0,
+    "Engine::actionMenu() const": 0.992,
+    "TrainingRules::actions(State const&) const": 0.919,
+    "PoliticsRules::actions(State const&) const": 0.678,
+    "MovementRules::actions(State const&) const": 0.668,
+    "NavalRules::actions(State const&) const": 0.601,
+    "LandCombatRules::actions(State const&) const": 0.389,
+    "AirRules::actions(State const&) const": 0.388,
+    "_platform_memcmp": 0.257,
+    "forwardNavalOrderActions(State const&, std::vector<>)": 0.217,
+    "forwardNavalOrderActions(State const&, std::vector<>)::$_0::operator()(Action const&) const": 0.216,
+    "NavalOrderCompletion::possible(std::vector<> const&)": 0.215,
+    "visitNavalRoutes(State const&, std::vector<> const&, std::function<> const&, bool*)": 0.212,
+    "std::__function::__func<>::operator()(std::vector<>&&)": 0.21,
+    "solveReachablePlan(State const&, LandingPreview const*, int)": 0.207,
+    "validateNavalRoute(State const&, NavalRouteRequest const&)": 0.206,
+    "allowance(State const&, UnitState const&, bool, string const&, string const&)": 0.164,
+    "allowanceNow(State const&, UnitState const&, bool, string const&, string const&)": 0.159,
+    "operator new(unsigned long)": 0.129,
+    "traceSupply(State const&, string const&, string const&, std::optional<> const&, bool)": 0.127,
+    "navalOperationActions(State const&)": 0.127,
+    "inSupply(State const&, string const&, string const&)": 0.126,
+    "flightKeepsLanding(State const&, string const&, std::vector<> const&)": 0.124,
+    "EconomyRules::actions(State const&) const": 0.108,
+    "nanov2_malloc_type_zero_on_alloc": 0.105,
+    "economyActions(State const&)": 0.103,
+    "solveReachablePlan(State const&, LandingPreview const*, int)::$_6::operator()(unsigned long) const": 0.09,
+    "navalEndZones(State const&, string const&)": 0.09,
+    "<>": 0.09,
+    "navalEndZones(State const&, string const&)::$_0::operator()() const": 0.089
+   },
+   "playing a move": {
+    "Engine::step(Action const&)": 1.0,
+    "Engine::step(Action const&)::$_0::operator()(Engine&) const": 0.988,
+    "TrainingRules::apply(State&, Action const&) const": 0.581,
+    "PoliticsRules::apply(State&, Action const&) const": 0.492,
+    "NavalRules::apply(State&, Action const&) const": 0.487,
+    "EconomyRules::apply(State&, Action const&) const": 0.255,
+    "applyEconomyAction(State&, Action const&)": 0.255,
+    "economyActions(State const&)": 0.221,
+    "_platform_memcmp": 0.204,
+    "State::planningKey() const": 0.202,
+    "applyNavalMovementAction(State&, Action const&)": 0.175,
+    "validateNavalRoute(State const&, NavalRouteRequest const&)": 0.159,
+    "writeState(string&, State const&, bool)": 0.154,
+    "State::validate(unsigned long) const": 0.15,
+    "visitNavalRoutes(State const&, std::vector<> const&, std::function<> const&, bool*)": 0.147,
+    "std::__function::__func<>::operator()(std::vector<>&&)": 0.13,
+    "inSupply(State const&, string const&, string const&)": 0.125,
+    "traceSupply(State const&, string const&, string const&, std::optional<> const&, bool)": 0.123,
+    "writeString(string&, string const&)": 0.122,
+    "capacity(State const&, string const&, string const&, bool)": 0.122,
+    "allowanceNow(State const&, UnitState const&, bool, string const&, string const&)": 0.12,
+    "buildContext(State const&, string const&, std::optional<> const&, bool)": 0.117,
+    "operator new(unsigned long)": 0.112,
+    "canFactoryBuy(State const&, string const&, string const&, bool)": 0.109,
+    "routeChoices(State&, BattleState&)": 0.109,
+    "std::__tree<>::__emplace_unique[abi:nqe220106]<>(std::piecewise_construct_t const&, std::tuple<>&&, std::tuple<>&&)::'la": 0.099,
+    "nanov2_malloc_type_zero_on_alloc": 0.094,
+    "allowance(State const&, UnitState const&, bool, string const&, string const&)": 0.086,
+    "<>": 0.063,
+    "navalFacilityUsable(State const&, string const&, string const&, bool)": 0.057
+   },
+   "rolling dice": {
+    "Engine::resolveChance()": 1.0,
+    "Engine::resolveChance()::$_0::operator()(Engine&) const": 0.997,
+    "Engine::commitChance(ChanceRequest const&, ChanceOutcome const&)": 0.996,
+    "State::planningKey() const": 0.407,
+    "writeState(string&, State const&, bool)": 0.315,
+    "TrainingRules::applyChance(State&, ChanceRequest const&, ChanceOutcome const&) const": 0.276,
+    "State::validate(unsigned long) const": 0.27,
+    "writeString(string&, string const&)": 0.198,
+    "PoliticsRules::applyChance(State&, ChanceRequest const&, ChanceOutcome const&) const": 0.191,
+    "LandCombatRules::applyChance(State&, ChanceRequest const&, ChanceOutcome const&) const": 0.183,
+    "_platform_memcmp": 0.178,
+    "chooseHit(State&, BattleState&)": 0.161,
+    "advance(State&, BattleState&)": 0.145,
+    "shoot(State&, BattleState&, string const&)": 0.107,
+    "writeIntMap(string&, std::map<> const&)": 0.101,
+    "refreshPoliticalState(State&)": 0.092,
+    "operator new(unsigned long)": 0.089,
+    "contentDigest(string const&)": 0.082,
+    "nanov2_malloc_type_zero_on_alloc": 0.078,
+    "landCombatStats(State const&, BattleState const&, string const&, bool, int)": 0.067,
+    "State::validate(unsigned long) const::$_0::operator()(string const&) const": 0.064,
+    "_platform_memmove": 0.054,
+    "State::validate(unsigned long) const::$_1::operator()(string const&) const": 0.051,
+    "buildContext(State const&, string const&, std::optional<> const&, bool)": 0.049,
+    "endIfOver(State&, BattleState&)": 0.049,
+    "refreshAlliances(State&)": 0.048,
+    "finishBattle(State&, BattleState&, string const&)": 0.048,
+    "politicallyFriendly(State const&, string const&, string const&)": 0.046,
+    "std::__tree<>::__emplace_unique[abi:nqe220106]<>(std::piecewise_construct_t const&, std::tuple<>&&, std::tuple<>&&)::'la": 0.041,
+    "game::json::Value::find(string const&) const": 0.041
+   }
+  },
+  "whole_state_copies_by_caller_samples": {
+   "search copies (cloneForSearch)": 2751,
+   "validateNavalRoute(State const&, NavalRouteRequest const&)": 945,
+   "AirRules::actions(State const&) const": 272,
+   "TrainingRules::actions(State const&) const::'lambda'(Action ": 170,
+   "TrainingRules::apply(State&, Action const&) const": 58,
+   "Engine::step(Action const&)": 58,
+   "berthKeepsLandings(State const&, string const&, string const": 50,
+   "withdrawalEligibleRecipients(State const&, string const&, st": 41
+  }
+ },
+ "coordinator": {
+  "setup": "tools/profile_coordinator.py, the coordinator profile batch: each step of every serving round timed; every 200th round's requests saved",
+  "requests": 1363143,
+  "rounds": 307266,
+  "requests_per_round": 4.44,
+  "serve_wall_seconds": 443.7,
+  "serve_thread_cpu_seconds": 381.3,
+  "steps": {
+   "waiting": {
+    "seconds": 43.0,
+    "share": 0.097,
+    "microseconds_per_request": 31.6
+   },
+   "receiving": {
+    "seconds": 8.1,
+    "share": 0.018,
+    "microseconds_per_request": 5.9
+   },
+   "reading": {
+    "seconds": 7.5,
+    "share": 0.017,
+    "microseconds_per_request": 5.5
+   },
+   "packing": {
+    "seconds": 63.8,
+    "share": 0.144,
+    "microseconds_per_request": 46.8
+   },
+   "forward": {
+    "seconds": 287.5,
+    "share": 0.648,
+    "microseconds_per_request": 210.9
+   },
+   "collecting": {
+    "seconds": 10.1,
+    "share": 0.023,
+    "microseconds_per_request": 7.4
+   },
+   "replying": {
+    "seconds": 10.8,
+    "share": 0.024,
+    "microseconds_per_request": 7.9
+   },
+   "other": {
+    "seconds": 7.0,
+    "share": 0.016,
+    "microseconds_per_request": 5.2
+   }
+  },
+  "passes_by_positions": {
+   "1": {
+    "share_of_passes": 0.18,
+    "milliseconds_per_pass": 0.413
+   },
+   "2": {
+    "share_of_passes": 0.154,
+    "milliseconds_per_pass": 0.573
+   },
+   "3": {
+    "share_of_passes": 0.146,
+    "milliseconds_per_pass": 0.717
+   },
+   "4": {
+    "share_of_passes": 0.125,
+    "milliseconds_per_pass": 0.866
+   },
+   "5": {
+    "share_of_passes": 0.098,
+    "milliseconds_per_pass": 1.007
+   },
+   "6": {
+    "share_of_passes": 0.077,
+    "milliseconds_per_pass": 1.146
+   },
+   "7": {
+    "share_of_passes": 0.058,
+    "milliseconds_per_pass": 1.315
+   },
+   "8": {
+    "share_of_passes": 0.045,
+    "milliseconds_per_pass": 1.48
+   },
+   "9": {
+    "share_of_passes": 0.034,
+    "milliseconds_per_pass": 1.668
+   },
+   "10": {
+    "share_of_passes": 0.026,
+    "milliseconds_per_pass": 1.821
+   },
+   "11": {
+    "share_of_passes": 0.018,
+    "milliseconds_per_pass": 1.972
+   },
+   "12": {
+    "share_of_passes": 0.014,
+    "milliseconds_per_pass": 2.121
+   },
+   "13": {
+    "share_of_passes": 0.01,
+    "milliseconds_per_pass": 2.23
+   },
+   "14": {
+    "share_of_passes": 0.007,
+    "milliseconds_per_pass": 2.394
+   },
+   "15": {
+    "share_of_passes": 0.004,
+    "milliseconds_per_pass": 2.496
+   },
+   "16": {
+    "share_of_passes": 0.002,
+    "milliseconds_per_pass": 2.682
+   }
+  },
+  "pass_fit_milliseconds": {
+   "fixed": 0.259,
+   "per_position": 0.153
+  },
+  "other_steps_microseconds_per_request": 78.8,
+  "native_samples": {
+   "setup": "macOS /usr/bin/sample, 20 s at 1 ms intervals of the coordinator at 150 and 330 s into the coordinator profile batch; its serving thread's samples by the library and function of the innermost frame",
+   "by_library": {
+    "libtorch_cpu.dylib": 0.405,
+    "python3.13": 0.216,
+    "_multiarray_umath.cpython-313-darwin.so": 0.093,
+    "libsystem_platform.dylib": 0.06,
+    "libsystem_kernel.dylib": 0.058,
+    "libBLAS.dylib": 0.047,
+    "libsystem_malloc.dylib": 0.041,
+    "libtorch_python.dylib": 0.026,
+    "libc10.dylib": 0.016,
+    "libdyld.dylib": 0.013,
+    "libsystem_m.dylib": 0.011,
+    "libsystem_pthread.dylib": 0.005
+   },
+   "functions": {
+    "at::native::DEFAULT::vectorized_gelu<>(at::vec::DEFAULT::Vectorized<>)": 0.123,
+    "_PyEval_EvalFrameDefault": 0.084,
+    "caffe2::EmbeddingLookupIdx_int64_t_float_float_false(long long, long long, long ": 0.07,
+    "???": 0.046,
+    "c10::function_ref<>::callback_fn<>(long, char**, long long const*, long long, lo": 0.046,
+    "_platform_memmove": 0.039,
+    "madvise": 0.032,
+    "at::native::cpu_scatter_reduce_expanded_index<>(at::Tensor const&, at::Tensor co": 0.02,
+    "at::native::cat_serial_kernel(at::Tensor const&, std::vector<> const&, long long": 0.02,
+    "at::native::DEFAULT::VectorizedLoop2d<>::operator()(char**, long long const*, lo": 0.015,
+    "at::native::DEFAULT::RowwiseMomentsImpl<>(float const*, long long, long long)": 0.015,
+    "_tlv_get_addr": 0.013,
+    "_platform_memset": 0.012,
+    "write": 0.01,
+    "at::native::radix_sort_parallel<>(long long*, long long*, long long*, long long*": 0.009,
+    "_PyObject_GenericGetAttrWithDict": 0.009,
+    "tupledealloc": 0.008,
+    "arr_bincount": 0.008,
+    "poll": 0.007,
+    "log1pf": 0.007
+   },
+   "samples": 29459
+  }
+ },
+ "capacity": {
+  "status": "inferred from the measurements above, not measured",
+  "coordinator_round_model_milliseconds": {
+   "fixed": 0.259,
+   "per_position": 0.231,
+   "note": "the pass fit plus every other step's cost per request; it gives 1.285 ms for the measured 4.44 positions, against 1.304 ms of busy time per round measured"
+  },
+  "coordinator_busy_all_the_time_by_positions_per_round": {
+   "4.44": {
+    "evaluations_per_second": 3453,
+    "decisions_per_hour": 240454
+   },
+   "8": {
+    "evaluations_per_second": 3792,
+    "decisions_per_hour": 264081
+   },
+   "12": {
+    "evaluations_per_second": 3954,
+    "decisions_per_hour": 275327
+   },
+   "24": {
+    "evaluations_per_second": 4130,
+    "decisions_per_hour": 287574
+   },
+   "unbounded": {
+    "evaluations_per_second": 4322,
+    "decisions_per_hour": 300962
+   }
+  },
+  "cores": {
+   "cpu_ms_per_decision": 147.7,
+   "batch_cores_mean": 9.13,
+   "decisions_per_hour_at_that_load": 222532
+  }
+ }
+}
