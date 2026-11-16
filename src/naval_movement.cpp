@@ -204,8 +204,9 @@ bool available(const State &s, const UnitState &u, bool combat) {
   return p.empty() ||
          (s.facilities.contains(p) && s.facilities.at(p).damage == 0);
 }
-int allowanceNow(const State &s, const UnitState &u, bool combat,
-                 const Id &target, const Id &routeStart) {
+// A ship's movement before the bonus a Japanese surprise attack gives for its
+// own target zone, which alone depends on where the move goes; it may be negative.
+int allowanceBeforeSurprise(const State &s, const UnitState &u, const Id &routeStart) {
   int total =
       catalogStats(s, u.type, u.damage, u.owner, u.zone).movement.value_or(0);
   Id start = u.turnOrigin;
@@ -244,25 +245,31 @@ int allowanceNow(const State &s, const UnitState &u, bool combat,
     --total;
   if (u.owner == "japan" && u.type == "destroyer" && !u.cargo.empty())
     --total;
-  if (combat && u.owner == "japan" &&
-      marked(s.nations.at("japan").turnFlags, "surprise_attack_zone:" + target))
-    ++total;
-  return std::max(0, total);
+  return total;
+}
+int surpriseBonus(const State &s, const UnitState &u, bool combat, const Id &target) {
+  return combat && u.owner == "japan" &&
+                 marked(s.nations.at("japan").turnFlags, "surprise_attack_zone:" + target)
+             ? 1
+             : 0;
+}
+int allowanceNow(const State &s, const UnitState &u, bool combat,
+                 const Id &target, const Id &routeStart) {
+  return std::max(0, allowanceBeforeSurprise(s, u, routeStart) + surpriseBonus(s, u, combat, target));
 }
 int allowance(const State &s, const UnitState &u, bool combat, const Id &target,
               const Id &routeStart = {}) {
-  // Route validation asks again for every route with the same unit, origin
-  // and destination. Reuse the answer only for this position's own unit.
+  // Route validation asks again for every route with the same unit and origin,
+  // whatever its destination. Reuse the answer only for this position's own unit.
   const auto found = s.units.find(u.id);
   auto *facts = found != s.units.end() && &found->second == &u
                     ? positionFacts(s)
                     : nullptr;
   if (!facts)
     return allowanceNow(s, u, combat, target, routeStart);
-  return facts->number(
-      PositionFacts::Fact::NavalAllowance,
-      u.id + '\n' + target + '\n' + routeStart + (combat ? "\nc" : "\nn"),
-      [&] { return allowanceNow(s, u, combat, target, routeStart); });
+  const int before = facts->number(PositionFacts::Fact::NavalAllowance, u.id + '\n' + routeStart,
+                                   [&] { return allowanceBeforeSurprise(s, u, routeStart); });
+  return std::max(0, before + surpriseBonus(s, u, combat, target));
 }
 int spent(const State &s, const UnitState &u) {
   return value(u.turnFlags, "naval_movement_spent");

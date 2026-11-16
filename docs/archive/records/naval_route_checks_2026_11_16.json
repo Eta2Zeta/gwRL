@@ -1,0 +1,138 @@
+{
+ "date": "2026-11-16",
+ "question": "Can the naval-route and aircraft-landing checks be cut without changing play, and what does it buy?",
+ "code": {
+  "before": "61c8e31",
+  "after": "this change"
+ },
+ "machine": "Apple M4 Max: 10 performance and 4 efficiency cores, 36 GB",
+ "where_the_time_goes": {
+  "setup": "macOS sample, 50 s of one process playing search-driven game seed 41 (64 simulations, networks evaluated one position at a time in the same process) on the code with both candidate changes; inclusive samples",
+  "thread_samples": 38433,
+  "inclusive_share_of_all_samples": {
+   "Engine::legalActions": 0.316,
+   "Engine::step": 0.135,
+   "validateNavalRoute(": 0.098,
+   "visitNavalRoutes(": 0.097,
+   "encodeZoneInput": 0.084,
+   "forwardNavalOrderActions": 0.068,
+   "traceSupply(": 0.063,
+   "solveReachablePlan(": 0.057,
+   "State::planningKey": 0.055,
+   "State::State(State const&)": 0.045
+  },
+  "inside_validateNavalRoute": {
+   "samples": 3770,
+   "shares": {
+    "the landing check at each stop, with its copy (PositionFacts::remember)": 0.563,
+    "allowance(": 0.562,
+    "traceSupply(": 0.438,
+    "airLandingsKept(": 0.326,
+    "navalEndZones(": 0.224,
+    "State::State(State const&)": 0.139,
+    "State::~State()": 0.095
+   },
+   "note": "outermost occurrence of each function below validateNavalRoute, so the rows overlap; PositionFacts::remember is the remembered landing answer's computation: the copy of the position, the copy's own landing plan, end zones, allowances and supply"
+  }
+ },
+ "same_play": {
+  "random": {
+   "setup": "tools/compare_engine_builds.py random: 300 games, seeds 7000-7299, eleven rounds",
+   "identical_games": 300,
+   "games": 300,
+   "steps": 443974,
+   "against": "557b03e, before this morning's changes"
+  },
+  "search": {
+   "setup": "tools/compare_engine_builds.py search: games 41-44, eleven rounds, 64 simulations, depth 16, random-filled 64x2 weights, one position at a time",
+   "runs": {
+    "c61": {
+     "label": "previous commit 61c8e31",
+     "events": 4985,
+     "billion_instructions": 6863,
+     "cpu_seconds": 587.8,
+     "identical_to_previous_commit": true
+    },
+    "allowance": {
+     "label": "the allowance change alone, as kept",
+     "events": 4985,
+     "billion_instructions": 6794,
+     "cpu_seconds": 537.3,
+     "identical_to_previous_commit": true
+    },
+    "routes": {
+     "label": "the allowance change and remembered landing answers, not kept",
+     "events": 4985,
+     "billion_instructions": 6777,
+     "cpu_seconds": 579.4,
+     "identical_to_previous_commit": true
+    },
+    "final": {
+     "label": "the commit's own build",
+     "events": 4985,
+     "billion_instructions": 6793,
+     "cpu_seconds": 525.3,
+     "identical_to_previous_commit": true
+    }
+   }
+  }
+ },
+ "random_play_instructions": {
+  "setup": "the same 300 random games; instructions per engine call",
+  "557b03e": {
+   "legal_actions": {
+    "calls": 391840,
+    "million_instructions_per_call": 10.29
+   },
+   "apply_action": {
+    "calls": 391840,
+    "million_instructions_per_call": 6.18
+   },
+   "resolve_chance": {
+    "calls": 52134,
+    "million_instructions_per_call": 3.61
+   }
+  },
+  "61c8e31": {
+   "legal_actions": {
+    "calls": 391840,
+    "million_instructions_per_call": 10.29
+   },
+   "apply_action": {
+    "calls": 391840,
+    "million_instructions_per_call": 4.4
+   },
+   "resolve_chance": {
+    "calls": 52134,
+    "million_instructions_per_call": 3.19
+   }
+  },
+  "this_change": {
+   "legal_actions": {
+    "calls": 391840,
+    "million_instructions_per_call": 10.02
+   },
+   "apply_action": {
+    "calls": 391840,
+    "million_instructions_per_call": 4.31
+   },
+   "resolve_chance": {
+    "calls": 52134,
+    "million_instructions_per_call": 3.2
+   }
+  }
+ },
+ "training_batch": {
+  "setup": "one Mac-profile batch (6 processes of 4 games, 24 games, 64 simulations, seed 20261104) on the variant that also remembered landing answers, with tools/log_process_load.py",
+  "game_processes_million_instructions_per_decision": {
+   "61c8e31_batches": [
+    1124,
+    1102
+   ],
+   "variant": 1106
+  },
+  "other_work_cores_median": 4.54,
+  "decisions_per_hour_while_playing": 209659
+ },
+ "tried_and_not_kept": "remembering, for the rest of the position, whether aircraft keep a landing plan when a force stops in a zone after a given number of zones: 0.24% fewer instructions in the search-driven games, beyond the allowance change's 1.01%"
+}

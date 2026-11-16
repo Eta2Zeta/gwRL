@@ -227,6 +227,11 @@ engine builds the list once and shares it between copies.
 - **Random play** finds what set-up positions miss.
   `tools/fuzz_campaign_dead_ends.py` plays random games looking for positions
   with no legal move and for moves that change nothing.
+- **A change meant only for speed** must leave play the same.
+  `tools/compare_engine_builds.py` plays the same seeded random games, and
+  searched games evaluated one position at a time, on two builds, and compares
+  every step's legal moves, chosen move and position. It also measures the
+  instructions each build runs.
 
 ## 10. What the learner uses
 

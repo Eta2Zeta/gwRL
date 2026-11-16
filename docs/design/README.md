@@ -1947,8 +1947,10 @@ measured and what would settle it.
   coordinator is busy all the time. Within the engine, listing a position's
   legal moves costs the most, about 1.0 ms a call, and 59% of the engine's time
   goes to comparing names, allocating memory, looking up maps and copying memory.
-  Checking a naval route copies the whole position, and every move and every
-  dice roll writes out the whole position for its planning key. When the Mac's
+  Checking a naval route copies the whole position, and the copy works out its
+  carriers' reach and supply again with no cache
+  ([record](../archive/records/naval_route_checks_2026_11_16.md)). Every move
+  and every dice roll writes out the whole position for its planning key. When the Mac's
   other work needs more than one core, part of the training runs on the
   efficiency cores
   ([record](../archive/records/self_play_limits_2026_11_16.md)).
