@@ -630,9 +630,9 @@ and a run cannot resume across a layout change.
 ### 5.6 More detail: how the encoder builds the input
 
 The encoder reads the engine's memory directly; no text is written or parsed.
-The engine holds zones, nations and unit types as numbers, and each one's
-number is its column in the encoder's list of its kind ([names held as
-numbers](../engine/names.md)). Marks are numbered too, but the encoder asks
+The engine holds zones, nations, unit types, facility types and technologies
+as numbers, and each one's number is its column in the encoder's list of its
+kind ([names held as numbers](../engine/names.md)). Marks are numbered too, but the encoder asks
 about them through its own lists of their names. Everything else it identifies
 by name (battle notes, a move's details), so the encoder translates those
 names into question numbers through fixed lists. Encoding costs about 0.17 ms per decision, about 4% of a
@@ -1557,13 +1557,16 @@ of work, 59% of the engine's time went to comparing names, allocating memory,
 looking up maps and copying memory, and 41% to the rules' own logic, while the
 position kept its zones, units, facilities and nations in maps keyed by name
 ([record](../archive/records/self_play_limits_2026_11_16.md#inside-the-engine)).
-The engine now holds zones, nations, unit types and the bases of marks as
-numbers, which together took 18.1% of the instructions out of a searched game
-with play unchanged ([zones](../archive/records/zone_numbers_2026_11_16.md),
+The engine now holds zones, nations, unit types, facility types, technologies
+and the bases of marks as numbers, which together took 21.4% of the
+instructions out of a searched game with play unchanged
+([zones](../archive/records/zone_numbers_2026_11_16.md),
 [nations](../archive/records/nation_numbers_2026_11_16.md),
 [unit types](../archive/records/unit_type_numbers_2026_11_16.md),
-[marks](../archive/records/mark_numbers_2026_11_16.md)); units and facilities
-are still keyed by name ([names held as numbers](../engine/names.md)).
+[marks](../archive/records/mark_numbers_2026_11_16.md),
+[facility types](../archive/records/facility_type_numbers_2026_11_16.md)); units
+and facilities themselves are still keyed by name ([names held as
+numbers](../engine/names.md)).
 While the engine lists a position's legal moves, it keeps a cache of facts about
 that position, such as whether a zone is in supply for a nation, so that each is
 worked out once (`PositionScope` in `include/game/position_facts.hpp`). Playing a

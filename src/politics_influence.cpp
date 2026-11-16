@@ -147,7 +147,7 @@ bool unfinishedShip(const State& state, const BuildProject& project, NationId mi
     if (project.owner != minor || project.remainingPayments.empty() || project.queuePosition <= 1
             || !state.definition->catalog) return false;
     const auto& catalog = *state.definition->catalog;
-    return catalog.isUnitType(project.type) && catalog.unit(project.type).classes.contains(catalog.knownUnitClasses().naval);
+    return project.type.isUnit() && catalog.unit(project.type.unit()).classes.contains(catalog.knownUnitClasses().naval);
 }
 
 std::vector<Action> recruitmentChoices(const State& state, NationId minor) {

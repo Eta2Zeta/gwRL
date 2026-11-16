@@ -230,9 +230,15 @@ State loadScenario(const std::filesystem::path& directory) {
         }
         state.territories.emplace(zoneNumber(state, zone), TerritoryState {nationNumber(state, original.require("original_faction_id").asString()), {}});
     }
+    // The map names some facilities by a label of its own, such as airfield; the
+    // scenario contract gives the catalog type each label stands for.
+    const auto& aliases = contract.document.require("facility_type_aliases");
     for (const auto& [id, source] : map.document.require("facilities").asObject()) {
+        const auto& label = source.require("type").asString();
+        const auto* alias = aliases.find(label);
         state.facilities.emplace(id, FacilityState {
-            id, source.require("type").asString(), zoneNumber(state, source.require("land_id").asString()), 0, {}});
+            id, facilityTypeNumber(state, alias ? alias->asString() : label),
+            zoneNumber(state, source.require("land_id").asString()), 0, {}});
     }
     for (const auto& [zone, node] : nodes) {
         if (node.require("type").asString() != "land") continue;
@@ -258,7 +264,7 @@ State loadScenario(const std::filesystem::path& directory) {
             if (source.require("count").asInt() != 1) throw std::runtime_error("Setup facility ID must represent one instance");
             FacilityState facility;
             facility.id = source.require("id").asString();
-            facility.type = source.require("type").asString();
+            facility.type = facilityTypeNumber(state, source.require("type").asString());
             facility.zone = zoneNumber(state, zone);
             facility.damage = integerOr(source, "damage_points", 0);
             if (!state.facilities.emplace(facility.id, facility).second) {
@@ -284,7 +290,7 @@ State loadScenario(const std::filesystem::path& directory) {
         BuildProject project;
         project.id = source.require("id").asString();
         project.owner = nationNumber(state, japanId);
-        project.type = source.require("type").asString();
+        project.type = buildTypeNumber(state, source.require("type").asString());
         project.site = optionalId(source.find("node_id"));
         project.queuePosition = source.require("queue_stage").asInt();
         project.paidIpp = source.require("paid_construction_value").asInt();

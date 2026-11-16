@@ -160,7 +160,7 @@ void productionRepair() {
     s.construction.clear();
     s.nations.at(nationNumber(s, "japan")).treasury = 100;
     for (auto it = s.facilities.begin(); it != s.facilities.end();)
-        if (it->second.type.find("factory") != Id::npos && it->first != "setup_japan_tokyo_major_factory")
+        if (knownFacilityTypes(s).factory(it->second.type) && it->first != "setup_japan_tokyo_major_factory")
             it = s.facilities.erase(it);
         else
             ++it;
@@ -231,7 +231,7 @@ void decentralizedAndMilitia() {
 }
 void research() {
     auto s = fixture();
-    s.nations.at(nationNumber(s, "japan")).technologyStages["radar"] = 2;
+    s.nations.at(nationNumber(s, "japan")).technologyStages[technologyNumber(s, "radar")] = 2;
     turn(s, "japan", Phase::Production, 5);
     check(!offers(s, "economy_research",
                   [](const auto &a) { return a.parameters.require("technology").asString() == "radar"; }),
@@ -243,12 +243,12 @@ void research() {
     const auto r = *s.chance;
     s.chance.reset();
     applyEconomyChance(s, r, ChanceOutcome{{{1}}});
-    check(s.nations.at(nationNumber(s, "japan")).technologyStages.at("radar") == 3, "Research advances exact stage");
+    check(s.nations.at(nationNumber(s, "japan")).technologyStages.at(technologyNumber(s, "radar")) == 3, "Research advances exact stage");
     check(!offers(s, "economy_research",
                   [](const auto &a) { return a.parameters.require("technology").asString() == "radar"; }),
           "Research technology once per calendar turn");
     auto t = fixture();
-    t.nations.at(nationNumber(t, "japan")).technologyStages["airborne_doctrine"] = 3;
+    t.nations.at(nationNumber(t, "japan")).technologyStages[technologyNumber(t, "airborne_doctrine")] = 3;
     addUnit(t, "airborne", "airborne_infantry", "japan", tokyo);
     applyEconomyAction(t, pick(t, "economy_research", [](const auto &a) {
                            return a.parameters.require("technology").asString() == "airborne_doctrine";
@@ -259,7 +259,7 @@ void research() {
     check(t.units.at("airborne").type == knownUnitTypes(s).elite_airborne_infantry, "Technology conversion immediate");
     t.validate();
     auto f = fixture();
-    f.nations.at(nationNumber(f, "japan")).technologyStages["improved_factories"] = 4;
+    f.nations.at(nationNumber(f, "japan")).technologyStages[technologyNumber(f, "improved_factories")] = 4;
     check(facilityCapacity(f, nationNumber(f, "japan"), "setup_japan_tokyo_major_factory") == 8,
           "Technology capacity benefit immediate");
 }
@@ -287,12 +287,12 @@ void constructionAndCapture() {
     auto c = fixture();
     c.facilities.at("setup_japan_tokyo_major_factory").damage = 12;
     changePossession(c, zoneNumber(c, tokyo), nationNumber(c, "ccp"), PossessionCause::Capture, nationNumber(c, "ccp"));
-    check(c.facilities.at("setup_japan_tokyo_major_factory").type == "minor_factory" &&
+    check(c.facilities.at("setup_japan_tokyo_major_factory").type == facilityTypeNumber(s, "minor_factory") &&
               c.facilities.at("setup_japan_tokyo_major_factory").damage == 12,
           "Captured Major Factory downgrades retaining original damage cap");
     c.validate();
     changePossession(c, zoneNumber(c, tokyo), nationNumber(c, "japan"), PossessionCause::Liberation, nationNumber(c, "japan"));
-    check(c.facilities.at("setup_japan_tokyo_major_factory").type == "major_factory",
+    check(c.facilities.at("setup_japan_tokyo_major_factory").type == facilityTypeNumber(s, "major_factory"),
           "Original owner recovers factory tier");
     c.validate();
 }
@@ -377,7 +377,7 @@ void sharedShipyardRepair() {
     s.construction.clear();
     s.nations.at(nationNumber(s, "japan")).treasury = 100;
     for (auto it = s.facilities.begin(); it != s.facilities.end();)
-        if (it->second.type.find("shipyard") != Id::npos && it->first != "facility_tokyo_major_shipyard")
+        if (knownFacilityTypes(s).shipyard(it->second.type) && it->first != "facility_tokyo_major_shipyard")
             it = s.facilities.erase(it);
         else
             ++it;
@@ -411,7 +411,7 @@ void upgradesDiscountsAndCaps() {
     auto s = fixture();
     s.construction.clear();
     s.nations.at(nationNumber(s, "japan")).treasury = 100;
-    s.nations.at(nationNumber(s, "japan")).technologyStages["improved_construction"] = 4;
+    s.nations.at(nationNumber(s, "japan")).technologyStages[technologyNumber(s, "improved_construction")] = 4;
     finishResearch(s);
     const auto target = "setup_japan_kyushu_medium_factory";
     applyEconomyAction(
@@ -424,7 +424,7 @@ void upgradesDiscountsAndCaps() {
     applyEconomyAction(s, pick(s, "economy_place", [&](const auto &a) {
                            return a.parameters.require("target").asString() == target;
                        }));
-    check(s.facilities.at(target).type == "major_factory" && facilityCapacity(s, nationNumber(s, "japan"), target) == 3,
+    check(s.facilities.at(target).type == facilityTypeNumber(s, "major_factory") && facilityCapacity(s, nationNumber(s, "japan"), target) == 3,
           "Upgraded factory retains starting tier capacity this turn");
     turn(s, "japan", Phase::Production, 1);
     check(facilityCapacity(s, nationNumber(s, "japan"), target) == 5, "Upgraded capacity next turn");
@@ -482,7 +482,7 @@ bool railroadOffered(const State &s, const Id &a, const Id &b) {
         const auto *zone = x.parameters.find("zone");
         const auto *border = x.parameters.find("border");
         return zone && border &&
-               s.definition->catalog->row(x.parameters.require("row").asString()).type == "railroad" &&
+               s.definition->catalog->row(x.parameters.require("row").asString()).type == facilityTypeNumber(s, "railroad") &&
                ((zone->asString() == a && border->asString() == b) ||
                 (zone->asString() == b && border->asString() == a));
     });
@@ -515,7 +515,7 @@ void oneRailroadPerBorder() {
 
     // A railroad bought on an empty border: no second one while it is built or after.
     const auto first = pick(s, "economy_purchase", [&](const Action &x) {
-        return s.definition->catalog->row(x.parameters.require("row").asString()).type == "railroad";
+        return s.definition->catalog->row(x.parameters.require("row").asString()).type == facilityTypeNumber(s, "railroad");
     });
     const auto zone = first.parameters.require("zone").asString();
     const auto border = first.parameters.require("border").asString();
@@ -576,7 +576,7 @@ void leaseCredits() {
     r.territories.at(zoneNumber(r, beiping)).possessor = nationNumber(r, "dadao");
     FacilityState f;
     f.id = "dadao_damaged_base";
-    f.type = "airbase";
+    f.type = facilityTypeNumber(r, "airbase");
     f.zone = zoneNumber(r, beiping);
     f.damage = 2;
     r.facilities.emplace(f.id, f);
@@ -667,7 +667,7 @@ void upgradesKeepCargo() {
         return offers(s, "economy_place", [&](const auto &a) {
             const auto *t = a.parameters.find("target");
             return t && t->asString() == target &&
-                   s.construction.at(a.parameters.require("project").asString()).type == type;
+                   s.construction.at(a.parameters.require("project").asString()).type == buildTypeNumber(s, type);
         });
     };
     check(!offered("flown", "motorized_infantry"),
@@ -706,7 +706,7 @@ void upgradesWaitAtSea() {
         return offers(s, "economy_place", [&](const auto &a) {
             const auto *t = a.parameters.find("target");
             return t && t->asString() == target &&
-                   s.construction.at(a.parameters.require("project").asString()).type == type;
+                   s.construction.at(a.parameters.require("project").asString()).type == buildTypeNumber(s, type);
         });
     };
     // A Supply Path reaches the sea zone, so only the land-zone rule withholds these.
@@ -742,7 +742,7 @@ void replacementUpgradeAndEliteLease() {
     e.nations.at(nationNumber(e, "japan")).treasury = 100;
     ensureDadao(e);
     e.territories.at(zoneNumber(e, beiping)).possessor = nationNumber(e, "dadao");
-    e.nations.at(nationNumber(e, "japan")).technologyStages["airborne_doctrine"] = 4;
+    e.nations.at(nationNumber(e, "japan")).technologyStages[technologyNumber(e, "airborne_doctrine")] = 4;
     turn(e, "japan");
     finishResearch(e);
     buy(e, "japan_major_elite_airborne_infantry");

@@ -79,7 +79,7 @@ void carpetBombingParticipatesOnceAndCannotBeHitByInfantry() {
     auto rules=campaignRules();
     const auto beforeTechnology=AirRules{}.actions(s);
     check(std::none_of(beforeTechnology.begin(),beforeTechnology.end(),[](const auto&a){return a.kind=="air_ground_attack"&&a.parameters.require("unit").asString()=="carpet_bomber";}),"Carpet bombing became available without Heavy Strategic Bombers technology");
-    s.nations.at(nationNumber(s, "japan")).technologyStages["heavy_strategic_bombers"]=4;
+    s.nations.at(nationNumber(s, "japan")).technologyStages[technologyNumber(s, "heavy_strategic_bombers")]=4;
     Engine e(s,rules,68);e.setDiceTapeForTesting({12,12,12,12,12,12,12,12,1,12,12,12,12,12});
     const auto checkpoint=e.serialize();CampaignAuditLog log(e);
     auto choose=[&](const Id&kind,const Id&unit=Id{}){

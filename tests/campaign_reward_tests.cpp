@@ -190,7 +190,7 @@ void bombingAndPaidRepairCannotCreateValue() {
     s.nations.at(nationNumber(s, "kmt")).powerStatus = "major";
     s.politics.capitals[nationNumber(s, "kmt")] = zoneNumber(s, "land_china_nanking");
     s.politics.evolutionAwarded.insert(nationNumber(s, "kmt"));
-    s.facilities["target_factory"] = {"target_factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
+    s.facilities["target_factory"] = {"target_factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}};
     add(s, "bomber", "medium_bomber", "japan", beiping);
     s.captureTurnStart();
     Engine e(s, campaignRules(), 83);
@@ -248,7 +248,7 @@ void conquestTransfersAssetsAndDoesNotRewardDeclarations() {
     s.territories.at(zoneNumber(s, hopeh)).possessor = nationNumber(s, "kmt");
     s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
     s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
-    s.facilities["captured_factory"] = {"captured_factory", "minor_factory", zoneNumber(s, hopeh), 0, {}};
+    s.facilities["captured_factory"] = {"captured_factory", facilityTypeNumber(s, "minor_factory"), zoneNumber(s, hopeh), 0, {}};
     add(s, "attacker", "infantry", "japan", beiping);
     s.captureTurnStart();
     Engine e(s, campaignRules(), 97);

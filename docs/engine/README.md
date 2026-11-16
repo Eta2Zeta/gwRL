@@ -36,13 +36,16 @@ Everything about a game at one moment is its *state* (`State` in
 | The clock | The round, the nation whose turn it is and the phase | round 1, the CCP, Production |
 | Pending work | Decisions waiting for an answer, and a dice roll waiting to be made | none |
 
-The state holds zones, nations, unit types and the bases of marks as numbers:
-each one's place in the sorted list of the names of its kind, the definition's
-for zones and nations, the catalog's for unit types and the engine's mark table
-for marks (zone 0 is `land_china_beiping`, nation 0 is `ccp`, unit type 0 is
-`advanced_artillery`, mark 0 is `__campaign_started`). Everything else, and
-everything the engine reads or writes, uses names; [names held as
-numbers](names.md) explains the numbering and lists the campaign's tables.
+The state holds zones, nations, unit types, facility types, technologies and
+the bases of marks as numbers: each one's place in the sorted list of the names
+of its kind, the definition's for zones and nations, the catalog's for unit
+types, facility types and technologies, and the engine's mark table for marks
+(zone 0 is `land_china_beiping`, nation 0 is `ccp`, unit type 0 is
+`advanced_artillery`, facility type 0 is `airbase`, mark 0 is
+`__campaign_started`). A construction project's type is a unit type or a
+facility type number. Everything else, and everything the engine reads or
+writes, uses names; [names held as numbers](names.md) explains the numbering
+and lists the campaign's tables.
 
 Two things are kept beside the state:
 

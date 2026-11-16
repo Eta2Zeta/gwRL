@@ -76,7 +76,7 @@ void chooseCapital(State& state, const Id& zone, bool factory = true) {
 }
 std::size_t factoryCount(const State& state, const Id& zone, const Id& type) {
     return static_cast<std::size_t>(std::count_if(state.facilities.begin(), state.facilities.end(), [&](const auto& pair) {
-        return pair.second.zone == zoneNumber(state, zone) && pair.second.type == type;
+        return pair.second.zone == zoneNumber(state, zone) && pair.second.type == facilityTypeNumber(state, type);
     }));
 }
 void prepareTwelveIppKmt(State& state) {
@@ -207,7 +207,7 @@ void oneChinaPointIsNotSurrenderBonus() {
     check(state.units.size() < unitCount, "A surrender bonus was placed at an invented destination");
     std::map<Id, int> awards;
     for (const auto& [id, project] : state.construction) if (flagged(project.flags, mark::national_objective_award)) {
-        ++awards[project.type];
+        ++awards[buildTypeName(state, project.type)];
         check(project.owner == nationNumber(state, "ccp") && project.paidIpp == 0 && project.remainingPayments.empty()
                 && !project.site && flagged(project.flags, mark::completed), "One China entitlement is not a free completed placement project");
     }
@@ -253,10 +253,10 @@ void captureCapitalAndFacilities() {
     state.nations.at(nationNumber(state, "kmt")).atWarWith.insert(nationNumber(state, "japan"));
     state.nations.at(nationNumber(state, "japan")).atWarWith.insert(nationNumber(state, "kmt"));
     const auto conquerorCash = state.nations.at(nationNumber(state, "kmt")).treasury;
-    state.facilities["test_fort"] = FacilityState{"test_fort", "fortification", zoneNumber(state, tokyo)};
-    state.facilities["test_coast"] = FacilityState{"test_coast", "coastal_artillery", zoneNumber(state, tokyo)};
-    state.facilities["test_factory"] = FacilityState{"test_factory", "medium_factory", zoneNumber(state, tokyo)};
-    state.construction["test_factory_queue"] = BuildProject{"test_factory_queue", nationNumber(state, "japan"), "minor_factory", tokyo, 2, 4, {4}};
+    state.facilities["test_fort"] = FacilityState{"test_fort", facilityTypeNumber(state, "fortification"), zoneNumber(state, tokyo)};
+    state.facilities["test_coast"] = FacilityState{"test_coast", facilityTypeNumber(state, "coastal_artillery"), zoneNumber(state, tokyo)};
+    state.facilities["test_factory"] = FacilityState{"test_factory", facilityTypeNumber(state, "medium_factory"), zoneNumber(state, tokyo)};
+    state.construction["test_factory_queue"] = BuildProject{"test_factory_queue", nationNumber(state, "japan"), buildTypeNumber(state, "minor_factory"), tokyo, 2, 4, {4}};
     rejects([&] { captureLand(state, nationNumber(state, "kmt"), zoneNumber(state, tokyo)); }, "Air/naval presence alone established land possession");
     addUnit(state, "surviving_conqueror", "kmt", tokyo);
     captureLand(state, nationNumber(state, "kmt"), zoneNumber(state, tokyo));

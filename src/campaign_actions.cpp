@@ -360,7 +360,7 @@ void validateTrainingActionState(const State& state) {
             require(state.construction.contains(project->asString()), "Unknown railroad request project");
         else
             require(state.definition->catalog->rows().contains(parameters.require("row").asString()) &&
-                    state.definition->catalog->row(parameters.require("row").asString()).type == "railroad",
+                    state.definition->catalog->row(parameters.require("row").asString()).type == knownFacilityTypes(state).railroad,
                     "Unknown railroad request purchase row");
         require(seen.insert(canonicalJson(request)).second, "Duplicate declined railroad request");
     }

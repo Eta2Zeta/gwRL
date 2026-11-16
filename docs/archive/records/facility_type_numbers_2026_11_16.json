@@ -1,0 +1,154 @@
+{
+ "date": "2026-11-16",
+ "question": "Does holding facility types, technologies and build types as numbers, after zones, nations, unit types and marks, and reading Improved Factories without a full catalog context, leave play unchanged, and what does it save?",
+ "code": {
+  "before_any": "9519ea7",
+  "marks": "ac26249",
+  "facility_types": "this change"
+ },
+ "machine": "Apple M4 Max: 10 performance and 4 efficiency cores, 36 GB",
+ "tool": "tools/compare_engine_builds.py",
+ "random_games": {
+  "seeds": "7000-7299",
+  "calendar_rounds": 11,
+  "processes": 4,
+  "games_compared": 300,
+  "identical": 300,
+  "steps": 443974,
+  "per_call": {
+   "legal_actions": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "before_any": 10.03,
+     "marks": 7.07,
+     "facility_types": 6.08,
+     "change_percent_from_marks": -14.0,
+     "change_percent_from_before_any": -39.4
+    },
+    "microseconds_per_call": {
+     "before_any": 640,
+     "marks": 415,
+     "facility_types": 350
+    }
+   },
+   "apply_action": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "before_any": 4.31,
+     "marks": 3.24,
+     "facility_types": 3.18,
+     "change_percent_from_marks": -1.9,
+     "change_percent_from_before_any": -26.2
+    },
+    "microseconds_per_call": {
+     "before_any": 311,
+     "marks": 223,
+     "facility_types": 206
+    }
+   },
+   "resolve_chance": {
+    "calls": 52134,
+    "million_instructions_per_call": {
+     "before_any": 3.2,
+     "marks": 2.54,
+     "facility_types": 2.54,
+     "change_percent_from_marks": 0.0,
+     "change_percent_from_before_any": -20.6
+    },
+    "microseconds_per_call": {
+     "before_any": 225,
+     "marks": 175,
+     "facility_types": 166
+    }
+   }
+  }
+ },
+ "searched_games": {
+  "seeds": "41-44",
+  "calendar_rounds": 11,
+  "simulations": 64,
+  "max_depth": 16,
+  "network": "64x2 networks with random-filled first-layer tables (tools/replay_coordinator_rounds.py --make-weights), evaluated one position at a time",
+  "games_compared": 4,
+  "identical": 4,
+  "events": 4985,
+  "billion_instructions": {
+   "before_any": 6782,
+   "marks": 5557,
+   "facility_types": 5334,
+   "change_percent_from_marks": -4.0,
+   "change_percent_from_before_any": -21.4,
+   "marks_bracketed_run": 5601,
+   "facility_types_runs": [
+    5386,
+    5321
+   ]
+  },
+  "cpu_seconds_bracketed": {
+   "facility_types_before": 395.8,
+   "marks": 407.0,
+   "facility_types_after": 404.0,
+   "change_percent": -1.7
+  },
+  "cpu_seconds_first_pair": {
+   "marks": 407.1,
+   "facility_types": [
+    396.5,
+    394.4
+   ],
+   "change_percent": -2.9,
+   "caveat": "A profiling run (one more game process) overlapped most of this pair's first run of this change and the first half-minute of its marks run; the bracketed pair above was run again, with nothing else of this study running, for that reason."
+  }
+ },
+ "profiles": {
+  "how": "/usr/bin/sample for 60 s of one searched game (seed 41), from 25 s after it started, one process; shares of the engine's samples (those under the Python binding), each counting a sample once if the function is on its stack",
+  "engine_samples": {
+   "marks": 22408,
+   "facility_types": 19783,
+   "overhead_count_basis": {
+    "marks": 22455,
+    "facility_types": 19826
+   }
+  },
+  "inclusive_share_percent": {
+   "economyActions (the build and research menu)": {
+    "marks": 9.14,
+    "facility_types": 4.32
+   },
+   "canFactoryBuy (the factory capacity check of each build-chart row)": {
+    "marks": 4.97,
+    "facility_types": 0.4
+   },
+   "buildContext (making a catalog context)": {
+    "marks": 5.89,
+    "facility_types": 1.47
+   },
+   "CatalogContext destructor": {
+    "marks": 1.51,
+    "facility_types": 0.41
+   }
+  },
+  "overhead_share_of_engine_samples_percent": {
+   "marks": {
+    "allocation": 16.1,
+    "string_compare": 13.1,
+    "memory_copy": 9.3,
+    "map_lookup": 6.9,
+    "total": 45.4
+   },
+   "facility_types": {
+    "allocation": 14.4,
+    "string_compare": 13.0,
+    "memory_copy": 8.9,
+    "map_lookup": 6.7,
+    "total": 43.0
+   }
+  },
+  "overhead": "Engine samples whose innermost function compares strings, allocates or frees, copies memory or looks up a map",
+  "caveat": "Each profile covers 60 s of the same game; the faster build gets further in that time, so the positions sampled differ a little."
+ },
+ "notes": [
+  "The bracketed searched games ran in the order: this change, the marks build, this change, back to back on the same Mac, with nothing else of this study running.",
+  "Instruction counts of repeated searched-game runs of one build differ by about 1% (marks build 5,557 and 5,601 G; this change 5,334, 5,386 and 5,321 G); CPU seconds depend more on the Mac's other work."
+ ]
+}

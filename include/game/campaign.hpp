@@ -132,6 +132,45 @@ UnitTypeId unitTypeNumber(const State&, std::string_view name);  // Throws "Unkn
 const std::string& unitTypeName(const State&, UnitTypeId);
 const KnownUnitTypes& knownUnitTypes(const State&);
 const KnownUnitClasses& knownUnitClasses(const State&);
+// The same for facility types and technologies, also from the catalog.
+struct KnownFacilityTypes;
+struct KnownTechnologies;
+FacilityTypeId facilityTypeNumber(const State&, std::string_view name);  // Throws "Unknown facility type: <name>".
+const std::string& facilityTypeName(const State&, FacilityTypeId);
+const KnownFacilityTypes& knownFacilityTypes(const State&);
+TechnologyId technologyNumber(const State&, std::string_view name);  // Throws "Unknown technology: <name>".
+const std::string& technologyName(const State&, TechnologyId);
+const KnownTechnologies& knownTechnologies(const State&);
+
+// What a construction project or a build-chart row builds: a unit type or a
+// facility type, held as a number of its own kind. The catalog never gives a
+// unit type and a facility type the same name, so a name says which of the two
+// it is (buildTypeNumber). A default BuildType names nothing.
+class BuildType {
+  public:
+    constexpr BuildType() = default;
+    constexpr BuildType(UnitTypeId unit) : unit_(unit) {}
+    constexpr BuildType(FacilityTypeId facility) : facility_(facility) {}
+    constexpr bool valid() const { return unit_.valid() || facility_.valid(); }
+    constexpr bool isUnit() const { return unit_.valid(); }
+    constexpr bool isFacility() const { return facility_.valid(); }
+    // The unit type; a default number, which names no unit type, for a facility type.
+    constexpr UnitTypeId unit() const { return unit_; }
+    // The facility type; a default number for a unit type.
+    constexpr FacilityTypeId facility() const { return facility_; }
+    friend constexpr bool operator==(BuildType, BuildType) = default;
+
+  private:
+    UnitTypeId unit_;
+    FacilityTypeId facility_;
+};
+BuildType buildTypeNumber(const State&, std::string_view name);  // Throws "Unknown build type: <name>".
+const std::string& buildTypeName(const State&, BuildType);
+
+// Whether a nation has completed a technology (stage 4 of 4), and the set of
+// technologies it has completed.
+bool hasTechnology(const State&, NationId, TechnologyId);
+NumberSet<TechnologyId> completedTechnologies(const State&, NationId);
 // A railroad's name from the two land zones it connects, in either order.
 Id railroadId(const State&, ZoneId a, ZoneId b);
 // Map reads for rule hot paths. Each matches reading the definition's map JSON
@@ -164,7 +203,9 @@ struct NationState {
     std::optional<int> treasury;  // No account is different from an account with zero cash.
     std::map<Id, int> incomeComponents;  // The parts of its income as the position stands.
     bool incomeKnown {false};  // An unevaluated rate is not a zero-income ruling.
-    std::map<Id, int> technologyStages;
+    // Research stage of each technology it has rolled for, 0 to 4; 4 is
+    // complete. A technology never rolled for has no entry.
+    NumberMap<TechnologyId, int> technologyStages;
     NumberSet<NationId> atWarWith;
     NumberSet<NationId> allies;
     Marks turnFlags;  // Marks (marks.hpp) cleared when the nation's turn begins.
@@ -197,7 +238,7 @@ struct UnitState {
 
 struct FacilityState {
     Id id;
-    Id type;
+    FacilityTypeId type;  // A number in the catalog's facility type table (facilityTypeName names it).
     ZoneId zone;
     int damage {0};
     Marks flags;
@@ -220,7 +261,7 @@ inline Id railroadId(const Id& a, const Id& b) {
 struct BuildProject {
     Id id;
     NationId owner;
-    Id type;
+    BuildType type;  // The unit or facility it builds (buildTypeName names it).
     std::optional<Id> site;
     int queuePosition {1};
     int paidIpp {0};

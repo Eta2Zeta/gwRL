@@ -293,7 +293,7 @@ void repairsRailAndNeutralAttribution() {
     near(healthyCity.infrastructure, bombedCity.infrastructure, "City label created a separately priced asset or repair deduction");
     s.territories.at(zoneNumber(s, "land_jap_tokyo")).flags.clear();
     FacilityState factory;
-    factory.id = "factory"; factory.type = "major_factory"; factory.zone = zoneNumber(s, "land_jap_honshu"); factory.damage = 20;
+    factory.id = "factory"; factory.type = facilityTypeNumber(s, "major_factory"); factory.zone = zoneNumber(s, "land_jap_honshu"); factory.damage = 20;
     s.facilities.emplace(factory.id, factory);
     near(allianceWealth(s)[0].infrastructure, -2, "Negative surviving facility value was clamped");
     const auto before = allianceWealth(s)[0].total();
@@ -301,7 +301,7 @@ void repairsRailAndNeutralAttribution() {
     s.repairs.emplace("paid", RepairJob{"paid", nationNumber(s, "japan"), "factory", 3, 0, false, std::nullopt});
     near(allianceWealth(s)[0].total(), before, "Prepaid repair lost both cash and repair value");
     auto captured = emptyAssets();
-    captured.facilities.emplace("yard", FacilityState{"yard", "major_shipyard", zoneNumber(s, "land_jap_honshu"), 3});
+    captured.facilities.emplace("yard", FacilityState{"yard", facilityTypeNumber(captured, "major_shipyard"), zoneNumber(s, "land_jap_honshu"), 3});
     captured.repairs.emplace("old_repair", RepairJob{"old_repair", nationNumber(captured, "japan"), "yard", 3, 0, false, std::nullopt});
     near(allianceWealth(captured)[0].infrastructure, 10, "Current owner's prepaid repair was not credited");
     captured.territories.at(zoneNumber(captured, "land_jap_honshu")).possessor = nationNumber(captured, "kmt");

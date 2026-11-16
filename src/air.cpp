@@ -28,10 +28,6 @@ V num(int x) {
 }
 bool marked(const Marks &f, const MarkKey &k) { return f.value(k) != 0; }
 int flag(const Marks &f, const MarkKey &k) { return f.value(k); }
-int flag(const std::map<Id, int> &f, const Id &k) {
-    const auto i = f.find(k);
-    return i == f.end() ? 0 : i->second;
-}
 const V &node(const State &s, ZoneId z) {
     return mapNode(s, z);
 }
@@ -41,9 +37,6 @@ bool land(const State &s, ZoneId z) {
 bool city(const State &s, ZoneId z) {
     auto p = node(s, z).find("is_city");
     return p && p->asBool();
-}
-bool tech(const State &s, NationId nation, const Id &id) {
-    return flag(s.nations.at(nation).technologyStages, id) == 4;
 }
 bool has(const State &s, const UnitState &u, UnitClassId cls) {
     return s.definition->catalog->unit(u.type).classes.contains(cls);
@@ -84,7 +77,7 @@ int occupiedCarrierSlots(const State &s, const Id &carrier, const std::set<Id> &
 int patrolRange(const State &s, const UnitState &u) {
     auto ctx = catalogContext(s, u.owner, u.zone);
     for (const auto &[id, f] : s.facilities)
-        if (f.zone == u.turnOrigin && f.type == "seaplane_base" && f.damage == 0 &&
+        if (f.zone == u.turnOrigin && f.type == knownFacilityTypes(s).seaplane_base && f.damage == 0 &&
             !marked(f.flags, mark::placed_this_turn) && s.territories.at(f.zone).possessor &&
             friendly(s, u.owner, *s.territories.at(f.zone).possessor) &&
             (*s.territories.at(f.zone).possessor != u.owner ||
@@ -147,12 +140,6 @@ void put(BattleState &b, const Id &key, V v) {
     auto o = b.data.asObject();
     o[key] = std::move(v);
     b.data = V(std::move(o));
-}
-A ids(const std::vector<Id> &v) {
-    A a;
-    for (const auto &x : v)
-        a.emplace_back(x);
-    return a;
 }
 // A flight path as actions name it: its zones' names.
 A zoneIds(const State &s, const std::vector<ZoneId> &path) {
@@ -311,7 +298,7 @@ std::vector<Id> scrambleSources(const State &s, const Id &unit, ZoneId target, b
     if ((!fighter(s, u) && !seaplane) || used(s, u) || !adjacent(s, u.zone, target))
         return r;
     for (const auto &[id, f] : s.facilities)
-        if (f.zone == u.zone && f.type == (seaplane ? "seaplane_base" : "airbase") && f.damage == 0 &&
+        if (f.zone == u.zone && f.type == (seaplane ? knownFacilityTypes(s).seaplane_base : knownFacilityTypes(s).airbase) && f.damage == 0 &&
             !marked(f.flags, mark::placed_this_turn) && s.territories.at(f.zone).possessor &&
             friendly(s, u.owner, *s.territories.at(f.zone).possessor) &&
             (*s.territories.at(f.zone).possessor != u.owner ||
@@ -320,12 +307,12 @@ std::vector<Id> scrambleSources(const State &s, const Id &unit, ZoneId target, b
             int spent = flag(f.flags, mark::air_scramble_turn) == static_cast<int>(s.clock.playerTurnSerial + 1)
                             ? flag(f.flags, mark::air_scramble_used)
                             : 0;
-            if (tech(s, owner, "radar") || spent < 3)
+            if (hasTechnology(s, owner, knownTechnologies(s).radar) || spent < 3)
                 r.push_back(id);
         }
     for (const auto &[id, carrier] : s.units)
         if (!seaplane && carrier.zone == u.zone && carrier.type == knownUnitTypes(s).heavy_fleet_carrier &&
-            tech(s, carrier.owner, "radar") && friendly(s, u.owner, carrier.owner) &&
+            hasTechnology(s, carrier.owner, knownTechnologies(s).radar) && friendly(s, u.owner, carrier.owner) &&
             std::find(carrier.cargo.begin(), carrier.cargo.end(), unit) != carrier.cargo.end())
             r.push_back(id);
     return r;
@@ -498,7 +485,7 @@ int damageDice(const State &s, const UnitState &u) {
     return 0;
 }
 int aaThreshold(const State &s, const BattleState &b) {
-    return tech(s, b.attacker, "heavy_strategic_bombers") ? 2 : 3;
+    return hasTechnology(s, b.attacker, knownTechnologies(s).heavy_strategic_bombers) ? 2 : 3;
 }
 void continueBombing(State &s, BattleState &b) {
     auto stage = str(b, "air_stage");
@@ -558,7 +545,7 @@ void continueBombing(State &s, BattleState &b) {
     }
     if (stage == "rocket_aa") {
         put(b, "air_stage", V(std::string("damage")));
-        if (tech(s, b.defender, "radar") && str(b, "target_kind") != "rail" &&
+        if (hasTechnology(s, b.defender, knownTechnologies(s).radar) && str(b, "target_kind") != "rail" &&
             str(b, "target_kind") != "construction") {
             roll(s, b, "air_rocket_aa", b.defender, {DieSpec{}});
             return;
@@ -642,12 +629,12 @@ std::vector<Id> targets(const State &s, ZoneId zone, const Id &kind) {
             r.push_back(zoneName(s, zone));
     } else if (kind == "facility") {
         for (const auto &[id, f] : s.facilities)
-            if (f.zone == zone && f.type != "fortification" && f.type != "coastal_artillery")
+            if (f.zone == zone && f.type != knownFacilityTypes(s).fortification && f.type != knownFacilityTypes(s).coastal_artillery)
                 r.push_back(id);
     } else if (kind == "construction") {
         for (const auto &[id, p] : s.construction)
-            if (p.site && *p.site == zoneName(s, zone) && s.definition->catalog->facilities().contains(p.type) &&
-                p.type != "fortification")
+            if (p.site && *p.site == zoneName(s, zone) && p.type.isFacility() &&
+                p.type != knownFacilityTypes(s).fortification)
                 r.push_back(id);
     } else if (kind == "rail") {
         for (const auto &[id, r1] : s.rails)
@@ -1314,12 +1301,12 @@ void applyFacilityBombDamage(State &s, const Id &id, int damage) {
     auto &f = s.facilities.at(id);
     const int previousDamage=f.damage;
     const auto &type = s.definition->catalog->facility(f.type);
-    require(f.type != "fortification" && f.type != "coastal_artillery", "Unbombable facility");
+    require(f.type != knownFacilityTypes(s).fortification && f.type != knownFacilityTypes(s).coastal_artillery, "Unbombable facility");
     auto owner = s.territories.at(f.zone).possessor;
-    if (owner && tech(s, *owner, "improved_construction")) {
-        int allowance = f.type == "minor_factory"    ? 1
-                        : f.type == "medium_factory" ? 3
-                        : f.type == "major_factory"  ? 5
+    if (owner && hasTechnology(s, *owner, knownTechnologies(s).improved_construction)) {
+        int allowance = f.type == knownFacilityTypes(s).minor_factory    ? 1
+                        : f.type == knownFacilityTypes(s).medium_factory ? 3
+                        : f.type == knownFacilityTypes(s).major_factory  ? 5
                                                      : 0;
         const auto key = MarkKey(mark::bombing_reduction, id);
         auto &ledger = s.nations.at(*owner).turnFlags;
@@ -1344,7 +1331,7 @@ void applyCityBombDamage(State &s, ZoneId zone, int damage) {
     auto &t = s.territories.at(zone);
     if (marked(t.flags, mark::city_destroyed))
         return;
-    if (t.possessor && tech(s, *t.possessor, "improved_construction")) {
+    if (t.possessor && hasTechnology(s, *t.possessor, knownTechnologies(s).improved_construction)) {
         auto &ledger = s.nations.at(*t.possessor).turnFlags;
         const auto key = MarkKey(mark::city_bombing_reduction, zoneName(s, zone)), turnKey = MarkKey(mark::city_bombing_reduction_turn, zoneName(s, zone));
         int used =
@@ -1641,7 +1628,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                                 action(s, s.currentNation(), "air_escort",
                                        {{"unit", V(id)}, {"path", V(zoneIds(s, path))}, {"battle", V(bid)}}));
                 if (u.type != knownUnitTypes(s).seaplane && !transport(s, u) &&
-                    (!has(s, u, knownUnitClasses(s).strategic_bomber) || tech(s, u.owner, "heavy_strategic_bombers"))) {
+                    (!has(s, u, knownUnitClasses(s).strategic_bomber) || hasTechnology(s, u.owner, knownTechnologies(s).heavy_strategic_bombers))) {
                     bool existing = false;
                     for (const auto &[bid, b] : s.battles)
                         if (b.zone == zone && b.attacker == u.owner && !marked(b.flags, mark::air_mission) &&
@@ -1656,7 +1643,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                         if (b.zone == zone && b.attacker == s.currentNation() &&
                             !marked(b.flags, mark::air_mission) && !marked(b.flags, mark::finished) &&
                             b.stage == "awaiting_combat_rules" &&
-                            (!has(s, u, knownUnitClasses(s).strategic_bomber) || tech(s, u.owner, "heavy_strategic_bombers")))
+                            (!has(s, u, knownUnitClasses(s).strategic_bomber) || hasTechnology(s, u.owner, knownTechnologies(s).heavy_strategic_bombers)))
                             out.push_back(
                                 action(s, s.currentNation(), "air_support",
                                        {{"unit", V(id)}, {"path", V(zoneIds(s, path))}, {"battle", V(bid)}}));
@@ -2063,7 +2050,7 @@ void AirRules::apply(State &s, const Action &a) const {
     if (a.kind == "air_choose_technology_loss") {
         release(s, a);
         auto owner = *s.territories.at(b.zone).possessor;
-        --s.nations.at(owner).technologyStages.at(p.require("technology").asString());
+        --s.nations.at(owner).technologyStages.at(technologyNumber(s, p.require("technology").asString()));
         continueBombing(s, b);
         return;
     }
@@ -2110,10 +2097,10 @@ void AirRules::applyChance(State &s, const ChanceRequest &r, const ChanceOutcome
             if (!before && marked(s.territories.at(b.zone).flags, mark::city_destroyed)) {
                 auto owner = *s.territories.at(b.zone).possessor;
                 std::vector<Action> opts;
-                for (const auto &[id, stage] : s.nations.at(owner).technologyStages)
+                for (const auto &[technology, stage] : s.nations.at(owner).technologyStages)
                     if (stage >= 1 && stage <= 3)
                         opts.push_back(action(s, b.attacker, "air_choose_technology_loss",
-                                              {{"battle", V(b.id)}, {"technology", V(id)}}));
+                                              {{"battle", V(b.id)}, {"technology", V(technologyName(s, technology))}}));
                 if (!opts.empty()) {
                     decision(s, b, b.attacker, "air_destroyed_city_technology", std::move(opts));
                     return;
@@ -2173,8 +2160,8 @@ void AirRules::beginTurn(State &s) const {
             }
             for (const auto &[fid, f] : s.facilities)
                 if (f.zone == u.zone && f.damage == 0 && !marked(f.flags, mark::placed_this_turn) &&
-                    ((f.type == "airbase" && u.type != knownUnitTypes(s).seaplane) ||
-                     (f.type == "seaplane_base" && u.type == knownUnitTypes(s).seaplane)) &&
+                    ((f.type == knownFacilityTypes(s).airbase && u.type != knownUnitTypes(s).seaplane) ||
+                     (f.type == knownFacilityTypes(s).seaplane_base && u.type == knownUnitTypes(s).seaplane)) &&
                     s.territories.at(f.zone).possessor &&
                     friendly(s, u.owner, *s.territories.at(f.zone).possessor) &&
                     (*s.territories.at(f.zone).possessor != u.owner ||

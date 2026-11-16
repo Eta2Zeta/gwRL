@@ -401,6 +401,8 @@ struct Context {
         powerStatuses, incomeComponents, enumValues, parameterKeys, roleGroups, repairTargets, repairStats,
         facilityStats, projectClasses, projectStats, chanceStats, positions, ranks, battleWordKeys, battleWords;
     std::vector<int> unitClassOfType;
+    // The projectTypes column of each unit type and each facility type, by number.
+    std::vector<int> unitProjects, facilityProjects;
     std::vector<int> wordKeyOfDataKey;  // Each battle-note key's row in battleWordKeys, or its other.
     std::unordered_map<std::string, int> roleOfKey;
     Layout zone, global, action;
@@ -540,8 +542,8 @@ std::shared_ptr<const Context> buildContext(const State& s) {
         const auto found = catalog.unitClasses().find(name);
         return found && unit.classes.contains(*found);
     };
-    for (const auto& [id, facility] : catalog.facilities()) facilities.push_back(id);
-    for (const auto& [id, technology] : catalog.technologies()) technologies.push_back(id);
+    for (const auto& facility : catalog.facilities()) facilities.push_back(facility.id);
+    technologies = catalog.technologies().names();
     for (const auto& [id, row] : catalog.rows()) rows.push_back(id);
     const auto& nodes = s.definition->geography.require("nodes").asObject();
     for (const auto& [id, node] : nodes) {
@@ -578,8 +580,12 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->unitTypes = Vocabulary("unit_type", types, false);
     c->unitTypes.numberBy(catalog.unitTypes());
     c->facilityTypes = Vocabulary("facility_type", facilities, true);
+    c->facilityTypes.numberBy(catalog.facilityTypes());
     c->technologies = Vocabulary("technology", technologies, true);
+    c->technologies.numberBy(catalog.technologies());
     c->projectTypes = Vocabulary("project_type", projects, true);
+    for (const auto& name : catalog.unitTypes().names()) c->unitProjects.push_back(c->projectTypes(name));
+    for (const auto& name : catalog.facilityTypes().names()) c->facilityProjects.push_back(c->projectTypes(name));
     c->rows = Vocabulary("row", rows, true);
     c->terrains = Vocabulary("terrain", terrains, true);
     c->unitClasses = Vocabulary("unit_class", kUnitClasses, true);
@@ -1327,11 +1333,16 @@ void projectFacts(const Context& c, const State& s, const BuildProject& p, int t
     }
 }
 
+// A project's projectTypes column.
+int projectColumn(const Context& c, BuildType type) {
+    return type.isUnit() ? c.unitProjects.at(type.unit().index()) : c.facilityProjects.at(type.facility().index());
+}
+
 void encodeProjects(const Context& c, const State& s, Builder& b) {
     for (const auto& [id, p] : s.construction) {
-        const int type = c.projectTypes(p.type);
+        const int type = projectColumn(c, p.type);
         const int nation = c.nations(p.owner);
-        const int cls = c.unitTypes.find(p.type) >= 0 ? c.projectClasses.find("unit") : c.projectClasses.find("facility");
+        const int cls = p.type.isUnit() ? c.projectClasses.find("unit") : c.projectClasses.find("facility");
         const int site = p.site ? c.zones.find(*p.site) : -1;
         if (site >= 0) {
             b.zone(site, c.zone.at(c.zProject, {nation, type}), 1);
@@ -1757,7 +1768,7 @@ void optionValue(const Context& c, const State& s, Builder& b, const UnitRoles& 
             places(record.data, 0);
             b.zoneRef(role == 1 ? 3 : role, c.zones.find(record.zone));
         } else if (const auto project = s.construction.find(text); project != s.construction.end()) {
-            const int type = c.projectTypes(project->second.type);
+            const int type = projectColumn(c, project->second.type);
             b.option(c.action.at(c.aProject, {role, type}), 1, role);
             b.option(c.action.at(c.aProjectOwner, {role, c.nations(project->second.owner)}), 1, role);
             projectFacts(c, s, project->second, type,

@@ -16,10 +16,6 @@ template <class Message> void require(bool c, const Message &why) {
         throw std::runtime_error(why);
 }
 int value(const Marks &flags, const MarkKey &key) { return flags.value(key); }
-int value(const std::map<Id, int> &values, const Id &key) {
-    const auto found = values.find(key);
-    return found == values.end() ? 0 : found->second;
-}
 // The argument after `prefix` of the first nonzero mark of this base, in name order.
 std::optional<Id> marker(const Marks &flags, MarkId base, std::string_view prefix = {}) {
     return flags.argumentAfter(base, prefix);
@@ -41,11 +37,11 @@ bool recipientHome(const State &s, NationId recipient, ZoneId zone) {
            (nationFaction(s, recipient).homeZones.contains(zone) ||
             (recipient == knownNations(s).dadao && chineseHomeCountry(s, zone)));
 }
-bool baseType(const Id &type) {
-    return type == "airbase" || type == "seaplane_base" || type == "submarine_base";
+bool baseType(const State &s, BuildType type) {
+    return knownFacilityTypes(s).base(type.facility());
 }
 bool techUnit(const State &s, const BuildProject &p) {
-    if (p.type == "elite_airborne_infantry")
+    if (p.type == knownUnitTypes(s).elite_airborne_infantry)
         return false; // RB47 expressly permits its lend-lease conversion.
     for (const auto &[id, row] : s.definition->catalog->rows())
         if (row.nation == nationName(s, p.owner) && row.type == p.type && row.kind == "purchase" &&
@@ -71,28 +67,29 @@ NationId controllerTurn(const State &s, NationId nation) {
 }
 std::vector<std::pair<Id, ZoneId>> senderFactories(const State &s, const BuildProject &p) {
     std::vector<std::pair<Id, ZoneId>> out;
-    if (s.definition->catalog->facilities().contains(p.type) || value(p.flags, mark::lease_militia_upgrade) ||
+    if (p.type.isFacility() || value(p.flags, mark::lease_militia_upgrade) ||
         value(p.flags, mark::lease_repair))
         return {{"", ZoneId {}}};
-    const bool naval = s.definition->catalog->unit(p.type).classes.contains(knownUnitClasses(s).naval);
-    const bool capital = s.definition->catalog->unit(p.type).classes.contains(knownUnitClasses(s).capital_ship);
-    if (p.type == "militia")
+    const auto &unit = s.definition->catalog->unit(p.type.unit());
+    const bool naval = unit.classes.contains(knownUnitClasses(s).naval);
+    const bool capital = unit.classes.contains(knownUnitClasses(s).capital_ship);
+    if (p.type == knownUnitTypes(s).militia)
         return {{"", ZoneId {}}};
     if (decentralizedProduction(s, p.owner) &&
-        (s.definition->catalog->unit(p.type).classes.contains(knownUnitClasses(s).infantry_class) || p.type == "cavalry"))
+        (unit.classes.contains(knownUnitClasses(s).infantry_class) || p.type == knownUnitTypes(s).cavalry))
         return {{"", ZoneId {}}};
     for (const auto &[id, f] : s.facilities)
         if (facilityCapacity(s, p.owner, id, false) > 0 &&
-            (naval ? (f.type.find("shipyard") != Id::npos && (!capital || f.type == "major_shipyard"))
-                   : (f.type == "minor_factory" || f.type == "medium_factory" || f.type == "major_factory")))
+            (naval ? (knownFacilityTypes(s).shipyard(f.type) && (!capital || f.type == knownFacilityTypes(s).major_shipyard))
+                   : knownFacilityTypes(s).factory(f.type)))
             out.emplace_back(id, f.zone);
     return out;
 }
 bool transportable(const State &s, const BuildProject &p, const SupplyRoute &route) {
     if (!route.connected)
         return false;
-    if (!s.definition->catalog->isUnitType(p.type) ||
-        !s.definition->catalog->unit(p.type).classes.contains(knownUnitClasses(s).naval))
+    if (!p.type.isUnit() ||
+        !s.definition->catalog->unit(p.type.unit()).classes.contains(knownUnitClasses(s).naval))
         return true;
     // A naval delivery can only have its source and destination land tiles.
     for (std::size_t i = 1; i + 1 < route.zones.size(); ++i)
@@ -117,11 +114,11 @@ std::vector<Action> recipientPlacements(const State &s, const BuildProject &p) {
                         !value(u.turnFlags, mark::placed_this_turn) && upgradeKeepsCargo(s, u, knownUnitTypes(s).infantry))
                         out.push_back(
                             action(s, "economy_lease_place", {{"project", V(p.id)}, {"target", V(id)}}));
-            } else if (baseType(p.type)) {
-                if (p.type == "airbase") {
+            } else if (baseType(s, p.type)) {
+                if (p.type == knownFacilityTypes(s).airbase) {
                     bool exists = false;
                     for (const auto &[id, f] : s.facilities)
-                        if (f.zone == zone && f.type == "airbase")
+                        if (f.zone == zone && f.type == knownFacilityTypes(s).airbase)
                             exists = true;
                     if (!exists)
                         out.push_back(
@@ -186,7 +183,7 @@ std::vector<Action> lendLeaseActions(const State &s) {
                         !marker(p.flags, mark::lend_to) && !marker(p.flags, mark::target) &&
                         !value(p.flags, mark::unit_upgrade) && !value(p.flags, mark::facility_upgrade) &&
                         !value(p.flags, mark::lease_received) &&
-                        (!s.definition->catalog->facilities().contains(p.type) || baseType(p.type)) &&
+                        (!p.type.isFacility() || baseType(s, p.type)) &&
                         !techUnit(s, p))
                         out.push_back(action(s, "economy_lease_declare",
                                              {{"project", V(id)}, {"recipient", V(nationName(s, recipient))}}));
@@ -214,8 +211,8 @@ std::vector<Action> lendLeaseActions(const State &s) {
             continue;
         for (const auto &[zone, t] : s.territories)
             if (recipientHome(s, *recipient, zone)) {
-                const bool ship = s.definition->catalog->isUnitType(p.type) &&
-                                  s.definition->catalog->unit(p.type).classes.contains(knownUnitClasses(s).naval);
+                const bool ship = p.type.isUnit() &&
+                                  s.definition->catalog->unit(p.type.unit()).classes.contains(knownUnitClasses(s).naval);
                 const auto route = lendLeaseSupplyRoute(s, sender, *recipient, zone, ship);
                 if (!transportable(s, p, route))
                     continue;
@@ -223,10 +220,9 @@ std::vector<Action> lendLeaseActions(const State &s) {
                     O params{{"project", V(id)}, {"zone", V(zoneName(s, zone))}};
                     if (!factory.empty())
                         params["factory"] = V(factory);
-                    if (s.definition->catalog->isUnitType(p.type) &&
-                        s.definition->catalog->unit(p.type).classes.contains(knownUnitClasses(s).naval)) {
+                    if (ship) {
                         // Delivery in port is allowed; submarines need a submarine base.
-                        const bool sub = s.definition->catalog->unit(p.type).classes.contains(knownUnitClasses(s).submarine);
+                        const bool sub = s.definition->catalog->unit(p.type.unit()).classes.contains(knownUnitClasses(s).submarine);
                         if (!route.facilities.empty())
                             for (const auto &sea : navalFacilitySeaZones(s, route.facilities.back())) {
                                 auto afloat = params;
@@ -235,9 +231,9 @@ std::vector<Action> lendLeaseActions(const State &s) {
                             }
                         for (const auto &[fid, f] : s.facilities)
                             if (f.zone == zone && f.damage == 0 &&
-                                (sub ? f.type == "submarine_base"
-                                     : f.type.rfind("major_", 0) == 0 &&
-                                           f.type.find("factory") == Id::npos)) {
+                                (sub ? f.type == knownFacilityTypes(s).submarine_base
+                                     : knownFacilityTypes(s).major(f.type) &&
+                                           !knownFacilityTypes(s).factory(f.type))) {
                                 auto port = params;
                                 port["port"] = V(fid);
                                 out.push_back(action(s, "economy_lease_deliver", std::move(port)));
@@ -270,8 +266,8 @@ bool applyLendLeaseAction(State &s, const Action &a) {
         p.id = unique(s, "lease");
         p.owner = nationNumber(s, a.nation);
         p.type = a.kind == "economy_lease_upgrade"
-                     ? "infantry"
-                     : s.facilities.at(a.parameters.require("target").asString()).type;
+                     ? BuildType(knownUnitTypes(s).infantry)
+                     : BuildType(s.facilities.at(a.parameters.require("target").asString()).type);
         const int cost = a.kind == "economy_lease_upgrade"
                              ? 2
                              : s.facilities.at(a.parameters.require("target").asString()).damage;
@@ -300,10 +296,10 @@ bool applyLendLeaseAction(State &s, const Action &a) {
             FacilityState f;
             f.id = unique(s, "lease_base");
             f.zone = zoneNumber(s, a.parameters.require("zone").asString());
-            f.type = p.type;
+            f.type = p.type.facility();
             f.flags[mark::placed_this_turn] = 1;
             f.flags[MarkKey(mark::original_owner, nationName(s, p.owner))] = 1;
-            f.flags[MarkKey(mark::original_type, p.type)] = 1;
+            f.flags[MarkKey(mark::original_type, facilityTypeName(s, f.type))] = 1;
             if (const auto *border = a.parameters.find("border"))
                 f.flags[MarkKey(mark::border, border->asString())] = 1;
             if (const auto *border = a.parameters.find("border2"))
@@ -339,7 +335,7 @@ bool applyLendLeaseAction(State &s, const Action &a) {
                 s.completedTurns.at(controllerTurn(s, recipient)) +
                 (controllerTurn(s, recipient) == sender ? 1 : 0);
             s.construction.erase(id);
-        } else if (value(p.flags, mark::lease_militia_upgrade) || baseType(p.type)) {
+        } else if (value(p.flags, mark::lease_militia_upgrade) || baseType(s, p.type)) {
             p.flags.erase(MarkKey(mark::lend_to, recipientName));
             p.owner = recipient;
             p.site.reset();
@@ -352,15 +348,15 @@ bool applyLendLeaseAction(State &s, const Action &a) {
         } else {
             UnitState u;
             u.id = unique(s, "lease_unit");
-            u.type = unitTypeNumber(s, p.type);
+            u.type = p.type.unit();
             u.owner = recipient;
             if (u.type == knownUnitTypes(s).elite_airborne_infantry &&
-                value(s.nations.at(recipient).technologyStages, "airborne_doctrine") != 4)
+                !hasTechnology(s, recipient, knownTechnologies(s).airborne_doctrine))
                 u.type = knownUnitTypes(s).airborne_infantry;
             const auto conversions =
                 s.definition->catalog->automaticConversions(u.type, catalogContext(s, recipient, zone));
             if (!conversions.empty())
-                u.type = unitTypeNumber(s, conversions.front().to);
+                u.type = conversions.front().to.unit();
             u.zone = u.turnOrigin = a.parameters.find("sea") ? zoneNumber(s, a.parameters.require("sea").asString()) : zone;
             u.movementAllowance =
                 s.definition->catalog->stats(u.type, 0, catalogContext(s, recipient, zone)).movement;

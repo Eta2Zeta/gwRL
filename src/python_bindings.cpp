@@ -332,18 +332,21 @@ PYBIND11_MODULE(gwrl_cpp, module) {
             return py::module_::import("json").attr("loads")(text);
         })
         .def("name_tables", [](const NativeCampaignEnv& self) {
-            const auto [zones, nations, unitTypes, unitClasses] = self.call([](const CampaignEnv& env) {
+            const auto [zones, nations, unitTypes, unitClasses, facilityTypes, technologies] = self.call([](const CampaignEnv& env) {
                 const auto& state = env.engine().state();
                 const auto& names = game::campaign::names(state);
                 const auto& catalog = *state.definition->catalog;
                 return std::tuple{names.zones.names(), names.nations.names(), catalog.unitTypes().names(),
-                                  catalog.unitClasses().names()};
+                                  catalog.unitClasses().names(), catalog.facilityTypes().names(),
+                                  catalog.technologies().names()};
             });
             py::dict tables;
             tables["zones"] = zones;
             tables["nations"] = nations;
             tables["unit_types"] = unitTypes;
             tables["unit_classes"] = unitClasses;
+            tables["facility_types"] = facilityTypes;
+            tables["technologies"] = technologies;
             tables["marks"] = game::campaign::markNames();
             return tables;
         }, "The tables that number the definition's names, by kind: each kind's names listed in "

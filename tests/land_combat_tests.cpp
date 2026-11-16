@@ -499,7 +499,7 @@ void fortificationConstrainsApproach() {
     add(s, "d", "kmt", hopeh);
     FacilityState f;
     f.id = "fort";
-    f.type = "fortification";
+    f.type = facilityTypeNumber(s, "fortification");
     f.zone = zoneNumber(s, hopeh);
     f.flags[MarkKey(mark::border, beiping)] = 1;
     s.facilities.emplace(f.id, f);

@@ -25,9 +25,10 @@
 // of a type of its own for each kind of name, such as ZoneId for a zone, so
 // that comparing, copying and looking up names costs no more than for an
 // integer. The numbers come from name tables: the definition's for zones and
-// nations (Names in campaign.hpp), the catalog's for unit types and unit
-// classes (Catalog in catalog.hpp). A table lists a kind's names sorted
-// bytewise, each name's number being its place in that list, counted from 0. Numbers therefore compare as their names do, and a
+// nations (Names in campaign.hpp), the catalog's for unit types, unit classes,
+// facility types and technologies (Catalog in catalog.hpp). A table lists a
+// kind's names sorted bytewise, each name's number being its place in that
+// list, counted from 0. Numbers therefore compare as their names do, and a
 // container keyed by numbers lists its entries in the order the same container
 // keyed by the names would.
 //
@@ -61,6 +62,16 @@ struct UnitClassKind {
     using Rep = std::uint8_t;
     static constexpr std::size_t capacity = 64;  // The catalog has 17.
     static constexpr std::string_view noun = "unit class";
+};
+struct FacilityTypeKind {
+    using Rep = std::uint8_t;
+    static constexpr std::size_t capacity = 64;  // The catalog has 15.
+    static constexpr std::string_view noun = "facility type";
+};
+struct TechnologyKind {
+    using Rep = std::uint8_t;
+    static constexpr std::size_t capacity = 64;  // The catalog has 16.
+    static constexpr std::string_view noun = "technology";
 };
 
 // A name of one kind, held as its number in the definition's table of that
@@ -106,6 +117,8 @@ using ZoneId = Number<ZoneKind>;
 using NationId = Number<NationKind>;
 using UnitTypeId = Number<UnitTypeKind>;
 using UnitClassId = Number<UnitClassKind>;
+using FacilityTypeId = Number<FacilityTypeKind>;
+using TechnologyId = Number<TechnologyKind>;
 
 // Every number below a count, ascending: the numbers a table holds.
 template <class Kind>
@@ -429,6 +442,13 @@ class NumberSet {
         if (!contains(key)) return 0;
         bits_[key.index() / bitsPerWord] &= ~(std::uint64_t {1} << (key.index() % bitsPerWord));
         return 1;
+    }
+
+    // Whether this set holds every member of the other.
+    bool includes(const NumberSet& other) const {
+        for (std::size_t word = 0; word < wordCount; ++word)
+            if (other.bits_[word] & ~bits_[word]) return false;
+        return true;
     }
 
     // Keeps only the members the other set also holds.

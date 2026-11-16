@@ -101,7 +101,7 @@ bool doubleAmphibiousCasualty(const State &s, const BattleState &b, const Id &id
     const auto &u=s.units.at(id);
     return ground(s,u) && amphibious(u) && u.type!= knownUnitTypes(s).marine &&
         !(has(s,u,knownUnitClasses(s).infantry_class) &&
-          catalogContext(s,u.owner,u.zone).technologies.contains("amphibious_doctrine"));
+          hasTechnology(s,u.owner,knownTechnologies(s).amphibious_doctrine));
 }
 bool operational(const State &s, const BattleState &b, const Id &id) {
     if (!s.units.contains(id))
@@ -142,7 +142,7 @@ bool city(const State &s, ZoneId zone) {
     return c && c->isBool() && c->asBool();
 }
 bool fortBorder(const State &s, const FacilityState &f, ZoneId fromZone) {
-    if (f.type != "fortification" || f.damage || marked(f.flags, mark::under_construction) || !fromZone.valid())
+    if (f.type != knownFacilityTypes(s).fortification || f.damage || marked(f.flags, mark::under_construction) || !fromZone.valid())
         return false;
     const auto &from = zoneName(s, fromZone);
     if (marked(f.flags, MarkKey(mark::border, from)))
@@ -544,7 +544,7 @@ void shoot(State &s, BattleState &b, const Id &which) {
     const bool attackerOnly = which == "attacker_fire" || which == "attrition_fire";
     if (which == "city_airborne_aaa") {
         if (city(s, b.zone) &&
-            !catalogContext(s, b.attacker, b.zone).technologies.contains("airborne_doctrine"))
+            !hasTechnology(s, b.attacker, knownTechnologies(s).airborne_doctrine))
             for (const auto &id : living(s, b, true)) {
                 const auto &u = s.units.at(id);
                 if (aircraft(s, u) && airborne(u) && !u.cargo.empty())
@@ -651,14 +651,13 @@ void shoot(State &s, BattleState &b, const Id &which) {
     }
     if (first && round == 1)
         for (const auto &[id, f] : s.facilities)
-            if (f.zone == b.zone && f.type == "fortification") {
+            if (f.zone == b.zone && f.type == knownFacilityTypes(s).fortification) {
                 auto eligible = protectedAttackers(s, b, f);
                 if (eligible.empty())
                     continue;
                 bool doctrine = false;
                 if (marked(b.flags, mark::airborne_assault))
-                    doctrine =
-                        catalogContext(s, b.attacker, b.zone).technologies.contains("airborne_doctrine");
+                    doctrine = hasTechnology(s, b.attacker, knownTechnologies(s).airborne_doctrine);
                 if (doctrine)
                     continue;
                 for (int n = 0; n < 2; ++n)
@@ -1003,10 +1002,9 @@ bool citySurrounded(const State &s, ZoneId zone, NationId defender) {
         return false;
     for (const auto &[id, f] : s.facilities)
         if (f.zone == zone && f.damage == 0 && !marked(f.flags, mark::under_construction)) {
-            if (f.type == "airbase" || f.type == "airfield")
+            if (f.type == knownFacilityTypes(s).airbase)
                 return false;
-            if (f.type.find("port") != Id::npos || f.type.find("dockyard") != Id::npos ||
-                f.type.find("shipyard") != Id::npos) {
+            if (knownFacilityTypes(s).naval(f.type)) {
                 if (!facilityBlockaded(s, defender, id))
                     return false;
             }

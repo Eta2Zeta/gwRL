@@ -1,15 +1,15 @@
 # Names held as numbers
 
 The scenario names everything with strings: zones such as `land_china_hopeh`,
-nations such as `japan`, unit types such as `cavalry`, marks such as
-`placed_this_turn`. Inside the engine zones, nations, unit types, unit classes
-and the bases of marks are held as numbers instead, a few bytes that compare,
-copy and look up as fast as any integer. This page says which names the engine holds as
-numbers, where each number comes from, where the engine turns names into numbers
-and back, and how to look a number up.
+nations such as `japan`, unit types such as `cavalry`, facility types such as
+`major_port`, technologies such as `radar`, marks such as `placed_this_turn`.
+Inside the engine zones, nations, unit types, unit classes, facility types,
+technologies and the bases of marks are held as numbers instead, a few bytes
+that compare, copy and look up as fast as any integer. This page says which
+names the engine holds as numbers, where each number comes from, where the
+engine turns names into numbers and back, and how to look a number up.
 
-Zones, nations, unit types, unit classes and marks are numbers so far.
-Facility types, technologies and the units themselves are still held by name;
+The units, facilities and other things themselves are still held by name;
 [what is still a name](#what-is-still-a-name) lists them.
 
 ## 1. Why numbers
@@ -18,19 +18,26 @@ Before zones were numbered, 59% of the engine's time went to comparing names,
 allocating memory, looking up maps and copying memory, against 41% to the rules'
 own logic ([record](../archive/records/self_play_limits_2026_11_16.md#inside-the-engine)).
 The position kept its zones, units, facilities and nations in maps keyed by
-name, and every rule check named them as strings. Holding zones as numbers took
-13.0% of the instructions out of listing a position's moves and 7.2% to 7.9%
-out of a searched game, with play unchanged
-([record](../archive/records/zone_numbers_2026_11_16.md)). Holding nations as
-numbers as well took a further 6.6% out of listing the moves and 3.9% to 4.7%
-out of a searched game: 11.6% fewer instructions than before either change
-([record](../archive/records/nation_numbers_2026_11_16.md)). Holding unit types
-and classes as numbers took a further 4.7% out of listing the moves and 2.5% out
-of a searched game: 13.8% fewer instructions than before any of these changes
-([record](../archive/records/unit_type_numbers_2026_11_16.md)). Holding marks as
-numbers took a further 9.0% out of listing the moves and 4.9% out of a searched
-game: 18.1% fewer instructions than before any of these changes
-([record](../archive/records/mark_numbers_2026_11_16.md)).
+name, and every rule check named them as strings. Holding names as numbers took
+that work out kind by kind, with play unchanged at every step of the same 300
+random games and 4 searched games each time
+(`tools/compare_engine_builds.py`):
+
+| Held as numbers | Instructions to list a position's moves, per call | Instructions in four searched games | Record |
+| --- | ---: | ---: | --- |
+| None (commit `9519ea7`) | 10.03 million | 6,782 billion | — |
+| Zones | 8.73 million | 6,292 billion | [zones](../archive/records/zone_numbers_2026_11_16.md) |
+| Nations as well | 8.15 million | 5,996 billion | [nations](../archive/records/nation_numbers_2026_11_16.md) |
+| Unit types and classes as well | 7.77 million | 5,845 billion | [unit types](../archive/records/unit_type_numbers_2026_11_16.md) |
+| The bases of marks as well | 7.07 million | 5,557 billion | [marks](../archive/records/mark_numbers_2026_11_16.md) |
+| Facility types and technologies as well | 6.08 million | 5,334 billion | [facility types](../archive/records/facility_type_numbers_2026_11_16.md) |
+
+So listing a position's moves runs 39.4% fewer instructions than before any of
+these changes, and a searched game 21.4% fewer. Part of the last step is a
+check that numbers made cheap: a factory's production capacity, which the build
+menu asks for each row of the build chart, reads the nation's completed
+technologies as a set of bits (`completedTechnologies`) instead of a catalog
+context that copied every mark of the nation by name.
 
 ## 2. Where the numbers come from
 
@@ -38,9 +45,11 @@ Each kind of name has a table: its names sorted bytewise, a name's number
 being its place in that list, counted from 0 (`NameTable` in
 `include/game/names.hpp`). `freezeDefinition` builds the tables of zones and
 nations from the definition's own data (`Names` in `include/game/campaign.hpp`),
-and `Catalog::fromJson` the tables of unit types and unit classes from the
-catalog's (`include/game/catalog.hpp`). No table is saved, since the names they
-are made from are part of the definition and of the catalog.
+and `Catalog::fromJson` the tables of unit types, unit classes, facility types
+and technologies from the catalog's (`include/game/catalog.hpp`), before it
+reads the catalog's definitions, so that each definition can hold the names it
+cites as numbers. No table is saved, since the names they are made from are
+part of the definition and of the catalog.
 
 | Kind | Type | Its names | In the campaign |
 | --- | --- | --- | ---: |
@@ -48,6 +57,8 @@ are made from are part of the definition and of the catalog.
 | Nations | `NationId` | The keys of the definition's `factions`, dormant ones included | 13 |
 | Unit types | `UnitTypeId` | The catalog's units (`land_air.json` and `naval.json` in `game_content/catalog/gw36_v43`) | 53 |
 | Unit classes | `UnitClassId` | Every class some unit of the catalog has | 17 |
+| Facility types | `FacilityTypeId` | The catalog's facilities (`facilities.json`) | 15 |
+| Technologies | `TechnologyId` | The catalog's technologies (`technologies.json`) | 16 |
 | Marks | `MarkId` | The bases in the engine's mark table, `GWRL_MARKS` in `include/game/marks.hpp` | 218 |
 
 The campaign's 13 nations are the 12 of its faction index
@@ -71,10 +82,9 @@ Because a number is a place in a sorted list:
   [unit types](../archive/records/unit_type_numbers_2026_11_16.md),
   [marks](../archive/records/mark_numbers_2026_11_16.md)).
 - **A number belongs to its definition or catalog.** Adding a zone to the map,
-  a nation to the factions or a unit type to the catalog renumbers those after
-  it. Saved games, planning keys and
-  moves hold names, so they are unaffected; only the engine's memory holds
-  numbers.
+  a nation to the factions or a unit type, facility type or technology to the
+  catalog renumbers those after it. Saved games, planning keys and moves hold
+  names, so they are unaffected; only the engine's memory holds numbers.
 
 ### The nations the rules name
 
@@ -104,7 +114,49 @@ true. Loading a catalog that lacks one of the names fails, so every member
 holds a number.
 
 A unit's type comes from the catalog, so a position holds units only if its
-definition has a catalog; `State::validate` refuses a unit otherwise.
+definition has a catalog; `State::validate` refuses a unit otherwise. The same
+holds for facilities, construction projects and technology stages below.
+
+### The facility types and technologies the rules name
+
+The rules name every facility type of the catalog and 9 of its 16
+technologies in their code. Two more lists in `include/game/catalog.hpp`,
+`GWRL_KNOWN_FACILITY_TYPES` and `GWRL_KNOWN_TECHNOLOGIES`, hold their names,
+as for unit types: a rule asks whether a facility is a fortification with
+`f.type == known.fortification`, and whether a nation has completed Radar with
+`hasTechnology(state, nation, knownTechnologies(state).radar)`.
+
+Some rules treat several facility types alike. `KnownFacilityTypes` names
+those groups, each by its members:
+
+| Group | Facility types |
+| --- | --- |
+| `factory` | The minor, medium and major factory |
+| `naval` | The minor and major port, dockyard and shipyard |
+| `shipyard` | The minor and major shipyard |
+| `major` | The major factory, port, dockyard and shipyard |
+| `base` | The airbase, seaplane base and submarine base |
+
+Before facility types were numbered, the rules found these groups by searching
+a type's name, for `shipyard` say, or by its `major_` prefix. Each group holds
+exactly the types those searches found, and `tests/names_tests.cpp` checks it
+against the names.
+
+The map calls three facilities by a label of its own, `airfield`. The scenario
+contract says an airfield is the catalog's airbase (`facility_type_aliases` in
+`game_content/scenarios/japan_china_1936/scenario_contract.json`), and
+`loadScenario` reads those facilities as airbases (`src/campaign_setup.cpp`), so
+no position holds a facility type the catalog lacks.
+
+### What a build type is
+
+A build-chart row and a construction project build either a unit or a
+facility, so their type is a `BuildType` (`include/game/campaign.hpp`): a unit
+type number or a facility type number, of which `isUnit()` and `isFacility()`
+say which. The catalog gives no unit type and facility type the same name, so a
+name says which of the two it is: `buildTypeNumber(state, name)` reads it and
+`buildTypeName(state, type)` names it. The target of an upgrade, the type a row
+upgrades from and the types a technology unlocks are build types too.
 
 ### What a mark is
 
@@ -277,6 +329,47 @@ The campaign, `game_content/scenarios/japan_china_1936`, and its catalog,
 | 14 | `surface_ship` |
 | 15 | `surface_warship` |
 | 16 | `vehicle_class` |
+
+### Facility types
+
+| Number | Name |
+| ---: | --- |
+| 0 | `airbase` |
+| 1 | `coastal_artillery` |
+| 2 | `fortification` |
+| 3 | `major_dockyard` |
+| 4 | `major_factory` |
+| 5 | `major_port` |
+| 6 | `major_shipyard` |
+| 7 | `medium_factory` |
+| 8 | `minor_dockyard` |
+| 9 | `minor_factory` |
+| 10 | `minor_port` |
+| 11 | `minor_shipyard` |
+| 12 | `railroad` |
+| 13 | `seaplane_base` |
+| 14 | `submarine_base` |
+
+### Technologies
+
+| Number | Name |
+| ---: | --- |
+| 0 | `advanced_artillery` |
+| 1 | `advanced_mechanized_infantry` |
+| 2 | `advanced_submarines` |
+| 3 | `airborne_doctrine` |
+| 4 | `amphibious_doctrine` |
+| 5 | `anti_submarine_warfare` |
+| 6 | `heavy_armor` |
+| 7 | `heavy_strategic_bombers` |
+| 8 | `improved_construction` |
+| 9 | `improved_factories` |
+| 10 | `improved_logistics` |
+| 11 | `jet_fighters` |
+| 12 | `large_ship_construction` |
+| 13 | `long_range_aircraft` |
+| 14 | `radar` |
+| 15 | `strategic_rockets` |
 
 ### Marks
 
@@ -507,15 +600,15 @@ The engine holds numbers in its memory and names everywhere else:
 
 | Where | Holds | How it converts |
 | --- | --- | --- |
-| The position (`State`) | Numbers. Zones: each unit's zone, the zone it began its turn in and its route; each facility's zone; the territories, keyed by zone; a railroad's two ends and the damage on each side; a battle's zone; the side of a railroad a repair mends; the zones held at the start of the turn; capitals. Nations: the nations' records, keyed by nation, with each one's wars, allies and controller; the owner of each unit, construction project and repair job; each territory's possessor, now and at the start of the turn; a battle's attacker and defender; each nation's completed turns; the capitals, surrenders, evolutions, alignment queue, attacked warlords and China's invader. Unit types: each unit's type. Marks: the base of each mark on a unit, a nation, a territory, a facility, a construction project, a battle or the position, and of each unit's commitments; the argument stays text | — |
-| The catalog (`Catalog`) | Numbers: the unit definitions, kept in unit type order, and each one's classes | Built by `Catalog::fromJson` |
+| The position (`State`) | Numbers. Zones: each unit's zone, the zone it began its turn in and its route; each facility's zone; the territories, keyed by zone; a railroad's two ends and the damage on each side; a battle's zone; the side of a railroad a repair mends; the zones held at the start of the turn; capitals. Nations: the nations' records, keyed by nation, with each one's wars, allies and controller; the owner of each unit, construction project and repair job; each territory's possessor, now and at the start of the turn; a battle's attacker and defender; each nation's completed turns; the capitals, surrenders, evolutions, alignment queue, attacked warlords and China's invader. Unit types: each unit's type. Facility types: each facility's type. Build types: each construction project's type. Technologies: each nation's research stages, keyed by technology. Marks: the base of each mark on a unit, a nation, a territory, a facility, a construction project, a battle or the position, and of each unit's commitments; the argument stays text | — |
+| The catalog (`Catalog`) | Numbers: the definitions of unit types, facility types and technologies, each kept in number order; each unit's classes; the type and upgrade source of each build-chart row and the technologies it requires or forbids; each upgrade's target and required technologies; each unit mode's required technologies; the types a technology unlocks; the capacities Improved Factories gives each facility type, read from that technology's rule once | Built by `Catalog::fromJson` |
 | The map index (`IndexedGeography`) | Numbers: each zone's JSON, its neighbors in source order, its first edge to each neighbor, the hops between zones | Built by `freezeDefinition` |
-| Saved positions, planning keys and observations | Names | `State::toJson` and the planning-key writer name the zones, nations, unit types and marks; `State::fromJson` numbers them again and refuses a mark the table lacks |
+| Saved positions, planning keys and observations | Names | `State::toJson` and the planning-key writer name the zones, nations, unit types, facility types, build types, technologies and marks; `State::fromJson` numbers them again and refuses a name its table lacks |
 | Moves, decisions and dice requests | Names: a move's details, such as `zone` and `path`, name zones, and the `nation` of a move, a decision or a dice request names the nation that acts | A rule numbers the names as it reads them, such as `nationNumber(state, move.nation)`, and names them as it writes a move |
-| Build-chart rows, upgrades and construction projects | Names: a row's and a project's type may be a unit type or a facility type | `catalog.unit(name)` and `catalog.isUnitType(name)` read a unit type by name where one is read |
-| A mark's argument | Text: the name of the zone, nation, facility or other thing the mark is about, as in `surprise_attack_zone:sea_p15` | A rule names the zone or nation as it sets the mark: `MarkKey(mark::surprise_attack_zone, zoneName(state, zone))` |
+| The scenario's setup | Names, and the map's own label `airfield` | `loadScenario` numbers each facility's and starting project's type, reading `airfield` as the airbase the scenario contract names |
+| A mark's argument | Text: the name of the zone, nation, facility, facility type or other thing the mark is about, as in `surprise_attack_zone:sea_p15` or `original_type:major_factory` | A rule names the zone, nation or type as it sets the mark, such as `MarkKey(mark::surprise_attack_zone, zoneName(state, zone))`, and numbers it as it reads the mark, such as `facilityTypeNumber(state, argument)` |
 | Battle notes and political records | Names: such as a battle's `origins` or `last_conqueror_kmt` | A rule names the zone or nation as it writes the note |
-| The network input | Zone, nation and unit type columns in name order, so a number is its column; marks through the encoder's own lists of their bases | `Vocabulary::numberBy` in `src/zone_encoding.cpp` checks the order when the encoder is built; `baseName` gives a mark's base and argument without reading its name |
+| The network input | Zone, nation, unit type, facility type and technology columns in name order, so a number is its column; a project's column through a list by build type; marks through the encoder's own lists of their bases | `Vocabulary::numberBy` in `src/zone_encoding.cpp` checks the order when the encoder is built, and `projectColumn` reads a project's column by its build type; `baseName` gives a mark's base and argument without reading its name |
 | Python | Names only | `CampaignEnv.name_tables()` returns the tables |
 
 The functions that convert, declared in `include/game/campaign.hpp`:
@@ -540,6 +633,12 @@ The functions that convert, declared in `include/game/campaign.hpp`:
 | `knownUnitTypes(state)`, `knownUnitClasses(state)` | The numbers of [the unit types and classes the rules name](#the-unit-types-and-classes-the-rules-name) |
 | `catalog.unit(type)` | A unit type's definition, by number |
 | `catalog.unitHasClass(type, name)` | Whether a unit type has the class a name read from data names, such as a hit's target classes |
+| `facilityTypeNumber(state, name)`, `facilityTypeName(state, type)` | A facility type's number, which throws `Unknown facility type: <name>` for a name that is no facility type, and a number's name |
+| `technologyNumber(state, name)`, `technologyName(state, technology)` | The same for technologies: `Unknown technology: <name>` |
+| `knownFacilityTypes(state)`, `knownTechnologies(state)` | The numbers of [the facility types and technologies the rules name](#the-facility-types-and-technologies-the-rules-name), and the groups of facility types |
+| `buildTypeNumber(state, name)`, `buildTypeName(state, type)` | [A build type](#what-a-build-type-is) from the name of a unit type or a facility type, which throws `Unknown build type: <name>` for a name that is neither, and a build type's name |
+| `catalog.facility(type)`, `catalog.technology(technology)` | A facility type's or a technology's definition, by number |
+| `hasTechnology(state, nation, technology)`, `completedTechnologies(state, nation)` | Whether a nation has completed a technology, which is stage 4 of 4, and the set of all it has completed |
 
 The marks' own, declared in `include/game/marks.hpp`:
 
@@ -558,12 +657,15 @@ The marks' own, declared in `include/game/marks.hpp`:
   parts of `std::map`'s interface the engine uses and lists its entries in
   number order, which is name order, but copies without allocating a node per
   entry. The territories, the zones held at the start of the turn, the nations'
-  records, their completed turns and the capitals use it.
+  records, their completed turns, their technology stages and the capitals use
+  it.
 - **`NumberSet<Key>`** keeps one bit per number, with no allocation. A nation's
   wars and allies, the surrendered nations, the nations that have evolved and
-  a unit type's classes use it; so do the searches, for the zones they have
-  seen, and the position's fact cache (`PositionFacts`), for the zone sets it
-  keeps.
+  a unit type's classes use it, as do a nation's completed technologies and
+  the technologies a build-chart row, a unit mode or an upgrade requires or
+  forbids, which `includes` compares in one step; so do the searches, for the
+  zones they have seen, and the position's fact cache (`PositionFacts`), for
+  the zone sets it keeps.
 - **`Marks`** keeps one thing's marks as a sorted vector of small slots (the
   base's number, where its argument lies, the value) and all their arguments
   in one string, so copying a set of marks allocates twice, however many marks
@@ -590,9 +692,12 @@ The marks' own, declared in `include/game/marks.hpp`:
   table.
 - **Convert at the edge.** A rule reads a move's names once, with `zoneNumber`
   or `nationNumber`, and works with numbers from there on.
-- **Name a unit type or class through its known member,** such as
-  `knownUnitTypes(state).militia`, never by comparing a string; add the name to
-  its list in `include/game/catalog.hpp` when a rule starts to name it.
+- **Name a unit type, unit class, facility type or technology through its
+  known member,** such as `knownUnitTypes(state).militia`, never by comparing a
+  string; add the name to its list in `include/game/catalog.hpp` when a rule
+  starts to name it. Ask whether a facility type is in a group, such as the
+  naval facilities, with the group's test in `KnownFacilityTypes`, never by
+  searching its name.
 - **Name a mark through `mark::<name>`,** never by a string. A key with an
   argument refers to the argument's text, so that text must outlive the key: a
   key cannot be made from a temporary string, and an argument built from parts
@@ -605,8 +710,9 @@ The marks' own, declared in `include/game/marks.hpp`:
 
 ## What is still a name
 
-Alliances and players; facility types, technologies, and the types of
-build-chart rows, upgrades and construction projects, which may be a unit or a
-facility; units, facilities, railroads, construction projects, repair jobs and
-battles; the arguments of marks; a move's details, a battle's notes and the
-political records. Each is held as a string.
+Alliances and players; power statuses; the build-chart rows themselves and the
+nation each one names; units, facilities, railroads, construction projects,
+repair jobs and battles; the arguments of marks; a move's details, a battle's
+notes and the political records; and the rule data the catalog keeps as JSON,
+such as a technology's modifiers and conversions, which name unit types and
+classes. Each is held as a string.

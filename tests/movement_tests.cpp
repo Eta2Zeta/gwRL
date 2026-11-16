@@ -144,7 +144,7 @@ void port(State &s, const Id &id, const Id &zone, const std::vector<Id> &seas,
           const Id &type = "minor_port") {
   FacilityState f;
   f.id = id;
-  f.type = type;
+  f.type = facilityTypeNumber(s, type);
   f.zone = zoneNumber(s, zone);
   for (const auto &sea : seas)
     f.flags[MarkKey(mark::border, sea)] = 1;
@@ -260,7 +260,7 @@ void railGaugeDamageCapacity() {
              s, {"one", zoneNumbers(s, {"a", "b", "c"}), MovementMode::StrategicRail, false})
              .allowed,
         "Gauge change accepted without technology");
-  s.nations.at(nationNumber(s, "japan")).technologyStages["improved_logistics"] = 4;
+  s.nations.at(nationNumber(s, "japan")).technologyStages[technologyNumber(s, "improved_logistics")] = 4;
   const auto route = validateRoute(
       s, {"one", zoneNumbers(s, {"a", "b", "c"}), MovementMode::StrategicRail, false});
   check(route.allowed && route.regions.size() == 2,
@@ -377,7 +377,7 @@ void seaRangeRefreshAndSharedPorts() {
   port(s, "source", "a", {"s0"});
   port(s, "destination", "b", {"s3"});
   check(!inSupply(s, nationNumber(s, "japan"), zoneNumber(s, "b")), "Minor port exceeded range two");
-  s.nations.at(nationNumber(s, "japan")).technologyStages["improved_logistics"] = 4;
+  s.nations.at(nationNumber(s, "japan")).technologyStages[technologyNumber(s, "improved_logistics")] = 4;
   check(inSupply(s, nationNumber(s, "japan"), zoneNumber(s, "b")),
         "Improved Logistics did not extend supply by one");
   s.nations.at(nationNumber(s, "japan")).technologyStages.clear();
@@ -667,13 +667,13 @@ void factoryRelocation() {
   s.definition = freezeDefinition(std::move(def));
   FacilityState f;
   f.id = "factory";
-  f.type = "major_factory";
+  f.type = facilityTypeNumber(s, "major_factory");
   f.zone = zoneNumber(s, "a");
   f.damage = 2;
   s.facilities[f.id] = f;
   check(!validateFactoryRailRoute(s, "factory", zoneNumbers(s, {"a", "b"})).allowed,
         "Factory moved without Improved Logistics");
-  s.nations.at(nationNumber(s, "japan")).technologyStages["improved_logistics"] = 4;
+  s.nations.at(nationNumber(s, "japan")).technologyStages[technologyNumber(s, "improved_logistics")] = 4;
   check(validateFactoryRailRoute(s, "factory", zoneNumbers(s, {"a", "b"})).allowed,
         "Eligible damaged factory could not relocate");
   s.facilities.at("factory").flags[mark::researched_this_turn] = 1;

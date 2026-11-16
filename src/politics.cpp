@@ -70,7 +70,7 @@ void queueObjectiveBonus(State& s) {
     if(!s.nations.contains(ccpNation))return;
     auto& ccp=s.nations.at(*ccpNation);
     if(!marked(ccp.gameFlags,mark::one_china_bonus_eligible_at_surrender)||marked(ccp.gameFlags,mark::one_china_bonus_awarded))return;
-    for(const auto& [type,count]:std::vector<std::pair<Id,int>>{{"cavalry",3},{"infantry",2}}) {
+    for(const auto& [type,count]:std::vector<std::pair<UnitTypeId,int>>{{knownUnitTypes(s).cavalry,3},{knownUnitTypes(s).infantry,2}}) {
         for(int i=0;i<count;++i) {
             BuildProject award;award.id=uniqueContinuation(s,"one_china_award");award.owner=*ccpNation;award.type=type;
             award.flags[mark::completed]=1;award.flags[mark::national_objective_award]=1;
@@ -476,10 +476,10 @@ void changePossession(State& s,ZoneId zone,NationId recipient,PossessionCause ca
         reconcileCapturedFacilities(s,zone,old.value_or(recipient),recipient);
         std::set<Id> removed;
         for(auto it=s.facilities.begin();it!=s.facilities.end();) {
-            if(it->second.zone==zone&&(it->second.type=="fortification"||it->second.type=="coastal_artillery"||marked(it->second.flags,mark::under_construction))) {removed.insert(it->first);it=s.facilities.erase(it);}else ++it;
+            if(it->second.zone==zone&&(it->second.type == knownFacilityTypes(s).fortification||it->second.type == knownFacilityTypes(s).coastal_artillery||marked(it->second.flags,mark::under_construction))) {removed.insert(it->first);it=s.facilities.erase(it);}else ++it;
         }
         for(auto it=s.construction.begin();it!=s.construction.end();) {
-            const auto& b=it->second;const bool facility=s.definition->catalog->facilities().contains(b.type);
+            const auto& b=it->second;const bool facility=b.type.isFacility();
             if(facility&&b.site&&(*b.site==zoneName(s,zone)||removed.contains(*b.site)))it=s.construction.erase(it);else ++it;
         }
         for(auto it=s.repairs.begin();it!=s.repairs.end();)if(removed.contains(it->second.target))it=s.repairs.erase(it);else ++it;
@@ -604,7 +604,7 @@ void surrenderNation(State& s,NationId nation,NationId attacker) {
     }
     A ships;for(auto it=s.construction.begin();it!=s.construction.end();) {
         if(it->second.owner!=nation){++it;continue;}
-        if(s.definition->catalog->isUnitType(it->second.type)&&s.definition->catalog->unit(it->second.type).classes.contains(knownUnitClasses(s).naval)){ships.emplace_back(it->first);++it;}else it=s.construction.erase(it);
+        if(it->second.type.isUnit()&&s.definition->catalog->unit(it->second.type.unit()).classes.contains(knownUnitClasses(s).naval)){ships.emplace_back(it->first);++it;}else it=s.construction.erase(it);
     }
     if(!ships.empty()) {
         require(!s.chance,"Cannot queue surrender dice over another chance event");
@@ -661,7 +661,7 @@ void PoliticsRules::apply(State& s,const Action& a) const {
         releaseDecision(s,a);s.politics.capitals[nation]=zone;s.politics.evolutionAwarded.insert(nation);s.flags.erase(MarkKey(mark::evolution_pending, a.nation));
         if(a.parameters.require("factory").asBool()) {
             const auto& node=mapNode(s,zone);const auto* city=node.find("is_city");
-            FacilityState facility;facility.id=uniqueContinuation(s,"evolution_factory");facility.zone=zone;facility.type=city&&city->asBool()?"major_factory":"medium_factory";
+            FacilityState facility;facility.id=uniqueContinuation(s,"evolution_factory");facility.zone=zone;facility.type=city&&city->asBool()?knownFacilityTypes(s).major_factory:knownFacilityTypes(s).medium_factory;
             facility.flags[mark::placed_this_turn]=1;s.facilities.emplace(facility.id,std::move(facility));
         }
         continueCombatPoliticalResolution(s);return;

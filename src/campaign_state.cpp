@@ -31,7 +31,6 @@ std::optional<Id> readOptionalId(const V& v) { return v.isNull() ? std::nullopt 
 std::optional<int> readOptionalInt(const V& v) { return v.isNull() ? std::nullopt : std::optional<int>(v.asInt()); }
 template<class C> V strings(const C& values) { A a; for (const auto& v : values) a.emplace_back(v); return V(std::move(a)); }
 std::vector<Id> readStrings(const V& v) { std::vector<Id> a; for (const auto& x : v.asArray()) a.push_back(x.asString()); return a; }
-std::set<Id> readSet(const V& v) { auto a = readStrings(v); std::set<Id> s(a.begin(), a.end()); require(s.size() == a.size(), "Duplicate set value"); return s; }
 V ints(const std::vector<int>& values) { A a; for (int v : values) a.push_back(number(v)); return V(std::move(a)); }
 // Builds an object by moving its values; an initializer list would copy each one.
 struct Field { const char* key; V value; };
@@ -45,10 +44,6 @@ V intMap(const Marks& values) { O o; for (const auto& [k,v] : values) o.emplace(
 V strings(const MarkSet& values) { A a; for (const auto key : values) a.emplace_back(key.name()); return V(std::move(a)); }
 Marks readMarks(const V& v) { Marks marks; for (const auto& [k,x] : v.asObject()) marks[parseMark(k)]=x.asInt(); return marks; }
 MarkSet readMarkSet(const V& v) { MarkSet set; for (const auto& x : v.asArray()) require(set.insert(parseMark(x.asString())), "Duplicate set value"); return set; }
-V idMap(const std::map<Id, Id>& values) { O o; for (const auto& [k,v] : values) o.emplace(k,V(v)); return V(std::move(o)); }
-V optionalIdMap(const std::map<Id, std::optional<Id>>& values) { O o; for(const auto& [k,v]:values)o.emplace(k,optionalId(v));return V(std::move(o)); }
-std::map<Id,std::optional<Id>> readOptionalIdMap(const V& v) {std::map<Id,std::optional<Id>> o;for(const auto& [k,x]:v.asObject())o.emplace(k,readOptionalId(x));return o;}
-std::map<Id,Id> readIdMap(const V& v) { std::map<Id,Id> o; for (const auto& [k,x] : v.asObject()) o.emplace(k,x.asString()); return o; }
 std::uint64_t readCounter(const V& v) {
     const auto& text=v.asString(); std::uint64_t n=0;
     require(!text.empty() && (text.size()==1 || text.front()!='0'), "Invalid decimal counter");
@@ -198,6 +193,7 @@ template<class C> void writeStrings(std::string& out,const C& values) { out+='['
 void writeInts(std::string& out,const std::vector<int>& values) { out+='['; bool first=true; for(int v:values) { if(!first)out+=','; first=false; writeInt(out,v); } out+=']'; }
 void writeIntMap(std::string& out,const std::map<Id,int>& values) { out+='{'; bool first=true; for(const auto& [k,v]:values) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; writeInt(out,v); } out+='}'; }
 // Marks list themselves in the order of their names, as the object needs.
+void writeTechnologyStages(std::string& out,const State& s,const NumberMap<TechnologyId,int>& values) { out+='{'; bool first=true; for(const auto& [k,v]:values) { if(!first)out+=','; first=false; writeString(out,technologyName(s,k)); out+=':'; writeInt(out,v); } out+='}'; }
 void writeIntMap(std::string& out,const Marks& values) { out+='{'; bool first=true; for(const auto& [k,v]:values) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; writeInt(out,v); } out+='}'; }
 template<class M,class F> void writeEntries(std::string& out,const M& entries,F&& write) { out+='{'; bool first=true; for(const auto& [k,v]:entries) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; write(v); } out+='}'; }
 // The same for entries keyed by zone number, written under the zones' names.
@@ -229,12 +225,12 @@ void writeState(std::string& out,const State& s,bool includeHistory) {
         writeKey(out,"flags",true); writeIntMap(out,x.flags); writeKey(out,"id"); writeString(out,x.id); writeKey(out,"owner"); writeString(out,nations.name(x.owner));
         writeKey(out,"paid_ipp"); writeInt(out,x.paidIpp); writeKey(out,"queue_position"); writeInt(out,x.queuePosition);
         writeKey(out,"remaining_payments"); writeInts(out,x.remainingPayments); writeKey(out,"site"); writeOptionalId(out,x.site);
-        writeKey(out,"type"); writeString(out,x.type); out+='}'; });
+        writeKey(out,"type"); writeString(out,buildTypeName(s,x.type)); out+='}'; });
     writeKey(out,"decisions"); out+='['; for(std::size_t i=0;i<s.decisions.size();++i) { if(i)out+=','; writeJson(out,decisionJson(s.decisions[i])); } out+=']';
     writeKey(out,"definition_fingerprint"); writeString(out,s.definition->fingerprint);
     writeKey(out,"facilities"); writeEntries(out,s.facilities,[&](const FacilityState& x) {
         writeKey(out,"damage",true); writeInt(out,x.damage); writeKey(out,"flags"); writeIntMap(out,x.flags); writeKey(out,"id"); writeString(out,x.id);
-        writeKey(out,"type"); writeString(out,x.type); writeKey(out,"zone"); writeString(out,zones.name(x.zone)); out+='}'; });
+        writeKey(out,"type"); writeString(out,facilityTypeName(s,x.type)); writeKey(out,"zone"); writeString(out,zones.name(x.zone)); out+='}'; });
     writeKey(out,"flags"); writeIntMap(out,s.flags);
     if(includeHistory) {
         writeKey(out,"history"); out+='['; bool first=true;
@@ -250,7 +246,7 @@ void writeState(std::string& out,const State& s,bool includeHistory) {
         writeKey(out,"at_war_with"); writeNations(out,nations,x.atWarWith); writeKey(out,"controller_nation"); writeOptionalNation(out,nations,x.controllerNation);
         writeKey(out,"game_flags"); writeIntMap(out,x.gameFlags); writeKey(out,"income_components"); writeIntMap(out,x.incomeComponents);
         writeKey(out,"income_known"); writeBool(out,x.incomeKnown); writeKey(out,"player"); writeOptionalId(out,x.player);
-        writeKey(out,"power_status"); writeString(out,x.powerStatus); writeKey(out,"technology_stages"); writeIntMap(out,x.technologyStages);
+        writeKey(out,"power_status"); writeString(out,x.powerStatus); writeKey(out,"technology_stages"); writeTechnologyStages(out,s,x.technologyStages);
         writeKey(out,"treasury"); writeOptionalInt(out,x.treasury); writeKey(out,"turn_flags"); writeIntMap(out,x.turnFlags); out+='}'; });
     writeKey(out,"politics"); writeJson(out,politicsJson(names(s),s.politics));
     writeKey(out,"rails"); writeEntries(out,s.rails,[&](const RailState& x) {
@@ -410,8 +406,11 @@ const FactionDefinition& nationFaction(const State& s,NationId nation) {
 }
 const KnownNations& knownNations(const State& s) { return names(s).known; }
 namespace {
+bool validBuildType(const Catalog& catalog,BuildType type) {
+    return type.isUnit()?type.unit().index()<catalog.unitTypes().size():type.isFacility()&&type.facility().index()<catalog.facilityTypes().size();
+}
 const Catalog& catalogOf(const State& s) {
-    if(!s.definition||!s.definition->catalog)throw std::runtime_error("Unit types need a catalog");
+    if(!s.definition||!s.definition->catalog)throw std::runtime_error("Unit types, facility types and technologies need a catalog");
     return *s.definition->catalog;
 }
 }
@@ -419,6 +418,24 @@ UnitTypeId unitTypeNumber(const State& s,std::string_view name) { return catalog
 const std::string& unitTypeName(const State& s,UnitTypeId type) { return catalogOf(s).unitTypes().name(type); }
 const KnownUnitTypes& knownUnitTypes(const State& s) { return catalogOf(s).knownUnitTypes(); }
 const KnownUnitClasses& knownUnitClasses(const State& s) { return catalogOf(s).knownUnitClasses(); }
+FacilityTypeId facilityTypeNumber(const State& s,std::string_view name) { return catalogOf(s).facilityTypes().number(name); }
+const std::string& facilityTypeName(const State& s,FacilityTypeId type) { return catalogOf(s).facilityTypes().name(type); }
+const KnownFacilityTypes& knownFacilityTypes(const State& s) { return catalogOf(s).knownFacilityTypes(); }
+TechnologyId technologyNumber(const State& s,std::string_view name) { return catalogOf(s).technologies().number(name); }
+const std::string& technologyName(const State& s,TechnologyId technology) { return catalogOf(s).technologies().name(technology); }
+const KnownTechnologies& knownTechnologies(const State& s) { return catalogOf(s).knownTechnologies(); }
+BuildType buildTypeNumber(const State& s,std::string_view name) { return catalogOf(s).buildType(name); }
+const std::string& buildTypeName(const State& s,BuildType type) { return catalogOf(s).buildTypeName(type); }
+bool hasTechnology(const State& s,NationId nation,TechnologyId technology) {
+    const auto& stages=s.nations.at(nation).technologyStages;
+    const auto i=stages.find(technology);
+    return i!=stages.end()&&i->second==4;
+}
+NumberSet<TechnologyId> completedTechnologies(const State& s,NationId nation) {
+    NumberSet<TechnologyId> out;
+    for(const auto& [technology,stage]:s.nations.at(nation).technologyStages)if(stage==4)out.insert(technology);
+    return out;
+}
 bool isNation(const State& s,NationId nation,std::string_view name) { return nation.valid()&&names(s).nations.name(nation)==name; }
 bool isNation(const State& s,const std::optional<NationId>& nation,std::string_view name) { return nation&&isNation(s,*nation,name); }
 bool hasNation(const State& s,std::string_view name) { const auto nation=findNation(s,name); return nation&&s.nations.contains(*nation); }
@@ -475,13 +492,14 @@ V State::toJson(bool includeHistory) const {
     const auto zoneValue=[&](ZoneId zone){return V(zones.name(zone));};
     const auto nationValue=[&](NationId nation){return V(nationTable.name(nation));};
     const auto optionalNation=[&](const std::optional<NationId>& nation){return nation?nationValue(*nation):V(nullptr);};
-    for(const auto& [id,x]:nations)n.emplace(nationTable.name(id),V(fields({{"controller_nation",optionalNation(x.controllerNation)},{"player",optionalId(x.player)},{"alliance",optionalId(x.alliance)},{"power_status",V(x.powerStatus)},{"treasury",optionalInt(x.treasury)},{"income_components",intMap(x.incomeComponents)},{"income_known",V(x.incomeKnown)},{"technology_stages",intMap(x.technologyStages)},{"at_war_with",nationNames(nationTable,x.atWarWith)},{"allies",nationNames(nationTable,x.allies)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}})));
+    const auto technologyStages=[&](const NumberMap<TechnologyId,int>& stages){O o;for(const auto& [k,v]:stages)o.emplace(technologyName(*this,k),number(v));return V(std::move(o));};
+    for(const auto& [id,x]:nations)n.emplace(nationTable.name(id),V(fields({{"controller_nation",optionalNation(x.controllerNation)},{"player",optionalId(x.player)},{"alliance",optionalId(x.alliance)},{"power_status",V(x.powerStatus)},{"treasury",optionalInt(x.treasury)},{"income_components",intMap(x.incomeComponents)},{"income_known",V(x.incomeKnown)},{"technology_stages",technologyStages(x.technologyStages)},{"at_war_with",nationNames(nationTable,x.atWarWith)},{"allies",nationNames(nationTable,x.allies)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}})));
     for(const auto& [id,x]:territories)t.emplace(zones.name(id),V(fields({{"possessor",optionalNation(x.possessor)},{"flags",intMap(x.flags)}})));
     for(const auto& [id,x]:units)u.emplace(id,V(fields({{"id",V(x.id)},{"type",V(unitTypeName(*this,x.type))},{"owner",nationValue(x.owner)},{"zone",zoneValue(x.zone)},{"movement_remaining",optionalInt(x.movementRemaining)},{"movement_allowance",optionalInt(x.movementAllowance)},{"turn_origin",zoneValue(x.turnOrigin)},{"route",strings(zoneNames(*this,x.route))},{"carried_by",optionalId(x.carriedBy)},{"cargo",strings(x.cargo)},{"damage",number(x.damage)},{"commitments",strings(x.commitments)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}})));
-    for(const auto& [id,x]:facilities)f.emplace(id,V(fields({{"id",V(x.id)},{"type",V(x.type)},{"zone",zoneValue(x.zone)},{"damage",number(x.damage)},{"flags",intMap(x.flags)}})));
+    for(const auto& [id,x]:facilities)f.emplace(id,V(fields({{"id",V(x.id)},{"type",V(facilityTypeName(*this,x.type))},{"zone",zoneValue(x.zone)},{"damage",number(x.damage)},{"flags",intMap(x.flags)}})));
     for(const auto& [id,x]:rails) { O damage; for(const auto& [endpoint,value]:x.damageByEndpoint)damage.emplace(zones.name(endpoint),number(value));
         r.emplace(id,V(fields({{"id",V(x.id)},{"endpoint_a",zoneValue(x.endpointA)},{"endpoint_b",zoneValue(x.endpointB)},{"damage_by_endpoint",V(std::move(damage))}}))); }
-    for(const auto& [id,x]:construction)b.emplace(id,V(fields({{"id",V(x.id)},{"owner",nationValue(x.owner)},{"type",V(x.type)},{"site",optionalId(x.site)},{"queue_position",number(x.queuePosition)},{"paid_ipp",number(x.paidIpp)},{"remaining_payments",ints(x.remainingPayments)},{"flags",intMap(x.flags)}})));
+    for(const auto& [id,x]:construction)b.emplace(id,V(fields({{"id",V(x.id)},{"owner",nationValue(x.owner)},{"type",V(buildTypeName(*this,x.type))},{"site",optionalId(x.site)},{"queue_position",number(x.queuePosition)},{"paid_ipp",number(x.paidIpp)},{"remaining_payments",ints(x.remainingPayments)},{"flags",intMap(x.flags)}})));
     for(const auto& [id,x]:repairs)j.emplace(id,V(fields({{"id",V(x.id)},{"owner",nationValue(x.owner)},{"target",V(x.target)},{"remaining_damage",number(x.remainingDamage)},{"remaining_cost",number(x.remainingCost)},{"restricts_action",V(x.restrictsAction)},{"endpoint",x.endpoint?zoneValue(*x.endpoint):V(nullptr)}})));
     for(const auto& [id,x]:battles)bs.emplace(id,V(fields({{"id",V(x.id)},{"zone",zoneValue(x.zone)},{"attacker",nationValue(x.attacker)},{"defender",nationValue(x.defender)},{"stage",V(x.stage)},{"attackers",strings(x.attackers)},{"defenders",strings(x.defenders)},{"pending_hits",intMap(x.pendingHits)},{"flags",intMap(x.flags)},{"data",x.data}})));
     for(const auto& d:decisions)ds.push_back(decisionJson(d));
@@ -499,13 +517,13 @@ State State::fromJson(std::shared_ptr<const Definition> definition,const V& v) {
     const auto& zones=names(s).zones; const auto& nationTable=names(s).nations;
     const auto zoneOf=[&](const V& x){return zones.number(x.asString());};
     const auto nationOf=[&](const V& x){return readNation(nationTable,x);};
-    for(const auto& [id,x]:v.require("nations").asObject()) { NationState n;n.controllerNation=readOptionalNation(nationTable,x.require("controller_nation"));n.player=readOptionalId(x.require("player"));n.alliance=readOptionalId(x.require("alliance"));n.powerStatus=x.require("power_status").asString();n.treasury=readOptionalInt(x.require("treasury"));n.incomeComponents=readIntMap(x.require("income_components"));n.incomeKnown=x.require("income_known").asBool();n.technologyStages=readIntMap(x.require("technology_stages"));n.atWarWith=readNationSet(nationTable,x.require("at_war_with"));n.allies=readNationSet(nationTable,x.require("allies"));n.turnFlags=readMarks(x.require("turn_flags"));n.gameFlags=readMarks(x.require("game_flags"));s.nations.emplace(nationTable.number(id),std::move(n)); }
+    for(const auto& [id,x]:v.require("nations").asObject()) { NationState n;n.controllerNation=readOptionalNation(nationTable,x.require("controller_nation"));n.player=readOptionalId(x.require("player"));n.alliance=readOptionalId(x.require("alliance"));n.powerStatus=x.require("power_status").asString();n.treasury=readOptionalInt(x.require("treasury"));n.incomeComponents=readIntMap(x.require("income_components"));n.incomeKnown=x.require("income_known").asBool();for(const auto& [tech,stage]:x.require("technology_stages").asObject())n.technologyStages.emplace(technologyNumber(s,tech),stage.asInt());n.atWarWith=readNationSet(nationTable,x.require("at_war_with"));n.allies=readNationSet(nationTable,x.require("allies"));n.turnFlags=readMarks(x.require("turn_flags"));n.gameFlags=readMarks(x.require("game_flags"));s.nations.emplace(nationTable.number(id),std::move(n)); }
     for(const auto& [id,x]:v.require("territories").asObject())s.territories.emplace(zones.number(id),TerritoryState{readOptionalNation(nationTable,x.require("possessor")),readMarks(x.require("flags"))});
     for(const auto& [id,x]:v.require("units").asObject()) { UnitState u;u.id=x.require("id").asString();u.type=unitTypeNumber(s, x.require("type").asString());u.owner=nationOf(x.require("owner"));u.zone=zoneOf(x.require("zone"));u.movementRemaining=readOptionalInt(x.require("movement_remaining"));u.movementAllowance=readOptionalInt(x.require("movement_allowance"));u.turnOrigin=zoneOf(x.require("turn_origin"));u.route=zoneNumbers(s,readStrings(x.require("route")));u.carriedBy=readOptionalId(x.require("carried_by"));u.cargo=readStrings(x.require("cargo"));u.damage=x.require("damage").asInt();u.commitments=readMarkSet(x.require("commitments"));u.turnFlags=readMarks(x.require("turn_flags"));u.gameFlags=readMarks(x.require("game_flags"));s.units.emplace(id,std::move(u)); }
-    for(const auto& [id,x]:v.require("facilities").asObject())s.facilities.emplace(id,FacilityState{x.require("id").asString(),x.require("type").asString(),zoneOf(x.require("zone")),x.require("damage").asInt(),readMarks(x.require("flags"))});
+    for(const auto& [id,x]:v.require("facilities").asObject())s.facilities.emplace(id,FacilityState{x.require("id").asString(),facilityTypeNumber(s,x.require("type").asString()),zoneOf(x.require("zone")),x.require("damage").asInt(),readMarks(x.require("flags"))});
     for(const auto& [id,x]:v.require("rails").asObject()) { std::map<ZoneId,int> damage; for(const auto& [endpoint,value]:x.require("damage_by_endpoint").asObject())damage.emplace(zones.number(endpoint),value.asInt());
         s.rails.emplace(id,RailState{x.require("id").asString(),zoneOf(x.require("endpoint_a")),zoneOf(x.require("endpoint_b")),std::move(damage)}); }
-    for(const auto& [id,x]:v.require("construction").asObject())s.construction.emplace(id,BuildProject{x.require("id").asString(),nationOf(x.require("owner")),x.require("type").asString(),readOptionalId(x.require("site")),x.require("queue_position").asInt(),x.require("paid_ipp").asInt(),readInts(x.require("remaining_payments")),readMarks(x.require("flags"))});
+    for(const auto& [id,x]:v.require("construction").asObject())s.construction.emplace(id,BuildProject{x.require("id").asString(),nationOf(x.require("owner")),buildTypeNumber(s,x.require("type").asString()),readOptionalId(x.require("site")),x.require("queue_position").asInt(),x.require("paid_ipp").asInt(),readInts(x.require("remaining_payments")),readMarks(x.require("flags"))});
     for(const auto& [id,x]:v.require("repairs").asObject())s.repairs.emplace(id,RepairJob{x.require("id").asString(),nationOf(x.require("owner")),x.require("target").asString(),x.require("remaining_damage").asInt(),x.require("remaining_cost").asInt(),x.require("restricts_action").asBool(),x.find("endpoint")&&!x.require("endpoint").isNull()?std::optional<ZoneId>(zoneOf(x.require("endpoint"))):std::nullopt});
     const auto& c=v.require("clock");s.clock={c.require("round_index").asInt(),c.require("nation_index").asInt(),parsePhase(c.require("phase").asString()),c.require("completed_rounds").asInt(),readCounter(c.require("player_turn_serial")),c.require("income_collected").asBool()};
     const auto& snapshot=v.require("turn_start");for(const auto& [id,x]:snapshot.require("possessions").asObject())s.turnStart.possessions.emplace(zones.number(id),readOptionalNation(nationTable,x));
@@ -550,7 +568,7 @@ void State::validate(std::size_t historyFrom) const {
         require(ids.size()<2||std::set<Item>(ids.begin(),ids.end()).size()==ids.size(),message);
     };
     for(const auto& [id,f]:definition->factions)require(f.dormant||nations.contains(nationTable.number(id)),"State faction inventory differs from definition");
-    for(const auto& [id,n]:nations) { if(!id.valid()||id.index()>=nationTable.size())throw std::runtime_error("Undefined national identity");if(n.controllerNation)nation(*n.controllerNation);if(n.player)require(definition->players.contains(*n.player),"Unknown controlling player");if(n.alliance)require(!n.alliance->empty(),"Empty alliance identity");require(!n.powerStatus.empty(),"Missing power status");if(n.treasury)require(*n.treasury>=0,"Negative treasury");for(const auto& [tech,stage]:n.technologyStages){require(!tech.empty()&&stage>=0,"Invalid technology stage");if(definition->catalog)require(stage<=4&&definition->catalog->technologies().contains(tech),"Unknown catalog technology/stage");}for(const auto& other:n.atWarWith){nation(other);require(other!=id,"Nation cannot be at war with itself");}for(const auto& other:n.allies){nation(other);require(other!=id,"Nation cannot ally with itself");} }
+    for(const auto& [id,n]:nations) { if(!id.valid()||id.index()>=nationTable.size())throw std::runtime_error("Undefined national identity");if(n.controllerNation)nation(*n.controllerNation);if(n.player)require(definition->players.contains(*n.player),"Unknown controlling player");if(n.alliance)require(!n.alliance->empty(),"Empty alliance identity");require(!n.powerStatus.empty(),"Missing power status");if(n.treasury)require(*n.treasury>=0,"Negative treasury");for(const auto& [tech,stage]:n.technologyStages)require(definition->catalog&&tech.index()<definition->catalog->technologies().size()&&stage>=0&&stage<=4,"Unknown catalog technology/stage");for(const auto& other:n.atWarWith){nation(other);require(other!=id,"Nation cannot be at war with itself");}for(const auto& other:n.allies){nation(other);require(other!=id,"Nation cannot ally with itself");} }
     if(mapIndex) { for(const auto id:mapIndex->landZones)if(!territories.contains(id))throw std::runtime_error("Missing retained territory: "+zones.name(id)); }
     else for(const auto& [id,node]:nodes)if(node.require("type").asString()=="land"&&!territories.contains(zones.number(id)))throw std::runtime_error("Missing retained territory: "+id);
     for(const auto& [id,t]:territories){land(id);if(t.possessor)nation(*t.possessor);}
@@ -568,9 +586,10 @@ void State::validate(std::size_t historyFrom) const {
         if(u.carriedBy){require(units.contains(*u.carriedBy),"Unknown carrier");const auto& carrier=units.at(*u.carriedBy);require(std::count(carrier.cargo.begin(),carrier.cargo.end(),id)==1,"Carrier omits cargo");require(carrier.zone==u.zone,"Cargo and carrier locations differ");}
         if(u.carriedBy){std::set<Id> chain{id};auto parent=u.carriedBy;while(parent){require(chain.insert(*parent).second,"Cargo cycle");require(units.contains(*parent),"Unknown carrier");parent=units.at(*parent).carriedBy;}}
     }
-    for(const auto& [id,f]:facilities){require(!id.empty()&&id==f.id&&!f.type.empty(),"Invalid facility identity/type");land(f.zone);require(f.damage>=0,"Negative facility damage");require(!units.contains(id),"Unit/facility identity collision");if(definition->catalog){const auto& type=definition->catalog->facility(f.type);const auto captured=f.flags.find(mark::captured_max_damage);const int maximum=captured==f.flags.end()?type.maxDamage.value_or(f.damage):captured->second;require(maximum>=0&&f.damage<=maximum,"Facility damage exceeds maximum");}}
+    // A facility's type, and a project's, are numbers in the catalog's tables, so they need a catalog too.
+    for(const auto& [id,f]:facilities){require(!id.empty()&&id==f.id&&definition->catalog&&f.type.valid()&&f.type.index()<definition->catalog->facilityTypes().size(),"Invalid facility identity/type");land(f.zone);require(f.damage>=0,"Negative facility damage");require(!units.contains(id),"Unit/facility identity collision");if(definition->catalog){const auto& type=definition->catalog->facility(f.type);const auto captured=f.flags.find(mark::captured_max_damage);const int maximum=captured==f.flags.end()?type.maxDamage.value_or(f.damage):captured->second;require(maximum>=0&&f.damage<=maximum,"Facility damage exceeds maximum");}}
     for(const auto& [id,r]:rails){require(!id.empty()&&id==r.id&&r.endpointA<r.endpointB,"Invalid railway identity/endpoints");land(r.endpointA);land(r.endpointB);require(id==railroadId(*this,r.endpointA,r.endpointB),"A railroad is named by its border (one railroad per border)");require(!units.contains(id)&&!facilities.contains(id),"Ambiguous repair target identity");for(const auto& [endpoint,damage]:r.damageByEndpoint)require((endpoint==r.endpointA||endpoint==r.endpointB)&&damage>=0,"Invalid railway damage endpoint");}
-    for(const auto& [id,b]:construction){require(!id.empty()&&id==b.id&&!b.type.empty(),"Invalid construction identity/type");nation(b.owner);if(b.site)require(zones.contains(*b.site)||facilities.contains(*b.site),"Unknown construction site");require(b.queuePosition>=1&&b.paidIpp>=0,"Invalid build stage/payment");for(auto payment:b.remainingPayments)require(payment>=0,"Negative remaining build payment");if(definition->catalog)require(definition->catalog->isUnitType(b.type)||definition->catalog->facilities().contains(b.type),"Unknown construction type");}
+    for(const auto& [id,b]:construction){require(!id.empty()&&id==b.id&&definition->catalog&&validBuildType(*definition->catalog,b.type),"Invalid construction identity/type");nation(b.owner);if(b.site)require(zones.contains(*b.site)||facilities.contains(*b.site),"Unknown construction site");require(b.queuePosition>=1&&b.paidIpp>=0,"Invalid build stage/payment");for(auto payment:b.remainingPayments)require(payment>=0,"Negative remaining build payment");}
     for(const auto& [id,r]:repairs){require(!id.empty()&&id==r.id,"Invalid repair identity");nation(r.owner);const auto targetZone=zones.find(r.target);require(units.contains(r.target)||facilities.contains(r.target)||rails.contains(r.target)||(targetZone&&territories.contains(*targetZone))||construction.contains(r.target),"Unknown repair target");require(r.remainingDamage>=0&&r.remainingCost>=0,"Negative repair work/cost");require(!rails.contains(r.target)||r.endpoint,"Railroad repair names its side");if(r.endpoint){require(rails.contains(r.target),"Only railroad repair has an endpoint");const auto& rail=rails.at(r.target);require(*r.endpoint==rail.endpointA||*r.endpoint==rail.endpointB,"Repair endpoint not on border");}}
     require(clock.roundIndex>=0&&clock.roundIndex<definition->calendarRounds,"Invalid calendar round");require(clock.completedRounds>=0&&clock.completedRounds<=definition->calendarRounds,"Invalid completed-round count");(void)currentNation();(void)toString(clock.phase);
     require(clock.completedRounds == clock.roundIndex + (terminal ? 1 : 0),

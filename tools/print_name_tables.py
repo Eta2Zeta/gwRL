@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Print the tables that number the scenario's names.
 
-Inside the engine a zone, a nation, a unit type, a unit class or the base of a
-mark is held as a number, not as its name: its place in the sorted list of the
-names of that kind, counted from 0, the definition's for zones and nations, the
-catalog's for unit types and classes, and the engine's mark table for marks
-(include/game/names.hpp, include/game/marks.hpp and docs/engine/names.md). Saved positions, actions and
-the Python interface keep the names. This prints each kind's table, number and
-name, as Markdown, for the scenario the training plays, or for another scenario
-folder:
+Inside the engine a zone, a nation, a unit type, a unit class, a facility type,
+a technology or the base of a mark is held as a number, not as its name: its
+place in the sorted list of the names of that kind, counted from 0, the
+definition's for zones and nations, the catalog's for unit types, unit classes,
+facility types and technologies, and the engine's mark table for marks
+(include/game/names.hpp, include/game/marks.hpp and docs/engine/names.md).
+Saved positions, actions and the Python interface keep the names. This prints
+each kind's table, number and name, as Markdown, for the scenario the training
+plays, or for another scenario folder:
 
     .venv/bin/python tools/print_name_tables.py
     .venv/bin/python tools/print_name_tables.py --kind nations --scenario game_content/scenarios/japan_china_1936
@@ -53,7 +54,8 @@ def kind_table(kind: str, names: list[str]) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--scenario", type=Path, default=SCENARIO, help="Scenario folder (default: the training scenario)")
-    parser.add_argument("--kind", help="Print only this kind of name: zones, nations, unit_types, unit_classes or marks")
+    parser.add_argument("--kind", help="Print only this kind of name: zones, nations, unit_types, unit_classes, "
+                                       "facility_types, technologies or marks")
     args = parser.parse_args(argv)
     found = tables(args.scenario)
     kinds = [args.kind] if args.kind else sorted(found)

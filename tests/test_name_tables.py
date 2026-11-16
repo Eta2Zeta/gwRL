@@ -15,7 +15,8 @@ class NameTablesTest(unittest.TestCase):
     def test_the_page_lists_the_engines_numbers(self):
         page = (ROOT / "docs/engine/names.md").read_text(encoding="utf-8")
         found = tables(SCENARIO)
-        self.assertEqual(sorted(found), ["marks", "nations", "unit_classes", "unit_types", "zones"],
+        self.assertEqual(sorted(found), ["facility_types", "marks", "nations", "technologies", "unit_classes",
+                                         "unit_types", "zones"],
                          "The engine numbers other kinds of name")
         for kind, names in found.items():
             with self.subTest(kind=kind):

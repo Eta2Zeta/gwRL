@@ -238,7 +238,7 @@ void flightMayPrecedeItsLandingCarrier() {
 void bombingDamageThenAAAndReplay() {
     auto s = fixture();
     add(s, "b", "medium_bomber", "japan", beiping);
-    s.facilities["factory"] = {"factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
+    s.facilities["factory"] = {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}};
     Engine e(s, rules(), 4);
     e.setDiceTapeForTesting({6, 1});
     auto checkpoint = e.serialize();
@@ -261,7 +261,7 @@ void interceptorAndEscortSimultaneous() {
     add(s, "b", "medium_bomber", "japan", beiping);
     add(s, "escort", "fighter", "japan", beiping);
     add(s, "i", "fighter", "kmt", hopeh);
-    s.facilities["factory"] = {"factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
+    s.facilities["factory"] = {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}};
     Engine e(s, rules());
     choose(e, "air_bomb",
            [](const auto &a) { return a.parameters.require("target").asString() == "factory"; });
@@ -301,8 +301,8 @@ void cityPermanentIPPAndDestruction() {
 }
 void improvedConstructionPerPlayerTurn() {
     auto s = fixture();
-    s.nations.at(nationNumber(s, "kmt")).technologyStages["improved_construction"] = 4;
-    s.facilities["factory"] = {"factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
+    s.nations.at(nationNumber(s, "kmt")).technologyStages[technologyNumber(s, "improved_construction")] = 4;
+    s.facilities["factory"] = {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}};
     applyFacilityBombDamage(s, "factory", 4);
     applyFacilityBombDamage(s, "factory", 4);
     check(s.facilities.at("factory").damage == 3, "Factory mitigation stacked across missions");
@@ -558,7 +558,7 @@ void aRaidOnAVanishedProjectDoesNothing() {
     // before the damage roll (seed 8215 of the 2 November random games).
     auto s = fixture();
     add(s, "b", "medium_bomber", "japan", beiping);
-    s.construction["project"] = BuildProject{"project", nationNumber(s, "kmt"), "medium_factory", hopeh, 1, 3, {3}};
+    s.construction["project"] = BuildProject{"project", nationNumber(s, "kmt"), buildTypeNumber(s, "medium_factory"), hopeh, 1, 3, {3}};
     Engine e(s, rules(), 4);
     choose(e, "air_bomb",
            [](const auto &a) { return a.parameters.require("target").asString() == "project"; });

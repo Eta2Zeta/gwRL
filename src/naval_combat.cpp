@@ -26,10 +26,6 @@ bool sub(const State& s, const UnitState& u) { return has(s, u, knownUnitClasses
 bool plane(const State& s, const UnitState& u) { return has(s, u, knownUnitClasses(s).aircraft); }
 bool fighter(const State& s, const UnitState& u) { return has(s, u, knownUnitClasses(s).fighter); }
 bool transport(const State& s, const UnitState& u) { return has(s, u, knownUnitClasses(s).naval_transport); }
-bool tech(const State& s, NationId owner, const Id& t) {
-    const auto it = s.nations.at(owner).technologyStages.find(t);
-    return it != s.nations.at(owner).technologyStages.end() && it->second == 4;
-}
 O object(const BattleState& b, const Id& key) { auto p = b.data.find(key); return p ? p->asObject() : O{}; }
 A array(const BattleState& b, const Id& key) { auto p = b.data.find(key); return p ? p->asArray() : A{}; }
 Id string(const BattleState& b, const Id& key, const Id& fallback = "") {
@@ -202,7 +198,7 @@ void shoot(State& s, BattleState& b, const Id& stage) {
             auto threshold = attacking ? stats.attack : stats.defense;
             int dice = attacking ? stats.attackDice : stats.defenseDice;
             bool aswTransport = false;
-            if (!attacking && u.type == knownUnitTypes(s).naval_transport && tech(s, u.owner, "anti_submarine_warfare") &&
+            if (!attacking && u.type == knownUnitTypes(s).naval_transport && hasTechnology(s, u.owner, knownTechnologies(s).anti_submarine_warfare) &&
                 std::any_of(opponents.begin(), opponents.end(), [&](const Id& enemy) { return sub(s, s.units.at(enemy)); })) {
                 threshold = 1; dice = 1; aswTransport = true;
             }
@@ -228,7 +224,7 @@ void shoot(State& s, BattleState& b, const Id& stage) {
                                      {"threshold", num(*threshold)}, {"target", num(target)},
                                      {"target_classes", V(classes)}, {"eligible", V(ids(eligible))},
                                      {"air_priority", V(air)},
-                                     {"asw_sub_bonus", num(attacking && u.type == knownUnitTypes(s).seaplane && onMap(s, id) && tech(s, u.owner, "anti_submarine_warfare") ? 2 : 0)}});
+                                     {"asw_sub_bonus", num(attacking && u.type == knownUnitTypes(s).seaplane && onMap(s, id) && hasTechnology(s, u.owner, knownTechnologies(s).anti_submarine_warfare) ? 2 : 0)}});
         }
     }
     const Id after = first ? "naval_air_superiority" : air ? "naval_attacker_fire" :
@@ -528,8 +524,8 @@ void prepareShipScrambles(State& s, BattleState& b) {
                 if (value && key.base() == mark::in_port) facility = std::string(key.argument());
             if (facility.empty() || !s.facilities.contains(facility)) continue;
             const auto& f = s.facilities.at(facility);
-            if (f.damage || (sub(s, u) ? f.type != "submarine_base" :
-                f.type != "major_port" && f.type != "major_dockyard" && f.type != "major_shipyard")) continue;
+            if (f.damage || (sub(s, u) ? f.type != knownFacilityTypes(s).submarine_base :
+                f.type != knownFacilityTypes(s).major_port && f.type != knownFacilityTypes(s).major_dockyard && f.type != knownFacilityTypes(s).major_shipyard)) continue;
             const auto seas = navalFacilitySeaZones(s, facility);
             if (std::find(seas.begin(), seas.end(), b.zone) == seas.end()) continue;
             const auto owner = s.territories.at(f.zone).possessor;
@@ -537,7 +533,7 @@ void prepareShipScrambles(State& s, BattleState& b) {
                 marked(f.flags, mark::placed_this_turn) || (*owner == u.owner && !heldSinceNationTurnStart(s, u.owner, f.zone, false))) continue;
             int spent = marked(f.flags, mark::naval_scramble_turn) && f.flags.at(mark::naval_scramble_turn) == static_cast<int>(s.clock.playerTurnSerial + 1) ?
                 (f.flags.contains(mark::naval_scramble_used) ? f.flags.at(mark::naval_scramble_used) : 0) : 0;
-            if (!tech(s, *owner, "radar") && spent >= 3) continue;
+            if (!hasTechnology(s, *owner, knownTechnologies(s).radar) && spent >= 3) continue;
             std::vector<Action> options{
                 action(s, u.owner, "naval_decline_scramble", {{"battle", V(b.id)}, {"unit", V(id)}}),
                 action(s, u.owner, "naval_scramble", {{"battle", V(b.id)}, {"unit", V(id)}, {"facility", V(facility)}})};
@@ -836,8 +832,8 @@ bool applyNavalCombatChance(State& s, const ChanceRequest& request, const Chance
             const auto& u = s.units.at(id); if (has(s, u, knownUnitClasses(s).surface_warship)) ++opponent;
             if (plane(s, u) && s.definition->catalog->stats(u.type, u.damage, catalogContext(s, u.owner, u.zone)).attack) opponent += 4;
         }
-        const int raider = results[0] + 6 + (tech(s, owner, "radar") ? 1 : 0);
-        const int attack = results[1] + opponent + (tech(s, b.attacker, "radar") ? 1 : 0);
+        const int raider = results[0] + 6 + (hasTechnology(s, owner, knownTechnologies(s).radar) ? 1 : 0);
+        const int attack = results[1] + opponent + (hasTechnology(s, b.attacker, knownTechnologies(s).radar) ? 1 : 0);
         if (raider == attack) { roll(s, b, "naval_raider_discovery", 2); return true; }
         if (raider > attack) {
             decision(s, b, owner, "naval_raider_slip_choice", {

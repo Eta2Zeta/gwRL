@@ -91,8 +91,8 @@ void declareRocket(Engine &e) {
 void rocketRadarBeforeDamage() {
   auto s = fixture();
   add(s, "rocket", "strategic_rocket", "japan", beiping);
-  s.facilities["factory"] = {"factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
-  s.nations.at(nationNumber(s, "kmt")).technologyStages["radar"] = 4;
+  s.facilities["factory"] = {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}};
+  s.nations.at(nationNumber(s, "kmt")).technologyStages[technologyNumber(s, "radar")] = 4;
   Engine hit(s, rules());
   hit.setDiceTapeForTesting({1});
   declareRocket(hit);
@@ -124,7 +124,7 @@ void rocketRadarBeforeDamage() {
 void rocketWithoutRadar() {
   auto s = fixture();
   add(s, "rocket", "strategic_rocket", "japan", beiping);
-  s.facilities["factory"] = {"factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
+  s.facilities["factory"] = {"factory", facilityTypeNumber(s, "major_factory"), zoneNumber(s, hopeh), 0, {}};
   Engine e(s, rules());
   e.setDiceTapeForTesting({4});
   declareRocket(e);
@@ -141,8 +141,8 @@ void selectedSurpriseBombingUsesFirstStrikeWithoutRemovingFacilityAA() {
   s.nations.at(nationNumber(s, "japan")).turnFlags[MarkKey(mark::surprise_attack_target, "kmt")]=1;
   add(s,"bomber","medium_bomber","japan",beiping);add(s,"escort","fighter","japan",beiping);
   add(s,"local","fighter","kmt",hopeh);add(s,"adjacent","fighter","kmt",shensi);
-  s.territories.at(zoneNumber(s, shensi)).possessor=nationNumber(s, "kmt");s.facilities["base"]={"base","airbase",zoneNumber(s, shensi),0,{}};
-  s.facilities["factory"]={"factory","major_factory",zoneNumber(s, hopeh),0,{}};s.captureTurnStart();
+  s.territories.at(zoneNumber(s, shensi)).possessor=nationNumber(s, "kmt");s.facilities["base"]={"base",facilityTypeNumber(s, "airbase"),zoneNumber(s, shensi),0,{}};
+  s.facilities["factory"]={"factory",facilityTypeNumber(s, "major_factory"),zoneNumber(s, hopeh),0,{}};s.captureTurnStart();
   Engine e(s,rules(),32);e.setDiceTapeForTesting({1,12,4,12,12});const auto checkpoint=e.serialize();
   choose(e,"land_select_surprise_zone",[](const auto& a){return a.parameters.require("zone").asString()==hopeh;});
   choose(e,"air_bomb",[](const auto& a){return a.parameters.require("target").asString()=="factory";});
@@ -165,7 +165,7 @@ void selectedSurpriseBombingUsesFirstStrikeWithoutRemovingFacilityAA() {
 }
 void rocketRangeIgnoresAircraftInterceptionAndRequiresNoTransport() {
   auto s=fixture();add(s,"rocket","strategic_rocket","japan",beiping);
-  add(s,"blocker","fighter","kmt",hopeh);s.facilities["factory"]={"factory","major_factory",zoneNumber(s, shensi),0,{}};
+  add(s,"blocker","fighter","kmt",hopeh);s.facilities["factory"]={"factory",facilityTypeNumber(s, "major_factory"),zoneNumber(s, shensi),0,{}};
   s.territories.at(zoneNumber(s, shensi)).possessor=nationNumber(s, "kmt");
   const auto actions=AirRules{}.actions(s);
   check(std::any_of(actions.begin(),actions.end(),[](const auto& a){return a.kind=="air_rocket_attack"&&
@@ -184,8 +184,8 @@ void artilleryCityBombingStaysAdjacentAndBypassesAirDefence() {
     auto s=fixture();add(s,"gun",type,"japan",shantung);add(s,"lift","heavy_air_transport","japan",shantung);
     add(s,"interceptor","fighter","kmt",nanking);
     add(s,"aaa","anti_aircraft_artillery","kmt",nanking);
-    s.facilities["fort"]={"fort","fortification",zoneNumber(s, nanking),0,{}};
-    s.nations.at(nationNumber(s, "kmt")).technologyStages["radar"]=4;s.captureTurnStart();
+    s.facilities["fort"]={"fort",facilityTypeNumber(s, "fortification"),zoneNumber(s, nanking),0,{}};
+    s.nations.at(nationNumber(s, "kmt")).technologyStages[technologyNumber(s, "radar")]=4;s.captureTurnStart();
     Engine e(s,rules(),77);e.setDiceTapeForTesting({6});const auto checkpoint=e.serialize();
     choose(e,"air_artillery_city_bomb");
     check(e.state().units.at("gun").zone == zoneNumber(e.state(), shantung)&&e.state().units.at("gun").movementRemaining==0&&
@@ -227,21 +227,21 @@ void artilleryCityBombingRequiresAnUnmovedStartingNeighbor() {
 }
 void artilleryCityDestructionUsesTheExistingTechnologyChoice() {
   auto s=fixture();add(s,"gun","advanced_artillery","japan",shantung);s.captureTurnStart();
-  s.territories.at(zoneNumber(s, nanking)).flags[mark::city_damage]=44;s.nations.at(nationNumber(s, "kmt")).technologyStages["radar"]=1;
+  s.territories.at(zoneNumber(s, nanking)).flags[mark::city_damage]=44;s.nations.at(nationNumber(s, "kmt")).technologyStages[technologyNumber(s, "radar")]=1;
   Engine e(s,rules());e.setDiceTapeForTesting({1});choose(e,"air_artillery_city_bomb");
   choose(e,"end_phase");choose(e,"air_begin_bombing");e.resolveChance();
   check(e.state().territories.at(zoneNumber(e.state(), nanking)).flags.at(mark::city_destroyed)==1&&
         e.state().decisions.back().kind=="air_destroyed_city_technology","Artillery city destruction omitted technology loss");
   choose(e,"air_choose_technology_loss");
-  check(e.state().nations.at(nationNumber(e.state(), "kmt")).technologyStages.at("radar")==0&&e.state().battles.empty()&&
+  check(e.state().nations.at(nationNumber(e.state(), "kmt")).technologyStages.at(technologyNumber(e.state(), "radar"))==0&&e.state().battles.empty()&&
         e.state().units.contains("gun"),"Artillery city destruction did not complete after its technology choice");
 }
 void destroyedCityTechnologyChoice() {
   auto s = fixture();
   s.territories.at(zoneNumber(s, nanking)).possessor = nationNumber(s, "kmt");
   s.territories.at(zoneNumber(s, nanking)).flags[mark::city_damage] = 44;
-  s.nations.at(nationNumber(s, "kmt")).technologyStages["radar"] = 1;
-  s.nations.at(nationNumber(s, "kmt")).technologyStages["improved_logistics"] = 2;
+  s.nations.at(nationNumber(s, "kmt")).technologyStages[technologyNumber(s, "radar")] = 1;
+  s.nations.at(nationNumber(s, "kmt")).technologyStages[technologyNumber(s, "improved_logistics")] = 2;
   add(s, "bomber", "medium_bomber", "japan", shantung);
   s.captureTurnStart();
   Engine e(s, rules());
@@ -265,9 +265,9 @@ void destroyedCityTechnologyChoice() {
   choose(e, "air_choose_technology_loss", [](const auto &a) {
     return a.parameters.require("technology").asString() == "radar";
   });
-  check(e.state().nations.at(nationNumber(e.state(), "kmt")).technologyStages.at("radar") == 0 &&
+  check(e.state().nations.at(nationNumber(e.state(), "kmt")).technologyStages.at(technologyNumber(e.state(), "radar")) == 0 &&
             e.state().nations.at(nationNumber(e.state(), "kmt")).technologyStages.at(
-                "improved_logistics") == 2,
+                technologyNumber(e.state(), "improved_logistics")) == 2,
         "City destruction changed unchosen technology");
 }
 State scrambledFixture() {
@@ -277,7 +277,7 @@ State scrambledFixture() {
   add(s, "attacker", "infantry", "japan", hopeh);
   add(s, "defender", "infantry", "kmt", hopeh);
   add(s, "scrambler", "fighter", "kmt", shensi);
-  s.facilities["base"] = {"base", "airbase", zoneNumber(s, shensi), 0, {}};
+  s.facilities["base"] = {"base", facilityTypeNumber(s, "airbase"), zoneNumber(s, shensi), 0, {}};
   const auto id = registerLandBattle(s, zoneNumber(s, hopeh), nationNumber(s, "japan"), {"attacker"},
                                      {{"attacker", zoneNumber(s, beiping)}});
   beginAirDefence(s, id);

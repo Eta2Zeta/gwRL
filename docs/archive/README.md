@@ -61,6 +61,7 @@ the first learning stage.
 | 16 Nov | [Nations held as numbers](records/nation_numbers_2026_11_16.md) | Identical play again; after zones, listing the moves takes a further 6.6% fewer instructions and a searched game 3.9% to 4.7% fewer, 11.6% fewer than before either change. |
 | 16 Nov | [Unit types held as numbers](records/unit_type_numbers_2026_11_16.md) | Identical play again; after nations, listing the moves takes a further 4.7% fewer instructions and a searched game 2.5% fewer, 13.8% fewer than before any of the three changes. |
 | 16 Nov | [Marks held as numbers](records/mark_numbers_2026_11_16.md) | Identical play again (after fixing a bug the check caught); after unit types, listing the moves takes a further 9.0% fewer instructions and a searched game 4.9% fewer, 18.1% fewer than before any of the four changes. |
+| 16 Nov | [Facility types and technologies held as numbers](records/facility_type_numbers_2026_11_16.md) | Identical play again; after marks, listing the moves takes a further 14.0% fewer instructions and a searched game 4.0% fewer, 21.4% fewer than before any of the five changes; the build menu's factory capacity check, which copied every mark by name, fell from 5.0% to 0.4% of a searched game's engine samples. |
 
 ### The engine
 

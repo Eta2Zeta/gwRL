@@ -22,10 +22,6 @@ template <class Message> void require(bool ok, const Message &why) {
 V number(int n) { return V(static_cast<double>(n)); }
 bool marked(const Marks &flags, const MarkKey &key) { return flags.value(key) != 0; }
 int value(const Marks &flags, const MarkKey &key) { return flags.value(key); }
-int value(const std::map<Id, int> &values, const Id &key) {
-  const auto found = values.find(key);
-  return found == values.end() ? 0 : found->second;
-}
 bool has(const State &s, const UnitState &u, UnitClassId cls) {
   return unitClass(s, u, cls);
 }
@@ -38,9 +34,6 @@ bool sea(const State &s, ZoneId zone) {
 bool adjacent(const State &s, ZoneId a, ZoneId b) {
   const auto *e = mapEdge(s, a, b);
   return e && (!e->find("passable") || e->require("passable").asBool());
-}
-bool tech(const State &s, NationId n, const Id &id) {
-  return value(s.nations.at(n).technologyStages, id) == 4;
 }
 A ids(const std::vector<Id> &units) {
   A a;
@@ -220,10 +213,10 @@ int allowanceBeforeSurprise(const State &s, const UnitState &u, ZoneId routeStar
   }
   bool facilityBonus = false;
   for (const auto &[id, f] : s.facilities) {
-    const bool type = has(s, u, knownUnitClasses(s).submarine) ? f.type == "submarine_base"
-                                             : f.type == "major_port" ||
-                                                   f.type == "major_dockyard" ||
-                                                   f.type == "major_shipyard";
+    const bool type = has(s, u, knownUnitClasses(s).submarine) ? f.type == knownFacilityTypes(s).submarine_base
+                                             : f.type == knownFacilityTypes(s).major_port ||
+                                                   f.type == knownFacilityTypes(s).major_dockyard ||
+                                                   f.type == knownFacilityTypes(s).major_shipyard;
     if (!type || f.damage || marked(f.flags, mark::placed_this_turn))
       continue;
     const auto owner = s.territories.at(f.zone).possessor;
@@ -932,7 +925,7 @@ bool visitNavalRoutes(const State &s, const std::vector<Id> &selected,
         return true;
       if (strategicEligible)
         for (const auto &[origin, f] : s.facilities)
-          if (f.type.rfind("major_", 0) == 0) {
+          if (knownFacilityTypes(s).major(f.type)) {
             const auto access = navalFacilitySeaZones(s, origin);
             if (std::find(access.begin(), access.end(), start) == access.end())
               continue;
@@ -951,7 +944,7 @@ bool visitNavalRoutes(const State &s, const std::vector<Id> &selected,
                   if (path.size() >
                       static_cast<std::size_t>(
                           4 +
-                          (tech(s, nation, "improved_logistics") ? 1 : 0)))
+                          (hasTechnology(s, nation, knownTechnologies(s).improved_logistics) ? 1 : 0)))
                     return false;
                   for (const auto next : mapNeighbors(s, path.back())) {
                     if (!sea(s, next) ||
@@ -1212,7 +1205,7 @@ int strategicNavalCapacity(const State &s, NationId n) {
              : name == "usa"                                                  ? 4
              : name == "italy" || name == "france" || name == "great_britain" ? 3
                                                                               : 0;
-  if (tech(s, n, "improved_logistics"))
+  if (hasTechnology(s, n, knownTechnologies(s).improved_logistics))
     base += 2;
   if (marked(s.nations.at(n).gameFlags, mark::access_to_resources_completed))
     ++base;
@@ -1319,7 +1312,7 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
       return fail("Strategic movement requires origin and destination naval "
                   "facilities");
     const auto &f = s.facilities.at(*r.originFacility);
-    if (f.type.rfind("major_", 0) != 0 ||
+    if (!knownFacilityTypes(s).major(f.type) ||
         !navalFacilityUsable(s, n, *r.originFacility) ||
         !navalFacilityUsable(s, n, *r.destinationFacility) ||
         !inSupply(s, n, f.zone) ||
@@ -1333,7 +1326,7 @@ RouteResult validateNavalRoute(const State &s, const NavalRouteRequest &r) {
         std::find(destination.begin(), destination.end(), r.path.back()) ==
             destination.end())
       return fail("Strategic endpoints do not match facility accesses");
-    if (totalCost > 4 + (tech(s, n, "improved_logistics") ? 1 : 0) ||
+    if (totalCost > 4 + (hasTechnology(s, n, knownTechnologies(s).improved_logistics) ? 1 : 0) ||
         value(s.nations.at(n).turnFlags, mark::strategic_naval_used) +
                 strategicCost >
             strategicNavalCapacity(s, n))
@@ -1829,9 +1822,9 @@ bool applyNavalMovementChance(State &s, const ChanceRequest &request,
   for (const auto &id : enemies) {
     const auto &u = s.units.at(id);
     opponent += isAircraft(s, u) ? 4 : has(s, u, knownUnitClasses(s).surface_warship) ? 1 : 0;
-    radar |= tech(s, u.owner, "radar");
+    radar |= hasTechnology(s, u.owner, knownTechnologies(s).radar);
   }
-  const int own = rolls[0] + 6 + (tech(s, b.attacker, "radar") ? 1 : 0),
+  const int own = rolls[0] + 6 + (hasTechnology(s, b.attacker, knownTechnologies(s).radar) ? 1 : 0),
             enemy = rolls[1] + opponent + (radar ? 1 : 0);
   if (own == enemy) {
     s.chance = request;

@@ -83,10 +83,6 @@ bool restrictedTerrain(const std::set<Id> &t) {
 bool inHome(const State &s, NationId nation, ZoneId zone) {
   return nationFaction(s, nation).homeZones.contains(zone);
 }
-bool hasTech(const State &s, NationId nation, const Id &tech) {
-  auto i = s.nations.at(nation).technologyStages.find(tech);
-  return i != s.nations.at(nation).technologyStages.end() && i->second == 4;
-}
 bool damagedThisTurn(const State &s, const Id &id) {
   auto i = s.flags.find(MarkKey(mark::logistics_damaged_turn, id));
   return i != s.flags.end() &&
@@ -153,8 +149,7 @@ bool opposingFortification(const State &s, NationId nation, ZoneId from,
       !hostile(s, nation, *s.territories.at(to).possessor))
     return false;
   for (const auto &[id, f] : s.facilities)
-    if (f.zone == to &&
-        (f.type == "fortification" || f.type == "improved_fortification")) {
+    if (f.zone == to && f.type == knownFacilityTypes(s).fortification) {
       if (truth(node(s, to), "is_city") || flag(f.flags, MarkKey(mark::border, zoneName(s, from))))
         return true;
       const auto *metadata = s.definition->geography.find("facilities");
@@ -172,18 +167,14 @@ bool opposingFortification(const State &s, NationId nation, ZoneId from,
 std::string railCounter(const State &s, const Id &region) {
   return politicalPlayer(s, s.currentNation()) + ":" + region;
 }
-int navalRange(const FacilityState &f) {
-  return f.type.rfind("major_", 0) == 0 ? 4 : 2;
-}
-bool navalFacilityType(const Id &t) {
-  return t.find("port") != Id::npos || t.find("dockyard") != Id::npos ||
-         t.find("shipyard") != Id::npos;
+int navalRange(const State &s, const FacilityState &f) {
+  return knownFacilityTypes(s).major(f.type) ? 4 : 2;
 }
 bool narrowBlocked(const State &s, NationId nation, const V &e, bool combat,
                    ZoneId target) {
   if (combat)
     for (const auto &[id, f] : s.facilities)
-      if (f.zone == target && f.type == "coastal_artillery")
+      if (f.zone == target && f.type == knownFacilityTypes(s).coastal_artillery)
         return true;
   const auto *seas = e.find("narrow_crossing_sea_zones");
   if (!seas)
@@ -553,7 +544,7 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
           !riverRouteAvailable(s, u.owner, a, b))
         return fail("This route is not a river route");
       if (railUndamaged(s, a, b) && !riverRouteAvailable(s, u.owner, a, b) &&
-          gaugeChange(s, a, b) && !hasTech(s, u.owner, "improved_logistics"))
+          gaugeChange(s, a, b) && !hasTechnology(s, u.owner, knownTechnologies(s).improved_logistics))
         return fail("Gauge change requires Improved Logistics");
       out.regions.insert(railRegion(s, a));
       out.regions.insert(railRegion(s, b));
@@ -618,7 +609,7 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
                       .turnFlags.find(MarkKey(mark::rail_used, counter));
       const int capacity =
           regionalRailCapacity(region) +
-          (hasTech(s, s.currentNation(), "improved_logistics") ? 1 : 0);
+          (hasTechnology(s, s.currentNation(), knownTechnologies(s).improved_logistics) ? 1 : 0);
       if (used != s.nations.at(s.currentNation()).turnFlags.end() &&
           used->second >= capacity)
         return fail("Regional rail capacity exhausted");
@@ -697,12 +688,12 @@ RouteResult validateFactoryRailRoute(const State &s, const Id &facility,
   }
   const auto &f = i->second;
   const auto nation = s.currentNation();
-  if (f.type != "minor_factory" && f.type != "medium_factory" &&
-      f.type != "major_factory") {
+  if (f.type != knownFacilityTypes(s).minor_factory && f.type != knownFacilityTypes(s).medium_factory &&
+      f.type != knownFacilityTypes(s).major_factory) {
     out.reason = "Only factories may relocate";
     return out;
   }
-  if (!hasTech(s, nation, "improved_logistics")) {
+  if (!hasTechnology(s, nation, knownTechnologies(s).improved_logistics)) {
     out.reason = "Factory relocation requires Improved Logistics";
     return out;
   }
@@ -744,7 +735,7 @@ RouteResult validateFactoryRailRoute(const State &s, const Id &facility,
   out = validateRoute(probe, {proxy, path, MovementMode::StrategicRail, false});
   if (!out.allowed)
     return out;
-  const int cost = f.type == "major_factory" ? 2 : 1;
+  const int cost = f.type == knownFacilityTypes(s).major_factory ? 2 : 1;
   for (const auto &region : out.regions) {
     const auto counter = railCounter(s, region);
     const auto used =
@@ -831,7 +822,7 @@ bool facilityBlockaded(const State &s, NationId nation, const Id &facility) {
 bool navalFacilityUsable(const State &s, NationId nation, const Id &id,
                          bool held) {
   const auto i = s.facilities.find(id);
-  if (i == s.facilities.end() || !navalFacilityType(i->second.type) ||
+  if (i == s.facilities.end() || !knownFacilityTypes(s).naval(i->second.type) ||
       i->second.damage > 0)
     return false;
   const auto &f = i->second;
@@ -905,7 +896,7 @@ SupplyRoute traceSupply(const State &s, NationId nation, ZoneId destination,
     const auto &f = s.facilities.at(id);
     return f.zone == destination &&
            s.territories.at(f.zone).possessor == *recipient &&
-           navalFacilityType(f.type) && !f.damage &&
+           knownFacilityTypes(s).naval(f.type) && !f.damage &&
            heldSinceTurnStart(s, *recipient, f.zone, false) &&
            !flag(f.flags, mark::placed_this_turn) &&
            continuousInfrastructure(s, id) &&
@@ -1003,8 +994,8 @@ SupplyRoute traceSupply(const State &s, NationId nation, ZoneId destination,
         }
       }
       if (sea.distance >=
-          navalRange(origin) +
-              (hasTech(s, nation, "improved_logistics") ? 1 : 0))
+          navalRange(s, origin) +
+              (hasTechnology(s, nation, knownTechnologies(s).improved_logistics) ? 1 : 0))
         continue;
       for (const auto next : mapNeighbors(s, sea.sea)) {
         if (s.territories.contains(next) ||
@@ -1298,10 +1289,10 @@ std::vector<Action> MovementRules::actions(const State &s) const {
         }
       }
     }
-  if (!combat && !blitz && hasTech(s, s.currentNation(), "improved_logistics"))
+  if (!combat && !blitz && hasTechnology(s, s.currentNation(), knownTechnologies(s).improved_logistics))
     for (const auto &[id, f] : s.facilities)
-      if (f.type == "minor_factory" || f.type == "medium_factory" ||
-          f.type == "major_factory") {
+      if (f.type == knownFacilityTypes(s).minor_factory || f.type == knownFacilityTypes(s).medium_factory ||
+          f.type == knownFacilityTypes(s).major_factory) {
         std::deque<std::vector<ZoneId>> todo{{f.zone}};
         NumberSet<ZoneId> seen{f.zone};
         while (!todo.empty()) {

@@ -35,10 +35,6 @@ V number(int x) {
     return V(static_cast<double>(x));
 }
 int value(const Marks &flags, const MarkKey &key) { return flags.value(key); }
-int value(const std::map<Id, int> &values, const Id &key) {
-    const auto found = values.find(key);
-    return found == values.end() ? 0 : found->second;
-}
 bool flag(const Marks &flags, const MarkKey &key) { return flags.value(key) != 0; }
 const V &node(const State &s, ZoneId zone) {
     return mapNode(s, zone);
@@ -50,24 +46,17 @@ bool city(const State &s, ZoneId zone) {
     const auto *v = node(s, zone).find("is_city");
     return v && v->asBool();
 }
-bool facilityType(const State &s, const Id &type) {
-    return s.definition->catalog->facilities().contains(type);
+// Whether a build type is a naval unit, or a capital ship.
+bool naval(const State &s, BuildType type) {
+    return type.isUnit() && s.definition->catalog->unit(type.unit()).classes.contains(knownUnitClasses(s).naval);
 }
-bool naval(const State &s, const Id &type) {
-    return !facilityType(s, type) && s.definition->catalog->unit(type).classes.contains(knownUnitClasses(s).naval);
+bool capitalShip(const State &s, BuildType type) {
+    return type.isUnit() && s.definition->catalog->unit(type.unit()).classes.contains(knownUnitClasses(s).capital_ship);
 }
-bool capitalShip(const State &s, const Id &type) {
-    return !facilityType(s, type) && s.definition->catalog->unit(type).classes.contains(knownUnitClasses(s).capital_ship);
-}
-bool capitalShip(const State &s, UnitTypeId type) {
-    return s.definition->catalog->unit(type).classes.contains(knownUnitClasses(s).capital_ship);
-}
-bool factory(const Id &type) {
-    return type == "minor_factory" || type == "medium_factory" || type == "major_factory";
-}
-bool navalFacility(const Id &type) {
-    return type.find("port") != Id::npos || type.find("dockyard") != Id::npos ||
-           type.find("shipyard") != Id::npos;
+// A nation's research stage of a technology: 0 before its first roll.
+int researchStage(const NationState &n, TechnologyId technology) {
+    const auto i = n.technologyStages.find(technology);
+    return i == n.technologyStages.end() ? 0 : i->second;
 }
 int serial(const State &s) {
     require(s.clock.playerTurnSerial < std::numeric_limits<int>::max(), "Economy turn serial overflow");
@@ -154,54 +143,55 @@ int capacity(const State &s, NationId nation, const Id &facility, bool repair) {
         return 0;
     if (!inSupply(s, nation, f.zone))
         return 0;
-    if (navalFacility(f.type) && !navalFacilityUsable(s, nation, facility, true))
+    if (knownFacilityTypes(s).naval(f.type) && !navalFacilityUsable(s, nation, facility, true))
         return 0;
     const auto &catalog = *s.definition->catalog;
-    const auto ctx = catalogContext(s, nation, f.zone);
-    const int current = repair ? catalog.repairCapacity(f.type, f.damage, ctx)
-                               : catalog.productionCapacity(f.type, f.damage, ctx);
+    const auto technologies = completedTechnologies(s, nation);
+    const int current = repair ? catalog.repairCapacity(f.type, f.damage, technologies)
+                               : catalog.productionCapacity(f.type, f.damage, technologies);
     const auto &flags = s.nations.at(nation).turnFlags;
     const MarkKey key(repair ? mark::economy_repair_cap : mark::economy_production_cap, facility);
     const auto i = flags.find(key);
     int snapshot = i == flags.end() ? 0 : i->second;
     if (const auto original = marker(flags, mark::economy_start_type, facility + ":")) {
         const int damage = value(flags, MarkKey(mark::economy_start_damage, facility));
-        snapshot = repair ? catalog.repairCapacity(*original, damage, ctx)
-                          : catalog.productionCapacity(*original, damage, ctx);
+        const auto type = facilityTypeNumber(s, *original);
+        snapshot = repair ? catalog.repairCapacity(type, damage, technologies)
+                          : catalog.productionCapacity(type, damage, technologies);
     }
     return std::max(0, std::min(snapshot, current) - slotsUsed(s, nation, facility));
 }
 int totalCapacity(const State &s, NationId nation, bool ships, bool capitals = false) {
     int sum = 0;
     for (const auto &[id, f] : s.facilities)
-        if (ships ? (capitals ? f.type == "major_shipyard" : f.type.find("shipyard") != Id::npos)
-                  : factory(f.type))
+        if (ships ? (capitals ? f.type == knownFacilityTypes(s).major_shipyard : knownFacilityTypes(s).shipyard(f.type))
+                  : knownFacilityTypes(s).factory(f.type))
             sum += capacity(s, nation, id, false);
     return sum;
 }
 int queuedCapacity(const State &s, NationId nation, bool ships, bool capitals = false) {
     int n = 0;
     for (const auto &[id, p] : s.construction)
-        if (p.owner == nation && ready(p) && !facilityType(s, p.type) && !marker(p.flags, mark::target) &&
-            !flag(p.flags, mark::unit_upgrade) && !flag(p.flags, mark::facility_upgrade) && p.type != "militia" &&
+        if (p.owner == nation && ready(p) && !p.type.isFacility() && !marker(p.flags, mark::target) &&
+            !flag(p.flags, mark::unit_upgrade) && !flag(p.flags, mark::facility_upgrade) && p.type != knownUnitTypes(s).militia &&
             !flag(p.flags, mark::lease_received)) {
             const bool ship = naval(s, p.type);
             if (ship != ships || (capitals && !capitalShip(s, p.type)))
                 continue;
-            const auto &u = s.definition->catalog->unit(p.type);
+            const auto &u = s.definition->catalog->unit(p.type.unit());
             if (!ship && decentralizedProduction(s, nation) &&
-                (u.classes.contains(knownUnitClasses(s).infantry_class) || p.type == "cavalry"))
+                (u.classes.contains(knownUnitClasses(s).infantry_class) || p.type == knownUnitTypes(s).cavalry))
                 continue;
             ++n;
         }
     return n;
 }
-bool canFactoryBuy(const State &s, NationId nation, const Id &type, bool completion) {
-    if (facilityType(s, type) || type == "militia")
+bool canFactoryBuy(const State &s, NationId nation, BuildType type, bool completion) {
+    if (type.isFacility() || type == knownUnitTypes(s).militia)
         return true;
-    const auto &u = s.definition->catalog->unit(type);
+    const auto &u = s.definition->catalog->unit(type.unit());
     if (!naval(s, type) && decentralizedProduction(s, nation) &&
-        (u.classes.contains(knownUnitClasses(s).infantry_class) || type == "cavalry"))
+        (u.classes.contains(knownUnitClasses(s).infantry_class) || type == knownUnitTypes(s).cavalry))
         return true;
     if (naval(s, type)) {
         if (!completion)
@@ -243,12 +233,12 @@ bool siteLegal(const State &s, const BuildChartRow &r, ZoneId zone, std::optiona
         return false;
     if (r.placement.contains("land_or_sea_border") && (!border || !edge(s, zone, *border)))
         return false;
-    auto count = [&](const Id &type, bool major) {
+    const auto &known = knownFacilityTypes(s);
+    // The facilities of a type in the zone, built or under construction.
+    auto count = [&](FacilityTypeId type) {
         int n = 0;
         for (const auto &[id, f] : s.facilities)
-            if (f.zone == zone && (!exclude || id != *exclude) &&
-                ((type.empty() && navalFacility(f.type) && (f.type.rfind("major_", 0) == 0) == major) ||
-                 f.type == type))
+            if (f.zone == zone && (!exclude || id != *exclude) && f.type == type)
                 ++n;
         for (const auto &[id, p] : s.construction)
             if ((!exclude || id != *exclude) && p.site == site && p.type == type &&
@@ -256,29 +246,29 @@ bool siteLegal(const State &s, const BuildChartRow &r, ZoneId zone, std::optiona
                 ++n;
         return n;
     };
-    if (r.placement.contains("airbase_per_zone_limit") && count("airbase", false))
+    if (r.placement.contains("airbase_per_zone_limit") && count(known.airbase))
         return false;
     if (r.placement.contains("facility_city_naval_limit") && city(s, zone)) {
-        const bool major = r.type.rfind("major_", 0) == 0;
+        const bool major = known.major(r.type.facility());
         for (const auto &[id, f] : s.facilities)
-            if (f.zone == zone && (!exclude || id != *exclude) && navalFacility(f.type) &&
-                (f.type.rfind("major_", 0) == 0) == major)
+            if (f.zone == zone && (!exclude || id != *exclude) && known.naval(f.type) &&
+                known.major(f.type) == major)
                 return false;
         for (const auto &[id, p] : s.construction)
-            if ((!exclude || id != *exclude) && p.site == site && navalFacility(p.type) &&
-                (p.type.rfind("major_", 0) == 0) == major && !marker(p.flags, mark::target))
+            if ((!exclude || id != *exclude) && p.site == site && known.naval(p.type.facility()) &&
+                known.major(p.type.facility()) == major && !marker(p.flags, mark::target))
                 return false;
     }
-    if (r.type == "fortification" && border) {
+    if (r.type == knownFacilityTypes(s).fortification && border) {
         for (const auto &[id, f] : s.facilities)
-            if (f.type == "fortification" && f.zone == zone && flag(f.flags, MarkKey(mark::border, *borderName)))
+            if (f.type == knownFacilityTypes(s).fortification && f.zone == zone && flag(f.flags, MarkKey(mark::border, *borderName)))
                 return false;
         for (const auto &[id, p] : s.construction)
-            if ((!exclude || id != *exclude) && p.type == "fortification" && p.site == site &&
+            if ((!exclude || id != *exclude) && p.type == knownFacilityTypes(s).fortification && p.site == site &&
                 flag(p.flags, MarkKey(mark::border, *borderName)))
                 return false;
     }
-    if (r.type == "railroad") {
+    if (r.type == knownFacilityTypes(s).railroad) {
         if (!border || !s.territories.contains(*border) || !passableLandBorder(s, zone, *border))
             return false;
         const auto owner = s.territories.at(*border).possessor;
@@ -297,7 +287,7 @@ bool siteLegal(const State &s, const BuildChartRow &r, ZoneId zone, std::optiona
                 (rail.endpointA == *border && rail.endpointB == zone))
                 return false;
         for (const auto &[id, p] : s.construction)
-            if ((!exclude || id != *exclude) && p.type == "railroad" &&
+            if ((!exclude || id != *exclude) && p.type == knownFacilityTypes(s).railroad &&
                 ((p.site == site && flag(p.flags, MarkKey(mark::border, *borderName))) ||
                  (p.site == *borderName && flag(p.flags, MarkKey(mark::border, site)))))
                 return false;
@@ -315,17 +305,17 @@ bool upgradeFacilityLegal(const State &s, const BuildChartRow &row, const Facili
         if (!seas.empty())
             border = seas.front();
     }
-    return isNation(s, s.territories.at(f.zone).possessor, row.nation) && row.upgradesFrom == f.type &&
+    return isNation(s, s.territories.at(f.zone).possessor, row.nation) && row.upgradesFrom == BuildType(f.type) &&
            !flag(f.flags, mark::moved_this_turn) && siteLegal(s, row, f.zone, border, f.id);
 }
 // RB 12.3 needs a Supply Path to the land zone the unit is in, so a unit aboard
 // a ship at sea, in no land zone, cannot be upgraded until it is ashore or in
 // port (RCL-021).
 bool upgradeUnitLegal(const State &s, NationId nation, const BuildChartRow &row, const UnitState &u,
-                      const Id &type) {
-    return u.owner == nation && row.upgradesFrom == unitTypeName(s, u.type) && !flag(u.turnFlags, mark::placed_this_turn) &&
+                      BuildType type) {
+    return u.owner == nation && row.upgradesFrom == BuildType(u.type) && !flag(u.turnFlags, mark::placed_this_turn) &&
            s.territories.contains(u.zone) && inSupply(s, nation, u.zone) &&
-           upgradeKeepsCargo(s, u, unitTypeNumber(s, type)) &&
+           upgradeKeepsCargo(s, u, type.unit()) &&
            (u.type != knownUnitTypes(s).militia || value(s.nations.at(nation).turnFlags, mark::economy_militia_upgrades) < 2);
 }
 void copyMetadata(BuildProject &p, const BuildChartRow &row, const PriceOption &price) {
@@ -365,11 +355,11 @@ std::vector<Action> placements(const State &s, const BuildProject &p) {
         if (unit != s.units.end() && row && upgradeUnitLegal(s, n, *row, unit->second, p.type))
             out.push_back(action(s, "economy_place", {{"project", V(p.id)}, {"target", V(*target)}}));
         if (fac != s.facilities.end() && s.territories.at(fac->second.zone).possessor == n &&
-            inSupply(s, n, fac->second.zone) && row && row->upgradesFrom == fac->second.type)
+            inSupply(s, n, fac->second.zone) && row && row->upgradesFrom == BuildType(fac->second.type))
             out.push_back(action(s, "economy_place", {{"project", V(p.id)}, {"target", V(*target)}}));
         return out;
     }
-    if (facilityType(s, p.type)) {
+    if (p.type.isFacility()) {
         const auto site = p.site ? findZone(s, *p.site) : std::nullopt;
         if (site && s.territories.contains(*site) && ownsHeld(s, n, *site) &&
             !value(p.flags, mark::damage)) {
@@ -381,7 +371,7 @@ std::vector<Action> placements(const State &s, const BuildProject &p) {
             const bool approved = foreign && flag(p.flags, MarkKey(mark::foreign_consent, nationName(s, *foreign)));
             if (!row || siteLegal(s, *row, *site, border, p.id, approved))
                 out.push_back(action(s, "economy_place", {{"project", V(p.id)}, {"zone", V(*p.site)}}));
-            else if (row->type == "railroad" && foreign && *foreign != n &&
+            else if (row->type == knownFacilityTypes(s).railroad && foreign && *foreign != n &&
                      !value(s.nations.at(n).turnFlags, MarkKey(mark::rail_declined, p.id)) &&
                      siteLegal(s, *row, *site, border, p.id, true))
                 out.push_back(action(s, "economy_request_rail",
@@ -392,33 +382,33 @@ std::vector<Action> placements(const State &s, const BuildProject &p) {
     for (const auto &[zone, t] : s.territories) {
         if (!ownsHeld(s, n, zone))
             continue;
-        if (p.type == "militia") {
+        if (p.type == knownUnitTypes(s).militia) {
             if (militiaAllowance(s, n, zone) > 0)
                 out.push_back(action(s, "economy_place", {{"project", V(p.id)}, {"zone", V(zoneName(s, zone))}}));
             continue;
         }
-        const auto &unit = s.definition->catalog->unit(p.type);
+        const auto &unit = s.definition->catalog->unit(p.type.unit());
         if (decentralizedProduction(s, n) && chineseHomeCountry(s, zone) &&
-            (unit.classes.contains(knownUnitClasses(s).infantry_class) || p.type == "cavalry")) {
+            (unit.classes.contains(knownUnitClasses(s).infantry_class) || p.type == knownUnitTypes(s).cavalry)) {
             out.push_back(action(s, "economy_place", {{"project", V(p.id)}, {"zone", V(zoneName(s, zone))}}));
             continue;
         }
         for (const auto &[id, f] : s.facilities)
             if (f.zone == zone && capacity(s, n, id, false) > 0) {
                 if (naval(s, p.type)) {
-                    if (f.type.find("shipyard") == Id::npos ||
-                        (capitalShip(s, p.type) && f.type != "major_shipyard"))
+                    if (!knownFacilityTypes(s).shipyard(f.type) ||
+                        (capitalShip(s, p.type) && f.type != knownFacilityTypes(s).major_shipyard))
                         continue;
                     for (const auto &sea : navalFacilitySeaZones(s, id))
                         out.push_back(action(s, "economy_place",
                                              {{"project", V(p.id)}, {"zone", V(zoneName(s, sea))}, {"facility", V(id)}}));
-                    if (f.type == "major_shipyard" && !unit.classes.contains(knownUnitClasses(s).submarine))
+                    if (f.type == knownFacilityTypes(s).major_shipyard && !unit.classes.contains(knownUnitClasses(s).submarine))
                         out.push_back(action(s, "economy_place",
                                              {{"project", V(p.id)},
                                               {"zone", V(zoneName(s, zone))},
                                               {"facility", V(id)},
                                               {"in_port", V(true)}}));
-                } else if (factory(f.type))
+                } else if (knownFacilityTypes(s).factory(f.type))
                     out.push_back(action(s, "economy_place",
                                          {{"project", V(p.id)}, {"zone", V(zoneName(s, zone))}, {"facility", V(id)}}));
             }
@@ -485,17 +475,18 @@ void refreshIncome(State &s) {
 void reconcileCapturedFacilities(State &s, ZoneId zone, std::optional<NationId> oldOwner,
                                  NationId newOwner) {
     for (auto &[id, f] : s.facilities)
-        if (f.zone == zone && factory(f.type)) {
+        if (f.zone == zone && knownFacilityTypes(s).factory(f.type)) {
             if (!marker(f.flags, mark::original_owner))
                 f.flags[MarkKey(mark::original_owner, nationName(s, oldOwner.value_or(originalNation(s, zone))))] = 1;
             if (!marker(f.flags, mark::original_type))
-                f.flags[MarkKey(mark::original_type, f.type)] = 1;
-            const auto originalType = *marker(f.flags, mark::original_type);
+                f.flags[MarkKey(mark::original_type, facilityTypeName(s, f.type))] = 1;
+            const auto originalType = facilityTypeNumber(s, *marker(f.flags, mark::original_type));
             if (marker(f.flags, mark::original_owner) == nationName(s, newOwner)) {
                 f.type = originalType;
                 f.flags.erase(mark::captured_max_damage);
-            } else if (originalType == "medium_factory" || originalType == "major_factory") {
-                f.type = "minor_factory";
+            } else if (originalType == knownFacilityTypes(s).medium_factory ||
+                       originalType == knownFacilityTypes(s).major_factory) {
+                f.type = knownFacilityTypes(s).minor_factory;
                 f.flags[mark::captured_max_damage] =
                     s.definition->catalog->facility(originalType).maxDamage.value();
             }
@@ -513,22 +504,22 @@ void beginEconomyTurn(State &s) {
             f.flags.erase(mark::moved_this_turn);
             f.flags.erase(mark::researched_this_turn);
         }
+    const auto technologies = completedTechnologies(s, s.currentNation());
     for (const auto &[id, f] : s.facilities) {
         const auto owner = s.territories.at(f.zone).possessor;
         if (!owner || (*owner != s.currentNation() && !politicallyFriendly(s, s.currentNation(), *owner)))
             continue;
-        const auto context = catalogContext(s, s.currentNation(), f.zone);
-        const auto startType = id + ":" + f.type;
+        const auto startType = id + ":" + facilityTypeName(s, f.type);
         n.turnFlags[MarkKey(mark::economy_start_type, startType)] = 1;
         n.turnFlags[MarkKey(mark::economy_start_damage, id)] = f.damage;
         n.turnFlags[MarkKey(mark::economy_production_cap, id)] =
-            s.definition->catalog->productionCapacity(f.type, f.damage, context);
+            s.definition->catalog->productionCapacity(f.type, f.damage, technologies);
         n.turnFlags[MarkKey(mark::economy_repair_cap, id)] =
-            s.definition->catalog->repairCapacity(f.type, f.damage, context);
+            s.definition->catalog->repairCapacity(f.type, f.damage, technologies);
     }
     int research = 0;
     for (const auto &[id, f] : s.facilities)
-        if (f.type == "major_factory" && f.damage == 0 &&
+        if (f.type == knownFacilityTypes(s).major_factory && f.damage == 0 &&
             s.territories.at(f.zone).possessor == s.currentNation() && !flag(f.flags, mark::placed_this_turn))
             ++research;
     n.turnFlags[mark::economy_research_capacity] = n.powerStatus == "major" ? research : 0;
@@ -537,7 +528,7 @@ void beginEconomyTurn(State &s) {
 void damageConstruction(State &s, const Id &id, int damage) {
     require(damage >= 0, "Negative construction damage");
     auto &p = s.construction.at(id);
-    require(facilityType(s, p.type) && p.type != "fortification" && p.type != "coastal_artillery",
+    require(p.type.isFacility() && p.type != knownFacilityTypes(s).fortification && p.type != knownFacilityTypes(s).coastal_artillery,
             "Not a bombable construction project");
     int combined = value(p.flags, mark::damage) + damage;
     int paid = value(p.flags, mark::stages_paid);
@@ -589,15 +580,17 @@ std::vector<Action> economyActions(const State &s) {
         return out;
     if (!flag(n.turnFlags, mark::economy_research_finished)) {
         if (value(n.turnFlags, mark::economy_research_used) < value(n.turnFlags, mark::economy_research_capacity))
-            for (const auto &[id, t] : catalog.technologies()) {
-                const int stage = value(n.technologyStages, id);
-                if (stage >= 4 ||
-                    (stage == 2 && s.calendarDate().first * 100 + s.calendarDate().second < t.stageThreeFrom))
+            for (const auto tech : catalog.technologies().numbers()) {
+                const auto &t = catalog.technology(tech);
+                const auto &id = t.id;
+                const int reached = researchStage(n, tech);
+                if (reached >= 4 ||
+                    (reached == 2 && s.calendarDate().first * 100 + s.calendarDate().second < t.stageThreeFrom))
                     continue;
                 if (value(n.gameFlags, MarkKey(mark::economy_researched_round, id)) == s.clock.roundIndex + 1)
                     continue;
                 for (const auto &[facility, f] : s.facilities)
-                    if (f.type == "major_factory" && f.damage == 0 &&
+                    if (f.type == knownFacilityTypes(s).major_factory && f.damage == 0 &&
                         s.territories.at(f.zone).possessor == nation && !flag(f.flags, mark::placed_this_turn) &&
                         !flag(f.flags, mark::moved_this_turn) && !flag(f.flags, mark::researched_this_turn))
                         out.push_back(action(s, "economy_research",
@@ -614,15 +607,15 @@ std::vector<Action> economyActions(const State &s) {
             const auto base = O{{"row", V(r.id)}, {"price", V(price.method)}};
             if (r.kind == "upgrade") {
                 // The unit type the row upgrades, numbered once for the scan below.
-                const auto from = r.upgradesFrom ? catalog.unitTypes().find(*r.upgradesFrom) : std::nullopt;
-                if (!facilityType(s, r.type) &&
+                const auto from = r.upgradesFrom ? r.upgradesFrom->unit() : UnitTypeId {};
+                if (!r.type.isFacility() &&
                     std::any_of(s.units.begin(), s.units.end(), [&](const auto &item) {
                         const auto &u = item.second;
                         return u.owner == nation && from == u.type &&
                                !flag(u.turnFlags, mark::placed_this_turn);
                     }))
                     out.push_back(action(s, "economy_purchase", base));
-                if (facilityType(s, r.type) &&
+                if (r.type.isFacility() &&
                     std::any_of(s.facilities.begin(), s.facilities.end(),
                                 [&](const auto &item) { return upgradeFacilityLegal(s, r, item.second); }))
                     out.push_back(action(s, "economy_purchase", base));
@@ -630,14 +623,14 @@ std::vector<Action> economyActions(const State &s) {
             }
             if (!canFactoryBuy(s, nation, r.type, price.payments.size() == 1))
                 continue;
-            if (facilityType(s, r.type)) {
+            if (r.type.isFacility()) {
                 for (const auto &[zone, t] : s.territories) {
                     if (r.placement.contains("coastal_border") ||
-                        r.placement.contains("land_or_sea_border") || r.type == "railroad")
+                        r.placement.contains("land_or_sea_border") || r.type == knownFacilityTypes(s).railroad)
                         for (const auto &border : neighbors(s, zone)) {
                             const bool legal = siteLegal(s, r, zone, border);
                             const bool request =
-                                r.type == "railroad" && !legal && siteLegal(s, r, zone, border, {}, true);
+                                r.type == knownFacilityTypes(s).railroad && !legal && siteLegal(s, r, zone, border, {}, true);
                             if (!legal && !request)
                                 continue;
                             auto args = base;
@@ -645,8 +638,8 @@ std::vector<Action> economyActions(const State &s) {
                             args["border"] = V(zoneName(s, border));
                             out.push_back(
                                 action(s, request ? "economy_request_rail" : "economy_purchase", args));
-                            if (legal && (navalFacility(r.type) || r.type == "seaplane_base" ||
-                                          r.type == "submarine_base"))
+                            if (legal && (knownFacilityTypes(s).naval(r.type.facility()) || r.type == knownFacilityTypes(s).seaplane_base ||
+                                          r.type == knownFacilityTypes(s).submarine_base))
                                 for (const auto &second : neighbors(s, zone, false, true))
                                     if (border < second) {
                                         auto dual = args;
@@ -662,14 +655,14 @@ std::vector<Action> economyActions(const State &s) {
                 }
             } else {
                 int available = 0, queued = 0;
-                if (r.type == "militia") {
+                if (r.type == knownUnitTypes(s).militia) {
                     for (const auto &[zone, t] : s.territories)
                         available += militiaAllowance(s, nation, zone);
                     for (const auto &[id, p] : s.construction)
-                        if (p.owner == nation && p.type == "militia" && ready(p))
+                        if (p.owner == nation && p.type == knownUnitTypes(s).militia && ready(p))
                             ++queued;
                 }
-                if (r.type != "militia" || queued < available)
+                if (r.type != knownUnitTypes(s).militia || queued < available)
                     out.push_back(action(s, "economy_purchase", base));
             }
         }
@@ -780,7 +773,6 @@ bool applyEconomyAction(State &s, const Action &a) {
     }
     if (a.kind == "economy_research") {
         const auto tech = a.parameters.require("technology").asString();
-        const int stage = value(n.technologyStages, tech);
         s.facilities.at(a.parameters.require("facility").asString()).flags[mark::researched_this_turn] = 1;
         ++n.turnFlags[mark::economy_research_used];
         n.gameFlags[MarkKey(mark::economy_researched_round, tech)] = s.clock.roundIndex + 1;
@@ -791,7 +783,6 @@ bool applyEconomyAction(State &s, const Action &a) {
         request.continuation = tech;
         request.dice = {DieSpec{12, 0, {}, 0}};
         s.chance = std::move(request);
-        (void)stage;
         return true;
     }
     if (a.kind == "economy_purchase") {
@@ -803,7 +794,7 @@ bool applyEconomyAction(State &s, const Action &a) {
         require(price != prices.end(), "Unknown price option");
         debit(s, actor, price->payments.front());
         BuildProject p;
-        p.id = unique(s, r.type);
+        p.id = unique(s, buildTypeName(s, r.type));
         p.owner = actor;
         p.type = r.type;
         p.paidIpp = price->payments.front();
@@ -818,14 +809,14 @@ bool applyEconomyAction(State &s, const Action &a) {
             p.flags[MarkKey(mark::border, border->asString())] = 1;
         if (const auto *border = a.parameters.find("border2"))
             p.flags[MarkKey(mark::border, border->asString())] = 1;
-        if (r.type == "railroad")
+        if (r.type == knownFacilityTypes(s).railroad)
             if (const auto border = marker(p.flags, mark::border)) {
                 const auto owner = s.territories.at(zoneNumber(s, *border)).possessor;
                 if (owner && *owner != actor)
                     p.flags[MarkKey(mark::foreign_consent, nationName(s, *owner))] = 1;
             }
         if (r.kind == "upgrade")
-            p.flags[facilityType(s, r.type) ? mark::facility_upgrade : mark::unit_upgrade] = 1;
+            p.flags[r.type.isFacility() ? mark::facility_upgrade : mark::unit_upgrade] = 1;
         if (const auto *target = a.parameters.find("target")) {
             p.flags[MarkKey(mark::target, target->asString())] = 1;
             if (s.facilities.contains(target->asString()))
@@ -889,13 +880,13 @@ bool applyEconomyAction(State &s, const Action &a) {
                 auto &u = s.units.at(*target);
                 if (u.type == knownUnitTypes(s).militia)
                     ++n.turnFlags[mark::economy_militia_upgrades];
-                u.type = unitTypeNumber(s, p.type);
+                u.type = p.type.unit();
                 const auto stats = catalog.stats(u.type, u.damage, catalogContext(s, u.owner, u.zone));
                 u.movementAllowance = stats.movement;
                 u.movementRemaining = 0;
             } else {
                 auto &f = s.facilities.at(*target);
-                f.type = p.type;
+                f.type = p.type.facility();
                 f.flags[mark::upgraded_this_turn] = 1;
                 if (!flag(f.flags, mark::captured_max_damage)) {
                     for (auto it = f.flags.begin(); it != f.flags.end();)
@@ -903,12 +894,12 @@ bool applyEconomyAction(State &s, const Action &a) {
                             it = f.flags.erase(it);
                         else
                             ++it;
-                    f.flags[MarkKey(mark::original_type, p.type)] = 1;
+                    f.flags[MarkKey(mark::original_type, facilityTypeName(s, f.type))] = 1;
                 }
             }
-        } else if (facilityType(s, p.type)) {
+        } else if (p.type.isFacility()) {
             const auto zone = zoneNumber(s, *p.site);
-            if (p.type == "railroad") {
+            if (p.type == knownFacilityTypes(s).railroad) {
                 // One railroad per border (RCL-019); siteLegal refuses a second.
                 const auto border = zoneNumber(s, *marker(p.flags, mark::border));
                 RailState rail;
@@ -922,11 +913,11 @@ bool applyEconomyAction(State &s, const Action &a) {
             } else {
                 FacilityState f;
                 f.id = unique(s, "facility");
-                f.type = p.type;
+                f.type = p.type.facility();
                 f.zone = zone;
                 f.flags[mark::placed_this_turn] = 1;
                 f.flags[MarkKey(mark::original_owner, nationName(s, p.owner))] = 1;
-                f.flags[MarkKey(mark::original_type, p.type)] = 1;
+                f.flags[MarkKey(mark::original_type, facilityTypeName(s, f.type))] = 1;
                 for (const auto &[key, v] : p.flags)
                     if (key.base() == mark::border)
                         f.flags[key] = v;
@@ -935,7 +926,7 @@ bool applyEconomyAction(State &s, const Action &a) {
         } else {
             UnitState u;
             u.id = unique(s, "unit");
-            u.type = unitTypeNumber(s, p.type);
+            u.type = p.type.unit();
             u.owner = p.owner;
             u.zone = zoneNumber(s, a.parameters.require("zone").asString());
             u.turnOrigin = u.zone;
@@ -960,7 +951,7 @@ bool applyEconomyAction(State &s, const Action &a) {
 bool applyEconomyChance(State &s, const ChanceRequest &request, const ChanceOutcome &outcome) {
     if (request.purpose.rfind("economy_research:", 0) != 0)
         return false;
-    const auto tech = request.purpose.substr(17);
+    const auto tech = technologyNumber(s, request.purpose.substr(17));
     const auto researcher = nationNumber(s, request.nation);
     auto &n = s.nations.at(researcher);
     auto &stage = n.technologyStages[tech];
@@ -973,7 +964,7 @@ bool applyEconomyChance(State &s, const ChanceRequest &request, const ChanceOutc
                     const auto conversions = s.definition->catalog->automaticConversions(
                         u.type, catalogContext(s, u.owner, u.zone));
                     if (!conversions.empty())
-                        u.type = unitTypeNumber(s, conversions.front().to);
+                        u.type = conversions.front().to.unit();
                     const auto stats =
                         s.definition->catalog->stats(u.type, u.damage, catalogContext(s, u.owner, u.zone));
                     const int used = u.movementAllowance && u.movementRemaining

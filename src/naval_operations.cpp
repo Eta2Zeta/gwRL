@@ -354,7 +354,7 @@ void rollShore(State &s, BattleState &b) {
   bool fort = false;
   const auto water = b.data.require("sea").asString();
   for (const auto &[id, f] : s.facilities)
-    if (f.zone == b.zone && f.type == "fortification" && !f.damage &&
+    if (f.zone == b.zone && f.type == knownFacilityTypes(s).fortification && !f.damage &&
         flag(f.flags, MarkKey(mark::border, water)))
       fort = true;
   std::set<Id> attackingShips;
@@ -381,7 +381,7 @@ void rollShore(State &s, BattleState &b) {
     attackingShips.insert(*s.units.at(c).carriedBy);
   std::vector<Id> targets(attackingShips.begin(), attackingShips.end());
   for (auto &[id, f] : s.facilities)
-    if (f.zone == b.zone && f.type == "coastal_artillery" && !f.damage) {
+    if (f.zone == b.zone && f.type == knownFacilityTypes(s).coastal_artillery && !f.damage) {
       bool border =
           flag(f.flags, MarkKey(mark::border, water));
       if (const auto *metadata = s.definition->geography.find("facilities"))
@@ -439,10 +439,10 @@ bool canBerth(const State &s, const UnitState &u, const Id &facility) {
   if (std::find(seas.begin(), seas.end(), u.zone) == seas.end())
     return false;
   if (unitClass(s, u, knownUnitClasses(s).submarine)) {
-    if (f.type != "submarine_base")
+    if (f.type != knownFacilityTypes(s).submarine_base)
       return false;
-  } else if (f.type != "major_port" && f.type != "major_dockyard" &&
-             f.type != "major_shipyard")
+  } else if (f.type != knownFacilityTypes(s).major_port && f.type != knownFacilityTypes(s).major_dockyard &&
+             f.type != knownFacilityTypes(s).major_shipyard)
     return false;
   if (unitClass(s, u, knownUnitClasses(s).carrier) && !u.cargo.empty())
     return false;

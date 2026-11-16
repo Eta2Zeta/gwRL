@@ -413,7 +413,7 @@ void nationQuestionsFollowTheRules() {
     tibet.controllerNation = nationNumber(s, "japan");
     tibet.player = tibet.alliance = "axis";
     s.nations.at(nationNumber(s, "ccp")).powerStatus = "major";
-    s.nations.at(nationNumber(s, "ccp")).technologyStages["radar"] = 1;
+    s.nations.at(nationNumber(s, "ccp")).technologyStages[technologyNumber(s, "radar")] = 1;
     s.nations.at(nationNumber(s, "ccp")).gameFlags[MarkKey(mark::economy_researched_round, "radar")] = 1;
     s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "mongolia"));
     s.nations.at(nationNumber(s, "ccp")).allies.insert(nationNumber(s, "kmt"));
@@ -442,7 +442,7 @@ void nationQuestionsFollowTheRules() {
     mongolia.alliance = mongolia.player = "axis";
     mongolia.controllerNation = nationNumber(s, "japan");
     mongolia.powerStatus = "major";
-    mongolia.technologyStages["radar"] = 2;
+    mongolia.technologyStages[technologyNumber(s, "radar")] = 2;
     mongolia.gameFlags[MarkKey(mark::economy_researched_round, "radar")] = 1;
     mongolia.allies.insert(nationNumber(s, "ccp"));
     broken.nations.at(nationNumber(broken, "japan")).treasury.reset();
@@ -539,7 +539,7 @@ void repairsAndRareValuesHaveColumns() {
     auto s = env.engine().state().clone();
     s.repairs.emplace("repair_land_china_beiping",
                       RepairJob{"repair_land_china_beiping", nationNumber(s, "ccp"), "land_china_beiping", 3, 0, false, std::nullopt});
-    s.construction.emplace("economy_airbase_1", BuildProject{"economy_airbase_1", nationNumber(s, "japan"), "airbase",
+    s.construction.emplace("economy_airbase_1", BuildProject{"economy_airbase_1", nationNumber(s, "japan"), buildTypeNumber(s, "airbase"),
                                                              std::optional<Id>("land_formosa"), 1, 2, {2}, {{mark::damage, 1}}});
     s.repairs.emplace("repair_economy_airbase_1",
                       RepairJob{"repair_economy_airbase_1", nationNumber(s, "japan"), "economy_airbase_1", 1, 0, false, std::nullopt});

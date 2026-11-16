@@ -159,7 +159,7 @@ void purchaseBoundariesAndForeignExclusion(const Catalog& catalog) {
     c = japan();
     c.purchases["airborne_infantry"] = 1;
     check(catalog.purchaseEligibility("japan_major_airborne_infantry", c).allowed, "Second airborne purchase rejected");
-    c.technologies.insert("airborne_doctrine");
+    c.technologies.insert(catalog.technologies().number("airborne_doctrine"));
     check(!catalog.purchaseEligibility("japan_major_airborne_infantry", c).allowed, "Old airborne row not replaced");
     check(catalog.purchaseEligibility("japan_major_elite_airborne_infantry", c).allowed, "Elite replacement unavailable");
     check(!catalog.purchaseEligibility("japan_major_elite_airborne_infantry", c, 2).allowed,
@@ -171,7 +171,7 @@ void purchaseBoundariesAndForeignExclusion(const Catalog& catalog) {
         "katyusha_rocket_artillery", "b_29"};
     for (const auto& id : excluded) (void)catalog.unit(id);
     for (const auto& [id, row] : catalog.rows())
-        check(!excluded.contains(row.type), "Source-only foreign/setup unit gained a campaign purchase row: " + id);
+        check(!excluded.contains(catalog.buildTypeName(row.type)), "Source-only foreign/setup unit gained a campaign purchase row: " + id);
     for (const auto& id : {"torpedo_boat_destroyer", "coastal_defense_ship", "coastal_submarine"})
         check(!catalog.unit(id).assetValue && catalog.unit(id).purchaseCosts.empty(),
               "Unpriced source unit was assigned a generic purchase price");
@@ -196,7 +196,7 @@ void modesAndConditionalStats(const Catalog& catalog) {
           "AAA three-aircraft/first-round limit lost");
     check(!catalog.stats(catalog.unitTypes().number("strategic_bomber"), 0, c).attack, "Carpet bombing became unconditional attack");
     check(!hasMode(catalog.modes(catalog.unitTypes().number("strategic_bomber"), c), "carpet_bombing"), "Carpet bombing lacks technology gate");
-    c.technologies.insert("heavy_strategic_bombers");
+    c.technologies.insert(catalog.technologies().number("heavy_strategic_bombers"));
     const auto ordinary = catalog.modes(catalog.unitTypes().number("strategic_bomber"), c);
     const auto heavy = catalog.modes(catalog.unitTypes().number("heavy_strategic_bomber"), c);
     check(mode(ordinary, "carpet_bombing").dice == 3 && mode(heavy, "carpet_bombing").dice == 5
@@ -222,11 +222,11 @@ void modesAndConditionalStats(const Catalog& catalog) {
         check(catalog.stats(catalog.unitTypes().number("militia"), 0, blocked).movement == 0, "Militia movement ignored predicate: " + std::string(id));
     }
     c = japan();
-    c.technologies.insert("long_range_aircraft");
+    c.technologies.insert(catalog.technologies().number("long_range_aircraft"));
     check(catalog.stats(catalog.unitTypes().number("fighter"), 0, c).movement == 5 && catalog.stats(catalog.unitTypes().number("air_transport"), 0, c).movement == 7
               && catalog.stats(catalog.unitTypes().number("seaplane"), 0, c).movement == 7 && catalog.stats(catalog.unitTypes().number("infantry"), 0, c).movement == 1,
           "Long-range technology did not apply precisely to existing aircraft");
-    c.technologies.insert("anti_submarine_warfare");
+    c.technologies.insert(catalog.technologies().number("anti_submarine_warfare"));
     check(catalog.stats(catalog.unitTypes().number("seaplane"), 0, c).attack == 3, "ASW bonus applied outside patrol");
     c.flags["on_maritime_air_patrol"] = true;
     check(catalog.stats(catalog.unitTypes().number("seaplane"), 0, c).attack == 3, "ASW bonus applied against non-submarine targets");
@@ -242,7 +242,7 @@ void modesAndConditionalStats(const Catalog& catalog) {
     const auto basedPatrol = catalog.modes(catalog.unitTypes().number("seaplane"), c);
     check(mode(basedPatrol, "maritime_air_patrol").parameters.require("range").asInt() == 3,
           "Long-range seaplane patrol from base did not gain range");
-    c.technologies.insert("radar");
+    c.technologies.insert(catalog.technologies().number("radar"));
     const auto radarFighter = catalog.modes(catalog.unitTypes().number("fighter"), c);
     const auto radarBomber = catalog.modes(catalog.unitTypes().number("strategic_bomber"), c);
     check(mode(radarFighter, "interception").threshold == 4 && mode(radarBomber, "interception").threshold == 2,
@@ -252,24 +252,26 @@ void modesAndConditionalStats(const Catalog& catalog) {
 void technologyAndConstruction(const Catalog& catalog) {
     const std::set<Id> thresholdSeven {"advanced_mechanized_infantry", "advanced_artillery", "radar",
         "anti_submarine_warfare", "improved_factories", "improved_construction", "airborne_doctrine", "amphibious_doctrine"};
-    for (const auto& [id, tech] : catalog.technologies()) {
+    for (const auto number : catalog.technologies().numbers()) {
+        const auto& tech = catalog.technology(number);
+        const auto& id = tech.id;
         const int threshold = thresholdSeven.contains(id) ? 7 : (id == "heavy_strategic_bombers" || id == "strategic_rockets" ? 9 : 8);
         check(tech.thresholds == std::vector<int>(4, threshold) && tech.stageThreeFrom == 193907,
               "Research chart thresholds or Stage III date changed: " + id);
     }
     auto c = japan();
     check(catalog.automaticConversions(catalog.unitTypes().number("airborne_infantry"), c).empty(), "Airborne converted without doctrine");
-    c.technologies.insert("airborne_doctrine");
+    c.technologies.insert(catalog.technologies().number("airborne_doctrine"));
     const auto converted = catalog.automaticConversions(catalog.unitTypes().number("airborne_infantry"), c);
-    check(converted.size() == 1 && converted[0].to == "elite_airborne_infantry"
+    check(converted.size() == 1 && converted[0].to == catalog.buildType("elite_airborne_infantry")
               && converted[0].costIpp == 0 && converted[0].automatic,
           "Airborne Doctrine conversion absent, duplicated or charged");
-    c.technologies.insert("advanced_mechanized_infantry");
+    c.technologies.insert(catalog.technologies().number("advanced_mechanized_infantry"));
     check(catalog.automaticConversions(catalog.unitTypes().number("mechanized_infantry"), c).empty(), "Unstated automatic mechanized upgrade invented");
 
     c = japan();
     check(prices(catalog, "japan_major_heavy_cruiser", c) == std::set<std::vector<int>> {{5, 5}}, "Printed cruiser payments changed");
-    c.technologies.insert("improved_construction");
+    c.technologies.insert(catalog.technologies().number("improved_construction"));
     // The discount replaces the printed price, which would buy the same on the
     // same schedule for more (user decision, 5 November 2026).
     check(prices(catalog, "japan_major_heavy_cruiser", c) == std::set<std::vector<int>> {{4, 4}, {10}},
@@ -292,28 +294,30 @@ void technologyAndConstruction(const Catalog& catalog) {
     const std::map<Id, std::pair<int, int>> capacities {{"minor_factory", {1, 2}}, {"medium_factory", {3, 5}},
         {"major_factory", {5, 8}}, {"minor_shipyard", {1, 2}}, {"major_shipyard", {5, 8}}};
     for (const auto& [id, values] : capacities) {
-        check(catalog.productionCapacity(id, 0, c) == values.first, "Printed production capacity wrong: " + id);
+        const auto type = catalog.facilityTypes().number(id);
+        check(catalog.productionCapacity(type, 0, c.technologies) == values.first, "Printed production capacity wrong: " + id);
         auto improved = c;
-        improved.technologies.insert("improved_factories");
-        check(catalog.productionCapacity(id, 0, improved) == values.second
-                  && catalog.productionCapacity(id, 1, improved) == (id == "major_factory" ? 7 : 0),
+        improved.technologies.insert(catalog.technologies().number("improved_factories"));
+        check(catalog.productionCapacity(type, 0, improved.technologies) == values.second
+                  && catalog.productionCapacity(type, 1, improved.technologies) == (id == "major_factory" ? 7 : 0),
               "Improved or damaged production capacity wrong: " + id);
     }
-    c.technologies.insert("improved_factories");
+    c.technologies.insert(catalog.technologies().number("improved_factories"));
     check(prices(catalog, "japan_major_major_factory", c) == std::set<std::vector<int>> {{6, 6, 6}},
           "Improved Factories incorrectly discounts construction");
-    check(catalog.repairCapacity("minor_dockyard", 0) == 1 && catalog.repairCapacity("major_dockyard", 0) == 5
-              && catalog.repairCapacity("major_shipyard", 0) == 5 && catalog.repairCapacity("major_shipyard", 1) == 0,
+    const auto facility = [&](std::string_view name) { return catalog.facilityTypes().number(name); };
+    check(catalog.repairCapacity(facility("minor_dockyard"), 0) == 1 && catalog.repairCapacity(facility("major_dockyard"), 0) == 5
+              && catalog.repairCapacity(facility("major_shipyard"), 0) == 5 && catalog.repairCapacity(facility("major_shipyard"), 1) == 0,
           "Repair capacity or damage disabling wrong");
-    check(catalog.productionCapacity("major_factory", 2, japan()) == 3
-              && catalog.productionCapacity("major_factory", 8, japan()) == 0
-              && catalog.productionCapacity("major_factory", 2, c) == 6,
+    check(catalog.productionCapacity(facility("major_factory"), 2, japan().technologies) == 3
+              && catalog.productionCapacity(facility("major_factory"), 8, japan().technologies) == 0
+              && catalog.productionCapacity(facility("major_factory"), 2, c.technologies) == 6,
           "Major factory damage must subtract capacity, with a zero floor");
     for (const auto& id : {"minor_dockyard", "minor_shipyard"})
-        check(catalog.repairCapacity(id, 0, c) == 2 && catalog.repairCapacity(id, 1, c) == 0,
+        check(catalog.repairCapacity(facility(id), 0, c.technologies) == 2 && catalog.repairCapacity(facility(id), 1, c.technologies) == 0,
               "Improved minor naval facility repair capacity wrong");
     for (const auto& id : {"major_dockyard", "major_shipyard"})
-        check(catalog.repairCapacity(id, 0, c) == 8 && catalog.repairCapacity(id, 1, c) == 0,
+        check(catalog.repairCapacity(facility(id), 0, c.technologies) == 8 && catalog.repairCapacity(facility(id), 1, c.technologies) == 0,
               "Improved major naval facility repair capacity wrong");
 }
 
@@ -393,17 +397,18 @@ void scenarioIntegration(const Catalog& catalog) {
           "Campaign does not share the certified catalog");
     for (const auto& [id, unit] : state.units)
         check(unit.movementAllowance && unit.movementRemaining, "Starting unit lacks catalog movement: " + id);
-    check(completedAssetValue(*state.definition, "torpedo_boat_destroyer") == 5
-              && completedAssetValue(*state.definition, "coastal_submarine") == 4
-              && completedAssetValue(*state.definition, "fleet_carrier") == 15,
+    check(completedAssetValue(*state.definition, catalog.buildType("torpedo_boat_destroyer")) == 5
+              && completedAssetValue(*state.definition, catalog.buildType("coastal_submarine")) == 4
+              && completedAssetValue(*state.definition, catalog.buildType("fleet_carrier")) == 15
+              && completedAssetValue(*state.definition, catalog.buildType("major_factory")) == 18,
           "Setup-only valuation overrides or printed completed value changed");
-    rejects([&] { completedAssetValue(*state.definition, "coastal_defense_ship"); }, "Unapproved setup-only value guessed");
+    rejects([&] { completedAssetValue(*state.definition, catalog.buildType("coastal_defense_ship")); }, "Unapproved setup-only value guessed");
 
     auto& nation = state.nations.at(nationNumber(state, "japan"));
-    nation.technologyStages["long_range_aircraft"] = 3;
-    check(!catalogContext(state, nationNumber(state, "japan")).technologies.contains("long_range_aircraft"), "Stage III treated as completed technology");
-    nation.technologyStages["long_range_aircraft"] = 4;
-    check(catalogContext(state, nationNumber(state, "japan")).technologies.contains("long_range_aircraft"), "Completed technology absent from query context");
+    nation.technologyStages[technologyNumber(state, "long_range_aircraft")] = 3;
+    check(!catalogContext(state, nationNumber(state, "japan")).technologies.contains(knownTechnologies(state).long_range_aircraft), "Stage III treated as completed technology");
+    nation.technologyStages[technologyNumber(state, "long_range_aircraft")] = 4;
+    check(catalogContext(state, nationNumber(state, "japan")).technologies.contains(knownTechnologies(state).long_range_aircraft), "Completed technology absent from query context");
     nation.turnFlags[MarkKey(mark::purchased, "marine")] = 2;
     check(!catalog.purchaseEligibility("japan_major_marine", catalogContext(state, nationNumber(state, "japan"))).allowed,
           "State purchase accounting not exposed to catalog");
@@ -467,8 +472,32 @@ void scenarioIntegration(const Catalog& catalog) {
     invalid.units.at("catalog_heavy_battleship_2").damage = 3;
     rejects([&] { invalid.validate(); }, "Destroyed damage state accepted in campaign state");
     invalid = state.clone();
-    invalid.facilities.begin()->second.type = "invented_facility";
+    invalid.facilities.begin()->second.type = FacilityTypeId {};  // A number naming no facility type.
     rejects([&] { invalid.validate(); }, "Unknown facility type accepted in campaign state");
+    invalid = state.clone();
+    invalid.facilities.begin()->second.type = FacilityTypeId::fromIndex(catalog.facilityTypes().size());
+    rejects([&] { invalid.validate(); }, "Facility type beyond the catalog accepted in campaign state");
+    // A saved position naming a facility type or technology the catalog lacks is refused.
+    const auto renamedFacility = [&] {
+        auto root = state.toJson().asObject();
+        auto facilities = root.at("facilities").asObject();
+        auto facility = facilities.begin()->second.asObject();
+        facility["type"] = game::json::Value(std::string("invented_facility"));
+        facilities.begin()->second = game::json::Value(std::move(facility));
+        root["facilities"] = game::json::Value(std::move(facilities));
+        return game::json::Value(std::move(root));
+    }();
+    rejects([&] { State::fromJson(state.definition, renamedFacility); }, "Unknown facility type accepted on restore");
+    const auto renamedTechnology = [&] {
+        auto root = state.toJson().asObject();
+        auto nations = root.at("nations").asObject();
+        auto nation = nations.begin()->second.asObject();
+        nation["technology_stages"] = game::json::Value(game::json::Value::Object {{"invented_technology", game::json::Value(1.0)}});
+        nations.begin()->second = game::json::Value(std::move(nation));
+        root["nations"] = game::json::Value(std::move(nations));
+        return game::json::Value(std::move(root));
+    }();
+    rejects([&] { State::fromJson(state.definition, renamedTechnology); }, "Unknown technology accepted on restore");
 }
 }  // namespace
 

@@ -413,7 +413,7 @@ void offshoreThresholdDoesNotForbidPlacement() {
 
 void freeShipAdvanceAndFacilityRepair() {
     auto ship = fixture("mongolia");
-    ship.construction["minor_ship"] = BuildProject{"minor_ship", nationNumber(ship, "mongolia"), "heavy_cruiser", std::nullopt,
+    ship.construction["minor_ship"] = BuildProject{"minor_ship", nationNumber(ship, "mongolia"), buildTypeNumber(ship, "heavy_cruiser"), std::nullopt,
         2, 5, {5}, {}};
     const auto cash = ship.nations.at(nationNumber(ship, "ccp")).treasury;
     const auto units = ship.units.size();
@@ -428,7 +428,7 @@ void freeShipAdvanceAndFacilityRepair() {
           "Controlled-minor queue work changed a national treasury");
 
     auto repair = fixture("mongolia");
-    repair.facilities["minor_repair"] = FacilityState{"minor_repair", "major_factory", zoneNumber(repair, central), 9, {}};
+    repair.facilities["minor_repair"] = FacilityState{"minor_repair", facilityTypeNumber(repair, "major_factory"), zoneNumber(repair, central), 9, {}};
     repair.repairs["pending_job"] = RepairJob{"pending_job", nationNumber(repair, "mongolia"), "minor_repair", 9, 9, true};
     applyInfluenceAction(repair, recruitment(repair, "mongolia"));
     resolve(repair, 1);

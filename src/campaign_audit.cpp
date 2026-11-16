@@ -88,10 +88,10 @@ double actionScore(const State&s,const Action&a,int phaseCount,std::uint64_t see
     if(k=="economy_purchase") {
         const auto type=s.definition->catalog->row(a.parameters.require("row").asString()).type;
         if(s.currentNation()== knownNations(s).japan&&phaseCount>=5)return -20+jitter;
-        if(type=="fighter")return 700+jitter;
-        if(type=="infantry")return 600+jitter;
-        if(type=="artillery")return 550+jitter;
-        if(type=="militia")return 300+jitter;
+        if(type==knownUnitTypes(s).fighter)return 700+jitter;
+        if(type==knownUnitTypes(s).infantry)return 600+jitter;
+        if(type==knownUnitTypes(s).artillery)return 550+jitter;
+        if(type==knownUnitTypes(s).militia)return 300+jitter;
         return -30+jitter;
     }
     if(prefix(k,"economy_place")||prefix(k,"economy_deliver")||prefix(k,"economy_complete"))return 900+jitter;
@@ -186,13 +186,12 @@ std::vector<std::string> campaignInvariantFailures(const State&s) {
             const auto fid=std::string(key.argument());
             if(!s.facilities.contains(fid)||amount<0)out.push_back("invalid facility capacity use: "+key.name());
             else {
-                const auto &f=s.facilities.at(fid);
-                const auto ctx=catalogContext(s,id,f.zone);
+                const auto technologies=completedTechnologies(s,id);
                 int highest=std::max(value(nation.turnFlags,MarkKey(mark::economy_production_cap, fid)),value(nation.turnFlags,MarkKey(mark::economy_repair_cap, fid)));
                 for(const auto&[startKey,flag]:nation.turnFlags)if(flag&&startKey.base()==mark::economy_start_type&&startKey.argument().starts_with(fid+":")) {
-                    const auto type=std::string(startKey.argument().substr(fid.size()+1));
+                    const auto type=facilityTypeNumber(s,startKey.argument().substr(fid.size()+1));
                     const int damage=value(nation.turnFlags,MarkKey(mark::economy_start_damage, fid));
-                    highest=std::max({highest,s.definition->catalog->productionCapacity(type,damage,ctx),s.definition->catalog->repairCapacity(type,damage,ctx)});
+                    highest=std::max({highest,s.definition->catalog->productionCapacity(type,damage,technologies),s.definition->catalog->repairCapacity(type,damage,technologies)});
                 }
                 if(amount>highest)out.push_back("facility capacity exceeded: "+fid);
             }
@@ -239,14 +238,14 @@ void CampaignAuditLog::record(const State&before,const Engine&e,const std::strin
                 const auto project=text(input.require("parameters"),"project");
                 authorized=before.construction.contains(project)&&!after.construction.contains(project);
                 if(authorized) {
-                    const auto&type=before.construction.at(project).type;
-                    const auto& placed=unitTypeName(after,u.type);
+                    const auto type=before.construction.at(project).type;
+                    const BuildType placed(u.type);
                     authorized=type==placed;
-                    if(!authorized)for(const auto&conversion:after.definition->catalog->automaticConversions(after.definition->catalog->unit(type).number,catalogContext(after,u.owner,u.zone)))
+                    if(!authorized)for(const auto&conversion:after.definition->catalog->automaticConversions(type.unit(),catalogContext(after,u.owner,u.zone)))
                         authorized=authorized||conversion.to==placed;
                     // The explicit elite-airborne aid rule reverts doctrine-
                     // dependent elite infantry for an unqualified recipient.
-                    authorized=authorized||(type=="elite_airborne_infantry"&&u.type== knownUnitTypes(before).airborne_infantry&&command=="economy_lease_place");
+                    authorized=authorized||(type==knownUnitTypes(before).elite_airborne_infantry&&u.type== knownUnitTypes(before).airborne_infantry&&command=="economy_lease_place");
                 }
             }
             if(kind=="action"&&command=="recruitment_place_infantry")authorized=u.type== knownUnitTypes(before).infantry;

@@ -20,10 +20,13 @@ engine. It reads the live game state and receives the legal moves as the
 engine's own move objects. Nothing is written out as text or parsed on the way.
 
 **But the engine identifies most things by name.** Only zones, nations,
-unit types and the bases of marks are numbers: each one's place in the sorted
-list of the names of its kind ([names held as numbers](../engine/names.md)).
-For zones, nations and unit types that number is also its column in the
-encoder's list of that kind. The rest the encoder reads as names:
+unit types, facility types, technologies and the bases of marks are numbers:
+each one's place in the sorted list of the names of its kind ([names held as
+numbers](../engine/names.md)). For zones, nations, unit types, facility types
+and technologies that number is also its column in the encoder's list of that
+kind, and a construction project's type, a unit type or a facility type
+number, finds its column through a list kept for each. The rest the encoder
+reads as names:
 
 - a unit's marks are a base and a whole number, such as `repairing` → 1, and
   the encoder asks about them through its own lists of the bases' names;

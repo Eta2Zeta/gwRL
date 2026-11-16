@@ -76,6 +76,12 @@ static_assert(!std::is_constructible_v<NationId, const char*> && !std::is_constr
 static_assert(!std::is_constructible_v<NationId, int> && !std::is_constructible_v<ZoneId, std::size_t>);
 static_assert(!std::is_constructible_v<UnitTypeId, NationId> && !std::is_constructible_v<UnitTypeId, std::string>);
 static_assert(!std::is_constructible_v<UnitClassId, UnitTypeId> && !std::is_constructible_v<UnitClassId, const char*>);
+static_assert(!std::is_constructible_v<FacilityTypeId, UnitTypeId> && !std::is_constructible_v<FacilityTypeId, std::string>);
+static_assert(!std::is_constructible_v<TechnologyId, FacilityTypeId> && !std::is_constructible_v<TechnologyId, const char*>);
+// A build type is made from a unit type or a facility type number, never from a name.
+static_assert(std::is_convertible_v<UnitTypeId, BuildType> && std::is_convertible_v<FacilityTypeId, BuildType>);
+static_assert(!std::is_constructible_v<BuildType, const char*> && !std::is_constructible_v<BuildType, std::string>);
+static_assert(!std::is_constructible_v<BuildType, TechnologyId> && !std::is_constructible_v<BuildType, int>);
 // A mark key refers to its argument's text, so it cannot be made from a temporary string.
 static_assert(!std::is_constructible_v<MarkKey, MarkId, std::string&&> && std::is_constructible_v<MarkKey, MarkId, const std::string&>);
 static_assert(!std::is_convertible_v<const char*, MarkKey> && !std::is_convertible_v<std::string, MarkKey>);
@@ -136,6 +142,8 @@ void numberSetsHoldBitsInNameOrder() {
     std::vector<ZoneId> listed(set.begin(), set.end());
     check(listed == std::vector<ZoneId>({a, b, c}), "A set does not list its members in name order");
     check(set.erase(b) == 1 && set.erase(b) == 0 && !set.contains(b), "Erasing misbehaved");
+    check(set.includes(NumberSet<ZoneId>({a})) && set.includes(NumberSet<ZoneId>()) && !set.includes(NumberSet<ZoneId>({a, b})),
+          "A set's inclusion of another is wrong");
     NumberSet<ZoneId> other {b, c};
     auto both = set;
     both &= other;
@@ -249,6 +257,74 @@ void theCatalogNumbersItsUnitTypesAndClasses() {
     check(&knownUnitTypes(state) == &known && &knownUnitClasses(state) == &knownClasses,
           "The position reads other known names than its catalog's");
 }
+void theCatalogNumbersItsFacilityTypesAndTechnologies() {
+    const auto state = loadScenario(std::filesystem::path(GWRL_SOURCE_DIR) / "game_content/scenarios/japan_china_1936");
+    const auto& catalog = *state.definition->catalog;
+    // The facility types and technologies in name order, each definition at its own number.
+    const auto& facilities = catalog.facilityTypes();
+    check(facilities.size() == catalog.facilities().size() && facilities.size() == 15,
+          "The catalog does not number its 15 facility types");
+    for (const auto type : facilities.numbers()) {
+        const auto& facility = catalog.facility(type);
+        check(facility.number == type && facility.id == facilities.name(type) && &catalog.facility(facility.id) == &facility &&
+                  facilityTypeNumber(state, facility.id) == type && facilityTypeName(state, type) == facility.id,
+              "A facility type's number, name and definition do not agree");
+    }
+    const auto& technologies = catalog.technologies();
+    check(technologies.size() == 16, "The catalog does not number its 16 technologies");
+    for (const auto technology : technologies.numbers()) {
+        const auto& definition = catalog.technology(technology);
+        check(definition.number == technology && definition.id == technologies.name(technology) &&
+                  technologyNumber(state, definition.id) == technology && technologyName(state, technology) == definition.id,
+              "A technology's number, name and definition do not agree");
+    }
+    rejects([&] { catalog.facility(FacilityTypeId {}); }, "A number naming no facility type had a definition");
+    rejects([&] { catalog.technology(TechnologyId {}); }, "A number naming no technology had a definition");
+    throwsWith<std::runtime_error>([&] { facilityTypeNumber(state, "airfield"); }, "Unknown facility type: airfield",
+                                   "The map's airfield label became a facility type of its own");
+    throwsWith<std::runtime_error>([&] { technologyNumber(state, "invented_technology"); },
+                                   "Unknown technology: invented_technology", "An unknown technology is not reported by kind and name");
+    // The names the rules use, each the number of the string it is spelled as.
+    const auto& known = catalog.knownFacilityTypes();
+#define GWRL_CHECK(name) check(known.name == facilities.number(#name), "Known facility type " #name " has another number");
+    GWRL_KNOWN_FACILITY_TYPES(GWRL_CHECK)
+#undef GWRL_CHECK
+    const auto& knownTechnologies = catalog.knownTechnologies();
+#define GWRL_CHECK(name) check(knownTechnologies.name == technologies.number(#name), "Known technology " #name " has another number");
+    GWRL_KNOWN_TECHNOLOGIES(GWRL_CHECK)
+#undef GWRL_CHECK
+    // The groups the rules test are the facility types whose names say so.
+    for (const auto type : facilities.numbers()) {
+        const auto& name = facilities.name(type);
+        const auto has = [&](std::string_view part) { return name.find(part) != std::string::npos; };
+        check(known.factory(type) == has("factory") && known.shipyard(type) == has("shipyard") &&
+                  known.naval(type) == (has("port") || has("dockyard") || has("shipyard")) &&
+                  known.major(type) == name.starts_with("major_") && known.base(type) == has("base"),
+              "A facility type is in the wrong group: " + name);
+    }
+    // A build type names a unit type or a facility type, which share no name.
+    const auto infantry = catalog.buildType("infantry"), airbase = catalog.buildType("airbase");
+    check(infantry.isUnit() && !infantry.isFacility() && infantry.unit() == catalog.knownUnitTypes().infantry &&
+              airbase.isFacility() && !airbase.isUnit() && airbase.facility() == known.airbase &&
+              catalog.buildTypeName(infantry) == "infantry" && catalog.buildTypeName(airbase) == "airbase" &&
+              infantry == BuildType(catalog.knownUnitTypes().infantry) && infantry != airbase &&
+              !airbase.unit().valid() && !BuildType().valid(),
+          "A build type does not say which kind it names");
+    check(!catalog.findBuildType("invented_type"), "An unknown name became a build type");
+    throwsWith<std::runtime_error>([&] { buildTypeNumber(state, "invented_type"); }, "Unknown build type: invented_type",
+                                   "An unknown build type is not reported by kind and name");
+    // The position's technology stages and its completed technologies.
+    auto copy = state.clone();
+    const auto japan = nationNumber(copy, "japan");
+    auto& stages = copy.nations.at(japan).technologyStages;
+    stages.clear();
+    stages[knownTechnologies.radar] = 4;
+    stages[knownTechnologies.improved_factories] = 3;
+    check(hasTechnology(copy, japan, knownTechnologies.radar) && !hasTechnology(copy, japan, knownTechnologies.improved_factories) &&
+              !hasTechnology(copy, japan, knownTechnologies.amphibious_doctrine) &&
+              completedTechnologies(copy, japan) == NumberSet<TechnologyId>({knownTechnologies.radar}),
+          "Only stage 4 completes a technology");
+}
 void marksAreNumberedInNameOrder() {
     const auto names = markNames();
     check(names.size() > 200 && std::is_sorted(names.begin(), names.end()), "The mark table is not sorted by name");
@@ -347,6 +423,7 @@ int main() {
         {"the scenario numbers its map zones", theScenarioNumbersItsMapZones},
         {"the scenario numbers its nations", theScenarioNumbersItsNations},
         {"the catalog numbers its unit types and classes", theCatalogNumbersItsUnitTypesAndClasses},
+        {"the catalog numbers its facility types and technologies", theCatalogNumbersItsFacilityTypesAndTechnologies},
         {"marks are numbered in name order", marksAreNumberedInNameOrder},
         {"sets of marks list them in name order", setsOfMarksListThemInNameOrder},
     };
