@@ -56,10 +56,10 @@ State fixture(const Id& actor = "japan", Phase phase = Phase::Combat) {
 void addUnit(State& state, const Id& id, const Id& owner, const Id& zone, const Id& type = "infantry") {
     UnitState unit;
     unit.id = id;
-    unit.type = type;
+    unit.type = unitTypeNumber(state, type);
     unit.owner = nationNumber(state, owner);
     unit.zone = unit.turnOrigin = zoneNumber(state, zone);
-    unit.movementAllowance = unit.movementRemaining = state.definition->catalog->stats(type, 0, catalogContext(state, nationNumber(state, owner), zoneNumber(state, zone))).movement;
+    unit.movementAllowance = unit.movementRemaining = state.definition->catalog->stats(unitTypeNumber(state, type), 0, catalogContext(state, nationNumber(state, owner), zoneNumber(state, zone))).movement;
     state.units.emplace(id, std::move(unit));
 }
 Action action(const std::vector<Action>& options, const Id& kind,

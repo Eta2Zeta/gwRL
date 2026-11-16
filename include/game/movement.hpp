@@ -45,7 +45,7 @@ struct SupplyRoute {
   std::vector<Id> facilities;
 };
 
-bool unitClass(const State &, const UnitState &, const Id &classification);
+bool unitClass(const State &, const UnitState &, UnitClassId classification);
 bool movementController(const State &, NationId nation);
 bool landAccess(const State &, NationId nation, ZoneId zone,
                 bool combat = false);

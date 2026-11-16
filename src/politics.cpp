@@ -117,7 +117,7 @@ void destroyUnrelocatableNeutralUnit(State& s,const Id& unit,ZoneId origin) {
     A destroyed;
     for(const auto& id:removed) {
         const auto& u=s.units.at(id);
-        destroyed.emplace_back(O{{"id",V(id)},{"type",V(u.type)},{"owner",V(nationName(s,u.owner))},
+        destroyed.emplace_back(O{{"id",V(id)},{"type",V(unitTypeName(s,u.type))},{"owner",V(nationName(s,u.owner))},
             {"zone",V(zoneName(s,u.zone))},{"carried_by",u.carriedBy?V(*u.carriedBy):V(nullptr)}});
     }
     removePoliticalUnits(s,removed);
@@ -348,8 +348,8 @@ Id politicalPlayer(const State& s,NationId nation) {
 void addPoliticalUnit(State& s,NationId nation,const Id& type,ZoneId zone,int count) {
     require(count>0&&s.territories.at(zone).possessor==nation,"Invalid political unit placement");
     for(int i=0;i<count;++i) {
-        UnitState u;u.id=uniqueContinuation(s,"political_"+type);u.type=type;u.owner=nation;u.zone=zone;u.turnOrigin=zone;
-        u.movementAllowance=s.definition->catalog->stats(type,0,catalogContext(s,nation,zone)).movement;
+        UnitState u;u.id=uniqueContinuation(s,"political_"+type);u.type=unitTypeNumber(s, type);u.owner=nation;u.zone=zone;u.turnOrigin=zone;
+        u.movementAllowance=s.definition->catalog->stats(u.type,0,catalogContext(s,nation,zone)).movement;
         u.movementRemaining=0;u.turnFlags["placed_this_turn"]=1;s.units.emplace(u.id,std::move(u));
     }
 }
@@ -495,12 +495,12 @@ void changePossession(State& s,ZoneId zone,NationId recipient,PossessionCause ca
 }
 void captureLand(State& s,NationId attacker,ZoneId zone,const NumberSet<NationId>& withdrawalEligibleRecipients) {
     require(s.nations.contains(attacker),"Unknown land conqueror");
-    require(std::any_of(s.units.begin(),s.units.end(),[&](const auto& item){const auto& u=item.second;return u.owner==attacker&&u.zone==zone&&s.definition->catalog->unit(u.type).classes.contains("land");}),"Land capture requires a surviving attacking land unit");
+    require(std::any_of(s.units.begin(),s.units.end(),[&](const auto& item){const auto& u=item.second;return u.owner==attacker&&u.zone==zone&&s.definition->catalog->unit(u.type).classes.contains(knownUnitClasses(s).land);}),"Land capture requires a surviving attacking land unit");
     std::vector<Id> neutralNonparticipants;const auto previous=s.territories.at(zone).possessor;
     if(previous)for(const auto& [id,u]:s.units)
         if(u.zone==zone&&!u.carriedBy&&u.owner!=attacker&&u.owner!=*previous&&
             !s.nations.at(attacker).atWarWith.contains(u.owner)&&politicallyFriendly(s,u.owner,*previous)&&
-            !s.definition->catalog->unit(u.type).classes.contains("naval"))neutralNonparticipants.push_back(id);
+            !s.definition->catalog->unit(u.type).classes.contains(knownUnitClasses(s).naval))neutralNonparticipants.push_back(id);
     const NationId original=originalNation(s,zone);NationId recipient=attacker;
     if(original!=attacker&&s.nations.at(original).powerStatus=="major"&&s.nations.at(original).alliance==s.nations.at(attacker).alliance&&!s.politics.surrendered.contains(original))recipient=original;
     changePossession(s,zone,recipient,recipient==attacker?PossessionCause::Capture:PossessionCause::Liberation,attacker);
@@ -606,7 +606,7 @@ void surrenderNation(State& s,NationId nation,NationId attacker) {
     }
     A ships;for(auto it=s.construction.begin();it!=s.construction.end();) {
         if(it->second.owner!=nation){++it;continue;}
-        if(s.definition->catalog->units().contains(it->second.type)&&s.definition->catalog->unit(it->second.type).classes.contains("naval")){ships.emplace_back(it->first);++it;}else it=s.construction.erase(it);
+        if(s.definition->catalog->isUnitType(it->second.type)&&s.definition->catalog->unit(it->second.type).classes.contains(knownUnitClasses(s).naval)){ships.emplace_back(it->first);++it;}else it=s.construction.erase(it);
     }
     if(!ships.empty()) {
         require(!s.chance,"Cannot queue surrender dice over another chance event");
@@ -687,7 +687,7 @@ void PoliticsRules::apply(State& s,const Action& a) const {
             const auto zone=zoneNumber(s,a.parameters.require("zone").asString());
             if(a.parameters.require("requires_withdrawal").asBool())
                 for(auto& [id,u]:s.units)if(u.owner==giver&&u.zone==zone&&
-                    s.definition->catalog->unit(u.type).classes.contains("land"))
+                    s.definition->catalog->unit(u.type).classes.contains(knownUnitClasses(s).land))
                     u.turnFlags["must_withdraw_from_chinese_gift"]=1;
             changePossession(s,zone,nationNumber(s,a.parameters.require("recipient").asString()),PossessionCause::Transfer,giver);
         }

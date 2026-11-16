@@ -75,8 +75,8 @@ V configuration(const State& state) {
     O raiders, aircraft, carriers;
     std::set<ZoneId> deckZones;
     for (const auto& [id, unit] : state.units) {
-        if (unitClass(state, unit, "carrier")) deckZones.insert(unit.zone);
-        if (unit.type == "battlecruiser" && movementController(state, unit.owner)) {
+        if (unitClass(state, unit, knownUnitClasses(state).carrier)) deckZones.insert(unit.zone);
+        if (unit.type == knownUnitTypes(state).battlecruiser && movementController(state, unit.owner)) {
             O roles;
             for (const auto* key : {"raider", "naval_raider"})
                 if (const auto found = unit.gameFlags.find(key); found != unit.gameFlags.end())
@@ -95,7 +95,7 @@ V configuration(const State& state) {
                 {"turn_flags", flags(unit.turnFlags)}}));
         }
     for (const auto& [id, unit] : state.units)
-        if (unitClass(state, unit, "carrier") && relevantZones.contains(unit.zone))
+        if (unitClass(state, unit, knownUnitClasses(state).carrier) && relevantZones.contains(unit.zone))
             carriers.emplace(id, V(O{{"cargo", ids(unit.cargo)}}));
     return V(O{{"raiders", V(std::move(raiders))}, {"aircraft", V(std::move(aircraft))},
                {"carriers", V(std::move(carriers))}});
@@ -113,7 +113,7 @@ bool reversibleConfigurationAction(const State& state, const Action& action) {
     // assignment. Real inland returns without a nearby carrier remain ordinary
     // progress, so their mandatory landing effects are never filtered away.
     return std::any_of(state.units.begin(), state.units.end(), [&](const auto& entry) {
-        return entry.second.zone == zone && unitClass(state, entry.second, "carrier");
+        return entry.second.zone == zone && unitClass(state, entry.second, knownUnitClasses(state).carrier);
     });
 }
 
@@ -315,7 +315,7 @@ void validateTrainingActionState(const State& state) {
                     "Invalid aircraft configuration zone");
             const auto& parent = plane.require("carried_by");
             require(parent.isNull() || (parent.isString() && state.units.contains(parent.asString()) &&
-                    unitClass(state, state.units.at(parent.asString()), "carrier")), "Invalid aircraft carrier configuration");
+                    unitClass(state, state.units.at(parent.asString()), knownUnitClasses(state).carrier)), "Invalid aircraft carrier configuration");
             for (const auto* field : {"movement_allowance", "movement_remaining"}) {
                 const auto& amount = plane.require(field);
                 require(amount.isNull() || amount.isNumber(), "Invalid aircraft movement configuration");

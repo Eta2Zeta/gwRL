@@ -59,6 +59,7 @@ the first learning stage.
 | 16 Nov | [The naval-route and landing checks](records/naval_route_checks_2026_11_16.md) | They spend most of their time on copies of the position, each working out supply and the carriers' reach again; the one exact saving, a ship's allowance worked out once for all destinations, cuts 1% of a searched game's instructions. |
 | 16 Nov | [Zones held as numbers](records/zone_numbers_2026_11_16.md) | Identical play in 300 random games and 4 searched games; listing a position's moves takes 13.0% fewer instructions and a searched game 7.2% to 7.9% fewer. |
 | 16 Nov | [Nations held as numbers](records/nation_numbers_2026_11_16.md) | Identical play again; after zones, listing the moves takes a further 6.6% fewer instructions and a searched game 3.9% to 4.7% fewer, 11.6% fewer than before either change. |
+| 16 Nov | [Unit types held as numbers](records/unit_type_numbers_2026_11_16.md) | Identical play again; after nations, listing the moves takes a further 4.7% fewer instructions and a searched game 2.5% fewer, 13.8% fewer than before any of the three changes. |
 
 ### The engine
 

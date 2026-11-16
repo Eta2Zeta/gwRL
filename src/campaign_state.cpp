@@ -262,7 +262,7 @@ void writeState(std::string& out,const State& s,bool includeHistory) {
         writeKey(out,"movement_allowance"); writeOptionalInt(out,x.movementAllowance); writeKey(out,"movement_remaining"); writeOptionalInt(out,x.movementRemaining);
         writeKey(out,"owner"); writeString(out,nations.name(x.owner)); writeKey(out,"route"); writeZones(out,zones,x.route);
         writeKey(out,"turn_flags"); writeIntMap(out,x.turnFlags); writeKey(out,"turn_origin"); writeString(out,zones.name(x.turnOrigin));
-        writeKey(out,"type"); writeString(out,x.type); writeKey(out,"zone"); writeString(out,zones.name(x.zone)); out+='}'; });
+        writeKey(out,"type"); writeString(out,unitTypeName(s,x.type)); writeKey(out,"zone"); writeString(out,zones.name(x.zone)); out+='}'; });
     out+='}';
 }
 }
@@ -393,6 +393,16 @@ const FactionDefinition& nationFaction(const State& s,NationId nation) {
     return factions[nation.index()];
 }
 const KnownNations& knownNations(const State& s) { return names(s).known; }
+namespace {
+const Catalog& catalogOf(const State& s) {
+    if(!s.definition||!s.definition->catalog)throw std::runtime_error("Unit types need a catalog");
+    return *s.definition->catalog;
+}
+}
+UnitTypeId unitTypeNumber(const State& s,std::string_view name) { return catalogOf(s).unitTypes().number(name); }
+const std::string& unitTypeName(const State& s,UnitTypeId type) { return catalogOf(s).unitTypes().name(type); }
+const KnownUnitTypes& knownUnitTypes(const State& s) { return catalogOf(s).knownUnitTypes(); }
+const KnownUnitClasses& knownUnitClasses(const State& s) { return catalogOf(s).knownUnitClasses(); }
 bool isNation(const State& s,NationId nation,std::string_view name) { return nation.valid()&&names(s).nations.name(nation)==name; }
 bool isNation(const State& s,const std::optional<NationId>& nation,std::string_view name) { return nation&&isNation(s,*nation,name); }
 bool hasNation(const State& s,std::string_view name) { const auto nation=findNation(s,name); return nation&&s.nations.contains(*nation); }
@@ -451,7 +461,7 @@ V State::toJson(bool includeHistory) const {
     const auto optionalNation=[&](const std::optional<NationId>& nation){return nation?nationValue(*nation):V(nullptr);};
     for(const auto& [id,x]:nations)n.emplace(nationTable.name(id),V(fields({{"controller_nation",optionalNation(x.controllerNation)},{"player",optionalId(x.player)},{"alliance",optionalId(x.alliance)},{"power_status",V(x.powerStatus)},{"treasury",optionalInt(x.treasury)},{"income_components",intMap(x.incomeComponents)},{"income_known",V(x.incomeKnown)},{"technology_stages",intMap(x.technologyStages)},{"at_war_with",nationNames(nationTable,x.atWarWith)},{"allies",nationNames(nationTable,x.allies)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}})));
     for(const auto& [id,x]:territories)t.emplace(zones.name(id),V(fields({{"possessor",optionalNation(x.possessor)},{"flags",intMap(x.flags)}})));
-    for(const auto& [id,x]:units)u.emplace(id,V(fields({{"id",V(x.id)},{"type",V(x.type)},{"owner",nationValue(x.owner)},{"zone",zoneValue(x.zone)},{"movement_remaining",optionalInt(x.movementRemaining)},{"movement_allowance",optionalInt(x.movementAllowance)},{"turn_origin",zoneValue(x.turnOrigin)},{"route",strings(zoneNames(*this,x.route))},{"carried_by",optionalId(x.carriedBy)},{"cargo",strings(x.cargo)},{"damage",number(x.damage)},{"commitments",strings(x.commitments)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}})));
+    for(const auto& [id,x]:units)u.emplace(id,V(fields({{"id",V(x.id)},{"type",V(unitTypeName(*this,x.type))},{"owner",nationValue(x.owner)},{"zone",zoneValue(x.zone)},{"movement_remaining",optionalInt(x.movementRemaining)},{"movement_allowance",optionalInt(x.movementAllowance)},{"turn_origin",zoneValue(x.turnOrigin)},{"route",strings(zoneNames(*this,x.route))},{"carried_by",optionalId(x.carriedBy)},{"cargo",strings(x.cargo)},{"damage",number(x.damage)},{"commitments",strings(x.commitments)},{"turn_flags",intMap(x.turnFlags)},{"game_flags",intMap(x.gameFlags)}})));
     for(const auto& [id,x]:facilities)f.emplace(id,V(fields({{"id",V(x.id)},{"type",V(x.type)},{"zone",zoneValue(x.zone)},{"damage",number(x.damage)},{"flags",intMap(x.flags)}})));
     for(const auto& [id,x]:rails) { O damage; for(const auto& [endpoint,value]:x.damageByEndpoint)damage.emplace(zones.name(endpoint),number(value));
         r.emplace(id,V(fields({{"id",V(x.id)},{"endpoint_a",zoneValue(x.endpointA)},{"endpoint_b",zoneValue(x.endpointB)},{"damage_by_endpoint",V(std::move(damage))}}))); }
@@ -475,7 +485,7 @@ State State::fromJson(std::shared_ptr<const Definition> definition,const V& v) {
     const auto nationOf=[&](const V& x){return readNation(nationTable,x);};
     for(const auto& [id,x]:v.require("nations").asObject()) { NationState n;n.controllerNation=readOptionalNation(nationTable,x.require("controller_nation"));n.player=readOptionalId(x.require("player"));n.alliance=readOptionalId(x.require("alliance"));n.powerStatus=x.require("power_status").asString();n.treasury=readOptionalInt(x.require("treasury"));n.incomeComponents=readIntMap(x.require("income_components"));n.incomeKnown=x.require("income_known").asBool();n.technologyStages=readIntMap(x.require("technology_stages"));n.atWarWith=readNationSet(nationTable,x.require("at_war_with"));n.allies=readNationSet(nationTable,x.require("allies"));n.turnFlags=readIntMap(x.require("turn_flags"));n.gameFlags=readIntMap(x.require("game_flags"));s.nations.emplace(nationTable.number(id),std::move(n)); }
     for(const auto& [id,x]:v.require("territories").asObject())s.territories.emplace(zones.number(id),TerritoryState{readOptionalNation(nationTable,x.require("possessor")),readIntMap(x.require("flags"))});
-    for(const auto& [id,x]:v.require("units").asObject()) { UnitState u;u.id=x.require("id").asString();u.type=x.require("type").asString();u.owner=nationOf(x.require("owner"));u.zone=zoneOf(x.require("zone"));u.movementRemaining=readOptionalInt(x.require("movement_remaining"));u.movementAllowance=readOptionalInt(x.require("movement_allowance"));u.turnOrigin=zoneOf(x.require("turn_origin"));u.route=zoneNumbers(s,readStrings(x.require("route")));u.carriedBy=readOptionalId(x.require("carried_by"));u.cargo=readStrings(x.require("cargo"));u.damage=x.require("damage").asInt();u.commitments=readSet(x.require("commitments"));u.turnFlags=readIntMap(x.require("turn_flags"));u.gameFlags=readIntMap(x.require("game_flags"));s.units.emplace(id,std::move(u)); }
+    for(const auto& [id,x]:v.require("units").asObject()) { UnitState u;u.id=x.require("id").asString();u.type=unitTypeNumber(s, x.require("type").asString());u.owner=nationOf(x.require("owner"));u.zone=zoneOf(x.require("zone"));u.movementRemaining=readOptionalInt(x.require("movement_remaining"));u.movementAllowance=readOptionalInt(x.require("movement_allowance"));u.turnOrigin=zoneOf(x.require("turn_origin"));u.route=zoneNumbers(s,readStrings(x.require("route")));u.carriedBy=readOptionalId(x.require("carried_by"));u.cargo=readStrings(x.require("cargo"));u.damage=x.require("damage").asInt();u.commitments=readSet(x.require("commitments"));u.turnFlags=readIntMap(x.require("turn_flags"));u.gameFlags=readIntMap(x.require("game_flags"));s.units.emplace(id,std::move(u)); }
     for(const auto& [id,x]:v.require("facilities").asObject())s.facilities.emplace(id,FacilityState{x.require("id").asString(),x.require("type").asString(),zoneOf(x.require("zone")),x.require("damage").asInt(),readIntMap(x.require("flags"))});
     for(const auto& [id,x]:v.require("rails").asObject()) { std::map<ZoneId,int> damage; for(const auto& [endpoint,value]:x.require("damage_by_endpoint").asObject())damage.emplace(zones.number(endpoint),value.asInt());
         s.rails.emplace(id,RailState{x.require("id").asString(),zoneOf(x.require("endpoint_a")),zoneOf(x.require("endpoint_b")),std::move(damage)}); }
@@ -528,8 +538,10 @@ void State::validate(std::size_t historyFrom) const {
     if(mapIndex) { for(const auto id:mapIndex->landZones)if(!territories.contains(id))throw std::runtime_error("Missing retained territory: "+zones.name(id)); }
     else for(const auto& [id,node]:nodes)if(node.require("type").asString()=="land"&&!territories.contains(zones.number(id)))throw std::runtime_error("Missing retained territory: "+id);
     for(const auto& [id,t]:territories){land(id);if(t.possessor)nation(*t.possessor);}
+    // A unit's type is a number in the catalog's table, so a unit needs a catalog.
+    const auto* unitTypes=definition->catalog?&definition->catalog->unitTypes():nullptr;
     for(const auto& [id,u]:units) {
-        require(!id.empty()&&id==u.id&&!u.type.empty(),"Invalid unit identity/type");nation(u.owner);zone(u.zone);zone(u.turnOrigin);for(const auto routeZone:u.route)zone(routeZone);require(u.damage>=0,"Negative unit damage");
+        require(!id.empty()&&id==u.id&&unitTypes&&u.type.valid()&&u.type.index()<unitTypes->size(),"Invalid unit identity/type");nation(u.owner);zone(u.zone);zone(u.turnOrigin);for(const auto routeZone:u.route)zone(routeZone);require(u.damage>=0,"Negative unit damage");
         if(definition->catalog) {
             const auto& type=definition->catalog->unit(u.type);
             require(type.states.contains(u.damage),"Unknown surviving unit damage state");
@@ -542,7 +554,7 @@ void State::validate(std::size_t historyFrom) const {
     }
     for(const auto& [id,f]:facilities){require(!id.empty()&&id==f.id&&!f.type.empty(),"Invalid facility identity/type");land(f.zone);require(f.damage>=0,"Negative facility damage");require(!units.contains(id),"Unit/facility identity collision");if(definition->catalog){const auto& type=definition->catalog->facility(f.type);const auto captured=f.flags.find("captured_max_damage");const int maximum=captured==f.flags.end()?type.maxDamage.value_or(f.damage):captured->second;require(maximum>=0&&f.damage<=maximum,"Facility damage exceeds maximum");}}
     for(const auto& [id,r]:rails){require(!id.empty()&&id==r.id&&r.endpointA<r.endpointB,"Invalid railway identity/endpoints");land(r.endpointA);land(r.endpointB);require(id==railroadId(*this,r.endpointA,r.endpointB),"A railroad is named by its border (one railroad per border)");require(!units.contains(id)&&!facilities.contains(id),"Ambiguous repair target identity");for(const auto& [endpoint,damage]:r.damageByEndpoint)require((endpoint==r.endpointA||endpoint==r.endpointB)&&damage>=0,"Invalid railway damage endpoint");}
-    for(const auto& [id,b]:construction){require(!id.empty()&&id==b.id&&!b.type.empty(),"Invalid construction identity/type");nation(b.owner);if(b.site)require(zones.contains(*b.site)||facilities.contains(*b.site),"Unknown construction site");require(b.queuePosition>=1&&b.paidIpp>=0,"Invalid build stage/payment");for(auto payment:b.remainingPayments)require(payment>=0,"Negative remaining build payment");if(definition->catalog)require(definition->catalog->units().contains(b.type)||definition->catalog->facilities().contains(b.type),"Unknown construction type");}
+    for(const auto& [id,b]:construction){require(!id.empty()&&id==b.id&&!b.type.empty(),"Invalid construction identity/type");nation(b.owner);if(b.site)require(zones.contains(*b.site)||facilities.contains(*b.site),"Unknown construction site");require(b.queuePosition>=1&&b.paidIpp>=0,"Invalid build stage/payment");for(auto payment:b.remainingPayments)require(payment>=0,"Negative remaining build payment");if(definition->catalog)require(definition->catalog->isUnitType(b.type)||definition->catalog->facilities().contains(b.type),"Unknown construction type");}
     for(const auto& [id,r]:repairs){require(!id.empty()&&id==r.id,"Invalid repair identity");nation(r.owner);const auto targetZone=zones.find(r.target);require(units.contains(r.target)||facilities.contains(r.target)||rails.contains(r.target)||(targetZone&&territories.contains(*targetZone))||construction.contains(r.target),"Unknown repair target");require(r.remainingDamage>=0&&r.remainingCost>=0,"Negative repair work/cost");require(!rails.contains(r.target)||r.endpoint,"Railroad repair names its side");if(r.endpoint){require(rails.contains(r.target),"Only railroad repair has an endpoint");const auto& rail=rails.at(r.target);require(*r.endpoint==rail.endpointA||*r.endpoint==rail.endpointB,"Repair endpoint not on border");}}
     require(clock.roundIndex>=0&&clock.roundIndex<definition->calendarRounds,"Invalid calendar round");require(clock.completedRounds>=0&&clock.completedRounds<=definition->calendarRounds,"Invalid completed-round count");(void)currentNation();(void)toString(clock.phase);
     require(clock.completedRounds == clock.roundIndex + (terminal ? 1 : 0),

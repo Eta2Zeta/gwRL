@@ -523,7 +523,12 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     const auto& catalog = *s.definition->catalog;
     std::vector<std::string> nations, types, facilities, technologies, rows, terrains;
     for (const auto& [id, faction] : s.definition->factions) nations.push_back(id);
-    for (const auto& [id, unit] : catalog.units()) types.push_back(id);
+    for (const auto& unit : catalog.units()) types.push_back(unit.id);
+    // The layout below reads the catalog by name, once per definition.
+    const auto hasClass = [&](const UnitDefinition& unit, std::string_view name) {
+        const auto found = catalog.unitClasses().find(name);
+        return found && unit.classes.contains(*found);
+    };
     for (const auto& [id, facility] : catalog.facilities()) facilities.push_back(id);
     for (const auto& [id, technology] : catalog.technologies()) technologies.push_back(id);
     for (const auto& [id, row] : catalog.rows()) rows.push_back(id);
@@ -560,6 +565,7 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->players = Vocabulary("player", {"allies", "axis", "comintern"}, false);
     c->playerOrNone = Vocabulary("player", {"allies", "axis", "comintern", "~none"}, false);
     c->unitTypes = Vocabulary("unit_type", types, false);
+    c->unitTypes.numberBy(catalog.unitTypes());
     c->facilityTypes = Vocabulary("facility_type", facilities, true);
     c->technologies = Vocabulary("technology", technologies, true);
     c->projectTypes = Vocabulary("project_type", projects, true);
@@ -581,7 +587,8 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->dataKeys = Vocabulary("battle_data", kBattleDataKeys, true);
     std::vector<std::string> battleWords = kBattleWords;
     battleWords.insert(battleWords.end(), kBattleStages.begin(), kBattleStages.end());
-    for (const auto& [id, unit] : catalog.units()) battleWords.insert(battleWords.end(), unit.classes.begin(), unit.classes.end());
+    // The unit classes: the catalog's class table is every class some unit has.
+    battleWords.insert(battleWords.end(), catalog.unitClasses().names().begin(), catalog.unitClasses().names().end());
     battleWords.insert(battleWords.end(), nations.begin(), nations.end());
     for (const std::string player : {"allies", "axis", "comintern"}) battleWords.push_back(player);
     c->battleWords = Vocabulary("battle_word", battleWords, true);
@@ -607,11 +614,11 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->ranks = Vocabulary("rank", {"0", "1", "2", "3", "4", "5", "6", "7+"}, false);
 
     c->unitClassOfType.assign(static_cast<std::size_t>(c->unitTypes.size()), c->unitClasses.other());
-    for (const auto& [id, unit] : catalog.units()) {
+    for (const auto& unit : catalog.units()) {
         int cls = c->unitClasses.other();
         for (const auto& name : kUnitClasses)
-            if (unit.classes.contains(name)) cls = c->unitClasses.find(name);
-        c->unitClassOfType[static_cast<std::size_t>(c->unitTypes.find(id))] = cls;
+            if (hasClass(unit, name)) cls = c->unitClasses.find(name);
+        c->unitClassOfType[static_cast<std::size_t>(c->unitTypes.find(unit.id))] = cls;
     }
     for (const std::string key : {"artillery", "battle", "facility", "factory", "origin_facility", "plan", "project",
                                   "row", "source", "transport", "unit", "units"})
@@ -629,7 +636,7 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     const int typeCount = c->unitTypes.size(), nationCount = c->nations.size();
     const auto cell = [&](int a, int b) { return static_cast<std::size_t>(a * typeCount + b); };
     std::vector<char> ownable(static_cast<std::size_t>(nationCount * typeCount), 1);
-    for (const auto& [id, unit] : catalog.units())
+    for (const auto& unit : catalog.units())
         if (unit.rules.isArray())
             for (const auto& rule : unit.rules.asArray())
                 if (const auto* name = rule.find("id"); name && name->asString() == "national_exclusive_type") {
@@ -637,7 +644,7 @@ std::shared_ptr<const Context> buildContext(const State& s) {
                     for (const auto& nation : rule.require("parameters").require("nations").asArray())
                         owners.insert(nation.asString());
                     for (int n = 0; n < nationCount; ++n)
-                        ownable[cell(n, c->unitTypes.find(id))] = owners.contains(c->nations.names()[n]);
+                        ownable[cell(n, c->unitTypes.find(unit.id))] = owners.contains(c->nations.names()[n]);
                 }
     std::vector<char> owned(static_cast<std::size_t>(typeCount), 0);  // Some nation here may own the type.
     for (int t = 0; t < typeCount; ++t)
@@ -649,21 +656,23 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     // cargo their rules accept.
     std::vector<char> carries(static_cast<std::size_t>(typeCount * typeCount), 0);
     const auto allow = [&](int carrier, const std::function<bool(const UnitDefinition&)>& cargo) {
-        for (const auto& [id, unit] : catalog.units())
-            if (cargo(unit)) carries[cell(carrier, c->unitTypes.find(id))] = 1;
+        for (const auto& unit : catalog.units())
+            if (cargo(unit)) carries[cell(carrier, c->unitTypes.find(unit.id))] = 1;
     };
     const auto named = [](const V& list) {
         std::set<std::string> out;
         for (const auto& name : list.asArray()) out.insert(name.asString());
         return out;
     };
-    for (const auto& [id, unit] : catalog.units()) {
+    const auto& known = catalog.knownUnitClasses();
+    for (const auto& unit : catalog.units()) {
+        const auto& id = unit.id;
         const int carrier = c->unitTypes.find(id);
-        if (unit.classes.contains("naval_transport"))
-            allow(carrier, [](const UnitDefinition& u) { return u.classes.contains("land") || u.classes.contains("rocket"); });
-        if (unit.classes.contains("carrier"))
+        if (unit.classes.contains(known.naval_transport))
+            allow(carrier, [&](const UnitDefinition& u) { return u.classes.contains(known.land) || u.classes.contains(known.rocket); });
+        if (unit.classes.contains(known.carrier))
             allow(carrier, [&](const UnitDefinition& u) {
-                return u.classes.contains("fighter") || u.id == "tactical_bomber" ||
+                return u.classes.contains(known.fighter) || u.id == "tactical_bomber" ||
                        (u.id == "medium_bomber" && id == "heavy_fleet_carrier");
             });
         if (!unit.rules.isArray()) continue;
@@ -681,7 +690,7 @@ std::shared_ptr<const Context> buildContext(const State& s) {
             }
             allow(carrier, [&](const UnitDefinition& u) {
                 return types.contains(u.id) ||
-                       std::any_of(classes.begin(), classes.end(), [&](const auto& k) { return u.classes.contains(k); });
+                       std::any_of(classes.begin(), classes.end(), [&](const auto& k) { return hasClass(u, k); });
             });
         }
     }
@@ -1129,10 +1138,10 @@ struct UnitRoles {
     std::unordered_map<std::string, int> rank;
 };
 
-// Zones and nations appear by number: the signature only tells units apart.
+// Zones, nations and unit types appear by number: the signature only tells units apart.
 std::string unitSignature(const UnitState& u) {
     const auto zoneText = [](ZoneId zone) { return zone.valid() ? std::to_string(zone.index()) : std::string(); };
-    std::string out = std::to_string(u.owner.index()) + '|' + u.type + '|' + zoneText(u.zone) + '|' + std::to_string(u.damage) + '|' +
+    std::string out = std::to_string(u.owner.index()) + '|' + std::to_string(u.type.index()) + '|' + zoneText(u.zone) + '|' + std::to_string(u.damage) + '|' +
                       std::to_string(u.movementRemaining.value_or(-1)) + '|' + std::to_string(u.movementAllowance.value_or(-1)) +
                       '|' + u.carriedBy.value_or("") + '|' + zoneText(u.turnOrigin) + '|';
     for (const auto& id : u.cargo) out += id + ',';

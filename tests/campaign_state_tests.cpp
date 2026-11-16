@@ -1,5 +1,8 @@
 #include "game/campaign.hpp"
 #include "game/campaign_actions.hpp"
+#include "game/catalog.hpp"
+
+#include <filesystem>
 
 #include <cmath>
 #include <functional>
@@ -19,6 +22,9 @@ Definition definition() {
     Definition d;d.scenarioId="state_fixture";d.players={"axis","allies","comintern"};d.turnOrder={"ccp","mongolia","japan","kmt"};
     for(const auto& id:{"ccp","mongolia","japan","kmt","warlord"})d.factions.emplace(id,FactionDefinition{.id=id,.displayName=id});
     d.geography=V(O{{"nodes",V(O{{"a",V(O{{"id",V(std::string("a"))},{"type",V(std::string("land"))},{"original_owner",V(std::string("Japan"))}})},{"b",V(O{{"id",V(std::string("b"))},{"type",V(std::string("land"))},{"original_owner",V(std::string("Mongolia"))}})},{"sea",V(O{{"id",V(std::string("sea"))},{"type",V(std::string("sea"))}})}})},{"source_warning",V(std::string("Unresolved river network"))}});
+    // Units are typed by the catalog's unit type numbers, so the fixture has the catalog.
+    static const auto catalog=Catalog::load(std::filesystem::path(GWRL_SOURCE_DIR)/"game_content/catalog/gw36_v43");
+    d.catalog=catalog;
     d.rules=V(O{{"catalog_status",V(std::string("not_implemented"))}});d.factions.at("japan").homeCountry={"a"};d.factions.at("japan").homeCountryKnown=true;return d;
 }
 State fixture() {
@@ -33,9 +39,9 @@ State fixture() {
     s.nations.at(nationNumber(s, "japan")).incomeComponents={{"land",9},{"penalty",-1}};s.nations.at(nationNumber(s, "japan")).incomeKnown=true;s.nations.at(nationNumber(s, "japan")).technologyStages={{"radar",2}};s.nations.at(nationNumber(s, "japan")).turnFlags={{"research",1}};s.nations.at(nationNumber(s, "japan")).gameFlags={{"event",1}};
     const auto a=zoneNumber(s,"a"),b=zoneNumber(s,"b"),sea=zoneNumber(s,"sea");
     s.territories.emplace(a,TerritoryState{nationNumber(s, "japan"),{{"occupied",1}}});s.territories.emplace(b,TerritoryState{nationNumber(s, "mongolia"),{}});
-    UnitState carrier;carrier.id="carrier";carrier.type="transport";carrier.owner=nationNumber(s, "japan");carrier.zone=sea;carrier.turnOrigin=sea;carrier.movementRemaining=1;carrier.movementAllowance=2;carrier.cargo={"cargo"};carrier.route={sea};carrier.damage=1;carrier.commitments={"reserved"};carrier.turnFlags={{"moved",1}};carrier.gameFlags={{"veteran",1}};
-    UnitState cargo;cargo.id="cargo";cargo.type="infantry";cargo.owner=nationNumber(s, "kmt");cargo.zone=sea;cargo.turnOrigin=b;cargo.carriedBy="carrier";cargo.route={b,sea};
-    UnitState defender;defender.id="defender";defender.type="militia";defender.owner=nationNumber(s, "mongolia");defender.zone=b;defender.turnOrigin=b;
+    UnitState carrier;carrier.id="carrier";carrier.type=unitTypeNumber(s, "fleet_carrier");carrier.owner=nationNumber(s, "japan");carrier.zone=sea;carrier.turnOrigin=sea;carrier.movementRemaining=1;carrier.movementAllowance=2;carrier.cargo={"cargo"};carrier.route={sea};carrier.damage=1;carrier.commitments={"reserved"};carrier.turnFlags={{"moved",1}};carrier.gameFlags={{"veteran",1}};
+    UnitState cargo;cargo.id="cargo";cargo.type=knownUnitTypes(s).infantry;cargo.movementRemaining=0;cargo.movementAllowance=1;cargo.owner=nationNumber(s, "kmt");cargo.zone=sea;cargo.turnOrigin=b;cargo.carriedBy="carrier";cargo.route={b,sea};
+    UnitState defender;defender.id="defender";defender.type=knownUnitTypes(s).militia;defender.movementRemaining=0;defender.movementAllowance=0;defender.owner=nationNumber(s, "mongolia");defender.zone=b;defender.turnOrigin=b;
     s.units={{carrier.id,carrier},{cargo.id,cargo},{defender.id,defender}};
     s.facilities.emplace("port",FacilityState{"port","major_port",a,1,{{"blocked",1}}});
     s.rails.emplace("rail_a__b",RailState{"rail_a__b",a,b,{{a,1},{b,0}}});
@@ -86,7 +92,7 @@ void digestsAndCanonicalJson() {
     rejects([]{parsePhase("legacy_purchase_units");},"Unknown phase accepted");
 }
 void completeRoundTrip() {
-    const auto s=fixture();const auto encoded=s.serialize();auto restored=State::fromJson(s.definition,game::json::parse(encoded));check(restored.serialize()==encoded,"Complete mutable state was not round-tripped");check(restored.definition.get()==s.definition.get(),"Restore replaced immutable definition");check(restored.clock.playerTurnSerial==std::numeric_limits<std::uint64_t>::max(),"64-bit turn counter lost precision");check(restored.nations.at(nationNumber(restored, "mongolia")).treasury==std::nullopt,"No-account state became zero cash");check(restored.nations.at(nationNumber(restored, "japan")).incomeKnown&&!restored.nations.at(nationNumber(restored, "kmt")).incomeKnown,"Known vs unresolved income was lost");check(!restored.units.at("cargo").movementAllowance,"Unresolved movement became zero");check(restored.units.at("cargo").owner==nationNumber(restored, "kmt")&&restored.units.at("carrier").owner==nationNumber(restored, "japan"),"Cargo ownership merged with carrier");check(restored.turnStart.units.contains("historical_destroyed"),"Historical destroyed unit was discarded");
+    const auto s=fixture();const auto encoded=s.serialize();auto restored=State::fromJson(s.definition,game::json::parse(encoded));check(restored.serialize()==encoded,"Complete mutable state was not round-tripped");check(restored.definition.get()==s.definition.get(),"Restore replaced immutable definition");check(restored.clock.playerTurnSerial==std::numeric_limits<std::uint64_t>::max(),"64-bit turn counter lost precision");check(restored.nations.at(nationNumber(restored, "mongolia")).treasury==std::nullopt,"No-account state became zero cash");check(restored.nations.at(nationNumber(restored, "japan")).incomeKnown&&!restored.nations.at(nationNumber(restored, "kmt")).incomeKnown,"Known vs unresolved income was lost");check(restored.units.at("cargo").movementAllowance==1&&restored.units.at("cargo").movementRemaining==0,"Movement was not round-tripped");{auto root=game::json::parse(encoded).asObject();auto units=root.at("units").asObject();auto cargo=units.at("cargo").asObject();cargo["movement_allowance"]=V(nullptr);units["cargo"]=V(std::move(cargo));root["units"]=V(std::move(units));const V unresolved(std::move(root));rejects([&]{State::fromJson(s.definition,unresolved);},"Unresolved movement was accepted, or became zero");}check(restored.units.at("cargo").owner==nationNumber(restored, "kmt")&&restored.units.at("carrier").owner==nationNumber(restored, "japan"),"Cargo ownership merged with carrier");check(restored.turnStart.units.contains("historical_destroyed"),"Historical destroyed unit was discarded");
     auto wrong=definition();wrong.rules=V(O{{"different",V(true)}});rejects([&]{State::fromJson(freezeDefinition(wrong),game::json::parse(encoded));},"Wrong immutable definition accepted");
     auto json=game::json::parse(encoded).asObject();auto c=json.at("clock").asObject();c["player_turn_serial"]=V(std::string("18446744073709551616"));json["clock"]=V(c);rejects([&]{State::fromJson(s.definition,V(json));},"Overflow counter accepted");
     c["player_turn_serial"]=V(1.0);json["clock"]=V(c);rejects([&]{State::fromJson(s.definition,V(json));},"Numeric lossy counter accepted");
@@ -266,7 +272,7 @@ void everyFreeFormPayloadRetainsFiniteValidation() {
     // that would be rejected regardless of whether its number was finite.
     auto state=loadScenario(std::filesystem::path(GWRL_SOURCE_DIR)/"game_content/scenarios/japan_china_1936");
     state.units.clear();
-    UnitState unit;unit.id="finite_raider";unit.type="battlecruiser";unit.owner=state.currentNation();
+    UnitState unit;unit.id="finite_raider";unit.type=knownUnitTypes(state).battlecruiser;unit.owner=state.currentNation();
     unit.zone=unit.turnOrigin=zoneNumber(state,"sea_p15");unit.movementAllowance=unit.movementRemaining=0;unit.gameFlags["raider"]=0;
     state.units.emplace(unit.id,unit);
     auto configuration=[&](double number) {

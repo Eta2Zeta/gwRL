@@ -87,7 +87,7 @@ State fixture(const std::vector<std::pair<Id, Id>>& links = {}, bool withDadao =
             {"w1_guard_a", "infantry", firstWarlord, "w1a"},
             {"w1_guard_b", "militia", firstWarlord, "w1b"}}) {
         UnitState unit;
-        unit.id = id; unit.type = type; unit.owner = nationNumber(state, owner); unit.zone = zoneNumber(state, zone);
+        unit.id = id; unit.type = unitTypeNumber(state, type); unit.owner = nationNumber(state, owner); unit.zone = zoneNumber(state, zone);
         unit.turnOrigin = zoneNumber(state, zone); unit.movementAllowance = type == "militia" ? 0 : 1; unit.movementRemaining = unit.movementAllowance;
         state.units.emplace(id, std::move(unit));
     }
@@ -119,7 +119,7 @@ Action option(const State& state, const Id& kind) {
 }
 void addUnit(State& state, const Id& id, const Id& type, const Id& owner, const Id& zone) {
     UnitState unit;
-    unit.id = id; unit.type = type; unit.owner = nationNumber(state, owner); unit.zone = zoneNumber(state, zone);
+    unit.id = id; unit.type = unitTypeNumber(state, type); unit.owner = nationNumber(state, owner); unit.zone = zoneNumber(state, zone);
     unit.turnOrigin = zoneNumber(state, zone); unit.movementAllowance = 1; unit.movementRemaining = 1;
     state.units.emplace(id, std::move(unit));
 }

@@ -78,17 +78,17 @@ std::set<Id> terrain(const V *value) {
                 out.insert(x.asString());
     return out;
 }
-bool has(const State &s, const UnitState &u, const Id &c) {
+bool has(const State &s, const UnitState &u, UnitClassId c) {
     return s.definition->catalog->unit(u.type).classes.contains(c);
 }
 bool aircraft(const State &s, const UnitState &u) {
-    return has(s, u, "aircraft");
+    return has(s, u, knownUnitClasses(s).aircraft);
 }
-bool fighter(const UnitState &u) {
-    return u.type == "fighter" || u.type == "jet_fighter";
+bool fighter(const State &s, const UnitState &u) {
+    return u.type == knownUnitTypes(s).fighter || u.type == knownUnitTypes(s).jet_fighter;
 }
-bool transport(const UnitState &u) {
-    return u.type == "air_transport" || u.type == "heavy_air_transport";
+bool transport(const State &s, const UnitState &u) {
+    return u.type == knownUnitTypes(s).air_transport || u.type == knownUnitTypes(s).heavy_air_transport;
 }
 bool airborne(const UnitState &u) {
     return u.commitments.contains("airborne_assault") || marked(u.turnFlags, "airborne_assault");
@@ -97,13 +97,13 @@ bool amphibious(const UnitState &u) {
     return u.commitments.contains("amphibious_assault") || marked(u.turnFlags, "amphibious_assault");
 }
 bool ground(const State &s, const UnitState &u) {
-    return has(s, u, "land");
+    return has(s, u, knownUnitClasses(s).land);
 }
 bool doubleAmphibiousCasualty(const State &s, const BattleState &b, const Id &id) {
     if (integer(b,"round",1)!=1 || !s.units.contains(id)) return false;
     const auto &u=s.units.at(id);
-    return ground(s,u) && amphibious(u) && u.type!="marine" &&
-        !(has(s,u,"infantry_class") &&
+    return ground(s,u) && amphibious(u) && u.type!= knownUnitTypes(s).marine &&
+        !(has(s,u,knownUnitClasses(s).infantry_class) &&
           catalogContext(s,u.owner,u.zone).technologies.contains("amphibious_doctrine"));
 }
 bool operational(const State &s, const BattleState &b, const Id &id) {
@@ -244,14 +244,14 @@ void eraseUnit(State &s, const Id &id) {
 void eliminateUnsupportedRockets(State &s, BattleState &b) {
     std::vector<Id> doomed;
     for(const auto& [id,rocket]:s.units) {
-        if(rocket.zone!=b.zone||rocket.carriedBy||!has(s,rocket,"rocket"))continue;
+        if(rocket.zone!=b.zone||rocket.carriedBy||!has(s,rocket,knownUnitClasses(s).rocket))continue;
         bool enemyLand=false,supported=false;
         for(const auto& [other,u]:s.units) {
             if(other==id||u.zone!=b.zone||u.carriedBy)continue;
             if(ground(s,u)&&opposing(s,rocket.owner,u.owner)&&!politicallyFriendly(s,rocket.owner,u.owner))enemyLand=true;
             const bool participating=std::find(b.attackers.begin(),b.attackers.end(),other)!=b.attackers.end()||
                                      std::find(b.defenders.begin(),b.defenders.end(),other)!=b.defenders.end();
-            if(participating&&!has(s,u,"rocket")&&operational(s,b,other)&&politicallyFriendly(s,rocket.owner,u.owner))supported=true;
+            if(participating&&!has(s,u,knownUnitClasses(s).rocket)&&operational(s,b,other)&&politicallyFriendly(s,rocket.owner,u.owner))supported=true;
         }
         if(enemyLand&&!supported)doomed.push_back(id);
     }
@@ -312,7 +312,7 @@ std::vector<Id> eligibleHits(const State &s, const BattleState &b, const V &hit)
                 v.end());
     }
     v.erase(std::remove_if(v.begin(), v.end(), [&](const Id &id) {
-        return pendingDead(b,id)||has(s,s.units.at(id),"rocket");
+        return pendingDead(b,id)||has(s,s.units.at(id),knownUnitClasses(s).rocket);
     }),v.end());
     if (const auto *extra=hit.find("amphibious_extra"); extra && extra->asBool())
         v.erase(std::remove_if(v.begin(),v.end(),[&](const Id &id){
@@ -355,13 +355,13 @@ std::vector<Id> eligibleHits(const State &s, const BattleState &b, const V &hit)
     bool carryingException = side && integer(b, "round", 1) == 1;
     bool notTransport = std::any_of(v.begin(), v.end(), [&](const Id &id) {
         const auto &u = s.units.at(id);
-        return !transport(u) || (carryingException && airborne(u));
+        return !transport(s, u) || (carryingException && airborne(u));
     });
     if (notTransport)
         v.erase(std::remove_if(v.begin(), v.end(),
                                [&](const Id &id) {
                                    const auto &u = s.units.at(id);
-                                   return transport(u) && !(carryingException && airborne(u));
+                                   return transport(s, u) && !(carryingException && airborne(u));
                                }),
                 v.end());
     return v;
@@ -387,7 +387,7 @@ void chooseHit(State &s, BattleState &b) {
         if (target)
             for (const auto &id : candidates)
                 for (const auto &c : target->asArray())
-                    if (has(s, s.units.at(id), c.asString())) {
+                    if (s.definition->catalog->unitHasClass(s.units.at(id).type, c.asString())) {
                         targets.push_back(id);
                         break;
                     }
@@ -448,11 +448,11 @@ void chooseHit(State &s, BattleState &b) {
             const bool attacking = std::find(b.attackers.begin(), b.attackers.end(), id) != b.attackers.end();
             const auto stats = landCombatStats(s, b, id, attacking, integer(b, "round", 1));
             bool ordinaryRoll = stats.threshold && stats.dice > 0;
-            if (attacking && has(s, u, "strategic_bomber") && !airborne(u))
+            if (attacking && has(s, u, knownUnitClasses(s).strategic_bomber) && !airborne(u))
                 for (const auto &mode : s.definition->catalog->modes(u.type, catalogContext(s, u.owner, u.zone), u.damage))
                     if (mode.id == "carpet_bombing" && mode.dice > 0) ordinaryRoll = true;
-            if (!fighter(u) && !transport(u) && u.type != "seaplane" &&
-                !has(s, u, "anti_aircraft_artillery_class") && !stats.firstStrike &&
+            if (!fighter(s, u) && !transport(s, u) && u.type != knownUnitTypes(s).seaplane &&
+                !has(s, u, knownUnitClasses(s).anti_aircraft_artillery_class) && !stats.firstStrike &&
                 ordinaryRoll)
                 returning.push_back(entry);
             else
@@ -520,11 +520,11 @@ void requestPairing(State &s, BattleState &b, bool attacker, const Id &after) {
     for (const auto &[art, companion] : pairs)
         used.insert(companion.asString());
     for (const auto &artillery : current)
-        if (has(s, s.units.at(artillery), "artillery_class") && !pairs.contains(artillery)) {
+        if (has(s, s.units.at(artillery), knownUnitClasses(s).artillery_class) && !pairs.contains(artillery)) {
             std::vector<Action> options;
             for (const auto &companion : current)
-                if (!used.contains(companion) && (has(s, s.units.at(companion), "infantry_class") ||
-                                                  has(s, s.units.at(companion), "vehicle_class")))
+                if (!used.contains(companion) && (has(s, s.units.at(companion), knownUnitClasses(s).infantry_class) ||
+                                                  has(s, s.units.at(companion), knownUnitClasses(s).vehicle_class)))
                     options.push_back(action(s, attacker ? b.attacker : b.defender, "land_pair_artillery",
                                              {{"battle", V(b.id)},
                                               {"artillery", V(artillery)},
@@ -580,26 +580,26 @@ void shoot(State &s, BattleState &b, const Id &which) {
             } else if (airStep) {
                 if (round != 1)
                     continue;
-                if (has(s, u, "anti_aircraft_artillery_class")) {
+                if (has(s, u, knownUnitClasses(s).anti_aircraft_artillery_class)) {
                     // Corrected airborne step 4 resolves both sides' AAA and
                     // Fighters together before surviving transports land.
                     for (int n = 0; n < std::min(3, enemyAircraft); ++n)
                         addShot(shots, id, nationName(s, u.owner), !attacking, 3, 0, {}, {{"air_only", V(true)}});
                     continue;
                 }
-                if (!fighter(u) || stats.firstStrike)
+                if (!fighter(s, u) || stats.firstStrike)
                     continue;
             } else {
-                if (round == 1 && (stats.firstStrike || fighter(u)))
+                if (round == 1 && (stats.firstStrike || fighter(s, u)))
                     continue;
-                if (has(s, u, "anti_aircraft_artillery_class")) {
+                if (has(s, u, knownUnitClasses(s).anti_aircraft_artillery_class)) {
 
                     continue;
                 }
             }
-            if (u.type == "seaplane" || transport(u))
+            if (u.type == knownUnitTypes(s).seaplane || transport(s, u))
                 continue;
-            const bool carpet = attacking && definition.classes.contains("strategic_bomber");
+            const bool carpet = attacking && definition.classes.contains(knownUnitClasses(s).strategic_bomber);
             if (carpet) {
                 if (round != 1 || airborne(u))
                     continue;
@@ -618,24 +618,24 @@ void shoot(State &s, BattleState &b, const Id &which) {
                 // Minor KMT must still roll every attacking Infantry/Cavalry
                 // even if the destination was empty or an attack value is N/A.
                 if (attacking && u.owner == knownNations(s).kmt && s.nations.at(nationNumber(s, "kmt")).powerStatus != "major" &&
-                    (u.type == "infantry" || u.type == "cavalry"))
+                    (u.type == knownUnitTypes(s).infantry || u.type == knownUnitTypes(s).cavalry))
                     addShot(shots, id, nationName(s, u.owner), false, 0, 0, {}, {{"low_morale", V(true)}});
                 continue;
             }
             O extra;
-            if (!attacking && !fighter(u)) {
+            if (!attacking && !fighter(s, u)) {
                 std::vector<Id> eligible;
                 for (const auto &target : opponents)
-                    if (!(has(s, s.units.at(target), "strategic_bomber") && !airborne(s.units.at(target))))
+                    if (!(has(s, s.units.at(target), knownUnitClasses(s).strategic_bomber) && !airborne(s.units.at(target))))
                         eligible.push_back(target);
                 extra["eligible"] = ids(eligible);
             }
             if (attacking && u.owner == knownNations(s).kmt && s.nations.at(nationNumber(s, "kmt")).powerStatus != "major" &&
-                (u.type == "infantry" || u.type == "cavalry"))
+                (u.type == knownUnitTypes(s).infantry || u.type == knownUnitTypes(s).cavalry))
                 extra["low_morale"] = V(true);
-            if (fighter(u) && round == 1)
+            if (fighter(s, u) && round == 1)
                 extra["air_priority"] = V(true);
-            if (!attacking && round == 1 && has(s, u, "infantry_class") && fortActive(s, b)) {
+            if (!attacking && round == 1 && has(s, u, knownUnitClasses(s).infantry_class) && fortActive(s, b)) {
                 auto withoutFort = b;
                 withoutFort.flags["ignore_fortification"] = 1;
                 const auto baseline = landCombatStats(s, withoutFort, id, false, round).threshold.value_or(0);
@@ -695,14 +695,14 @@ void finishPostBattle(State &s, BattleState &b) {
             int usedCapacity = 0;
             if (pairs.contains(tank))
                 for (const auto &id : pairs.at(tank).asArray())
-                    usedCapacity += s.units.at(id.asString()).type == "advanced_mechanized_infantry" ? 1 : 2;
+                    usedCapacity += s.units.at(id.asString()).type == knownUnitTypes(s).advanced_mechanized_infantry ? 1 : 2;
             for (const auto &id : living(s, b, true)) {
                 const auto &u = s.units.at(id);
-                bool advanced = u.type == "advanced_mechanized_infantry";
-                bool companion = advanced || u.type == "mechanized_infantry" ||
-                                 u.type == "self_propelled_artillery" ||
-                                 u.type == "advanced_self_propelled_artillery" || fighter(u) ||
-                                 u.type == "tactical_bomber";
+                bool advanced = u.type == knownUnitTypes(s).advanced_mechanized_infantry;
+                bool companion = advanced || u.type == knownUnitTypes(s).mechanized_infantry ||
+                                 u.type == knownUnitTypes(s).self_propelled_artillery ||
+                                 u.type == knownUnitTypes(s).advanced_self_propelled_artillery || fighter(s, u) ||
+                                 u.type == knownUnitTypes(s).tactical_bomber;
                 if (!companion || used.contains(id) || !u.movementRemaining || *u.movementRemaining < 1 ||
                     marked(u.turnFlags, "crossed_enemy_fortification") || airborne(u) || amphibious(u) ||
                     usedCapacity + (advanced ? 1 : 2) > 2)
@@ -752,14 +752,14 @@ void finishBattle(State &s, BattleState &b, const Id &result) {
 bool endIfOver(State &s, BattleState &b) {
     eliminateUnsupportedRockets(s,b);
     auto attackers = living(s, b, true), defenders = living(s, b, false);
-    const bool onlyRockets=!defenders.empty()&&std::all_of(defenders.begin(),defenders.end(),[&](const Id& id){return has(s,s.units.at(id),"rocket");});
+    const bool onlyRockets=!defenders.empty()&&std::all_of(defenders.begin(),defenders.end(),[&](const Id& id){return has(s,s.units.at(id),knownUnitClasses(s).rocket);});
     if(onlyRockets&&std::none_of(attackers.begin(),attackers.end(),[&](const Id& id){return ground(s,s.units.at(id));})) {
         finishBattle(s,b,"defender_wins");return true;
     }
     // Unsupported seaplanes and transports cannot defend a land zone alone.
     bool defendingCombatant = std::any_of(defenders.begin(), defenders.end(), [&](const Id &id) {
         const auto &u = s.units.at(id);
-        return u.type != "seaplane" && !transport(u);
+        return u.type != knownUnitTypes(s).seaplane && !transport(s, u);
     });
     if (!defendingCombatant)
         for (const auto &id : defenders)
@@ -960,7 +960,7 @@ void advance(State &s, BattleState &b) {
             auto exited = object(b, "exited_aircraft");
             std::vector<Id> bombers;
             for (const auto &id : living(s, b, true))
-                if (has(s, s.units.at(id), "strategic_bomber") && !airborne(s.units.at(id))) {
+                if (has(s, s.units.at(id), knownUnitClasses(s).strategic_bomber) && !airborne(s.units.at(id))) {
                     exited[id] = V(true);
                     bombers.push_back(id);
                 }
@@ -1027,14 +1027,14 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
     LandCombatStats result;
     result.threshold = attacking ? base.attack : base.defense;
     result.dice = attacking ? base.attackDice : base.defenseDice;
-    if (has(s, u, "anti_aircraft_artillery_class")) {
+    if (has(s, u, knownUnitClasses(s).anti_aircraft_artillery_class)) {
         result.threshold = std::nullopt;
         result.dice = 0;
         return result;
     }
     result.firstStrike =
         round == 1 &&
-        (d.classes.contains("artillery_class") ||
+        (d.classes.contains(knownUnitClasses(s).artillery_class) ||
          (attacking && u.owner == knownNations(s).japan && aircraft(s, u) && marked(b.flags, "japanese_surprise_attack")));
     for (const auto &mode : catalog.modes(u.type, catalogContext(s, u.owner, u.zone), u.damage))
         if (mode.id == "target_selection") {
@@ -1067,7 +1067,7 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
                 t.insert(border.begin(), border.end());
             }
     bool mountain =
-        d.abilities.contains("mountain_infantry_terrain") || u.type == "foreign_legion" || u.type == "gurkha";
+        d.abilities.contains("mountain_infantry_terrain") || u.type == knownUnitTypes(s).foreign_legion || u.type == knownUnitTypes(s).gurkha;
     if (!aircraft(s, u)) {
         if (t.contains("mountain") || t.contains("mountains")) {
             if (attacking && !mountain)
@@ -1076,16 +1076,16 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
                 bonus(1);
         }
         if (t.contains("desert")) {
-            if (attacking && u.type != "foreign_legion")
+            if (attacking && u.type != knownUnitTypes(s).foreign_legion)
                 bonus(-1);
-            if (attacking && u.type == "foreign_legion")
+            if (attacking && u.type == knownUnitTypes(s).foreign_legion)
                 bonus(1);
         }
-        if ((t.contains("jungle") || t.contains("marsh")) && has(s, u, "vehicle_class"))
+        if ((t.contains("jungle") || t.contains("marsh")) && has(s, u, knownUnitClasses(s).vehicle_class))
             bonus(-2);
-        if (t.contains("jungle") && attacking && u.type == "gurkha")
+        if (t.contains("jungle") && attacking && u.type == knownUnitTypes(s).gurkha)
             bonus(1);
-        if (attacking && round == 1 && !has(s, u, "artillery_class") && u.type != "marine" && !airborne(u)) {
+        if (attacking && round == 1 && !has(s, u, knownUnitClasses(s).artillery_class) && u.type != knownUnitTypes(s).marine && !airborne(u)) {
             if (edge(s, approach(s, b, id), b.zone) && borderApproach(s, approach(s, b, id), b.zone).river)
                 bonus(-1);
         }
@@ -1095,33 +1095,33 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
         if (!attacking && surrounded && !marked(u.turnFlags, "scrambled"))
             bonus(-1);
         if (!surrounded) {
-            if (attacking && has(s, u, "vehicle_class"))
+            if (attacking && has(s, u, knownUnitClasses(s).vehicle_class))
                 bonus(-2);
-            if (!attacking && has(s, u, "infantry_class")) {
+            if (!attacking && has(s, u, knownUnitClasses(s).infantry_class)) {
                 bonus(1);
                 result.targetSelection = std::max(result.targetSelection, 1);
                 result.targetClasses.insert("vehicle_class");
             }
         }
     }
-    if (!attacking && round == 1 && has(s, u, "infantry_class") && fortActive(s, b))
+    if (!attacking && round == 1 && has(s, u, knownUnitClasses(s).infantry_class) && fortActive(s, b))
         bonus(2);
-    if (!attacking && u.owner == knownNations(s).japan && has(s, u, "infantry_class") &&
+    if (!attacking && u.owner == knownNations(s).japan && has(s, u, knownUnitClasses(s).infantry_class) &&
         nationFaction(s, u.owner).homeZones.contains(b.zone))
         extra += 1;
     if (!attacking && round == 1 && marked(b.flags, "japanese_surprise_attack"))
         extra -= 1;
     auto pairs = object(b, attacking ? "attack_pairs" : "defense_pairs");
-    if (has(s, u, "artillery_class") && (!pairs.contains(id) || !s.units.contains(pairs.at(id).asString())))
+    if (has(s, u, knownUnitClasses(s).artillery_class) && (!pairs.contains(id) || !s.units.contains(pairs.at(id).asString())))
         bonus(-1);
-    if (attacking && has(s, u, "infantry_class"))
+    if (attacking && has(s, u, knownUnitClasses(s).infantry_class))
         for (const auto &[art, companion] : pairs)
             if (companion.asString() == id && s.units.contains(art))
                 bonus(1);
     if (attacking && round == 1 && airborne(u) &&
-        (u.type == "airborne_infantry" || u.type == "elite_airborne_infantry"))
+        (u.type == knownUnitTypes(s).airborne_infantry || u.type == knownUnitTypes(s).elite_airborne_infantry))
         bonus(1);
-    if (attacking && round == 1 && u.type == "marine" && marked(u.turnFlags, "from_attack_naval_transport"))
+    if (attacking && round == 1 && u.type == knownUnitTypes(s).marine && marked(u.turnFlags, "from_attack_naval_transport"))
         bonus(1);
     result.threshold = std::max(1, *result.threshold + positive + negative + extra);
     return result;
@@ -1204,8 +1204,8 @@ Id registerAttritionBattle(State &s, ZoneId zone, NationId attacker, const std::
     for (const auto &id : units) {
         auto &u = s.units.at(id);
         require(u.owner == attacker &&
-                    (u.type == "advanced_artillery" || u.type == "advanced_self_propelled_artillery" ||
-                     u.type == "katyusha_rocket_artillery"),
+                    (u.type == knownUnitTypes(s).advanced_artillery || u.type == knownUnitTypes(s).advanced_self_propelled_artillery ||
+                     u.type == knownUnitTypes(s).katyusha_rocket_artillery),
                 "Unit cannot make an attrition attack");
         require(u.route.empty() && s.turnStart.units.contains(id) &&
                     s.turnStart.units.at(id).second == u.zone && passableLandBorder(s, u.zone, zone),
@@ -1297,8 +1297,8 @@ std::vector<Id> blitzEligible(const State &s, const BattleState &b) {
         if (!u.movementRemaining || *u.movementRemaining < 1 ||
             marked(u.turnFlags, "crossed_enemy_fortification") || airborne(u) || amphibious(u))
             continue;
-        if (u.type == "light_armor" || u.type == "medium_armor" || u.type == "heavy_armor" ||
-            u.type == "t34" || u.type == "tiger_i" || u.type == "panzergrenadier")
+        if (u.type == knownUnitTypes(s).light_armor || u.type == knownUnitTypes(s).medium_armor || u.type == knownUnitTypes(s).heavy_armor ||
+            u.type == knownUnitTypes(s).t_34 || u.type == knownUnitTypes(s).tiger_i || u.type == knownUnitTypes(s).panzergrenadier)
             out.push_back(id);
     }
     return out;
@@ -1338,7 +1338,7 @@ std::vector<Action> LandCombatRules::actions(const State &s) const {
     if (s.clock.phase == Phase::CombatMovement) {
         for (const auto &[id, u] : s.units)
             if (movementController(s, u.owner) &&
-                (u.type == "advanced_artillery" || u.type == "advanced_self_propelled_artillery") &&
+                (u.type == knownUnitTypes(s).advanced_artillery || u.type == knownUnitTypes(s).advanced_self_propelled_artillery) &&
                 u.route.empty() && !u.commitments.contains("attrition") &&
                 !u.commitments.contains("combat") && s.turnStart.units.contains(id))
                 for (const auto zone : mapNeighbors(s, u.zone)) {

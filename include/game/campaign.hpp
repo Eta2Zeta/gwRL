@@ -122,6 +122,15 @@ bool isNation(const State&, NationId, std::string_view name);
 bool isNation(const State&, const std::optional<NationId>&, std::string_view name);
 // Whether the position holds a nation of this name.
 bool hasNation(const State&, std::string_view name);
+// A unit type's number and name, from the catalog's table (catalog.hpp), and
+// the unit types and classes the rules name. Each throws for a definition
+// without a catalog.
+struct KnownUnitTypes;
+struct KnownUnitClasses;
+UnitTypeId unitTypeNumber(const State&, std::string_view name);  // Throws "Unknown unit type: <name>".
+const std::string& unitTypeName(const State&, UnitTypeId);
+const KnownUnitTypes& knownUnitTypes(const State&);
+const KnownUnitClasses& knownUnitClasses(const State&);
 // A railroad's name from the two land zones it connects, in either order.
 Id railroadId(const State&, ZoneId a, ZoneId b);
 // Map reads for rule hot paths. Each matches reading the definition's map JSON
@@ -168,10 +177,11 @@ struct TerritoryState {
 
 struct UnitState {
     Id id;
-    Id type;
+    UnitTypeId type;  // A number in the catalog's unit type table (unitTypeName names it).
     NationId owner;
     ZoneId zone;
-    // Null is reserved for catalog-free foundation fixtures, never zero movement.
+    // Set for every unit of a valid position: a unit's type comes from the catalog,
+    // which gives its movement, and State::validate refuses a unit without it.
     std::optional<int> movementRemaining;
     std::optional<int> movementAllowance;
     ZoneId turnOrigin;

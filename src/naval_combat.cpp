@@ -18,16 +18,16 @@ V num(int n) { return V(static_cast<double>(n)); }
 bool marked(const std::map<Id, int>& flags, const Id& key) {
     auto it = flags.find(key); return it != flags.end() && it->second != 0;
 }
-bool has(const State& s, const UnitState& u, const Id& c) {
+bool has(const State& s, const UnitState& u, UnitClassId c) {
     return s.definition->catalog->unit(u.type).classes.contains(c);
 }
 bool hostile(const State& s, NationId a, NationId b) {
     return a != b && s.nations.at(a).atWarWith.contains(b);
 }
-bool sub(const State& s, const UnitState& u) { return has(s, u, "submarine"); }
-bool plane(const State& s, const UnitState& u) { return has(s, u, "aircraft"); }
-bool fighter(const State& s, const UnitState& u) { return has(s, u, "fighter"); }
-bool transport(const State& s, const UnitState& u) { return has(s, u, "naval_transport"); }
+bool sub(const State& s, const UnitState& u) { return has(s, u, knownUnitClasses(s).submarine); }
+bool plane(const State& s, const UnitState& u) { return has(s, u, knownUnitClasses(s).aircraft); }
+bool fighter(const State& s, const UnitState& u) { return has(s, u, knownUnitClasses(s).fighter); }
+bool transport(const State& s, const UnitState& u) { return has(s, u, knownUnitClasses(s).naval_transport); }
 bool tech(const State& s, NationId owner, const Id& t) {
     const auto it = s.nations.at(owner).technologyStages.find(t);
     return it != s.nations.at(owner).technologyStages.end() && it->second == 4;
@@ -103,7 +103,7 @@ bool onMap(const State& s, const Id& id) {
            std::any_of(u.commitments.begin(), u.commitments.end(), [](const Id& commitment) {
                return commitment.rfind("air_defending_carrier:", 0) == 0;
            }) ||
-           (u.carriedBy && s.units.contains(*u.carriedBy) && has(s, s.units.at(*u.carriedBy), "carrier"));
+           (u.carriedBy && s.units.contains(*u.carriedBy) && has(s, s.units.at(*u.carriedBy), knownUnitClasses(s).carrier));
 }
 std::optional<Id> originalCarrier(const UnitState& u) {
     if (u.carriedBy) return u.carriedBy;
@@ -117,7 +117,7 @@ void chooseHit(State&, BattleState&);
 void queueCarrierLandings(State&, BattleState&);
 void removeUnit(State& s, BattleState& b, const Id& id) {
     if (!s.units.contains(id)) return;
-    const bool carrier = has(s, s.units.at(id), "carrier");
+    const bool carrier = has(s, s.units.at(id), knownUnitClasses(s).carrier);
     if (carrier) {
         // RB10.7: defending aircraft get an immediate one-movement landing.
         // Detach before generic linked-cargo removal; ordinary transport cargo
@@ -177,10 +177,10 @@ std::vector<Id> targetsFor(const State& s, const BattleState& b, const Id& firin
     candidates.erase(std::remove_if(candidates.begin(), candidates.end(), [&](const Id& id) {
         const auto& target = s.units.at(id);
         if (sub(s, shooter) && plane(s, target)) return true;
-        if (shooter.type == "seaplane" && !sub(s, target) && !transport(s, target)) return true;
+        if (shooter.type == knownUnitTypes(s).seaplane && !sub(s, target) && !transport(s, target)) return true;
         if (!sub(s, target) || victimAttacker || port || subsInitiated || !protectedSubs.contains(id)) return false;
         if (plane(s, shooter) && onMap(s, firing)) return false;
-        if (shooter.type == "destroyer" && pairs.contains(firing) && target.type != "advanced_submarine") return false;
+        if (shooter.type == knownUnitTypes(s).destroyer && pairs.contains(firing) && target.type != knownUnitTypes(s).advanced_submarine) return false;
         return true;
     }), candidates.end());
     return candidates;
@@ -194,7 +194,7 @@ void shoot(State& s, BattleState& b, const Id& stage) {
         const auto participants = living(s, b, attacking, !attacking && stage == "naval_defender_fire");
         const auto opponents = living(s, b, !attacking);
         const bool enemyDestroyer = std::any_of(opponents.begin(), opponents.end(), [&](const Id& id) {
-            return s.units.at(id).type == "destroyer";
+            return s.units.at(id).type == knownUnitTypes(s).destroyer;
         });
         for (const auto& id : participants) {
             const auto& u = s.units.at(id);
@@ -207,12 +207,12 @@ void shoot(State& s, BattleState& b, const Id& stage) {
             auto threshold = attacking ? stats.attack : stats.defense;
             int dice = attacking ? stats.attackDice : stats.defenseDice;
             bool aswTransport = false;
-            if (!attacking && u.type == "naval_transport" && tech(s, u.owner, "anti_submarine_warfare") &&
+            if (!attacking && u.type == knownUnitTypes(s).naval_transport && tech(s, u.owner, "anti_submarine_warfare") &&
                 std::any_of(opponents.begin(), opponents.end(), [&](const Id& enemy) { return sub(s, s.units.at(enemy)); })) {
                 threshold = 1; dice = 1; aswTransport = true;
             }
             if (!threshold || dice == 0) continue;
-            if (!attacking && string(b, "context") == "port_attack" && has(s, u, "naval")) continue;
+            if (!attacking && string(b, "context") == "port_attack" && has(s, u, knownUnitClasses(s).naval)) continue;
             if (!attacking && round == 1 && marked(b.flags, "japanese_surprise_attack")) threshold = std::max(1, *threshold - 1);
             auto eligible = targetsFor(s, b, id, !attacking);
             if (aswTransport) eligible.erase(std::remove_if(eligible.begin(), eligible.end(), [&](const Id& enemy) { return !sub(s, s.units.at(enemy)); }), eligible.end());
@@ -224,7 +224,7 @@ void shoot(State& s, BattleState& b, const Id& stage) {
                     for (const auto& c : mode.parameters.require("target_classes").asArray()) targetClasses.insert(c.asString());
                 }
             if (sub(s, u)) { target = 1; targetClasses = {"surface_ship"}; }
-            if (!attacking && u.type == "battlecruiser" && marked(u.gameFlags, "raider")) {
+            if (!attacking && u.type == knownUnitTypes(s).battlecruiser && marked(u.gameFlags, "raider")) {
                 target = *threshold; targetClasses = {"naval"};
             }
             A classes; for (const auto& c : targetClasses) classes.emplace_back(c);
@@ -233,7 +233,7 @@ void shoot(State& s, BattleState& b, const Id& stage) {
                                      {"threshold", num(*threshold)}, {"target", num(target)},
                                      {"target_classes", V(classes)}, {"eligible", V(ids(eligible))},
                                      {"air_priority", V(air)},
-                                     {"asw_sub_bonus", num(attacking && u.type == "seaplane" && onMap(s, id) && tech(s, u.owner, "anti_submarine_warfare") ? 2 : 0)}});
+                                     {"asw_sub_bonus", num(attacking && u.type == knownUnitTypes(s).seaplane && onMap(s, id) && tech(s, u.owner, "anti_submarine_warfare") ? 2 : 0)}});
         }
     }
     const Id after = first ? "naval_air_superiority" : air ? "naval_attacker_fire" :
@@ -259,7 +259,7 @@ std::vector<Id> eligibleHit(const State& s, const BattleState& b, const V& hit) 
     if (hit.require("targeted").asBool())
         for (const auto& id : units)
             for (const auto& c : hit.require("target_classes").asArray())
-                if (has(s, s.units.at(id), c.asString())) { targeted.push_back(id); break; }
+                if (s.definition->catalog->unitHasClass(s.units.at(id).type, c.asString())) { targeted.push_back(id); break; }
     if (!targeted.empty()) return targeted;
     const bool combatants = std::any_of(units.begin(), units.end(), [&](const Id& id) { return !transport(s, s.units.at(id)); });
     if (combatants) units.erase(std::remove_if(units.begin(), units.end(), [&](const Id& id) { return transport(s, s.units.at(id)); }), units.end());
@@ -269,7 +269,7 @@ bool isTargeted(const State& s, const V& hit, const std::vector<Id>& eligible) {
     if (!hit.require("targeted").asBool()) return false;
     for (const auto& id : eligible)
         for (const auto& c : hit.require("target_classes").asArray())
-            if (has(s, s.units.at(id), c.asString())) return true;
+            if (s.definition->catalog->unitHasClass(s.units.at(id).type, c.asString())) return true;
     return false;
 }
 NationId casualtyOwner(const State& s, const BattleState& b, const V& hit, const std::vector<Id>& candidates) {
@@ -385,7 +385,7 @@ std::set<Id> retreatOrigins(const State& s, const BattleState& b) {
 void assignRetreat(State& s, BattleState& b) {
     const auto origins = retreatOrigins(s, b);
     for (const auto& id : living(s, b, true))
-        if (has(s, s.units.at(id), "naval")) {
+        if (has(s, s.units.at(id), knownUnitClasses(s).naval)) {
             std::vector<Action> options;
             for (const auto& destination : origins)
                 options.push_back(action(s, b.attacker, "naval_retreat_unit", {{"battle", V(b.id)}, {"unit", V(id)}, {"zone", V(destination)}}));
@@ -399,18 +399,18 @@ void preparePairs(State& s, BattleState& b) {
     std::set<Id> used; for (const auto& [ship, aircraft] : pairs) used.insert(aircraft.asString());
     for (bool attacker : {true, false}) {
         const auto enemy = living(s, b, !attacker);
-        if (std::none_of(enemy.begin(), enemy.end(), [&](const Id& id) { return sub(s, s.units.at(id)) && s.units.at(id).type != "advanced_submarine"; })) continue;
+        if (std::none_of(enemy.begin(), enemy.end(), [&](const Id& id) { return sub(s, s.units.at(id)) && s.units.at(id).type != knownUnitTypes(s).advanced_submarine; })) continue;
         auto own = living(s, b, attacker);
         if (!attacker && string(b, "context") == "movement_map")
             for (const auto& [id, u] : s.units)
-                if (u.zone == b.zone && u.type == "destroyer" && hostile(s, b.attacker, u.owner) &&
+                if (u.zone == b.zone && u.type == knownUnitTypes(s).destroyer && hostile(s, b.attacker, u.owner) &&
                     std::find(own.begin(), own.end(), id) == own.end() &&
                     std::any_of(own.begin(), own.end(), [&](const Id& aircraft) {
                         return plane(s, s.units.at(aircraft)) && onMap(s, aircraft) &&
                                politicallyFriendly(s, u.owner, s.units.at(aircraft).owner);
                     })) own.push_back(id);
         for (const auto& id : own)
-            if (s.units.at(id).type == "destroyer" && !pairs.contains(id) && !object(b, "naval_pairing_done").contains(id)) {
+            if (s.units.at(id).type == knownUnitTypes(s).destroyer && !pairs.contains(id) && !object(b, "naval_pairing_done").contains(id)) {
                 std::vector<Action> options{action(s, s.units.at(id).owner, "naval_decline_pair", {{"battle", V(b.id)}, {"unit", V(id)}})};
                 for (const auto& aircraft : own)
                     if (plane(s, s.units.at(aircraft)) && onMap(s, aircraft) && !used.contains(aircraft))
@@ -450,7 +450,7 @@ void openBattle(State& s, BattleState& b) {
             s.units.at(unit).turnFlags["naval_combat_turn"] = serial;
             defending.push_back(unit);
         }
-    if (defending.size() == 1 && s.units.at(defending.front()).type == "battlecruiser" &&
+    if (defending.size() == 1 && s.units.at(defending.front()).type == knownUnitTypes(s).battlecruiser &&
         marked(s.units.at(defending.front()).gameFlags, "raider")) put(b, "one_round", V(true));
     b.stage = "naval_raider_discovery"; advance(s, b);
 }
@@ -472,7 +472,7 @@ void stayOut(State& s, BattleState& b, const Id& id) {
     if (const auto* movement = b.data.find("naval_movement"))
         ships = readIds(movement->require("request").require("units"));
     for (const auto& ship : ships)
-        if (s.units.contains(ship) && has(s, s.units.at(ship), "naval") && s.units.at(ship).zone == b.zone)
+        if (s.units.contains(ship) && has(s, s.units.at(ship), knownUnitClasses(s).naval) && s.units.at(ship).zone == b.zone)
             s.units.at(ship).turnFlags["map_declined_combat"] = 1;
 }
 // RB 9.3.1 and 9.4: an aircraft on Maritime Air Patrol, unlike one aboard a
@@ -513,7 +513,7 @@ void preparePatrols(State& s, BattleState& b) {
 void prepareRaiders(State& s, BattleState& b) {
     if (string(b, "context") != "port_attack" && string(b, "context") != "movement_submarines" && string(b, "context") != "movement_map")
         for (const auto& id : b.defenders)
-            if (operational(s, b, id) && s.units.at(id).type == "battlecruiser" &&
+            if (operational(s, b, id) && s.units.at(id).type == knownUnitTypes(s).battlecruiser &&
                 marked(s.units.at(id).gameFlags, "raider") && !object(b, "naval_raider_choices").contains(id)) {
                 decision(s, b, b.attacker, "naval_engage_raider", {
                     action(s, b.attacker, "naval_ignore_raider", {{"battle", V(b.id)}, {"unit", V(id)}}),
@@ -525,7 +525,7 @@ void prepareShipScrambles(State& s, BattleState& b) {
     if (string(b, "context") != "port_attack" && !boolean(b, "no_scramble") &&
         !marked(b.flags, "japanese_surprise_attack") && !b.defenders.empty())
         for (const auto& [id, u] : s.units) {
-            if (!has(s, u, "naval") || !hostile(s, b.attacker, u.owner) ||
+            if (!has(s, u, knownUnitClasses(s).naval) || !hostile(s, b.attacker, u.owner) ||
                 !politicallyFriendly(s, b.defender, u.owner) || marked(u.gameFlags, "skeleton_crew") || u.gameFlags.contains("skeleton_crew_until_own_turn") ||
                 marked(u.turnFlags, "repairing") || object(b, "naval_scramble_choices").contains(id)) continue;
             Id facility;
@@ -596,7 +596,7 @@ void advance(State& s, BattleState& b) {
         if (integer(b, "naval_round_shots") == 0) { finishBattle(s, b, "stalemate"); return; }
         auto origins = retreatOrigins(s, b);
         bool ship = false, air = false;
-        for (const auto& id : living(s, b, true)) { ship |= has(s, s.units.at(id), "naval"); air |= plane(s, s.units.at(id)); }
+        for (const auto& id : living(s, b, true)) { ship |= has(s, s.units.at(id), knownUnitClasses(s).naval); air |= plane(s, s.units.at(id)); }
         if ((!ship || !origins.empty()) && (ship || air)) {
             std::vector<Action> choices{
                 action(s, b.attacker, "naval_continue_fighting", {{"battle", V(b.id)}}),
@@ -612,7 +612,7 @@ void advance(State& s, BattleState& b) {
 
 namespace {
 bool designatedRaider(const State& s, const Id& id) {
-    return s.units.contains(id) && s.units.at(id).type == "battlecruiser" && marked(s.units.at(id).gameFlags, "raider");
+    return s.units.contains(id) && s.units.at(id).type == knownUnitTypes(s).battlecruiser && marked(s.units.at(id).gameFlags, "raider");
 }
 bool hasRaider(const State& s, const std::vector<Id>& units) {
     return std::any_of(units.begin(), units.end(), [&](const Id& id) { return designatedRaider(s, id); });
@@ -652,7 +652,7 @@ Id registerNavalBattle(State& s, ZoneId zone, NationId attacker,
                 require(s.units.contains(id) && s.units.at(id).owner == attacker && s.units.at(id).zone == zone,
                         "Invalid merged naval attacker");
                 if (std::find(existing.attackers.begin(), existing.attackers.end(), id) == existing.attackers.end()) existing.attackers.push_back(id);
-                if (origins.contains(id)) { oldOrigins[id] = V(zoneName(s, origins.at(id))); if (has(s, s.units.at(id), "naval")) entries.emplace_back(zoneName(s, origins.at(id))); }
+                if (origins.contains(id)) { oldOrigins[id] = V(zoneName(s, origins.at(id))); if (has(s, s.units.at(id), knownUnitClasses(s).naval)) entries.emplace_back(zoneName(s, origins.at(id))); }
             }
             if (const auto* defenders = options.find("defenders"))
                 for (const auto& id : readIds(*defenders)) if (std::find(existing.defenders.begin(), existing.defenders.end(), id) == existing.defenders.end()) existing.defenders.push_back(id);
@@ -666,15 +666,15 @@ Id registerNavalBattle(State& s, ZoneId zone, NationId attacker,
     for (const auto& id : attackers) {
         require(s.units.contains(id) && (evacuation || s.units.at(id).owner == attacker) && s.units.at(id).zone == zone,
                 "Naval attackers must be one nation's units in the battle zone outside mandatory port evacuations");
-        require(has(s, s.units.at(id), "naval") || plane(s, s.units.at(id)), "Invalid naval attacker type");
+        require(has(s, s.units.at(id), knownUnitClasses(s).naval) || plane(s, s.units.at(id)), "Invalid naval attacker type");
         if (origins.contains(id)) {
             originData[id] = V(zoneName(s, origins.at(id)));
-            if (has(s, s.units.at(id), "naval")) entries.emplace_back(zoneName(s, origins.at(id)));
+            if (has(s, s.units.at(id), knownUnitClasses(s).naval)) entries.emplace_back(zoneName(s, origins.at(id)));
         }
     }
     if (const auto* defenders = options.find("defenders")) b.defenders = readIds(*defenders);
     else for (const auto& [id, u] : s.units)
-        if (u.zone == zone && hostile(s, attacker, u.owner) && (has(s, u, "naval") || plane(s, u))) b.defenders.push_back(id);
+        if (u.zone == zone && hostile(s, attacker, u.owner) && (has(s, u, knownUnitClasses(s).naval) || plane(s, u))) b.defenders.push_back(id);
     for (const auto& id : b.defenders) {
         const bool inPort = string(b, "context") == "port_attack" && b.data.find("facility") &&
             s.facilities.contains(string(b, "facility")) && s.units.contains(id) &&
@@ -838,7 +838,7 @@ bool applyNavalCombatChance(State& s, const ChanceRequest& request, const Chance
         require(results.size() == 2, "Raider discovery requires two dice"); const auto unit = string(b, "naval_discovering_raider");
         const auto owner = s.units.at(unit).owner; int opponent = 0;
         for (const auto& id : living(s, b, true)) {
-            const auto& u = s.units.at(id); if (has(s, u, "surface_warship")) ++opponent;
+            const auto& u = s.units.at(id); if (has(s, u, knownUnitClasses(s).surface_warship)) ++opponent;
             if (plane(s, u) && s.definition->catalog->stats(u.type, u.damage, catalogContext(s, u.owner, u.zone)).attack) opponent += 4;
         }
         const int raider = results[0] + 6 + (tech(s, owner, "radar") ? 1 : 0);

@@ -12,13 +12,13 @@
 #include <stdexcept>
 
 namespace game::campaign {
-bool upgradeKeepsCargo(const State &s, const UnitState &unit, const Id &type) {
+bool upgradeKeepsCargo(const State &s, const UnitState &unit, UnitTypeId type) {
     if (!unit.carriedBy)
         return true;
     const auto &carrier = s.units.at(*unit.carriedBy);
     if (isAircraft(s, carrier))
         return airCargoTypeFits(s, carrier, type);
-    std::vector<Id> types;
+    std::vector<UnitTypeId> types;
     for (const auto &id : carrier.cargo)
         types.push_back(id == unit.id ? type : s.units.at(id).type);
     return navalCargoTypesFit(s, carrier, types);
@@ -55,10 +55,13 @@ bool facilityType(const State &s, const Id &type) {
     return s.definition->catalog->facilities().contains(type);
 }
 bool naval(const State &s, const Id &type) {
-    return !facilityType(s, type) && s.definition->catalog->unit(type).classes.contains("naval");
+    return !facilityType(s, type) && s.definition->catalog->unit(type).classes.contains(knownUnitClasses(s).naval);
 }
 bool capitalShip(const State &s, const Id &type) {
-    return !facilityType(s, type) && s.definition->catalog->unit(type).classes.contains("capital_ship");
+    return !facilityType(s, type) && s.definition->catalog->unit(type).classes.contains(knownUnitClasses(s).capital_ship);
+}
+bool capitalShip(const State &s, UnitTypeId type) {
+    return s.definition->catalog->unit(type).classes.contains(knownUnitClasses(s).capital_ship);
 }
 bool factory(const Id &type) {
     return type == "minor_factory" || type == "medium_factory" || type == "major_factory";
@@ -190,7 +193,7 @@ int queuedCapacity(const State &s, NationId nation, bool ships, bool capitals = 
                 continue;
             const auto &u = s.definition->catalog->unit(p.type);
             if (!ship && decentralizedProduction(s, nation) &&
-                (u.classes.contains("infantry_class") || p.type == "cavalry"))
+                (u.classes.contains(knownUnitClasses(s).infantry_class) || p.type == "cavalry"))
                 continue;
             ++n;
         }
@@ -201,7 +204,7 @@ bool canFactoryBuy(const State &s, NationId nation, const Id &type, bool complet
         return true;
     const auto &u = s.definition->catalog->unit(type);
     if (!naval(s, type) && decentralizedProduction(s, nation) &&
-        (u.classes.contains("infantry_class") || type == "cavalry"))
+        (u.classes.contains(knownUnitClasses(s).infantry_class) || type == "cavalry"))
         return true;
     if (naval(s, type)) {
         if (!completion)
@@ -221,7 +224,7 @@ int militiaAllowance(const State &s, NationId nation, ZoneId zone) {
     if (s.nations.at(nation).powerStatus == "major" && !home(s, nation, zone)) {
         int present = 0;
         for (const auto &[id, u] : s.units)
-            if (u.owner == nation && u.zone == zone && u.type == "militia")
+            if (u.owner == nation && u.zone == zone && u.type == knownUnitTypes(s).militia)
                 ++present;
         left = std::min(left, limit - present);
     }
@@ -322,9 +325,10 @@ bool upgradeFacilityLegal(const State &s, const BuildChartRow &row, const Facili
 // port (RCL-021).
 bool upgradeUnitLegal(const State &s, NationId nation, const BuildChartRow &row, const UnitState &u,
                       const Id &type) {
-    return u.owner == nation && row.upgradesFrom == u.type && !flag(u.turnFlags, "placed_this_turn") &&
-           s.territories.contains(u.zone) && inSupply(s, nation, u.zone) && upgradeKeepsCargo(s, u, type) &&
-           (u.type != "militia" || value(s.nations.at(nation).turnFlags, "economy_militia_upgrades") < 2);
+    return u.owner == nation && row.upgradesFrom == unitTypeName(s, u.type) && !flag(u.turnFlags, "placed_this_turn") &&
+           s.territories.contains(u.zone) && inSupply(s, nation, u.zone) &&
+           upgradeKeepsCargo(s, u, unitTypeNumber(s, type)) &&
+           (u.type != knownUnitTypes(s).militia || value(s.nations.at(nation).turnFlags, "economy_militia_upgrades") < 2);
 }
 void copyMetadata(BuildProject &p, const BuildChartRow &row, const PriceOption &price) {
     p.flags["row:" + row.id] = 1;
@@ -395,7 +399,7 @@ std::vector<Action> placements(const State &s, const BuildProject &p) {
         }
         const auto &unit = s.definition->catalog->unit(p.type);
         if (decentralizedProduction(s, n) && chineseHomeCountry(s, zone) &&
-            (unit.classes.contains("infantry_class") || p.type == "cavalry")) {
+            (unit.classes.contains(knownUnitClasses(s).infantry_class) || p.type == "cavalry")) {
             out.push_back(action(s, "economy_place", {{"project", V(p.id)}, {"zone", V(zoneName(s, zone))}}));
             continue;
         }
@@ -408,7 +412,7 @@ std::vector<Action> placements(const State &s, const BuildProject &p) {
                     for (const auto &sea : navalFacilitySeaZones(s, id))
                         out.push_back(action(s, "economy_place",
                                              {{"project", V(p.id)}, {"zone", V(zoneName(s, sea))}, {"facility", V(id)}}));
-                    if (f.type == "major_shipyard" && !unit.classes.contains("submarine"))
+                    if (f.type == "major_shipyard" && !unit.classes.contains(knownUnitClasses(s).submarine))
                         out.push_back(action(s, "economy_place",
                                              {{"project", V(p.id)},
                                               {"zone", V(zoneName(s, zone))},
@@ -607,10 +611,12 @@ std::vector<Action> economyActions(const State &s) {
                 continue;
             const auto base = O{{"row", V(r.id)}, {"price", V(price.method)}};
             if (r.kind == "upgrade") {
+                // The unit type the row upgrades, numbered once for the scan below.
+                const auto from = r.upgradesFrom ? catalog.unitTypes().find(*r.upgradesFrom) : std::nullopt;
                 if (!facilityType(s, r.type) &&
                     std::any_of(s.units.begin(), s.units.end(), [&](const auto &item) {
                         const auto &u = item.second;
-                        return u.owner == nation && r.upgradesFrom == u.type &&
+                        return u.owner == nation && from == u.type &&
                                !flag(u.turnFlags, "placed_this_turn");
                     }))
                     out.push_back(action(s, "economy_purchase", base));
@@ -878,9 +884,9 @@ bool applyEconomyAction(State &s, const Action &a) {
                                     : marker(p.flags, "target:")) {
             if (s.units.contains(*target)) {
                 auto &u = s.units.at(*target);
-                if (u.type == "militia")
+                if (u.type == knownUnitTypes(s).militia)
                     ++n.turnFlags["economy_militia_upgrades"];
-                u.type = p.type;
+                u.type = unitTypeNumber(s, p.type);
                 const auto stats = catalog.stats(u.type, u.damage, catalogContext(s, u.owner, u.zone));
                 u.movementAllowance = stats.movement;
                 u.movementRemaining = 0;
@@ -926,7 +932,7 @@ bool applyEconomyAction(State &s, const Action &a) {
         } else {
             UnitState u;
             u.id = unique(s, "unit");
-            u.type = p.type;
+            u.type = unitTypeNumber(s, p.type);
             u.owner = p.owner;
             u.zone = zoneNumber(s, a.parameters.require("zone").asString());
             u.turnOrigin = u.zone;
@@ -939,7 +945,7 @@ bool applyEconomyAction(State &s, const Action &a) {
                     if (port->asBool())
                         u.gameFlags["in_port:" + f->asString()] = 1;
             }
-            if (u.type == "militia")
+            if (u.type == knownUnitTypes(s).militia)
                 ++n.turnFlags["economy_militia_placed:" + zoneName(s, u.zone)];
             s.units.emplace(u.id, std::move(u));
         }
@@ -964,7 +970,7 @@ bool applyEconomyChance(State &s, const ChanceRequest &request, const ChanceOutc
                     const auto conversions = s.definition->catalog->automaticConversions(
                         u.type, catalogContext(s, u.owner, u.zone));
                     if (!conversions.empty())
-                        u.type = conversions.front().to;
+                        u.type = unitTypeNumber(s, conversions.front().to);
                     const auto stats =
                         s.definition->catalog->stats(u.type, u.damage, catalogContext(s, u.owner, u.zone));
                     const int used = u.movementAllowance && u.movementRemaining

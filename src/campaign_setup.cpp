@@ -48,7 +48,7 @@ void addUnits(State& state, const Id& owner, const Id& zone, const json::Value& 
         if (explicitId && count != 1) throw std::runtime_error("A setup instance ID must describe one unit");
         for (int index = 0; index < count; ++index) {
             UnitState unit;
-            unit.type = type;
+            unit.type = unitTypeNumber(state, type);
             unit.owner = nationNumber(state, owner);
             unit.zone = zoneNumber(state, zone);
             unit.turnOrigin = unit.zone;

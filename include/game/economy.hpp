@@ -14,7 +14,7 @@ int effectiveTerritorialIpp(const State &, ZoneId zone);
 // Whether upgrading this unit to `type` leaves its transport, if it is aboard
 // one, with cargo it may carry. An upgrade that would not waits on the build
 // queue (user ruling RCL-021; RB 12.3).
-bool upgradeKeepsCargo(const State &, const UnitState &unit, const Id &type);
+bool upgradeKeepsCargo(const State &, const UnitState &unit, UnitTypeId type);
 // Whether the nation keeps an account, its treasury. The scenario opens one for
 // Japan, the KMT and the CCP (campaign_setup.cpp). None is opened or closed
 // afterwards; a lost capital or a surrender only empties one. The network's

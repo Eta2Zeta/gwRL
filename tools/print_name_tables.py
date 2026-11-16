@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Print the tables that number the scenario's names.
 
-Inside the engine a zone or a nation is held as a number, not as its name: its
-place in the sorted list of the definition's names of that kind, counted from 0
-(include/game/names.hpp and docs/engine/names.md). Saved positions, actions and
+Inside the engine a zone, a nation, a unit type or a unit class is held as a
+number, not as its name: its place in the sorted list of the names of that kind,
+counted from 0, the definition's for zones and nations and the catalog's for
+unit types and classes (include/game/names.hpp and docs/engine/names.md). Saved positions, actions and
 the Python interface keep the names. This prints each kind's table, number and
 name, as Markdown, for the scenario the training plays, or for another scenario
 folder:
@@ -40,14 +41,15 @@ def table(names: list[str]) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--scenario", type=Path, default=SCENARIO, help="Scenario folder (default: the training scenario)")
-    parser.add_argument("--kind", help="Print only this kind of name, such as zones or nations")
+    parser.add_argument("--kind", help="Print only this kind of name: zones, nations, unit_types or unit_classes")
     args = parser.parse_args(argv)
     found = tables(args.scenario)
     kinds = [args.kind] if args.kind else sorted(found)
     unknown = [kind for kind in kinds if kind not in found]
     if unknown:
         parser.error(f"no table of {', '.join(unknown)}; the tables are {', '.join(sorted(found))}")
-    print("\n\n".join(f"## {kind.capitalize()} ({len(found[kind])})\n\n{table(found[kind])}" for kind in kinds))
+    print("\n\n".join(f"## {kind.replace('_', ' ').capitalize()} ({len(found[kind])})\n\n{table(found[kind])}"
+                      for kind in kinds))
     return 0
 
 

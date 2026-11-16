@@ -47,17 +47,17 @@ bool city(const State &s, ZoneId z) {
 bool tech(const State &s, NationId nation, const Id &id) {
     return flag(s.nations.at(nation).technologyStages, id) == 4;
 }
-bool has(const State &s, const UnitState &u, const Id &cls) {
+bool has(const State &s, const UnitState &u, UnitClassId cls) {
     return s.definition->catalog->unit(u.type).classes.contains(cls);
 }
 bool fighter(const State &s, const UnitState &u) {
-    return has(s, u, "fighter") || u.type == "fighter" || u.type == "jet_fighter";
+    return has(s, u, knownUnitClasses(s).fighter) || u.type == knownUnitTypes(s).fighter || u.type == knownUnitTypes(s).jet_fighter;
 }
-bool transport(const UnitState &u) {
-    return u.type == "air_transport" || u.type == "heavy_air_transport";
+bool transport(const State &s, const UnitState &u) {
+    return u.type == knownUnitTypes(s).air_transport || u.type == knownUnitTypes(s).heavy_air_transport;
 }
 bool bomber(const State &s, const UnitState &u) {
-    return u.type == "medium_bomber" || has(s, u, "strategic_bomber");
+    return u.type == knownUnitTypes(s).medium_bomber || has(s, u, knownUnitClasses(s).strategic_bomber);
 }
 bool friendly(const State &s, NationId n, NationId owner) {
     return n == owner || politicallyFriendly(s, n, owner);
@@ -65,7 +65,7 @@ bool friendly(const State &s, NationId n, NationId owner) {
 bool hostile(const State &s, NationId n, NationId owner) {
     return n != owner && s.nations.at(n).atWarWith.contains(owner);
 }
-int carrierSlots(const UnitState &u) { return u.type == "medium_bomber" ? 2 : 1; }
+int carrierSlots(const State &s, const UnitState &u) { return u.type == knownUnitTypes(s).medium_bomber ? 2 : 1; }
 Id scrambleSource(const UnitState &u) {
     for (const auto &c : u.commitments)
         if (c.rfind("air_scramble_source:", 0) == 0)
@@ -73,9 +73,9 @@ Id scrambleSource(const UnitState &u) {
     return {};
 }
 bool carrierEligible(const State &s, const UnitState &u, const UnitState &c) {
-    return friendly(s, u.owner, c.owner) && has(s, c, "carrier") &&
-        (fighter(s, u) || u.type == "tactical_bomber" ||
-         (u.type == "medium_bomber" && c.type == "heavy_fleet_carrier"));
+    return friendly(s, u.owner, c.owner) && has(s, c, knownUnitClasses(s).carrier) &&
+        (fighter(s, u) || u.type == knownUnitTypes(s).tactical_bomber ||
+         (u.type == knownUnitTypes(s).medium_bomber && c.type == knownUnitTypes(s).heavy_fleet_carrier));
 }
 int occupiedCarrierSlots(const State &s, const Id &carrier, const std::set<Id> &except = {}) {
     int occupied = 0;
@@ -83,7 +83,7 @@ int occupiedCarrierSlots(const State &s, const Id &carrier, const std::set<Id> &
         if (!except.contains(id) && (u.carriedBy == carrier || (!u.carriedBy &&
             ((marked(u.turnFlags, "scrambled") && scrambleSource(u) == carrier) ||
              u.commitments.contains("air_defending_carrier:" + carrier)))))
-            occupied += carrierSlots(u);
+            occupied += carrierSlots(s, u);
     return occupied;
 }
 int patrolRange(const State &s, const UnitState &u) {
@@ -259,7 +259,7 @@ void moveFlight(State &s, const Id &id, const std::vector<ZoneId> &path) {
     auto &u = s.units.at(id);
     if (u.carriedBy) {
         const auto parent = *u.carriedBy;
-        require(has(s, s.units.at(parent), "carrier"), "Aircraft is transport cargo");
+        require(has(s, s.units.at(parent), knownUnitClasses(s).carrier), "Aircraft is transport cargo");
         detachCargo(s, parent, id, u.zone);
         u.turnFlags["launched_from_carrier"] = 1;
     }
@@ -312,7 +312,7 @@ std::vector<Id> liveAircraft(const State &s, const std::vector<Id> &units) {
 std::vector<Id> scrambleSources(const State &s, const Id &unit, ZoneId target, bool intercept) {
     const auto &u = s.units.at(unit);
     std::vector<Id> r;
-    const bool seaplane = u.type == "seaplane" && !intercept && !land(s, target);
+    const bool seaplane = u.type == knownUnitTypes(s).seaplane && !intercept && !land(s, target);
     if ((!fighter(s, u) && !seaplane) || used(s, u) || !adjacent(s, u.zone, target))
         return r;
     for (const auto &[id, f] : s.facilities)
@@ -329,7 +329,7 @@ std::vector<Id> scrambleSources(const State &s, const Id &unit, ZoneId target, b
                 r.push_back(id);
         }
     for (const auto &[id, carrier] : s.units)
-        if (!seaplane && carrier.zone == u.zone && carrier.type == "heavy_fleet_carrier" &&
+        if (!seaplane && carrier.zone == u.zone && carrier.type == knownUnitTypes(s).heavy_fleet_carrier &&
             tech(s, carrier.owner, "radar") && friendly(s, u.owner, carrier.owner) &&
             std::find(carrier.cargo.begin(), carrier.cargo.end(), unit) != carrier.cargo.end())
             r.push_back(id);
@@ -371,7 +371,7 @@ void continueDefence(State &s, BattleState &b) {
     if (!surprise)
         for (const auto &[id, u] : s.units)
             if (hostile(s, b.attacker, u.owner) && friendly(s, u.owner, b.defender) &&
-                (fighter(s, u) || (u.type == "seaplane" && !land(s, b.zone))) &&
+                (fighter(s, u) || (u.type == knownUnitTypes(s).seaplane && !land(s, b.zone))) &&
                 !done.contains("scramble:" + id)) {
                 auto sources = scrambleSources(s, id, b.zone, false);
                 if (sources.empty())
@@ -401,7 +401,7 @@ void continueDefence(State &s, BattleState &b) {
             }
             std::vector<Action> options{
                 action(s, u.owner, "air_ground", {{"battle", V(b.id)}, {"unit", V(id)}})};
-            if (u.type != "seaplane" || !land(s, b.zone))
+            if (u.type != knownUnitTypes(s).seaplane || !land(s, b.zone))
                 options.push_back(action(s, u.owner, "air_defend", {{"battle", V(b.id)}, {"unit", V(id)}}));
             decision(s, b, u.owner, "air_ground_or_defend", std::move(options));
             return;
@@ -666,16 +666,18 @@ std::vector<Id> targets(const State &s, ZoneId zone, const Id &kind) {
 } // namespace
 
 bool isAircraft(const State &s, const UnitState &u) {
-    return has(s, u, "aircraft");
+    return has(s, u, knownUnitClasses(s).aircraft);
 }
-bool airCargoTypeFits(const State &s, const UnitState &aircraft, const Id &type) {
-    if (has(s, aircraft, "strategic_bomber"))
-        return type == "airborne_infantry" || type == "elite_airborne_infantry";
-    const auto &classes = s.definition->catalog->unit(type).classes;
-    return transport(aircraft) && classes.contains("land") &&
-           (classes.contains("infantry_class") ||
-            (aircraft.type == "heavy_air_transport" &&
-             (classes.contains("artillery_class") || type == "anti_aircraft_artillery")));
+bool airCargoTypeFits(const State &s, const UnitState &aircraft, UnitTypeId type) {
+    const auto &types = knownUnitTypes(s);
+    const auto &classes = knownUnitClasses(s);
+    if (has(s, aircraft, classes.strategic_bomber))
+        return type == types.airborne_infantry || type == types.elite_airborne_infantry;
+    const auto &cargo = s.definition->catalog->unit(type).classes;
+    return transport(s, aircraft) && cargo.contains(classes.land) &&
+           (cargo.contains(classes.infantry_class) ||
+            (aircraft.type == types.heavy_air_transport &&
+             (cargo.contains(classes.artillery_class) || type == types.anti_aircraft_artillery)));
 }
 bool onMaritimeAirPatrol(const State &s, const UnitState &u) {
     return isAircraft(s, u) && !u.carriedBy &&
@@ -694,11 +696,11 @@ FlightResult validateFlight(const State &s, const Id &id, const std::vector<Zone
     if (!s.units.contains(id))
         return {false, "Unknown aircraft", 0};
     const auto &u = s.units.at(id);
-    if (!isAircraft(s, u) || (u.carriedBy && !has(s, s.units.at(*u.carriedBy), "carrier")) || path.empty() ||
+    if (!isAircraft(s, u) || (u.carriedBy && !has(s, s.units.at(*u.carriedBy), knownUnitClasses(s).carrier)) || path.empty() ||
         path.front() != u.zone)
         return {false, "Invalid flight origin or aircraft", 0};
     int cost = static_cast<int>(path.size()) - 1;
-    if (!combat && transport(u) && u.cargo.size() > 1)
+    if (!combat && transport(s, u) && u.cargo.size() > 1)
         return {false, "Noncombat air transport capacity is one land unit", cost};
     if (cost > u.movementRemaining.value_or(0))
         return {false, "Insufficient aircraft movement", cost};
@@ -722,7 +724,7 @@ bool airLandingAvailable(const State &s, const Id &id, const Id &destination) {
             return false;
         const auto cap = catalogStats(s, c.type, c.damage, c.owner, c.zone)
                              .carrierCapacity.value_or(0);
-        return occupiedCarrierSlots(s, destination, {id}) + carrierSlots(u) <= cap;
+        return occupiedCarrierSlots(s, destination, {id}) + carrierSlots(s, u) <= cap;
     }
     const auto zone = findZone(s, destination);
     return zone && airLandingAvailable(s, id, *zone);
@@ -755,7 +757,7 @@ bool landingPlan(const State &s, const std::vector<Id> &aircraft, int spare = 0)
     const auto decks = [&]() -> std::map<Id, int> & {
         if (!capacityKnown)
             for (const auto &[id, u] : s.units)
-                if (has(s, u, "carrier"))
+                if (has(s, u, knownUnitClasses(s).carrier))
                     capacity[id] = catalogStats(s, u.type, u.damage, u.owner, u.zone).carrierCapacity.value_or(0) -
                         occupiedCarrierSlots(s, id, requested);
         capacityKnown = true;
@@ -771,7 +773,7 @@ bool landingPlan(const State &s, const std::vector<Id> &aircraft, int spare = 0)
                 return s.territories.contains(entry.first) && airLandingAvailable(s, id, entry.first);
             }))
             continue;
-        Return options{carrierSlots(u), {}};
+        Return options{carrierSlots(s, u), {}};
         for (const auto &[carrier, remaining] : decks())
             if (remaining >= options.slots && paths.contains(s.units.at(carrier).zone) &&
                 carrierEligible(s, u, s.units.at(carrier))) options.carriers.push_back(carrier);
@@ -928,7 +930,7 @@ std::optional<LandingNeed> releasedNeed(const State &s, const UnitState &u, cons
     }
     if (ashore && !starts.empty())
         return std::nullopt;
-    return LandingNeed{u.id, carrierSlots(u), common.value_or(NumberSet<ZoneId>{})};
+    return LandingNeed{u.id, carrierSlots(s, u), common.value_or(NumberSet<ZoneId>{})};
 }
 // Whether a joint plan lands every airborne aircraft but at most `spare` of
 // them. A previewed flight's own aircraft must land.
@@ -950,9 +952,9 @@ bool solveReachablePlan(const State &s, const LandingPreview *preview, int spare
         if (previewed(id)) {
             auto zones = returnZones(s, u.owner, preview->zone, preview->movement);
             if (!landsAshore(s, id, zones))
-                needs.push_back({id, carrierSlots(u), std::move(zones)});
+                needs.push_back({id, carrierSlots(s, u), std::move(zones)});
         } else if (!ownLandingAshore(s, u))
-            needs.push_back({id, carrierSlots(u), ownReturnZones(s, u)});
+            needs.push_back({id, carrierSlots(s, u), ownReturnZones(s, u)});
     }
     if (needs.empty())
         return true;
@@ -975,23 +977,23 @@ bool solveReachablePlan(const State &s, const LandingPreview *preview, int spare
     // that a sailing carrier launches.
     std::vector<LandingDeck> decks;
     for (const auto &[cid, c] : s.units) {
-        if (!has(s, c, "carrier"))
+        if (!has(s, c, knownUnitClasses(s).carrier))
             continue;
         LandingDeck deck{cid, c.zone};
         int fixed = 0, staying = 0;
         if (const auto found = seated.find(cid); found != seated.end())
             for (const auto *u : found->second) {
                 if (u->carriedBy.value_or(Id{}) != cid && !previewed(u->id)) {
-                    fixed += carrierSlots(*u);  // A reserved return seat.
+                    fixed += carrierSlots(s, *u);  // A reserved return seat.
                     continue;
                 }
                 if (!isAircraft(s, *u) || u->owner != c.owner) {
-                    fixed += carrierSlots(*u);  // Allied cargo stays aboard.
+                    fixed += carrierSlots(s, *u);  // Allied cargo stays aboard.
                     continue;
                 }
                 // A landing candidate stays where it lands.
                 if (previewed(u->id) || !mayFlyAshore(s, *u))
-                    staying += carrierSlots(*u);
+                    staying += carrierSlots(s, *u);
                 const int fuel = previewed(u->id) ? preview->movement : u->movementRemaining.value_or(0);
                 if (!movementController(s, c.owner))
                     continue;  // It cannot sail, so its aircraft are never released.
@@ -1305,7 +1307,7 @@ void returnCarpetBombers(State &s, const Id &id, const std::vector<Id> &bombers)
     A queue;
     for (const auto &unit : bombers)
         if (s.units.contains(unit)) {
-            require(has(s,s.units.at(unit),"strategic_bomber"), "Carpet return requires a strategic bomber");
+            require(has(s,s.units.at(unit),knownUnitClasses(s).strategic_bomber), "Carpet return requires a strategic bomber");
             queue.emplace_back(unit);
         }
     put(battle, "air_landing_queue", V(std::move(queue)));
@@ -1396,24 +1398,24 @@ namespace {
 // infantry for an airborne assault in Combat Movement (RB 9.3.2), other cargo
 // in Noncombat Movement (RB 11.3.1).
 bool loadsAt(const State &s, const UnitState &u, ZoneId zone, bool combat, const UnitState &c) {
-    if (c.zone != zone || c.carriedBy || !has(s, c, "land") || u.owner != c.owner || !c.route.empty() ||
+    if (c.zone != zone || c.carriedBy || !has(s, c, knownUnitClasses(s).land) || u.owner != c.owner || !c.route.empty() ||
         marked(c.turnFlags, "placed_this_turn") || marked(c.turnFlags, "air_transport_unloaded") ||
         marked(c.turnFlags, "naval_unloaded") || c.commitments.contains("transport_unloaded") ||
         c.commitments.contains("attrition") || c.commitments.contains("combat") ||
         c.commitments.contains("combat_move") || !militiaAllowedIn(s, c, zone))
         return false;
-    const int cap = u.type == "heavy_air_transport" && combat ? 2 : 1;
+    const int cap = u.type == knownUnitTypes(s).heavy_air_transport && combat ? 2 : 1;
     if (static_cast<int>(u.cargo.size()) >= cap)
         return false;
-    return combat ? (c.type == "airborne_infantry" || c.type == "elite_airborne_infantry")
-                  : transport(u) && airCargoTypeFits(s, u, c.type);
+    return combat ? (c.type == knownUnitTypes(s).airborne_infantry || c.type == knownUnitTypes(s).elite_airborne_infantry)
+                  : transport(s, u) && airCargoTypeFits(s, u, c.type);
 }
 // Militia start and end every move in their Home Country (RB): militia aboard
 // may be carried only to a land zone there where they could step off.
 bool militiaCanAlight(const State &s, const UnitState &u, ZoneId zone) {
     return std::all_of(u.cargo.begin(), u.cargo.end(), [&](const Id &cargo) {
         const auto &c = s.units.at(cargo);
-        return c.type != "militia" ||
+        return c.type != knownUnitTypes(s).militia ||
                (land(s, zone) && militiaAllowedIn(s, c, zone) && enterableThisTurn(s, c.owner, zone, true) &&
                 s.territories.at(zone).possessor && friendly(s, c.owner, *s.territories.at(zone).possessor));
     });
@@ -1422,7 +1424,7 @@ bool militiaCanAlight(const State &s, const UnitState &u, ZoneId zone) {
 // stops short of one is allowed only for an air transport or strategic bomber
 // picking up airborne infantry on its way to an airborne assault (RB 9.3.2).
 bool collectsAirborne(const State &s, const UnitState &u, ZoneId zone) {
-    if (!(transport(u) || has(s, u, "strategic_bomber")) || !land(s, zone))
+    if (!(transport(s, u) || has(s, u, knownUnitClasses(s).strategic_bomber)) || !land(s, zone))
         return false;
     return std::any_of(s.units.begin(), s.units.end(),
                        [&](const auto &entry) { return loadsAt(s, u, zone, true, entry.second); });
@@ -1459,7 +1461,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                 out.push_back(action(s, s.currentNation(), "air_begin_bombing", {{"battle", V(id)}}));
         for (const auto &[id, u] : s.units)
             if (isAircraft(s, u) && movementController(s, u.owner) && marked(u.turnFlags, "blitz_eligible") &&
-                (fighter(s, u) || u.type == "tactical_bomber") && u.movementRemaining.value_or(0) > 0) {
+                (fighter(s, u) || u.type == knownUnitTypes(s).tactical_bomber) && u.movementRemaining.value_or(0) > 0) {
                 for (const auto &zone : neighbors(s, u.zone))
                     if (s.territories.contains(zone) && blitzPairValid(s, u, u.zone, zone)) {
                         std::vector<ZoneId> path{u.zone, zone};
@@ -1480,7 +1482,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
     const bool combat = s.clock.phase != Phase::NonCombatMovement;
     if (s.clock.phase == Phase::CombatMovement)
         for (const auto &[id, u] : s.units)
-            if ((u.type == "advanced_artillery" || u.type == "advanced_self_propelled_artillery") &&
+            if ((u.type == knownUnitTypes(s).advanced_artillery || u.type == knownUnitTypes(s).advanced_self_propelled_artillery) &&
                 movementController(s, u.owner) && !u.carriedBy && u.route.empty() &&
                 !marked(u.turnFlags, "placed_this_turn") && !u.commitments.contains("attrition") &&
                 !u.commitments.contains("combat_move") && !u.commitments.contains("combat") &&
@@ -1493,10 +1495,10 @@ std::vector<Action> AirRules::actions(const State &s) const {
                                              {{"unit", V(id)}, {"zone", V(zoneName(s, zone))}}));
     if (!combat)
         for (const auto &[tid, t] : s.units)
-            if (transport(t) && t.owner != s.currentNation() &&
+            if (transport(s, t) && t.owner != s.currentNation() &&
                 politicallyFriendly(s, s.currentNation(), t.owner))
                 for (const auto &[cid, c] : s.units)
-                    if (c.owner == s.currentNation() && has(s, c, "land")) {
+                    if (c.owner == s.currentNation() && has(s, c, knownUnitClasses(s).land)) {
                         if (c.carriedBy == tid && enterableThisTurn(s, c.owner, t.zone, true) &&
                             flag(c.gameFlags, "air_allied_loaded_turn") !=
                                 static_cast<int>(s.clock.playerTurnSerial + 1) &&
@@ -1510,13 +1512,13 @@ std::vector<Action> AirRules::actions(const State &s) const {
                             !c.commitments.contains("attrition") && !c.commitments.contains("combat") &&
                             !c.commitments.contains("combat_move") && t.cargo.empty() &&
                             // Militia must land again this turn, which an allied load forbids.
-                            c.type != "militia" && airCargoTypeFits(s, t, c.type))
+                            c.type != knownUnitTypes(s).militia && airCargoTypeFits(s, t, c.type))
                             out.push_back(action(s, s.currentNation(), "air_allied_load",
                                                  {{"unit", V(tid)}, {"cargo", V(cid)}}));
                     }
     if (s.clock.phase == Phase::CombatMovement)
         for (const auto &[id, u] : s.units)
-            if (u.type == "strategic_rocket" && movementController(s, u.owner) && !u.carriedBy && u.route.empty() &&
+            if (u.type == knownUnitTypes(s).strategic_rocket && movementController(s, u.owner) && !u.carriedBy && u.route.empty() &&
                 u.commitments.empty() && !marked(u.turnFlags, "placed_this_turn"))
                 for (const auto &[zone, path] : flightPaths(s, id, true, 3, true)) {
                     auto owner =
@@ -1534,7 +1536,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
 
     for (const auto &[id, u] : s.units)
         if (isAircraft(s, u) && movementController(s, u.owner) &&
-            (!u.carriedBy || has(s, s.units.at(*u.carriedBy), "carrier"))) {
+            (!u.carriedBy || has(s, s.units.at(*u.carriedBy), knownUnitClasses(s).carrier))) {
             if (s.clock.phase == Phase::Combat && !marked(u.turnFlags, "air_screening_ready")) continue;
             // An aircraft still flying that some loss must include may be given up:
             // attackers and continuing (screening) aircraft too, and in Combat a
@@ -1563,7 +1565,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                 continue;
             if (!combat && used(s, u) && !marked(u.turnFlags, "air_in_flight"))
                 continue;
-            if (!combat && transport(u) && u.cargo.size() > 1) {
+            if (!combat && transport(s, u) && u.cargo.size() > 1) {
                 if (land(s, u.zone) && enterableThisTurn(s, u.owner, u.zone, true))
                     for (const auto &cargo : u.cargo)
                         if (s.units.at(cargo).owner == u.owner && militiaAllowedIn(s, s.units.at(cargo), u.zone))
@@ -1643,8 +1645,8 @@ std::vector<Action> AirRules::actions(const State &s) const {
                             out.push_back(
                                 action(s, s.currentNation(), "air_escort",
                                        {{"unit", V(id)}, {"path", V(zoneIds(s, path))}, {"battle", V(bid)}}));
-                if (u.type != "seaplane" && !transport(u) &&
-                    (!has(s, u, "strategic_bomber") || tech(s, u.owner, "heavy_strategic_bombers"))) {
+                if (u.type != knownUnitTypes(s).seaplane && !transport(s, u) &&
+                    (!has(s, u, knownUnitClasses(s).strategic_bomber) || tech(s, u.owner, "heavy_strategic_bombers"))) {
                     bool existing = false;
                     for (const auto &[bid, b] : s.battles)
                         if (b.zone == zone && b.attacker == u.owner && !marked(b.flags, "air_mission") &&
@@ -1654,27 +1656,27 @@ std::vector<Action> AirRules::actions(const State &s) const {
                         out.push_back(action(s, s.currentNation(), "air_ground_attack",
                                              {{"unit", V(id)}, {"path", V(zoneIds(s, path))}}));
                 }
-                if (u.type != "seaplane" && !transport(u)) {
+                if (u.type != knownUnitTypes(s).seaplane && !transport(s, u)) {
                     for (const auto &[bid, b] : s.battles)
                         if (b.zone == zone && b.attacker == s.currentNation() &&
                             !marked(b.flags, "air_mission") && !marked(b.flags, "finished") &&
                             b.stage == "awaiting_combat_rules" &&
-                            (!has(s, u, "strategic_bomber") || tech(s, u.owner, "heavy_strategic_bombers")))
+                            (!has(s, u, knownUnitClasses(s).strategic_bomber) || tech(s, u.owner, "heavy_strategic_bombers")))
                             out.push_back(
                                 action(s, s.currentNation(), "air_support",
                                        {{"unit", V(id)}, {"path", V(zoneIds(s, path))}, {"battle", V(bid)}}));
                 }
                 if (!u.commitments.contains("air_screening_continued") && !u.cargo.empty() &&
-                    (transport(u) || has(s, u, "strategic_bomber")) &&
+                    (transport(s, u) || has(s, u, knownUnitClasses(s).strategic_bomber)) &&
                     std::all_of(u.cargo.begin(), u.cargo.end(), [&](const Id &c) {
                         const auto &cargo = s.units.at(c);
                         return cargo.owner == u.owner &&
-                               (cargo.type == "airborne_infantry" || cargo.type == "elite_airborne_infantry");
+                               (cargo.type == knownUnitTypes(s).airborne_infantry || cargo.type == knownUnitTypes(s).elite_airborne_infantry);
                     }))
                     out.push_back(action(s, s.currentNation(), "air_assault",
                                          {{"unit", V(id)}, {"path", V(zoneIds(s, path))}}));
             }
-            if (!landingOnly && (transport(u) || has(s, u, "strategic_bomber")) && land(s, u.zone))
+            if (!landingOnly && (transport(s, u) || has(s, u, knownUnitClasses(s).strategic_bomber)) && land(s, u.zone))
                 for (const auto &[cargo, c] : s.units)
                     if (loadsAt(s, u, u.zone, combat, c))
                         out.push_back(action(s, s.currentNation(), "air_load",
@@ -1868,7 +1870,7 @@ void AirRules::apply(State &s, const Action &a) const {
         // Militia aboard step off as their transport lands, ending their move.
         const auto cargo = s.units.at(id).cargo;
         for (const auto &c : cargo)
-            if (s.units.at(c).type == "militia") {
+            if (s.units.at(c).type == knownUnitTypes(s).militia) {
                 detachCargo(s, id, c, dest);
                 s.units.at(c).movementRemaining = 0;
                 s.units.at(c).turnFlags["air_transport_unloaded"] = 1;
@@ -1911,11 +1913,11 @@ void AirRules::apply(State &s, const Action &a) const {
             require(!u.commitments.contains("air_screening_continued"), "A continuing force cannot conduct an airborne assault");
             auto cargo = u.cargo;
             require(!cargo.empty() &&
-                        cargo.size() <= static_cast<std::size_t>(u.type == "heavy_air_transport" ? 2 : 1),
+                        cargo.size() <= static_cast<std::size_t>(u.type == knownUnitTypes(s).heavy_air_transport ? 2 : 1),
                     "Invalid airborne capacity");
             for (const auto &c : cargo)
-                require(s.units.at(c).owner == u.owner && (s.units.at(c).type == "airborne_infantry" ||
-                                                           s.units.at(c).type == "elite_airborne_infantry"),
+                require(s.units.at(c).owner == u.owner && (s.units.at(c).type == knownUnitTypes(s).airborne_infantry ||
+                                                           s.units.at(c).type == knownUnitTypes(s).elite_airborne_infantry),
                         "Only own airborne infantry can assault");
             u.commitments.insert("airborne_assault");
             for (const auto &c : cargo) {
@@ -2013,7 +2015,7 @@ void AirRules::apply(State &s, const Action &a) const {
         }
         if (a.kind == "air_defend") {
             auto &u = s.units.at(id);
-            if (u.carriedBy && has(s, s.units.at(*u.carriedBy), "carrier") && !land(s, b.zone)) {
+            if (u.carriedBy && has(s, s.units.at(*u.carriedBy), knownUnitClasses(s).carrier) && !land(s, b.zone)) {
                 const auto carrier = *u.carriedBy;
                 detachCargo(s, carrier, id, u.zone);
                 u.commitments.insert("air_defending_carrier:" + carrier);
@@ -2176,8 +2178,8 @@ void AirRules::beginTurn(State &s) const {
             }
             for (const auto &[fid, f] : s.facilities)
                 if (f.zone == u.zone && f.damage == 0 && !marked(f.flags, "placed_this_turn") &&
-                    ((f.type == "airbase" && u.type != "seaplane") ||
-                     (f.type == "seaplane_base" && u.type == "seaplane")) &&
+                    ((f.type == "airbase" && u.type != knownUnitTypes(s).seaplane) ||
+                     (f.type == "seaplane_base" && u.type == knownUnitTypes(s).seaplane)) &&
                     s.territories.at(f.zone).possessor &&
                     friendly(s, u.owner, *s.territories.at(f.zone).possessor) &&
                     (*s.territories.at(f.zone).possessor != u.owner ||

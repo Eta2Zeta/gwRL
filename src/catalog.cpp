@@ -62,12 +62,14 @@ std::shared_ptr<const Catalog> Catalog::load(const std::filesystem::path& direct
 
 std::shared_ptr<const Catalog> Catalog::fromJson(const V& documents) {
     auto out=std::shared_ptr<Catalog>(new Catalog);out->sourceData_=documents;
+    // Units are kept by name while the documents are read, then numbered below.
+    std::map<Id,UnitDefinition> parsedUnits;std::map<Id,std::set<Id>> unitClassNames;
     for(const auto& [file,doc]:documents.asObject()) {
         require(doc.require("schema_version").asInt()==1,"Unsupported catalog schema");
         std::set<Id> sources;for(const auto& source:doc.require("sources").asArray())require(sources.insert(source.require("id").asString()).second,"Duplicate catalog source");references(doc,sources);
         if(const auto* list=doc.find("units")) for(const auto& v:list->asArray()) {
-            UnitDefinition u;u.id=v.require("id").asString();u.name=v.require("name").asString();u.classes=ids(v.require("classes"));u.purchaseCosts=integers(v.require("purchase_costs"));u.assetValue=optionalInt(v.require("asset_value"));u.maxHits=v.require("max_hits").asInt();u.targetClasses=ids(v.require("target_classes"));u.abilities=ids(v.require("abilities"));u.upgrades=upgrades(v.require("upgrades"));u.rules=v.require("rules");u.repair=v.require("repair");u.sourceRefs=v.require("source_refs"); if(const auto* p=v.find("unresolved_fields"))u.unresolved=*p;
-            require(!u.id.empty()&&!u.name.empty()&&!u.classes.empty()&&u.maxHits>0,"Invalid unit definition");prices(u.purchaseCosts);
+            UnitDefinition u;u.id=v.require("id").asString();u.name=v.require("name").asString();const auto classNames=ids(v.require("classes"));u.purchaseCosts=integers(v.require("purchase_costs"));u.assetValue=optionalInt(v.require("asset_value"));u.maxHits=v.require("max_hits").asInt();u.targetClasses=ids(v.require("target_classes"));u.abilities=ids(v.require("abilities"));u.upgrades=upgrades(v.require("upgrades"));u.rules=v.require("rules");u.repair=v.require("repair");u.sourceRefs=v.require("source_refs"); if(const auto* p=v.find("unresolved_fields"))u.unresolved=*p;
+            require(!u.id.empty()&&!u.name.empty()&&!classNames.empty()&&u.maxHits>0,"Invalid unit definition");unitClassNames[u.id]=classNames;prices(u.purchaseCosts);
             for(const auto& s:v.require("states").asArray()) {
                 CatalogStats x;x.attack=optionalInt(s.require("attack"));x.defense=optionalInt(s.require("defense"));x.attackDice=s.require("attack_dice").asInt();x.defenseDice=s.require("defense_dice").asInt();x.movement=optionalInt(s.require("movement"));x.bombardment=optionalInt(s.require("bombardment"));x.bombardmentDice=s.require("bombardment_dice").asInt();x.cargoCapacity=optionalInt(s.require("cargo_capacity"));x.carrierCapacity=optionalInt(s.require("carrier_capacity"));
                 const int damage=s.require("damage").asInt(); require(damage>=0&&damage<u.maxHits,"Invalid surviving damage state");for(auto n:{x.attack,x.defense,x.bombardment})require(!n||(*n>=0&&*n<=12),"Invalid D12 combat threshold");for(auto n:{x.movement,x.cargoCapacity,x.carrierCapacity})require(!n||*n>=0,"Negative unit capacity/movement");require(x.attackDice>=0&&x.defenseDice>=0&&x.bombardmentDice>=0,"Negative combat dice");require(u.states.emplace(damage,x).second,"Duplicate damage state");
@@ -77,7 +79,7 @@ std::shared_ptr<const Catalog> Catalog::fromJson(const V& documents) {
             for(const auto& m:v.require("modes").asArray()) {
                 CatalogMode x;x.id=m.require("id").asString();x.threshold=optionalInt(m.require("threshold"));x.dieSides=m.require("die_sides").asInt();x.dice=m.require("dice").asInt();x.requiredTechnologies=ids(m.require("requires_technology"));x.parameters=m.require("parameters");x.sourceRefs=m.require("source_refs");require(modes.insert(x.id).second&&x.dice>=0&&(x.dice==0||x.dieSides>=2),"Invalid/duplicate unit mode");u.modes.push_back(std::move(x));
             }
-            require(out->units_.emplace(u.id,std::move(u)).second,"Duplicate unit type");
+            require(parsedUnits.emplace(u.id,std::move(u)).second,"Duplicate unit type");
         }
         if(const auto* list=doc.find("facilities"))for(const auto& v:list->asArray()) {
             FacilityDefinition f;f.id=v.require("id").asString();f.name=v.require("name").asString();f.purchaseCosts=integers(v.require("purchase_costs"));f.assetValue=v.require("asset_value").asInt();f.maxDamage=optionalInt(v.require("max_damage"));f.repairCost=optionalInt(v.require("repair_cost_per_damage"));f.productionCapacity=v.require("production_capacity").asInt();f.repairCapacity=v.require("repair_capacity").asInt();f.aaThreshold=optionalInt(v.require("aaa").require("threshold"));f.aaDice=v.require("aaa").require("dice").asInt();f.abilities=ids(v.require("abilities"));f.upgrades=upgrades(v.require("upgrades"));f.rules=v.require("rules");f.sourceRefs=v.require("source_refs");prices(f.purchaseCosts);require(!f.id.empty()&&!f.name.empty()&&f.assetValue>=0&&f.productionCapacity>=0&&f.repairCapacity>=0,"Invalid facility");require(out->facilities_.emplace(f.id,std::move(f)).second,"Duplicate facility");
@@ -89,30 +91,52 @@ std::shared_ptr<const Catalog> Catalog::fromJson(const V& documents) {
             BuildChartRow r;r.id=v.require("id").asString();r.nation=v.require("nation").asString();r.powerStatus=v.require("power_status").asString();r.type=v.require("type").asString();r.kind=v.require("kind").asString();r.purchaseCosts=integers(v.require("purchase_costs"));r.availableFrom=optionalDate(v.require("available_from"));r.availableThrough=optionalDate(v.require("available_through"));r.requiredTechnologies=ids(v.require("requires_technology"));r.forbiddenTechnologies=ids(v.require("forbids_technology"));r.cap=optionalInt(v.require("cap_per_turn"));r.capGroup=optionalId(v.require("cap_group"));r.requiredFlags=ids(v.require("requires_flags"));r.placement=ids(v.require("placement"));r.upgradesFrom=optionalId(v.require("upgrades_from"));if(const auto* d=v.find("derived_from"))r.derivedFrom=optionalId(*d);r.sourceRefs=v.require("source_refs");r.notes=v.require("notes").asString();prices(r.purchaseCosts);require(!r.id.empty()&&!r.purchaseCosts.empty()&&(r.kind=="purchase"||r.kind=="upgrade")&&(!r.cap||*r.cap>0),"Invalid build-chart row");require(out->rows_.emplace(r.id,std::move(r)).second,"Duplicate build-chart row");
         }
     }
-    const auto knownType=[&](const Id& id){return out->units_.contains(id)||out->facilities_.contains(id);};
+    // Number the unit classes and unit types, each sorted by name (names.hpp),
+    // and keep the units in number order.
+    std::set<Id> classNames;for(const auto& [id,names]:unitClassNames)classNames.insert(names.begin(),names.end());
+    out->unitClasses_=NameTable<UnitClassKind>(std::vector<std::string>(classNames.begin(),classNames.end()));
+    std::vector<std::string> typeNames;for(const auto& [id,u]:parsedUnits)typeNames.push_back(id);
+    out->unitTypes_=NameTable<UnitTypeKind>(std::move(typeNames));
+    for(auto& [id,u]:parsedUnits) {
+        u.number=out->unitTypes_.number(id);
+        for(const auto& name:unitClassNames.at(id))u.classes.insert(out->unitClasses_.number(name));
+        out->units_.push_back(std::move(u));
+    }
+    // The names the rules use must be in the catalog: number() throws for one that is not.
+#define GWRL_FILL(name) out->knownUnitTypes_.name=out->unitTypes_.number(#name);
+    GWRL_KNOWN_UNIT_TYPES(GWRL_FILL)
+#undef GWRL_FILL
+#define GWRL_FILL(name) out->knownUnitClasses_.name=out->unitClasses_.number(#name);
+    GWRL_UNIT_CLASSES(GWRL_FILL)
+#undef GWRL_FILL
+    const auto knownType=[&](const Id& id){return out->unitTypes_.contains(id)||out->facilities_.contains(id);};
     const auto knownTech=[&](const auto& list){for(const auto& id:list)require(out->technologies_.contains(id),"Unknown required technology: "+id);};
-    for(const auto& [id,u]:out->units_) {require(!out->facilities_.contains(id),"Ambiguous catalog type");for(const auto& m:u.modes)knownTech(m.requiredTechnologies);for(const auto& up:u.upgrades){require(knownType(up.to),"Unknown upgrade target");knownTech(up.requiredTechnologies);}}
+    for(const auto& u:out->units_) {require(!out->facilities_.contains(u.id),"Ambiguous catalog type");for(const auto& m:u.modes)knownTech(m.requiredTechnologies);for(const auto& up:u.upgrades){require(knownType(up.to),"Unknown upgrade target");knownTech(up.requiredTechnologies);}}
     for(const auto& [id,f]:out->facilities_) for(const auto& up:f.upgrades){require(knownType(up.to),"Unknown facility upgrade target");knownTech(up.requiredTechnologies);}
     for(const auto& [id,t]:out->technologies_) {for(const auto& type:t.unlocks)require(knownType(type),"Unknown technology unlock");for(const auto& c:t.conversions.asArray())require(knownType(c.require("from").asString())&&knownType(c.require("to").asString()),"Unknown conversion type");}
     for(const auto& [id,r]:out->rows_) {require(knownType(r.type),"Unknown build type: "+r.type);if(r.upgradesFrom)require(knownType(*r.upgradesFrom),"Unknown upgrade source");if(r.derivedFrom)require(out->rows_.contains(*r.derivedFrom),"Unknown derived build row");knownTech(r.requiredTechnologies);knownTech(r.forbiddenTechnologies);}
     out->fingerprint_=contentDigest(canonicalJson(documents));return out;
 }
 
-const UnitDefinition& Catalog::unit(const Id& id) const { return units_.at(id); }
+const UnitDefinition& Catalog::unit(UnitTypeId type) const {
+    if(!type.valid()||type.index()>=units_.size())throw std::runtime_error("A unit type number names no unit type");
+    return units_[type.index()];
+}
+const UnitDefinition& Catalog::unit(const Id& type) const { return units_[unitTypes_.number(type).index()]; }
 const FacilityDefinition& Catalog::facility(const Id& id) const { return facilities_.at(id); }
 const TechnologyDefinition& Catalog::technology(const Id& id) const { return technologies_.at(id); }
 const BuildChartRow& Catalog::row(const Id& id) const { return rows_.at(id); }
-CatalogStats Catalog::stats(const Id& type,int damage,const CatalogContext& c) const {
+CatalogStats Catalog::stats(UnitTypeId type,int damage,const CatalogContext& c) const {
     const auto& u=unit(type);auto s=u.states.at(damage);
     for(const auto& rule:u.rules.asArray())if(rule.require("id").asString()=="militia_conditional_movement") {const auto& p=rule.require("parameters");if(flags(c,p.find("requires_flags")))s.movement=p.require("conditional_movement").asInt();}
     for(const auto& tech:c.technologies)for(const auto& m:technology(tech).modifiers.asArray()) {
-        const auto types=ids(m.require("unit_types")),classes=ids(m.require("classes"));bool match=types.contains(type);for(const auto& id:classes)match=match||u.classes.contains(id);if(!match||!flags(c,m.find("requires_flags")))continue;
+        const auto types=ids(m.require("unit_types")),classes=ids(m.require("classes"));bool match=types.contains(u.id);for(const auto& id:classes)match=match||u.classes.contains(unitClasses_.find(id));if(!match||!flags(c,m.find("requires_flags")))continue;
         const int add=m.require("add").asInt();const auto& stat=m.require("stat").asString();
         const auto apply=[&](std::optional<int>& n){if(n)*n+=add;};
         if(stat=="attack")apply(s.attack);else if(stat=="defense")apply(s.defense);else if(stat=="movement")apply(s.movement);else if(stat=="bombardment")apply(s.bombardment);else if(stat=="cargo_capacity")apply(s.cargoCapacity);else if(stat=="carrier_capacity")apply(s.carrierCapacity);else if(stat=="attack_dice")s.attackDice+=add;else if(stat=="defense_dice")s.defenseDice+=add;else throw std::runtime_error("Unknown stat modifier: "+stat);
     }return s;
 }
-std::vector<CatalogMode> Catalog::modes(const Id& type,const CatalogContext& c,int damage) const {
+std::vector<CatalogMode> Catalog::modes(UnitTypeId type,const CatalogContext& c,int damage) const {
     const auto current=stats(type,damage,c);
     std::vector<CatalogMode> out;
     for(const auto& mode:unit(type).modes) {
@@ -134,8 +158,8 @@ std::vector<CatalogMode> Catalog::modes(const Id& type,const CatalogContext& c,i
                 if(rule.require("id").asString()!="long_range_aircraft_map")continue;
                 const auto& p=rule.require("parameters");
                 int bonus=0;
-                if(type=="medium_bomber")bonus=p.require("medium_bomber_map_range_bonus").asInt();
-                if(type=="seaplane"&&flags(c,p.find("seaplane_requires_flags")))bonus=p.require("seaplane_map_range_bonus").asInt();
+                if(type==knownUnitTypes_.medium_bomber)bonus=p.require("medium_bomber_map_range_bonus").asInt();
+                if(type==knownUnitTypes_.seaplane&&flags(c,p.find("seaplane_requires_flags")))bonus=p.require("seaplane_map_range_bonus").asInt();
                 auto parameters=resolved.parameters.asObject();
                 parameters["range"]=V(static_cast<double>(parameters.at("range").asInt()+bonus));
                 resolved.parameters=V(std::move(parameters));
@@ -157,16 +181,16 @@ Eligibility Catalog::placementEligibility(const Id& id,const CatalogContext& c) 
 std::vector<BuildChartRow> Catalog::purchaseOptions(const CatalogContext& c) const {std::vector<BuildChartRow> out;for(const auto& [id,r]:rows_)if(purchaseEligibility(id,c).allowed)out.push_back(r);return out;}
 std::vector<PriceOption> Catalog::priceOptions(const Id& id,const CatalogContext& c) const {
     const auto& r=row(id);if(!purchaseEligibility(id,c).allowed)return {};std::vector<PriceOption> out;
-    const bool naval=units_.contains(r.type)&&unit(r.type).classes.contains("naval");if(!c.technologies.contains("improved_construction")||(!naval&&!facilities_.contains(r.type))){out.push_back({"printed",r.purchaseCosts});return out;}
+    const bool naval=isUnitType(r.type)&&unit(r.type).classes.contains(knownUnitClasses_.naval);if(!c.technologies.contains("improved_construction")||(!naval&&!facilities_.contains(r.type))){out.push_back({"printed",r.purchaseCosts});return out;}
     // The discount replaces the printed price: that would buy the same thing on
     // the same schedule for more (user decision, 5 November 2026).
     auto reduced=r.purchaseCosts;for(int& n:reduced)n=std::max(0,n-1);out.push_back({"improved_construction_discount",reduced});
     if(r.purchaseCosts.size()>=2) {auto combined=r.purchaseCosts;combined[0]+=combined[1];combined.erase(combined.begin()+1);out.push_back({"improved_construction_combine",combined});}return out;
 }
-std::vector<CatalogUpgrade> Catalog::automaticConversions(const Id& type,const CatalogContext& c) const {
-    (void)unit(type);std::vector<CatalogUpgrade> out;
-    for(const auto& up:unit(type).upgrades)if(up.automatic&&hasTechnologies(c,up.requiredTechnologies)&&flags(c,up.parameters.find("requires_flags")))out.push_back(up);
-    for(const auto& tech:c.technologies)for(const auto& v:technology(tech).conversions.asArray())if(v.require("from").asString()==type&&v.require("automatic").asBool()) {CatalogUpgrade up;up.to=v.require("to").asString();up.costIpp=v.require("cost_ipp").asInt();up.automatic=true;up.requiredTechnologies={tech};up.parameters=V::Object{};up.sourceRefs=technology(tech).sourceRefs; if(std::none_of(out.begin(),out.end(),[&](const auto& x){return x.to==up.to;}))out.push_back(std::move(up));}return out;
+std::vector<CatalogUpgrade> Catalog::automaticConversions(UnitTypeId type,const CatalogContext& c) const {
+    const auto& u=unit(type);std::vector<CatalogUpgrade> out;
+    for(const auto& up:u.upgrades)if(up.automatic&&hasTechnologies(c,up.requiredTechnologies)&&flags(c,up.parameters.find("requires_flags")))out.push_back(up);
+    for(const auto& tech:c.technologies)for(const auto& v:technology(tech).conversions.asArray())if(v.require("from").asString()==u.id&&v.require("automatic").asBool()) {CatalogUpgrade up;up.to=v.require("to").asString();up.costIpp=v.require("cost_ipp").asInt();up.automatic=true;up.requiredTechnologies={tech};up.parameters=V::Object{};up.sourceRefs=technology(tech).sourceRefs; if(std::none_of(out.begin(),out.end(),[&](const auto& x){return x.to==up.to;}))out.push_back(std::move(up));}return out;
 }
 int Catalog::productionCapacity(const Id& type,int damage,const CatalogContext& c) const {
     require(damage>=0,"Negative facility damage");
@@ -193,7 +217,7 @@ int Catalog::repairCapacity(const Id& type,int damage,const CatalogContext& c) c
     }
     return capacity;
 }
-std::vector<std::string> Catalog::unresolvedFields() const {std::vector<std::string> out;for(const auto& [id,u]:units_)if(!u.unresolved.isNull()&&((u.unresolved.isArray()&&!u.unresolved.asArray().empty())||(!u.unresolved.isArray())))out.push_back(id+":"+canonicalJson(u.unresolved));for(const auto& [file,doc]:sourceData_.asObject())if(const auto* b=doc.find("blockers"))for(const auto& x:b->asArray())out.push_back(file+":"+canonicalJson(x));return out;}
+std::vector<std::string> Catalog::unresolvedFields() const {std::vector<std::string> out;for(const auto& u:units_)if(!u.unresolved.isNull()&&((u.unresolved.isArray()&&!u.unresolved.asArray().empty())||(!u.unresolved.isArray())))out.push_back(u.id+":"+canonicalJson(u.unresolved));for(const auto& [file,doc]:sourceData_.asObject())if(const auto* b=doc.find("blockers"))for(const auto& x:b->asArray())out.push_back(file+":"+canonicalJson(x));return out;}
 void Catalog::requireComplete() const {const auto missing=unresolvedFields();require(missing.empty(),"Catalog has unresolved source fields" );require(!units_.empty()&&!facilities_.empty()&&!technologies_.empty()&&!rows_.empty(),"Incomplete catalog documents");}
 
 namespace {
@@ -215,7 +239,7 @@ CatalogContext buildContext(const State& state,NationId owner,std::optional<Zone
 CatalogContext catalogContext(const State& state,NationId owner,std::optional<ZoneId> zone) {
     return buildContext(state,owner,zone,true);
 }
-CatalogStats catalogStats(const State& state,const Id& type,int damage,NationId owner,std::optional<ZoneId> zone) {
+CatalogStats catalogStats(const State& state,UnitTypeId type,int damage,NationId owner,std::optional<ZoneId> zone) {
     return state.definition->catalog->stats(type,damage,buildContext(state,owner,zone,false));
 }
 void initializeCatalogState(State& state) {

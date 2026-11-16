@@ -182,10 +182,10 @@ void purchaseBoundariesAndForeignExclusion(const Catalog& catalog) {
 
 void modesAndConditionalStats(const Catalog& catalog) {
     auto c = japan();
-    const auto aa = catalog.stats("anti_aircraft_artillery", 0, c);
+    const auto aa = catalog.stats(catalog.unitTypes().number("anti_aircraft_artillery"), 0, c);
     check(!aa.attack && !aa.defense && aa.attackDice == 0 && aa.defenseDice == 0,
           "AAA became an ordinary land combat roll");
-    const auto aaModes = catalog.modes("anti_aircraft_artillery", c);
+    const auto aaModes = catalog.modes(catalog.unitTypes().number("anti_aircraft_artillery"), c);
     const auto& fire = mode(aaModes, "anti_aircraft_fire");
     check(fire.threshold == 3 && fire.dieSides == 12 && fire.dice == 0,
           "AAA dynamic dice definition changed");
@@ -194,57 +194,57 @@ void modesAndConditionalStats(const Catalog& catalog) {
               && fire.parameters.require("rounds").asArray().size() == 1
               && fire.parameters.require("rounds").asArray()[0].asInt() == 1,
           "AAA three-aircraft/first-round limit lost");
-    check(!catalog.stats("strategic_bomber", 0, c).attack, "Carpet bombing became unconditional attack");
-    check(!hasMode(catalog.modes("strategic_bomber", c), "carpet_bombing"), "Carpet bombing lacks technology gate");
+    check(!catalog.stats(catalog.unitTypes().number("strategic_bomber"), 0, c).attack, "Carpet bombing became unconditional attack");
+    check(!hasMode(catalog.modes(catalog.unitTypes().number("strategic_bomber"), c), "carpet_bombing"), "Carpet bombing lacks technology gate");
     c.technologies.insert("heavy_strategic_bombers");
-    const auto ordinary = catalog.modes("strategic_bomber", c);
-    const auto heavy = catalog.modes("heavy_strategic_bomber", c);
+    const auto ordinary = catalog.modes(catalog.unitTypes().number("strategic_bomber"), c);
+    const auto heavy = catalog.modes(catalog.unitTypes().number("heavy_strategic_bomber"), c);
     check(mode(ordinary, "carpet_bombing").dice == 3 && mode(heavy, "carpet_bombing").dice == 5
               && mode(heavy, "carpet_bombing").threshold == 2,
           "Carpet bombing multi-die thresholds changed");
     check(mode(ordinary, "strategic_bombing").dieSides == 6 && mode(ordinary, "strategic_bombing").dice == 2
               && mode(heavy, "strategic_bombing").dice == 3,
           "Strategic bombing damage dice confused with carpet combat dice");
-    const auto fighterModes = catalog.modes("fighter", c);
+    const auto fighterModes = catalog.modes(catalog.unitTypes().number("fighter"), c);
     check(mode(fighterModes, "interception").threshold == 3
               && mode(fighterModes, "interception").parameters.require("radar_bonus").asInt() == 1,
           "Interception/Radar source parameters lost");
 
     c = japan();
-    check(catalog.stats("militia", 0, c).movement == 0, "Unknown homeland predicates grant militia movement");
+    check(catalog.stats(catalog.unitTypes().number("militia"), 0, c).movement == 0, "Unknown homeland predicates grant militia movement");
     for (const auto& id : {"owner_is_major_power", "movement_starts_in_owner_home_country",
                            "movement_ends_in_owner_home_country"}) c.flags[id] = true;
-    check(catalog.stats("militia", 0, c).movement == 1, "Major home-country militia movement missing");
+    check(catalog.stats(catalog.unitTypes().number("militia"), 0, c).movement == 1, "Major home-country militia movement missing");
     for (const auto& id : {"owner_is_major_power", "movement_starts_in_owner_home_country",
                            "movement_ends_in_owner_home_country"}) {
         auto blocked = c;
         blocked.flags[id] = false;
-        check(catalog.stats("militia", 0, blocked).movement == 0, "Militia movement ignored predicate: " + std::string(id));
+        check(catalog.stats(catalog.unitTypes().number("militia"), 0, blocked).movement == 0, "Militia movement ignored predicate: " + std::string(id));
     }
     c = japan();
     c.technologies.insert("long_range_aircraft");
-    check(catalog.stats("fighter", 0, c).movement == 5 && catalog.stats("air_transport", 0, c).movement == 7
-              && catalog.stats("seaplane", 0, c).movement == 7 && catalog.stats("infantry", 0, c).movement == 1,
+    check(catalog.stats(catalog.unitTypes().number("fighter"), 0, c).movement == 5 && catalog.stats(catalog.unitTypes().number("air_transport"), 0, c).movement == 7
+              && catalog.stats(catalog.unitTypes().number("seaplane"), 0, c).movement == 7 && catalog.stats(catalog.unitTypes().number("infantry"), 0, c).movement == 1,
           "Long-range technology did not apply precisely to existing aircraft");
     c.technologies.insert("anti_submarine_warfare");
-    check(catalog.stats("seaplane", 0, c).attack == 3, "ASW bonus applied outside patrol");
+    check(catalog.stats(catalog.unitTypes().number("seaplane"), 0, c).attack == 3, "ASW bonus applied outside patrol");
     c.flags["on_maritime_air_patrol"] = true;
-    check(catalog.stats("seaplane", 0, c).attack == 3, "ASW bonus applied against non-submarine targets");
+    check(catalog.stats(catalog.unitTypes().number("seaplane"), 0, c).attack == 3, "ASW bonus applied against non-submarine targets");
     c.flags["target_is_submarine"] = true;
-    check(catalog.stats("seaplane", 0, c).attack == 5 && catalog.stats("fighter", 0, c).attack == 6,
+    check(catalog.stats(catalog.unitTypes().number("seaplane"), 0, c).attack == 5 && catalog.stats(catalog.unitTypes().number("fighter"), 0, c).attack == 6,
           "ASW conditional modifier targets wrong aircraft");
-    const auto mediumPatrol = catalog.modes("medium_bomber", c);
-    const auto seaplanePatrol = catalog.modes("seaplane", c);
+    const auto mediumPatrol = catalog.modes(catalog.unitTypes().number("medium_bomber"), c);
+    const auto seaplanePatrol = catalog.modes(catalog.unitTypes().number("seaplane"), c);
     check(mode(mediumPatrol, "maritime_air_patrol").parameters.require("range").asInt() == 2
               && mode(seaplanePatrol, "maritime_air_patrol").parameters.require("range").asInt() == 2,
           "Long-range patrol bonus ignored its seaplane-base condition");
     c.flags["starts_at_seaplane_base"] = true;
-    const auto basedPatrol = catalog.modes("seaplane", c);
+    const auto basedPatrol = catalog.modes(catalog.unitTypes().number("seaplane"), c);
     check(mode(basedPatrol, "maritime_air_patrol").parameters.require("range").asInt() == 3,
           "Long-range seaplane patrol from base did not gain range");
     c.technologies.insert("radar");
-    const auto radarFighter = catalog.modes("fighter", c);
-    const auto radarBomber = catalog.modes("strategic_bomber", c);
+    const auto radarFighter = catalog.modes(catalog.unitTypes().number("fighter"), c);
+    const auto radarBomber = catalog.modes(catalog.unitTypes().number("strategic_bomber"), c);
     check(mode(radarFighter, "interception").threshold == 4 && mode(radarBomber, "interception").threshold == 2,
           "Completed Radar did not add one to interception thresholds");
 }
@@ -258,14 +258,14 @@ void technologyAndConstruction(const Catalog& catalog) {
               "Research chart thresholds or Stage III date changed: " + id);
     }
     auto c = japan();
-    check(catalog.automaticConversions("airborne_infantry", c).empty(), "Airborne converted without doctrine");
+    check(catalog.automaticConversions(catalog.unitTypes().number("airborne_infantry"), c).empty(), "Airborne converted without doctrine");
     c.technologies.insert("airborne_doctrine");
-    const auto converted = catalog.automaticConversions("airborne_infantry", c);
+    const auto converted = catalog.automaticConversions(catalog.unitTypes().number("airborne_infantry"), c);
     check(converted.size() == 1 && converted[0].to == "elite_airborne_infantry"
               && converted[0].costIpp == 0 && converted[0].automatic,
           "Airborne Doctrine conversion absent, duplicated or charged");
     c.technologies.insert("advanced_mechanized_infantry");
-    check(catalog.automaticConversions("mechanized_infantry", c).empty(), "Unstated automatic mechanized upgrade invented");
+    check(catalog.automaticConversions(catalog.unitTypes().number("mechanized_infantry"), c).empty(), "Unstated automatic mechanized upgrade invented");
 
     c = japan();
     check(prices(catalog, "japan_major_heavy_cruiser", c) == std::set<std::vector<int>> {{5, 5}}, "Printed cruiser payments changed");
@@ -320,7 +320,8 @@ void technologyAndConstruction(const Catalog& catalog) {
 void nationalRuleScopes(const Catalog& catalog) {
     // These are retained conditional handlers for the combat modules,
     // not unconditional changes to shared unit stats.
-    for (const auto& [id, unit] : catalog.units()) {
+    for (const auto& unit : catalog.units()) {
+        const auto& id = unit.id;
         const auto& surprise = rule(unit.rules, "japanese_surprise_attack_defense");
         check(surprise.require("defense_modifier").asInt() == -1
                   && surprise.require("defense_modifier_rounds").asArray().size() == 1
@@ -330,9 +331,9 @@ void nationalRuleScopes(const Catalog& catalog) {
                   && !surprise.require("inherent_facility_aaa_defends_in_affected_port_attack").asBool()
                   && !surprise.require("three_round_city_combat_limit_applies").asBool(),
               "Surprise Attack scope/effects incomplete: " + id);
-        check(hasRule(unit.rules, "japanese_dug_in_defense") == unit.classes.contains("infantry_class"),
+        check(hasRule(unit.rules, "japanese_dug_in_defense") == unit.classes.contains(catalog.knownUnitClasses().infantry_class),
               "Dug In Defense attached to wrong unit class: " + id);
-        check(hasRule(unit.rules, "japanese_surprise_attack_aircraft") == unit.classes.contains("aircraft"),
+        check(hasRule(unit.rules, "japanese_surprise_attack_aircraft") == unit.classes.contains(catalog.knownUnitClasses().aircraft),
               "Surprise aircraft first strike attached to wrong unit class: " + id);
         check(hasRule(unit.rules, "kmt_low_morale") == (id == "infantry" || id == "cavalry"),
               "Low Morale attached beyond regular infantry and cavalry: " + id);
@@ -352,35 +353,35 @@ void nationalRuleScopes(const Catalog& catalog) {
               && !morale.require("forced_retreat_units_may_be_taken_as_casualties").asBool()
               && morale.require("ceases_immediately_on_major_power_evolution").asBool(),
           "Low Morale timing or casualty restrictions lost");
-    check(catalog.stats("infantry", 0, japan()).defense == 4 && catalog.stats("fighter", 0, japan()).defense == 6,
+    check(catalog.stats(catalog.unitTypes().number("infantry"), 0, japan()).defense == 4 && catalog.stats(catalog.unitTypes().number("fighter"), 0, japan()).defense == 6,
           "Conditional national abilities changed ordinary shared stats");
 }
 
 void navalDamage(const Catalog& catalog) {
     const auto c = japan();
-    const auto battleship = catalog.stats("battleship", 1, c);
+    const auto battleship = catalog.stats(catalog.unitTypes().number("battleship"), 1, c);
     check(battleship.attack == 6 && battleship.defense == 6 && battleship.bombardment == 2 && battleship.movement == 1,
           "Approved battleship damage ruling changed");
-    const auto first = catalog.stats("heavy_battleship", 1, c);
-    const auto second = catalog.stats("heavy_battleship", 2, c);
+    const auto first = catalog.stats(catalog.unitTypes().number("heavy_battleship"), 1, c);
+    const auto second = catalog.stats(catalog.unitTypes().number("heavy_battleship"), 2, c);
     check(first.attack == 8 && first.defense == 8 && first.bombardment == 3 && first.movement == 2
               && second.attack == 6 && second.defense == 6 && second.bombardment == 1 && second.movement == 2,
           "Heavy battleship per-hit fire reduction or flat movement penalty wrong");
-    const auto battleshipModes = catalog.modes("battleship", c, 1);
-    const auto heavyModes = catalog.modes("heavy_battleship", c, 2);
+    const auto battleshipModes = catalog.modes(catalog.unitTypes().number("battleship"), c, 1);
+    const auto heavyModes = catalog.modes(catalog.unitTypes().number("heavy_battleship"), c, 2);
     check(mode(battleshipModes, "shore_bombardment").threshold == 2
               && mode(battleshipModes, "shore_bombardment").dice == 1
               && mode(heavyModes, "shore_bombardment").threshold == 1
               && mode(heavyModes, "shore_bombardment").dice == 1,
           "Combat-mode query ignored damaged shore-bombardment stats");
     for (const auto& id : {"fleet_carrier", "heavy_fleet_carrier"}) {
-        const auto intact = catalog.stats(id, 0, c);
-        const auto damaged = catalog.stats(id, 1, c);
+        const auto intact = catalog.stats(catalog.unitTypes().number(id), 0, c);
+        const auto damaged = catalog.stats(catalog.unitTypes().number(id), 1, c);
         check(!damaged.attack && damaged.attackDice == 0 && damaged.defense == 1 && damaged.movement == 2
                   && damaged.carrierCapacity == intact.carrierCapacity,
               "Carrier damage invented attack or aircraft-capacity loss");
     }
-    rejects([&] { catalog.stats("heavy_battleship", 3, c); }, "Destroyed ship has surviving stats");
+    rejects([&] { catalog.stats(catalog.unitTypes().number("heavy_battleship"), 3, c); }, "Destroyed ship has surviving stats");
     const auto& resolution = catalog.sourceData().require("naval").require("source_review").require("capital_damage_resolution");
     check(resolution.require("authority_id").asString() == "user_naval_damage_2026_10_21",
           "User ruling was relabeled as printed source certainty");
@@ -421,16 +422,16 @@ void scenarioIntegration(const Catalog& catalog) {
     }
     check(!land.empty() && !sea.empty(), "Scenario fixture lacks both zone kinds");
     state.units.clear();
-    for (const auto& [type, definition] : catalog.units()) {
+    for (const auto& definition : catalog.units()) {
         for (const auto& [damage, stats] : definition.states) {
             UnitState u;
-            u.id = "catalog_" + type + "_" + std::to_string(damage);
-            u.type = type;
+            u.id = "catalog_" + definition.id + "_" + std::to_string(damage);
+            u.type = definition.number;
             u.owner = nationNumber(state, "japan");
-            u.zone = zoneNumber(state, definition.classes.contains("naval") ? sea : land);
+            u.zone = zoneNumber(state, definition.classes.contains(catalog.knownUnitClasses().naval) ? sea : land);
             u.turnOrigin = u.zone;
             u.damage = damage;
-            u.movementAllowance = catalog.stats(type, damage, catalogContext(state, u.owner, u.zone)).movement;
+            u.movementAllowance = catalog.stats(u.type, damage, catalogContext(state, u.owner, u.zone)).movement;
             u.movementRemaining = u.movementAllowance;
             state.units.emplace(u.id, u);
         }
@@ -442,13 +443,23 @@ void scenarioIntegration(const Catalog& catalog) {
     const auto observation = copy.observation();
     for (const auto& [id, unit] : state.units) {
         const auto& observed = observation.require("units").require(id);
-        check(observed.require("type").asString() == unit.type && observed.require("damage").asInt() == unit.damage,
+        check(observed.require("type").asString() == unitTypeName(state, unit.type) && observed.require("damage").asInt() == unit.damage,
               "Policy observation dropped type/damage identity: " + id);
     }
     auto invalid = state.clone();
-    invalid.units.begin()->second.type = "invented_type";
+    invalid.units.begin()->second.type = UnitTypeId {};  // A number naming no unit type.
     rejects([&] { invalid.validate(); }, "Unknown unit type accepted in campaign state");
-    rejects([&] { State::fromJson(invalid.definition, invalid.toJson()); }, "Unknown unit accepted on restore");
+    // A saved position naming a type the catalog lacks is refused when restored.
+    const auto renamed = [&] {
+        auto root = state.toJson().asObject();
+        auto units = root.at("units").asObject();
+        auto unit = units.begin()->second.asObject();
+        unit["type"] = game::json::Value(std::string("invented_type"));
+        units.begin()->second = game::json::Value(std::move(unit));
+        root["units"] = game::json::Value(std::move(units));
+        return game::json::Value(std::move(root));
+    }();
+    rejects([&] { State::fromJson(state.definition, renamed); }, "Unknown unit accepted on restore");
     invalid = state.clone();
     invalid.units.at("catalog_heavy_battleship_2").damage = 3;
     rejects([&] { invalid.validate(); }, "Destroyed damage state accepted in campaign state");

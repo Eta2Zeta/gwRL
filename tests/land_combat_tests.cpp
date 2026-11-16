@@ -63,9 +63,9 @@ void add(State &s, const Id &id, const Id &nation, const Id &zone, const Id &typ
     u.id = id;
     u.owner = nationNumber(s, nation);
     u.zone = u.turnOrigin = zoneNumber(s, zone);
-    u.type = type;
+    u.type = unitTypeNumber(s, type);
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, 0, catalogContext(s, nationNumber(s, nation), zoneNumber(s, zone))).movement;
+        s.definition->catalog->stats(unitTypeNumber(s, type), 0, catalogContext(s, nationNumber(s, nation), zoneNumber(s, zone))).movement;
     s.units.emplace(id, u);
 }
 Action select(

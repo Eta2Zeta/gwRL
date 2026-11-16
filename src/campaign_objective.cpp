@@ -79,7 +79,7 @@ std::array<WealthComponents, 3> allianceWealth(const State& s) {
         const auto* repair = type.repair.isObject() ? type.repair.find("cost_per_hit") : nullptr;
         const int cost = repair && repair->isNumber() ? repair->asInt() : 0;
         const int remainingDamage = std::max(0, unit.damage - prepaidRepair(s, id, unit.owner));
-        values[*i].units += completedAssetValue(*s.definition, unit.type) - cost * remainingDamage;
+        values[*i].units += completedAssetValue(*s.definition, unitTypeName(s, unit.type)) - cost * remainingDamage;
     }
     for (const auto& [id, facility] : s.facilities)
         if (const auto i = recipient(s, s.territories.at(facility.zone).possessor)) {

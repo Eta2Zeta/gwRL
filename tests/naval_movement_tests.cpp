@@ -41,12 +41,12 @@ void add(State &s, const Id &id, const Id &type, const Id &zone,
          const Id &n = "japan", int damage = 0) {
   UnitState u;
   u.id = id;
-  u.type = type;
+  u.type = unitTypeNumber(s, type);
   u.owner = nationNumber(s, n);
   u.zone = u.turnOrigin = zoneNumber(s, zone);
   u.damage = damage;
   u.movementAllowance = u.movementRemaining =
-      s.definition->catalog->stats(type, damage, catalogContext(s, nationNumber(s, n), zoneNumber(s, zone)))
+      s.definition->catalog->stats(unitTypeNumber(s, type), damage, catalogContext(s, nationNumber(s, n), zoneNumber(s, zone)))
           .movement;
   s.units.emplace(id, std::move(u));
 }
@@ -656,7 +656,7 @@ void strategicAndNoncombatBlockers() {
             !validateNavalRoute(s, {{"t"}, zoneNumbers(s, {p16, p15, p14})}).allowed,
         "Enemy warship failed to block route");
   s.units.at("enemy").gameFlags["raider"] = 1;
-  s.units.at("enemy").type = "battlecruiser";
+  s.units.at("enemy").type = knownUnitTypes(s).battlecruiser;
   check(validateNavalRoute(s, {{"t"}, zoneNumbers(s, {p16, p15, p14})}).allowed,
         "Ordinary movement could not ignore raiding battlecruiser");
   check(!validateNavalRoute(s, r).allowed,

@@ -65,14 +65,14 @@ bool hostileFighterAt(const State &s, NationId nation, ZoneId zone) {
                   NumberSet<ZoneId> zones;
                   for (const auto &[id, u] : s.units)
                     if (hostile(s, nation, u.owner) &&
-                        unitClass(s, u, "fighter"))
+                        unitClass(s, u, knownUnitClasses(s).fighter))
                       zones.insert(u.zone);
                   return zones;
                 })
         .contains(zone);
   for (const auto &[id, u] : s.units)
     if (u.zone == zone && hostile(s, nation, u.owner) &&
-        unitClass(s, u, "fighter"))
+        unitClass(s, u, knownUnitClasses(s).fighter))
       return true;
   return false;
 }
@@ -193,8 +193,8 @@ bool narrowBlocked(const State &s, NationId nation, const V &e, bool combat,
     const auto sea = findZone(s, seaName.asString());
     for (const auto &[id, u] : s.units)
       if (sea && u.zone == *sea && hostile(s, nation, u.owner)) {
-        if (unitClass(s, u, "surface_warship") ||
-            (unitClass(s, u, "submarine") && !flag(u.turnFlags, "submerged")) ||
+        if (unitClass(s, u, knownUnitClasses(s).surface_warship) ||
+            (unitClass(s, u, knownUnitClasses(s).submarine) && !flag(u.turnFlags, "submerged")) ||
             u.commitments.contains("maritime_air_patrol") ||
             flag(u.turnFlags, "on_map"))
           return true;
@@ -269,7 +269,7 @@ MovementMode parseMovementMode(const std::string &s) {
       return m;
   throw std::runtime_error("Unknown movement mode: " + s);
 }
-bool unitClass(const State &s, const UnitState &u, const Id &c) {
+bool unitClass(const State &s, const UnitState &u, UnitClassId c) {
   return s.definition->catalog->unit(u.type).classes.contains(c);
 }
 bool movementController(const State &s, NationId nation) {
@@ -440,9 +440,9 @@ int regionalRailCapacity(const Id &r) {
 }
 bool blitzPairValid(const State &s, const UnitState &u, ZoneId from,
                     ZoneId to) {
-  if (u.type == "light_armor" || u.type == "medium_armor" || u.type == "t_34" ||
-      u.type == "heavy_armor" || u.type == "tiger_i" ||
-      u.type == "panzergrenadier")
+  if (u.type == knownUnitTypes(s).light_armor || u.type == knownUnitTypes(s).medium_armor || u.type == knownUnitTypes(s).t_34 ||
+      u.type == knownUnitTypes(s).heavy_armor || u.type == knownUnitTypes(s).tiger_i ||
+      u.type == knownUnitTypes(s).panzergrenadier)
     return true;
   for (const auto &link : u.commitments)
     if (link.rfind("blitz_with:", 0) == 0) {
@@ -495,7 +495,7 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
         flag(u.turnFlags, "strategic_moved"))
       return fail("Unit already moved this turn");
   } else {
-    if (!unitClass(s, u, "land"))
+    if (!unitClass(s, u, knownUnitClasses(s).land))
       return fail("Ordinary land movement requires a land unit");
     if (r.combat && s.clock.phase != Phase::CombatMovement &&
         !(r.mode == MovementMode::Blitz && s.clock.phase == Phase::Combat))
@@ -508,11 +508,11 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
   }
   if (!strategic && (!u.movementRemaining || *u.movementRemaining <= 0))
     return fail("No movement remaining");
-  if (unitClass(s, u, "naval") ||
-      (strategic && !unitClass(s, u, "land") && !unitClass(s, u, "aircraft") &&
-       !unitClass(s, u, "rocket")))
+  if (unitClass(s, u, knownUnitClasses(s).naval) ||
+      (strategic && !unitClass(s, u, knownUnitClasses(s).land) && !unitClass(s, u, knownUnitClasses(s).aircraft) &&
+       !unitClass(s, u, knownUnitClasses(s).rocket)))
     return fail("Unit cannot use strategic rail");
-  if (u.type == "militia" && (!inHome(s, u.owner, r.path.front()) ||
+  if (u.type == knownUnitTypes(s).militia && (!inHome(s, u.owner, r.path.front()) ||
                               !inHome(s, u.owner, r.path.back())))
     return fail("Militia must start and end in its Home Country");
   if (r.mode == MovementMode::Blitz &&
@@ -566,7 +566,7 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
       if (!friendly && i + 1 < r.path.size())
         return fail("Enemy land ends ordinary movement; resolve combat before "
                     "blitzing");
-      if (!friendly && u.type == "militia")
+      if (!friendly && u.type == knownUnitTypes(s).militia)
         return fail("Militia cannot attack");
       if (!r.combat && !enterableThisTurn(s, u.owner, b))
         return fail("Cannot enter land captured this turn");
@@ -583,7 +583,7 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
           return fail("Cannot blitz into friendly land");
       }
       bool stops = restrictedTerrain(all);
-      if (u.type == "cavalry" && all.size() == 1 && all.contains("mountain"))
+      if (u.type == knownUnitTypes(s).cavalry && all.size() == 1 && all.contains("mountain"))
         stops = false;
       if (stops) {
         out.exhaustsMovement = true;
@@ -593,7 +593,7 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
       if (r.mode == MovementMode::NarrowCrossing) {
         if (!narrow(e) || r.path.size() != 2 || !u.route.empty())
           return fail("Crossing must begin and end the unit's movement");
-        if (r.combat ? u.type != "marine" : !unitClass(s, u, "infantry_class"))
+        if (r.combat ? u.type != knownUnitTypes(s).marine : !unitClass(s, u, knownUnitClasses(s).infantry_class))
           return fail(
               "Only Marines attack; infantry-class units may noncombat cross");
         if (narrowBlocked(s, u.owner, *e, r.combat, b))
@@ -642,12 +642,12 @@ RouteResult validateRoute(const State &s, const RouteRequest &r) {
         return fail("Towed artillery must continue with its motorized partner");
     return validateSingleRoute(s, r);
   }
-  if (r.mode != MovementMode::Ordinary || motor.type != "motorized_infantry" ||
+  if (r.mode != MovementMode::Ordinary || motor.type != knownUnitTypes(s).motorized_infantry ||
       !s.units.contains(*r.towed) || *r.towed == r.unit)
     return fail("Only ordinary Motorized Infantry movement can tow one unit");
   const auto &artillery = s.units.at(*r.towed);
-  if (artillery.type != "artillery" && artillery.type != "advanced_artillery" &&
-      artillery.type != "anti_aircraft_artillery")
+  if (artillery.type != knownUnitTypes(s).artillery && artillery.type != knownUnitTypes(s).advanced_artillery &&
+      artillery.type != knownUnitTypes(s).anti_aircraft_artillery)
     return fail("This unit cannot be towed");
   if (artillery.owner != motor.owner || artillery.zone != motor.zone ||
       artillery.carriedBy)
@@ -734,7 +734,7 @@ RouteResult validateFactoryRailRoute(const State &s, const Id &facility,
     proxy += "_";
   UnitState u;
   u.id = proxy;
-  u.type = "infantry";
+  u.type = knownUnitTypes(s).infantry;
   u.owner = nation;
   u.zone = u.turnOrigin = f.zone;
   u.movementAllowance = u.movementRemaining = 0;
@@ -786,23 +786,23 @@ namespace {
 bool blockadedNow(const State &s, NationId nation, ZoneId sea) {
   std::map<Id, int> count;
   for (const auto &[id, u] : s.units)
-    if (u.zone == sea && unitClass(s, u, "surface_warship") &&
+    if (u.zone == sea && unitClass(s, u, knownUnitClasses(s).surface_warship) &&
         s.nations.at(u.owner).alliance)
       ++count[*s.nations.at(u.owner).alliance];
   for (const auto &[alliance, n] : count)
     if (n >= 3) {
       bool enemy = false, opposed = false;
       for (const auto &[id, u] : s.units)
-        if (u.zone == sea && unitClass(s, u, "surface_warship") &&
+        if (u.zone == sea && unitClass(s, u, knownUnitClasses(s).surface_warship) &&
             s.nations.at(u.owner).alliance == alliance)
           enemy |= hostile(s, nation, u.owner);
       if (!enemy)
         continue;
       for (const auto &[id, u] : s.units)
-        if (u.zone == sea && unitClass(s, u, "surface_warship") &&
+        if (u.zone == sea && unitClass(s, u, knownUnitClasses(s).surface_warship) &&
             s.nations.at(u.owner).alliance != alliance) {
           for (const auto &[oid, other] : s.units)
-            if (other.zone == sea && unitClass(s, other, "surface_warship") &&
+            if (other.zone == sea && unitClass(s, other, knownUnitClasses(s).surface_warship) &&
                 s.nations.at(other.owner).alliance == alliance &&
                 hostile(s, other.owner, u.owner))
               opposed = true;
@@ -1097,7 +1097,7 @@ NumberSet<NationId> withdrawalEligibleRecipients(const State &s, NationId attack
   for (const auto &[id, u] : s.units)
     if (u.owner == attacker &&
         (u.zone == zone || flag(u.turnFlags, "must_withdraw_from_chinese_gift")) && !u.carriedBy &&
-        unitClass(s, u, "land")) {
+        unitClass(s, u, knownUnitClasses(probe).land)) {
       auto &p = probe.units.at(id);
       p.turnFlags["must_withdraw_from_chinese_gift"] = 1;
       bool canLeave = false;
@@ -1129,7 +1129,7 @@ NumberSet<NationId> withdrawalEligibleRecipients(const State &s, NationId attack
   std::set<Id> ships;
   for (const auto &cargo : needTransport) {
     for (const auto &[ship, u] : probe.units)
-      if (unitClass(probe, u, "naval") && navalLoadAllowed(probe, ship, cargo)) {
+      if (unitClass(probe, u, knownUnitClasses(probe).naval) && navalLoadAllowed(probe, ship, cargo)) {
         candidates[cargo].push_back(ship);
         ships.insert(ship);
       }
@@ -1144,7 +1144,7 @@ NumberSet<NationId> withdrawalEligibleRecipients(const State &s, NationId attack
     O loads;
     for (const auto &ship : ships) {
       std::vector<Id> types;
-      for (const auto &cargo : probe.units.at(ship).cargo) types.push_back(probe.units.at(cargo).type);
+      for (const auto &cargo : probe.units.at(ship).cargo) types.push_back(unitTypeName(probe, probe.units.at(cargo).type));
       std::sort(types.begin(), types.end());
       A entries;
       for (const auto &type : types) entries.emplace_back(type);
@@ -1209,7 +1209,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
         s.territories.contains(u.zone)) {
       // Zones this unit reaches by an ordinary noncombat move.
       NumberSet<ZoneId> ordinaryEnds;
-      if (unitClass(s, u, "land")) {
+      if (unitClass(s, u, knownUnitClasses(s).land)) {
         std::function<void(std::vector<ZoneId>)> visit = [&](std::vector<ZoneId> path) {
           if (path.size() > 1) {
             RouteRequest r{id, path,
@@ -1223,7 +1223,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
                 out.push_back(movementAction(s, r));
                 if (!combat && !blitz)
                   ordinaryEnds.insert(path.back());
-                if (u.type == "motorized_infantry" && !blitz)
+                if (u.type == knownUnitTypes(s).motorized_infantry && !blitz)
                   for (const auto &[partner, towed] : s.units)
                     if (partner != id && towed.zone == u.zone &&
                         towed.owner == u.owner) {

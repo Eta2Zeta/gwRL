@@ -131,12 +131,12 @@ void unit(State &s, const Id &id, const Id &zone, const Id &type = "infantry",
   UnitState u;
   u.id = id;
   u.owner = nationNumber(s, owner);
-  u.type = type;
+  u.type = unitTypeNumber(s, type);
   u.zone = u.turnOrigin = zoneNumber(s, zone);
   u.movementAllowance = u.movementRemaining =
       movement >= 0 ? std::optional<int>(movement)
                     : s.definition->catalog
-                          ->stats(type, 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone)))
+                          ->stats(unitTypeNumber(s, type), 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone)))
                           .movement;
   s.units[id] = std::move(u);
 }
@@ -728,7 +728,7 @@ void pairedTowingMovesWithoutChangingCatalogStats() {
         "Two-zone towing failed to move/exhaust both partners");
   check(!s.units.at("gun").carriedBy && s.units.at("motor").cargo.empty(),
         "Towing incorrectly used transport cargo");
-  check(s.definition->catalog->stats("artillery", 0, catalogContext(s, nationNumber(s, "japan")))
+  check(s.definition->catalog->stats(knownUnitTypes(s).artillery, 0, catalogContext(s, nationNumber(s, "japan")))
                 .movement == 1,
         "Towing rewrote ordinary artillery catalog movement");
 }

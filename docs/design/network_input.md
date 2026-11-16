@@ -19,13 +19,11 @@ describes one decision: both the state of the game and the moves on offer.
 engine. It reads the live game state and receives the legal moves as the
 engine's own move objects. Nothing is written out as text or parsed on the way.
 
-**But the engine identifies most things by name.** Only zones and nations are
-numbers: each one's place in the sorted list of the definition's names of its
+**But the engine identifies most things by name.** Only zones, nations and
+unit types are numbers: each one's place in the sorted list of the names of its
 kind ([names held as numbers](../engine/names.md)), which is also its column in
-the encoder's zone list or nation list. The rest of the state is stored as
-names:
+the encoder's list of that kind. The rest of the state is stored as names:
 
-- a unit's type is a name, such as `cavalry`;
 - a unit's marks are a table of names and numbers, such as `repairing` → 1;
 - a battle's notes, and a legal move's details, are small trees of named
   entries, such as `target` → `rail_land_manchuria_northern__land_manchuria_western`

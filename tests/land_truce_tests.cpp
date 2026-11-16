@@ -27,8 +27,8 @@ State fixture(const Id& actor="ccp",Phase phase=Phase::Combat) {
     s.captureTurnStart();return s;
 }
 void add(State& s,const Id& id,const Id& owner,const Id& zone,const Id& type="infantry") {
-    UnitState u;u.id=id;u.type=type;u.owner=nationNumber(s, owner);u.zone=u.turnOrigin = zoneNumber(s, zone);
-    u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(type,0,catalogContext(s,nationNumber(s, owner),zoneNumber(s, zone))).movement;
+    UnitState u;u.id=id;u.type=unitTypeNumber(s, type);u.owner=nationNumber(s, owner);u.zone=u.turnOrigin = zoneNumber(s, zone);
+    u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(unitTypeNumber(s, type),0,catalogContext(s,nationNumber(s, owner),zoneNumber(s, zone))).movement;
     s.units.emplace(id,std::move(u));
 }
 std::shared_ptr<const Rules> rules(){return std::make_shared<PoliticsRules>(std::make_shared<MovementRules>(std::make_shared<LandCombatRules>(std::make_shared<AirRules>(std::make_shared<EconomyRules>()))));}

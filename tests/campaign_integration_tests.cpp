@@ -19,7 +19,7 @@ void authoritativeInitialStateAndDomainDiagnostics() {
     const auto warFailures=campaignInvariantFailures(broken);
     check(std::find(warFailures.begin(),warFailures.end(),"asymmetric war: japan / kmt")!=warFailures.end(),"Asymmetric war escaped domain audit");
     broken=s.clone();
-    const auto i=std::find_if(broken.units.begin(),broken.units.end(),[&](const auto&p){return broken.definition->catalog->unit(p.second.type).classes.contains("land");});
+    const auto i=std::find_if(broken.units.begin(),broken.units.end(),[&](const auto&p){return broken.definition->catalog->unit(p.second.type).classes.contains(knownUnitClasses(broken).land);});
     check(i!=broken.units.end(),"No land unit in setup");
     i->second.zone = zoneNumber(broken, "sea_p14");
     const auto cargoFailures=campaignInvariantFailures(broken);
@@ -69,8 +69,8 @@ void carpetBombingParticipatesOnceAndCannotBeHitByInfantry() {
     const Id origin="land_china_beiping",target="land_china_hopeh";
     s.territories.at(zoneNumber(s, origin)).possessor=nationNumber(s, "japan");s.territories.at(zoneNumber(s, target)).possessor=nationNumber(s, "kmt");
     auto add=[&](const Id&id,const Id&type,const Id&owner,const Id&zone){
-        UnitState u;u.id=id;u.type=type;u.owner=nationNumber(s, owner);u.zone=u.turnOrigin = zoneNumber(s, zone);
-        u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(type,0,catalogContext(s,nationNumber(s, owner),zoneNumber(s, zone))).movement;s.units[id]=u;
+        UnitState u;u.id=id;u.type=unitTypeNumber(s, type);u.owner=nationNumber(s, owner);u.zone=u.turnOrigin = zoneNumber(s, zone);
+        u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(unitTypeNumber(s, type),0,catalogContext(s,nationNumber(s, owner),zoneNumber(s, zone))).movement;s.units[id]=u;
     };
     add("carpet_bomber","heavy_strategic_bomber","japan",origin);
     add("ordinary_aircraft","tactical_bomber","japan",origin);

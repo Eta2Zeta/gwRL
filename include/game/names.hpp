@@ -24,9 +24,10 @@
 // "land_china_hopeh". Inside the engine such a name is held as a small number
 // of a type of its own for each kind of name, such as ZoneId for a zone, so
 // that comparing, copying and looking up names costs no more than for an
-// integer. The numbers come from the definition's name tables (Names below):
-// a kind's names sorted bytewise, each name's number being its place in that
-// list, counted from 0. Numbers therefore compare as their names do, and a
+// integer. The numbers come from name tables: the definition's for zones and
+// nations (Names in campaign.hpp), the catalog's for unit types and unit
+// classes (Catalog in catalog.hpp). A table lists a kind's names sorted
+// bytewise, each name's number being its place in that list, counted from 0. Numbers therefore compare as their names do, and a
 // container keyed by numbers lists its entries in the order the same container
 // keyed by the names would.
 //
@@ -50,6 +51,16 @@ struct NationKind {
     using Rep = std::uint16_t;
     static constexpr std::size_t capacity = 256;
     static constexpr std::string_view noun = "nation";
+};
+struct UnitTypeKind {
+    using Rep = std::uint16_t;
+    static constexpr std::size_t capacity = 256;  // The catalog has 53.
+    static constexpr std::string_view noun = "unit type";
+};
+struct UnitClassKind {
+    using Rep = std::uint8_t;
+    static constexpr std::size_t capacity = 64;  // The catalog has 17.
+    static constexpr std::string_view noun = "unit class";
 };
 
 // A name of one kind, held as its number in the definition's table of that
@@ -93,6 +104,8 @@ class Number {
 
 using ZoneId = Number<ZoneKind>;
 using NationId = Number<NationKind>;
+using UnitTypeId = Number<UnitTypeKind>;
+using UnitClassId = Number<UnitClassKind>;
 
 // Every number below a count, ascending: the numbers a table holds.
 template <class Kind>

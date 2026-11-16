@@ -96,7 +96,7 @@ void queueSharedBattles(State& state, NationId breaker) {
                 ? unit.route[unit.route.size() - 2] : unit.turnOrigin;
             if (passableLandBorder(state, from, zone)) {
                 origins[id] = V(zoneName(state, from));
-                if (state.definition->catalog->unit(unit.type).classes.contains("land") &&
+                if (state.definition->catalog->unit(unit.type).classes.contains(knownUnitClasses(state).land) &&
                     !unit.commitments.contains("airborne_assault") &&
                     !unit.commitments.contains("amphibious_assault")) landEntries.emplace_back(zoneName(state, from));
             }

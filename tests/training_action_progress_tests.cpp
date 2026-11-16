@@ -43,11 +43,11 @@ State fixture(Phase phase) {
 void add(State& state, const Id& id, const Id& type, const Id& zone, const Id& owner = "japan") {
     UnitState unit;
     unit.id = id;
-    unit.type = type;
+    unit.type = unitTypeNumber(state, type);
     unit.owner = nationNumber(state, owner);
     unit.zone = unit.turnOrigin = zoneNumber(state, zone);
     unit.movementAllowance = unit.movementRemaining =
-        state.definition->catalog->stats(type, 0, catalogContext(state, nationNumber(state, owner), zoneNumber(state, zone))).movement;
+        state.definition->catalog->stats(unitTypeNumber(state, type), 0, catalogContext(state, nationNumber(state, owner), zoneNumber(state, zone))).movement;
     state.units.emplace(id, std::move(unit));
 }
 

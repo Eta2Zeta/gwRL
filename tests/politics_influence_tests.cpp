@@ -31,7 +31,7 @@ void unit(State& state, const Id& id, const Id& owner, const Id& zone,
           const Id& type = "infantry") {
     UnitState value;
     value.id = id;
-    value.type = type;
+    value.type = unitTypeNumber(state, type);
     value.owner = nationNumber(state, owner);
     value.zone = value.turnOrigin = zoneNumber(state, zone);
     value.movementAllowance = value.movementRemaining = 1;
@@ -127,7 +127,7 @@ void resolve(State& state, int raw) {
 
 std::size_t ownedUnits(const State& state, const Id& owner, const Id& type) {
     return static_cast<std::size_t>(std::count_if(state.units.begin(), state.units.end(), [&](const auto& item) {
-        return item.second.owner == nationNumber(state, owner) && item.second.type == type;
+        return item.second.owner == nationNumber(state, owner) && item.second.type == unitTypeNumber(state, type);
     }));
 }
 
@@ -339,7 +339,7 @@ void ccpRecruitmentAndSplitMilitia() {
     applyInfluenceAction(state, selected);
     check(ownedUnits(state, "ccp", "militia") == 2 && state.nations.at(nationNumber(state, "ccp")).treasury == cash,
           "Recruitment did not place two free national militia");
-    for (const auto& [id, value] : state.units) if (value.owner == nationNumber(state, "ccp") && value.type == "militia")
+    for (const auto& [id, value] : state.units) if (value.owner == nationNumber(state, "ccp") && value.type == knownUnitTypes(state).militia)
         check(value.movementRemaining == 0 && value.turnFlags.at("placed_this_turn") != 0,
               "Recruited unit gained movement this turn");
     check(actions(state, "recruitment_roll").empty(), "CCP recruited twice in one turn");

@@ -22,12 +22,12 @@ V n(int x) { return V(static_cast<double>(x)); }
 int value(const std::map<Id,int> &flags, const Id &key) {
     const auto i=flags.find(key); return i==flags.end()?0:i->second;
 }
-bool has(const State &s,const UnitState &u,const Id &c) {
+bool has(const State &s,const UnitState &u,UnitClassId c) {
     return s.definition->catalog->unit(u.type).classes.contains(c);
 }
 V unitJson(const State &s,const UnitState &u) {
     A cargo;for(const auto&id:u.cargo)cargo.emplace_back(id);
-    return V(O{{"id",V(u.id)},{"type",V(u.type)},{"owner",V(nationName(s,u.owner))},{"zone",V(zoneName(s,u.zone))},
+    return V(O{{"id",V(u.id)},{"type",V(unitTypeName(s,u.type))},{"owner",V(nationName(s,u.owner))},{"zone",V(zoneName(s,u.zone))},
         {"damage",n(u.damage)},{"movement",u.movementRemaining?n(*u.movementRemaining):V(nullptr)},
         {"carried_by",u.carriedBy?V(*u.carriedBy):V(nullptr)},{"cargo",V(cargo)}});
 }
@@ -145,36 +145,36 @@ std::vector<std::string> campaignInvariantFailures(const State&s) {
             }
     for(const auto &[id,u]:s.units) {
         if(!u.cargo.empty()) {
-            if(has(s,u,"carrier")) {
+            if(has(s,u,knownUnitClasses(s).carrier)) {
                 int occupied=0;
                 for(const auto&child:u.cargo) {
-                    const auto&c=s.units.at(child);occupied+=c.type=="medium_bomber"?2:1;
+                    const auto&c=s.units.at(child);occupied+=c.type== knownUnitTypes(s).medium_bomber?2:1;
                     if(!isAircraft(s,c))out.push_back("non-aircraft carrier cargo: "+child);
-                    if(!(has(s,c,"fighter")||c.type=="tactical_bomber"||(c.type=="medium_bomber"&&u.type=="heavy_fleet_carrier")))
+                    if(!(has(s,c,knownUnitClasses(s).fighter)||c.type== knownUnitTypes(s).tactical_bomber||(c.type== knownUnitTypes(s).medium_bomber&&u.type== knownUnitTypes(s).heavy_fleet_carrier)))
                         out.push_back("ineligible carrier aircraft: "+child);
                 }
                 const int cap=s.definition->catalog->stats(u.type,u.damage,catalogContext(s,u.owner,u.zone)).carrierCapacity.value_or(0);
                 if(occupied>cap)out.push_back("carrier over capacity: "+id);
-            } else if(has(s,u,"naval")) {
+            } else if(has(s,u,knownUnitClasses(s).naval)) {
                 if(!navalCargoFits(s,id,u.cargo))out.push_back("illegal naval cargo: "+id);
             } else if(isAircraft(s,u)) {
-                const bool airTransport=u.type=="air_transport"||u.type=="heavy_air_transport";
-                const bool strategic=has(s,u,"strategic_bomber");
+                const bool airTransport=u.type== knownUnitTypes(s).air_transport||u.type== knownUnitTypes(s).heavy_air_transport;
+                const bool strategic=has(s,u,knownUnitClasses(s).strategic_bomber);
                 if(!airTransport&&!strategic)out.push_back("non-transport aircraft carries cargo: "+id);
-                const bool airborne=std::all_of(u.cargo.begin(),u.cargo.end(),[&](const auto&child){const auto&type=s.units.at(child).type;return type=="airborne_infantry"||type=="elite_airborne_infantry";});
-                const int cap=u.type=="heavy_air_transport"&&airborne?2:1;
+                const bool airborne=std::all_of(u.cargo.begin(),u.cargo.end(),[&](const auto&child){const auto&type=s.units.at(child).type;return type== knownUnitTypes(s).airborne_infantry||type== knownUnitTypes(s).elite_airborne_infantry;});
+                const int cap=u.type== knownUnitTypes(s).heavy_air_transport&&airborne?2:1;
                 if(static_cast<int>(u.cargo.size())>cap)out.push_back("air transport cargo exceeds mission capacity: "+id);
                 if(strategic&&!airborne)out.push_back("strategic bomber carries non-airborne cargo: "+id);
                 for(const auto&child:u.cargo) {
                     const auto&cargo=s.units.at(child);
-                    const bool allowed=has(s,cargo,"infantry_class")||(u.type=="heavy_air_transport"&&(has(s,cargo,"artillery_class")||cargo.type=="anti_aircraft_artillery"));
-                    if(!has(s,cargo,"land")||(!strategic&&!allowed))out.push_back("ineligible air cargo: "+child);
+                    const bool allowed=has(s,cargo,knownUnitClasses(s).infantry_class)||(u.type== knownUnitTypes(s).heavy_air_transport&&(has(s,cargo,knownUnitClasses(s).artillery_class)||cargo.type== knownUnitTypes(s).anti_aircraft_artillery));
+                    if(!has(s,cargo,knownUnitClasses(s).land)||(!strategic&&!allowed))out.push_back("ineligible air cargo: "+child);
                 }
             } else out.push_back("non-transport carries cargo: "+id);
         }
-        if(!u.carriedBy&&has(s,u,"land")&&!s.territories.contains(u.zone))
+        if(!u.carriedBy&&has(s,u,knownUnitClasses(s).land)&&!s.territories.contains(u.zone))
             out.push_back("untransported land unit at sea: "+id);
-        if(has(s,u,"naval")&&s.territories.contains(u.zone)) {
+        if(has(s,u,knownUnitClasses(s).naval)&&s.territories.contains(u.zone)) {
             bool berthed=false;
             for(const auto&[flag,on]:u.gameFlags)if(on&&prefix(flag,"in_port:")) {
                 const auto facility=flag.substr(std::string("in_port:").size());
@@ -242,19 +242,20 @@ void CampaignAuditLog::record(const State&before,const Engine&e,const std::strin
                 authorized=before.construction.contains(project)&&!after.construction.contains(project);
                 if(authorized) {
                     const auto&type=before.construction.at(project).type;
-                    authorized=type==u.type;
-                    if(!authorized)for(const auto&conversion:after.definition->catalog->automaticConversions(type,catalogContext(after,u.owner,u.zone)))
-                        authorized=authorized||conversion.to==u.type;
+                    const auto& placed=unitTypeName(after,u.type);
+                    authorized=type==placed;
+                    if(!authorized)for(const auto&conversion:after.definition->catalog->automaticConversions(after.definition->catalog->unit(type).number,catalogContext(after,u.owner,u.zone)))
+                        authorized=authorized||conversion.to==placed;
                     // The explicit elite-airborne aid rule reverts doctrine-
                     // dependent elite infantry for an unqualified recipient.
-                    authorized=authorized||(type=="elite_airborne_infantry"&&u.type=="airborne_infantry"&&command=="economy_lease_place");
+                    authorized=authorized||(type=="elite_airborne_infantry"&&u.type== knownUnitTypes(before).airborne_infantry&&command=="economy_lease_place");
                 }
             }
-            if(kind=="action"&&command=="recruitment_place_infantry")authorized=u.type=="infantry";
-            if(kind=="action"&&command=="recruitment_place_militia")authorized=u.type=="militia";
+            if(kind=="action"&&command=="recruitment_place_infantry")authorized=u.type== knownUnitTypes(before).infantry;
+            if(kind=="action"&&command=="recruitment_place_militia")authorized=u.type== knownUnitTypes(before).militia;
             if(prefix(id,"ship_crew_"))for(const auto&[flag,on]:u.gameFlags)if(on&&prefix(flag,"ship_crew:")) {
                 const auto ship=flag.substr(std::string("ship_crew:").size());
-                authorized=before.units.contains(ship)&&u.type=="militia"&&before.units.at(ship).owner==u.owner&&before.units.at(ship).zone==u.zone;
+                authorized=before.units.contains(ship)&&u.type== knownUnitTypes(before).militia&&before.units.at(ship).owner==u.owner&&before.units.at(ship).zone==u.zone;
             }
             if(!authorized)throw std::runtime_error("Unit creation lacks a completed placement, recruitment choice, or ship-crew source: "+id);
             seenUnitIds_.insert(id);added.push_back(unitJson(after,u));

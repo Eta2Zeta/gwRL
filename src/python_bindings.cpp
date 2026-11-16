@@ -1,6 +1,7 @@
 #include "game/air.hpp"
 #include "game/campaign_env.hpp"
 #include "game/campaign_actions.hpp"
+#include "game/catalog.hpp"
 #include "game/zone_encoding.hpp"
 
 #include <pybind11/numpy.h>
@@ -13,6 +14,7 @@
 #include <functional>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 #include <memory>
 #include <unordered_map>
 #include <mutex>
@@ -323,13 +325,18 @@ PYBIND11_MODULE(gwrl_cpp, module) {
             return py::module_::import("json").attr("loads")(text);
         })
         .def("name_tables", [](const NativeCampaignEnv& self) {
-            const auto [zones, nations] = self.call([](const CampaignEnv& env) {
-                const auto& names = game::campaign::names(env.engine().state());
-                return std::pair{names.zones.names(), names.nations.names()};
+            const auto [zones, nations, unitTypes, unitClasses] = self.call([](const CampaignEnv& env) {
+                const auto& state = env.engine().state();
+                const auto& names = game::campaign::names(state);
+                const auto& catalog = *state.definition->catalog;
+                return std::tuple{names.zones.names(), names.nations.names(), catalog.unitTypes().names(),
+                                  catalog.unitClasses().names()};
             });
             py::dict tables;
             tables["zones"] = zones;
             tables["nations"] = nations;
+            tables["unit_types"] = unitTypes;
+            tables["unit_classes"] = unitClasses;
             return tables;
         }, "The tables that number the definition's names, by kind: each kind's names listed in "
            "number order, so a name's number is its place in its list (include/game/names.hpp).")

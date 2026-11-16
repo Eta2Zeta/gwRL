@@ -1,0 +1,98 @@
+{
+ "date": "2026-11-16",
+ "question": "Does holding unit types and classes as numbers, after zones and nations, leave play unchanged, and what does it save?",
+ "code": {
+  "before_any": "9519ea7",
+  "nations": "57d50f9",
+  "unit_types": "this change"
+ },
+ "machine": "Apple M4 Max: 10 performance and 4 efficiency cores, 36 GB",
+ "tool": "tools/compare_engine_builds.py",
+ "random_games": {
+  "seeds": "7000-7299",
+  "calendar_rounds": 11,
+  "processes": 4,
+  "games_compared": 300,
+  "identical": 300,
+  "steps": 443974,
+  "per_call": {
+   "legal_actions": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "before_any": 10.03,
+     "nations": 8.15,
+     "unit_types": 7.77,
+     "change_percent_from_nations": -4.7,
+     "change_percent_from_before_any": -22.5
+    },
+    "microseconds_per_call": {
+     "before_any": 640,
+     "nations": 503,
+     "unit_types": 453
+    }
+   },
+   "apply_action": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "before_any": 4.31,
+     "nations": 3.72,
+     "unit_types": 3.66,
+     "change_percent_from_nations": -1.6,
+     "change_percent_from_before_any": -15.1
+    },
+    "microseconds_per_call": {
+     "before_any": 311,
+     "nations": 269,
+     "unit_types": 250
+    }
+   },
+   "resolve_chance": {
+    "calls": 52134,
+    "million_instructions_per_call": {
+     "before_any": 3.2,
+     "nations": 2.89,
+     "unit_types": 2.88,
+     "change_percent_from_nations": -0.3,
+     "change_percent_from_before_any": -10.0
+    },
+    "microseconds_per_call": {
+     "before_any": 225,
+     "nations": 206,
+     "unit_types": 197
+    }
+   }
+  }
+ },
+ "searched_games": {
+  "seeds": "41-44",
+  "calendar_rounds": 11,
+  "simulations": 64,
+  "max_depth": 16,
+  "network": "64x2 networks with random-filled first-layer tables (tools/replay_coordinator_rounds.py --make-weights), evaluated one position at a time",
+  "games_compared": 4,
+  "identical": 4,
+  "events": 4985,
+  "billion_instructions": {
+   "before_any": 6782,
+   "nations": 5996,
+   "unit_types": 5845,
+   "change_percent_from_nations": -2.5,
+   "change_percent_from_before_any": -13.8,
+   "nations_bracketed_run": 5994,
+   "unit_types_runs": [
+    5845,
+    5848
+   ]
+  },
+  "cpu_seconds_bracketed": {
+   "unit_types_before": 443.0,
+   "nations": 462.0,
+   "unit_types_after": 445.5,
+   "change_percent": -3.8
+  }
+ },
+ "notes": [
+  "The bracketed searched games ran in the order: this change, the nations build, this change, back to back on the same Mac.",
+  "Instructions do not depend on the Mac's other work; CPU seconds do."
+ ]
+}

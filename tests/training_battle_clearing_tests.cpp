@@ -310,11 +310,11 @@ State navalFixture() {
   for (const auto &[id, owner] : {std::pair<Id, Id>{"attacker", "japan"}, {"defender", "kmt"}}) {
     UnitState unit;
     unit.id = id;
-    unit.type = "destroyer";
+    unit.type = knownUnitTypes(state).destroyer;
     unit.owner = nationNumber(state, owner);
     unit.zone = unit.turnOrigin = zoneNumber(state, "sea_p15");
     unit.movementAllowance = unit.movementRemaining =
-        state.definition->catalog->stats("destroyer", 0, catalogContext(state, unit.owner, zoneNumber(state, "sea_p15"))).movement;
+        state.definition->catalog->stats(knownUnitTypes(state).destroyer, 0, catalogContext(state, unit.owner, zoneNumber(state, "sea_p15"))).movement;
     state.units.emplace(id, std::move(unit));
   }
   state.captureTurnStart();

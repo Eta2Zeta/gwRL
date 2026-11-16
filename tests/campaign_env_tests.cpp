@@ -263,13 +263,13 @@ void setupValuesAndNoDoubleCounting() {
     const auto initial = allianceWealth(s);
     near(initial[0].paidConstruction, 10, "Opening queue paid amounts changed");
     near(initial[0].treasury, 15, "Opening treasury was debited historical payments");
-    const auto first = std::find_if(s.units.begin(), s.units.end(), [](const auto& item) { return item.second.type == "torpedo_boat_destroyer"; });
+    const auto first = std::find_if(s.units.begin(), s.units.end(), [&](const auto& item) { return item.second.type == unitTypeNumber(s, "torpedo_boat_destroyer"); });
     require(first != s.units.end(), "Missing setup-only ship");
     s.units.erase(first);
     near(initial[0].units - allianceWealth(s)[0].units, 5, "Unbuildable setup type lost approved price");
     auto bare = emptyAssets();
     UnitState battleship;
-    battleship.id = "battleship"; battleship.type = "battleship"; battleship.owner = nationNumber(s, "japan");
+    battleship.id = "battleship"; battleship.type = knownUnitTypes(bare).battleship; battleship.owner = nationNumber(s, "japan");
     battleship.zone = battleship.turnOrigin = zoneNumber(s, "sea_p15");
     battleship.movementAllowance = battleship.movementRemaining = 2;
     bare.units.emplace(battleship.id, battleship);
@@ -278,7 +278,7 @@ void setupValuesAndNoDoubleCounting() {
     ship.damage = 1;
     near(allianceWealth(bare)[0].units, undamaged, "Invented a capital ship damage discount despite free repair");
     UnitState crew;
-    crew.id = "crew"; crew.owner = nationNumber(s, "japan"); crew.type = "militia"; crew.zone = crew.turnOrigin = zoneNumber(s, "land_jap_honshu");
+    crew.id = "crew"; crew.owner = nationNumber(s, "japan"); crew.type = knownUnitTypes(bare).militia; crew.zone = crew.turnOrigin = zoneNumber(s, "land_jap_honshu");
     crew.gameFlags["ship_crew:" + ship.id] = 1;
     bare.units.emplace(crew.id, crew);
     near(allianceWealth(bare)[0].units, undamaged, "Temporary crew was counted as another purchased asset");

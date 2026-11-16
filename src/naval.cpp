@@ -1,4 +1,5 @@
 #include "game/naval.hpp"
+#include "game/catalog.hpp"
 
 #include <algorithm>
 #include <stdexcept>
@@ -75,9 +76,9 @@ std::vector<Action> NavalRules::actions(const State &s) const {
               // Militia aboard must still land in their Home Country (RB).
               const auto *cargo = a.parameters.find("cargo");
               const bool militia =
-                  (a.kind == "naval_unload" && u.type == "militia") ||
+                  (a.kind == "naval_unload" && u.type == knownUnitTypes(s).militia) ||
                   (a.kind == "air_unload" && cargo &&
-                   s.units.at(cargo->asString()).type == "militia");
+                   s.units.at(cargo->asString()).type == knownUnitTypes(s).militia);
               return !landing && !withdrawal && !militia;
             }),
         out.end());

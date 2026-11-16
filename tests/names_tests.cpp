@@ -1,6 +1,8 @@
 // Names held as numbers (include/game/names.hpp): the tables, the number type
-// and the containers keyed by numbers, then the scenario's zone and nation tables.
+// and the containers keyed by numbers, then the scenario's zone and nation tables
+// and the catalog's unit type and unit class tables.
 #include "game/campaign.hpp"
+#include "game/catalog.hpp"
 #include "game/names.hpp"
 
 #include <algorithm>
@@ -70,6 +72,8 @@ void tablesNumberNamesInSortedOrder() {
 static_assert(!std::is_constructible_v<NationId, ZoneId> && !std::is_constructible_v<ZoneId, NationId>);
 static_assert(!std::is_constructible_v<NationId, const char*> && !std::is_constructible_v<NationId, std::string>);
 static_assert(!std::is_constructible_v<NationId, int> && !std::is_constructible_v<ZoneId, std::size_t>);
+static_assert(!std::is_constructible_v<UnitTypeId, NationId> && !std::is_constructible_v<UnitTypeId, std::string>);
+static_assert(!std::is_constructible_v<UnitClassId, UnitTypeId> && !std::is_constructible_v<UnitClassId, const char*>);
 // Two names in braces are not a pair of iterators into a set of numbers.
 static_assert(!std::is_constructible_v<NumberSet<NationId>, const char*, const char*>);
 
@@ -204,6 +208,42 @@ void theScenarioNumbersItsNations() {
     check(nationName(state, state.currentNation()) == state.currentNationName(),
           "The current nation's number and name disagree");
 }
+void theCatalogNumbersItsUnitTypesAndClasses() {
+    const auto state = loadScenario(std::filesystem::path(GWRL_SOURCE_DIR) / "game_content/scenarios/japan_china_1936");
+    const auto& catalog = *state.definition->catalog;
+    // The unit types in name order, each definition at its own number.
+    const auto& types = catalog.unitTypes();
+    check(types.size() == catalog.units().size() && types.size() == 53, "The catalog does not number its 53 unit types");
+    for (const auto type : types.numbers()) {
+        const auto& unit = catalog.unit(type);
+        check(unit.number == type && unit.id == types.name(type) && &catalog.unit(unit.id) == &unit &&
+                  unitTypeNumber(state, unit.id) == type && unitTypeName(state, type) == unit.id,
+              "A unit type's number, name and definition do not agree");
+    }
+    rejects([&] { catalog.unit(UnitTypeId {}); }, "A number naming no unit type had a definition");
+    throwsWith<std::runtime_error>([&] { unitTypeNumber(state, "invented_type"); }, "Unknown unit type: invented_type",
+                                   "An unknown unit type is not reported by kind and name");
+    // The classes: every class some unit has, and each unit's classes by number.
+    const auto& classes = catalog.unitClasses();
+    check(classes.size() == 17 && classes.contains("naval") && classes.contains("vehicle_class"),
+          "The catalog does not number its 17 unit classes");
+    const auto& infantry = catalog.unit("infantry");
+    check(infantry.classes.contains(classes.number("land")) && infantry.classes.contains(classes.number("infantry_class")) &&
+              !infantry.classes.contains(classes.number("naval")) && catalog.unitHasClass(infantry.number, "land") &&
+              !catalog.unitHasClass(infantry.number, "invented_class"),
+          "A unit's classes are not its catalog classes");
+    // The names the rules use, each the number of the string it is spelled as.
+    const auto& known = catalog.knownUnitTypes();
+#define GWRL_CHECK(name) check(known.name == types.number(#name), "Known unit type " #name " has another number");
+    GWRL_KNOWN_UNIT_TYPES(GWRL_CHECK)
+#undef GWRL_CHECK
+    const auto& knownClasses = catalog.knownUnitClasses();
+#define GWRL_CHECK(name) check(knownClasses.name == classes.number(#name), "Known unit class " #name " has another number");
+    GWRL_UNIT_CLASSES(GWRL_CHECK)
+#undef GWRL_CHECK
+    check(&knownUnitTypes(state) == &known && &knownUnitClasses(state) == &knownClasses,
+          "The position reads other known names than its catalog's");
+}
 }  // namespace
 
 int main() {
@@ -214,6 +254,7 @@ int main() {
         {"number sets hold bits in name order", numberSetsHoldBitsInNameOrder},
         {"the scenario numbers its map zones", theScenarioNumbersItsMapZones},
         {"the scenario numbers its nations", theScenarioNumbersItsNations},
+        {"the catalog numbers its unit types and classes", theCatalogNumbersItsUnitTypesAndClasses},
     };
     int failures = 0;
     for (const auto& [name, test] : tests) {

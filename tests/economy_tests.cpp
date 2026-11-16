@@ -83,12 +83,12 @@ void buy(State &s, const Id &row, const Id &price = "printed") {
 void addUnit(State &s, const Id &id, const Id &type, const Id &nation, const Id &zone, int damage = 0) {
     UnitState u;
     u.id = id;
-    u.type = type;
+    u.type = unitTypeNumber(s, type);
     u.owner = nationNumber(s, nation);
     u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.damage = damage;
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, damage, catalogContext(s, nationNumber(s, nation), zoneNumber(s, zone))).movement;
+        s.definition->catalog->stats(unitTypeNumber(s, type), damage, catalogContext(s, nationNumber(s, nation), zoneNumber(s, zone))).movement;
     s.units.emplace(id, std::move(u));
 }
 int paid(const State &s) {
@@ -256,7 +256,7 @@ void research() {
     const auto req = *t.chance;
     t.chance.reset();
     applyEconomyChance(t, req, ChanceOutcome{{{1}}});
-    check(t.units.at("airborne").type == "elite_airborne_infantry", "Technology conversion immediate");
+    check(t.units.at("airborne").type == knownUnitTypes(s).elite_airborne_infantry, "Technology conversion immediate");
     t.validate();
     auto f = fixture();
     f.nations.at(nationNumber(f, "japan")).technologyStages["improved_factories"] = 4;
@@ -367,7 +367,7 @@ void ladaoLease() {
     check(std::any_of(s.units.begin(), s.units.end(),
                       [&](const auto &x) {
                           return x.second.owner == nationNumber(s, "dadao") && x.second.zone == zoneNumber(s, beiping) &&
-                                 x.second.type == "infantry";
+                                 x.second.type == knownUnitTypes(s).infantry;
                       }),
           "Delivered unit has recipient identity");
     s.validate();
@@ -566,7 +566,7 @@ void leaseCredits() {
     check(offers(s, "economy_lease_place"),
           "Dadao upgrade available in next Japan-controlled placement slot");
     applyEconomyAction(s, pick(s, "economy_lease_place"));
-    check(s.units.at("dadao_militia").type == "infantry" && *s.nations.at(nationNumber(s, "japan")).treasury == 98,
+    check(s.units.at("dadao_militia").type == knownUnitTypes(s).infantry && *s.nations.at(nationNumber(s, "japan")).treasury == 98,
           "Delivered militia credit upgrades recipient for2paidIPP");
     s.validate();
     auto r = fixture();
@@ -679,7 +679,7 @@ void upgradesKeepCargo() {
     applyEconomyAction(s, pick(s, "economy_place", [](const auto &a) {
                            return a.parameters.require("target").asString() == "first";
                        }));
-    check(s.units.at("first").type == "motorized_infantry", "Upgrade aboard a naval transport not applied");
+    check(s.units.at("first").type == knownUnitTypes(s).motorized_infantry, "Upgrade aboard a naval transport not applied");
     check(!offered("second", "motorized_infantry"),
           "Upgrade offered that would leave a naval transport two units that are not infantry-class");
     check(offered("ashore", "motorized_infantry") && !offered("flown", "motorized_infantry"),
@@ -734,7 +734,7 @@ void replacementUpgradeAndEliteLease() {
     applyEconomyAction(s, pick(s, "economy_place", [](const auto &a) {
                            return a.parameters.require("target").asString() == "militia_replacement";
                        }));
-    check(s.units.at("militia_replacement").type == "infantry",
+    check(s.units.at("militia_replacement").type == knownUnitTypes(s).infantry,
           "Purchased upgrade can select another surviving suitable unit");
     s.validate();
     auto e = fixture();
@@ -756,7 +756,7 @@ void replacementUpgradeAndEliteLease() {
     check(std::any_of(e.units.begin(), e.units.end(),
                       [&](const auto &item) {
                           return item.second.owner == nationNumber(e, "dadao") && item.second.zone == zoneNumber(e, beiping) &&
-                                 item.second.type == "airborne_infantry";
+                                 item.second.type == knownUnitTypes(s).airborne_infantry;
                       }),
           "Explicit RB47 EliteAirborne lend-lease exception downgrades for receiver without doctrine");
     e.validate();

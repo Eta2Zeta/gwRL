@@ -149,8 +149,8 @@ std::vector<ZoneId> recruitmentZones(const State& state, NationId minor) {
 bool unfinishedShip(const State& state, const BuildProject& project, NationId minor) {
     if (project.owner != minor || project.remainingPayments.empty() || project.queuePosition <= 1
             || !state.definition->catalog) return false;
-    const auto& units = state.definition->catalog->units();
-    return units.contains(project.type) && units.at(project.type).classes.contains("naval");
+    const auto& catalog = *state.definition->catalog;
+    return catalog.isUnitType(project.type) && catalog.unit(project.type).classes.contains(catalog.knownUnitClasses().naval);
 }
 
 std::vector<Action> recruitmentChoices(const State& state, NationId minor) {

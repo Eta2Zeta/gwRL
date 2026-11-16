@@ -49,11 +49,11 @@ State fixture(Phase phase = Phase::CombatMovement) {
 void add(State &s, const Id &id, const Id &type, const Id &owner, const Id &zone) {
     UnitState u;
     u.id = id;
-    u.type = type;
+    u.type = unitTypeNumber(s, type);
     u.owner = nationNumber(s, owner);
     u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone))).movement;
+        s.definition->catalog->stats(unitTypeNumber(s, type), 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone))).movement;
     s.units.emplace(id, std::move(u));
 }
 std::shared_ptr<const Rules> rules() {

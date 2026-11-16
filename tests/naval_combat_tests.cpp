@@ -23,8 +23,8 @@ State fixture(){
     s.captureTurnStart();return s;
 }
 void add(State& s,const Id& id,const Id& type,const Id& owner,const Id& zone=sea){
-    UnitState u;u.id=id;u.type=type;u.owner=nationNumber(s, owner);u.zone=u.turnOrigin = zoneNumber(s, zone);
-    u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(type,0,catalogContext(s,nationNumber(s, owner),zoneNumber(s, zone))).movement;
+    UnitState u;u.id=id;u.type=unitTypeNumber(s, type);u.owner=nationNumber(s, owner);u.zone=u.turnOrigin = zoneNumber(s, zone);
+    u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(unitTypeNumber(s, type),0,catalogContext(s,nationNumber(s, owner),zoneNumber(s, zone))).movement;
     s.units[id]=u;
 }
 std::shared_ptr<const Rules> rules(){return std::make_shared<NavalRules>(std::make_shared<AirRules>(std::make_shared<EconomyRules>()));}
@@ -62,9 +62,9 @@ void capitalHitsAndDamageValues(){
     check(e.state().units.at("d").damage==1&&e.state().units.at("d").movementRemaining==1,"First battleship hit did not reduce damage/movement once");
     choose(e,"naval_take_casualty","d");check(e.state().chance&&e.state().units.contains("d"),"Sunk capital ship did not receive ordinary return fire");e.resolveChance();finish(e);
     check(!e.state().units.contains("d"),"Second battleship hit failed to sink");
-    auto c=s.definition->catalog->stats("heavy_battleship",2,catalogContext(s,nationNumber(s, "japan"),zoneNumber(s, sea)));
+    auto c=s.definition->catalog->stats(knownUnitTypes(s).heavy_battleship,2,catalogContext(s,nationNumber(s, "japan"),zoneNumber(s, sea)));
     check(c.attack==6&&c.defense==6&&c.movement==2,"User-confirmed capital damage matrix changed");
-    auto carrier=s.definition->catalog->stats("fleet_carrier",1,catalogContext(s,nationNumber(s, "japan"),zoneNumber(s, sea)));check(carrier.defense==1,"Damaged carrier defense incorrect");
+    auto carrier=s.definition->catalog->stats(unitTypeNumber(s, "fleet_carrier"),1,catalogContext(s,nationNumber(s, "japan"),zoneNumber(s, sea)));check(carrier.defense==1,"Damaged carrier defense incorrect");
 }
 void submarineFirstStrikeAndDestroyer(){
     auto s=fixture();add(s,"a","submarine","japan");add(s,"d","heavy_cruiser","kmt");battle(s,{"a"});Engine e(s,rules());e.setDiceTapeForTesting({2});choose(e,"naval_begin_battle");e.resolveChance();choose(e,"naval_take_casualty","d");
@@ -226,7 +226,7 @@ void patrolPlaneChoosesBeforeScrambles(){
 }
 void seaplaneAswBonusTargetsSubmarines(){
     auto s=fixture();add(s,"a","seaplane","japan");add(s,"d","submarine","kmt");s.nations.at(nationNumber(s, "japan")).technologyStages["anti_submarine_warfare"]=4;
-    s.units.at("a").gameFlags["on_map"]=1;s.units.at("a").gameFlags["map_range"]=2;const auto base=s.definition->catalog->stats("seaplane",0,catalogContext(s,nationNumber(s, "japan"),zoneNumber(s, sea))).attack.value();battle(s,{"a"});
+    s.units.at("a").gameFlags["on_map"]=1;s.units.at("a").gameFlags["map_range"]=2;const auto base=s.definition->catalog->stats(knownUnitTypes(s).seaplane,0,catalogContext(s,nationNumber(s, "japan"),zoneNumber(s, sea))).attack.value();battle(s,{"a"});
     Engine e(s,rules());e.setDiceTapeForTesting({base+1});choose(e,"naval_begin_battle");choose(e,"naval_sub_protected");e.resolveChance();choose(e,"naval_take_casualty","d");check(!e.state().units.contains("d"),"Seaplane MAP ASW bonus did not hit submarine");finish(e);
 }
 } // namespace

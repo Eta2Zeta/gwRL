@@ -1,8 +1,10 @@
 #include "game/campaign.hpp"
+#include "game/catalog.hpp"
 #include "game/position_facts.hpp"
 
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 #include <functional>
 #include <future>
 #include <iostream>
@@ -34,6 +36,9 @@ State initialState() {
         {"land_b", V(O{{"id", V(std::string("land_b"))}, {"type", V(std::string("land"))}})}
     })}});
     definition.rules = V(O{{"synthetic_fixture_only", V(true)}});
+    // Units are typed by the catalog's unit type numbers, so the fixture has the catalog.
+    static const auto catalog = Catalog::load(std::filesystem::path(GWRL_SOURCE_DIR) / "game_content/catalog/gw36_v43");
+    definition.catalog = catalog;
     definition.turnOrder = {"ccp", "mongolia", "japan", "kmt"};
     definition.players = {"axis", "allies", "comintern"};
     for (const auto& id : definition.turnOrder) definition.factions[id] = FactionDefinition{id, id, {}};
@@ -402,9 +407,9 @@ void freshCampaignStartAndRestoreBoundary() {
     rules->moveOnInitialBegin = true;
     auto state = initialState();
     UnitState unit;
-    unit.id = "ccp_unit"; unit.owner = nationNumber(state, "ccp"); unit.type = "fixture_unit";
+    unit.id = "ccp_unit"; unit.owner = nationNumber(state, "ccp"); unit.type = knownUnitTypes(state).infantry;
     unit.zone = zoneNumber(state, "land_a"); unit.turnOrigin = zoneNumber(state, "land_b"); unit.route = zoneNumbers(state, {"land_b", "land_a"});
-    unit.movementAllowance = 3; unit.movementRemaining = 0;
+    unit.movementAllowance = 3; unit.movementRemaining = 0;  // Not infantry's: the new turn restores the catalog's 1.
     unit.turnFlags["used"] = 1; unit.commitments.insert("spent");
     state.units[unit.id] = unit;
     state.nations.at(nationNumber(state, "ccp")).turnFlags["used"] = 1;
@@ -419,7 +424,7 @@ void freshCampaignStartAndRestoreBoundary() {
             && engine.state().turnStart.units.at(unit.id).second == zoneNumber(engine.state(), "land_a"), "Initial snapshot followed hook effects");
     require(isNation(engine.state(), engine.state().territories.at(zoneNumber(engine.state(), "land_a")).possessor, "kmt")
             && engine.state().units.at(unit.id).zone == zoneNumber(engine.state(), "land_b"), "Initial beginTurn effects were skipped");
-    require(engine.state().units.at(unit.id).movementRemaining == 3
+    require(engine.state().units.at(unit.id).movementRemaining == 1
             && engine.state().units.at(unit.id).turnFlags.empty()
             && engine.state().units.at(unit.id).commitments.empty(), "Initial active turn state was not reset");
     require(!state.flags.contains("began:ccp") && state.units.at(unit.id).zone == zoneNumber(state, "land_a"), "Start mutated its input state");
@@ -457,9 +462,9 @@ void accountingFailureAndTurnStartSnapshot() {
     auto state = initialState();
     state.clock.phase = Phase::PlaceUnits;
     UnitState unit;
-    unit.id = "mongolian_unit"; unit.owner = nationNumber(state, "mongolia"); unit.type = "fixture_unit";
+    unit.id = "mongolian_unit"; unit.owner = nationNumber(state, "mongolia"); unit.type = knownUnitTypes(state).infantry;
     unit.zone = zoneNumber(state, "land_a"); unit.turnOrigin = zoneNumber(state, "land_a"); unit.route = zoneNumbers(state, {"land_a"});
-    unit.movementAllowance = 2; unit.movementRemaining = 0;
+    unit.movementAllowance = 2; unit.movementRemaining = 0;  // Not infantry's: the new turn restores the catalog's 1.
     unit.turnFlags["used"] = 1; unit.gameFlags["keep"] = 1; unit.commitments.insert("spent");
     state.units[unit.id] = unit;
     state.nations.at(nationNumber(state, "mongolia")).turnFlags["used"] = 1;
@@ -475,7 +480,7 @@ void accountingFailureAndTurnStartSnapshot() {
     require(isNation(engine.state(), engine.state().turnStart.possessions.at(zoneNumber(engine.state(), "land_a")), "ccp")
             && engine.state().turnStart.units.at(unit.id).second == zoneNumber(engine.state(), "land_a"), "Snapshot was taken after beginTurn effects");
     const auto& reset = engine.state().units.at(unit.id);
-    require(reset.zone == zoneNumber(state, "land_b") && reset.movementRemaining == 2 && reset.turnFlags.empty()
+    require(reset.zone == zoneNumber(state, "land_b") && reset.movementRemaining == 1 && reset.turnFlags.empty()
             && reset.commitments.empty() && reset.route.empty() && reset.gameFlags.at("keep") == 1, "Per-turn unit reset lost persistent state");
 }
 
