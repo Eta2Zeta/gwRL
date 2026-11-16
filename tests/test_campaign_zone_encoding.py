@@ -159,7 +159,9 @@ class EngineNamesHaveColumnsTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        spec = make_env(1951, calendar_rounds=3).raw.zone_encoding_spec()
+        env = make_env(1951, calendar_rounds=3).raw
+        spec = env.zone_encoding_spec()
+        cls.marks = env.name_tables()["marks"]
         cls.zone_columns = set(spec["zone_column_names"])
         cls.global_columns = set(spec["global_column_names"])
         cls.action_columns = set(spec["action_column_names"])
@@ -183,15 +185,16 @@ class EngineNamesHaveColumnsTests(unittest.TestCase):
         self.assertEqual(self.missing(found, lambda key: f"battle_data:{key}" in self.zone_columns), [])
 
     def test_marks(self):
-        written = re.compile(r'(?:turnFlags|gameFlags|flags|commitments)\s*(?:\[|\.insert\(|\.emplace\()\s*(?:std::string\()?"([a-z_0-9]+)')
-        found = {}
-        for name, text in self.sources.items():
-            for match in written.finditer(text):
-                base = re.sub(r"_\d+$", "", match.group(1).rstrip("_"))
-                found.setdefault(base, set()).add(name)
-        self.assertGreater(len(found), 150)
+        # Every mark a position may hold is in the engine's mark table
+        # (include/game/marks.hpp); the code names marks only through it.
+        self.assertGreater(len(self.marks), 200)
+        # The four bombing-reduction marks have no question yet (docs/questions.md,
+        # Q-003); fixture marks are for test rules. Drop a name here once it has one.
+        unasked = {"bombing_reduction", "bombing_reduction_turn", "city_bombing_reduction",
+                   "city_bombing_reduction_turn", "fixture"}
         known = lambda flag: f"nation_flag:japan:{flag}" in self.global_columns or f"state_flag:{flag}" in self.global_columns
-        self.assertEqual(self.missing(found, known), [])
+        self.assertEqual(sorted(mark for mark in self.marks if mark not in unasked and not known(mark)), [])
+        self.assertEqual(sorted(mark for mark in unasked if known(mark) or mark not in self.marks), [])
 
     def test_words_in_battle_notes(self):
         found = {}

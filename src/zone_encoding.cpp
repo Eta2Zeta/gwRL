@@ -450,6 +450,17 @@ std::string baseName(const std::string& name, std::string* argument = nullptr) {
     if (end < base.size() && end > 0 && base[end - 1] == '_') base.resize(end - 1);
     return base;
 }
+// The same for a mark, without reading its name: its base, and its argument if
+// it has one after a colon. A mark joined by an underscore reads as one base,
+// as its name did (withoutNation splits it). No base ends in a number.
+std::string baseName(const MarkKey& mark, std::string* argument = nullptr) {
+    if (markSeparator(mark.base()) == '_') {
+        if (argument) argument->clear();
+        return mark.name();
+    }
+    if (argument) argument->assign(mark.argument());
+    return std::string(markName(mark.base()));
+}
 
 // Splits a trailing nation from names such as last_conqueror_kmt or evolution_pending_ccp.
 std::string withoutNation(const Context& c, const std::string& base, std::string* nation) {
@@ -1148,11 +1159,11 @@ std::string unitSignature(const UnitState& u) {
     out += '|';
     for (const auto zone : u.route) out += zoneText(zone) + ',';
     out += '|';
-    for (const auto& name : u.commitments) out += name + ',';
+    for (const auto name : u.commitments) out += name.name() + ',';
     out += '|';
-    for (const auto& [name, value] : u.turnFlags) out += name + '=' + std::to_string(value) + ',';
+    for (const auto& [name, value] : u.turnFlags) out += name.name() + '=' + std::to_string(value) + ',';
     out += '|';
-    for (const auto& [name, value] : u.gameFlags) out += name + '=' + std::to_string(value) + ',';
+    for (const auto& [name, value] : u.gameFlags) out += name.name() + '=' + std::to_string(value) + ',';
     return out;
 }
 
@@ -1187,7 +1198,7 @@ void unitFacts(const Context& c, const State& s, const UnitState& u, const UnitR
         if (const auto other = s.units.find(argument); other != s.units.end()) return c.zones.find(other->second.zone);
         return -1;
     };
-    const auto flagged = [&](const std::string& name, int value) {
+    const auto flagged = [&](const MarkKey& name, int value) {
         std::string argument;
         const auto base = baseName(name, &argument);
         const int v = flagValue(s, base, value);
@@ -1510,7 +1521,7 @@ void encodeNations(const Context& c, const State& s, Builder& b) {
             if (const int m = c.nations.find(other); m >= 0) b.global(c.global.at(c.gWar, {nation, m}), 1);
         for (const auto& other : n.allies)
             if (const int m = c.nations.find(other); m >= 0) b.global(c.global.at(c.gAlly, {nation, m}), 1);
-        const auto flagged = [&](const std::string& name, int value) {
+        const auto flagged = [&](const MarkKey& name, int value) {
             std::string argument;
             const auto base = baseName(name, &argument);
             if (base == "economy_researched_round" && c.technologies.find(argument) >= 0) {
@@ -1690,7 +1701,7 @@ void optionValue(const Context& c, const State& s, Builder& b, const UnitRoles& 
                     b.option(c.action.at(c.aUnitCargo, {role, c.unitTypes(load.type)}), 1, role);
                     if (const int origin = c.zones.find(load.turnOrigin); origin >= 0)
                         b.option(c.action.at(c.aUnitCargoOrigin, {role, origin}), 1, role);
-                    const auto cargoFlag = [&](const std::string& name, int value) {
+                    const auto cargoFlag = [&](const MarkKey& name, int value) {
                         const auto base = baseName(name);
                         b.option(c.action.at(c.aUnitCargoFlag, {role, c.actorFlags(base)}), flagValue(s, base, value), role);
                     };

@@ -20,10 +20,7 @@ template <class Message> void require(bool condition, const Message &message) {
 
 V number(int value) { return V(static_cast<double>(value)); }
 
-bool flagged(const std::map<Id, int>& flags, const Id& key) {
-    const auto found = flags.find(key);
-    return found != flags.end() && found->second != 0;
-}
+bool flagged(const Marks& flags, const MarkKey& key) { return flags.value(key) != 0; }
 
 bool quietPlacement(const State& state) {
     return !state.terminal && state.clock.phase == Phase::PlaceUnits
@@ -48,7 +45,7 @@ bool influencingGarrison(const State& state, ZoneId zone) {
         const bool resetForActiveTurn = unit.owner == state.currentNation()
             || controlledBy(state, unit.owner, state.currentNation())
             || (unit.owner == knownNations(state).dadao && state.currentNation() == knownNations(state).japan
-                && flagged(state.nations.at(nationNumber(state, "dadao")).gameFlags, "direct_axis_control_after_japan_surrender"));
+                && flagged(state.nations.at(nationNumber(state, "dadao")).gameFlags, mark::direct_axis_control_after_japan_surrender));
         // Other nations' units may retain routes and placement flags from their
         // earlier Player Turn. Those stale flags cannot invalidate this snapshot.
         if (!resetForActiveTurn || unit.route.empty()) return true;
@@ -68,7 +65,7 @@ InfluenceTarget influenceTarget(const State& state, NationId actor, NationId tar
     if (found == state.nations.end() || !isWarlord(nationName(state, target))) return result;
     const auto& nation = found->second;
     if (nation.controllerNation || nation.player || nation.alliance
-            || flagged(nation.gameFlags, "incorporated")) return result;
+            || flagged(nation.gameFlags, mark::incorporated)) return result;
     const auto remaining = possessedLand(state, target);
     if (remaining.empty()) return result;
     std::set<ZoneId> adjacent;
@@ -91,7 +88,7 @@ bool canInfluence(const State& state, NationId actor) {
     const auto& nation = state.nations.at(actor);
     return (actor == knownNations(state).japan || (actor == knownNations(state).ccp && nation.powerStatus == "minor"))
         && !state.politics.surrendered.contains(actor)
-        && !flagged(nation.turnFlags, "influence_attempted")
+        && !flagged(nation.turnFlags, mark::influence_attempted)
         && nation.treasury.has_value();
 }
 
@@ -107,11 +104,11 @@ bool offshore(const State& state, ZoneId zone) {
 bool controlledRecruitment(const State& state, NationId minor) {
     const auto& nation = state.nations.at(minor);
     if (nation.powerStatus != "minor" || minor == knownNations(state).ccp || minor == knownNations(state).kmt
-            || flagged(nation.gameFlags, "incorporated")
+            || flagged(nation.gameFlags, mark::incorporated)
             || state.politics.surrendered.contains(minor)) return false;
     if (minor == knownNations(state).dadao && state.currentNation() == knownNations(state).japan && nation.player == "axis"
             && state.politics.surrendered.contains(knownNations(state).japan)
-            && flagged(nation.gameFlags, "direct_axis_control_after_japan_surrender")) return true;
+            && flagged(nation.gameFlags, mark::direct_axis_control_after_japan_surrender)) return true;
     if (minor == knownNations(state).mongolia && state.currentNation() == knownNations(state).mongolia)
         return nation.player.has_value();  // Approved direct Comintern control.
     return minor != state.currentNation() && controlledBy(state, minor, state.currentNation());
@@ -119,7 +116,7 @@ bool controlledRecruitment(const State& state, NationId minor) {
 
 bool recruitmentAvailable(const State& state, NationId minor) {
     const auto& nation = state.nations.at(minor);
-    if (flagged(nation.turnFlags, "recruitment_attempted")) return false;
+    if (flagged(nation.turnFlags, mark::recruitment_attempted)) return false;
     if (minor == knownNations(state).ccp) return state.currentNation() == minor && nation.powerStatus == "minor";
     return controlledRecruitment(state, minor);
 }
@@ -137,7 +134,7 @@ std::vector<ZoneId> recruitmentZones(const State& state, NationId minor) {
         const auto beginning = state.turnStart.possessions.find(zone);
         if (beginning == state.turnStart.possessions.end() || beginning->second != minor) continue;
         const auto& flags = state.territories.at(zone).flags;
-        const auto changed = flags.find("last_possession_change_turn");
+        const auto changed = flags.find(mark::last_possession_change_turn);
         if (changed != flags.end() && changed->second >= 0
                 && static_cast<std::uint64_t>(changed->second) == state.clock.playerTurnSerial) continue;
         if (minor == knownNations(state).ccp && !chineseHomeCountry(state, zone)) continue;
@@ -215,7 +212,7 @@ void applyRecruitmentChoice(State& state, const Action& action) {
         --project.queuePosition;
         // Free recruitment work is not an IPP payment. A finished ship waits
         // for the economy module's placement rather than spawning at an invented location.
-        if (project.remainingPayments.empty()) project.flags["completed"] = 1;
+        if (project.remainingPayments.empty()) project.flags[mark::completed] = 1;
     } else if (action.kind == "recruitment_repair_facility") {
         const auto id = action.parameters.require("facility").asString();
         auto& facility = state.facilities.at(id);
@@ -263,14 +260,14 @@ bool applyInfluenceAction(State& state, const Action& action) {
         const auto candidate = influenceTarget(state, actorNation, nationNumber(state, targetName));
         auto& actor = state.nations.at(actorNation);
         *actor.treasury -= spend;
-        actor.turnFlags["influence_attempted"] = 1;
+        actor.turnFlags[mark::influence_attempted] = 1;
         requestPoliticalRoll(state, actorNation, "influence_roll", 12,
             V(O{{"actor", V(action.nation)}, {"target", V(targetName)},
                 {"threshold", number(candidate.threshold)}, {"spend", number(spend)}}));
     } else {
         const auto minorName = action.parameters.require("beneficiary").asString();
         const auto minor = nationNumber(state, minorName);
-        state.nations.at(minor).turnFlags["recruitment_attempted"] = 1;
+        state.nations.at(minor).turnFlags[mark::recruitment_attempted] = 1;
         requestPoliticalRoll(state, minor, "recruitment_roll", 12,
             V(O{{"beneficiary", V(minorName)}, {"threshold", number(recruitmentThreshold(state, minor))}}));
     }
@@ -300,14 +297,14 @@ bool applyInfluenceChance(State& state, const ChanceRequest& request, const Chan
             // liberation, not this specific influence result. Restore only the
             // recipient's ability to receive the actual surviving warlord.
             state.politics.surrendered.erase(nationNumber(state, "kmt"));
-            state.nations.at(nationNumber(state, "kmt")).gameFlags["surrendered"] = 0;
+            state.nations.at(nationNumber(state, "kmt")).gameFlags[mark::surrendered] = 0;
             incorporateNation(state, target, nationNumber(state, "kmt"));
         }
         else if (raw - spend <= threshold) {
             if (actor == "japan") {
                 ensureDadao(state);
                 const auto& dadao = state.nations.at(nationNumber(state, "dadao"));
-                if (flagged(dadao.gameFlags, "incorporated")) {
+                if (flagged(dadao.gameFlags, mark::incorporated)) {
                     require(dadao.controllerNation.has_value(), "Incorporated Dadao has no recipient nation");
                     incorporateNation(state, target, *dadao.controllerNation);
                 } else incorporateNation(state, target, nationNumber(state, "dadao"));

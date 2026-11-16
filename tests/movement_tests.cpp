@@ -147,7 +147,7 @@ void port(State &s, const Id &id, const Id &zone, const std::vector<Id> &seas,
   f.type = type;
   f.zone = zoneNumber(s, zone);
   for (const auto &sea : seas)
-    f.flags["border:" + sea] = 1;
+    f.flags[MarkKey(mark::border, sea)] = 1;
   s.facilities[id] = std::move(f);
 }
 Action offered(const MovementRules &rules, const State &s, const Id &id,
@@ -296,7 +296,7 @@ void railGaugeDamageCapacity() {
              .allowed,
         "Bombed rail remained usable for strategic movement");
   bombed.rails.at("ab").damageByEndpoint.clear();
-  bombed.flags["logistics_damaged_turn:ab"] = 3;
+  bombed.flags[MarkKey(mark::logistics_damaged_turn, "ab")] = 3;
   check(!inSupply(bombed, nationNumber(bombed, "japan"), zoneNumber(bombed, "b")),
         "Repair this turn restored continuously undamaged supply");
   check(
@@ -322,13 +322,13 @@ void immobileRailAndContinuousPossession() {
             s, {"militia", zoneNumbers(s, {"a", "b"}), MovementMode::StrategicRail, false})
             .allowed,
         "Zero ordinary movement prevented strategic rail");
-  s.units.at("militia").commitments.insert("attrition");
+  s.units.at("militia").commitments.insert(mark::attrition);
   check(!validateRoute(
              s, {"militia", zoneNumbers(s, {"a", "b"}), MovementMode::StrategicRail, false})
              .allowed,
         "Attrition unit moved by strategic rail");
   s.units.at("militia").commitments.clear();
-  s.territories.at(zoneNumber(s, "b")).flags["last_possession_change_turn"] = 2;
+  s.territories.at(zoneNumber(s, "b")).flags[mark::last_possession_change_turn] = 2;
   check(!heldSinceTurnStart(s, nationNumber(s, "japan"), zoneNumber(s, "b")) &&
             !validateRoute(
                  s, {"militia", zoneNumbers(s, {"a", "b"}), MovementMode::StrategicRail, false})
@@ -336,10 +336,10 @@ void immobileRailAndContinuousPossession() {
         "Recaptured territory passed possession timing");
   check(!heldSinceNationTurnStart(s, nationNumber(s, "japan"), zoneNumber(s, "b")),
         "Captured base became eligible before first own turn");
-  s.nations.at(nationNumber(s, "japan")).gameFlags["logistics_last_turn_start"] = 3;
+  s.nations.at(nationNumber(s, "japan")).gameFlags[mark::logistics_last_turn_start] = 3;
   check(!heldSinceNationTurnStart(s, nationNumber(s, "japan"), zoneNumber(s, "b")),
         "Same-turn capture satisfied own-turn age");
-  s.nations.at(nationNumber(s, "japan")).gameFlags["logistics_last_turn_start"] = 7;
+  s.nations.at(nationNumber(s, "japan")).gameFlags[mark::logistics_last_turn_start] = 7;
   check(heldSinceNationTurnStart(s, nationNumber(s, "japan"), zoneNumber(s, "b")),
         "Base held across next own turn stayed unavailable");
 }
@@ -387,13 +387,13 @@ void seaRangeRefreshAndSharedPorts() {
   s.facilities.at("refresh").damage = 1;
   check(!inSupply(s, nationNumber(s, "japan"), zoneNumber(s, "b")), "Damaged port refreshed supply");
   s.facilities.at("refresh").damage = 0;
-  s.facilities.at("refresh").flags["placed_this_turn"] = 1;
+  s.facilities.at("refresh").flags[mark::placed_this_turn] = 1;
   check(!inSupply(s, nationNumber(s, "japan"), zoneNumber(s, "b")), "New port immediately supplied route");
   s.facilities.at("refresh").flags.clear();
-  s.facilities.at("refresh").flags["border:s2"] = 1;
-  s.facilities.at("refresh").flags["border:s5"] = 1;
+  s.facilities.at("refresh").flags[MarkKey(mark::border, "s2")] = 1;
+  s.facilities.at("refresh").flags[MarkKey(mark::border, "s5")] = 1;
   s.facilities.at("destination").flags.clear();
-  s.facilities.at("destination").flags["border:s5"] = 1;
+  s.facilities.at("destination").flags[MarkKey(mark::border, "s5")] = 1;
   check(!inSupply(s, nationNumber(s, "japan"), zoneNumber(s, "b")),
         "Shared port teleported supply between unconnected sea accesses");
 }
@@ -553,23 +553,23 @@ void giftWithdrawalRequiresExecutableSharedLoading() {
   unit(s, "ship", "s0", "naval_transport");
   auto &inf = s.units.at("inf");
   inf.route = zoneNumbers(s, {"enemy", "a"});
-  inf.commitments.insert("combat_move");
-  inf.commitments.insert("combat");
+  inf.commitments.insert(mark::combat_move);
+  inf.commitments.insert(mark::combat);
   inf.movementRemaining = 0;
   check(withdrawalEligibleRecipients(s, nationNumber(s, "japan"), zoneNumber(s, "a")).size() == 2,
         "Gift's printed noncombat exception did not allow boarding a fresh transport");
   auto unloaded = s;
-  unloaded.units.at("ship").turnFlags["naval_unloaded"] = 1;
+  unloaded.units.at("ship").turnFlags[mark::naval_unloaded] = 1;
   check(withdrawalEligibleRecipients(unloaded, nationNumber(s, "japan"), zoneNumber(unloaded, "a")).empty(),
         "Transport already unloaded this turn falsely proved Chinese gift withdrawal");
   auto amphibious = s;
-  amphibious.units.at("inf").turnFlags["naval_unloaded"] = 1;
-  amphibious.units.at("inf").commitments.insert("transport_unloaded");
+  amphibious.units.at("inf").turnFlags[mark::naval_unloaded] = 1;
+  amphibious.units.at("inf").commitments.insert(mark::transport_unloaded);
   check(withdrawalEligibleRecipients(amphibious, nationNumber(s, "japan"), zoneNumber(amphibious, "a")).empty(),
         "Amphibiously unloaded cargo falsely proved another movement after debarking");
   s.clock.phase = Phase::NonCombatMovement;
   s.territories.at(zoneNumber(s, "a")).possessor = nationNumber(s, "ccp");
-  s.units.at("inf").turnFlags["must_withdraw_from_chinese_gift"] = 1;
+  s.units.at("inf").turnFlags[mark::must_withdraw_from_chinese_gift] = 1;
   check(navalLoadAllowed(s, "ship", "inf"), "Proved loading became impossible after the unaligned gift");
   const auto actions = navalMovementActions(s);
   const auto load = std::find_if(actions.begin(), actions.end(), [](const Action &a) {
@@ -577,7 +577,7 @@ void giftWithdrawalRequiresExecutableSharedLoading() {
   });
   check(load != actions.end(), "Executable withdrawal loading action was not exposed");
   check(applyNavalMovementAction(s, *load) && s.units.at("inf").carriedBy == "ship" &&
-            !s.units.at("inf").turnFlags.contains("must_withdraw_from_chinese_gift"),
+            !s.units.at("inf").turnFlags.contains(mark::must_withdraw_from_chinese_gift),
         "Actual loading failed to complete the mandatory gift withdrawal");
 }
 void pendingGiftsShareTheSameTransportCapacity() {
@@ -589,8 +589,8 @@ void pendingGiftsShareTheSameTransportCapacity() {
   unit(s, "old1", "a"); unit(s, "old2", "a"); unit(s, "new", "b");
   unit(s, "ship", "s0", "naval_transport");
   for (const auto &id : {"old1", "old2", "new"}) s.units.at(id).movementRemaining = 0;
-  s.units.at("old1").turnFlags["must_withdraw_from_chinese_gift"] = 1;
-  s.units.at("old2").turnFlags["must_withdraw_from_chinese_gift"] = 1;
+  s.units.at("old1").turnFlags[mark::must_withdraw_from_chinese_gift] = 1;
+  s.units.at("old2").turnFlags[mark::must_withdraw_from_chinese_gift] = 1;
   check(withdrawalEligibleRecipients(s, nationNumber(s, "japan"), zoneNumber(s, "b")).empty(),
         "Two Chinese gifts double-booked the same physical transport slots");
   s.units.erase("new");
@@ -614,8 +614,8 @@ void giftWithdrawalsKeepEachOthersTransportPlaces() {
   unit(s, "stuck1", "a"); unit(s, "stuck2", "a"); unit(s, "walker", "a", "infantry", "japan", 1);
   unit(s, "ship", "s0", "naval_transport");
   for (const auto &id : {"stuck1", "stuck2", "walker"}) {
-    s.units.at(id).commitments.insert("combat_move");
-    s.units.at(id).turnFlags["must_withdraw_from_chinese_gift"] = 1;
+    s.units.at(id).commitments.insert(mark::combat_move);
+    s.units.at(id).turnFlags[mark::must_withdraw_from_chinese_gift] = 1;
   }
   s.units.at("stuck1").movementRemaining = s.units.at("stuck2").movementRemaining = 0;
   s.territories.at(zoneNumber(s, "a")).possessor = nationNumber(s, "ccp");
@@ -644,9 +644,9 @@ void pairedBlitz() {
   auto s = p.state(Phase::Combat);
   unit(s, "armor", "a", "light_armor");
   unit(s, "support", "a", "self_propelled_artillery");
-  s.units.at("armor").turnFlags["blitz_eligible"] = 1;
-  s.units.at("support").turnFlags["blitz_eligible"] = 1;
-  s.units.at("support").commitments.insert("blitz_with:armor");
+  s.units.at("armor").turnFlags[mark::blitz_eligible] = 1;
+  s.units.at("support").turnFlags[mark::blitz_eligible] = 1;
+  s.units.at("support").commitments.insert(MarkKey(mark::blitz_with, "armor"));
   check(
       !validateRoute(s, {"support", zoneNumbers(s, {"a", "enemy"}), MovementMode::Blitz, true})
            .allowed,
@@ -676,7 +676,7 @@ void factoryRelocation() {
   s.nations.at(nationNumber(s, "japan")).technologyStages["improved_logistics"] = 4;
   check(validateFactoryRailRoute(s, "factory", zoneNumbers(s, {"a", "b"})).allowed,
         "Eligible damaged factory could not relocate");
-  s.facilities.at("factory").flags["researched_this_turn"] = 1;
+  s.facilities.at("factory").flags[mark::researched_this_turn] = 1;
   check(!validateFactoryRailRoute(s, "factory", zoneNumbers(s, {"a", "b"})).allowed,
         "Research factory moved in same turn");
   s.facilities.at("factory").flags.clear();
@@ -690,7 +690,7 @@ void factoryRelocation() {
   rules.apply(s, *a);
   check(s.facilities.at("factory").zone == zoneNumber(s, "b") &&
             s.facilities.at("factory").damage == 2 &&
-            s.facilities.at("factory").flags.at("moved_this_turn") == 1,
+            s.facilities.at("factory").flags.at(mark::moved_this_turn) == 1,
         "Factory relocation lost damage or restriction");
   unit(s, "u", "a");
   check(!validateRoute(s, {"u", zoneNumbers(s, {"a", "b"}), MovementMode::StrategicRail, false})
@@ -773,8 +773,8 @@ void towingRespectsTerrainAndCommitments() {
   check(s.units.at("gun").movementRemaining == 0 &&
             s.units.at("motor").movementRemaining == 0,
         "Terrain did not exhaust both tow partners");
-  for (const auto &commitment :
-       {Id("attrition"), Id("repair"), Id("transport_unloaded")}) {
+  for (const auto commitment :
+       {mark::attrition, mark::repair, mark::transport_unloaded}) {
     auto t = p.state();
     unit(t, "motor", "a", "motorized_infantry");
     unit(t, "gun", "a", "artillery");
@@ -804,7 +804,7 @@ void combatTowingRegistersBothApproachesAndReplays() {
             b.data.require("origins").require("motor").asString() == "b" &&
             b.data.require("origins").require("gun").asString() == "b",
         "Towed contingent lost actual approach origins");
-  check(e.state().units.at("gun").commitments.contains("combat_move"),
+  check(e.state().units.at("gun").commitments.contains(mark::combat_move),
         "Towed gun was not committed to combat movement");
   auto replay =
       Engine::replay(s.definition, rules, checkpoint, e.state().history);

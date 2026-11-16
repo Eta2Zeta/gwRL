@@ -87,7 +87,7 @@ class FixtureRules : public Rules {
         return actions;
     }
     bool phaseComplete(const State& state) const override {
-        return !state.flags.contains("phase_blocked");
+        return !state.flags.contains(MarkKey(mark::fixture, "phase_blocked"));
     }
     static Decision reaction(const Id& nation, const Id& player) {
         Decision decision;
@@ -116,26 +116,27 @@ class FixtureRules : public Rules {
         return request;
     }
     void apply(State& state, const Action& action) const override {
-        if (action.kind == "mark") ++state.flags["marks"];
+        if (action.kind == "mark") ++state.flags[MarkKey(mark::fixture, "marks")];
         else if (action.kind == "request_chance") state.chance = chance(action.nation);
         else if (action.kind == "request_reaction") state.decisions.push_back(reaction("kmt", "allies"));
-        else if (action.kind == "react") { state.decisions.pop_back(); ++state.flags["reactions"]; }
+        else if (action.kind == "react") { state.decisions.pop_back(); ++state.flags[MarkKey(mark::fixture, "reactions")]; }
         else if (action.kind == "clear_battle") { state.battles.clear(); state.battleOrder.clear(); }
-        else if (action.kind == "throw_after_mutation") { state.flags["bad_mutation"] = 1; throw std::runtime_error("Synthetic handler failure"); }
+        else if (action.kind == "throw_after_mutation") { state.flags[MarkKey(mark::fixture, "bad_mutation")] = 1; throw std::runtime_error("Synthetic handler failure"); }
         else if (action.kind == "change_clock") state.clock.phase = Phase::Combat;
         else throw std::runtime_error("Unknown synthetic action");
     }
     void applyChance(State& state, const ChanceRequest& request, const ChanceOutcome& outcome) const override {
         const auto results = effectiveResults(request, outcome);
-        state.flags["result"] = results.at(0) + results.at(1);
+        state.flags[MarkKey(mark::fixture, "result")] = results.at(0) + results.at(1);
         if (throwOnChance) throw std::runtime_error("Synthetic chance failure");
     }
     void finishTurn(State& state) const override {
-        ++state.flags["finished:" + state.currentNationName()];
+        const auto finished = "finished:" + state.currentNationName();
+        ++state.flags[MarkKey(mark::fixture, finished)];
         if (!missingIncome) state.clock.incomeCollected = true;
         if (finalPendingWork && state.currentNationName() == "kmt" && state.clock.roundIndex == 10
-                && !state.flags.contains("final_work_created")) {
-            state.flags["final_work_created"] = 1;
+                && !state.flags.contains(MarkKey(mark::fixture, "final_work_created"))) {
+            state.flags[MarkKey(mark::fixture, "final_work_created")] = 1;
             state.chance = chance("kmt");
             state.decisions.push_back(reaction("japan", "axis"));
             BattleState battle;
@@ -149,7 +150,8 @@ class FixtureRules : public Rules {
         }
     }
     void beginTurn(State& state) const override {
-        ++state.flags["began:" + state.currentNationName()];
+        const auto began = "began:" + state.currentNationName();
+        ++state.flags[MarkKey(mark::fixture, began)];
         if (moveOnInitialBegin && state.currentNationName() == "ccp") {
             state.territories.at(zoneNumber(state, "land_a")).possessor = nationNumber(state, "kmt");
             state.units.at("ccp_unit").zone = zoneNumber(state, "land_b");
@@ -168,7 +170,7 @@ class CountingRules : public FixtureRules {
     std::vector<Action> actions(const State& state) const override {
         ++actionCalls;
         auto actions = FixtureRules::actions(state);
-        const auto mark = state.flags.find("marks");
+        const auto mark = state.flags.find(MarkKey(mark::fixture, "marks"));
         for (auto& action : actions)
             if (action.kind == "mark")
                 action.parameters = V(O{{"value", V(mark == state.flags.end() ? 0.0 : double(mark->second))}});
@@ -176,7 +178,7 @@ class CountingRules : public FixtureRules {
     }
     std::vector<Action> interrupts(const State& state) const override {
         ++interruptCalls;
-        if (state.flags.contains("interrupt_mark")) return {};
+        if (state.flags.contains(MarkKey(mark::fixture, "interrupt_mark"))) return {};
         Action action;
         action.id = action.kind = "interrupt_mark";
         action.nation = "kmt";
@@ -185,7 +187,7 @@ class CountingRules : public FixtureRules {
         return {action};
     }
     void apply(State& state, const Action& action) const override {
-        if (action.kind == "interrupt_mark") ++state.flags["interrupt_mark"];
+        if (action.kind == "interrupt_mark") ++state.flags[MarkKey(mark::fixture, "interrupt_mark")];
         else FixtureRules::apply(state, action);
     }
 };
@@ -271,7 +273,7 @@ void tapesAreTestOnlyAndExact() {
     require(engine.exactReplayIdentity() != exact, "Exact execution identity omitted test tape");
     engine.step(findAction(engine, "request_chance"));
     engine.resolveChance();
-    require(engine.state().flags.at("result") == 19, "Controlled reroll/modifier result wrong");
+    require(engine.state().flags.at(MarkKey(mark::fixture, "result")) == 19, "Controlled reroll/modifier result wrong");
     auto restored = Engine::restore(engine.state().definition, rules, engine.serialize());
     for (auto* branch : {&engine, &restored}) {
         branch->step(findAction(*branch, "request_chance"));
@@ -287,7 +289,7 @@ void tapesAreTestOnlyAndExact() {
 void directActionsCannotBypassLegality() {
     auto rules = std::make_shared<FixtureRules>();
     auto state = initialState();
-    state.flags["phase_blocked"] = 1;
+    state.flags[MarkKey(mark::fixture, "phase_blocked")] = 1;
     Engine engine(state, rules);
     require(!hasAction(engine, "end_phase"), "Incomplete phase offered end action");
     auto legal = findAction(engine, "mark");
@@ -305,7 +307,7 @@ void directActionsCannotBypassLegality() {
         require(engine.serialize() == before, "Rejected action changed engine");
     }
     engine.step(legal);
-    require(engine.state().flags.at("marks") == 1, "Listed action failed");
+    require(engine.state().flags.at(MarkKey(mark::fixture, "marks")) == 1, "Listed action failed");
     rules->offerReservedAction = true;
     rejects([&] { engine.legalActions(); }, "Rules could forge reserved phase action");
     rejects([&] { Engine(initialState(), nullptr); }, "Missing rules module was permissive");
@@ -360,7 +362,7 @@ void explicitChanceOutcomesMatchRulesWithoutConsumingRandom() {
             "Explicit and sampled outcomes apply different rules/history");
     require(canonicalJson(game::json::parse(explicitEngine.serialize()).require("random")) == canonicalJson(randomBefore),
             "Explicit chance consumed execution RNG");
-    require(explicitEngine.state().flags.at("result") == 13, "Explicit rerolls/modifiers were not applied");
+    require(explicitEngine.state().flags.at(MarkKey(mark::fixture, "result")) == 13, "Explicit rerolls/modifiers were not applied");
     const auto after = explicitEngine.serialize();
     rejects([&] { explicitEngine.applyChanceOutcome(key, valid); }, "An outcome could be applied twice");
     require(explicitEngine.serialize() == after, "Repeated outcome changed completed state");
@@ -396,8 +398,9 @@ void fivePhasesAndElevenFullRounds() {
     require(engine.state().calendarDate() == std::pair<int, int>{1941, 7}, "Terminal date is not July 1941");
     require(engine.legalActions().empty(), "Terminal campaign still offered actions");
     for (const auto& nation : engine.state().definition->turnOrder) {
-        require(engine.state().completedTurns.at(nationNumber(engine.state(), nation)) == 11 && engine.state().flags.at("finished:" + nation) == 11, "Income/accounting hook was skipped or repeated");
-        require(engine.state().flags.at("began:" + nation) == 11, "Initial or later beginTurn hook was skipped/repeated");
+        const auto finished = "finished:" + nation, began = "began:" + nation;
+        require(engine.state().completedTurns.at(nationNumber(engine.state(), nation)) == 11 && engine.state().flags.at(MarkKey(mark::fixture, finished)) == 11, "Income/accounting hook was skipped or repeated");
+        require(engine.state().flags.at(MarkKey(mark::fixture, began)) == 11, "Initial or later beginTurn hook was skipped/repeated");
         if (engine.state().nations.at(nationNumber(engine.state(), nation)).treasury) require(*engine.state().nations.at(nationNumber(engine.state(), nation)).treasury == 2, "Foundation invented income");
     }
 }
@@ -410,15 +413,15 @@ void freshCampaignStartAndRestoreBoundary() {
     unit.id = "ccp_unit"; unit.owner = nationNumber(state, "ccp"); unit.type = knownUnitTypes(state).infantry;
     unit.zone = zoneNumber(state, "land_a"); unit.turnOrigin = zoneNumber(state, "land_b"); unit.route = zoneNumbers(state, {"land_b", "land_a"});
     unit.movementAllowance = 3; unit.movementRemaining = 0;  // Not infantry's: the new turn restores the catalog's 1.
-    unit.turnFlags["used"] = 1; unit.commitments.insert("spent");
+    unit.turnFlags[MarkKey(mark::fixture, "used")] = 1; unit.commitments.insert(MarkKey(mark::fixture, "spent"));
     state.units[unit.id] = unit;
-    state.nations.at(nationNumber(state, "ccp")).turnFlags["used"] = 1;
-    state.territories.at(zoneNumber(state, "land_b")).flags["aligned_turn"] = 0;
-    state.territories.at(zoneNumber(state, "land_b")).flags["kept"] = 1;
+    state.nations.at(nationNumber(state, "ccp")).turnFlags[MarkKey(mark::fixture, "used")] = 1;
+    state.territories.at(zoneNumber(state, "land_b")).flags[mark::aligned_turn] = 0;
+    state.territories.at(zoneNumber(state, "land_b")).flags[MarkKey(mark::fixture, "kept")] = 1;
     auto engine = Engine::start(state, rules, 42);
-    require(engine.state().flags.at("began:ccp") == 1, "Fresh initial nation did not begin once");
-    require(!engine.state().territories.at(zoneNumber(engine.state(), "land_b")).flags.contains("aligned_turn")
-            && engine.state().territories.at(zoneNumber(engine.state(), "land_b")).flags.at("kept") == 1,
+    require(engine.state().flags.at(MarkKey(mark::fixture, "began:ccp")) == 1, "Fresh initial nation did not begin once");
+    require(!engine.state().territories.at(zoneNumber(engine.state(), "land_b")).flags.contains(mark::aligned_turn)
+            && engine.state().territories.at(zoneNumber(engine.state(), "land_b")).flags.at(MarkKey(mark::fixture, "kept")) == 1,
             "A new turn kept an old alignment mark or lost another territory flag");
     require(isNation(engine.state(), engine.state().turnStart.possessions.at(zoneNumber(engine.state(), "land_a")), "ccp")
             && engine.state().turnStart.units.at(unit.id).second == zoneNumber(engine.state(), "land_a"), "Initial snapshot followed hook effects");
@@ -427,15 +430,15 @@ void freshCampaignStartAndRestoreBoundary() {
     require(engine.state().units.at(unit.id).movementRemaining == 1
             && engine.state().units.at(unit.id).turnFlags.empty()
             && engine.state().units.at(unit.id).commitments.empty(), "Initial active turn state was not reset");
-    require(!state.flags.contains("began:ccp") && state.units.at(unit.id).zone == zoneNumber(state, "land_a"), "Start mutated its input state");
+    require(!state.flags.contains(MarkKey(mark::fixture, "began:ccp")) && state.units.at(unit.id).zone == zoneNumber(state, "land_a"), "Start mutated its input state");
     auto restored = Engine::restore(engine.state().definition, rules, engine.serialize());
     auto replayed = Engine::replay(engine.state().definition, rules, engine.serialize(), {});
     auto clone = engine.clone();
     auto search = engine.cloneForSearch(12);
     Engine wrapped(engine.state().clone(), rules);
     for (const auto* branch : {&restored, &replayed, &clone, &search, &wrapped}) {
-        require(branch->state().flags.at("began:ccp") == 1, "Restore/clone/wrap re-ran beginTurn");
-        require(branch->state().flags.at("__campaign_started") == 1, "Restore/clone/wrap dropped runtime start marker");
+        require(branch->state().flags.at(MarkKey(mark::fixture, "began:ccp")) == 1, "Restore/clone/wrap re-ran beginTurn");
+        require(branch->state().flags.at(mark::campaign_started) == 1, "Restore/clone/wrap dropped runtime start marker");
     }
     require(restored.serialize() == engine.serialize() && replayed.serialize() == engine.serialize(), "Initial checkpoint round trip changed execution");
     rejects([&] { Engine::start(engine.state().clone(), rules); }, "Already started state was started twice");
@@ -465,9 +468,9 @@ void accountingFailureAndTurnStartSnapshot() {
     unit.id = "mongolian_unit"; unit.owner = nationNumber(state, "mongolia"); unit.type = knownUnitTypes(state).infantry;
     unit.zone = zoneNumber(state, "land_a"); unit.turnOrigin = zoneNumber(state, "land_a"); unit.route = zoneNumbers(state, {"land_a"});
     unit.movementAllowance = 2; unit.movementRemaining = 0;  // Not infantry's: the new turn restores the catalog's 1.
-    unit.turnFlags["used"] = 1; unit.gameFlags["keep"] = 1; unit.commitments.insert("spent");
+    unit.turnFlags[MarkKey(mark::fixture, "used")] = 1; unit.gameFlags[MarkKey(mark::fixture, "keep")] = 1; unit.commitments.insert(MarkKey(mark::fixture, "spent"));
     state.units[unit.id] = unit;
-    state.nations.at(nationNumber(state, "mongolia")).turnFlags["used"] = 1;
+    state.nations.at(nationNumber(state, "mongolia")).turnFlags[MarkKey(mark::fixture, "used")] = 1;
     Engine engine(state, rules);
     rules->missingIncome = true;
     const auto before = engine.serialize();
@@ -481,7 +484,7 @@ void accountingFailureAndTurnStartSnapshot() {
             && engine.state().turnStart.units.at(unit.id).second == zoneNumber(engine.state(), "land_a"), "Snapshot was taken after beginTurn effects");
     const auto& reset = engine.state().units.at(unit.id);
     require(reset.zone == zoneNumber(state, "land_b") && reset.movementRemaining == 1 && reset.turnFlags.empty()
-            && reset.commitments.empty() && reset.route.empty() && reset.gameFlags.at("keep") == 1, "Per-turn unit reset lost persistent state");
+            && reset.commitments.empty() && reset.route.empty() && reset.gameFlags.at(MarkKey(mark::fixture, "keep")) == 1, "Per-turn unit reset lost persistent state");
 }
 
 void finalPendingWorkPreventsDeadline() {
@@ -499,7 +502,7 @@ void finalPendingWorkPreventsDeadline() {
     require(!hasAction(engine, "end_phase"), "Unresolved battle did not hold final turn");
     engine.step(findAction(engine, "clear_battle"));
     endPhase(engine);
-    require(engine.state().terminal && engine.state().flags.at("finished:kmt") == 11
+    require(engine.state().terminal && engine.state().flags.at(MarkKey(mark::fixture, "finished:kmt")) == 11
             && engine.state().clock.playerTurnSerial == 44, "Final turn was collected twice or never completed");
 }
 
@@ -583,7 +586,7 @@ void decisionMenusAreReusedAndTransactional() {
     require(branch.legalActionMenu() != cached && cached->front().id == exposed.front().id,
             "A move changed or reused an earlier cached menu");
     engine.legalActions();
-    require(rules->actionCalls == 2 && !engine.state().flags.contains("marks"),
+    require(rules->actionCalls == 2 && !engine.state().flags.contains(MarkKey(mark::fixture, "marks")),
             "Clone mutation invalidated or changed its parent cache");
     rejects([&] { branch.step(mark); }, "An old action payload remained legal after state changed");
     require(rules->actionCalls == 2, "Stale payload validation regenerated an available menu");
@@ -660,7 +663,7 @@ void runtimeStateKeysFollowEveryMutationAndIgnoreLoadedEventKeys() {
     const auto restored=Engine::restore(engine.state().definition,rules,canonicalJson(V(std::move(encoded))));
     checkKey(restored,false);
     require(restored.planningKey()==engine.planningKey(),"Restore trusted a loaded historical key");
-    auto externallyPrepared=engine.state().clone();externallyPrepared.flags["prepared_outside_runtime"]=1;
+    auto externallyPrepared=engine.state().clone();externallyPrepared.flags[MarkKey(mark::fixture, "prepared_outside_runtime")]=1;
     Engine wrapped(std::move(externallyPrepared),rules);
     checkKey(wrapped,false);
     require(wrapped.planningKey()!=engine.planningKey(),"Wrapping a state reused a stale historical key");
@@ -722,7 +725,7 @@ void reachedMenusAreSharedAcrossClonesAndBounded() {
     forged.parameters = V(O{{"value", V(999.0)}});
     rejects([&] { right.step(forged); }, "A shared menu authorized a forged payload");
     right.step(findAction(right, "mark"));
-    require(rules->actionCalls == 2 && right.state().flags.at("marks") == 2,
+    require(rules->actionCalls == 2 && right.state().flags.at(MarkKey(mark::fixture, "marks")) == 2,
             "Validating against a shared menu rebuilt it or misapplied the action");
     Engine independent(initialState(), rules, 777);
     independent.legalActions();
@@ -771,11 +774,11 @@ class HistoryRules : public FixtureRules {
     void apply(State& state, const Action& action) const override {
         if (action.kind == "append_event") state.history.push_back(Event{"audit", V(O{{"value", V(1.0)}}), "key"});
         else if (action.kind == "interrupt_after_mutation") {
-            state.flags["bad_mutation"] = 1;
+            state.flags[MarkKey(mark::fixture, "bad_mutation")] = 1;
             throw std::runtime_error("Synthetic interrupt failure");
         }
         // As the economy rules do, read the action after removing the decision that held it.
-        else if (action.kind == "react") { state.decisions.pop_back(); ++state.flags["reacted:" + action.kind]; }
+        else if (action.kind == "react") { state.decisions.pop_back(); const auto reacted = "reacted:" + action.kind; ++state.flags[MarkKey(mark::fixture, reacted)]; }
         else if (action.kind == "append_nonfinite")
             state.history.push_back(Event{"audit", V(O{{"value", V(std::numeric_limits<double>::infinity())}}), "key"});
         else if (action.kind == "rebuild_history") {
@@ -898,7 +901,7 @@ void searchCopiesRefuseEveryCallAfterFailingMidTransition() {
     require(engine.serialize() == checkpoint && engine.planningKey() == key, "A failed search copy changed its source");
     auto fresh = engine.cloneForSearch(7);
     fresh.step(findAction(fresh, "mark"));
-    require(fresh.state().flags.at("marks") == 2, "A failed search copy spoiled later copies");
+    require(fresh.state().flags.at(MarkKey(mark::fixture, "marks")) == 2, "A failed search copy spoiled later copies");
 }
 
 void searchCopiesCheckHistoryOnlyTheyHold() {
@@ -940,7 +943,7 @@ void searchCopiesStayUsableAfterRejections() {
     rejects([&] { search.applyChanceOutcome(search.planningKey(), ChanceOutcome{{{2}, {99}}}); }, "Search copy applied an impossible outcome");
     require(search.serialize() == pending, "A rejected outcome changed a search copy");
     search.resolveChance();
-    require(search.state().flags.contains("result"), "A rejection stopped a search copy");
+    require(search.state().flags.contains(MarkKey(mark::fixture, "result")), "A rejection stopped a search copy");
 }
 
 void searchCopiesMatchEnginesThatRollBack() {
@@ -961,7 +964,7 @@ void searchCopiesMatchEnginesThatRollBack() {
     both([](Engine& next) { next.step(findAction(next, "request_reaction")); });
     // The action passed here lives inside the decision that the rules remove.
     both([](Engine& next) { next.step(next.state().decisions.back().options.front()); });
-    require(inPlace.state().flags.at("reacted:react") == 1, "Rules lost the action they were applying");
+    require(inPlace.state().flags.at(MarkKey(mark::fixture, "reacted:react")) == 1, "Rules lost the action they were applying");
     both(chance);
     both([](Engine& next) { next.resolveChance(); });
     both(chance);

@@ -404,16 +404,19 @@ void scenarioIntegration(const Catalog& catalog) {
     check(!catalogContext(state, nationNumber(state, "japan")).technologies.contains("long_range_aircraft"), "Stage III treated as completed technology");
     nation.technologyStages["long_range_aircraft"] = 4;
     check(catalogContext(state, nationNumber(state, "japan")).technologies.contains("long_range_aircraft"), "Completed technology absent from query context");
-    nation.turnFlags["purchased:marine"] = 2;
+    nation.turnFlags[MarkKey(mark::purchased, "marine")] = 2;
     check(!catalog.purchaseEligibility("japan_major_marine", catalogContext(state, nationNumber(state, "japan"))).allowed,
           "State purchase accounting not exposed to catalog");
-    state.nations.at(nationNumber(state, "ccp")).gameFlags["ccp_soviet_rail_production"] = 1;
-    const auto ccp = catalogContext(state, nationNumber(state, "ccp"));
+    // A disabled predicate stays false even when the context claims it. These
+    // predicates are no marks, so no saved position can claim them.
+    auto ccp = catalogContext(state, nationNumber(state, "ccp"));
+    ccp.flags["ccp_soviet_rail_production"] = true;
     check(!catalog.purchaseEligibility("ccp_minor_artillery", ccp).allowed,
           "Mongolia/control flag bypasses absent Soviet railroad");
-    state.nations.at(nationNumber(state, "kmt")).gameFlags["kmt_burma_road"] = 1;
-    check(!catalog.purchaseEligibility("kmt_minor_artillery", catalogContext(state, nationNumber(state, "kmt"))).allowed,
-          "Burma exclusion bypassed by a saved flag");
+    auto kmt = catalogContext(state, nationNumber(state, "kmt"));
+    kmt.flags["kmt_burma_road"] = true;
+    check(!catalog.purchaseEligibility("kmt_minor_artillery", kmt).allowed, "Burma exclusion bypassed by a claimed flag");
+    check(!findMarkKey("kmt_burma_road") && !findMarkKey("ccp_soviet_rail_production"), "A catalog predicate became a mark");
 
     Id land, sea;
     for (const auto& [id, node] : state.definition->geography.require("nodes").asObject()) {

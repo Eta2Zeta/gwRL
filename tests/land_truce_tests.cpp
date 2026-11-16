@@ -16,7 +16,7 @@ using V = game::json::Value;
 const Id hopeh="land_china_hopeh", beiping="land_china_beiping", shantung="land_china_shantung";
 const Id nanking="land_china_nanking", hainan="land_hainan", kwangtung="land_kwangtung";
 void check(bool condition, const std::string& message) { if(!condition) throw std::runtime_error(message); }
-bool marked(const std::map<Id,int>& flags,const Id& key){auto i=flags.find(key);return i!=flags.end()&&i->second;}
+bool marked(const Marks& flags,const MarkKey& key){return flags.value(key)!=0;}
 State fixture(const Id& actor="ccp",Phase phase=Phase::Combat) {
     static const auto base=loadScenario(std::filesystem::path(GWRL_SOURCE_DIR)/"game_content/scenarios/japan_china_1936");
     auto s=base.clone();s.units.clear();s.facilities.clear();s.construction.clear();s.repairs.clear();
@@ -38,14 +38,14 @@ Action select(Engine& e,const Id& kind,const std::function<bool(const Action&)>&
 void choose(Engine& e,const Id& kind,const std::function<bool(const Action&)>& matches=[](const Action&){return true;}){e.step(select(e,kind,matches));}
 void capitalize(Engine& e){choose(e,"politics_choose_capital",[](const Action& a){return a.parameters.require("zone").asString()==nanking&&!a.parameters.require("factory").asBool();});}
 void clearNested(Engine& e){
-    for(int step=0;step<100&&marked(e.state().flags,"immediate_land_battles");++step){
+    for(int step=0;step<100&&marked(e.state().flags,mark::immediate_land_battles);++step){
         if(e.state().chance){e.resolveChance();continue;}
         auto actions=e.legalActions();check(!actions.empty(),"Nested shared-zone event has no continuation");
         auto capital=std::find_if(actions.begin(),actions.end(),[](const Action& a){return a.kind=="politics_choose_capital";});
         if(capital!=actions.end()){capitalize(e);continue;}
         e.step(actions.front());
     }
-    check(!marked(e.state().flags,"immediate_land_battles"),"Nested shared-zone event did not finish");
+    check(!marked(e.state().flags,mark::immediate_land_battles),"Nested shared-zone event did not finish");
 }
 void restrictAdjacent(State& s,const Id& zone,const std::set<Id>& kmtZones){
     for(const auto& border:s.definition->geography.require("nodes").require(zone).require("neighbors").asArray()){
@@ -60,7 +60,7 @@ void voluntarySharedRolesFollowTheActiveBreaker(){
         check(b.attacker==nationNumber(s, breaker)&&b.defender==nationNumber(s, breaker=="ccp"?"kmt":"ccp"),"Voluntary shared combat did not use the active truce breaker as attacker");
         check(b.attackers==std::vector<Id>{breaker=="ccp"?"c":"k"}&&b.defenders==std::vector<Id>{breaker=="ccp"?"k":"c"},"Shared combat assigned units to the wrong side");
         check(b.data.require("origins").asObject().empty()&&!b.data.find("retreat_mode"),"Shared battle invented an entry origin or retreat exception");
-        check(marked(e.state().flags,"immediate_land_battles"),"Mandatory shared combat did not block the surrounding phase");
+        check(marked(e.state().flags,mark::immediate_land_battles),"Mandatory shared combat did not block the surrounding phase");
     }
 }
 void automaticSharedRolesFollowTheActiveChineseFaction(){
@@ -90,10 +90,10 @@ void thirdPartyAutomaticSharedRolesFollowTheLandPossessor(){
                 check(battle.attackers==std::vector<Id>{attacker=="ccp"?"c":"k"}&&
                       battle.defenders==std::vector<Id>{possessor=="ccp"?"c":"k"},
                       "Third-party automatic combat routed units to the wrong side");
-                check(marked(battle.flags,"truce_low_morale_eliminates")==
+                check(marked(battle.flags,mark::truce_low_morale_eliminates)==
                       (attacker=="kmt"&&evolved!="kmt")&&battle.data.require("origins").asObject().empty(),
                       "Automatic termination lost attacking minor KMT elimination or invented an attack origin");
-                check(marked(s.flags,"immediate_land_battles")&&s.currentNationName() ==actor&&
+                check(marked(s.flags,mark::immediate_land_battles)&&s.currentNationName() ==actor&&
                       s.clock.phase==before.phase&&s.clock.playerTurnSerial==before.playerTurnSerial,
                       "Third-party automatic combat advanced its surrounding turn or phase");
             }
@@ -107,10 +107,10 @@ void automaticTruceLowMoraleEliminatesWithoutAnEscape(){
                 add(s,"c","ccp",hopeh,"militia");add(s,"k","kmt",hopeh,type);
                 // An earlier turn's route is not a fresh origin, and adjacent
                 // safe land does not override the shared-zone elimination.
-                s.units.at("k").turnOrigin = zoneNumber(s, beiping);s.units.at("k").route=zoneNumbers(s,{hopeh});s.units.at("k").commitments.insert("combat_move");
+                s.units.at("k").turnOrigin = zoneNumber(s, beiping);s.units.at("k").route=zoneNumbers(s,{hopeh});s.units.at("k").commitments.insert(mark::combat_move);
                 terminateChineseTruce(s,nationNumber(s, "ccp"),true);
                 const auto& battle=s.battles.begin()->second;
-                check(marked(battle.flags,"truce_low_morale_eliminates")&&
+                check(marked(battle.flags,mark::truce_low_morale_eliminates)&&
                       battle.data.require("origins").asObject().empty(),
                       "Automatic shared-zone elimination lost its flag or invented a fresh origin");
                 Engine e(s,rules(),9);e.setDiceTapeForTesting({10});const auto checkpoint=e.serialize();
@@ -136,14 +136,14 @@ void voluntaryKmtBreakUsesTheAttackingDiceInEveryRound(){
     e.resolveChance();check(e.state().chance&&e.state().chance->dice.size()==1&&e.state().battles.begin()->second.data.require("round").asInt()==2,"No-origin combat did not continue to round two");
     e.resolveChance();check(!e.state().units.contains("survivor")&&e.state().units.contains("c"),"Second-round KMT Low Morale did not eliminate on its attacking die");
     check(!e.state().chance&&e.state().decisions.empty(),"All eliminated attackers still fired or selected casualties");
-    choose(e,"land_progress_battle");check(!marked(e.state().flags,"immediate_land_battles"),"Finished mandatory combat failed to release its phase");
+    choose(e,"land_progress_battle");check(!marked(e.state().flags,mark::immediate_land_battles),"Finished mandatory combat failed to release its phase");
     check(game::json::parse(e.serialize()).require("random").require("tape_position").asString()=="4","Extra preliminary morale dice were consumed");
     auto replayed=Engine::replay(s.definition,rules(),checkpoint,e.state().history);check(replayed.exactReplayIdentity()==e.exactReplayIdentity(),"Corrected KMT truce combat replay diverged");
 }
 void automaticTruceEliminationOverridesAnAvailableAttackOrigin(){
     auto s=fixture("kmt");s.territories.at(zoneNumber(s, hopeh)).possessor=nationNumber(s, "ccp");s.territories.at(zoneNumber(s, beiping)).possessor=nationNumber(s, "kmt");
     s.nations.at(nationNumber(s, "ccp")).powerStatus="major";add(s,"c","ccp",hopeh,"militia");add(s,"k","kmt",hopeh);
-    auto& unit=s.units.at("k");unit.turnOrigin = zoneNumber(s, beiping);unit.route=zoneNumbers(s,{hopeh});unit.commitments.insert("combat_move");
+    auto& unit=s.units.at("k");unit.turnOrigin = zoneNumber(s, beiping);unit.route=zoneNumbers(s,{hopeh});unit.commitments.insert(mark::combat_move);
     terminateChineseTruce(s,nationNumber(s, "ccp"),true);
     check(landRetreatOrigins(s,s.battles.begin()->second)==std::set<ZoneId>{zoneNumber(s,beiping)},
           "Automatic Low Morale fixture lost its genuinely available attack-origin retreat");
@@ -198,7 +198,7 @@ void genuineCurrentTurnEntryProvidesAnOrdinaryRetreat(){
     for(bool multiStep:{false,true}){
         auto s=fixture();s.territories.at(zoneNumber(s, hopeh)).possessor=nationNumber(s, "kmt");s.territories.at(zoneNumber(s, beiping)).possessor=nationNumber(s, "ccp");s.territories.at(zoneNumber(s, shantung)).possessor=nationNumber(s, "ccp");
         add(s,"c","ccp",hopeh);add(s,"entered","ccp",hopeh);add(s,"k","kmt",hopeh,"militia");
-        auto& unit=s.units.at("entered");unit.turnOrigin = zoneNumber(s, shantung);unit.route=zoneNumbers(s,multiStep?std::vector<Id>{beiping,hopeh}:std::vector<Id>{hopeh});unit.commitments.insert("combat_move");
+        auto& unit=s.units.at("entered");unit.turnOrigin = zoneNumber(s, shantung);unit.route=zoneNumbers(s,multiStep?std::vector<Id>{beiping,hopeh}:std::vector<Id>{hopeh});unit.commitments.insert(mark::combat_move);
         terminateChineseTruce(s,nationNumber(s, "ccp"));const auto origin=multiStep?beiping:shantung;const auto& b=s.battles.begin()->second;
         check(b.data.require("origins").asObject().size()==1&&b.data.require("origins").require("entered").asString()==origin,"Current-turn entry lost its real adjacent approach");
         check(landRetreatOrigins(s,b)==std::set<ZoneId>{zoneNumber(s,origin)},"Shared battle allowed a destination other than its real entry origin");
@@ -222,7 +222,7 @@ void noOriginTerrainLimitEliminatesAttackers(){
 }
 void prepareTwelveIppKmt(State& s){
     for(const auto& zone:{beiping,hopeh,Id("land_china_yunnan"),Id("land_formosa")})s.territories.at(zoneNumber(s, zone)).possessor=nationNumber(s, "kmt");
-    refreshPoliticalState(s);check(s.nations.at(nationNumber(s, "kmt")).gameFlags.at("possessed_land_ipp")==12,"Nested-evolution fixture does not begin at 12 IPP");
+    refreshPoliticalState(s);check(s.nations.at(nationNumber(s, "kmt")).gameFlags.at(mark::possessed_land_ipp)==12,"Nested-evolution fixture does not begin at 12 IPP");
 }
 void evolutionDuringAnotherSlotPreservesPhase(Phase phase){
     auto s=fixture("japan",phase);prepareTwelveIppKmt(s);add(s,"c","ccp",beiping);add(s,"k","kmt",beiping,"militia");add(s,"c2","ccp",hopeh);add(s,"k2","kmt",hopeh,"militia");
@@ -242,17 +242,17 @@ void japaneseCaptureGiftCanEndAnExistingTruce(){
     for(const auto& zone:{Id("land_china_yunnan"),Id("land_formosa"),kwangtung,hainan})
         s.territories.at(zoneNumber(s, zone)).possessor=nationNumber(s, "kmt");
     for(auto& [zone,territory]:s.territories)
-        territory.flags.erase("last_possession_change_turn");
+        territory.flags.erase(mark::last_possession_change_turn);
     for(const auto& faction:{Id("ccp"),Id("kmt")}){
         s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, faction));
         s.nations.at(nationNumber(s, faction)).atWarWith.insert(nationNumber(s, "japan"));
     }
     refreshPoliticalState(s);
-    check(s.nations.at(nationNumber(s, "kmt")).gameFlags.at("possessed_land_ipp")==12&&
+    check(s.nations.at(nationNumber(s, "kmt")).gameFlags.at(mark::possessed_land_ipp)==12&&
           s.nations.at(nationNumber(s, "kmt")).powerStatus=="minor"&&s.politics.chineseTruce,
           "Chinese-land gift fixture does not begin with a legal 12-IPP KMT Truce");
     for(const auto& [id,nation]:s.nations)if(isWarlord(nationName(s, id)))
-        check(marked(nation.gameFlags,"incorporated"),"Existing Truce retained an independent warlord");
+        check(marked(nation.gameFlags,mark::incorporated),"Existing Truce retained an independent warlord");
     add(s,"conqueror","japan",beiping,"medium_armor");
     add(s,"d","ccp",hopeh);
     add(s,"c","ccp",nanking,"militia");add(s,"k","kmt",nanking,"artillery");
@@ -279,13 +279,13 @@ void japaneseCaptureGiftCanEndAnExistingTruce(){
     choose(e,"politics_give_capture",[](const Action& a){return a.parameters.require("zone").asString()==hopeh&&
         a.parameters.require("recipient").asString()=="kmt"&&a.parameters.require("requires_withdrawal").asBool();});
     check(e.state().nations.at(nationNumber(e.state(), "kmt")).powerStatus=="major"&&
-          e.state().nations.at(nationNumber(e.state(), "kmt")).gameFlags.at("possessed_land_ipp")==13&&
+          e.state().nations.at(nationNumber(e.state(), "kmt")).gameFlags.at(mark::possessed_land_ipp)==13&&
           isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt")&&!e.state().politics.chineseTruce,
           "Japanese Chinese-land gift did not terminate the Truce at 13 IPP");
-    check(marked(e.state().units.at("conqueror").turnFlags,"must_withdraw_from_chinese_gift"),
+    check(marked(e.state().units.at("conqueror").turnFlags,mark::must_withdraw_from_chinese_gift),
           "Unaligned gift lost the Japanese conquering unit's withdrawal obligation");
     check(std::any_of(e.state().battles.begin(),e.state().battles.end(),[&](const auto& entry){
-        return entry.second.zone == zoneNumber(e.state(), nanking)&&marked(entry.second.flags,"chinese_truce_termination");}),
+        return entry.second.zone == zoneNumber(e.state(), nanking)&&marked(entry.second.flags,mark::chinese_truce_termination);}),
         "Gift-triggered evolution omitted the remaining mixed Chinese stack");
     const auto before=e.state().clock;capitalize(e);clearNested(e);
     check(e.state().clock.phase==Phase::Combat&&e.state().currentNationName() =="japan"&&
@@ -299,7 +299,7 @@ void japaneseCaptureGiftCanEndAnExistingTruce(){
     choose(e,"movement_route",[](const Action& a){const auto& path=a.parameters.require("path").asArray();return a.parameters.require("unit").asString()=="conqueror"&&
         path.size()==2&&path.front().asString()==hopeh&&path.back().asString()==beiping;});
     check(e.state().units.at("conqueror").zone == zoneNumber(e.state(), beiping)&&
-          !marked(e.state().units.at("conqueror").turnFlags,"must_withdraw_from_chinese_gift"),
+          !marked(e.state().units.at("conqueror").turnFlags,mark::must_withdraw_from_chinese_gift),
           "Japanese conqueror could not complete the proven friendly withdrawal");
     auto replayed=Engine::replay(s.definition,rules(),checkpoint,e.state().history);
     check(replayed.exactReplayIdentity()==e.exactReplayIdentity(),"Capture→gift→evolution→shared combat replay diverged");

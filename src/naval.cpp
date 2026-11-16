@@ -8,8 +8,8 @@ namespace game::campaign {
 namespace {
 bool activeNavalBattle(const State &s) {
   for (const auto &[id, b] : s.battles)
-    if (b.flags.contains("naval_battle") && b.flags.at("naval_battle") &&
-        !(b.flags.contains("finished") && b.flags.at("finished")) &&
+    if (b.flags.contains(mark::naval_battle) && b.flags.at(mark::naval_battle) &&
+        !(b.flags.contains(mark::finished) && b.flags.at(mark::finished)) &&
         b.stage != "naval_declared")
       return true;
   return false;
@@ -24,7 +24,7 @@ int navalCompletedTurns(const State &s, NationId nation) {
   if (n.controllerNation && s.completedTurns.contains(*n.controllerNation))
     return s.completedTurns.at(*n.controllerNation);
   if (nation == knownNations(s).dadao &&
-      n.gameFlags.contains("direct_axis_control_after_japan_surrender"))
+      n.gameFlags.contains(mark::direct_axis_control_after_japan_surrender))
     return s.completedTurns.at(nationNumber(s, "japan"));
   throw std::runtime_error("Nation has no operational calendar turn: " +
                            nationName(s, nation));
@@ -38,8 +38,8 @@ Id NavalRules::id() const {
 std::vector<Action> NavalRules::actions(const State &s) const {
   if (s.chance || !s.decisions.empty())
     return {};
-  if (s.flags.contains("immediate_land_battles") &&
-      s.flags.at("immediate_land_battles"))
+  if (s.flags.contains(mark::immediate_land_battles) &&
+      s.flags.at(mark::immediate_land_battles))
     return gameplay_ ? gameplay_->actions(s) : std::vector<Action>{};
   auto combat = navalCombatActions(s);
   for (const auto &a : combat)
@@ -47,14 +47,14 @@ std::vector<Action> NavalRules::actions(const State &s) const {
       return {a};
   auto operations = navalOperationActions(s);
   combat.insert(combat.end(), operations.begin(), operations.end());
-  if (activeNavalBattle(s) || (s.flags.contains("immediate_naval_battles") &&
-                               s.flags.at("immediate_naval_battles")))
+  if (activeNavalBattle(s) || (s.flags.contains(mark::immediate_naval_battles) &&
+                               s.flags.at(mark::immediate_naval_battles)))
     return combat;
   auto out = gameplay_ ? gameplay_->actions(s) : std::vector<Action>{};
   out.insert(out.end(), combat.begin(), combat.end());
   auto movement = navalMovementActions(s);
   out.insert(out.end(), movement.begin(), movement.end());
-  if (s.flags.contains("naval_berthing") && s.flags.at("naval_berthing"))
+  if (s.flags.contains(mark::naval_berthing) && s.flags.at(mark::naval_berthing))
     out.erase(
         std::remove_if(
             out.begin(), out.end(),
@@ -65,13 +65,13 @@ std::vector<Action> NavalRules::actions(const State &s) const {
               if (!id || !s.units.contains(id->asString()))
                 return true;
               const auto &u = s.units.at(id->asString());
-              const bool landing = u.turnFlags.contains("air_in_flight") &&
-                                   u.turnFlags.at("air_in_flight") &&
+              const bool landing = u.turnFlags.contains(mark::air_in_flight) &&
+                                   u.turnFlags.at(mark::air_in_flight) &&
                                    (a.kind == "air_land_noncombat" ||
                                     a.kind == "air_failed_landing");
               const bool withdrawal =
-                  u.turnFlags.contains("must_withdraw_from_chinese_gift") &&
-                  u.turnFlags.at("must_withdraw_from_chinese_gift") &&
+                  u.turnFlags.contains(mark::must_withdraw_from_chinese_gift) &&
+                  u.turnFlags.at(mark::must_withdraw_from_chinese_gift) &&
                   (a.kind == "movement_route" || a.kind == "naval_load");
               // Militia aboard must still land in their Home Country (RB).
               const auto *cargo = a.parameters.find("cargo");
@@ -131,10 +131,10 @@ void NavalRules::beginTurn(State &s) const {
   beginNavalMovementTurn(s);
   for (auto &[id, unit] : s.units)
     if (movementController(s, unit.owner) &&
-        unit.gameFlags.contains("skeleton_crew") &&
-        unit.gameFlags.at("skeleton_crew") &&
-        !unit.gameFlags.contains("skeleton_crew_until_own_turn"))
-      unit.gameFlags["skeleton_crew_until_own_turn"] =
+        unit.gameFlags.contains(mark::skeleton_crew) &&
+        unit.gameFlags.at(mark::skeleton_crew) &&
+        !unit.gameFlags.contains(mark::skeleton_crew_until_own_turn))
+      unit.gameFlags[mark::skeleton_crew_until_own_turn] =
           navalCompletedTurns(s, unit.owner) + 1;
 }
 void NavalRules::finishPhase(State &s) const {
@@ -149,15 +149,15 @@ void NavalRules::finishTurn(State &s) const {
     throw std::runtime_error("Naval rules require income accounting");
   gameplay_->finishTurn(s);
   for (auto &[id, unit] : s.units) {
-    unit.turnFlags.erase("submerged");
-    unit.gameFlags.erase("submerged");
+    unit.turnFlags.erase(mark::submerged);
+    unit.gameFlags.erase(mark::submerged);
     if (!movementController(s, unit.owner))
       continue;
-    const auto skeleton = unit.gameFlags.find("skeleton_crew_until_own_turn");
+    const auto skeleton = unit.gameFlags.find(mark::skeleton_crew_until_own_turn);
     if (skeleton != unit.gameFlags.end() &&
         navalCompletedTurns(s, unit.owner) + 1 >= skeleton->second) {
       unit.gameFlags.erase(skeleton);
-      unit.gameFlags.erase("skeleton_crew");
+      unit.gameFlags.erase(mark::skeleton_crew);
     }
   }
 }

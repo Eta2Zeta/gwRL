@@ -239,7 +239,9 @@ engine can put that mark, and should it learn the four marks it does not know?
 **What happens now.** The engine puts *marks* on things to remember what has
 happened to them: on a unit that has moved, on a nation that has finished its
 research this turn, on a city that is damaged, on a facility built this turn.
-The code calls a mark a flag. The network's input asks one question for each
+The code calls a mark a flag; the engine's mark table, `GWRL_MARKS` in
+`include/game/marks.hpp`, lists every mark a position may hold
+([names held as numbers](engine/names.md#what-a-mark-is)). The network's input asks one question for each
 pairing of a thing and a mark
 ([the network's input](design/network_input.md#3-questions-and-answers)). But
 it keeps only two lists of marks, `kActorFlags` and `kRecordFlags` in
@@ -272,9 +274,10 @@ them. Put on Japan by hand, the first pair arrives as
 which says only that Japan carries some unlisted mark, and the name check
 reports them ([record](archive/records/answer_census_2026_11_15.md#four-marks-without-a-question)). No random
 game has reached this: it needs a nation that has completed Improved
-Construction to be bombed. The test that reads the engine's source for marks
-(`test_marks` in `tests/test_campaign_zone_encoding.py`) misses them because
-the engine builds their names in a variable.
+Construction to be bombed. The engine's mark table lists them, and the test
+that checks every mark in it has a question (`test_marks` in
+`tests/test_campaign_zone_encoding.py`) names these four as the ones this
+question leaves open.
 
 **Why it matters.** Play is not affected: the rules are applied. For learning,
 the questions that can never be answered cost no time, because an unanswered
@@ -287,7 +290,7 @@ player choosing what to bomb next. That is rare.
 
 | Choice | What it changes |
 | --- | --- |
-| A. Give each kind of thing its own list, and add the four marks | One layout change, so networks trained before it no longer load; those so far are experiments. Work of about the size of the pruning of 14 November (commit `bce7a4c`): every place where the engine writes a mark is listed, and a test keeps the lists in step with the source. Most of the 8,902 questions go. |
+| A. Give each kind of thing its own list, and add the four marks | One layout change, so networks trained before it no longer load; those so far are experiments. Work of about the size of the pruning of 14 November (commit `bce7a4c`): each mark of the engine's table is given the kinds of thing it can be on, and a test keeps the lists in step with the table. Most of the 8,902 questions go. |
 | B. Only add the four marks | A small layout change. The questions that cannot be answered stay. |
 | C. Leave it | Nothing changes. The name check reports the four marks if a game ever reaches them. |
 

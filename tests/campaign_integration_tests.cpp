@@ -34,8 +34,8 @@ void authoritativeInitialStateAndDomainDiagnostics() {
     const auto aircraftFailures=campaignInvariantFailures(broken);
     check(std::find(aircraftFailures.begin(),aircraftFailures.end(),"non-transport aircraft carries cargo: "+fighter.id)!=aircraftFailures.end(),"Fighter carrying land cargo escaped audit");
     broken=s.clone();const Id factory="setup_japan_tokyo_major_factory";
-    broken.nations.at(nationNumber(broken, "japan")).turnFlags["economy_production_cap:"+factory]=5;
-    broken.nations.at(nationNumber(broken, "japan")).turnFlags["economy_used:"+factory]=6;
+    broken.nations.at(nationNumber(broken, "japan")).turnFlags[MarkKey(mark::economy_production_cap, factory)]=5;
+    broken.nations.at(nationNumber(broken, "japan")).turnFlags[MarkKey(mark::economy_used, factory)]=6;
     const auto capacityFailures=campaignInvariantFailures(broken);
     check(std::find(capacityFailures.begin(),capacityFailures.end(),"facility capacity exceeded: "+factory)!=capacityFailures.end(),"Excess facility use escaped audit");
     const auto started=Engine::start(initial(),campaignRules(),1936).state().clone();

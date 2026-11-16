@@ -121,7 +121,7 @@ void landingTimingAndCarrierCapacity() {
     add(s, "f", "fighter", "japan", beiping);
     check(airLandingAvailable(s, "f", beiping), "Held friendly land unavailable");
     s.territories.at(zoneNumber(s, hopeh)).possessor = nationNumber(s, "japan");
-    s.territories.at(zoneNumber(s, hopeh)).flags["last_possession_change_turn"] = 2;
+    s.territories.at(zoneNumber(s, hopeh)).flags[mark::last_possession_change_turn] = 2;
     check(!airLandingAvailable(s, "f", hopeh), "Newly captured landing allowed");
     add(s, "cv", "fleet_carrier", "japan", beiping);
     check(airLandingAvailable(s, "f", "cv"), "Carrier landing unavailable");
@@ -160,7 +160,7 @@ void ordinaryFlightsKeepALandingContinuation() {
     choose(e, "air_fly", [](const Action& action) {
         return action.parameters.require("path").asArray().back().asString() == "sea_p15";
     });
-    check(e.state().units.at("b").turnFlags.at("air_in_flight") && !offered(e, "end_phase"),
+    check(e.state().units.at("b").turnFlags.at(mark::air_in_flight) && !offered(e, "end_phase"),
           "A valid split flight was rejected or prematurely grounded");
     auto clone = e.clone();
     const auto landing = select(e, "air_land_noncombat", [&](const Action& action) {
@@ -292,11 +292,11 @@ void cityPermanentIPPAndDestruction() {
     s.territories.at(zoneNumber(s, nanking)).possessor = nationNumber(s, "kmt");
     applyCityBombDamage(s, zoneNumber(s, nanking), 20);
     check(effectiveTerritorialIpp(s, zoneNumber(s, nanking)) == 1, "City IPP not reduced");
-    s.territories.at(zoneNumber(s, nanking)).flags["city_damage"] = 0;
+    s.territories.at(zoneNumber(s, nanking)).flags[mark::city_damage] = 0;
     check(effectiveTerritorialIpp(s, zoneNumber(s, nanking)) == 1, "Repair restored permanently destroyed IPP");
     applyCityBombDamage(s, zoneNumber(s, nanking), 100);
-    check(s.territories.at(zoneNumber(s, nanking)).flags.at("city_destroyed") == 1 &&
-              s.territories.at(zoneNumber(s, nanking)).flags.at("city_damage") == 45,
+    check(s.territories.at(zoneNumber(s, nanking)).flags.at(mark::city_destroyed) == 1 &&
+              s.territories.at(zoneNumber(s, nanking)).flags.at(mark::city_damage) == 45,
           "Ordinary city cap wrong");
 }
 void improvedConstructionPerPlayerTurn() {
@@ -375,7 +375,7 @@ void failedLanding() {
         auto s = fixture(phase);
         add(s, "f", "fighter", "japan", phase == Phase::NonCombatMovement ? hopeh : "sea_p14");
         s.units.at("f").movementRemaining = 0;
-        s.units.at("f").turnFlags["air_in_flight"] = 1;
+        s.units.at("f").turnFlags[mark::air_in_flight] = 1;
         Engine e(s, rules());
         check(!offered(e, "end_phase") && !offered(e, "air_start_patrol"), "Stranded plane let phase complete");
         choose(e, "air_failed_landing");
@@ -406,7 +406,7 @@ void strandedAttackersStillEndCombatMovement() {
     const auto menu = e.legalActions();
     check(menu.size() == 1 && menu.front().kind == "air_failed_landing", "The stranded attacker could not be given up");
     e.step(menu.front());
-    check(!e.state().units.contains("bomber") && offered(e, "end_phase") && !e.state().flags.contains("stranded_aircraft_lost"),
+    check(!e.state().units.contains("bomber") && offered(e, "end_phase") && !e.state().flags.contains(mark::stranded_aircraft_lost),
           "Giving up the stranded attacker did not let Combat Movement end");
     choose(e, "end_phase");
     check(e.state().clock.phase == Phase::Combat, "Combat Movement did not end after the attacker was given up");
@@ -481,7 +481,7 @@ void combatMovementFlightIsTheTurnsMove() {
     choose(e, "naval_route", [](const Action &a) {
         return a.parameters.require("request").require("path").asArray().back().asString() == "sea_p15";
     });
-    check(e.state().units.at("deck").turnFlags.contains("air_in_flight") && !hasOrder(e, "deck", "air_fly"),
+    check(e.state().units.at("deck").turnFlags.contains(mark::air_in_flight) && !hasOrder(e, "deck", "air_fly"),
           "A sailing carrier carried its fighter along, or the fighter got a flight that starts no combat");
     choose(e, "air_land_noncombat", [](const Action &a) {
         return a.parameters.require("unit").asString() == "deck" &&
@@ -499,7 +499,7 @@ void combatMovementFlightIsTheTurnsMove() {
         return a.parameters.require("request").require("path").asArray().back().asString() == "sea_p15";
     });
     const auto orders = unitOrders(e, "deck");
-    check(e.state().units.at("deck").turnFlags.contains("air_in_flight") && !orders.empty() &&
+    check(e.state().units.at("deck").turnFlags.contains(mark::air_in_flight) && !orders.empty() &&
               std::all_of(orders.begin(), orders.end(), [](const Id &kind) {
                   return kind == "air_land_noncombat" || kind == "air_failed_landing";
               }),
@@ -538,7 +538,7 @@ void alliedTransportBoardsAfterItsOwnersTurn() {
     s.completedTurns[nationNumber(s, "japan")] = 1;
     s.politics.chineseTruce = true;
     add(s, "lift", "air_transport", "ccp", hopeh);
-    s.units.at("lift").commitments.insert("combat_move");  // From CCP's own Combat Movement.
+    s.units.at("lift").commitments.insert(mark::combat_move);  // From CCP's own Combat Movement.
     add(s, "infantry", "infantry", "kmt", hopeh);
     add(s, "militia", "militia", "kmt", hopeh);
     s.captureTurnStart();

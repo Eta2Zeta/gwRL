@@ -22,10 +22,7 @@ template <class Message> void require(bool ok, const Message &message) {
 V num(int n) {
     return V(static_cast<double>(n));
 }
-bool marked(const std::map<Id, int> &f, const Id &k) {
-    auto i = f.find(k);
-    return i != f.end() && i->second != 0;
-}
+bool marked(const Marks &f, const MarkKey &k) { return f.value(k) != 0; }
 void put(BattleState &b, const Id &key, V value) {
     auto o = b.data.asObject();
     o[key] = std::move(value);
@@ -91,10 +88,10 @@ bool transport(const State &s, const UnitState &u) {
     return u.type == knownUnitTypes(s).air_transport || u.type == knownUnitTypes(s).heavy_air_transport;
 }
 bool airborne(const UnitState &u) {
-    return u.commitments.contains("airborne_assault") || marked(u.turnFlags, "airborne_assault");
+    return u.commitments.contains(mark::airborne_assault) || marked(u.turnFlags, mark::airborne_assault);
 }
 bool amphibious(const UnitState &u) {
-    return u.commitments.contains("amphibious_assault") || marked(u.turnFlags, "amphibious_assault");
+    return u.commitments.contains(mark::amphibious_assault) || marked(u.turnFlags, mark::amphibious_assault);
 }
 bool ground(const State &s, const UnitState &u) {
     return has(s, u, knownUnitClasses(s).land);
@@ -110,13 +107,13 @@ bool operational(const State &s, const BattleState &b, const Id &id) {
     if (!s.units.contains(id))
         return false;
     const auto &u = s.units.at(id);
-    if (u.zone != b.zone && !(marked(b.flags, "attrition") &&
+    if (u.zone != b.zone && !(marked(b.flags, mark::attrition) &&
                               std::find(b.attackers.begin(), b.attackers.end(), id) != b.attackers.end()))
         return false;
-    auto used = u.turnFlags.find("air_battle_turn");
+    auto used = u.turnFlags.find(mark::air_battle_turn);
     if (aircraft(s, u) && used != u.turnFlags.end() &&
         used->second == static_cast<int>(s.clock.playerTurnSerial + 1) &&
-        !u.commitments.contains("air_battle:" + b.id))
+        !u.commitments.contains(MarkKey(mark::air_battle, b.id)))
         return false;
     const auto grounded = object(b, "grounded");
     const auto *retreated = b.data.find("retreated_units");
@@ -145,11 +142,10 @@ bool city(const State &s, ZoneId zone) {
     return c && c->isBool() && c->asBool();
 }
 bool fortBorder(const State &s, const FacilityState &f, ZoneId fromZone) {
-    if (f.type != "fortification" || f.damage || marked(f.flags, "under_construction") || !fromZone.valid())
+    if (f.type != "fortification" || f.damage || marked(f.flags, mark::under_construction) || !fromZone.valid())
         return false;
     const auto &from = zoneName(s, fromZone);
-    if (marked(f.flags, "border_" + from) || marked(f.flags, "towards_" + from) ||
-        marked(f.flags, "border:" + from))
+    if (marked(f.flags, MarkKey(mark::border, from)))
         return true;
     const auto *fs = s.definition->geography.find("facilities");
     if (fs && fs->isObject())
@@ -174,7 +170,7 @@ std::vector<Id> protectedAttackers(const State &s, const BattleState &b, const F
     return out;
 }
 bool fortActive(const State &s, const BattleState &b) {
-    if (marked(b.flags, "ignore_fortification"))
+    if (marked(b.flags, mark::ignore_fortification))
         return false;
     for (const auto &[id, f] : s.facilities)
         if (f.zone == b.zone && !protectedAttackers(s, b, f).empty())
@@ -193,7 +189,7 @@ Action action(const State &s, NationId nation, const Id &kind, O p = {}) {
 void decision(State &s, BattleState &b, NationId nation, const Id &kind, std::vector<Action> options) {
     require(!options.empty(), "Empty land battle decision");
     Decision d;
-    d.id = b.id + "_" + kind + "_" + std::to_string(++s.flags["land_decision_sequence"]);
+    d.id = b.id + "_" + kind + "_" + std::to_string(++s.flags[mark::land_decision_sequence]);
     d.kind = kind;
     d.nation = nationName(s, nation);
     d.reaction = nation != s.currentNation();
@@ -213,15 +209,15 @@ void release(State &s, const Action &a) {
 }
 void refreshImmediateBattles(State& s) {
     const bool pending = std::any_of(s.battles.begin(), s.battles.end(), [](const auto& entry) {
-        return marked(entry.second.flags, "chinese_truce_termination");
+        return marked(entry.second.flags, mark::chinese_truce_termination);
     });
-    if (pending) s.flags["immediate_land_battles"] = 1;
-    else s.flags.erase("immediate_land_battles");
+    if (pending) s.flags[mark::immediate_land_battles] = 1;
+    else s.flags.erase(mark::immediate_land_battles);
 }
 bool pendingAmphibiousPreparation(const State& s, const BattleState& land) {
     return std::any_of(s.battles.begin(), s.battles.end(), [&](const auto& entry) {
         const auto& prep = entry.second;
-        return marked(prep.flags, "amphibious_preparation") && !assaultCalledOff(s, prep) &&
+        return marked(prep.flags, mark::amphibious_preparation) && !assaultCalledOff(s, prep) &&
                prep.zone == land.zone && prep.attacker == land.attacker;
     });
 }
@@ -231,11 +227,11 @@ void setStage(BattleState &b, const Id &stage) {
 void eraseUnit(State &s, const Id &id) {
     if (s.units.contains(id))
         for (const auto &[key, value] : s.units.at(id).gameFlags)
-            if (value && key.rfind("ship_crew:", 0) == 0) {
-                const auto ship = key.substr(10);
+            if (value && key.base() == mark::ship_crew) {
+                const auto ship = std::string(key.argument());
                 if (s.units.contains(ship)) {
                     const auto owner = s.units.at(ship).owner;
-                    s.units.at(ship).gameFlags["skeleton_crew_until_own_turn"] =
+                    s.units.at(ship).gameFlags[mark::skeleton_crew_until_own_turn] =
                         navalCompletedTurns(s,owner) + (movementController(s,owner) ? 2 : 1);
                 }
             }
@@ -285,8 +281,8 @@ void retreatUnit(State &s, BattleState &battle, const Id &id, ZoneId to) {
     auto &u = s.units.at(id);
     u.zone = to;
     u.movementRemaining = 0;
-    u.turnFlags["land_retreating"] = 1;
-    u.commitments.insert("retreated");
+    u.turnFlags[mark::land_retreating] = 1;
+    u.commitments.insert(mark::retreated);
     // Retreat removes a unit from this battle. Its movement commitment lasts
     // until its next turn, but must not suppress defense in another battle.
     auto retreated = array(battle, "retreated_units");
@@ -318,7 +314,7 @@ std::vector<Id> eligibleHits(const State &s, const BattleState &b, const V &hit)
         v.erase(std::remove_if(v.begin(),v.end(),[&](const Id &id){
             return !doubleAmphibiousCasualty(s,b,id);
         }),v.end());
-    if (side && marked(b.flags,"amphibious_assault")) {
+    if (side && marked(b.flags,mark::amphibious_assault)) {
         const bool assaulting=std::any_of(v.begin(),v.end(),[&](const Id &id){
             return ground(s,s.units.at(id)) && amphibious(s.units.at(id));
         });
@@ -328,7 +324,7 @@ std::vector<Id> eligibleHits(const State &s, const BattleState &b, const V &hit)
     }
     const auto phase = string(b, "rolling_phase");
     if ((phase == "first_strike" || phase == "air_fire" || phase == "city_airborne_aaa") &&
-        marked(b.flags, "airborne_assault"))
+        marked(b.flags, mark::airborne_assault))
         v.erase(std::remove_if(v.begin(), v.end(),
                                [&](const Id &id) {
                                    const auto &u = s.units.at(id);
@@ -505,7 +501,7 @@ void requestShots(State &s, BattleState &b, A shots, const Id &after) {
     put(b, "after_roll", V(after));
     put(b, "rolling_phase", V(b.stage));
     ChanceRequest c;
-    c.id = b.id + "_roll_" + std::to_string(++s.flags["land_roll_sequence"]);
+    c.id = b.id + "_roll_" + std::to_string(++s.flags[mark::land_roll_sequence]);
     c.continuation = b.id;
     c.nation = nationName(s, b.attacker);
     c.purpose = "land_combat_roll";
@@ -637,7 +633,7 @@ void shoot(State &s, BattleState &b, const Id &which) {
                 extra["air_priority"] = V(true);
             if (!attacking && round == 1 && has(s, u, knownUnitClasses(s).infantry_class) && fortActive(s, b)) {
                 auto withoutFort = b;
-                withoutFort.flags["ignore_fortification"] = 1;
+                withoutFort.flags[mark::ignore_fortification] = 1;
                 const auto baseline = landCombatStats(s, withoutFort, id, false, round).threshold.value_or(0);
                 extra["fort_baseline"] = num(baseline);
                 std::vector<Id> eligible;
@@ -660,7 +656,7 @@ void shoot(State &s, BattleState &b, const Id &which) {
                 if (eligible.empty())
                     continue;
                 bool doctrine = false;
-                if (marked(b.flags, "airborne_assault"))
+                if (marked(b.flags, mark::airborne_assault))
                     doctrine =
                         catalogContext(s, b.attacker, b.zone).technologies.contains("airborne_doctrine");
                 if (doctrine)
@@ -669,10 +665,10 @@ void shoot(State &s, BattleState &b, const Id &which) {
                     addShot(shots, id, nationName(s, b.defender), true, 5, 0, {}, {{"eligible", ids(eligible)}});
                 for (const auto &unit : eligible)
                     if (s.units.contains(unit))
-                        s.units.at(unit).turnFlags["crossed_enemy_fortification"] = 1;
+                        s.units.at(unit).turnFlags[mark::crossed_enemy_fortification] = 1;
             }
     Id after = first     ? "air_fire"
-               : airStep ? (marked(b.flags, "airborne_assault") ? "airborne_drop" : "attacker_fire")
+               : airStep ? (marked(b.flags, mark::airborne_assault) ? "airborne_drop" : "attacker_fire")
                : which == "attacker_fire" ? "defender_fire"
                                           : "round_end";
     requestShots(s, b, std::move(shots), after);
@@ -680,7 +676,7 @@ void shoot(State &s, BattleState &b, const Id &which) {
 void finishPostBattle(State &s, BattleState &b) {
     if (s.chance || !s.decisions.empty())
         return;
-    if (string(b, "result") == "attacker_wins" && !marked(b.flags, "blitz_pairing_done")) {
+    if (string(b, "result") == "attacker_wins" && !marked(b.flags, mark::blitz_pairing_done)) {
         const auto armor = blitzEligible(s, b);
         auto pairs = object(b, "blitz_pairs");
         std::set<Id> used;
@@ -689,7 +685,7 @@ void finishPostBattle(State &s, BattleState &b) {
                 used.insert(id.asString());
         for (const auto &id : armor)
             if (s.units.contains(id))
-                s.units.at(id).turnFlags["blitz_eligible"] = 1;
+                s.units.at(id).turnFlags[mark::blitz_eligible] = 1;
         std::vector<Action> options;
         for (const auto &tank : armor) {
             int usedCapacity = 0;
@@ -704,7 +700,7 @@ void finishPostBattle(State &s, BattleState &b) {
                                  u.type == knownUnitTypes(s).advanced_self_propelled_artillery || fighter(s, u) ||
                                  u.type == knownUnitTypes(s).tactical_bomber;
                 if (!companion || used.contains(id) || !u.movementRemaining || *u.movementRemaining < 1 ||
-                    marked(u.turnFlags, "crossed_enemy_fortification") || airborne(u) || amphibious(u) ||
+                    marked(u.turnFlags, mark::crossed_enemy_fortification) || airborne(u) || amphibious(u) ||
                     usedCapacity + (advanced ? 1 : 2) > 2)
                     continue;
                 options.push_back(action(s, b.attacker, "land_pair_blitz",
@@ -716,27 +712,27 @@ void finishPostBattle(State &s, BattleState &b) {
             decision(s, b, b.attacker, "land_blitz_pairing", std::move(options));
             return;
         }
-        b.flags["blitz_pairing_done"] = 1;
+        b.flags[mark::blitz_pairing_done] = 1;
     }
-    b.flags["finished"] = 1;
+    b.flags[mark::finished] = 1;
     b.stage = "finished";
     finishAirCombat(s, b.id);
 }
 void finishBattle(State &s, BattleState &b, const Id &result) {
-    if (result=="attacker_wins" && integer(b,"round",1)==1 && marked(b.flags,"amphibious_assault"))
+    if (result=="attacker_wins" && integer(b,"round",1)==1 && marked(b.flags,mark::amphibious_assault))
         releaseAmphibiousReserves(s,b.id);
     put(b, "result", V(result));
     b.stage = "post_capture";
     const auto alive = living(s, b, true);
-    if (result == "attacker_wins" && !marked(b.flags, "capture_done")) {
+    if (result == "attacker_wins" && !marked(b.flags, mark::capture_done)) {
         auto grounded = object(b, "grounded");
         for (const auto &[id, x] : grounded)
             if (s.units.contains(id))
                 eraseUnit(s, id);
         bool occupying =
             std::any_of(alive.begin(), alive.end(), [&](const Id &id) { return ground(s, s.units.at(id)); });
-        b.flags["capture_done"] = 1;
-        if (occupying && !marked(b.flags, "attrition")) {
+        b.flags[mark::capture_done] = 1;
+        if (occupying && !marked(b.flags, mark::attrition)) {
             resolveCapturedPorts(s, b.zone, b.attacker);
             captureLand(s, b.attacker, b.zone, withdrawalEligibleRecipients(s, b.attacker, b.zone));
         }
@@ -744,7 +740,7 @@ void finishBattle(State &s, BattleState &b, const Id &result) {
     std::set<Id> crews;
     for (const auto &[id, unit] : s.units)
         for (const auto &[key, value] : unit.gameFlags)
-            if (value && key.rfind("ship_crew:", 0) == 0 && unit.zone == b.zone) crews.insert(id);
+            if (value && key.base() == mark::ship_crew && unit.zone == b.zone) crews.insert(id);
     removePoliticalUnits(s, crews);
     finishPostBattle(s, b);
 }
@@ -772,7 +768,7 @@ bool endIfOver(State &s, BattleState &b) {
     }
     if (defenders.empty()) {
         // Low-morale tests are an attack roll, even against empty territory.
-        if (integer(b, "round", 1) == 1 && !marked(b.flags, "attack_rolled"))
+        if (integer(b, "round", 1) == 1 && !marked(b.flags, mark::attack_rolled))
             return false;
         finishBattle(s, b, "attacker_wins");
         return true;
@@ -884,7 +880,7 @@ void advance(State &s, BattleState &b) {
         roundsWithoutPause = 0;
     ++advanceDepth;
     struct Leave { ~Leave() { --advanceDepth; } } leave;
-    if (s.chance || !s.decisions.empty() || marked(b.flags, "finished"))
+    if (s.chance || !s.decisions.empty() || marked(b.flags, mark::finished))
         return;
     eliminateUnsupportedRockets(s,b);
     pruneUnits(s, b);
@@ -894,7 +890,7 @@ void advance(State &s, BattleState &b) {
             return;
         setStage(b, "pair_attack");
         put(b, "after_pairing",
-            V(marked(b.flags, "airborne_assault") ? std::string("city_airborne_aaa")
+            V(marked(b.flags, mark::airborne_assault) ? std::string("city_airborne_aaa")
                                                   : std::string("first_strike")));
     }
     if (b.stage == "airborne_drop") {
@@ -924,7 +920,7 @@ void advance(State &s, BattleState &b) {
         if (b.stage != "attacker_fire" && b.stage != "defender_fire" && endIfOver(s, b))
             return;
         if (b.stage == "attacker_fire")
-            b.flags["attack_rolled"] = 1;
+            b.flags[mark::attack_rolled] = 1;
         shoot(s, b, b.stage);
         return;
     }
@@ -947,16 +943,16 @@ void advance(State &s, BattleState &b) {
     if (b.stage == "round_end") {
         clearPendingDead(s, b);
         pruneUnits(s, b);
-        if (integer(b, "round", 1) == 1 && marked(b.flags, "amphibious_assault"))
+        if (integer(b, "round", 1) == 1 && marked(b.flags, mark::amphibious_assault))
             releaseAmphibiousReserves(s, b.id);
-        if (marked(b.flags, "attrition")) {
+        if (marked(b.flags, mark::attrition)) {
             finishBattle(s, b, "attrition_complete");
             return;
         }
         // RB10.2 requires the surviving carpet bombers to return immediately,
         // before choosing whether the remaining forces fight another round.
-        if (integer(b, "round", 1) == 1 && !marked(b.flags,"carpet_return_started")) {
-            b.flags["carpet_return_started"] = 1;
+        if (integer(b, "round", 1) == 1 && !marked(b.flags,mark::carpet_return_started)) {
+            b.flags[mark::carpet_return_started] = 1;
             auto exited = object(b, "exited_aircraft");
             std::vector<Id> bombers;
             for (const auto &id : living(s, b, true))
@@ -982,7 +978,7 @@ void advance(State &s, BattleState &b) {
                     t.insert(border.begin(), border.end());
                 }
         bool forced = (city(s, b.zone) && integer(b, "round", 1) >= 3 &&
-                       !marked(b.flags, "japanese_surprise_attack")) ||
+                       !marked(b.flags, mark::japanese_surprise_attack)) ||
                       t.contains("tundra") || t.contains("ice") || t.contains("tundra/ice");
         setStage(b, "retreat");
         retreatDecision(s, b, forced);
@@ -1006,7 +1002,7 @@ bool citySurrounded(const State &s, ZoneId zone, NationId defender) {
     if (!landNeighbor)
         return false;
     for (const auto &[id, f] : s.facilities)
-        if (f.zone == zone && f.damage == 0 && !marked(f.flags, "under_construction")) {
+        if (f.zone == zone && f.damage == 0 && !marked(f.flags, mark::under_construction)) {
             if (f.type == "airbase" || f.type == "airfield")
                 return false;
             if (f.type.find("port") != Id::npos || f.type.find("dockyard") != Id::npos ||
@@ -1035,7 +1031,7 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
     result.firstStrike =
         round == 1 &&
         (d.classes.contains(knownUnitClasses(s).artillery_class) ||
-         (attacking && u.owner == knownNations(s).japan && aircraft(s, u) && marked(b.flags, "japanese_surprise_attack")));
+         (attacking && u.owner == knownNations(s).japan && aircraft(s, u) && marked(b.flags, mark::japanese_surprise_attack)));
     for (const auto &mode : catalog.modes(u.type, catalogContext(s, u.owner, u.zone), u.damage))
         if (mode.id == "target_selection") {
             const auto *enabled = mode.parameters.find(attacking ? "attack" : "defense");
@@ -1092,7 +1088,7 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
     }
     bool surrounded = citySurrounded(s, b.zone, b.defender);
     if (city(s, b.zone)) {
-        if (!attacking && surrounded && !marked(u.turnFlags, "scrambled"))
+        if (!attacking && surrounded && !marked(u.turnFlags, mark::scrambled))
             bonus(-1);
         if (!surrounded) {
             if (attacking && has(s, u, knownUnitClasses(s).vehicle_class))
@@ -1109,7 +1105,7 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
     if (!attacking && u.owner == knownNations(s).japan && has(s, u, knownUnitClasses(s).infantry_class) &&
         nationFaction(s, u.owner).homeZones.contains(b.zone))
         extra += 1;
-    if (!attacking && round == 1 && marked(b.flags, "japanese_surprise_attack"))
+    if (!attacking && round == 1 && marked(b.flags, mark::japanese_surprise_attack))
         extra -= 1;
     auto pairs = object(b, attacking ? "attack_pairs" : "defense_pairs");
     if (has(s, u, knownUnitClasses(s).artillery_class) && (!pairs.contains(id) || !s.units.contains(pairs.at(id).asString())))
@@ -1121,7 +1117,7 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
     if (attacking && round == 1 && airborne(u) &&
         (u.type == knownUnitTypes(s).airborne_infantry || u.type == knownUnitTypes(s).elite_airborne_infantry))
         bonus(1);
-    if (attacking && round == 1 && u.type == knownUnitTypes(s).marine && marked(u.turnFlags, "from_attack_naval_transport"))
+    if (attacking && round == 1 && u.type == knownUnitTypes(s).marine && marked(u.turnFlags, mark::from_attack_naval_transport))
         bonus(1);
     result.threshold = std::max(1, *result.threshold + positive + negative + extra);
     return result;
@@ -1138,9 +1134,9 @@ Id registerLandBattle(State &s, ZoneId zone, NationId attacker, const std::vecto
                 "Attacker is not at battle zone or lacks its approach origin");
     }
     for (auto &[id, b] : s.battles)
-        if (b.zone == zone && b.attacker == attacker && !marked(b.flags, "attrition") &&
-            !marked(b.flags, "naval_battle") && !marked(b.flags, "amphibious_preparation") &&
-            !marked(b.flags, "finished")) {
+        if (b.zone == zone && b.attacker == attacker && !marked(b.flags, mark::attrition) &&
+            !marked(b.flags, mark::naval_battle) && !marked(b.flags, mark::amphibious_preparation) &&
+            !marked(b.flags, mark::finished)) {
             auto o = object(b, "origins");
             auto landEntries = array(b, "land_entry_origins");
             for (const auto &unit : units) {
@@ -1157,7 +1153,7 @@ Id registerLandBattle(State &s, ZoneId zone, NationId attacker, const std::vecto
             return id;
         }
     BattleState b;
-    b.id = "land_battle_" + std::to_string(++s.flags["land_battle_sequence"]);
+    b.id = "land_battle_" + std::to_string(++s.flags[mark::land_battle_sequence]);
     b.zone = zone;
     b.attacker = attacker;
     b.stage = "awaiting_combat_rules";
@@ -1165,7 +1161,7 @@ Id registerLandBattle(State &s, ZoneId zone, NationId attacker, const std::vecto
     auto owner = s.territories.at(zone).possessor;
     b.defender = owner.value_or(attacker);
     if (!owner)
-        b.flags["uncontested"] = 1;
+        b.flags[mark::uncontested] = 1;
     O o;
     A landEntries;
     for (const auto &id : units) {
@@ -1175,9 +1171,9 @@ Id registerLandBattle(State &s, ZoneId zone, NationId attacker, const std::vecto
         o[id] = V(zoneName(s, origins.at(id)));
         if (ground(s, u) && !airborne(u) && !amphibious(u)) landEntries.emplace_back(zoneName(s, origins.at(id)));
         if (airborne(u))
-            b.flags["airborne_assault"] = 1;
+            b.flags[mark::airborne_assault] = 1;
         if (amphibious(u))
-            b.flags["amphibious_assault"] = 1;
+            b.flags[mark::amphibious_assault] = 1;
     }
     for (const auto &[id, u] : s.units)
         if (u.zone == zone && !u.carriedBy && (ground(s, u) || aircraft(s, u)) &&
@@ -1210,21 +1206,21 @@ Id registerAttritionBattle(State &s, ZoneId zone, NationId attacker, const std::
         require(u.route.empty() && s.turnStart.units.contains(id) &&
                     s.turnStart.units.at(id).second == u.zone && passableLandBorder(s, u.zone, zone),
                 "Attrition artillery must have remained adjacent since turn start");
-        require(!u.commitments.contains("combat_move") && !u.commitments.contains("combat") &&
-                    !u.commitments.contains("attrition"),
+        require(!u.commitments.contains(mark::combat_move) && !u.commitments.contains(mark::combat) &&
+                    !u.commitments.contains(mark::attrition),
                 "Artillery already committed");
         origins[id] = u.zone;
-        u.commitments.insert("attrition");
+        u.commitments.insert(mark::attrition);
         u.movementRemaining = 0;
     }
     BattleState b;
-    b.id = "attrition_battle_" + std::to_string(++s.flags["land_battle_sequence"]);
+    b.id = "attrition_battle_" + std::to_string(++s.flags[mark::land_battle_sequence]);
     b.zone = zone;
     b.attacker = attacker;
     b.defender = s.territories.at(zone).possessor.value_or(attacker);
     b.attackers = units;
     b.stage = "awaiting_combat_rules";
-    b.flags["attrition"] = 1;
+    b.flags[mark::attrition] = 1;
     for (const auto &[id, u] : s.units)
         if (u.zone == zone && opposing(s, attacker, u.owner) && ground(s, u))
             b.defenders.push_back(id);
@@ -1245,25 +1241,25 @@ void beginLandBattle(State &s, const Id &id) {
     const auto& pending = s.battles.at(id);
     require(!pendingAmphibiousPreparation(s, pending),
             "Resolve the same nation's amphibious preparation before its combined land battle");
-    require((s.clock.phase == Phase::Combat || marked(pending.flags, "chinese_truce_termination")) &&
+    require((s.clock.phase == Phase::Combat || marked(pending.flags, mark::chinese_truce_termination)) &&
                 !s.chance && s.decisions.empty(),
             "Cannot begin land battle now");
     auto &b = s.battles.at(id);
     require(b.stage == "awaiting_combat_rules", "Battle has already begun");
     for (const auto &[other, x] : s.battles)
-        if (other != id && !marked(x.flags, "finished") && x.stage != "awaiting_combat_rules" &&
+        if (other != id && !marked(x.flags, mark::finished) && x.stage != "awaiting_combat_rules" &&
             x.stage != "air_declared" && x.stage != "naval_declared" && x.stage != "amphibious_declared")
             throw std::runtime_error("Another battle is in progress");
-    if (marked(b.flags, "attrition")) {
+    if (marked(b.flags, mark::attrition)) {
         setStage(b, "attrition_fire");
         advance(s, b);
         return;
     }
     preparePortLandDefence(s, id);
-    if (b.attacker == knownNations(s).japan && marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_zone:" + zoneName(s, b.zone)) &&
-        !marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_used")) {
-        b.flags["japanese_surprise_attack"] = 1;
-        s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_used"] = 1;
+    if (b.attacker == knownNations(s).japan && marked(s.nations.at(nationNumber(s, "japan")).turnFlags, MarkKey(mark::surprise_attack_zone, zoneName(s, b.zone))) &&
+        !marked(s.nations.at(nationNumber(s, "japan")).turnFlags, mark::surprise_attack_used)) {
+        b.flags[mark::japanese_surprise_attack] = 1;
+        s.nations.at(nationNumber(s, "japan")).turnFlags[mark::surprise_attack_used] = 1;
     }
     setStage(b, "awaiting_air_defence");
     beginAirDefence(s, id);
@@ -1284,8 +1280,8 @@ std::set<ZoneId> landRetreatOrigins(const State &s, const BattleState &b) {
 std::vector<Id> blitzEligible(const State &s, const BattleState &b) {
     std::vector<Id> out;
     if (s.clock.phase != Phase::Combat || b.attacker != s.currentNation()) return out;
-    if (integer(b, "round", 1) > 2 || city(s, b.zone) || marked(b.flags, "amphibious_assault") ||
-        marked(b.flags, "attrition"))
+    if (integer(b, "round", 1) > 2 || city(s, b.zone) || marked(b.flags, mark::amphibious_assault) ||
+        marked(b.flags, mark::attrition))
         return out;
     auto t = terrain(node(s, b.zone).find("terrain"));
     for (const auto &x :
@@ -1295,7 +1291,7 @@ std::vector<Id> blitzEligible(const State &s, const BattleState &b) {
     for (const auto &id : living(s, b, true)) {
         const auto &u = s.units.at(id);
         if (!u.movementRemaining || *u.movementRemaining < 1 ||
-            marked(u.turnFlags, "crossed_enemy_fortification") || airborne(u) || amphibious(u))
+            marked(u.turnFlags, mark::crossed_enemy_fortification) || airborne(u) || amphibious(u))
             continue;
         if (u.type == knownUnitTypes(s).light_armor || u.type == knownUnitTypes(s).medium_armor || u.type == knownUnitTypes(s).heavy_armor ||
             u.type == knownUnitTypes(s).t_34 || u.type == knownUnitTypes(s).tiger_i || u.type == knownUnitTypes(s).panzergrenadier)
@@ -1306,11 +1302,11 @@ std::vector<Id> blitzEligible(const State &s, const BattleState &b) {
 std::vector<Action> landBattleClearing(const State &s) {
     std::vector<Action> out;
     if (s.chance || !s.decisions.empty() ||
-        (s.clock.phase != Phase::Combat && !marked(s.flags, "immediate_land_battles")))
+        (s.clock.phase != Phase::Combat && !marked(s.flags, mark::immediate_land_battles)))
         return out;
     for (const auto &[id, b] : s.battles)
-        if (!marked(b.flags, "air_mission") && !marked(b.flags, "naval_battle") &&
-            !marked(b.flags, "amphibious_preparation") && marked(b.flags, "finished"))
+        if (!marked(b.flags, mark::air_mission) && !marked(b.flags, mark::naval_battle) &&
+            !marked(b.flags, mark::amphibious_preparation) && marked(b.flags, mark::finished))
             out.push_back(action(s, s.currentNation(), "land_progress_battle", {{"battle", V(id)}}));
     return out;
 }
@@ -1324,23 +1320,23 @@ std::vector<Action> LandCombatRules::actions(const State &s) const {
     if (s.chance || !s.decisions.empty())
         return out;
     if (s.currentNation() == knownNations(s).japan && s.clock.phase == Phase::CombatMovement &&
-        marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_available")) {
+        marked(s.nations.at(nationNumber(s, "japan")).turnFlags, mark::surprise_attack_available)) {
         bool selected = false;
         for (const auto &[key, value] : s.nations.at(nationNumber(s, "japan")).turnFlags)
-            if (value && key.rfind("surprise_attack_zone:", 0) == 0)
+            if (value && key.base() == mark::surprise_attack_zone)
                 selected = true;
         if (!selected)
             for (const auto &[zone, t] : s.territories)
                 if (t.possessor &&
-                    marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_target:" + nationName(s, *t.possessor)))
+                    marked(s.nations.at(nationNumber(s, "japan")).turnFlags, MarkKey(mark::surprise_attack_target, nationName(s, *t.possessor))))
                     out.push_back(action(s, nationNumber(s, "japan"), "land_select_surprise_zone", {{"zone", V(zoneName(s, zone))}}));
     }
     if (s.clock.phase == Phase::CombatMovement) {
         for (const auto &[id, u] : s.units)
             if (movementController(s, u.owner) &&
                 (u.type == knownUnitTypes(s).advanced_artillery || u.type == knownUnitTypes(s).advanced_self_propelled_artillery) &&
-                u.route.empty() && !u.commitments.contains("attrition") &&
-                !u.commitments.contains("combat") && s.turnStart.units.contains(id))
+                u.route.empty() && !u.commitments.contains(mark::attrition) &&
+                !u.commitments.contains(mark::combat) && s.turnStart.units.contains(id))
                 for (const auto zone : mapNeighbors(s, u.zone)) {
                     if (s.territories.contains(zone) && s.territories.at(zone).possessor &&
                         opposing(s, u.owner, *s.territories.at(zone).possessor) &&
@@ -1349,20 +1345,20 @@ std::vector<Action> LandCombatRules::actions(const State &s) const {
                                              {{"unit", V(id)}, {"zone", V(zoneName(s, zone))}}));
                 }
     }
-    const bool immediate = marked(s.flags, "immediate_land_battles");
+    const bool immediate = marked(s.flags, mark::immediate_land_battles);
     if (s.clock.phase != Phase::Combat && !immediate)
         return out;
     const auto clearing = landBattleClearing(s);
     out.insert(out.end(), clearing.begin(), clearing.end());
     bool active = false;
     for (const auto &[id, b] : s.battles)
-        if (!marked(b.flags, "finished") && b.stage != "awaiting_combat_rules" &&
+        if (!marked(b.flags, mark::finished) && b.stage != "awaiting_combat_rules" &&
             b.stage != "air_declared" && b.stage != "naval_declared" &&
             b.stage != "amphibious_declared") {
             active = true;
             const auto *ready = b.data.find("air_defence_ready");
-            if (!marked(b.flags, "air_mission") && !marked(b.flags, "naval_battle") &&
-                !marked(b.flags, "amphibious_preparation") &&
+            if (!marked(b.flags, mark::air_mission) && !marked(b.flags, mark::naval_battle) &&
+                !marked(b.flags, mark::amphibious_preparation) &&
                 (b.stage != "awaiting_air_defence" || (ready && ready->asBool())))
                 out.push_back(action(s, s.currentNation(), "land_progress_battle", {{"battle", V(id)}}));
         }
@@ -1370,7 +1366,7 @@ std::vector<Action> LandCombatRules::actions(const State &s) const {
         for (const auto &id : s.battleOrder)
             if (s.battles.contains(id) && s.battles.at(id).stage == "awaiting_combat_rules" &&
                 !pendingAmphibiousPreparation(s, s.battles.at(id)) &&
-                (!immediate || marked(s.battles.at(id).flags, "chinese_truce_termination"))) {
+                (!immediate || marked(s.battles.at(id).flags, mark::chinese_truce_termination))) {
                 out.push_back(action(s, s.currentNation(), "land_begin_battle", {{"battle", V(id)}}));
                 // Mandatory shared-zone reactions use their stable queued
                 // order; the active third-party player gets no ordering choice.
@@ -1385,7 +1381,7 @@ std::vector<Action> LandCombatRules::interrupts(const State &s) const {
 bool LandCombatRules::phaseComplete(const State &s) const {
     if (s.clock.phase == Phase::Combat)
         for (const auto &[id, b] : s.battles)
-            if (!marked(b.flags, "finished") && !assaultCalledOff(s, b))
+            if (!marked(b.flags, mark::finished) && !assaultCalledOff(s, b))
                 return false;
     return !gameplay_ || gameplay_->phaseComplete(s);
 }
@@ -1398,7 +1394,7 @@ void LandCombatRules::apply(State &s, const Action &a) const {
         throw std::runtime_error("Unknown land combat action");
     }
     if (a.kind == "land_select_surprise_zone") {
-        s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_zone:" + a.parameters.require("zone").asString()] =
+        s.nations.at(nationNumber(s, "japan")).turnFlags[MarkKey(mark::surprise_attack_zone, a.parameters.require("zone").asString())] =
             1;
         return;
     }
@@ -1414,7 +1410,7 @@ void LandCombatRules::apply(State &s, const Action &a) const {
         return;
     }
     if (a.kind == "land_progress_battle") {
-        if (marked(b.flags, "finished")) {
+        if (marked(b.flags, mark::finished)) {
             require(!s.chance && s.decisions.empty(), "Air reactions must finish before battle cleanup");
             s.battles.erase(id);
             s.battleOrder.erase(std::remove(s.battleOrder.begin(), s.battleOrder.end(), id),
@@ -1433,14 +1429,14 @@ void LandCombatRules::apply(State &s, const Action &a) const {
         list.emplace_back(unit);
         pairs[tank] = V(list);
         put(b, "blitz_pairs", V(pairs));
-        s.units.at(unit).turnFlags["blitz_eligible"] = 1;
-        s.units.at(unit).commitments.insert("blitz_with:" + tank);
+        s.units.at(unit).turnFlags[mark::blitz_eligible] = 1;
+        s.units.at(unit).commitments.insert(MarkKey(mark::blitz_with, tank));
         finishPostBattle(s, b);
         return;
     }
     if (a.kind == "land_finish_blitz_pairing") {
         release(s, a);
-        b.flags["blitz_pairing_done"] = 1;
+        b.flags[mark::blitz_pairing_done] = 1;
         finishPostBattle(s, b);
         return;
     }
@@ -1468,7 +1464,7 @@ void LandCombatRules::apply(State &s, const Action &a) const {
             for (const auto &d : living(s, b, false))
                 if (politicalPlayer(s, s.units.at(d).owner) != politicalPlayer(s, b.defender))
                     other = true;
-            if (other && !marked(b.flags, "casualty_dispute_decided")) {
+            if (other && !marked(b.flags, mark::casualty_dispute_decided)) {
                 put(b, "casualty_proposal", V(unit));
                 put(b, "casualty_consents", V(O{}));
                 chooseHit(s, b);
@@ -1476,7 +1472,7 @@ void LandCombatRules::apply(State &s, const Action &a) const {
             }
         }
         const auto phase = string(b, "rolling_phase");
-        const bool linkedAirborne = marked(b.flags, "airborne_assault") && s.units.contains(unit) &&
+        const bool linkedAirborne = marked(b.flags, mark::airborne_assault) && s.units.contains(unit) &&
                                     !s.units.at(unit).cargo.empty() &&
                                     (phase == "first_strike" || phase == "air_fire" ||
                                      phase == "city_airborne_aaa");
@@ -1491,7 +1487,7 @@ void LandCombatRules::apply(State &s, const Action &a) const {
             hits.insert(hits.begin()+hitIndex+1,V(std::move(extra)));
             put(b,"hits",V(std::move(hits)));
         }
-        b.flags.erase("casualty_dispute_decided");
+        b.flags.erase(mark::casualty_dispute_decided);
         put(b, "hit_index", num(integer(b, "hit_index") + 1));
         chooseHit(s, b);
         return;
@@ -1587,7 +1583,7 @@ void LandCombatRules::applyChance(State &s, const ChanceRequest &request,
         for (const auto &unit : candidates)
             options.push_back(action(s, winner, "land_take_casualty",
                                      {{"battle", V(b.id)}, {"unit", V(unit)}, {"targeted", V(false)}}));
-        b.flags["casualty_dispute_decided"] = 1;
+        b.flags[mark::casualty_dispute_decided] = 1;
         decision(s, b, winner, "land_casualty", std::move(options));
         return;
     }
@@ -1599,7 +1595,7 @@ void LandCombatRules::applyChance(State &s, const ChanceRequest &request,
         const auto unit = shot.require("unit").asString();
         const auto *low = shot.find("low_morale");
         if (low && low->asBool() && results[i] >= 10 && s.units.contains(unit)) {
-            if (marked(b.flags, "truce_low_morale_eliminates")) {
+            if (marked(b.flags, mark::truce_low_morale_eliminates)) {
                 // RB 6.6 uses the attacking die for voluntary shared-zone
                 // elimination. The user's campaign ruling extends that result
                 // to automatic truce termination, without an extra die.
@@ -1652,7 +1648,7 @@ void LandCombatRules::beginTurn(State &s) const {
 void LandCombatRules::finishPhase(State &s) const {
     if (s.clock.phase == Phase::Combat) {
         for (auto i = s.battles.begin(); i != s.battles.end();)
-            if (marked(i->second.flags, "finished"))
+            if (marked(i->second.flags, mark::finished))
                 i = s.battles.erase(i);
             else
                 ++i;

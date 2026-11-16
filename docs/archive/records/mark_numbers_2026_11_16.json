@@ -1,0 +1,98 @@
+{
+ "date": "2026-11-16",
+ "question": "Does holding marks as numbers, after zones, nations and unit types, leave play unchanged, and what does it save?",
+ "code": {
+  "before_any": "9519ea7",
+  "unit_types": "004b028",
+  "marks": "this change"
+ },
+ "machine": "Apple M4 Max: 10 performance and 4 efficiency cores, 36 GB",
+ "tool": "tools/compare_engine_builds.py",
+ "random_games": {
+  "seeds": "7000-7299",
+  "calendar_rounds": 11,
+  "processes": 4,
+  "games_compared": 300,
+  "identical": 300,
+  "steps": 443974,
+  "per_call": {
+   "legal_actions": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "before_any": 10.03,
+     "unit_types": 7.77,
+     "marks": 7.07,
+     "change_percent_from_unit_types": -9.0,
+     "change_percent_from_before_any": -29.5
+    },
+    "microseconds_per_call": {
+     "before_any": 640,
+     "unit_types": 453,
+     "marks": 415
+    }
+   },
+   "apply_action": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "before_any": 4.31,
+     "unit_types": 3.66,
+     "marks": 3.24,
+     "change_percent_from_unit_types": -11.5,
+     "change_percent_from_before_any": -24.8
+    },
+    "microseconds_per_call": {
+     "before_any": 311,
+     "unit_types": 250,
+     "marks": 223
+    }
+   },
+   "resolve_chance": {
+    "calls": 52134,
+    "million_instructions_per_call": {
+     "before_any": 3.2,
+     "unit_types": 2.88,
+     "marks": 2.54,
+     "change_percent_from_unit_types": -11.8,
+     "change_percent_from_before_any": -20.6
+    },
+    "microseconds_per_call": {
+     "before_any": 225,
+     "unit_types": 197,
+     "marks": 175
+    }
+   }
+  }
+ },
+ "searched_games": {
+  "seeds": "41-44",
+  "calendar_rounds": 11,
+  "simulations": 64,
+  "max_depth": 16,
+  "network": "64x2 networks with random-filled first-layer tables (tools/replay_coordinator_rounds.py --make-weights), evaluated one position at a time",
+  "games_compared": 4,
+  "identical": 4,
+  "events": 4985,
+  "billion_instructions": {
+   "before_any": 6782,
+   "unit_types": 5845,
+   "marks": 5557,
+   "change_percent_from_unit_types": -4.9,
+   "change_percent_from_before_any": -18.1,
+   "unit_types_bracketed_run": 5848,
+   "marks_runs": [
+    5557,
+    5559
+   ]
+  },
+  "cpu_seconds_bracketed": {
+   "marks_before": 432.9,
+   "unit_types": 458.2,
+   "marks_after": 438.6,
+   "change_percent": -4.9
+  }
+ },
+ "notes": [
+  "The bracketed searched games ran in the order: this change, the unit types build, this change, back to back on the same Mac.",
+  "Instructions do not depend on the Mac's other work; CPU seconds do."
+ ]
+}

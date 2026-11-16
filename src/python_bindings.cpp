@@ -230,6 +230,13 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         return ZoneInputHandle{std::make_shared<const ZoneInput>(zoneFromArrays(arrays)), version};
     }, py::arg("version"), py::arg("arrays"),
        "Rebuild a zone input from its arrays, checking that its fields fit together.");
+    module.def("mark_arguments", [] {
+        std::vector<std::string> arguments;
+        for (const auto& name : game::campaign::markNames())
+            arguments.emplace_back(game::campaign::markArgument(game::campaign::markNumber(name)));
+        return arguments;
+    }, "What each mark's argument names, in mark number order (\"\" for a mark without one): the marks are "
+       "name_tables()[\"marks\"], numbered by include/game/marks.hpp.");
     module.def("zone_encoding_unknowns", [](bool reset) { return game::campaign::zoneEncodingUnknowns(reset); },
                py::arg("reset") = false,
                "Names counted in an \"other\" column of the zone encoding since the last reset.");
@@ -337,6 +344,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
             tables["nations"] = nations;
             tables["unit_types"] = unitTypes;
             tables["unit_classes"] = unitClasses;
+            tables["marks"] = game::campaign::markNames();
             return tables;
         }, "The tables that number the definition's names, by kind: each kind's names listed in "
            "number order, so a name's number is its place in its list (include/game/names.hpp).")

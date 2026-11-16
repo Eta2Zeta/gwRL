@@ -72,7 +72,7 @@ std::array<WealthComponents, 3> allianceWealth(const State& s) {
     }
     for (const auto& [id, unit] : s.units) if (const auto i = recipient(s, unit.owner)) {
         const bool crew = std::any_of(unit.gameFlags.begin(), unit.gameFlags.end(), [](const auto& flag) {
-            return flag.second && flag.first.rfind("ship_crew:", 0) == 0;
+            return flag.second && flag.first.base() == mark::ship_crew;
         });
         if (crew) continue;
         const auto& type = s.definition->catalog->unit(unit.type);

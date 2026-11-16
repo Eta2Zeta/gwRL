@@ -24,9 +24,9 @@ template <class Message> void require(bool yes, const Message &message) {
 
 V integer(int value) { return V(static_cast<double>(value)); }
 V optionalNumber(const std::optional<int>& value) { return value ? integer(*value) : V(nullptr); }
-V flags(const std::map<Id, int>& source) {
+V flags(const Marks& source) {
     O result;
-    for (const auto& [key, value] : source) result.emplace(key, integer(value));
+    for (const auto& [key, value] : source) result.emplace(key.name(), integer(value));
     return V(std::move(result));
 }
 V ids(const std::vector<Id>& source) {
@@ -78,9 +78,9 @@ V configuration(const State& state) {
         if (unitClass(state, unit, knownUnitClasses(state).carrier)) deckZones.insert(unit.zone);
         if (unit.type == knownUnitTypes(state).battlecruiser && movementController(state, unit.owner)) {
             O roles;
-            for (const auto* key : {"raider", "naval_raider"})
+            for (const auto key : {mark::raider, mark::naval_raider})
                 if (const auto found = unit.gameFlags.find(key); found != unit.gameFlags.end())
-                    roles.emplace(key, integer(found->second));
+                    roles.emplace(std::string(markName(key)), integer(found->second));
             raiders.emplace(id, V(std::move(roles)));
         }
     }
@@ -138,23 +138,20 @@ V declinedRailSignature(const State& state, const Action& action) {
                {"parameters", pending.require("parameters")}});
 }
 
-bool flagged(const std::map<Id, int>& flags, const char* key) {
-    const auto found = flags.find(key);
-    return found != flags.end() && found->second != 0;
-}
+bool flagged(const Marks& flags, const MarkKey& key) { return flags.value(key) != 0; }
 
 // The click that deletes a finished battle, if the combat menu offers one now.
 // NavalRules lists a finished naval battle's click alone and hides the land
 // combat menu while a naval battle is active or the land battles are immediate.
 std::optional<Action> battleClearing(const State& state) {
     if (state.terminal || state.chance || !state.decisions.empty()) return std::nullopt;
-    if (!flagged(state.flags, "immediate_land_battles")) {
+    if (!flagged(state.flags, mark::immediate_land_battles)) {
         for (auto& action : navalCombatActions(state))
             if (action.kind == "naval_finish_battle") return std::move(action);
-        const bool navalActive = flagged(state.flags, "immediate_naval_battles") ||
+        const bool navalActive = flagged(state.flags, mark::immediate_naval_battles) ||
             std::any_of(state.battles.begin(), state.battles.end(), [](const auto& entry) {
                 const auto& battle = entry.second;
-                return flagged(battle.flags, "naval_battle") && !flagged(battle.flags, "finished") &&
+                return flagged(battle.flags, mark::naval_battle) && !flagged(battle.flags, mark::finished) &&
                        battle.stage != "naval_declared";
             });
         if (navalActive) return std::nullopt;

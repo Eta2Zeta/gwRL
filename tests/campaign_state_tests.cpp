@@ -36,22 +36,22 @@ State fixture() {
     s.nations.at(nationNumber(s, "kmt")).player="allies";s.nations.at(nationNumber(s, "kmt")).alliance="allies";s.nations.at(nationNumber(s, "kmt")).treasury=6;
     s.nations.at(nationNumber(s, "warlord")).powerStatus="unaligned_warlord";
     s.nations.at(nationNumber(s, "kmt")).atWarWith={nationNumber(s, "ccp")};s.nations.at(nationNumber(s, "ccp")).atWarWith={nationNumber(s, "kmt")};
-    s.nations.at(nationNumber(s, "japan")).incomeComponents={{"land",9},{"penalty",-1}};s.nations.at(nationNumber(s, "japan")).incomeKnown=true;s.nations.at(nationNumber(s, "japan")).technologyStages={{"radar",2}};s.nations.at(nationNumber(s, "japan")).turnFlags={{"research",1}};s.nations.at(nationNumber(s, "japan")).gameFlags={{"event",1}};
+    s.nations.at(nationNumber(s, "japan")).incomeComponents={{"land",9},{"penalty",-1}};s.nations.at(nationNumber(s, "japan")).incomeKnown=true;s.nations.at(nationNumber(s, "japan")).technologyStages={{"radar",2}};s.nations.at(nationNumber(s, "japan")).turnFlags={{MarkKey(mark::fixture, "research"),1}};s.nations.at(nationNumber(s, "japan")).gameFlags={{MarkKey(mark::fixture, "event"),1}};
     const auto a=zoneNumber(s,"a"),b=zoneNumber(s,"b"),sea=zoneNumber(s,"sea");
-    s.territories.emplace(a,TerritoryState{nationNumber(s, "japan"),{{"occupied",1}}});s.territories.emplace(b,TerritoryState{nationNumber(s, "mongolia"),{}});
-    UnitState carrier;carrier.id="carrier";carrier.type=unitTypeNumber(s, "fleet_carrier");carrier.owner=nationNumber(s, "japan");carrier.zone=sea;carrier.turnOrigin=sea;carrier.movementRemaining=1;carrier.movementAllowance=2;carrier.cargo={"cargo"};carrier.route={sea};carrier.damage=1;carrier.commitments={"reserved"};carrier.turnFlags={{"moved",1}};carrier.gameFlags={{"veteran",1}};
+    s.territories.emplace(a,TerritoryState{nationNumber(s, "japan"),{{MarkKey(mark::fixture, "occupied"),1}}});s.territories.emplace(b,TerritoryState{nationNumber(s, "mongolia"),{}});
+    UnitState carrier;carrier.id="carrier";carrier.type=unitTypeNumber(s, "fleet_carrier");carrier.owner=nationNumber(s, "japan");carrier.zone=sea;carrier.turnOrigin=sea;carrier.movementRemaining=1;carrier.movementAllowance=2;carrier.cargo={"cargo"};carrier.route={sea};carrier.damage=1;carrier.commitments={MarkKey(mark::fixture, "reserved")};carrier.turnFlags={{MarkKey(mark::fixture, "moved"),1}};carrier.gameFlags={{MarkKey(mark::fixture, "veteran"),1}};
     UnitState cargo;cargo.id="cargo";cargo.type=knownUnitTypes(s).infantry;cargo.movementRemaining=0;cargo.movementAllowance=1;cargo.owner=nationNumber(s, "kmt");cargo.zone=sea;cargo.turnOrigin=b;cargo.carriedBy="carrier";cargo.route={b,sea};
     UnitState defender;defender.id="defender";defender.type=knownUnitTypes(s).militia;defender.movementRemaining=0;defender.movementAllowance=0;defender.owner=nationNumber(s, "mongolia");defender.zone=b;defender.turnOrigin=b;
     s.units={{carrier.id,carrier},{cargo.id,cargo},{defender.id,defender}};
-    s.facilities.emplace("port",FacilityState{"port","major_port",a,1,{{"blocked",1}}});
+    s.facilities.emplace("port",FacilityState{"port","major_port",a,1,{{MarkKey(mark::fixture, "blocked"),1}}});
     s.rails.emplace("rail_a__b",RailState{"rail_a__b",a,b,{{a,1},{b,0}}});
-    s.construction.emplace("ship",BuildProject{"ship",nationNumber(s, "japan"),"fleet_carrier",std::optional<Id>("port"),3,5,{5,5},{{"national_queue",1}}});
+    s.construction.emplace("ship",BuildProject{"ship",nationNumber(s, "japan"),"fleet_carrier",std::optional<Id>("port"),3,5,{5,5},{{MarkKey(mark::fixture, "national_queue"),1}}});
     s.repairs.emplace("repair",RepairJob{"repair",nationNumber(s, "japan"),"carrier",1,3,true});
     s.repairs.emplace("rail_repair",RepairJob{"rail_repair",nationNumber(s, "japan"),"rail_a__b",1,1,true,a});
     s.completedTurns={{nationNumber(s, "ccp"),0},{nationNumber(s, "mongolia"),0},{nationNumber(s, "japan"),0},{nationNumber(s, "kmt"),0}};s.captureTurnStart();s.turnStart.units.emplace("historical_destroyed",std::pair{nationNumber(s, "kmt"),a});
-    s.clock.playerTurnSerial=std::numeric_limits<std::uint64_t>::max();s.flags={{"rule_gate",1}};
+    s.clock.playerTurnSerial=std::numeric_limits<std::uint64_t>::max();s.flags={{MarkKey(mark::fixture, "rule_gate"),1}};
     Decision d;d.id="reaction";d.kind="scramble";d.nation="mongolia";d.reaction=true;d.continuation="resume_battle";d.options.push_back(Action{"decline","decline","comintern","mongolia",std::optional<Id>("reaction"),V(O{{"choice",V(std::string("no\n\"scramble\""))}})});s.decisions.push_back(d);
-    s.battles.emplace("battle",BattleState{"battle",b,nationNumber(s, "japan"),nationNumber(s, "mongolia"),"defender_reaction",{"carrier"},{"defender"},{{"defender",1}},{{"round",2}}});s.battleOrder={"battle"};s.battles.at("battle").data=V(O{{"origin",V(std::string("a"))},{"stage_queue",V(V::Array{V(std::string("first_strike")),V(std::string("ordinary"))})}});
+    s.battles.emplace("battle",BattleState{"battle",b,nationNumber(s, "japan"),nationNumber(s, "mongolia"),"defender_reaction",{"carrier"},{"defender"},{{"defender",1}},{{MarkKey(mark::fixture, "round"),2}}});s.battleOrder={"battle"};s.battles.at("battle").data=V(O{{"origin",V(std::string("a"))},{"stage_queue",V(V::Array{V(std::string("first_strike")),V(std::string("ordinary"))})}});
     s.chance=ChanceRequest{"roll","bombing","japan","resume_bombing",{{6,1,{1},1},{12,-1,{},0}}};
     s.history.push_back(Event{"fixture",V(O{{"text",V(std::string("歴史"))}}),"previous"});s.validate();return s;
 }
@@ -101,11 +101,11 @@ void completeRoundTrip() {
 void cloneIsolationAndKeys() {
     const auto original=fixture();const auto before=original.serialize();const auto key=original.planningKey();auto copy=original.clone();check(copy.definition.get()==original.definition.get(),"Clone copied definition");
     const std::vector<std::function<void(State&)>> changes={
-        [](State&s){s.nations.at(nationNumber(s, "japan")).treasury=14;},[](State&s){s.nations.at(nationNumber(s, "mongolia")).player="allies";},[](State&s){s.nations.at(nationNumber(s, "japan")).incomeComponents["land"]=8;},[](State&s){s.nations.at(nationNumber(s, "japan")).incomeKnown=false;},[](State&s){s.nations.at(nationNumber(s, "japan")).technologyStages["radar"]=3;},[](State&s){s.nations.at(nationNumber(s, "japan")).gameFlags["event"]=0;},
-        [](State&s){s.territories.at(zoneNumber(s,"a")).possessor=nationNumber(s, "kmt");},[](State&s){s.units.at("carrier").movementRemaining=0;},[](State&s){s.units.at("carrier").route.push_back(zoneNumber(s,"a"));},[](State&s){s.units.at("carrier").commitments.insert("another");},[](State&s){s.units.at("cargo").owner=nationNumber(s, "japan");},[](State&s){s.units.at("carrier").damage=0;},
-        [](State&s){s.facilities.at("port").flags["blocked"]=0;},[](State&s){s.rails.at("rail_a__b").damageByEndpoint[zoneNumber(s,"b")]=1;},[](State&s){s.construction.at("ship").remainingPayments[0]=4;},[](State&s){s.repairs.at("repair").restrictsAction=false;},[](State&s){s.repairs.at("rail_repair").endpoint=zoneNumber(s,"b");},
+        [](State&s){s.nations.at(nationNumber(s, "japan")).treasury=14;},[](State&s){s.nations.at(nationNumber(s, "mongolia")).player="allies";},[](State&s){s.nations.at(nationNumber(s, "japan")).incomeComponents["land"]=8;},[](State&s){s.nations.at(nationNumber(s, "japan")).incomeKnown=false;},[](State&s){s.nations.at(nationNumber(s, "japan")).technologyStages["radar"]=3;},[](State&s){s.nations.at(nationNumber(s, "japan")).gameFlags[MarkKey(mark::fixture, "event")]=0;},
+        [](State&s){s.territories.at(zoneNumber(s,"a")).possessor=nationNumber(s, "kmt");},[](State&s){s.units.at("carrier").movementRemaining=0;},[](State&s){s.units.at("carrier").route.push_back(zoneNumber(s,"a"));},[](State&s){s.units.at("carrier").commitments.insert(MarkKey(mark::fixture, "another"));},[](State&s){s.units.at("cargo").owner=nationNumber(s, "japan");},[](State&s){s.units.at("carrier").damage=0;},
+        [](State&s){s.facilities.at("port").flags[MarkKey(mark::fixture, "blocked")]=0;},[](State&s){s.rails.at("rail_a__b").damageByEndpoint[zoneNumber(s,"b")]=1;},[](State&s){s.construction.at("ship").remainingPayments[0]=4;},[](State&s){s.repairs.at("repair").restrictsAction=false;},[](State&s){s.repairs.at("rail_repair").endpoint=zoneNumber(s,"b");},
         [](State&s){s.clock.incomeCollected=true;},[](State&s){s.completedTurns.at(nationNumber(s, "ccp"))=1;},[](State&s){s.turnStart.possessions.at(zoneNumber(s,"a"))=nationNumber(s, "kmt");},[](State&s){s.turnStart.units.at("cargo").first=nationNumber(s, "japan");},
-        [](State&s){s.decisions.back().continuation="different";},[](State&s){s.decisions.back().options[0].parameters=V(O{{"choice",V(true)}});},[](State&s){s.battles.at("battle").pendingHits["defender"]=2;},[](State&s){s.battles.at("battle").data=V(O{{"origin",V(std::string("b"))}});},[](State&s){s.chance->dice[0].modifier=2;},[](State&s){s.flags["rule_gate"]=2;}
+        [](State&s){s.decisions.back().continuation="different";},[](State&s){s.decisions.back().options[0].parameters=V(O{{"choice",V(true)}});},[](State&s){s.battles.at("battle").pendingHits["defender"]=2;},[](State&s){s.battles.at("battle").data=V(O{{"origin",V(std::string("b"))}});},[](State&s){s.chance->dice[0].modifier=2;},[](State&s){s.flags[MarkKey(mark::fixture, "rule_gate")]=2;}
     };
     for(const auto& change:changes){copy=original.clone();change(copy);check(copy.planningKey()!=key,"Planning key omitted a mutable decision/outcome field");check(original.serialize()==before,"Clone mutation changed original");}
     copy=original.clone();copy.history.push_back(Event{"another",V(nullptr),"other"});check(copy.planningKey()==key,"History polluted planning identity");check(copy.serialize()!=before,"Exact state serialization omitted history");
@@ -273,7 +273,7 @@ void everyFreeFormPayloadRetainsFiniteValidation() {
     auto state=loadScenario(std::filesystem::path(GWRL_SOURCE_DIR)/"game_content/scenarios/japan_china_1936");
     state.units.clear();
     UnitState unit;unit.id="finite_raider";unit.type=knownUnitTypes(state).battlecruiser;unit.owner=state.currentNation();
-    unit.zone=unit.turnOrigin=zoneNumber(state,"sea_p15");unit.movementAllowance=unit.movementRemaining=0;unit.gameFlags["raider"]=0;
+    unit.zone=unit.turnOrigin=zoneNumber(state,"sea_p15");unit.movementAllowance=unit.movementRemaining=0;unit.gameFlags[mark::raider]=0;
     state.units.emplace(unit.id,unit);
     auto configuration=[&](double number) {
         // Built in steps: MSVC runs out of memory resolving it as one nested initializer.

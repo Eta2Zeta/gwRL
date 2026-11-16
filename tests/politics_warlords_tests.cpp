@@ -137,7 +137,7 @@ void wholeWarlordTable() {
         for (const auto& id : {"w1_guard_a", "w1_guard_b"}) require(state.units.at(id).owner == nationNumber(state, recipient), "Whole-warlord units did not follow result");
         require(state.nations.contains(nationNumber(state, firstWarlord)) && originalNation(state, zoneNumber(state, "w1a")) == originalIdentity,
                 "Alignment erased original national identity");
-        require(state.nations.at(nationNumber(state, firstWarlord)).gameFlags.at("incorporated") == 1, "Incorporated identity remained active");
+        require(state.nations.at(nationNumber(state, firstWarlord)).gameFlags.at(mark::incorporated) == 1, "Incorporated identity remained active");
     }
     for (const auto& neighbor : {Id("ccp"), Id("dadao")}) for (int roll : {6, 7}) {
         auto state = fixture({{"w1a", neighbor + "_home"}}, true);
@@ -200,7 +200,7 @@ void attacksAndDefeatedKmt() {
                 && defeated.units.at("w1_guard_a").owner == nationNumber(defeated, "kmt")
                 && defeated.units.at("w1_guard_b").owner == nationNumber(defeated, "kmt"), "Foreign table did not award the surviving warlord to KMT");
         require(!defeated.politics.surrendered.contains(nationNumber(defeated, "kmt"))
-                && !defeated.nations.at(nationNumber(defeated, "kmt")).gameFlags.contains("surrendered"), "Foreign table left KMT inactive");
+                && !defeated.nations.at(nationNumber(defeated, "kmt")).gameFlags.contains(mark::surrendered), "Foreign table left KMT inactive");
         require(!defeated.territories.at(zoneNumber(defeated, "kmt_home")).possessor
                 && !defeated.territories.at(zoneNumber(defeated, "separated")).possessor
                 && !defeated.units.contains("kmt_guard") && defeated.nations.at(nationNumber(defeated, "kmt")).treasury == 0,
@@ -217,7 +217,7 @@ void attacksAndDefeatedKmt() {
     recordLandAttack(revival, nationNumber(revival, "kmt"), zoneNumber(revival, "w1a"));
     require(isNation(revival, revival.territories.at(zoneNumber(revival, "w1b")).possessor, "ccp") && revival.units.at("w1_guard_a").owner == nationNumber(revival, "ccp"),
             "KMT attack did not immediately revive CCP through the whole warlord");
-    require(!revival.politics.surrendered.contains(nationNumber(revival, "ccp")) && revival.nations.at(nationNumber(revival, "ccp")).gameFlags.at("civil_war_eliminated") == 0,
+    require(!revival.politics.surrendered.contains(nationNumber(revival, "ccp")) && revival.nations.at(nationNumber(revival, "ccp")).gameFlags.at(mark::civil_war_eliminated) == 0,
             "CCP elimination was treated as permanent surrender");
 }
 
@@ -302,7 +302,7 @@ void lowMoraleAndSharedBattles() {
     const auto& battle = state.battles.at(state.battleOrder.front());
     require(battle.stage == "awaiting_combat_rules" && battle.attacker == nationNumber(state, "kmt") && battle.defender == nationNumber(state, "ccp")
             && battle.attackers.size() == 3 && battle.defenders == std::vector<Id>{"ccp_guard"}
-            && battle.flags.at("truce_low_morale_eliminates") == 1,
+            && battle.flags.at(mark::truce_low_morale_eliminates) == 1,
             "Shared-stack battle has wrong sides or lacks the attack-roll elimination rule");
     state.validate();
 
@@ -313,7 +313,7 @@ void lowMoraleAndSharedBattles() {
     terminateChineseTruce(evolution, nationNumber(evolution, "kmt"), true);
     require(!evolution.chance && evolution.units.contains("kmt_guard") && evolution.battleOrder.size() == 1
             && evolution.politics.trucePermanentlyEnded, "Evolution wrongly applied voluntary KMT Low Morale or omitted battle");
-    require(!evolution.battles.begin()->second.flags.contains("truce_low_morale_eliminates"),
+    require(!evolution.battles.begin()->second.flags.contains(mark::truce_low_morale_eliminates),
             "Major KMT received the minor-only Low Morale elimination flag");
     auto minorAttacking = fixture();
     minorAttacking.politics.chineseTruce = true;
@@ -322,7 +322,7 @@ void lowMoraleAndSharedBattles() {
     terminateChineseTruce(minorAttacking, nationNumber(minorAttacking, "ccp"), true);
     require(!minorAttacking.chance && minorAttacking.units.contains("kmt_guard") &&
             minorAttacking.battles.begin()->second.attacker == nationNumber(minorAttacking, "kmt") &&
-            minorAttacking.battles.begin()->second.flags.at("truce_low_morale_eliminates") == 1,
+            minorAttacking.battles.begin()->second.flags.at(mark::truce_low_morale_eliminates) == 1,
             "Automatic Truce ending omitted minor attacking KMT's same-die elimination rule");
 }
 
@@ -345,7 +345,7 @@ void invasionAlignsEveryWarlordBeforeTruce() {
             "Chinese Truce was offered while another warlord alignment remained");
     resolve(state, {7});
     for (const auto& id : {firstWarlord, secondWarlord})
-        require(state.nations.at(nationNumber(state, id)).gameFlags.at("incorporated") == 1,
+        require(state.nations.at(nationNumber(state, id)).gameFlags.at(mark::incorporated) == 1,
                 "Foreign invasion left an independent warlord before the Truce offer");
     require(!state.chance && state.decisions.back().kind == "truce_offer_decision",
             "Completed invasion alignment did not offer the eligible Truce");
@@ -375,7 +375,7 @@ void temporaryWarlordDefenseDoesNotGrantControl() {
         require(state.territories.at(zoneNumber(state, "w1a")).possessor==nationNumber(state, firstWarlord)&&state.units.at("w1_guard_a").owner==nationNumber(state, firstWarlord),
                 "Warlord was incorporated before combat");
         addUnit(state,"invader","infantry",attacker,"w1a");state.units.at("invader").turnOrigin=zoneNumber(state, attacker=="ccp"?"ccp_home":"japan_home");
-        state.units.at("invader").commitments.insert("combat_move");state.clock.phase=Phase::Combat;
+        state.units.at("invader").commitments.insert(mark::combat_move);state.clock.phase=Phase::Combat;
         registerLandBattle(state,zoneNumber(state, "w1a"),nationNumber(state, attacker),{"invader"},{{"invader",state.units.at("invader").turnOrigin}});
         Engine engine(state,integratedRules());engine.setDiceTapeForTesting({1,12});const auto checkpoint=engine.serialize();
         engine.step(engineOption(engine,"land_begin_battle"));engine.resolveChance();
@@ -465,7 +465,7 @@ void neutralRelocationWithoutFriendlyLandUsesAdoptedElimination() {
     require(!engine.state().repairs.contains("neutral_repair")&&engine.state().decisions.empty()&&!engine.state().chance,
             "Eliminated neutrals retained repair work or introduced an extra choice/die");
     require(engine.state().units.contains("w1_guard_a")&&engine.state().units.contains("w1_guard_b"),"RCL-015 removed an unrelated neutral unit");
-    require(!engine.state().politics.surrendered.contains(nationNumber(engine.state(), "ccp"))&&engine.state().nations.at(nationNumber(engine.state(), "ccp")).gameFlags.at("civil_war_eliminated")==1,
+    require(!engine.state().politics.surrendered.contains(nationNumber(engine.state(), "ccp"))&&engine.state().nations.at(nationNumber(engine.state(), "ccp")).gameFlags.at(mark::civil_war_eliminated)==1,
             "No-destination elimination surrendered CCP or failed to refresh its surviving-unit status");
     require(std::none_of(engine.state().politics.pending.begin(),engine.state().politics.pending.end(),[](const auto& item){
         return item.first.rfind("neutral_land_relocation",0)==0||item.first.rfind("politics_neutral_relocation",0)==0;

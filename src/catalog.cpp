@@ -25,7 +25,8 @@ std::optional<int> optionalDate(const V& v) { return v.isNull()?std::nullopt:std
 bool flag(const CatalogContext& c,const Id& id) {
     if(c.disabledFlags.contains(id)) return false;
     if(const auto i=c.flags.find(id); i!=c.flags.end()) return i->second;
-    for(const auto* source:c.flagSources) if(const auto i=source->find(id); i!=source->end()) return i->second!=0;
+    if(!c.flagSources.empty())if(const auto key=findMarkKey(id))
+        for(const auto* source:c.flagSources) if(const auto i=source->find(*key); i!=source->end()) return i->second!=0;
     return false;
 }
 bool flags(const CatalogContext& c,const V* list) { if(list) for(const auto& x:list->asArray()) if(!flag(c,x.asString())) return false; return true; }
@@ -224,7 +225,7 @@ namespace {
 // Later flag maps override earlier ones and the derived flags override all.
 CatalogContext buildContext(const State& state,NationId owner,std::optional<ZoneId> zone,bool copyFlags) {
     require(state.definition!=nullptr,"Catalog context requires definition");const auto& n=state.nations.at(owner);CatalogContext c;c.nation=nationName(state,owner);c.powerStatus=n.powerStatus;const auto [y,m]=state.calendarDate();c.year=y;c.month=m;for(const auto& [id,stage]:n.technologyStages)if(stage==4)c.technologies.insert(id);
-    if(copyFlags) for(const auto* list:{&state.flags,&n.gameFlags,&n.turnFlags})for(const auto& [id,v]:*list)c.flags[id]=v!=0;
+    if(copyFlags) for(const auto* list:{&state.flags,&n.gameFlags,&n.turnFlags})for(const auto& [key,v]:*list)c.flags[key.name()]=v!=0;
     else c.flagSources={&n.turnFlags,&n.gameFlags,&state.flags};
     c.flags["owner_is_major_power"]=n.powerStatus=="major";
     if(zone) {const auto& faction=nationFaction(state,owner);const bool home=faction.homeCountryKnown&&faction.homeZones.contains(*zone);c.flags["movement_starts_in_owner_home_country"]=home;c.flags["movement_ends_in_owner_home_country"]=home;}
@@ -232,7 +233,7 @@ CatalogContext buildContext(const State& state,NationId owner,std::optional<Zone
     // These source predicates cannot be satisfied by a generic supply flag in
     // the closed theatre. Geography/rail path evaluation belongs to the politics and movement modules.
     if(state.definition->scenarioId=="japan_china_1936_1941")c.disabledFlags.insert("kmt_burma_road");
-    for(const auto& [key,value]:n.turnFlags)if(key.rfind("purchased:",0)==0)c.purchases[key.substr(10)]=value;
+    for(const auto& [key,value]:n.turnFlags)if(key.base()==mark::purchased)c.purchases[std::string(key.argument())]=value;
     return c;
 }
 }

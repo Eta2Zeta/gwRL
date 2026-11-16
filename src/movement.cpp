@@ -20,10 +20,7 @@ template <class Message> void require(bool c, const Message &m) {
   if (!c)
     throw std::runtime_error(m);
 }
-bool flag(const std::map<Id, int> &f, const Id &k) {
-  auto i = f.find(k);
-  return i != f.end() && i->second != 0;
-}
+bool flag(const Marks &f, const MarkKey &k) { return f.value(k) != 0; }
 bool truth(const V &v, const Id &k) {
   const auto *p = v.find(k);
   return p && p->isBool() && p->asBool();
@@ -91,7 +88,7 @@ bool hasTech(const State &s, NationId nation, const Id &tech) {
   return i != s.nations.at(nation).technologyStages.end() && i->second == 4;
 }
 bool damagedThisTurn(const State &s, const Id &id) {
-  auto i = s.flags.find("logistics_damaged_turn:" + id);
+  auto i = s.flags.find(MarkKey(mark::logistics_damaged_turn, id));
   return i != s.flags.end() &&
          i->second == static_cast<int>(s.clock.playerTurnSerial + 1);
 }
@@ -113,7 +110,7 @@ bool hasRiver(const State &s, ZoneId a, ZoneId b) {
 }
 bool narrow(const V *e) { return e && truth(*e, "narrow_crossing"); }
 bool continuousInfrastructure(const State &s, const Id &id) {
-  auto i = s.flags.find("logistics_start_damaged:" + id);
+  auto i = s.flags.find(MarkKey(mark::logistics_start_damaged, id));
   return (i == s.flags.end() || i->second == 0) && !damagedThisTurn(s, id);
 }
 bool strategicPermission(const State &s, NationId nation, ZoneId zone) {
@@ -127,7 +124,7 @@ bool strategicPermission(const State &s, NationId nation, ZoneId zone) {
   // One alliance agent can give its own nations permission in this action.
   if (s.nations.at(nation).player == s.nations.at(*owner).player)
     return true;
-  return flag(s.nations.at(*owner).turnFlags, "rail_permission:" + nationName(s, nation));
+  return flag(s.nations.at(*owner).turnFlags, MarkKey(mark::rail_permission, nationName(s, nation)));
 }
 bool gaugeChange(const State &s, ZoneId a, ZoneId b) {
   const auto *e = edge(s, a, b);
@@ -158,7 +155,7 @@ bool opposingFortification(const State &s, NationId nation, ZoneId from,
   for (const auto &[id, f] : s.facilities)
     if (f.zone == to &&
         (f.type == "fortification" || f.type == "improved_fortification")) {
-      if (truth(node(s, to), "is_city") || flag(f.flags, "border:" + zoneName(s, from)))
+      if (truth(node(s, to), "is_city") || flag(f.flags, MarkKey(mark::border, zoneName(s, from))))
         return true;
       const auto *metadata = s.definition->geography.find("facilities");
       const auto *spec = metadata ? metadata->find(id) : nullptr;
@@ -170,8 +167,10 @@ bool opposingFortification(const State &s, NationId nation, ZoneId from,
     }
   return false;
 }
+// The argument of the rail_used mark that counts the active player's rail
+// moves in a region: <player>:<region>.
 std::string railCounter(const State &s, const Id &region) {
-  return "rail_used:" + politicalPlayer(s, s.currentNation()) + ":" + region;
+  return politicalPlayer(s, s.currentNation()) + ":" + region;
 }
 int navalRange(const FacilityState &f) {
   return f.type.rfind("major_", 0) == 0 ? 4 : 2;
@@ -194,18 +193,19 @@ bool narrowBlocked(const State &s, NationId nation, const V &e, bool combat,
     for (const auto &[id, u] : s.units)
       if (sea && u.zone == *sea && hostile(s, nation, u.owner)) {
         if (unitClass(s, u, knownUnitClasses(s).surface_warship) ||
-            (unitClass(s, u, knownUnitClasses(s).submarine) && !flag(u.turnFlags, "submerged")) ||
-            u.commitments.contains("maritime_air_patrol") ||
-            flag(u.turnFlags, "on_map"))
+            (unitClass(s, u, knownUnitClasses(s).submarine) && !flag(u.turnFlags, mark::submerged)) ||
+            u.commitments.contains(mark::maritime_air_patrol) ||
+            flag(u.turnFlags, mark::on_map))
           return true;
       }
   }
   return false;
 }
+// The argument of the crossing_used mark that counts the units crossing a
+// narrow crossing: its id, or its two zones.
 Id crossingCounter(const State &s, const V &e, ZoneId a, ZoneId b) {
   const auto *id = e.find("narrow_crossing_id");
-  return "crossing_used:" +
-         (id ? id->asString() : zoneName(s, std::min(a, b)) + "__" + zoneName(s, std::max(a, b)));
+  return id ? id->asString() : zoneName(s, std::min(a, b)) + "__" + zoneName(s, std::max(a, b));
 }
 Action movementAction(const State &s, const RouteRequest &r) {
   A path;
@@ -277,7 +277,7 @@ bool movementController(const State &s, NationId nation) {
          controlledBy(s, nation, s.currentNation()) ||
          (nation == knownNations(s).dadao && s.currentNation() == knownNations(s).japan &&
           flag(s.nations.at(nation).gameFlags,
-               "direct_axis_control_after_japan_surrender"));
+               mark::direct_axis_control_after_japan_surrender));
 }
 bool landAccess(const State &s, NationId nation, ZoneId zone, bool combat) {
   if (!s.territories.contains(zone))
@@ -320,7 +320,7 @@ bool heldSinceTurnStart(const State &s, NationId nation, ZoneId zone,
   if (t == s.territories.end() || start == s.turnStart.possessions.end() ||
       !t->second.possessor || t->second.possessor != start->second)
     return false;
-  const auto changed = t->second.flags.find("last_possession_change_turn");
+  const auto changed = t->second.flags.find(mark::last_possession_change_turn);
   if (changed != t->second.flags.end() &&
       changed->second == static_cast<int>(s.clock.playerTurnSerial))
     return false;
@@ -334,7 +334,7 @@ bool enterableThisTurn(const State &s, NationId nation, ZoneId zone,
   const auto t = s.territories.find(zone);
   if (t == s.territories.end() || !t->second.possessor)
     return false;
-  const auto aligned = t->second.flags.find("aligned_turn");
+  const auto aligned = t->second.flags.find(mark::aligned_turn);
   if (aligned == t->second.flags.end() ||
       aligned->second != static_cast<int>(s.clock.playerTurnSerial))
     return false;
@@ -350,11 +350,11 @@ bool heldSinceNationTurnStart(const State &s, NationId nation, ZoneId zone,
   if (*t->second.possessor != nation &&
       (!allowFriendly || !logisticsFriendly(s, nation, *t->second.possessor)))
     return false;
-  const auto changed = t->second.flags.find("last_possession_change_turn");
+  const auto changed = t->second.flags.find(mark::last_possession_change_turn);
   if (changed == t->second.flags.end())
     return true;
   const auto ownStart =
-      s.nations.at(nation).gameFlags.find("logistics_last_turn_start");
+      s.nations.at(nation).gameFlags.find(mark::logistics_last_turn_start);
   return ownStart != s.nations.at(nation).gameFlags.end() &&
          changed->second + 1 < ownStart->second;
 }
@@ -390,7 +390,7 @@ bool railUndamaged(const State &s, ZoneId from, ZoneId to, bool since) {
     if (since) {
       if (!continuousInfrastructure(s, r->id))
         return false;
-      const auto i = s.flags.find("logistics_rail_created_turn:" + r->id);
+      const auto i = s.flags.find(MarkKey(mark::logistics_rail_created_turn, r->id));
       if (i != s.flags.end() &&
           i->second == static_cast<int>(s.clock.playerTurnSerial + 1))
         return false;
@@ -445,11 +445,11 @@ bool blitzPairValid(const State &s, const UnitState &u, ZoneId from,
       u.type == knownUnitTypes(s).panzergrenadier)
     return true;
   for (const auto &link : u.commitments)
-    if (link.rfind("blitz_with:", 0) == 0) {
-      const auto armor = s.units.find(link.substr(11));
+    if (link.base() == mark::blitz_with) {
+      const auto armor = s.units.find(std::string(link.argument()));
       return armor != s.units.end() && armor->second.zone == to &&
-             armor->second.commitments.contains("blitz_from:" + zoneName(s, from)) &&
-             armor->second.commitments.contains("blitz_to:" + zoneName(s, to));
+             armor->second.commitments.contains(MarkKey(mark::blitz_from, zoneName(s, from))) &&
+             armor->second.commitments.contains(MarkKey(mark::blitz_to, zoneName(s, to)));
     }
   return false;
 }
@@ -467,22 +467,22 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
   if (!movementController(s, u.owner))
     return fail("Not this nation's movement turn");
   for (const auto &[id, battle] : s.battles)
-    if (!flag(battle.flags, "finished") && !flag(battle.flags, "capture_done") &&
+    if (!flag(battle.flags, mark::finished) && !flag(battle.flags, mark::capture_done) &&
         std::find(battle.attackers.begin(), battle.attackers.end(), u.id) != battle.attackers.end())
       return fail("Unit is committed to an unresolved battle");
   if (u.carriedBy)
     return fail("Cargo must be moved by its transport");
-  if (flag(u.turnFlags, "naval_unloaded") ||
-      flag(u.turnFlags, "air_transport_unloaded") ||
-      u.commitments.contains("transport_unloaded") ||
-      (u.gameFlags.contains("port_unloaded_round") &&
-       u.gameFlags.at("port_unloaded_round") == s.clock.roundIndex + 1))
+  if (flag(u.turnFlags, mark::naval_unloaded) ||
+      flag(u.turnFlags, mark::air_transport_unloaded) ||
+      u.commitments.contains(mark::transport_unloaded) ||
+      (u.gameFlags.contains(mark::port_unloaded_round) &&
+       u.gameFlags.at(mark::port_unloaded_round) == s.clock.roundIndex + 1))
     return fail("Transported units cannot move further after unloading");
-  if (flag(u.turnFlags, "repairing") || u.commitments.contains("repair"))
+  if (flag(u.turnFlags, mark::repairing) || u.commitments.contains(mark::repair))
     return fail("Unit is committed to repair");
-  if (u.commitments.contains("attrition"))
+  if (u.commitments.contains(mark::attrition))
     return fail("Artillery used an attrition attack this turn");
-  if (flag(u.turnFlags, "placed_this_turn"))
+  if (flag(u.turnFlags, mark::placed_this_turn))
     return fail("Newly placed units cannot move this turn");
   if (r.path.size() < 2 || r.path.front() != u.zone)
     return fail("Route must start at the unit's current zone");
@@ -491,8 +491,8 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
   if (strategic) {
     if (s.clock.phase != Phase::NonCombatMovement || r.combat)
       return fail("Strategic rail is noncombat movement");
-    if (!u.route.empty() || u.commitments.contains("combat_move") ||
-        flag(u.turnFlags, "strategic_moved"))
+    if (!u.route.empty() || u.commitments.contains(mark::combat_move) ||
+        flag(u.turnFlags, mark::strategic_moved))
       return fail("Unit already moved this turn");
   } else {
     if (!unitClass(s, u, knownUnitClasses(s).land))
@@ -502,8 +502,8 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
       return fail("Combat movement phase required");
     if (!r.combat && s.clock.phase != Phase::NonCombatMovement)
       return fail("Noncombat movement phase required");
-    if (!r.combat && u.commitments.contains("combat_move") &&
-        !flag(u.turnFlags, "must_withdraw_from_chinese_gift"))
+    if (!r.combat && u.commitments.contains(mark::combat_move) &&
+        !flag(u.turnFlags, mark::must_withdraw_from_chinese_gift))
       return fail("Unit combat moved this turn");
   }
   if (!strategic && (!u.movementRemaining || *u.movementRemaining <= 0))
@@ -516,9 +516,9 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
                               !inHome(s, u.owner, r.path.back())))
     return fail("Militia must start and end in its Home Country");
   if (r.mode == MovementMode::Blitz &&
-      (!flag(u.turnFlags, "blitz_eligible") ||
-       flag(u.turnFlags, "crossed_enemy_fortification") ||
-       u.commitments.contains("amphibious_assault")))
+      (!flag(u.turnFlags, mark::blitz_eligible) ||
+       flag(u.turnFlags, mark::crossed_enemy_fortification) ||
+       u.commitments.contains(mark::amphibious_assault)))
     return fail("Unit is not eligible to blitz");
   if (r.mode == MovementMode::Blitz &&
       !blitzPairValid(s, u, r.path.front(), r.path.back()))
@@ -599,7 +599,8 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
         if (narrowBlocked(s, u.owner, *e, r.combat, b))
           return fail("Enemy units prevent the narrow crossing");
         const int cap = e->require("unit_capacity").asInt();
-        auto used = s.flags.find(crossingCounter(s, *e, a, b));
+        const auto crossing = crossingCounter(s, *e, a, b);
+        auto used = s.flags.find(MarkKey(mark::crossing_used, crossing));
         if (used != s.flags.end() && used->second >= cap)
           return fail("Narrow crossing capacity exhausted");
         out.exhaustsMovement = true;
@@ -612,8 +613,9 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
   }
   if (strategic) {
     for (const auto &region : out.regions) {
+      const auto counter = railCounter(s, region);
       auto used = s.nations.at(s.currentNation())
-                      .turnFlags.find(railCounter(s, region));
+                      .turnFlags.find(MarkKey(mark::rail_used, counter));
       const int capacity =
           regionalRailCapacity(region) +
           (hasTech(s, s.currentNation(), "improved_logistics") ? 1 : 0);
@@ -638,7 +640,7 @@ RouteResult validateRoute(const State &s, const RouteRequest &r) {
   const auto &motor = s.units.at(r.unit);
   if (!r.towed) {
     for (const auto &commitment : motor.commitments)
-      if (commitment.rfind("towed_by:", 0) == 0)
+      if (commitment.base() == mark::towed_by)
         return fail("Towed artillery must continue with its motorized partner");
     return validateSingleRoute(s, r);
   }
@@ -652,19 +654,19 @@ RouteResult validateRoute(const State &s, const RouteRequest &r) {
   if (artillery.owner != motor.owner || artillery.zone != motor.zone ||
       artillery.carriedBy)
     return fail("Tow pair must be the same nation's units in the same zone");
-  const bool continuing = motor.commitments.contains("towing:" + *r.towed) &&
-                          artillery.commitments.contains("towed_by:" + r.unit);
+  const bool continuing = motor.commitments.contains(MarkKey(mark::towing, *r.towed)) &&
+                          artillery.commitments.contains(MarkKey(mark::towed_by, r.unit));
   if (!continuing && (!motor.route.empty() || !artillery.route.empty() ||
                       motor.turnOrigin != artillery.turnOrigin))
     return fail("Tow pair must start together before either moves");
   for (const auto &commitment : motor.commitments)
-    if (commitment.rfind("towing:", 0) == 0 &&
-        commitment != "towing:" + *r.towed)
+    if (commitment.base() == mark::towing &&
+        commitment != MarkKey(mark::towing, *r.towed))
       return fail(
           "Motorized Infantry is already paired with another towed unit");
   for (const auto &commitment : artillery.commitments)
-    if (commitment.rfind("towed_by:", 0) == 0 &&
-        commitment != "towed_by:" + r.unit)
+    if (commitment.base() == mark::towed_by &&
+        commitment != MarkKey(mark::towed_by, r.unit))
       return fail("Artillery is already paired with another towing unit");
   if (!artillery.movementRemaining || *artillery.movementRemaining <= 0)
     return fail("Towed unit has no movement remaining");
@@ -712,9 +714,9 @@ RouteResult validateFactoryRailRoute(const State &s, const Id &facility,
         "Factory relocation must remain inside its possessed Home Country";
     return out;
   }
-  if (flag(f.flags, "placed_this_turn") || flag(f.flags, "moved_this_turn") ||
-      flag(f.flags, "researched_this_turn") ||
-      flag(f.flags, "under_construction")) {
+  if (flag(f.flags, mark::placed_this_turn) || flag(f.flags, mark::moved_this_turn) ||
+      flag(f.flags, mark::researched_this_turn) ||
+      flag(f.flags, mark::under_construction)) {
     out.reason = "Factory was placed, moved or used for technology this turn";
     return out;
   }
@@ -724,7 +726,7 @@ RouteResult validateFactoryRailRoute(const State &s, const Id &facility,
       return out;
     }
   for (const auto &[id, project] : s.construction)
-    if (flag(project.flags, "target:" + facility)) {
+    if (flag(project.flags, MarkKey(mark::target, facility))) {
       out.reason = "Factory is committed to an upgrade";
       return out;
     }
@@ -744,8 +746,9 @@ RouteResult validateFactoryRailRoute(const State &s, const Id &facility,
     return out;
   const int cost = f.type == "major_factory" ? 2 : 1;
   for (const auto &region : out.regions) {
+    const auto counter = railCounter(s, region);
     const auto used =
-        s.nations.at(nation).turnFlags.find(railCounter(s, region));
+        s.nations.at(nation).turnFlags.find(MarkKey(mark::rail_used, counter));
     const int spent =
         used == s.nations.at(nation).turnFlags.end() ? 0 : used->second;
     if (spent + cost > regionalRailCapacity(region) + 1) {
@@ -769,8 +772,8 @@ std::vector<ZoneId> navalFacilitySeaZones(const State &s, const Id &id) {
         if (const auto zone = findZone(s, x.asString()))
           out.insert(*zone);
   for (const auto &[k, v] : f.flags)
-    if (v && k.rfind("border:", 0) == 0) {
-      const auto zone = findZone(s, std::string_view(k).substr(7));
+    if (v && k.base() == mark::border) {
+      const auto zone = findZone(s, k.argument());
       if (zone && node(s, *zone).require("type").asString() == "sea")
         out.insert(*zone);
     }
@@ -837,7 +840,7 @@ bool navalFacilityUsable(const State &s, NationId nation, const Id &id,
     return false;
   if (held &&
       (!heldSinceTurnStart(s, nation, f.zone) ||
-       flag(f.flags, "placed_this_turn") || !continuousInfrastructure(s, id)))
+       flag(f.flags, mark::placed_this_turn) || !continuousInfrastructure(s, id)))
     return false;
   return !navalFacilitySeaZones(s, id).empty() &&
          !facilityBlockaded(s, nation, id);
@@ -904,7 +907,7 @@ SupplyRoute traceSupply(const State &s, NationId nation, ZoneId destination,
            s.territories.at(f.zone).possessor == *recipient &&
            navalFacilityType(f.type) && !f.damage &&
            heldSinceTurnStart(s, *recipient, f.zone, false) &&
-           !flag(f.flags, "placed_this_turn") &&
+           !flag(f.flags, mark::placed_this_turn) &&
            continuousInfrastructure(s, id) &&
            !navalFacilitySeaZones(s, id).empty() &&
            !facilityBlockaded(s, *recipient, id);
@@ -1096,10 +1099,10 @@ NumberSet<NationId> withdrawalEligibleRecipients(const State &s, NationId attack
   std::vector<Id> needTransport;
   for (const auto &[id, u] : s.units)
     if (u.owner == attacker &&
-        (u.zone == zone || flag(u.turnFlags, "must_withdraw_from_chinese_gift")) && !u.carriedBy &&
+        (u.zone == zone || flag(u.turnFlags, mark::must_withdraw_from_chinese_gift)) && !u.carriedBy &&
         unitClass(s, u, knownUnitClasses(probe).land)) {
       auto &p = probe.units.at(id);
-      p.turnFlags["must_withdraw_from_chinese_gift"] = 1;
+      p.turnFlags[mark::must_withdraw_from_chinese_gift] = 1;
       bool canLeave = false;
       std::function<void(std::vector<ZoneId>)> search = [&](std::vector<ZoneId> path) {
         if (canLeave)
@@ -1328,7 +1331,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
   if (s.clock.phase == Phase::NonCombatMovement) {
     const bool withdrawalPending = std::any_of(s.units.begin(), s.units.end(), [&](const auto &item) {
       return movementController(s, item.second.owner) &&
-             flag(item.second.turnFlags, "must_withdraw_from_chinese_gift");
+             flag(item.second.turnFlags, mark::must_withdraw_from_chinese_gift);
     });
     if (withdrawalPending) {
       out.erase(std::remove_if(out.begin(), out.end(), [&](const Action &a) {
@@ -1338,7 +1341,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
         if (a.kind != "movement_route" && a.kind != "naval_load") return true;
         const auto *unit = a.parameters.find("unit");
         return !unit || !s.units.contains(unit->asString()) ||
-               !flag(s.units.at(unit->asString()).turnFlags, "must_withdraw_from_chinese_gift");
+               !flag(s.units.at(unit->asString()).turnFlags, mark::must_withdraw_from_chinese_gift);
       }), out.end());
       // Nor may one withdrawal take what another needs, such as a unit that can
       // walk out boarding the last transport place of one that cannot: the gift
@@ -1350,7 +1353,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
         apply(after, a);
         const bool remaining = std::any_of(after.units.begin(), after.units.end(), [&](const auto &item) {
           return item.second.owner == moved.owner &&
-                 flag(item.second.turnFlags, "must_withdraw_from_chinese_gift");
+                 flag(item.second.turnFlags, mark::must_withdraw_from_chinese_gift);
         });
         return remaining && withdrawalEligibleRecipients(after, moved.owner, moved.zone).empty();
       }), out.end());
@@ -1366,7 +1369,7 @@ std::vector<Action> MovementRules::interrupts(const State &s) const {
   const auto active = s.currentNation();
   for (const auto &[owner, n] : s.nations)
     if (owner != active && politicallyFriendly(s, owner, active) &&
-        !flag(n.turnFlags, "rail_permission:" + nationName(s, active))) {
+        !flag(n.turnFlags, MarkKey(mark::rail_permission, nationName(s, active)))) {
       V p(O{{"requester", V(nationName(s, active))}});
       out.push_back({"rail_permission_" + nationName(s, owner) + "_" + nationName(s, active),
                      "movement_grant_rail", politicalPlayer(s, owner), nationName(s, owner),
@@ -1378,15 +1381,14 @@ bool MovementRules::phaseComplete(const State &s) const {
   if (s.clock.phase == Phase::NonCombatMovement)
     for (const auto &[id, u] : s.units)
       if (movementController(s, u.owner) &&
-          flag(u.turnFlags, "must_withdraw_from_chinese_gift"))
+          flag(u.turnFlags, mark::must_withdraw_from_chinese_gift))
         return false;
   return !gameplay_ || gameplay_->phaseComplete(s);
 }
 void MovementRules::apply(State &s, const Action &a) const {
   if (a.kind == "movement_grant_rail") {
     s.nations.at(nationNumber(s, a.nation))
-        .turnFlags["rail_permission:" +
-                   a.parameters.require("requester").asString()] = 1;
+        .turnFlags[MarkKey(mark::rail_permission, a.parameters.require("requester").asString())] = 1;
     return;
   }
   if (a.kind == "movement_factory_rail") {
@@ -1396,12 +1398,14 @@ void MovementRules::apply(State &s, const Action &a) const {
       path.push_back(zoneNumber(s, z.asString()));
     const auto result = validateFactoryRailRoute(s, id, path);
     require(result.allowed, result.reason);
-    for (const auto &region : result.regions)
-      s.nations.at(s.currentNation()).turnFlags[railCounter(s, region)] +=
+    for (const auto &region : result.regions) {
+      const auto counter = railCounter(s, region);
+      s.nations.at(s.currentNation()).turnFlags[MarkKey(mark::rail_used, counter)] +=
           result.cost;
+    }
     auto &f = s.facilities.at(id);
     f.zone = path.back();
-    f.flags["moved_this_turn"] = 1;
+    f.flags[mark::moved_this_turn] = 1;
     return;
   }
   if (a.kind != "movement_route") {
@@ -1428,27 +1432,30 @@ void MovementRules::apply(State &s, const Action &a) const {
     for (std::size_t i = 1; i < r.path.size(); ++i)
       artillery.route.push_back(r.path[i]);
     artillery.zone = r.path.back();
-    artillery.commitments.insert("towed_by:" + r.unit);
-    u.commitments.insert("towing:" + *r.towed);
+    artillery.commitments.insert(MarkKey(mark::towed_by, r.unit));
+    u.commitments.insert(MarkKey(mark::towing, *r.towed));
     if (r.combat)
-      artillery.commitments.insert("combat_move");
+      artillery.commitments.insert(mark::combat_move);
   }
   const auto target = r.path.back();
   if (r.mode == MovementMode::StrategicRail ||
       r.mode == MovementMode::StrategicRiver) {
-    for (const auto &region : result.regions)
-      ++s.nations.at(s.currentNation()).turnFlags[railCounter(s, region)];
-    u.turnFlags["strategic_moved"] = 1;
+    for (const auto &region : result.regions) {
+      const auto counter = railCounter(s, region);
+      ++s.nations.at(s.currentNation()).turnFlags[MarkKey(mark::rail_used, counter)];
+    }
+    u.turnFlags[mark::strategic_moved] = 1;
   }
   if (r.mode == MovementMode::NarrowCrossing) {
-    ++s.flags[crossingCounter(s, *edge(s, from, target), from, target)];
+    const auto crossing = crossingCounter(s, *edge(s, from, target), from, target);
+    ++s.flags[MarkKey(mark::crossing_used, crossing)];
     if (r.combat)
-      u.commitments.insert("amphibious_assault");
+      u.commitments.insert(mark::amphibious_assault);
   }
   if (r.mode == MovementMode::Blitz) {
-    u.turnFlags.erase("blitz_eligible");
-    u.commitments.insert("blitz_from:" + zoneName(s, from));
-    u.commitments.insert("blitz_to:" + zoneName(s, target));
+    u.turnFlags.erase(mark::blitz_eligible);
+    u.commitments.insert(MarkKey(mark::blitz_from, zoneName(s, from)));
+    u.commitments.insert(MarkKey(mark::blitz_to, zoneName(s, target)));
   }
   for (std::size_t i = 1; i < r.path.size(); ++i)
     u.route.push_back(r.path[i]);
@@ -1458,9 +1465,9 @@ void MovementRules::apply(State &s, const Action &a) const {
   u.movementRemaining =
       result.exhaustsMovement ? 0 : *u.movementRemaining - result.cost;
   if (r.combat)
-    u.commitments.insert("combat_move");
-  if (flag(u.turnFlags, "must_withdraw_from_chinese_gift"))
-    u.turnFlags.erase("must_withdraw_from_chinese_gift");
+    u.commitments.insert(mark::combat_move);
+  if (flag(u.turnFlags, mark::must_withdraw_from_chinese_gift))
+    u.turnFlags.erase(mark::must_withdraw_from_chinese_gift);
   if (attack) {
     recordLandAttack(s, owner, target);
     std::vector<Id> attackers{r.unit};
@@ -1484,25 +1491,25 @@ void MovementRules::finishTurn(State &s) const {
 void MovementRules::beginTurn(State &s) const {
   for (auto &[id, n] : s.nations)
     if (movementController(s, id))
-      n.gameFlags["logistics_last_turn_start"] =
+      n.gameFlags[mark::logistics_last_turn_start] =
           static_cast<int>(s.clock.playerTurnSerial + 1);
   for (auto it = s.flags.begin(); it != s.flags.end();)
-    if (it->first.rfind("crossing_used:", 0) == 0 ||
-        it->first.rfind("logistics_start_damaged:", 0) == 0)
+    if (it->first.base() == mark::crossing_used ||
+        it->first.base() == mark::logistics_start_damaged)
       it = s.flags.erase(it);
     else
       ++it;
   for (const auto &[id, f] : s.facilities)
-    s.flags["logistics_start_damaged:" + id] = f.damage;
+    s.flags[MarkKey(mark::logistics_start_damaged, id)] = f.damage;
   for (const auto &[id, r] : s.rails) {
     int damage = 0;
     for (const auto &[zone, d] : r.damageByEndpoint)
       damage += d;
-    s.flags["logistics_start_damaged:" + id] = damage;
+    s.flags[MarkKey(mark::logistics_start_damaged, id)] = damage;
   }
   for (auto &[id, n] : s.nations)
     for (auto it = n.turnFlags.begin(); it != n.turnFlags.end();)
-      if (it->first.rfind("rail_permission:", 0) == 0)
+      if (it->first.base() == mark::rail_permission)
         it = n.turnFlags.erase(it);
       else
         ++it;

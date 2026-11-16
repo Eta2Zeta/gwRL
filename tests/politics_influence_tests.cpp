@@ -168,7 +168,7 @@ void beginningUnitAndPassability() {
     auto& garrison = allied.units.at("ccp_garrison");
     garrison.owner = nationNumber(allied, "kmt");
     garrison.route = zoneNumbers(allied, {"land_china_nanking", shensi});
-    garrison.turnFlags["placed_this_turn"] = 1;  // Stale from KMT's earlier turn.
+    garrison.turnFlags[mark::placed_this_turn] = 1;  // Stale from KMT's earlier turn.
     allied.captureTurnStart();
     check(hasInfluence(allied, clique), "Another nation's stale turn flags invalidated a start-present unit");
 }
@@ -268,7 +268,7 @@ void backfireRevivesOnlyActualWarlordAssets() {
     const auto capitals = state.politics.capitals;
     applyInfluenceAction(state, influence(state, clique, 1));
     resolve(state, 12);
-    check(!state.politics.surrendered.contains(nationNumber(state, "kmt")) && state.nations.at(nationNumber(state, "kmt")).gameFlags.at("surrendered") == 0,
+    check(!state.politics.surrendered.contains(nationNumber(state, "kmt")) && state.nations.at(nationNumber(state, "kmt")).gameFlags.at(mark::surrendered) == 0,
           "Adopted always-backfire could not align with surrendered KMT");
     check(isNation(state, state.territories.at(zoneNumber(state, beiping)).possessor, "kmt") && isNation(state, state.territories.at(zoneNumber(state, hopeh)).possessor, "kmt")
           && state.units.at("warlord_a").owner == nationNumber(state, "kmt") && state.units.at("warlord_b").owner == nationNumber(state, "kmt"),
@@ -296,7 +296,7 @@ void influenceAfterDadaoIncorporation() {
     resolve(state, 1);
     check(isNation(state, state.territories.at(zoneNumber(state, zone)).possessor, "japan") && state.units.at("next_warlord").owner == nationNumber(state, "japan"),
           "Japanese success tried to transfer assets into an inactive incorporated Dadao");
-    check(possessedLand(state, nationNumber(state, "dadao")).empty() && state.nations.at(nationNumber(state, "dadao")).gameFlags.at("incorporated") == 1
+    check(possessedLand(state, nationNumber(state, "dadao")).empty() && state.nations.at(nationNumber(state, "dadao")).gameFlags.at(mark::incorporated) == 1
           && !state.nations.at(nationNumber(state, "dadao")).treasury,
           "Subsequent influence recreated a separate incorporated Dadao or its treasury");
 }
@@ -340,7 +340,7 @@ void ccpRecruitmentAndSplitMilitia() {
     check(ownedUnits(state, "ccp", "militia") == 2 && state.nations.at(nationNumber(state, "ccp")).treasury == cash,
           "Recruitment did not place two free national militia");
     for (const auto& [id, value] : state.units) if (value.owner == nationNumber(state, "ccp") && value.type == knownUnitTypes(state).militia)
-        check(value.movementRemaining == 0 && value.turnFlags.at("placed_this_turn") != 0,
+        check(value.movementRemaining == 0 && value.turnFlags.at(mark::placed_this_turn) != 0,
               "Recruited unit gained movement this turn");
     check(actions(state, "recruitment_roll").empty(), "CCP recruited twice in one turn");
 }
@@ -355,7 +355,7 @@ void recruitmentUsesBeginningPossessionAndHome() {
     const auto options = actions(state, "recruitment_place_infantry");
     check(options.size() == 1 && options.front().parameters.require("zone").asString() == shensi,
           "CCP recruitment ignored start-possession or Chinese Home Country");
-    state.territories.at(zoneNumber(state, shensi)).flags["last_possession_change_turn"] = static_cast<int>(state.clock.playerTurnSerial);
+    state.territories.at(zoneNumber(state, shensi)).flags[mark::last_possession_change_turn] = static_cast<int>(state.clock.playerTurnSerial);
     const auto before = state.serialize();
     rejects([&] { applyInfluenceAction(state, options.front()); }, "Lost-and-retaken recruitment site remained eligible");
     check(state.serialize() == before, "Stale recruitment choice consumed pending work");
@@ -422,7 +422,7 @@ void freeShipAdvanceAndFacilityRepair() {
     applyInfluenceAction(ship, actions(ship, "recruitment_advance_ship").front());
     const auto& project = ship.construction.at("minor_ship");
     check(project.queuePosition == 1 && project.remainingPayments.empty() && project.paidIpp == 5
-          && project.flags.at("completed") == 1 && ship.units.size() == units,
+          && project.flags.at(mark::completed) == 1 && ship.units.size() == units,
           "Free ship advancement spent money, inflated paid value or invented placement");
     check(ship.nations.at(nationNumber(ship, "ccp")).treasury == cash && !ship.nations.at(nationNumber(ship, "mongolia")).treasury,
           "Controlled-minor queue work changed a national treasury");
@@ -450,7 +450,7 @@ void dadaoRecruitmentAfterJapanSurrenders() {
     state.construction.clear();  // This fixture isolates surviving Dadao, not surrender ship dice.
     surrenderNation(state, nationNumber(state, "japan"), nationNumber(state, "kmt"));
     check(!state.nations.at(nationNumber(state, "dadao")).controllerNation && state.nations.at(nationNumber(state, "dadao")).player == "axis"
-          && state.nations.at(nationNumber(state, "dadao")).gameFlags.at("direct_axis_control_after_japan_surrender") == 1,
+          && state.nations.at(nationNumber(state, "dadao")).gameFlags.at(mark::direct_axis_control_after_japan_surrender) == 1,
           "Japan's fall erased Dadao or changed its approved direct Axis control");
     check(actions(state, "influence_roll").empty(), "Surrendered Japan retained influence");
     applyInfluenceAction(state, recruitment(state, "dadao"));

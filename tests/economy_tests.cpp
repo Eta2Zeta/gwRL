@@ -105,10 +105,10 @@ void income() {
     check(!evaluateIncome(s, nationNumber(s, "mongolia")).collectable, "Mongolia has no ordinary income");
     s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "japan");
     check(evaluateIncome(s, nationNumber(s, "japan")).total == 18, "Japan gets China bonus without Major war");
-    s.territories.at(zoneNumber(s, beiping)).flags["city_damage"] = 20;
-    s.territories.at(zoneNumber(s, beiping)).flags["city_ipp_lost"] = 1;
+    s.territories.at(zoneNumber(s, beiping)).flags[mark::city_damage] = 20;
+    s.territories.at(zoneNumber(s, beiping)).flags[mark::city_ipp_lost] = 1;
     check(evaluateIncome(s, nationNumber(s, "japan")).total == 17, "City bombing changes territorial income");
-    s.territories.at(zoneNumber(s, beiping)).flags["city_damage"] = 0;
+    s.territories.at(zoneNumber(s, beiping)).flags[mark::city_damage] = 0;
     check(evaluateIncome(s, nationNumber(s, "japan")).total == 17, "City repair does not restore permanent IPP");
     s.territories.at(zoneNumber(s, tokyo)).possessor = nationNumber(s, "ccp");
     check(evaluateIncome(s, nationNumber(s, "japan")).total == 0 && !evaluateIncome(s, nationNumber(s, "japan")).collectable,
@@ -209,7 +209,7 @@ void decentralizedAndMilitia() {
         applyEconomyAction(s, pick(s, "economy_place"));
     turn(s, "ccp");
     s.territories.at(zoneNumber(s, nanking)).possessor = nationNumber(s, "ccp");
-    s.territories.at(zoneNumber(s, nanking)).flags["last_possession_change_turn"] =
+    s.territories.at(zoneNumber(s, nanking)).flags[mark::last_possession_change_turn] =
         static_cast<int>(s.clock.playerTurnSerial);
     buy(s, "ccp_minor_infantry");
     s.clock.phase = Phase::PlaceUnits;
@@ -280,7 +280,7 @@ void constructionAndCapture() {
     auto five = s.clone();
     damageConstruction(five, id, 5);
     check(five.construction.at(id).remainingPayments == std::vector<int>({6, 6}) &&
-              five.construction.at(id).flags.at("damage") == 2 && five.construction.at(id).paidIpp == 12,
+              five.construction.at(id).flags.at(mark::damage) == 2 && five.construction.at(id).paidIpp == 12,
           "Printed five-damage setback example preserves cumulative paid");
     damageConstruction(s, id, 6);
     check(!s.construction.contains(id), "Printed six-damage construction destruction example");
@@ -299,8 +299,8 @@ void constructionAndCapture() {
 void cityAndRailRepair() {
     auto s = fixture();
     s.nations.at(nationNumber(s, "japan")).treasury = 100;
-    s.territories.at(zoneNumber(s, tokyo)).flags["city_damage"] = 25;
-    s.territories.at(zoneNumber(s, tokyo)).flags["city_ipp_lost"] = 1;
+    s.territories.at(zoneNumber(s, tokyo)).flags[mark::city_damage] = 25;
+    s.territories.at(zoneNumber(s, tokyo)).flags[mark::city_ipp_lost] = 1;
     finishResearch(s);
     applyEconomyAction(s, pick(s, "economy_repair", [](const auto &a) {
                            return a.parameters.require("target").asString() == tokyo &&
@@ -309,12 +309,12 @@ void cityAndRailRepair() {
     s.validate();
     s.clock.phase = Phase::PlaceUnits;
     finishEconomyPlacement(s);
-    check(s.territories.at(zoneNumber(s, tokyo)).flags.at("city_damage") == 0 && effectiveTerritorialIpp(s, zoneNumber(s, tokyo)) == 1 &&
+    check(s.territories.at(zoneNumber(s, tokyo)).flags.at(mark::city_damage) == 0 && effectiveTerritorialIpp(s, zoneNumber(s, tokyo)) == 1 &&
               *s.nations.at(nationNumber(s, "japan")).treasury == 75,
           "City repairs cost actual damage without restoring IPP");
     turn(s, "japan", Phase::Production, 1);
-    s.territories.at(zoneNumber(s, tokyo)).flags["city_destroyed"] = 1;
-    s.territories.at(zoneNumber(s, tokyo)).flags["city_damage"] = 60;
+    s.territories.at(zoneNumber(s, tokyo)).flags[mark::city_destroyed] = 1;
+    s.territories.at(zoneNumber(s, tokyo)).flags[mark::city_damage] = 60;
     finishResearch(s);
     check(!offers(s, "economy_repair",
                   [](const auto &a) { return a.parameters.require("target").asString() == tokyo; }),
@@ -652,7 +652,7 @@ void upgradesKeepCargo() {
     addUnit(s, "flown_militia", "militia", "japan", tokyo);
     board(s, "airlift_militia", "flown_militia");
     addUnit(s, "ship", "naval_transport", "japan", tokyo);
-    s.units.at("ship").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
+    s.units.at("ship").gameFlags[MarkKey(mark::in_port, "facility_tokyo_major_shipyard")] = 1;
     addUnit(s, "first", "infantry", "japan", tokyo);
     addUnit(s, "second", "infantry", "japan", tokyo);
     board(s, "ship", "first");
@@ -716,7 +716,7 @@ void upgradesWaitAtSea() {
     s.validate();
     for (const Id id : {"ship", "sailor", "sailor_militia"})
         s.units.at(id).zone = zoneNumber(s, tokyo);
-    s.units.at("ship").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
+    s.units.at("ship").gameFlags[MarkKey(mark::in_port, "facility_tokyo_major_shipyard")] = 1;
     check(offered("sailor", "motorized_infantry") && offered("sailor_militia", "infantry"),
           "Upgrade withheld from cargo aboard a ship in port, which stands in the port's land zone");
     s.validate();

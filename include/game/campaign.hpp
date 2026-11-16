@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game/marks.hpp"
 #include "game/names.hpp"
 #include "game/simple_json.hpp"
 
@@ -166,13 +167,13 @@ struct NationState {
     std::map<Id, int> technologyStages;
     NumberSet<NationId> atWarWith;
     NumberSet<NationId> allies;
-    std::map<Id, int> turnFlags;
-    std::map<Id, int> gameFlags;
+    Marks turnFlags;  // Marks (marks.hpp) cleared when the nation's turn begins.
+    Marks gameFlags;  // Marks kept from turn to turn.
 };
 
 struct TerritoryState {
     std::optional<NationId> possessor;
-    std::map<Id, int> flags;
+    Marks flags;
 };
 
 struct UnitState {
@@ -189,9 +190,9 @@ struct UnitState {
     std::optional<Id> carriedBy;
     std::vector<Id> cargo;
     int damage {0};
-    std::set<Id> commitments;
-    std::map<Id, int> turnFlags;
-    std::map<Id, int> gameFlags;
+    MarkSet commitments;  // What the unit is committed to this turn, as marks without values.
+    Marks turnFlags;  // Marks cleared when its owner's turn begins.
+    Marks gameFlags;  // Marks kept from turn to turn.
 };
 
 struct FacilityState {
@@ -199,7 +200,7 @@ struct FacilityState {
     Id type;
     ZoneId zone;
     int damage {0};
-    std::map<Id, int> flags;
+    Marks flags;
 };
 
 struct RailState {
@@ -224,7 +225,7 @@ struct BuildProject {
     int queuePosition {1};
     int paidIpp {0};
     std::vector<int> remainingPayments;
-    std::map<Id, int> flags;
+    Marks flags;
 };
 
 struct RepairJob {
@@ -267,7 +268,7 @@ struct BattleState {
     std::vector<Id> attackers;
     std::vector<Id> defenders;
     std::map<Id, int> pendingHits;
-    std::map<Id, int> flags;
+    Marks flags;
     // Explicit battle continuations, participant roles and roll/casualty queues.
     // This is serialized decision state, never module-local memory.
     json::Value data {json::Value::Object {}};
@@ -395,7 +396,7 @@ struct State {
     std::map<Id, BattleState> battles;
     std::vector<Id> battleOrder;
     std::optional<ChanceRequest> chance;
-    std::map<Id, int> flags;
+    Marks flags;
     EventLog history;
     // Versioned AI action-construction state. Empty for the human/game API.
     // Public source data, included in observations, keys, clones and saves.

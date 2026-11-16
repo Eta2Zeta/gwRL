@@ -222,7 +222,7 @@ void shoreBombardmentAndCoastalFirstStrike() {
   add(s, "defender", "infantry", "kmt", shantung);
   attachCargo(s, "t", "i");
   s.facilities["coast"] = {
-      "coast", "coastal_artillery", zoneNumber(s, shantung), 0, {{"border:" + p14, 1}}};
+      "coast", "coastal_artillery", zoneNumber(s, shantung), 0, {{MarkKey(mark::border, p14), 1}}};
   Engine e(s, rules());
   e.setDiceTapeForTesting({1, 12, 12});
   choose(e, "naval_declare_assault", [](const Action &a) {
@@ -239,7 +239,7 @@ void shoreBombardmentAndCoastalFirstStrike() {
   check(!e.state().units.contains("defender") &&
             e.state().units.at("i").zone == zoneNumber(e.state(), shantung),
         "Shore first-strike casualty survived into land combat");
-  check(e.state().units.at("bb").commitments.contains("shore_bombardment"),
+  check(e.state().units.at("bb").commitments.contains(mark::shore_bombardment),
         "Bombardment usage missing");
 }
 void berthLocksMovementAndKeepsCargo() {
@@ -248,7 +248,7 @@ void berthLocksMovementAndKeepsCargo() {
   add(s, "i", "infantry", "japan", p16);
   attachCargo(s, "t", "i");
   s.facilities["port"] = {
-      "port", "major_port", zoneNumber(s, tokyo), 0, {{"border:" + p16, 1}}};
+      "port", "major_port", zoneNumber(s, tokyo), 0, {{MarkKey(mark::border, p16), 1}}};
   Engine e(s, rules());
   choose(e, "naval_enter_port", [](const Action &a) {
     return !a.parameters.require("unload").asBool();
@@ -264,9 +264,9 @@ void capturedShipRollPreservesDamage() {
   auto s = fixture(Phase::PlaceUnits);
   add(s, "bb", "battleship", "kmt", beiping);
   s.units.at("bb").damage = 1;
-  s.units.at("bb").gameFlags["in_port:port"] = 1;
-  s.units.at("bb").gameFlags["skeleton_crew"] = 1;
-  s.units.at("bb").gameFlags["skeleton_crew_until_own_turn"] = 1;
+  s.units.at("bb").gameFlags[MarkKey(mark::in_port, "port")] = 1;
+  s.units.at("bb").gameFlags[mark::skeleton_crew] = 1;
+  s.units.at("bb").gameFlags[mark::skeleton_crew_until_own_turn] = 1;
   s.facilities["port"] = {"port", "major_port", zoneNumber(s, beiping), 0, {}};
   resolveCapturedPorts(s, zoneNumber(s, beiping), nationNumber(s, "japan"));
   Engine e(s, rules());
@@ -276,7 +276,7 @@ void capturedShipRollPreservesDamage() {
   check(e.state().units.at("bb").owner == nationNumber(e.state(), "japan") &&
             e.state().units.at("bb").damage == 1,
         "Capture failed to preserve damaged ship state");
-  check(e.state().units.at("bb").gameFlags.at("skeleton_crew_until_own_turn") ==
+  check(e.state().units.at("bb").gameFlags.at(mark::skeleton_crew_until_own_turn) ==
             navalCompletedTurns(e.state(), nationNumber(s, "japan")) + 2,
         "Captured skeleton crew did not retain the next full own-turn lock");
   auto loss = s.clone();
@@ -298,7 +298,7 @@ void portUnloadAlternativeNeedsOwnedCargo() {
       attachCargo(s, "transport", "own");
     }
     s.facilities["home_port"] = {
-        "home_port", "major_port", zoneNumber(s, tokyo), 0, {{"border:" + p16, 1}}};
+        "home_port", "major_port", zoneNumber(s, tokyo), 0, {{MarkKey(mark::border, p16), 1}}};
     Engine engine(s, rules(), 57);
     int choices = 0;
     bool unload = false;
@@ -325,7 +325,7 @@ void portUnloadAlternativeNeedsOwnedCargo() {
 void temporaryCrewAndSkeletonRestriction() {
   auto s = fixture(Phase::Combat);
   add(s, "cruiser", "heavy_cruiser", "kmt", shantung);
-  s.units.at("cruiser").gameFlags["in_port:port"] = 1;
+  s.units.at("cruiser").gameFlags[MarkKey(mark::in_port, "port")] = 1;
   s.facilities["port"] = {"port", "major_port", zoneNumber(s, shantung), 0, {}};
   add(s, "attacker", "infantry", "japan", shantung);
   const auto b = registerLandBattle(s, zoneNumber(s, shantung), nationNumber(s, "japan"), {"attacker"},
@@ -333,7 +333,7 @@ void temporaryCrewAndSkeletonRestriction() {
   preparePortLandDefence(s, b);
   int crews = 0;
   for (const auto &[id, u] : s.units)
-    if (u.gameFlags.contains("ship_crew:cruiser"))
+    if (u.gameFlags.contains(MarkKey(mark::ship_crew, "cruiser")))
       ++crews;
   check(crews == 1 && s.battles.at(b).defenders.size() == 1,
         "Port ship fought as naval unit or supplied wrong crew");
@@ -348,7 +348,7 @@ void amphibiousDoubleCasualtiesAndExemptions() {
     add(s, "second", "infantry", "japan", shantung);
     add(s, "defender", "infantry", "kmt", shantung);
     for (const auto &id : {Id("first"), Id("second")})
-      s.units.at(id).commitments.insert("amphibious_assault");
+      s.units.at(id).commitments.insert(mark::amphibious_assault);
     if (mode == "doctrine")
       s.nations.at(nationNumber(s, "japan")).technologyStages["amphibious_doctrine"] = 4;
     registerLandBattle(s, zoneNumber(s, shantung), nationNumber(s, "japan"), {"first", "second"},
@@ -383,9 +383,9 @@ void damagedPortEvacuationSuspendsAndResumesBombing() {
   auto s = fixture();
   add(s, "bomber", "medium_bomber", "japan", beiping);
   add(s, "cruiser", "heavy_cruiser", "kmt", shantung);
-  s.units.at("cruiser").gameFlags["in_port:port"] = 1;
+  s.units.at("cruiser").gameFlags[MarkKey(mark::in_port, "port")] = 1;
   s.facilities["port"] = {
-      "port", "major_port", zoneNumber(s, shantung), 0, {{"border:" + p14, 1}}};
+      "port", "major_port", zoneNumber(s, shantung), 0, {{MarkKey(mark::border, p14), 1}}};
   Engine e(s, rules());
   e.setDiceTapeForTesting({1, 12});
   const auto checkpoint = e.serialize();
@@ -413,10 +413,10 @@ void thirdPartyEvacuationUsesFleetRolesAndPreservesBombing() {
   add(s, "bomber", "medium_bomber", "japan", beiping);
   for (const auto &id : {Id("cruiser_a"), Id("cruiser_b"), Id("waiting")}) {
     add(s, id, "heavy_cruiser", "kmt", shantung);
-    s.units.at(id).gameFlags["in_port:port"] = 1;
+    s.units.at(id).gameFlags[MarkKey(mark::in_port, "port")] = 1;
   }
   add(s, "transport", "naval_transport", "kmt", shantung);
-  s.units.at("transport").gameFlags["in_port:port"] = 1;
+  s.units.at("transport").gameFlags[MarkKey(mark::in_port, "port")] = 1;
   add(s, "cargo", "infantry", "kmt", shantung);
   attachCargo(s, "transport", "cargo");
   for (const auto &id : {Id("destroyer_a"), Id("destroyer_b")})
@@ -425,7 +425,7 @@ void thirdPartyEvacuationUsesFleetRolesAndPreservesBombing() {
   add(s, "enemy_cargo", "infantry", "ccp", p14);
   attachCargo(s, "enemy_transport", "enemy_cargo");
   s.facilities["port"] = {
-      "port", "major_port", zoneNumber(s, shantung), 0, {{"border:" + p14, 1}}};
+      "port", "major_port", zoneNumber(s, shantung), 0, {{MarkKey(mark::border, p14), 1}}};
   s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "kmt"));
   s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "ccp"));
   Engine e(s, rules());
@@ -517,14 +517,14 @@ void activeEnemyAttacksEvacuationAndSelectionMayStop() {
   auto s = fixture(Phase::Combat);
   for (const auto &id : {Id("cruiser"), Id("waiting")}) {
     add(s, id, "heavy_cruiser", "kmt", shantung);
-    s.units.at(id).gameFlags["in_port:port"] = 1;
+    s.units.at(id).gameFlags[MarkKey(mark::in_port, "port")] = 1;
   }
   add(s, "active_enemy", "destroyer", "japan", p14);
   add(s, "neutral", "destroyer", "mongolia", p14);
   s.nations.at(nationNumber(s, "mongolia")).atWarWith.erase(nationNumber(s, "kmt"));
   s.nations.at(nationNumber(s, "kmt")).atWarWith.erase(nationNumber(s, "mongolia"));
   s.facilities["port"] = {
-      "port", "major_port", zoneNumber(s, shantung), 1, {{"border:" + p14, 1}}};
+      "port", "major_port", zoneNumber(s, shantung), 1, {{MarkKey(mark::border, p14), 1}}};
   queueDamagedPortEvacuation(s, "port");
   Engine e(s, rules());
   e.setDiceTapeForTesting({12, 1});
@@ -552,10 +552,10 @@ void activeEnemyAttacksEvacuationAndSelectionMayStop() {
 void evacuationUsesAttackAndDefenseValues() {
   auto s = fixture(Phase::Combat);
   add(s, "carrier", "fleet_carrier", "kmt", shantung);
-  s.units.at("carrier").gameFlags["in_port:port"] = 1;
+  s.units.at("carrier").gameFlags[MarkKey(mark::in_port, "port")] = 1;
   add(s, "outside", "coastal_defense_ship", "japan", p14);
   s.facilities["port"] = {
-      "port", "major_port", zoneNumber(s, shantung), 1, {{"border:" + p14, 1}}};
+      "port", "major_port", zoneNumber(s, shantung), 1, {{MarkKey(mark::border, p14), 1}}};
   queueDamagedPortEvacuation(s, "port");
   Engine e(s, rules());
   // A coastal defense ship attacks at 4 rather than defending at 6. The
@@ -591,10 +591,10 @@ void evacuationUsesAttackAndDefenseValues() {
 void evacuatingSubmarineMakesDefendingChoicesAndSubmerges() {
   auto s = fixture(Phase::Combat);
   add(s, "sub", "submarine", "kmt", shantung);
-  s.units.at("sub").gameFlags["in_port:base"] = 1;
+  s.units.at("sub").gameFlags[MarkKey(mark::in_port, "base")] = 1;
   add(s, "outside", "destroyer", "japan", p14);
   s.facilities["base"] = {
-      "base", "submarine_base", zoneNumber(s, shantung), 1, {{"border:" + p14, 1}}};
+      "base", "submarine_base", zoneNumber(s, shantung), 1, {{MarkKey(mark::border, p14), 1}}};
   queueDamagedPortEvacuation(s, "base");
   Engine e(s, rules());
   e.setDiceTapeForTesting({12});
@@ -609,7 +609,7 @@ void evacuatingSubmarineMakesDefendingChoicesAndSubmerges() {
   e.resolveChance();
   finishBattles(e);
   check(e.state().units.contains("sub") &&
-            e.state().units.at("sub").turnFlags.at("submerged") == 1 &&
+            e.state().units.at("sub").turnFlags.at(mark::submerged) == 1 &&
             e.state().units.at("sub").zone == zoneNumber(e.state(), p14),
         "Evacuating defending submarine failed to submerge after one round");
   check(Engine::replay(s.definition, rules(), checkpoint, e.state().history)
@@ -619,12 +619,12 @@ void evacuatingSubmarineMakesDefendingChoicesAndSubmerges() {
 void evacuationScramblesOnlySupportTheDefendingFleet() {
   auto s = fixture(Phase::Combat);
   add(s, "cruiser", "heavy_cruiser", "kmt", shantung);
-  s.units.at("cruiser").gameFlags["in_port:port"] = 1;
+  s.units.at("cruiser").gameFlags[MarkKey(mark::in_port, "port")] = 1;
   add(s, "defending_fighter", "fighter", "kmt", shantung);
   add(s, "outside", "destroyer", "japan", p14);
   add(s, "attacking_fighter", "fighter", "japan", beiping);
   s.facilities["port"] = {
-      "port", "major_port", zoneNumber(s, shantung), 1, {{"border:" + p14, 1}}};
+      "port", "major_port", zoneNumber(s, shantung), 1, {{MarkKey(mark::border, p14), 1}}};
   s.facilities["defending_airbase"] = {
       "defending_airbase", "airbase", zoneNumber(s, shantung), 0, {}};
   s.facilities["attacking_airbase"] = {
@@ -653,13 +653,13 @@ void evacuationScramblesOnlySupportTheDefendingFleet() {
 void multinationalOutsideFleetUsesActualCasualtyPolicies() {
   auto s = fixture(Phase::Combat);
   add(s, "cruiser", "heavy_cruiser", "kmt", shantung);
-  s.units.at("cruiser").gameFlags["in_port:port"] = 1;
+  s.units.at("cruiser").gameFlags[MarkKey(mark::in_port, "port")] = 1;
   add(s, "axis_ship", "destroyer", "japan", p14);
   add(s, "comintern_ship", "destroyer", "ccp", p14);
   s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "kmt"));
   s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "ccp"));
   s.facilities["port"] = {
-      "port", "major_port", zoneNumber(s, shantung), 1, {{"border:" + p14, 1}}};
+      "port", "major_port", zoneNumber(s, shantung), 1, {{MarkKey(mark::border, p14), 1}}};
   queueDamagedPortEvacuation(s, "port");
   Engine e(s, rules());
   e.setDiceTapeForTesting({12, 12, 4, 1, 1});
@@ -695,9 +695,9 @@ void currentTurnOutsideFleetMayRetreatToItsRealEntrySea() {
   add(s, "bomber", "medium_bomber", "japan", beiping);
   add(s, "outside", "destroyer", "japan", origin);
   add(s, "cruiser", "heavy_cruiser", "kmt", shantung);
-  s.units.at("cruiser").gameFlags["in_port:port"] = 1;
+  s.units.at("cruiser").gameFlags[MarkKey(mark::in_port, "port")] = 1;
   s.facilities["port"] = {
-      "port", "major_port", zoneNumber(s, shantung), 0, {{"border:" + p14, 1}}};
+      "port", "major_port", zoneNumber(s, shantung), 0, {{MarkKey(mark::border, p14), 1}}};
   Engine e(s, rules());
   e.setDiceTapeForTesting({1, 12, 12, 12});
   const auto checkpoint = e.serialize();
@@ -771,7 +771,7 @@ void separateEvacuationSeasResolveBeforeCalendarResumes() {
   s.territories.at(zoneNumber(s, tokyo)).possessor = nationNumber(s, "kmt");
   for (const auto &id : {Id("first"), Id("second")}) {
     add(s, id, "heavy_cruiser", "kmt", tokyo);
-    s.units.at(id).gameFlags["in_port:port"] = 1;
+    s.units.at(id).gameFlags[MarkKey(mark::in_port, "port")] = 1;
   }
   add(s, "enemy_first", "destroyer", "ccp", p15);
   add(s, "enemy_second", "destroyer", "ccp", p16);
@@ -781,7 +781,7 @@ void separateEvacuationSeasResolveBeforeCalendarResumes() {
                           "major_port",
                           zoneNumber(s, tokyo),
                           1,
-                          {{"border:" + p15, 1}, {"border:" + p16, 1}}};
+                          {{MarkKey(mark::border, p15), 1}, {MarkKey(mark::border, p16), 1}}};
   queueDamagedPortEvacuation(s, "port");
   Engine e(s, rules());
   e.setDiceTapeForTesting({12, 1, 12, 1});
@@ -871,7 +871,7 @@ void portUnloadCannotBecomeRailOrAirMove() {
   add(s, "i", "infantry", "japan", p16);
   attachCargo(s, "t", "i");
   s.facilities["port"] = {
-      "port", "major_port", zoneNumber(s, tokyo), 0, {{"border:" + p16, 1}}};
+      "port", "major_port", zoneNumber(s, tokyo), 0, {{MarkKey(mark::border, p16), 1}}};
   Engine e(s, rules());
   choose(e, "naval_enter_port", [](const Action &a) {
     return a.parameters.require("unload").asBool();
@@ -928,9 +928,9 @@ void japanToChinaVoyageAndLanding(const Id &variant) {
   if (variant == "retreat")
     add(s, "origin_enemy", "destroyer", "kmt", p16);
   s.facilities["home_shipyard"] = {
-      "home_shipyard", "major_shipyard", zoneNumber(s, tokyo), 0, {{"border:" + p16, 1}}};
+      "home_shipyard", "major_shipyard", zoneNumber(s, tokyo), 0, {{MarkKey(mark::border, p16), 1}}};
   s.facilities["coast"] = {
-      "coast", "coastal_artillery", zoneNumber(s, shantung), 0, {{"border:" + p14, 1}}};
+      "coast", "coastal_artillery", zoneNumber(s, shantung), 0, {{MarkKey(mark::border, p14), 1}}};
   s.captureTurnStart();
   Engine e(s, rules());
   auto tape = variant == "clear"     ? std::vector<int>{1, 12, 12}
@@ -1045,13 +1045,13 @@ void berthWaitsForMandatoryLandingAndWithdrawal() {
   auto s = fixture(Phase::NonCombatMovement);
   add(s, "ship", "destroyer", "japan", p16);
   add(s, "aircraft", "medium_bomber", "japan", p16);
-  s.units.at("aircraft").turnFlags["air_in_flight"] = 1;
+  s.units.at("aircraft").turnFlags[mark::air_in_flight] = 1;
   s.facilities["home_port"] = {
-      "home_port", "major_port", zoneNumber(s, tokyo), 0, {{"border:" + p16, 1}}};
+      "home_port", "major_port", zoneNumber(s, tokyo), 0, {{MarkKey(mark::border, p16), 1}}};
   for (bool restoredBerthing : {false, true}) {
     auto state = s.clone();
     if (restoredBerthing)
-      state.flags["naval_berthing"] = 1;
+      state.flags[mark::naval_berthing] = 1;
     Engine e(state, rules());
     check(!offered(e, "naval_enter_port") && offered(e, "air_land_noncombat"),
           "Berthing stranded a mandatory airborne return");
@@ -1065,10 +1065,10 @@ void berthWaitsForMandatoryLandingAndWithdrawal() {
   gift.territories.at(zoneNumber(gift, honshu)).possessor = nationNumber(gift, "ccp");
   add(gift, "transport", "naval_transport", "japan", p16);
   add(gift, "gift", "infantry", "japan", honshu);
-  gift.units.at("gift").turnFlags["must_withdraw_from_chinese_gift"] = 1;
-  gift.units.at("gift").commitments.insert("combat_move");
+  gift.units.at("gift").turnFlags[mark::must_withdraw_from_chinese_gift] = 1;
+  gift.units.at("gift").commitments.insert(mark::combat_move);
   gift.facilities["home_port"] = s.facilities.at("home_port");
-  gift.flags["naval_berthing"] = 1;
+  gift.flags[mark::naval_berthing] = 1;
   Engine e(gift, rules());
   check(!offered(e, "naval_enter_port") && offered(e, "naval_load"),
         "Restored berthing lock stranded mandatory Chinese gift withdrawal");
@@ -1087,7 +1087,7 @@ void adjacentLandAndAmphibiousAttacksResolveTogether() {
   add(s, "defender", "infantry", "kmt", shantung);
   attachCargo(s, "transport", "amphibious");
   s.facilities["coast"] = {
-      "coast", "coastal_artillery", zoneNumber(s, shantung), 0, {{"border:" + p14, 1}}};
+      "coast", "coastal_artillery", zoneNumber(s, shantung), 0, {{MarkKey(mark::border, p14), 1}}};
   s.captureTurnStart();
   Engine e(s, rules());
   std::vector<int> tape(6, 12); // Shore shots, both attackers, defender miss.
@@ -1112,7 +1112,7 @@ void adjacentLandAndAmphibiousAttacksResolveTogether() {
   for (bool otherNation : {false, true}) {
     auto independent = e.state().clone();
     for (auto &[id, b] : independent.battles)
-      if (b.flags.contains("amphibious_preparation")) {
+      if (b.flags.contains(mark::amphibious_preparation)) {
         if (otherNation)
           b.attacker = nationNumber(independent, "ccp");
         else
@@ -1129,7 +1129,7 @@ void adjacentLandAndAmphibiousAttacksResolveTogether() {
   choose(e, "naval_finish_shore_selection");
   check(e.state().chance && e.state().chance->purpose == "naval_shore_roll" &&
             e.state().units.at("amphibious").carriedBy == "transport" &&
-            !e.state().units.at("overland").commitments.contains("combat"),
+            !e.state().units.at("overland").commitments.contains(mark::combat),
         "Land units fired or landed before shore/Coastal Artillery first strike");
   e.resolveChance();
   check(e.state().battles.size() == 1 && e.state().battles.contains(land),
@@ -1173,15 +1173,15 @@ void actualNavalAirDeclarationsKeepContextAndCombatPhase() {
         kind == "naval_patrol_attack" ? "seaplane" : "medium_bomber", "japan",
         kind == "naval_patrol_attack" ? p14 : beiping);
     if (kind == "naval_patrol_attack") {
-      s.units.at("plane").gameFlags["on_map"] = 1;
-      s.units.at("plane").gameFlags["map_range"] = 2;
+      s.units.at("plane").gameFlags[mark::on_map] = 1;
+      s.units.at("plane").gameFlags[mark::map_range] = 2;
     }
     add(s, "defender", "destroyer", "kmt",
         kind == "naval_port_attack" ? shantung : p14);
     if (kind == "naval_port_attack") {
-      s.units.at("defender").gameFlags["in_port:port"] = 1;
+      s.units.at("defender").gameFlags[MarkKey(mark::in_port, "port")] = 1;
       s.facilities["port"] = {
-          "port", "major_port", zoneNumber(s, shantung), 0, {{"border:" + p14, 1}}};
+          "port", "major_port", zoneNumber(s, shantung), 0, {{MarkKey(mark::border, p14), 1}}};
     }
     Engine e(s, rules());
     const auto checkpoint = e.serialize();
@@ -1194,7 +1194,7 @@ void actualNavalAirDeclarationsKeepContextAndCombatPhase() {
                   (kind == "naval_port_attack" ? "port_attack" : "standard"),
           "Actual naval air mission serialized a boolean context");
     if (kind != "naval_patrol_attack") {
-      check(e.state().units.at("plane").commitments.contains("air_combat") &&
+      check(e.state().units.at("plane").commitments.contains(mark::air_combat) &&
                 !offered(e, "air_fly") && !offered(e, "air_land_noncombat"),
             "Declared naval aircraft received another move or landed before "
             "its battle");
@@ -1254,10 +1254,10 @@ void patrollingAircraftAttackOnlyInTheirOwnSeaZone() {
   const auto patrol = [](State &s, const Id &zone) {
     add(s, "plane", "fighter", "japan", zone);
     auto &plane = s.units.at("plane");
-    plane.gameFlags["on_map"] = 1;
-    plane.gameFlags["map_range"] = 1;
-    plane.turnFlags["on_map"] = 1;
-    plane.commitments.insert("maritime_air_patrol");
+    plane.gameFlags[mark::on_map] = 1;
+    plane.gameFlags[mark::map_range] = 1;
+    plane.turnFlags[mark::on_map] = 1;
+    plane.commitments.insert(mark::maritime_air_patrol);
   };
   for (const bool patrolling : {false, true}) {
     auto s = fixture();
@@ -1267,8 +1267,8 @@ void patrollingAircraftAttackOnlyInTheirOwnSeaZone() {
       add(s, "plane", "fighter", "japan", beiping);
     add(s, "ship", "destroyer", "kmt", p14);
     add(s, "docked", "destroyer", "kmt", shantung);
-    s.units.at("docked").gameFlags["in_port:port"] = 1;
-    s.facilities["port"] = {"port", "major_port", zoneNumber(s, shantung), 0, {{"border:" + p14, 1}}};
+    s.units.at("docked").gameFlags[MarkKey(mark::in_port, "port")] = 1;
+    s.facilities["port"] = {"port", "major_port", zoneNumber(s, shantung), 0, {{MarkKey(mark::border, p14), 1}}};
     Engine e(s, rules());
     check(offered(e, "naval_air_attack") != patrolling &&
               offered(e, "naval_port_attack") != patrolling,
@@ -1290,10 +1290,10 @@ void declaredPatrolAttacksAreNotOfferedAgain() {
   for (const auto &id : {Id("first"), Id("second")}) {
     add(s, id, "fighter", "japan", "sea_p15");
     auto &plane = s.units.at(id);
-    plane.gameFlags["on_map"] = 1;
-    plane.gameFlags["map_range"] = 1;
-    plane.turnFlags["on_map"] = 1;
-    plane.commitments.insert("maritime_air_patrol");
+    plane.gameFlags[mark::on_map] = 1;
+    plane.gameFlags[mark::map_range] = 1;
+    plane.turnFlags[mark::on_map] = 1;
+    plane.commitments.insert(mark::maritime_air_patrol);
   }
   add(s, "ship", "destroyer", "kmt", "sea_p15");
   Engine e(s, rules());
@@ -1344,16 +1344,16 @@ void unclearedAssaultsAreCalledOffAsCombatEnds() {
       auto t = declaring.state().clone();
       if (occupied) {
         add(t, "destroyer", "destroyer", "kmt", p14);
-        t.units.at("destroyer").commitments.insert("naval_scramble_origin:port");
+        t.units.at("destroyer").commitments.insert(MarkKey(mark::naval_scramble_origin, "port"));
         t.facilities["port"] = {
-            "port", "major_port", zoneNumber(t, shantung), 0, {{"border:" + p14, 1}}};
+            "port", "major_port", zoneNumber(t, shantung), 0, {{MarkKey(mark::border, p14), 1}}};
       }
       for (int n = 1; n <= retreating; ++n) {
         auto &transport = t.units.at("transport" + std::to_string(n));
         transport.zone = t.units.at("infantry" + std::to_string(n)).zone =
             zoneNumber(t, "sea_p15");
-        transport.turnFlags["naval_retreated"] = 1;
-        transport.commitments.insert("retreated");
+        transport.turnFlags[mark::naval_retreated] = 1;
+        transport.commitments.insert(mark::retreated);
       }
       Engine e(t, rules(), 2);
       e.setDiceTapeForTesting(std::vector<int>(80, 1));
@@ -1430,8 +1430,8 @@ void calledOffAssaultsDoNotHoldUpLandBattles() {
   // The transport has since retreated from p14 with its cargo.
   auto t = declaring.state().clone();
   t.units.at("transport").zone = t.units.at("amphibious").zone = zoneNumber(t, "sea_p15");
-  t.units.at("transport").turnFlags["naval_retreated"] = 1;
-  t.units.at("transport").commitments.insert("retreated");
+  t.units.at("transport").turnFlags[mark::naval_retreated] = 1;
+  t.units.at("transport").commitments.insert(mark::retreated);
   Engine e(t, rules(), 2);
   e.setDiceTapeForTesting(std::vector<int>(80, 1));
   check(offered(e, "land_begin_battle") && !offered(e, "naval_begin_assault") &&
@@ -1441,7 +1441,7 @@ void calledOffAssaultsDoNotHoldUpLandBattles() {
   check(std::none_of(e.state().battles.begin(), e.state().battles.end(),
                      [](const auto &entry) {
                        return entry.second.flags.contains(
-                           "amphibious_preparation");
+                           mark::amphibious_preparation);
                      }) &&
             e.state().units.at("amphibious").carriedBy == "transport",
         "Beginning the land battle did not call off the assault");
@@ -1525,10 +1525,10 @@ void militiaEndEachMovementAshoreAtHome() {
   bound.units.at("t").cargo.clear();
   bound.units.at("m").carriedBy.reset();
   bound.units.at("m").zone = zoneNumber(bound, honshu);
-  bound.units.at("t").turnFlags["naval_strategic_destination:facility_rehe_major_port"] = 1;
+  bound.units.at("t").turnFlags[MarkKey(mark::naval_strategic_destination, "facility_rehe_major_port")] = 1;
   check(!navalLoadAllowed(bound, "t", "m"), "Militia boarded a ship bound abroad");
   bound.units.at("t").turnFlags.clear();
-  bound.units.at("t").turnFlags["naval_strategic_destination:facility_honshu_major_port"] = 1;
+  bound.units.at("t").turnFlags[MarkKey(mark::naval_strategic_destination, "facility_honshu_major_port")] = 1;
   check(navalLoadAllowed(bound, "t", "m"), "Militia could not board a ship bound home");
 }
 void militiaStepAshoreWhenTheirShipBerths() {

@@ -44,10 +44,7 @@ private:
   std::shared_ptr<const Rules> modules_ = campaignRules();
 };
 
-bool marked(const std::map<Id, int> &flags, const Id &key) {
-  const auto found = flags.find(key);
-  return found != flags.end() && found->second != 0;
-}
+bool marked(const Marks &flags, const MarkKey &key) { return flags.value(key) != 0; }
 
 bool clearsFinishedBattle(const State &state, const Action &action) {
   if (action.kind == "naval_finish_battle")
@@ -55,7 +52,7 @@ bool clearsFinishedBattle(const State &state, const Action &action) {
   if (action.kind != "land_progress_battle")
     return false;
   const auto found = state.battles.find(action.parameters.require("battle").asString());
-  return found != state.battles.end() && marked(found->second.flags, "finished");
+  return found != state.battles.end() && marked(found->second.flags, mark::finished);
 }
 
 std::vector<std::string> menuText(const std::vector<Action> &actions) {
@@ -135,8 +132,8 @@ Lockstep playLockstep(std::uint64_t seed, int rounds) {
       check(!clearsFinishedBattle(training.state(), action), "Training profile offered a battle clearing");
     if (training.state().decisions.empty() && !training.state().chance)
       for (const auto &[id, battle] : training.state().battles)
-        check(!marked(battle.flags, "finished") || marked(battle.flags, "air_mission") ||
-                  marked(battle.flags, "amphibious_preparation"),
+        check(!marked(battle.flags, mark::finished) || marked(battle.flags, mark::air_mission) ||
+                  marked(battle.flags, mark::amphibious_preparation),
               "Training profile kept a finished battle with nothing pending");
     // End a phase more often than uniform play would, so games reach later rounds.
     std::size_t index = std::uniform_int_distribution<std::size_t>(0, actions.size() - 1)(choices);

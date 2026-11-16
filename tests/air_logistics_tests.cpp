@@ -71,9 +71,9 @@ void endPatrolOnlyNoncombat() {
     auto s = fixture();
     add(s, "patrol", "fighter", "sea_p16");
     auto &u = s.units.at("patrol");
-    u.gameFlags["on_map"] = 1;
-    u.gameFlags["map_range"] = 1;
-    u.commitments.insert("maritime_air_patrol");
+    u.gameFlags[mark::on_map] = 1;
+    u.gameFlags[mark::map_range] = 1;
+    u.commitments.insert(mark::maritime_air_patrol);
     check(!offered(s, "air_end_patrol"), "MAP aircraft ended patrol during Combat Movement");
     s.clock.phase = Phase::NonCombatMovement;
     check(offered(s, "air_end_patrol"), "MAP aircraft could not return during Noncombat Movement");
@@ -106,7 +106,7 @@ void baseMovementNeedsSupplyAndAge() {
           "Held supplied airbase failed movement bonus");
     auto newBase = fixture();
     add(newBase, "aircraft", "fighter", honshu);
-    newBase.facilities["base"] = {"base", "airbase", zoneNumber(newBase, honshu), 0, {{"placed_this_turn", 1}}};
+    newBase.facilities["base"] = {"base", "airbase", zoneNumber(newBase, honshu), 0, {{mark::placed_this_turn, 1}}};
     AirRules{}.beginTurn(newBase);
     check(newBase.units.at("aircraft").movementRemaining == ordinary,
           "Newly placed airbase granted immediate movement bonus");
@@ -136,14 +136,14 @@ void carrierAircraftCanLaunch() {
 void jointLandingCannotCountTheSameCarrierSlotsTwice() {
     auto s=fixture();add(s,"carrier","fleet_carrier","sea_p41");
     for(const auto& id:{Id("a"),Id("b")}) {
-        add(s,id,"fighter","sea_p41");s.units.at(id).movementRemaining=0;s.units.at(id).turnFlags["air_in_flight"]=1;
+        add(s,id,"fighter","sea_p41");s.units.at(id).movementRemaining=0;s.units.at(id).turnFlags[mark::air_in_flight]=1;
     }
     check(airLandingPlanAvailable(s),"Two returning fighters cannot share a two-slot carrier");
-    add(s,"c","fighter","sea_p41");s.units.at("c").movementRemaining=0;s.units.at("c").turnFlags["air_in_flight"]=1;
+    add(s,"c","fighter","sea_p41");s.units.at("c").movementRemaining=0;s.units.at("c").turnFlags[mark::air_in_flight]=1;
     for(const auto& id:{Id("a"),Id("b"),Id("c")})check(airLandingAvailable(s,id,"carrier"),"Individual landing query unexpectedly reserved an unassigned aircraft");
     // As attackers, one of the three must be lost: their owner chooses which, and
     // Combat Movement ends once the other two can land.
-    for(const auto& id:{Id("a"),Id("b"),Id("c")})s.units.at(id).commitments.insert("air_combat");
+    for(const auto& id:{Id("a"),Id("b"),Id("c")})s.units.at(id).commitments.insert(mark::air_combat);
     check(!airLandingPlanAvailable(s)&&airLandingShortfall(s)==1&&givenUp(s)==std::set<Id>{"a","b","c"}&&
               !AirRules{}.phaseComplete(s)&&strandedAircraft(s).size()==1,
           "Three attackers reused two carrier slots at the Combat Movement boundary");
@@ -155,11 +155,11 @@ void jointLandingUsesWeightedCarrierAssignments() {
     auto s=fixture();add(s,"heavy","heavy_fleet_carrier","sea_p41");add(s,"fleet","fleet_carrier","sea_p41");
     for(const auto& id:{Id("a"),Id("b"),Id("c"),Id("bomber")}) {
         add(s,id,id=="bomber"?"medium_bomber":"fighter","sea_p41");
-        s.units.at(id).movementRemaining=0;s.units.at(id).turnFlags["air_in_flight"]=1;
+        s.units.at(id).movementRemaining=0;s.units.at(id).turnFlags[mark::air_in_flight]=1;
     }
     check(airLandingPlanAvailable(s),"Joint assignment stranded a bomber despite a fitting heavy-carrier allocation");
     s.units.erase("a");s.units.erase("b");s.units.erase("c");
-    add(s,"second","medium_bomber","sea_p41");s.units.at("second").movementRemaining=0;s.units.at("second").turnFlags["air_in_flight"]=1;
+    add(s,"second","medium_bomber","sea_p41");s.units.at("second").movementRemaining=0;s.units.at("second").turnFlags[mark::air_in_flight]=1;
     check(!airLandingPlanAvailable(s),"Medium bombers used a fleet carrier or shared only three heavy-carrier slots");
     add(s,"second_heavy","heavy_fleet_carrier","sea_p41");
     check(airLandingPlanAvailable(s),"Separate heavy carriers did not provide independent bomber capacity");
@@ -184,7 +184,7 @@ void scrambledAircraftReserveTheirOriginalCarrierSeats() {
         const auto declined=*decline;AirRules{}.apply(s,declined);
     }
     add(s,"incoming","fighter","sea_p14","kmt");s.units.at("incoming").movementRemaining=0;
-    s.units.at("incoming").turnFlags["air_in_flight"]=1;
+    s.units.at("incoming").turnFlags[mark::air_in_flight]=1;
     // The plan with no list covers only the moving nation's aircraft; name KMT's.
     check(!airLandingAvailable(s,"incoming","carrier")&&!airLandingPlanAvailable(s,{"incoming"}),"Another plane stole a surviving scrambler's reserved carrier seat");
     removePoliticalUnits(s,{"incoming"});AirRules{}.finishPhase(s);
@@ -194,8 +194,8 @@ void scrambledAircraftReserveTheirOriginalCarrierSeats() {
 void landingChoicesPreserveOtherAircraftsOnlyCarrierSlot() {
     auto s=fixture(Phase::NonCombatMovement);add(s,"carrier","fleet_carrier","sea_p16");
     add(s,"deck","fighter","sea_p16");attachCargo(s,"carrier","deck");s.units.at("deck").movementRemaining=0;
-    add(s,"flexible","fighter","sea_p16");s.units.at("flexible").movementRemaining=1;s.units.at("flexible").turnFlags["air_in_flight"]=1;
-    add(s,"constrained","fighter","sea_p16");s.units.at("constrained").movementRemaining=0;s.units.at("constrained").turnFlags["air_in_flight"]=1;
+    add(s,"flexible","fighter","sea_p16");s.units.at("flexible").movementRemaining=1;s.units.at("flexible").turnFlags[mark::air_in_flight]=1;
+    add(s,"constrained","fighter","sea_p16");s.units.at("constrained").movementRemaining=0;s.units.at("constrained").turnFlags[mark::air_in_flight]=1;
     check(airLandingPlanAvailable(s),"Flexible land return and constrained carrier return were not jointly feasible");
     auto options=AirRules{}.actions(s);
     check(std::none_of(options.begin(),options.end(),[](const auto& a){return a.kind=="air_land_noncombat"&&
@@ -212,7 +212,7 @@ void landingChoicesPreserveOtherAircraftsOnlyCarrierSlot() {
 void carriedAircraftAbleToFlyAshoreFreeTheirSeats() {
     auto s=fixture(Phase::NonCombatMovement);add(s,"carrier","light_carrier","sea_p16");
     add(s,"deck","fighter","sea_p16");attachCargo(s,"carrier","deck");
-    add(s,"inbound","fighter","sea_p16");s.units.at("inbound").movementRemaining=0;s.units.at("inbound").turnFlags["air_in_flight"]=1;
+    add(s,"inbound","fighter","sea_p16");s.units.at("inbound").movementRemaining=0;s.units.at("inbound").turnFlags[mark::air_in_flight]=1;
     check(!airLandingPlanAvailable(s)&&airLandingPlanReachable(s),
           "A carried fighter able to fly ashore did not free its seat for an aircraft without fuel");
     s.units.at("deck").movementRemaining=0;
@@ -227,11 +227,11 @@ State fiveThousandNinety(bool lightCarrierCanSail) {
     for(const auto& zone:{beiping,shantung,Id("land_china_hopeh")})s.territories.at(zoneNumber(s, zone)).possessor=nationNumber(s, "kmt");
     s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));s.captureTurnStart();
     add(s,"light","light_carrier","sea_p14");add(s,"fleet","fleet_carrier","sea_p15");
-    if(!lightCarrierCanSail)s.units.at("light").turnFlags["naval_movement_spent"]=99;
+    if(!lightCarrierCanSail)s.units.at("light").turnFlags[mark::naval_movement_spent]=99;
     auto airborne=[&](const Id& id,const Id& type,const Id& zone,int fuel){
-        add(s,id,type,zone);s.units.at(id).movementRemaining=fuel;s.units.at(id).turnFlags["air_in_flight"]=1;};
+        add(s,id,type,zone);s.units.at(id).movementRemaining=fuel;s.units.at(id).turnFlags[mark::air_in_flight]=1;};
     airborne("pinned","fighter","sea_p15",0);
-    airborne("attacker","tactical_bomber","land_china_hopeh",1);s.units.at("attacker").commitments.insert("air_combat");
+    airborne("attacker","tactical_bomber","land_china_hopeh",1);s.units.at("attacker").commitments.insert(mark::air_combat);
     airborne("returning","tactical_bomber","land_manchuria_rehe",1);
     return s;
 }
@@ -254,7 +254,7 @@ void secondBomberCannotTakeTheAttackersOnlySeat() {
     auto s=fiveThousandNinety(true);
     auto& returning=s.units.at("returning");
     returning.route=zoneNumbers(s, {"sea_p14"});returning.zone = zoneNumber(s, "sea_p14");returning.movementRemaining=0;
-    returning.commitments.insert("combat_move");
+    returning.commitments.insert(mark::combat_move);
     check(validateNavalRoute(s,{{"light"},zoneNumbers(s, {"sea_p14", "sea_p15"}),true}).allowed&&
               validateNavalRoute(s,{{"fleet"},zoneNumbers(s, {"sea_p15", "sea_p14"}),true}).allowed,
           "Either carrier could not begin the swap that seats all three aircraft");
@@ -279,7 +279,7 @@ void otherNationsPatrolsDoNotHoldTheMoversPlan() {
     // A KMT patrol with no landing is lost by RB 9.3.1 at a phase end; it does
     // not constrain Japan's moves or keep Japan's Combat Movement open.
     auto s=fixture();add(s,"patrol","fighter","sea_p16","kmt");
-    auto &u=s.units.at("patrol");u.gameFlags["on_map"]=1;u.gameFlags["map_range"]=0;u.commitments.insert("maritime_air_patrol");
+    auto &u=s.units.at("patrol");u.gameFlags[mark::on_map]=1;u.gameFlags[mark::map_range]=0;u.commitments.insert(mark::maritime_air_patrol);
     check(!airLandingPlanAvailable(s,{"patrol"})&&airLandingPlanAvailable(s)&&airLandingPlanReachable(s)&&AirRules{}.phaseComplete(s),
           "Another nation's stranded patrol held Japan's landing plan or Combat Movement");
 }
@@ -287,7 +287,7 @@ void noncombatMovementEndsOnlyWithTheMoversPatrolsLandable() {
     auto s=fixture(Phase::NonCombatMovement);add(s,"cv","light_carrier","sea_p16");
     add(s,"deck","fighter","sea_p16");attachCargo(s,"cv","deck");s.units.at("deck").movementRemaining=0;
     add(s,"patrol","fighter","sea_p16");auto &u=s.units.at("patrol");
-    u.gameFlags["on_map"]=1;u.gameFlags["map_range"]=0;u.commitments.insert("maritime_air_patrol");
+    u.gameFlags[mark::on_map]=1;u.gameFlags[mark::map_range]=0;u.commitments.insert(mark::maritime_air_patrol);
     check(!AirRules{}.phaseComplete(s),"Noncombat Movement ended with Japan's own patrol unable to land");
     add(s,"spare","light_carrier","sea_p16");
     check(AirRules{}.phaseComplete(s),"A landable patrol kept Noncombat Movement open");
@@ -298,7 +298,7 @@ void aSailingCarriersAircraftMayUseAnyCarrier() {
     auto s=fixture();add(s,"heavy","heavy_fleet_carrier","sea_p16");
     add(s,"deck","fighter","sea_p16");attachCargo(s,"heavy","deck");s.units.at("deck").movementRemaining=0;
     add(s,"light","light_carrier","sea_p16");
-    add(s,"bomber","medium_bomber","sea_p15");s.units.at("bomber").movementRemaining=0;s.units.at("bomber").turnFlags["air_in_flight"]=1;
+    add(s,"bomber","medium_bomber","sea_p15");s.units.at("bomber").movementRemaining=0;s.units.at("bomber").turnFlags[mark::air_in_flight]=1;
     check(!airLandingPlanAvailable(s)&&airLandingPlanReachable(s),
           "A sailing carrier's own aircraft could not use a carrier no airborne aircraft needed");
 }
@@ -326,13 +326,13 @@ void aircraftThatCannotLandDoNotBlockOtherMoves() {
     add(s,"cv","light_carrier","sea_p16");
     for(const Id id:{"p1","p2"}){
         add(s,id,"fighter","sea_p16");auto &u=s.units.at(id);
-        u.gameFlags["on_map"]=1;u.gameFlags["map_range"]=0;u.commitments.insert("maritime_air_patrol");
+        u.gameFlags[mark::on_map]=1;u.gameFlags[mark::map_range]=0;u.commitments.insert(mark::maritime_air_patrol);
     }
     // A carrier with one zone of movement left, too far to bring a second seat.
     add(s,"other","light_carrier","sea_p32");
     for(int spent=1;spent<12&&validateNavalRoute(s,{{"other"},zoneNumbers(s, {"sea_p32","sea_p15","sea_p16"}),true}).reason!=
                           "Insufficient naval movement";++spent)
-        s.units.at("other").turnFlags["naval_movement_spent"]=spent;
+        s.units.at("other").turnFlags[mark::naval_movement_spent]=spent;
     add(s,"bomber","tactical_bomber",beiping);add(s,"defender","infantry","land_china_hopeh","kmt");
     check(airLandingShortfall(s)==1&&!airLandingPlanReachable(s),"Two patrols for one seat did not leave exactly one without a landing");
     const auto attacks=[](const State& state,const Id& unit,const Id& target){
@@ -349,7 +349,7 @@ void aircraftThatCannotLandDoNotBlockOtherMoves() {
     // A fighter in flight may attack only if it can still land afterwards, even
     // where it is already lost without the attack.
     add(s,"target","infantry","land_china_suiyuan","kmt");
-    add(s,"stray","fighter","land_china_shensi");s.units.at("stray").turnFlags["air_in_flight"]=1;
+    add(s,"stray","fighter","land_china_shensi");s.units.at("stray").turnFlags[mark::air_in_flight]=1;
     s.units.at("stray").movementRemaining=3;
     check(airLandingShortfall(s)==1&&attacks(s,"stray","land_china_suiyuan"),"A fighter able to return was refused its attack");
     s.units.at("stray").movementRemaining=1;
@@ -358,7 +358,7 @@ void aircraftThatCannotLandDoNotBlockOtherMoves() {
     // even with another already lost.
     auto waiting=s.clone();waiting.units.erase("stray");
     add(waiting,"late","fighter","sea_p33");waiting.units.at("late").movementRemaining=0;
-    waiting.units.at("late").turnFlags["air_in_flight"]=1;waiting.units.at("late").commitments.insert("air_combat");
+    waiting.units.at("late").turnFlags[mark::air_in_flight]=1;waiting.units.at("late").commitments.insert(mark::air_combat);
     check(airLandingShortfall(waiting)==1&&!AirRules{}.phaseComplete(waiting)&&!givenUp(waiting).contains("late"),
           "Combat Movement ended, or offered to give up an attacker, while a carrier could still sail to it");
     waiting.units.at("other").zone = zoneNumber(waiting, "sea_p33");
@@ -374,15 +374,15 @@ void aMediumBomberLeftOutMayBeGivenUpAndAloneIsLost() {
     auto s=fixture();add(s,"heavy","heavy_fleet_carrier","sea_p41");
     add(s,"x","fighter","sea_p41");attachCargo(s,"heavy","x");s.units.at("x").movementRemaining=0;
     for(const auto& [id,type]:{std::pair<Id,Id>{"a","medium_bomber"},{"b","fighter"},{"c","fighter"}}){
-        add(s,id,type,"sea_p41");s.units.at(id).movementRemaining=0;s.units.at(id).turnFlags["air_in_flight"]=1;
+        add(s,id,type,"sea_p41");s.units.at(id).movementRemaining=0;s.units.at(id).turnFlags[mark::air_in_flight]=1;
     }
-    for(const auto& id:{Id("b"),Id("c")})s.units.at(id).commitments.insert("air_combat");
+    for(const auto& id:{Id("b"),Id("c")})s.units.at(id).commitments.insert(mark::air_combat);
     const auto actions=AirRules{}.actions(s);
     check(airLandingShortfall(s)==1&&!airLandingSpots(s,"a").empty()&&
               std::any_of(actions.begin(),actions.end(),[](const auto& a){
                   return a.kind=="air_failed_landing"&&a.parameters.require("unit").asString()=="a";}),
           "A medium bomber that no plan can land could not be given up");
-    s.units.at("a").commitments.insert("air_combat");
+    s.units.at("a").commitments.insert(mark::air_combat);
     check(givenUp(s)==std::set<Id>{"a"}&&!AirRules{}.phaseComplete(s)&&strandedAircraft(s)==std::vector<Id>{"a"},
           "The owner could give up a fighter where only losing the bomber loses no more");
     giveUp(s,"a");
@@ -393,17 +393,17 @@ void continuingAndScreenedAircraftMayBeGivenUp() {
     // and in Combat a screened aircraft left with no landing may be given up, so
     // the phase can end.
     auto s=fixture();add(s,"cv","light_carrier","sea_p16");
-    add(s,"p1","fighter","sea_p16");s.units.at("p1").gameFlags["on_map"]=1;s.units.at("p1").gameFlags["map_range"]=0;
-    s.units.at("p1").commitments.insert("maritime_air_patrol");
+    add(s,"p1","fighter","sea_p16");s.units.at("p1").gameFlags[mark::on_map]=1;s.units.at("p1").gameFlags[mark::map_range]=0;
+    s.units.at("p1").commitments.insert(mark::maritime_air_patrol);
     add(s,"cont","fighter","sea_p16");s.units.at("cont").movementRemaining=0;
-    s.units.at("cont").turnFlags["air_in_flight"]=1;s.units.at("cont").turnFlags["air_screening_wait"]=1;
-    s.units.at("cont").commitments.insert("air_combat");
+    s.units.at("cont").turnFlags[mark::air_in_flight]=1;s.units.at("cont").turnFlags[mark::air_screening_wait]=1;
+    s.units.at("cont").commitments.insert(mark::air_combat);
     check(airLandingShortfall(s)==1&&givenUp(s)==std::set<Id>{"p1","cont"},
           "A continuing aircraft could not be chosen among the losses");
     auto combat=fixture(Phase::Combat);
     add(combat,"ready","fighter","sea_p16");combat.units.at("ready").movementRemaining=0;
-    combat.units.at("ready").turnFlags["air_in_flight"]=1;combat.units.at("ready").turnFlags["air_screening_ready"]=1;
-    combat.units.at("ready").commitments.insert("air_combat");
+    combat.units.at("ready").turnFlags[mark::air_in_flight]=1;combat.units.at("ready").turnFlags[mark::air_screening_ready]=1;
+    combat.units.at("ready").commitments.insert(mark::air_combat);
     check(givenUp(combat)==std::set<Id>{"ready"},"A screened aircraft with no landing could not be given up in Combat");
     giveUp(combat,"ready");
     check(!combat.units.contains("ready"),"Giving up the screened aircraft left it in play");
@@ -414,15 +414,15 @@ void givingUpAMissionsLastBomberEndsTheMission() {
     auto s=fixture();add(s,"heavy","heavy_fleet_carrier","sea_p41");
     add(s,"x","fighter","sea_p41");attachCargo(s,"heavy","x");s.units.at("x").movementRemaining=0;
     for(const auto& [id,type]:{std::pair<Id,Id>{"a","medium_bomber"},{"b","fighter"},{"c","fighter"}}){
-        add(s,id,type,"sea_p41");s.units.at(id).movementRemaining=0;s.units.at(id).turnFlags["air_in_flight"]=1;
-        s.units.at(id).commitments.insert("air_combat");
+        add(s,id,type,"sea_p41");s.units.at(id).movementRemaining=0;s.units.at(id).turnFlags[mark::air_in_flight]=1;
+        s.units.at(id).commitments.insert(mark::air_combat);
     }
-    add(s,"esc","fighter",beiping);s.units.at("esc").turnFlags["air_in_flight"]=1;s.units.at("esc").commitments.insert("air_combat");
+    add(s,"esc","fighter",beiping);s.units.at("esc").turnFlags[mark::air_in_flight]=1;s.units.at("esc").commitments.insert(mark::air_combat);
     BattleState mission;mission.id="mission";mission.zone = zoneNumber(s, "land_china_hopeh");mission.attacker=nationNumber(s, "japan");mission.defender=nationNumber(s, "kmt");
-    mission.stage="air_declared";mission.flags["air_mission"]=1;mission.attackers={"a","esc"};
+    mission.stage="air_declared";mission.flags[mark::air_mission]=1;mission.attackers={"a","esc"};
     s.battles.emplace(mission.id,mission);s.battleOrder.push_back(mission.id);
     giveUp(s,"a");
-    check(!s.battles.contains("mission")&&!s.units.at("esc").commitments.contains("air_combat"),
+    check(!s.battles.contains("mission")&&!s.units.at("esc").commitments.contains(mark::air_combat),
           "A bombing mission kept its escort after losing its only bomber");
 }
 void attackDeclarationsRequireACombinedReturnPlan() {
@@ -477,7 +477,7 @@ void groundedLandingCannotRepeatWithoutChangingState() {
     check(moved != options.end(), "No-op filtering removed a real noncombat flight and landing");
     AirRules{}.apply(s, *moved);
     check(s.units.at("grounded").zone == zoneNumber(s, "land_jap_tokyo") && !s.units.at("grounded").route.empty() &&
-          !s.units.at("grounded").turnFlags.contains("air_in_flight"), "Real noncombat relocation failed");
+          !s.units.at("grounded").turnFlags.contains(mark::air_in_flight), "Real noncombat relocation failed");
 }
 void sameZoneLandingsRetainActualReturnEffects() {
     for (const bool screening : {false, true}) {
@@ -485,7 +485,7 @@ void sameZoneLandingsRetainActualReturnEffects() {
         add(s, "returning", "fighter", honshu);
         auto &u = s.units.at("returning");
         u.movementRemaining = 0;
-        u.turnFlags[screening ? "air_screening_ready" : "air_in_flight"] = 1;
+        u.turnFlags[screening ? mark::air_screening_ready : mark::air_in_flight] = 1;
         const auto options = AirRules{}.actions(s);
         const auto landing = std::find_if(options.begin(), options.end(), [](const auto &a) {
             return a.kind == "air_land_noncombat" &&
@@ -495,10 +495,10 @@ void sameZoneLandingsRetainActualReturnEffects() {
         check(landing != options.end(), "Actual same-zone return or screening consumption was removed");
         const auto before = s.planningKey();
         AirRules{}.apply(s, *landing);
-        check(s.planningKey() != before && !u.turnFlags.contains("air_in_flight") &&
-              !u.turnFlags.contains("air_screening_ready"), "Same-zone return did not consume its state effect");
+        check(s.planningKey() != before && !u.turnFlags.contains(mark::air_in_flight) &&
+              !u.turnFlags.contains(mark::air_screening_ready), "Same-zone return did not consume its state effect");
         if (screening)
-            check(u.turnFlags.at("air_battle_turn") == static_cast<int>(s.clock.playerTurnSerial + 1),
+            check(u.turnFlags.at(mark::air_battle_turn) == static_cast<int>(s.clock.playerTurnSerial + 1),
                   "Landing failed to consume the screened aircraft's combat commitment");
     }
     auto s = fixture(Phase::NonCombatMovement);
@@ -521,7 +521,7 @@ void sameZoneLandingsRetainActualReturnEffects() {
           "Same-sea carrier transfer failed");
     add(s, "incoming", "fighter", "sea_p16");
     s.units.at("incoming").movementRemaining = 0;
-    s.units.at("incoming").turnFlags["air_in_flight"] = 1;
+    s.units.at("incoming").turnFlags[mark::air_in_flight] = 1;
     const auto incomingOptions = AirRules{}.actions(s);
     const auto actualReturn = std::find_if(incomingOptions.begin(), incomingOptions.end(), [](const auto &a) {
         return a.kind == "air_land_noncombat" && a.parameters.require("unit").asString() == "incoming" &&
@@ -530,7 +530,7 @@ void sameZoneLandingsRetainActualReturnEffects() {
     check(actualReturn != incomingOptions.end(), "Redundant reattachment filtering removed an actual carrier return");
     AirRules{}.apply(s, *actualReturn);
     check(s.units.at("incoming").carriedBy == "first" &&
-          !s.units.at("incoming").turnFlags.contains("air_in_flight"), "Actual carrier return failed");
+          !s.units.at("incoming").turnFlags.contains(mark::air_in_flight), "Actual carrier return failed");
 }
 void startingCarrierAircraftDoNotOfferRedundantReattachment() {
     auto engine = Engine::start(

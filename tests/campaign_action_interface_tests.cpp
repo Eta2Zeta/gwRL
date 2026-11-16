@@ -189,7 +189,7 @@ void allFleetOrdersRemainAvailableAndEveryDraftTerminates() {
 void exhaustedAndZeroRouteStartsAreAbsentButPortExitRemains() {
   auto state = fixture();
   add(state, "exhausted", "destroyer", p16);
-  state.units.at("exhausted").turnFlags["naval_movement_spent"] = 99;
+  state.units.at("exhausted").turnFlags[mark::naval_movement_spent] = 99;
   state.units.at("exhausted").movementRemaining = 0;
   Engine human(state, campaignRules());
   Engine training(state, trainingCampaignRules());
@@ -203,8 +203,8 @@ void exhaustedAndZeroRouteStartsAreAbsentButPortExitRemains() {
 
   state.units.clear();
   add(state, "in_port", "destroyer", tokyo);
-  state.units.at("in_port").gameFlags["in_port:" + tokyoPort] = 1;
-  state.units.at("in_port").turnFlags["naval_movement_spent"] = 99;
+  state.units.at("in_port").gameFlags[MarkKey(mark::in_port, tokyoPort)] = 1;
+  state.units.at("in_port").turnFlags[mark::naval_movement_spent] = 99;
   state.units.at("in_port").movementRemaining = 0;
   Engine port(state, trainingCampaignRules());
   chooseUnit(port, "naval_start_move", "in_port");
@@ -219,7 +219,7 @@ void landingFailureAtAnIntermediateDestinationDoesNotHideLongerRoutes() {
   auto state = fixture();
   add(state, "carrier", "light_carrier", p16);
   add(state, "plane", "fighter", p14);
-  state.units.at("plane").turnFlags["air_in_flight"] = 1;
+  state.units.at("plane").turnFlags[mark::air_in_flight] = 1;
   state.units.at("plane").movementRemaining = 0;
   // RB 9.3 needs the seat only when movement ends, so a first leg that keeps
   // the waiting aircraft within the carrier's remaining reach is legal.
@@ -232,9 +232,9 @@ void landingFailureAtAnIntermediateDestinationDoesNotHideLongerRoutes() {
   for (int spent = 1; spent < 12 &&
                       validateNavalRoute(oneLeg, {{"carrier"}, zoneNumbers(oneLeg, {p16, p15, p14})}).allowed;
        ++spent)
-    oneLeg.units.at("carrier").turnFlags["naval_movement_spent"] = spent;
+    oneLeg.units.at("carrier").turnFlags[mark::naval_movement_spent] = spent;
   add(oneLeg, "beside", "fighter", p16);
-  oneLeg.units.at("beside").turnFlags["air_in_flight"] = 1;
+  oneLeg.units.at("beside").turnFlags[mark::air_in_flight] = 1;
   oneLeg.units.at("beside").movementRemaining = 0;
   const auto shortLeg = validateNavalRoute(oneLeg, {{"carrier"}, zoneNumbers(oneLeg, {p16, p15})});
   check(!shortLeg.allowed &&
@@ -261,7 +261,7 @@ void carriersMayJoinWaitingAircraftOneAtATime() {
     add(state, id, "light_carrier", p16);
   for (const auto &id : {"plane_one", "plane_two", "plane_three"}) {
     add(state, id, "fighter", p14);
-    state.units.at(id).turnFlags["air_in_flight"] = 1;
+    state.units.at(id).turnFlags[mark::air_in_flight] = 1;
     state.units.at(id).movementRemaining = 0;
   }
   check(validateNavalRoute(state, {{"a"}, zoneNumbers(state, {p16, p15, p14})}).allowed &&
@@ -293,7 +293,7 @@ void screeningRetainsAllNonemptySubsetsAndItsRealContinuationChoice() {
   state.nations.at(nationNumber(state, "kmt")).atWarWith.insert(nationNumber(state, "japan"));
   for (const auto &id : {"a", "b", "c"}) {
     add(state, id, "destroyer", tokyo);
-    state.units.at(id).gameFlags["in_port:" + tokyoPort] = 1;
+    state.units.at(id).gameFlags[MarkKey(mark::in_port, tokyoPort)] = 1;
   }
   add(state, "enemy", "destroyer", p16, "kmt");
   Engine engine(state, trainingCampaignRules());
@@ -340,7 +340,7 @@ void screeningRetainsAllNonemptySubsetsAndItsRealContinuationChoice() {
   const auto battle = after.battles.begin()->first;
   removePoliticalUnits(after, {"enemy"});
   after.battles.at(battle).stage = "naval_complete";
-  after.battles.at(battle).flags["finished"] = 1;
+  after.battles.at(battle).flags[mark::finished] = 1;
   continueNavalMovement(after, battle);
   forwardNavalOrderDecision(after);
   check(after.decisions.back().kind == "naval_screening_continuation",
@@ -414,7 +414,7 @@ void laterBlockingSeasStartAFreshScreenSelection() {
     const auto battle = after.battles.begin()->first;
     removePoliticalUnits(after, {"first_enemy"});
     after.battles.at(battle).stage = "naval_complete";
-    after.battles.at(battle).flags["finished"] = 1;
+    after.battles.at(battle).flags[mark::finished] = 1;
     continueNavalMovement(after, battle);
     const auto &options = after.decisions.back().options;
     const auto continuation = std::find_if(options.begin(), options.end(),

@@ -70,9 +70,9 @@ void checkHookClock(const State& state, const Clock& before, bool terminal, bool
 }
 
 bool phaseWorkClear(const State& state) {
-    const auto immediate = state.flags.find("immediate_land_battles");
+    const auto immediate = state.flags.find(mark::immediate_land_battles);
     if (immediate != state.flags.end() && immediate->second) return false;
-    const auto naval = state.flags.find("immediate_naval_battles");
+    const auto naval = state.flags.find(mark::immediate_naval_battles);
     if (naval != state.flags.end() && naval->second) return false;
     if (workClear(state)) return true;
     if (!state.decisions.empty() || state.chance) return false;
@@ -156,7 +156,7 @@ void prepareTurnStart(State& state) {
     // An alignment's mark (see incorporateNation) lasts only for its own
     // Player Turn, so observations carry no stale marks.
     for (auto& [id, territory] : state.territories)
-        territory.flags.erase("aligned_turn");
+        territory.flags.erase(mark::aligned_turn);
     state.captureTurnStart();
 }
 
@@ -320,12 +320,12 @@ Engine Engine::start(State initial, std::shared_ptr<const Rules> rules, std::uin
             && clock.phase == Phase::Production && clock.completedRounds == 0
             && clock.playerTurnSerial == 0 && !clock.incomeCollected
             && result.state_.history.empty() && workClear(result.state_)
-            && !result.state_.flags.contains("__campaign_started"), "Campaign start requires a fresh state");
+            && !result.state_.flags.contains(mark::campaign_started), "Campaign start requires a fresh state");
     for (const auto& [nation, count] : result.state_.completedTurns)
         require(count == 0, "Campaign start has completed national turns");
     // The __ prefix is reserved for runtime bookkeeping. Keep this marker in
     // state so a fresh-position restore cannot accidentally begin twice.
-    result.state_.flags["__campaign_started"] = 1;
+    result.state_.flags[mark::campaign_started] = 1;
     prepareTurnStart(result.state_);
     const auto before = result.state_.clock;
     result.rules_->beginTurn(result.state_);
@@ -372,7 +372,7 @@ std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
     auto& actions = menu->actions;
     const PositionScope scope(state_);  // Covers the phase check below too.
     actions = decisionPending ? state_.decisions.back().options : rules_->actions(state_);
-    const auto immediate = state_.flags.find("immediate_land_battles");
+    const auto immediate = state_.flags.find(mark::immediate_land_battles);
     if (!decisionPending && immediate != state_.flags.end() && immediate->second)
         actions.erase(std::remove_if(actions.begin(), actions.end(), [](const Action& action) {
             return action.kind != "land_begin_battle" && action.kind != "land_progress_battle";
@@ -392,8 +392,8 @@ std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
             require(state_.nations.contains(acting),"Rules action names an unknown nation");
             const auto &nation=state_.nations.at(*acting);
             const bool directAxis=*acting==knownNations(state_).dadao && state_.currentNation()==knownNations(state_).japan &&
-                nation.gameFlags.contains("direct_axis_control_after_japan_surrender") &&
-                nation.gameFlags.at("direct_axis_control_after_japan_surrender")!=0;
+                nation.gameFlags.contains(mark::direct_axis_control_after_japan_surrender) &&
+                nation.gameFlags.at(mark::direct_axis_control_after_japan_surrender)!=0;
             require((*acting == state_.currentNation() ||
                      controlledBy(state_,*acting,state_.currentNation()) || directAxis) && !action.decision,
                     "Rules action does not match active nation");
@@ -477,9 +477,9 @@ std::shared_ptr<const Engine::ActionMenu> Engine::interruptMenu() const {
         return menu;
     };
     if(state_.terminal||state_.chance)return finish();
-    const auto immediate = state_.flags.find("immediate_land_battles");
+    const auto immediate = state_.flags.find(mark::immediate_land_battles);
     if (immediate != state_.flags.end() && immediate->second) return finish();
-    const auto naval = state_.flags.find("immediate_naval_battles");
+    const auto naval = state_.flags.find(mark::immediate_naval_battles);
     if (naval != state_.flags.end() && naval->second) return finish();
     auto& actions=menu->actions;
     const PositionScope scope(state_);

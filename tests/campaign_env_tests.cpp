@@ -279,7 +279,7 @@ void setupValuesAndNoDoubleCounting() {
     near(allianceWealth(bare)[0].units, undamaged, "Invented a capital ship damage discount despite free repair");
     UnitState crew;
     crew.id = "crew"; crew.owner = nationNumber(s, "japan"); crew.type = knownUnitTypes(bare).militia; crew.zone = crew.turnOrigin = zoneNumber(s, "land_jap_honshu");
-    crew.gameFlags["ship_crew:" + ship.id] = 1;
+    crew.gameFlags[MarkKey(mark::ship_crew, ship.id)] = 1;
     bare.units.emplace(crew.id, crew);
     near(allianceWealth(bare)[0].units, undamaged, "Temporary crew was counted as another purchased asset");
 }
@@ -287,7 +287,7 @@ void setupValuesAndNoDoubleCounting() {
 void repairsRailAndNeutralAttribution() {
     auto s = emptyAssets();
     const auto healthyCity = allianceWealth(s)[0];
-    s.territories.at(zoneNumber(s, "land_jap_tokyo")).flags["city_damage"] = 20;
+    s.territories.at(zoneNumber(s, "land_jap_tokyo")).flags[mark::city_damage] = 20;
     const auto bombedCity = allianceWealth(s)[0];
     near(healthyCity.incomeRate - bombedCity.incomeRate, 1, "City bombing did not change the current legal income rate");
     near(healthyCity.infrastructure, bombedCity.infrastructure, "City label created a separately priced asset or repair deduction");

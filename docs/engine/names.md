@@ -1,15 +1,16 @@
 # Names held as numbers
 
 The scenario names everything with strings: zones such as `land_china_hopeh`,
-nations such as `japan`, unit types such as `cavalry`. Inside the engine zones,
-nations, unit types and unit classes are held as numbers instead, a few bytes
-that compare, copy and look up as fast as any integer. This page says which names the engine holds as
+nations such as `japan`, unit types such as `cavalry`, marks such as
+`placed_this_turn`. Inside the engine zones, nations, unit types, unit classes
+and the bases of marks are held as numbers instead, a few bytes that compare,
+copy and look up as fast as any integer. This page says which names the engine holds as
 numbers, where each number comes from, where the engine turns names into numbers
 and back, and how to look a number up.
 
-Zones, nations, unit types and unit classes are numbers so far. Facility types,
-technologies, the marks on units and the units themselves are still held by
-name; [what is still a name](#what-is-still-a-name) lists them.
+Zones, nations, unit types, unit classes and marks are numbers so far.
+Facility types, technologies and the units themselves are still held by name;
+[what is still a name](#what-is-still-a-name) lists them.
 
 ## 1. Why numbers
 
@@ -26,7 +27,10 @@ out of a searched game: 11.6% fewer instructions than before either change
 ([record](../archive/records/nation_numbers_2026_11_16.md)). Holding unit types
 and classes as numbers took a further 4.7% out of listing the moves and 2.5% out
 of a searched game: 13.8% fewer instructions than before any of these changes
-([record](../archive/records/unit_type_numbers_2026_11_16.md)).
+([record](../archive/records/unit_type_numbers_2026_11_16.md)). Holding marks as
+numbers took a further 9.0% out of listing the moves and 4.9% out of a searched
+game: 18.1% fewer instructions than before any of these changes
+([record](../archive/records/mark_numbers_2026_11_16.md)).
 
 ## 2. Where the numbers come from
 
@@ -44,6 +48,7 @@ are made from are part of the definition and of the catalog.
 | Nations | `NationId` | The keys of the definition's `factions`, dormant ones included | 13 |
 | Unit types | `UnitTypeId` | The catalog's units (`land_air.json` and `naval.json` in `game_content/catalog/gw36_v43`) | 53 |
 | Unit classes | `UnitClassId` | Every class some unit of the catalog has | 17 |
+| Marks | `MarkId` | The bases in the engine's mark table, `GWRL_MARKS` in `include/game/marks.hpp` | 218 |
 
 The campaign's 13 nations are the 12 of its faction index
 (`game_content/scenarios/japan_china_1936/faction_index.json`) and Dadao, which
@@ -63,7 +68,8 @@ Because a number is a place in a sorted list:
   after each kind was numbered
   ([zones](../archive/records/zone_numbers_2026_11_16.md),
   [nations](../archive/records/nation_numbers_2026_11_16.md),
-  [unit types](../archive/records/unit_type_numbers_2026_11_16.md)).
+  [unit types](../archive/records/unit_type_numbers_2026_11_16.md),
+  [marks](../archive/records/mark_numbers_2026_11_16.md)).
 - **A number belongs to its definition or catalog.** Adding a zone to the map,
   a nation to the factions or a unit type to the catalog renumbers those after
   it. Saved games, planning keys and
@@ -99,6 +105,32 @@ holds a number.
 
 A unit's type comes from the catalog, so a position holds units only if its
 definition has a catalog; `State::validate` refuses a unit otherwise.
+
+### What a mark is
+
+A *mark* is a small fact a rule notes, with a whole number, on a unit, a
+nation, a territory, a facility, a construction project, a battle or the
+position itself: `placed_this_turn` = 1, `naval_movement_spent` = 2,
+`economy_production_cap:facility_honshu_airfield` = 3. A unit's commitments,
+such as `combat_move`, are marks without numbers. A mark's name has a *base*,
+which says what it records, and for some bases an *argument*, which says what
+it is about: a zone, a nation, a facility, a unit and so on.
+
+The engine numbers the bases. `GWRL_MARKS` in `include/game/marks.hpp` lists
+every base a position may hold, in name order, with what its argument names;
+a base's number is its place in that list, and `mark::placed_this_turn` names
+that number in code. The argument stays text: the name of the zone, nation,
+facility or other thing the mark is about. A mark is written base, `:`,
+argument, except `evolution_pending`, whose argument follows an underscore, as
+in `evolution_pending_ccp`.
+
+The list is the whole set: reading a saved position refuses a mark it lacks,
+and setting a mark checks that its argument fits its base, so a misspelled
+mark cannot slip in. `fixture:<name>` is the one base no rule of the game
+notes: test rules and tools use it for their own bookkeeping. Static checks in
+the header keep the list sorted and keep each argument from moving a mark away
+from its number's place in name order, so a set of marks lists them in the
+order of their names.
 
 ## 3. The campaign's tables
 
@@ -246,20 +278,244 @@ The campaign, `game_content/scenarios/japan_china_1936`, and its catalog,
 | 15 | `surface_warship` |
 | 16 | `vehicle_class` |
 
+### Marks
+
+| Number | Name | Argument |
+| ---: | --- | --- |
+| 0 | `__campaign_started` | — |
+| 1 | `access_to_resources_completed` | — |
+| 2 | `air_allied_loaded_turn` | — |
+| 3 | `air_battle` | battle |
+| 4 | `air_battle_turn` | — |
+| 5 | `air_combat` | — |
+| 6 | `air_decision_sequence` | — |
+| 7 | `air_defending_carrier` | unit |
+| 8 | `air_in_flight` | — |
+| 9 | `air_landed_after_combat` | — |
+| 10 | `air_mission` | — |
+| 11 | `air_mission_sequence` | — |
+| 12 | `air_roll_sequence` | — |
+| 13 | `air_scramble_origin` | zone |
+| 14 | `air_scramble_source` | scramble source |
+| 15 | `air_scramble_turn` | — |
+| 16 | `air_scramble_used` | — |
+| 17 | `air_screening_continued` | — |
+| 18 | `air_screening_ready` | — |
+| 19 | `air_screening_wait` | — |
+| 20 | `air_transport_unloaded` | — |
+| 21 | `air_waiting_port_evacuation` | — |
+| 22 | `airborne_assault` | — |
+| 23 | `aligned_turn` | — |
+| 24 | `amphibious_assault` | — |
+| 25 | `amphibious_preparation` | — |
+| 26 | `amphibious_sequence` | — |
+| 27 | `amphibious_transport` | unit |
+| 28 | `artillery_city_bombing` | — |
+| 29 | `assault_declared` | — |
+| 30 | `assault_zone` | zone |
+| 31 | `attack_rolled` | — |
+| 32 | `attrition` | — |
+| 33 | `blitz_eligible` | — |
+| 34 | `blitz_from` | zone |
+| 35 | `blitz_pairing_done` | — |
+| 36 | `blitz_to` | zone |
+| 37 | `blitz_with` | unit |
+| 38 | `bomb_damage` | — |
+| 39 | `bombing_reduction` | facility |
+| 40 | `bombing_reduction_turn` | facility |
+| 41 | `border` | zone |
+| 42 | `capture_done` | — |
+| 43 | `captured_max_damage` | — |
+| 44 | `captured_port_pending` | nation |
+| 45 | `carpet_return_started` | — |
+| 46 | `casualty_dispute_decided` | — |
+| 47 | `chinese_truce_termination` | — |
+| 48 | `city_bombing_reduction` | zone |
+| 49 | `city_bombing_reduction_turn` | zone |
+| 50 | `city_damage` | — |
+| 51 | `city_destroyed` | — |
+| 52 | `city_ipp_lost` | — |
+| 53 | `civil_war_eliminated` | — |
+| 54 | `coastal_fire_turn` | — |
+| 55 | `coastal_shots_used` | — |
+| 56 | `combat` | — |
+| 57 | `combat_move` | — |
+| 58 | `completed` | — |
+| 59 | `controller_unresolved` | — |
+| 60 | `crossed_enemy_fortification` | — |
+| 61 | `crossing_used` | crossing |
+| 62 | `damage` | — |
+| 63 | `direct_axis_control_after_japan_surrender` | — |
+| 64 | `economy_last_paid_turn` | — |
+| 65 | `economy_militia_placed` | zone |
+| 66 | `economy_militia_upgrades` | — |
+| 67 | `economy_production_cap` | facility |
+| 68 | `economy_purchased` | — |
+| 69 | `economy_repair_cap` | facility |
+| 70 | `economy_repairs_finished` | — |
+| 71 | `economy_research_capacity` | — |
+| 72 | `economy_research_finished` | — |
+| 73 | `economy_research_used` | — |
+| 74 | `economy_researched_round` | technology |
+| 75 | `economy_sequence` | — |
+| 76 | `economy_start_damage` | facility |
+| 77 | `economy_start_type` | facility:type |
+| 78 | `economy_used` | facility |
+| 79 | `escort` | — |
+| 80 | `evolution_pending` | nation |
+| 81 | `evolved_during_own_turn` | — |
+| 82 | `evolved_turn_serial` | — |
+| 83 | `facility_upgrade` | — |
+| 84 | `finished` | — |
+| 85 | `first_allies_major_war_declared` | — |
+| 86 | `fixture` | name |
+| 87 | `foreign_consent` | nation |
+| 88 | `from_attack_naval_transport` | — |
+| 89 | `ignore_fortification` | — |
+| 90 | `immediate` | — |
+| 91 | `immediate_land_battles` | — |
+| 92 | `immediate_naval_battles` | — |
+| 93 | `in_port` | facility |
+| 94 | `incorporated` | — |
+| 95 | `influence_attempted` | — |
+| 96 | `japanese_surprise_attack` | — |
+| 97 | `land_battle_sequence` | — |
+| 98 | `land_decision_sequence` | — |
+| 99 | `land_retreating` | — |
+| 100 | `land_roll_sequence` | — |
+| 101 | `last_possession_change_turn` | — |
+| 102 | `launched_from_carrier` | — |
+| 103 | `lease_available_after_turns` | — |
+| 104 | `lease_declared` | nation |
+| 105 | `lease_delivered` | nation |
+| 106 | `lease_militia_upgrade` | — |
+| 107 | `lease_received` | — |
+| 108 | `lease_repair` | — |
+| 109 | `lease_repair_target` | repair target |
+| 110 | `lease_repair_wait` | repair target |
+| 111 | `lease_sender` | nation |
+| 112 | `lease_wait_controller` | nation |
+| 113 | `lend_to` | nation |
+| 114 | `logistics_damaged_turn` | facility or railroad |
+| 115 | `logistics_last_turn_start` | — |
+| 116 | `logistics_rail_created_turn` | railroad |
+| 117 | `logistics_start_damaged` | facility |
+| 118 | `map_declined_combat` | — |
+| 119 | `map_range` | — |
+| 120 | `maritime_air_patrol` | — |
+| 121 | `moved_this_turn` | — |
+| 122 | `must_withdraw_from_chinese_gift` | — |
+| 123 | `national_objective_award` | — |
+| 124 | `naval_battle` | — |
+| 125 | `naval_battle_sequence` | — |
+| 126 | `naval_berthing` | — |
+| 127 | `naval_casualty_dispute_decided` | — |
+| 128 | `naval_combat` | — |
+| 129 | `naval_combat_turn` | — |
+| 130 | `naval_combat_unloaded` | — |
+| 131 | `naval_decision_sequence` | — |
+| 132 | `naval_escort` | — |
+| 133 | `naval_last_origin` | zone |
+| 134 | `naval_loaded_completed_turns` | — |
+| 135 | `naval_move_decisions` | — |
+| 136 | `naval_move_sequence` | — |
+| 137 | `naval_movement_immediate` | — |
+| 138 | `naval_movement_plan` | — |
+| 139 | `naval_movement_spent` | — |
+| 140 | `naval_operation_decision_sequence` | — |
+| 141 | `naval_raider` | — |
+| 142 | `naval_retreated` | — |
+| 143 | `naval_roll_sequence` | — |
+| 144 | `naval_scramble_origin` | facility |
+| 145 | `naval_scramble_turn` | — |
+| 146 | `naval_scramble_used` | — |
+| 147 | `naval_scrambled` | — |
+| 148 | `naval_screening_continuing` | — |
+| 149 | `naval_start_sea` | zone |
+| 150 | `naval_strategic_destination` | facility |
+| 151 | `naval_strategic_moved` | — |
+| 152 | `naval_unloaded` | — |
+| 153 | `newly_placed` | — |
+| 154 | `objective_evolution` | — |
+| 155 | `objective_one_china` | — |
+| 156 | `on_map` | — |
+| 157 | `one_china_bonus_awarded` | — |
+| 158 | `one_china_bonus_eligible_at_surrender` | — |
+| 159 | `original_owner` | nation |
+| 160 | `original_type` | type |
+| 161 | `payment` | payment number |
+| 162 | `placed_this_turn` | — |
+| 163 | `politics_combat_finished` | — |
+| 164 | `politics_sequence` | — |
+| 165 | `port_aa_done` | — |
+| 166 | `port_crew_prepared` | — |
+| 167 | `port_unloaded_round` | — |
+| 168 | `possessed_land_ipp` | — |
+| 169 | `price` | price method |
+| 170 | `purchased` | row or cap group |
+| 171 | `raider` | — |
+| 172 | `rail_build_permission` | nation:zone:zone |
+| 173 | `rail_declined` | project |
+| 174 | `rail_permission` | nation |
+| 175 | `rail_used` | player:region |
+| 176 | `recruitment_attempted` | — |
+| 177 | `repair` | — |
+| 178 | `repair_at` | facility |
+| 179 | `repairing` | — |
+| 180 | `researched_this_turn` | — |
+| 181 | `retreated` | — |
+| 182 | `rocket_launched` | — |
+| 183 | `rocket_mission` | — |
+| 184 | `row` | build-chart row |
+| 185 | `scrambled` | — |
+| 186 | `ship_crew` | unit |
+| 187 | `shore_bombardment` | — |
+| 188 | `shore_dispute_decided` | — |
+| 189 | `shore_resolved` | — |
+| 190 | `skeleton_crew` | — |
+| 191 | `skeleton_crew_until_own_turn` | — |
+| 192 | `slip_attempted` | — |
+| 193 | `stages_paid` | — |
+| 194 | `stages_total` | — |
+| 195 | `stranded_aircraft_lost` | — |
+| 196 | `strategic_moved` | — |
+| 197 | `strategic_naval_movement_in_progress` | — |
+| 198 | `strategic_naval_used` | — |
+| 199 | `submerged` | — |
+| 200 | `surprise_attack_available` | — |
+| 201 | `surprise_attack_linked_land` | zone |
+| 202 | `surprise_attack_naval_sea` | zone |
+| 203 | `surprise_attack_target` | nation |
+| 204 | `surprise_attack_used` | — |
+| 205 | `surprise_attack_zone` | zone |
+| 206 | `surrendered` | — |
+| 207 | `target` | repair target |
+| 208 | `towed_by` | unit |
+| 209 | `towing` | unit |
+| 210 | `transport_unloaded` | — |
+| 211 | `truce_low_morale_eliminates` | — |
+| 212 | `uncontested` | — |
+| 213 | `under_construction` | — |
+| 214 | `unit_upgrade` | — |
+| 215 | `unloaded_combat` | — |
+| 216 | `unloaded_noncombat` | — |
+| 217 | `upgraded_this_turn` | — |
+
 ## 4. Where names become numbers
 
 The engine holds numbers in its memory and names everywhere else:
 
 | Where | Holds | How it converts |
 | --- | --- | --- |
-| The position (`State`) | Numbers. Zones: each unit's zone, the zone it began its turn in and its route; each facility's zone; the territories, keyed by zone; a railroad's two ends and the damage on each side; a battle's zone; the side of a railroad a repair mends; the zones held at the start of the turn; capitals. Nations: the nations' records, keyed by nation, with each one's wars, allies and controller; the owner of each unit, construction project and repair job; each territory's possessor, now and at the start of the turn; a battle's attacker and defender; each nation's completed turns; the capitals, surrenders, evolutions, alignment queue, attacked warlords and China's invader. Unit types: each unit's type | — |
+| The position (`State`) | Numbers. Zones: each unit's zone, the zone it began its turn in and its route; each facility's zone; the territories, keyed by zone; a railroad's two ends and the damage on each side; a battle's zone; the side of a railroad a repair mends; the zones held at the start of the turn; capitals. Nations: the nations' records, keyed by nation, with each one's wars, allies and controller; the owner of each unit, construction project and repair job; each territory's possessor, now and at the start of the turn; a battle's attacker and defender; each nation's completed turns; the capitals, surrenders, evolutions, alignment queue, attacked warlords and China's invader. Unit types: each unit's type. Marks: the base of each mark on a unit, a nation, a territory, a facility, a construction project, a battle or the position, and of each unit's commitments; the argument stays text | — |
 | The catalog (`Catalog`) | Numbers: the unit definitions, kept in unit type order, and each one's classes | Built by `Catalog::fromJson` |
 | The map index (`IndexedGeography`) | Numbers: each zone's JSON, its neighbors in source order, its first edge to each neighbor, the hops between zones | Built by `freezeDefinition` |
-| Saved positions, planning keys and observations | Names | `State::toJson` and the planning-key writer name the zones, nations and unit types; `State::fromJson` numbers them again |
+| Saved positions, planning keys and observations | Names | `State::toJson` and the planning-key writer name the zones, nations, unit types and marks; `State::fromJson` numbers them again and refuses a mark the table lacks |
 | Moves, decisions and dice requests | Names: a move's details, such as `zone` and `path`, name zones, and the `nation` of a move, a decision or a dice request names the nation that acts | A rule numbers the names as it reads them, such as `nationNumber(state, move.nation)`, and names them as it writes a move |
 | Build-chart rows, upgrades and construction projects | Names: a row's and a project's type may be a unit type or a facility type | `catalog.unit(name)` and `catalog.isUnitType(name)` read a unit type by name where one is read |
-| Marks on units, nations and territories, and battle notes | Names: such as `surprise_attack_zone:sea_p15` or `last_conqueror_kmt` | A rule names the zone or nation as it writes the mark |
-| The network input | Zone, nation and unit type columns in name order, so a number is its column | `Vocabulary::numberBy` in `src/zone_encoding.cpp` checks the order when the encoder is built |
+| A mark's argument | Text: the name of the zone, nation, facility or other thing the mark is about, as in `surprise_attack_zone:sea_p15` | A rule names the zone or nation as it sets the mark: `MarkKey(mark::surprise_attack_zone, zoneName(state, zone))` |
+| Battle notes and political records | Names: such as a battle's `origins` or `last_conqueror_kmt` | A rule names the zone or nation as it writes the note |
+| The network input | Zone, nation and unit type columns in name order, so a number is its column; marks through the encoder's own lists of their bases | `Vocabulary::numberBy` in `src/zone_encoding.cpp` checks the order when the encoder is built; `baseName` gives a mark's base and argument without reading its name |
 | Python | Names only | `CampaignEnv.name_tables()` returns the tables |
 
 The functions that convert, declared in `include/game/campaign.hpp`:
@@ -285,6 +541,17 @@ The functions that convert, declared in `include/game/campaign.hpp`:
 | `catalog.unit(type)` | A unit type's definition, by number |
 | `catalog.unitHasClass(type, name)` | Whether a unit type has the class a name read from data names, such as a hit's target classes |
 
+The marks' own, declared in `include/game/marks.hpp`:
+
+| Function | Gives |
+| --- | --- |
+| `mark::<name>` | A base's number, such as `mark::placed_this_turn` |
+| `MarkKey(mark, argument)` | A mark to look up or set; `MarkKey(mark::in_port, facility)` for one with an argument |
+| `key.name()` | The mark's name, as saved positions write it |
+| `markName(mark)`, `markNumber(name)`, `findMark(name)` | A base's name and number |
+| `markArgument(mark)`, `markSeparator(mark)` | What a base's argument names, and the character before it |
+| `parseMark(name)`, `findMarkKey(name)` | A mark read from its name; the first throws `Unknown mark: <name>`, the second gives nothing |
+
 ## 5. Containers keyed by numbers
 
 - **`NumberMap<Key, Value>`** keeps one slot per number in a vector. It has the
@@ -297,6 +564,13 @@ The functions that convert, declared in `include/game/campaign.hpp`:
   a unit type's classes use it; so do the searches, for the zones they have
   seen, and the position's fact cache (`PositionFacts`), for the zone sets it
   keeps.
+- **`Marks`** keeps one thing's marks as a sorted vector of small slots (the
+  base's number, where its argument lies, the value) and all their arguments
+  in one string, so copying a set of marks allocates twice, however many marks
+  it holds. It offers the parts of `std::map`'s interface the rules use, an
+  entry showing as `{first: key, second: value}`, and `argumentAfter(base,
+  prefix)` for the argument of the first mark of a base. **`MarkSet`** is the
+  same without values, for a unit's commitments.
 
 ## 6. Rules for code
 
@@ -319,6 +593,12 @@ The functions that convert, declared in `include/game/campaign.hpp`:
 - **Name a unit type or class through its known member,** such as
   `knownUnitTypes(state).militia`, never by comparing a string; add the name to
   its list in `include/game/catalog.hpp` when a rule starts to name it.
+- **Name a mark through `mark::<name>`,** never by a string. A key with an
+  argument refers to the argument's text, so that text must outlive the key: a
+  key cannot be made from a temporary string, and an argument built from parts
+  goes in a local variable first. Add a row to `GWRL_MARKS`, in name order,
+  when a rule starts to note a new mark; tests note their own bookkeeping as
+  `fixture:<name>` marks.
 - **Ask about a possessor with `isNation`.** A possessor may be empty, and so
   may a known nation the scenario lacks; comparing the two would match
   ([the nations the rules name](#the-nations-the-rules-name)).
@@ -328,5 +608,5 @@ The functions that convert, declared in `include/game/campaign.hpp`:
 Alliances and players; facility types, technologies, and the types of
 build-chart rows, upgrades and construction projects, which may be a unit or a
 facility; units, facilities, railroads, construction projects, repair jobs and
-battles; the marks on units, nations, territories and battles; a move's details
-and a battle's notes. Each is held as a string.
+battles; the arguments of marks; a move's details, a battle's notes and the
+political records. Each is held as a string.

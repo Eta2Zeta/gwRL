@@ -150,7 +150,7 @@ struct CatalogContext {
     std::map<Id, int> purchases;
     // Flag maps read in place after flags, in precedence order. Only
     // catalogStats sets them, for a context it uses at once.
-    std::vector<const std::map<Id, int>*> flagSources;
+    std::vector<const Marks*> flagSources;
 };
 
 struct Eligibility {

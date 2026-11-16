@@ -15,9 +15,7 @@ using A = V::Array;
 // Builds the message only on failure; most messages are literals.
 template <class Message> void require(bool ok, const Message &message) { if (!ok) throw std::runtime_error(message); }
 V num(int n) { return V(static_cast<double>(n)); }
-bool marked(const std::map<Id, int>& flags, const Id& key) {
-    auto it = flags.find(key); return it != flags.end() && it->second != 0;
-}
+bool marked(const Marks& flags, const MarkKey& key) { return flags.value(key) != 0; }
 bool has(const State& s, const UnitState& u, UnitClassId c) {
     return s.definition->catalog->unit(u.type).classes.contains(c);
 }
@@ -59,7 +57,7 @@ Action action(const State& s, NationId nation, const Id& kind, O parameters = {}
 }
 void decision(State& s, BattleState& b, NationId nation, const Id& kind, std::vector<Action> options) {
     require(!options.empty(), "Empty naval decision");
-    Decision d; d.id = b.id + "_decision_" + std::to_string(++s.flags["naval_decision_sequence"]);
+    Decision d; d.id = b.id + "_decision_" + std::to_string(++s.flags[mark::naval_decision_sequence]);
     d.nation = nationName(s, nation); d.kind = kind; d.reaction = nation != s.currentNation(); d.continuation = b.id;
     for (auto& a : options) a.decision = d.id;
     d.options = std::move(options); s.decisions.push_back(std::move(d));
@@ -79,7 +77,7 @@ bool operational(const State& s, const BattleState& b, const Id& id, bool includ
         std::find(b.defenders.begin(), b.defenders.end(), id) != b.defenders.end();
     return (u.zone == b.zone || portDefender) && !object(b, "grounded").contains(id) &&
            !object(b, "naval_excluded").contains(id) &&
-           !marked(u.turnFlags, "submerged") && !marked(u.turnFlags, "naval_retreated");
+           !marked(u.turnFlags, mark::submerged) && !marked(u.turnFlags, mark::naval_retreated);
 }
 std::vector<Id> living(const State& s, const BattleState& b, bool attacker, bool includeDead = false) {
     std::vector<Id> out;
@@ -94,23 +92,20 @@ bool oneRound(const BattleState& b) {
 }
 bool immediateBattle(const BattleState& b) {
     const auto context = string(b, "context");
-    return marked(b.flags, "immediate") || context == "movement_submarines" || context == "movement_map";
+    return marked(b.flags, mark::immediate) || context == "movement_submarines" || context == "movement_map";
 }
 bool onMap(const State& s, const Id& id) {
     if (!s.units.contains(id)) return false;
     const auto& u = s.units.at(id);
-    return marked(u.gameFlags, "on_map") ||
-           std::any_of(u.commitments.begin(), u.commitments.end(), [](const Id& commitment) {
-               return commitment.rfind("air_defending_carrier:", 0) == 0;
+    return marked(u.gameFlags, mark::on_map) ||
+           std::any_of(u.commitments.begin(), u.commitments.end(), [](const MarkKey& commitment) {
+               return commitment.base() == mark::air_defending_carrier;
            }) ||
            (u.carriedBy && s.units.contains(*u.carriedBy) && has(s, s.units.at(*u.carriedBy), knownUnitClasses(s).carrier));
 }
 std::optional<Id> originalCarrier(const UnitState& u) {
     if (u.carriedBy) return u.carriedBy;
-    const Id prefix = "air_defending_carrier:";
-    for (const auto& commitment : u.commitments)
-        if (commitment.rfind(prefix, 0) == 0) return commitment.substr(prefix.size());
-    return std::nullopt;
+    return u.commitments.argumentAfter(mark::air_defending_carrier);
 }
 void advance(State&, BattleState&);
 void chooseHit(State&, BattleState&);
@@ -134,7 +129,7 @@ void removeUnit(State& s, BattleState& b, const Id& id) {
                 cargo.erase(std::remove(cargo.begin(), cargo.end(), uid), cargo.end());
                 u.carriedBy.reset();
             }
-            u.commitments.erase("air_defending_carrier:" + id);
+            u.commitments.erase(MarkKey(mark::air_defending_carrier, id));
             u.movementRemaining = 1;
             if (!listed(rescue, uid)) rescue.emplace_back(uid);
             auto excluded = object(b, "naval_excluded"); excluded[uid] = V(true); put(b, "naval_excluded", V(excluded));
@@ -161,7 +156,7 @@ void takeHit(State& s, BattleState& b, const Id& id, bool immediate) {
 }
 void roll(State& s, BattleState& b, const Id& purpose, int count) {
     require(!s.chance && count > 0, "Invalid naval roll");
-    ChanceRequest c; c.id = b.id + "_roll_" + std::to_string(++s.flags["naval_roll_sequence"]);
+    ChanceRequest c; c.id = b.id + "_roll_" + std::to_string(++s.flags[mark::naval_roll_sequence]);
     c.purpose = purpose; c.nation = nationName(s, b.attacker); c.continuation = b.id;
     for (int i = 0; i < count; ++i) c.dice.push_back(DieSpec{});
     s.chance = std::move(c);
@@ -199,7 +194,7 @@ void shoot(State& s, BattleState& b, const Id& stage) {
         for (const auto& id : participants) {
             const auto& u = s.units.at(id);
             bool firstStrike = (sub(s, u) && !enemyDestroyer) ||
-                (attacking && plane(s, u) && marked(b.flags, "japanese_surprise_attack"));
+                (attacking && plane(s, u) && marked(b.flags, mark::japanese_surprise_attack));
             if (first && (!firstStrike || round != 1)) continue;
             if (air && (!fighter(s, u) || firstStrike || round != 1)) continue;
             if (!first && !air && round == 1 && (firstStrike || fighter(s, u))) continue;
@@ -213,7 +208,7 @@ void shoot(State& s, BattleState& b, const Id& stage) {
             }
             if (!threshold || dice == 0) continue;
             if (!attacking && string(b, "context") == "port_attack" && has(s, u, knownUnitClasses(s).naval)) continue;
-            if (!attacking && round == 1 && marked(b.flags, "japanese_surprise_attack")) threshold = std::max(1, *threshold - 1);
+            if (!attacking && round == 1 && marked(b.flags, mark::japanese_surprise_attack)) threshold = std::max(1, *threshold - 1);
             auto eligible = targetsFor(s, b, id, !attacking);
             if (aswTransport) eligible.erase(std::remove_if(eligible.begin(), eligible.end(), [&](const Id& enemy) { return !sub(s, s.units.at(enemy)); }), eligible.end());
             if (eligible.empty()) continue;
@@ -224,7 +219,7 @@ void shoot(State& s, BattleState& b, const Id& stage) {
                     for (const auto& c : mode.parameters.require("target_classes").asArray()) targetClasses.insert(c.asString());
                 }
             if (sub(s, u)) { target = 1; targetClasses = {"surface_ship"}; }
-            if (!attacking && u.type == knownUnitTypes(s).battlecruiser && marked(u.gameFlags, "raider")) {
+            if (!attacking && u.type == knownUnitTypes(s).battlecruiser && marked(u.gameFlags, mark::raider)) {
                 target = *threshold; targetClasses = {"naval"};
             }
             A classes; for (const auto& c : targetClasses) classes.emplace_back(c);
@@ -347,21 +342,21 @@ void finishBattle(State& s, BattleState& b, const Id& result) {
             if (carrier && s.units.contains(*carrier) && !s.units.at(id).carriedBy) {
                 if (airLandingAvailable(s, id, *carrier)) attachCargo(s, *carrier, id);
                 else { s.units.at(id).movementRemaining = 1; auto q = array(b, "naval_carrier_landing_queue"); q.emplace_back(id); put(b, "naval_carrier_landing_queue", V(q)); }
-                s.units.at(id).commitments.erase("air_defending_carrier:" + *carrier);
+                s.units.at(id).commitments.erase(MarkKey(mark::air_defending_carrier, *carrier));
             }
         }
     b.stage = "naval_aftermath";
     if (!array(b, "naval_carrier_landing_queue").empty()) { queueCarrierLandings(s, b); return; }
     if (!b.data.find("air_landing_done")) finishAirCombat(s, b.id);
     if (s.decisions.empty() && !s.chance && boolean(b, "air_landing_done")) {
-        b.flags["finished"] = 1; b.stage = "naval_complete";
-        s.flags.erase("immediate_naval_battles");
+        b.flags[mark::finished] = 1; b.stage = "naval_complete";
+        s.flags.erase(mark::immediate_naval_battles);
         if (b.data.find("naval_movement")) { const auto id = b.id; continueNavalMovement(s, id); }
     }
 }
 bool endIfOver(State& s, BattleState& b) {
     const auto attackers = living(s, b, true), defenders = living(s, b, false);
-    if (!attackers.empty() && string(b, "context") == "port_attack" && !marked(b.flags, "port_aa_done")) return false;
+    if (!attackers.empty() && string(b, "context") == "port_attack" && !marked(b.flags, mark::port_aa_done)) return false;
     if (attackers.empty() || defenders.empty()) {
         finishBattle(s, b, attackers.empty() ? (defenders.empty() ? "mutual_destruction" : "defender_wins") : "attacker_wins"); return true;
     }
@@ -434,7 +429,7 @@ void prepareSubmarines(State& s, BattleState& b) {
             }
     if (string(b, "context") != "movement_submarines" && string(b, "context") != "movement_map")
         for (const bool attacker : {true, false}) for (const auto& id : living(s, b, attacker))
-            s.units.at(id).commitments.insert("naval_combat");
+            s.units.at(id).commitments.insert(mark::naval_combat);
     b.stage = "naval_first_strike"; advance(s, b);
 }
 // The units still in the battle once the patrol planes have chosen take part
@@ -443,22 +438,22 @@ void openBattle(State& s, BattleState& b) {
     const auto out = object(b, "naval_patrol_declined");
     const int serial = static_cast<int>(s.clock.playerTurnSerial + 1);
     for (const auto& unit : b.attackers)
-        if (s.units.contains(unit)) s.units.at(unit).turnFlags["naval_combat_turn"] = serial;
+        if (s.units.contains(unit)) s.units.at(unit).turnFlags[mark::naval_combat_turn] = serial;
     std::vector<Id> defending;
     for (const auto& unit : b.defenders)
         if (s.units.contains(unit) && !out.contains(unit)) {
-            s.units.at(unit).turnFlags["naval_combat_turn"] = serial;
+            s.units.at(unit).turnFlags[mark::naval_combat_turn] = serial;
             defending.push_back(unit);
         }
     if (defending.size() == 1 && s.units.at(defending.front()).type == knownUnitTypes(s).battlecruiser &&
-        marked(s.units.at(defending.front()).gameFlags, "raider")) put(b, "one_round", V(true));
+        marked(s.units.at(defending.front()).gameFlags, mark::raider)) put(b, "one_round", V(true));
     b.stage = "naval_raider_discovery"; advance(s, b);
 }
 void joinPatrol(State& s, BattleState& b, const Id& id) {
     auto done = object(b, "naval_patrol_choices"); done[id] = V(true); put(b, "naval_patrol_choices", V(done));
     auto& u = s.units.at(id);
-    u.turnFlags["air_battle_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1);
-    u.commitments.insert("air_battle:" + b.id);
+    u.turnFlags[mark::air_battle_turn] = static_cast<int>(s.clock.playerTurnSerial + 1);
+    u.commitments.insert(MarkKey(mark::air_battle, b.id));
 }
 // The plane stays in its sea zone, unharmed and still on patrol. It has
 // declined combat with the ships, as when it lets them pass on entry, and does
@@ -473,7 +468,7 @@ void stayOut(State& s, BattleState& b, const Id& id) {
         ships = readIds(movement->require("request").require("units"));
     for (const auto& ship : ships)
         if (s.units.contains(ship) && has(s, s.units.at(ship), knownUnitClasses(s).naval) && s.units.at(ship).zone == b.zone)
-            s.units.at(ship).turnFlags["map_declined_combat"] = 1;
+            s.units.at(ship).turnFlags[mark::map_declined_combat] = 1;
 }
 // RB 9.3.1 and 9.4: an aircraft on Maritime Air Patrol, unlike one aboard a
 // carrier (RB 10.7, step 2), may stay out of combat with ships unless the
@@ -492,8 +487,8 @@ void preparePatrols(State& s, BattleState& b) {
             if (!s.units.contains(id) || done.contains(id) || !onMaritimeAirPatrol(s, s.units.at(id))) continue;
             const auto& u = s.units.at(id);
             // RB 10.1: one battle a turn, apart from single rounds at sea.
-            const auto fought = u.turnFlags.find("air_battle_turn");
-            if (fought != u.turnFlags.end() && fought->second == serial && !u.commitments.contains("air_battle:" + b.id))
+            const auto fought = u.turnFlags.find(mark::air_battle_turn);
+            if (fought != u.turnFlags.end() && fought->second == serial && !u.commitments.contains(MarkKey(mark::air_battle, b.id)))
                 stayOut(s, b, id);
             else if (armed)
                 joinPatrol(s, b, id);
@@ -514,7 +509,7 @@ void prepareRaiders(State& s, BattleState& b) {
     if (string(b, "context") != "port_attack" && string(b, "context") != "movement_submarines" && string(b, "context") != "movement_map")
         for (const auto& id : b.defenders)
             if (operational(s, b, id) && s.units.at(id).type == knownUnitTypes(s).battlecruiser &&
-                marked(s.units.at(id).gameFlags, "raider") && !object(b, "naval_raider_choices").contains(id)) {
+                marked(s.units.at(id).gameFlags, mark::raider) && !object(b, "naval_raider_choices").contains(id)) {
                 decision(s, b, b.attacker, "naval_engage_raider", {
                     action(s, b.attacker, "naval_ignore_raider", {{"battle", V(b.id)}, {"unit", V(id)}}),
                     action(s, b.attacker, "naval_discover_raider", {{"battle", V(b.id)}, {"unit", V(id)}})}); return;
@@ -523,14 +518,14 @@ void prepareRaiders(State& s, BattleState& b) {
 }
 void prepareShipScrambles(State& s, BattleState& b) {
     if (string(b, "context") != "port_attack" && !boolean(b, "no_scramble") &&
-        !marked(b.flags, "japanese_surprise_attack") && !b.defenders.empty())
+        !marked(b.flags, mark::japanese_surprise_attack) && !b.defenders.empty())
         for (const auto& [id, u] : s.units) {
             if (!has(s, u, knownUnitClasses(s).naval) || !hostile(s, b.attacker, u.owner) ||
-                !politicallyFriendly(s, b.defender, u.owner) || marked(u.gameFlags, "skeleton_crew") || u.gameFlags.contains("skeleton_crew_until_own_turn") ||
-                marked(u.turnFlags, "repairing") || object(b, "naval_scramble_choices").contains(id)) continue;
+                !politicallyFriendly(s, b.defender, u.owner) || marked(u.gameFlags, mark::skeleton_crew) || u.gameFlags.contains(mark::skeleton_crew_until_own_turn) ||
+                marked(u.turnFlags, mark::repairing) || object(b, "naval_scramble_choices").contains(id)) continue;
             Id facility;
             for (const auto& [key, value] : u.gameFlags)
-                if (value && key.rfind("in_port:", 0) == 0) facility = key.substr(8);
+                if (value && key.base() == mark::in_port) facility = std::string(key.argument());
             if (facility.empty() || !s.facilities.contains(facility)) continue;
             const auto& f = s.facilities.at(facility);
             if (f.damage || (sub(s, u) ? f.type != "submarine_base" :
@@ -539,9 +534,9 @@ void prepareShipScrambles(State& s, BattleState& b) {
             if (std::find(seas.begin(), seas.end(), b.zone) == seas.end()) continue;
             const auto owner = s.territories.at(f.zone).possessor;
             if (!owner || (*owner != u.owner && !politicallyFriendly(s, u.owner, *owner)) ||
-                marked(f.flags, "placed_this_turn") || (*owner == u.owner && !heldSinceNationTurnStart(s, u.owner, f.zone, false))) continue;
-            int spent = marked(f.flags, "naval_scramble_turn") && f.flags.at("naval_scramble_turn") == static_cast<int>(s.clock.playerTurnSerial + 1) ?
-                (f.flags.contains("naval_scramble_used") ? f.flags.at("naval_scramble_used") : 0) : 0;
+                marked(f.flags, mark::placed_this_turn) || (*owner == u.owner && !heldSinceNationTurnStart(s, u.owner, f.zone, false))) continue;
+            int spent = marked(f.flags, mark::naval_scramble_turn) && f.flags.at(mark::naval_scramble_turn) == static_cast<int>(s.clock.playerTurnSerial + 1) ?
+                (f.flags.contains(mark::naval_scramble_used) ? f.flags.at(mark::naval_scramble_used) : 0) : 0;
             if (!tech(s, *owner, "radar") && spent >= 3) continue;
             std::vector<Action> options{
                 action(s, u.owner, "naval_decline_scramble", {{"battle", V(b.id)}, {"unit", V(id)}}),
@@ -556,7 +551,7 @@ void prepareShipScrambles(State& s, BattleState& b) {
     } else { beginAirDefence(s, b.id); advance(s, b); }
 }
 void advance(State& s, BattleState& b) {
-    if (s.chance || !s.decisions.empty() || marked(b.flags, "finished")) return;
+    if (s.chance || !s.decisions.empty() || marked(b.flags, mark::finished)) return;
     if (!array(b, "naval_carrier_landing_queue").empty()) { queueCarrierLandings(s, b); return; }
     if (b.stage == "naval_patrol_choices") { preparePatrols(s, b); return; }
     if (b.stage == "naval_raider_discovery") { prepareRaiders(s, b); return; }
@@ -577,15 +572,15 @@ void advance(State& s, BattleState& b) {
         flushDead(s, b);
         for (const auto& id : b.defenders)
             if (operational(s, b, id) && sub(s, s.units.at(id)) && string(b, "context") != "port_attack") {
-                s.units.at(id).turnFlags["submerged"] = 1;
+                s.units.at(id).turnFlags[mark::submerged] = 1;
                 auto excluded = object(b, "naval_excluded"); excluded[id] = V(true); put(b, "naval_excluded", V(excluded));
             }
         if (!array(b, "naval_carrier_landing_queue").empty()) { queueCarrierLandings(s, b); return; }
-        if (string(b, "context") == "port_attack" && !marked(b.flags, "port_aa_done")) {
-            b.flags["port_aa_done"] = 1;
+        if (string(b, "context") == "port_attack" && !marked(b.flags, mark::port_aa_done)) {
+            b.flags[mark::port_aa_done] = 1;
             int aircraft = 0; for (const auto& id : living(s, b, true)) aircraft += plane(s, s.units.at(id));
             if (aircraft && b.data.find("facility") && s.facilities.contains(string(b, "facility")) &&
-                !marked(b.flags, "japanese_surprise_attack")) {
+                !marked(b.flags, mark::japanese_surprise_attack)) {
                 const auto& facility = s.facilities.at(string(b, "facility"));
                 const auto max = s.definition->catalog->facility(facility.type).maxDamage;
                 if (!max || facility.damage < *max) { roll(s, b, "naval_port_aa", aircraft); return; }
@@ -612,13 +607,13 @@ void advance(State& s, BattleState& b) {
 
 namespace {
 bool designatedRaider(const State& s, const Id& id) {
-    return s.units.contains(id) && s.units.at(id).type == knownUnitTypes(s).battlecruiser && marked(s.units.at(id).gameFlags, "raider");
+    return s.units.contains(id) && s.units.at(id).type == knownUnitTypes(s).battlecruiser && marked(s.units.at(id).gameFlags, mark::raider);
 }
 bool hasRaider(const State& s, const std::vector<Id>& units) {
     return std::any_of(units.begin(), units.end(), [&](const Id& id) { return designatedRaider(s, id); });
 }
 bool joinsDeclaredBattle(const BattleState& existing, ZoneId zone, NationId attacker, const Id& context) {
-    return marked(existing.flags, "naval_battle") && existing.stage == "naval_declared" && existing.zone == zone &&
+    return marked(existing.flags, mark::naval_battle) && existing.stage == "naval_declared" && existing.zone == zone &&
            existing.attacker == attacker && string(existing, "context") == context;
 }
 } // namespace
@@ -658,9 +653,9 @@ Id registerNavalBattle(State& s, ZoneId zone, NationId attacker,
                 for (const auto& id : readIds(*defenders)) if (std::find(existing.defenders.begin(), existing.defenders.end(), id) == existing.defenders.end()) existing.defenders.push_back(id);
             put(existing, "origins", V(oldOrigins)); put(existing, "naval_entry_origins", V(entries)); return bid;
         }
-    BattleState b; b.id = "naval_battle_" + std::to_string(++s.flags["naval_battle_sequence"]);
+    BattleState b; b.id = "naval_battle_" + std::to_string(++s.flags[mark::naval_battle_sequence]);
     b.zone = zone; b.attacker = attacker; b.stage = "naval_declared"; b.attackers = attackers; b.data = options;
-    b.flags["naval_battle"] = 1;
+    b.flags[mark::naval_battle] = 1;
     if (!b.data.find("context")) put(b, "context", V(std::string("standard")));
     O originData; A entries;
     for (const auto& id : attackers) {
@@ -692,20 +687,20 @@ Id registerNavalBattle(State& s, ZoneId zone, NationId attacker,
     put(b, "origins", V(originData)); put(b, "naval_entry_origins", V(entries)); put(b, "round", num(1));
     const auto id = b.id; s.battleOrder.push_back(id); s.battles.emplace(id, std::move(b));
     if (s.clock.phase != Phase::Combat && immediateBattle(s.battles.at(id)))
-        s.flags["immediate_naval_battles"] = 1;
+        s.flags[mark::immediate_naval_battles] = 1;
     return id;
 }
 void beginNavalBattle(State& s, const Id& id) {
     auto& b = s.battles.at(id);
-    require(marked(b.flags, "naval_battle") && b.stage == "naval_declared" && !s.chance && s.decisions.empty(),
+    require(marked(b.flags, mark::naval_battle) && b.stage == "naval_declared" && !s.chance && s.decisions.empty(),
             "Naval battle cannot begin now");
     const ZoneId targetZone = string(b, "context") == "port_attack" && b.data.find("facility") &&
         s.facilities.contains(string(b, "facility")) ? s.facilities.at(string(b, "facility")).zone : b.zone;
-    if (b.attacker == knownNations(s).japan && marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_zone:" + zoneName(s, targetZone)) &&
-        !marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_used")) {
-        b.flags["japanese_surprise_attack"] = 1;
-        s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_used"] = 1;
-        if (string(b, "context") != "port_attack") s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_naval_sea:" + zoneName(s, b.zone)] = 1;
+    if (b.attacker == knownNations(s).japan && marked(s.nations.at(nationNumber(s, "japan")).turnFlags, MarkKey(mark::surprise_attack_zone, zoneName(s, targetZone))) &&
+        !marked(s.nations.at(nationNumber(s, "japan")).turnFlags, mark::surprise_attack_used)) {
+        b.flags[mark::japanese_surprise_attack] = 1;
+        s.nations.at(nationNumber(s, "japan")).turnFlags[mark::surprise_attack_used] = 1;
+        if (string(b, "context") != "port_attack") s.nations.at(nationNumber(s, "japan")).turnFlags[MarkKey(mark::surprise_attack_naval_sea, zoneName(s, b.zone))] = 1;
     }
     b.stage = "naval_patrol_choices"; advance(s, b);
 }
@@ -714,13 +709,13 @@ std::vector<Action> navalCombatActions(const State& s) {
     std::vector<Action> out;
     for (const auto& id : s.battleOrder) {
         const auto it = s.battles.find(id); if (it == s.battles.end()) continue;
-        const auto& b = it->second; if (!marked(b.flags, "naval_battle")) continue;
-        if (marked(b.flags, "finished")) return {action(s, s.currentNation(), "naval_finish_battle", {{"battle", V(id)}})};
+        const auto& b = it->second; if (!marked(b.flags, mark::naval_battle)) continue;
+        if (marked(b.flags, mark::finished)) return {action(s, s.currentNation(), "naval_finish_battle", {{"battle", V(id)}})};
         if (b.stage != "naval_declared") return {action(s, s.currentNation(), "naval_progress_battle", {{"battle", V(id)}})};
     }
     for (const auto& id : s.battleOrder) {
         const auto it = s.battles.find(id); if (it == s.battles.end()) continue;
-        if (marked(it->second.flags, "naval_battle") && it->second.stage == "naval_declared" &&
+        if (marked(it->second.flags, mark::naval_battle) && it->second.stage == "naval_declared" &&
             (s.clock.phase == Phase::Combat || immediateBattle(it->second)))
             out.push_back(action(s, s.currentNation(), "naval_begin_battle", {{"battle", V(id)}}));
     }
@@ -729,10 +724,10 @@ std::vector<Action> navalCombatActions(const State& s) {
 bool applyNavalCombatAction(State& s, const Action& a) {
     if (a.kind.rfind("naval_", 0) != 0 || !a.parameters.find("battle")) return false;
     const auto id = a.parameters.require("battle").asString();
-    if (!s.battles.contains(id) || !marked(s.battles.at(id).flags, "naval_battle")) return false;
+    if (!s.battles.contains(id) || !marked(s.battles.at(id).flags, mark::naval_battle)) return false;
     auto& b = s.battles.at(id);
     if (a.kind == "naval_finish_battle") {
-        require(marked(b.flags, "finished"), "Naval battle has not finished");
+        require(marked(b.flags, mark::finished), "Naval battle has not finished");
         s.battleOrder.erase(std::remove(s.battleOrder.begin(), s.battleOrder.end(), id), s.battleOrder.end());
         s.battles.erase(id); return true;
     }
@@ -742,7 +737,7 @@ bool applyNavalCombatAction(State& s, const Action& a) {
         release(s, a); const auto selected = a.parameters.require("unit").asString();
         const auto hits = array(b, "naval_hits"); const auto& hit = hits.at(static_cast<std::size_t>(integer(b, "naval_hit_index")));
         if (!a.parameters.require("targeted").asBool() &&
-            !marked(b.flags, "naval_casualty_dispute_decided")) {
+            !marked(b.flags, mark::naval_casualty_dispute_decided)) {
             const auto candidates = eligibleHit(s, b, hit);
             const auto victim = casualtyOwner(s, b, hit, candidates);
             const bool joint = std::any_of(candidates.begin(), candidates.end(), [&](const Id& unit) {
@@ -750,7 +745,7 @@ bool applyNavalCombatAction(State& s, const Action& a) {
             });
             if (joint) { put(b, "naval_casualty_proposal", V(selected)); put(b, "naval_casualty_consents", V(O{})); chooseHit(s, b); return true; }
         }
-        b.flags.erase("naval_casualty_dispute_decided");
+        b.flags.erase(mark::naval_casualty_dispute_decided);
         takeHit(s, b, selected, boolean(b, "naval_immediate_hits"));
         put(b, "naval_hit_index", num(integer(b, "naval_hit_index") + 1)); chooseHit(s, b); return true;
     }
@@ -792,7 +787,7 @@ bool applyNavalCombatAction(State& s, const Action& a) {
         if (a.kind == "naval_pair_destroyer") {
             if (std::find(b.attackers.begin(), b.attackers.end(), unit) == b.attackers.end() &&
                 std::find(b.defenders.begin(), b.defenders.end(), unit) == b.defenders.end()) {
-                b.defenders.push_back(unit); s.units.at(unit).turnFlags["naval_combat_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1);
+                b.defenders.push_back(unit); s.units.at(unit).turnFlags[mark::naval_combat_turn] = static_cast<int>(s.clock.playerTurnSerial + 1);
             }
             auto pairs = object(b, "naval_destroyer_pairs"); pairs[unit] = a.parameters.require("aircraft"); put(b, "naval_destroyer_pairs", V(pairs)); }
         advance(s, b); return true;
@@ -802,11 +797,11 @@ bool applyNavalCombatAction(State& s, const Action& a) {
         auto done = object(b, "naval_scramble_choices"); done[unit] = V(true); put(b, "naval_scramble_choices", V(done));
         if (a.kind == "naval_scramble") {
             const auto facility = a.parameters.require("facility").asString(); auto& f = s.facilities.at(facility);
-            if (!f.flags.contains("naval_scramble_turn") || f.flags.at("naval_scramble_turn") != static_cast<int>(s.clock.playerTurnSerial + 1)) f.flags["naval_scramble_used"] = 0;
-            f.flags["naval_scramble_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1); ++f.flags["naval_scramble_used"];
-            auto& u = s.units.at(unit); u.gameFlags.erase("in_port:" + facility); u.zone = b.zone;
+            if (!f.flags.contains(mark::naval_scramble_turn) || f.flags.at(mark::naval_scramble_turn) != static_cast<int>(s.clock.playerTurnSerial + 1)) f.flags[mark::naval_scramble_used] = 0;
+            f.flags[mark::naval_scramble_turn] = static_cast<int>(s.clock.playerTurnSerial + 1); ++f.flags[mark::naval_scramble_used];
+            auto& u = s.units.at(unit); u.gameFlags.erase(MarkKey(mark::in_port, facility)); u.zone = b.zone;
             for (const auto& cargo : u.cargo) s.units.at(cargo).zone = b.zone;
-            u.commitments.insert("naval_scramble_origin:" + facility); u.turnFlags["naval_combat_turn"] = static_cast<int>(s.clock.playerTurnSerial + 1);
+            u.commitments.insert(MarkKey(mark::naval_scramble_origin, facility)); u.turnFlags[mark::naval_combat_turn] = static_cast<int>(s.clock.playerTurnSerial + 1);
             b.defenders.push_back(unit);
         }
         advance(s, b); return true;
@@ -816,7 +811,7 @@ bool applyNavalCombatAction(State& s, const Action& a) {
         require(airLandingAvailable(s, unit, destination), "Carrier rescue landing no longer available");
         auto& u = s.units.at(unit); const auto zone = s.units.contains(destination) ? s.units.at(destination).zone : zoneNumber(s, destination);
         if (zone != u.zone) u.movementRemaining = std::max(0, u.movementRemaining.value_or(0) - 1);
-        u.zone = zone; u.turnFlags.erase("air_in_flight");
+        u.zone = zone; u.turnFlags.erase(mark::air_in_flight);
         if (s.units.contains(destination)) attachCargo(s, destination, unit);
         auto queue = array(b, "naval_carrier_landing_queue"); queue.erase(queue.begin()); put(b, "naval_carrier_landing_queue", V(queue));
         advance(s, b); return true;
@@ -826,7 +821,7 @@ bool applyNavalCombatAction(State& s, const Action& a) {
     if (a.kind == "naval_retreat_unit") {
         release(s, a); auto& u = s.units.at(a.parameters.require("unit").asString()); const auto destination = a.parameters.require("zone").asString();
         require(retreatOrigins(s, b).contains(destination), "Naval retreat destination is not an entry sea zone");
-        u.zone = zoneNumber(s, destination); u.movementRemaining = 0; u.turnFlags["naval_retreated"] = 1; u.commitments.insert("retreated");
+        u.zone = zoneNumber(s, destination); u.movementRemaining = 0; u.turnFlags[mark::naval_retreated] = 1; u.commitments.insert(mark::retreated);
         for (const auto& cargo : u.cargo) s.units.at(cargo).zone = u.zone;
         assignRetreat(s, b); return true;
     }
@@ -862,7 +857,7 @@ bool applyNavalCombatChance(State& s, const ChanceRequest& request, const Chance
         const auto hit = array(b, "naval_hits").at(static_cast<std::size_t>(integer(b, "naval_hit_index")));
         std::vector<Action> options; for (const auto& unit : eligibleHit(s, b, hit))
             options.push_back(action(s, chooser, "naval_take_casualty", {{"battle", V(b.id)}, {"unit", V(unit)}, {"targeted", V(false)}}));
-        b.flags["naval_casualty_dispute_decided"] = 1; decision(s, b, chooser, "naval_casualty", std::move(options)); return true;
+        b.flags[mark::naval_casualty_dispute_decided] = 1; decision(s, b, chooser, "naval_casualty", std::move(options)); return true;
     }
     if (request.purpose == "naval_port_aa") {
         auto& b = s.battles.at(request.continuation); const auto results = effectiveResults(request, outcome);
@@ -897,7 +892,7 @@ bool navalCombatPhaseComplete(const State& s) {
         const auto& b = entry.second;
         if (s.clock.phase == Phase::CombatMovement && b.stage == "naval_declared" &&
             !immediateBattle(b)) return false;
-        return marked(b.flags, "naval_battle") && !marked(b.flags, "finished");
+        return marked(b.flags, mark::naval_battle) && !marked(b.flags, mark::finished);
     });
 }
 } // namespace game::campaign

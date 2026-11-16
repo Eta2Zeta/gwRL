@@ -148,7 +148,7 @@ void actualAirborneEntryResolvesFightersAndAaaBeforeLanding() {
     check(!e.state().units.contains("transport") && !e.state().units.contains("paratrooper") &&
               !e.state().units.contains("escort") && !e.state().units.contains("defending_fighter") &&
               !e.state().chance && e.state().decisions.empty() &&
-              e.state().battles.at(battle).flags.at("finished") &&
+              e.state().battles.at(battle).flags.at(mark::finished) &&
               isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt"),
           "Step-4 losses landed, lost simultaneous return fire, or prolonged an eliminated assault");
     auto replay = Engine::replay(s.definition, rules(), checkpoint, e.state().history);
@@ -206,7 +206,7 @@ void aircraftLaunchesFromCarrierAndReplaysCargoLinks() {
 void finishScreening(Engine& e, const Id& battle) {
     for(int step=0;step<80;++step) {
         if(e.state().chance){e.resolveChance();continue;}
-        if(e.state().decisions.empty()&&e.state().battles.at(battle).flags.contains("finished"))return;
+        if(e.state().decisions.empty()&&e.state().battles.at(battle).flags.contains(mark::finished))return;
         const auto actions=e.legalActions();
         const auto a=std::find_if(actions.begin(),actions.end(),[](const Action& x){return
             x.kind=="air_defend"||x.kind=="land_take_casualty"||x.kind=="land_progress_battle"||x.kind=="air_land";});
@@ -223,10 +223,10 @@ void successfulAirScreeningContinuesToAnotherAttackAndReplays() {
     const auto screenBattle=e.state().battleOrder.front();
     e.step(select(e,"air_screen_continue",[](const Action& a){return a.parameters.require("unit").asString()=="continuing";}));
     check(e.state().battles.at(screenBattle).attackers==std::vector<Id>{"screen"}&&
-          e.state().units.at("continuing").turnFlags.at("air_screening_wait")==1,
+          e.state().units.at("continuing").turnFlags.at(mark::air_screening_wait)==1,
           "Continuing aircraft fired in the screening battle");
     e.step(select(e,"end_phase"));e.step(select(e,"land_begin_battle"));finishScreening(e,screenBattle);
-    check(!e.state().units.contains("defender")&&e.state().units.at("continuing").turnFlags.at("air_screening_ready")==1,
+    check(!e.state().units.contains("defender")&&e.state().units.at("continuing").turnFlags.at(mark::air_screening_ready)==1,
           "Successful fighter screening did not release the continuing aircraft");
     const auto restored=Engine::restore(s.definition,rules(),e.serialize());
     check(restored.planningKey()==e.planningKey(),"Successful air screening continuation was not serialized");
@@ -235,7 +235,7 @@ void successfulAirScreeningContinuesToAnotherAttackAndReplays() {
         a.parameters.require("kind").asString()=="city"&&a.parameters.require("target").asString()=="land_china_nanking";}));
     check(e.state().clock.phase==Phase::Combat,"Continuing aircraft introduced a new movement phase");
     e.step(select(e,"air_begin_bombing"));e.resolveChance();e.resolveChance();e.step(select(e,"air_land"));
-    check(e.state().territories.at(zoneNumber(e.state(), "land_china_nanking")).flags.at("city_damage")==2&&e.state().battles.empty(),
+    check(e.state().territories.at(zoneNumber(e.state(), "land_china_nanking")).flags.at(mark::city_damage)==2&&e.state().battles.empty(),
           "Continuing bomber did not complete its subsequent city bombing");
     auto replay=Engine::replay(s.definition,rules(),checkpoint,e.state().history);
     check(replay.exactReplayIdentity()==e.exactReplayIdentity(),"Screening→continuing attack replay diverged");
@@ -249,8 +249,8 @@ void failedAirScreeningForcesTheContinuingAircraftToLand() {
     e.step(select(e,"air_screen_continue",[](const Action& a){return a.parameters.require("unit").asString()=="continuing";}));
     e.step(select(e,"end_phase"));e.step(select(e,"land_begin_battle"));finishScreening(e,battle);
     check(!e.state().units.contains("screen")&&e.state().units.contains("defender")&&
-          !e.state().units.at("continuing").turnFlags.contains("air_screening_ready")&&
-          !e.state().units.at("continuing").turnFlags.contains("air_in_flight")&&
+          !e.state().units.at("continuing").turnFlags.contains(mark::air_screening_ready)&&
+          !e.state().units.at("continuing").turnFlags.contains(mark::air_in_flight)&&
           e.state().units.at("continuing").zone != zoneNumber(e.state(), hopeh),"Failed screening let continuing aircraft attack through enemy fighters");
 }
 void continuingAircraftCannotPerformAnAirborneAssault() {
@@ -299,7 +299,7 @@ void ordinaryAircraftRetreatUsesRemainingFlightAndReplays() {
     check(e.state().decisions.back().kind=="air_landing","Aircraft retreat did not choose a flight landing");
     e.step(select(e,"air_land",[](const Action& a){return a.parameters.require("destination").asString()==beiping;}));
     check(e.state().units.at("fighter").zone == zoneNumber(e.state(), beiping)&&e.state().units.at("fighter").movementRemaining==2&&
-          !e.state().units.at("fighter").turnFlags.contains("air_in_flight"),"Aircraft retreat ignored its actual remaining movement");
+          !e.state().units.at("fighter").turnFlags.contains(mark::air_in_flight),"Aircraft retreat ignored its actual remaining movement");
     auto replay=Engine::replay(s.definition,rules(),checkpoint,e.state().history);
     check(replay.exactReplayIdentity()==e.exactReplayIdentity(),"Aircraft retreat/landing replay diverged");
 }

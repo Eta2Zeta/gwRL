@@ -1,8 +1,10 @@
 // Names held as numbers (include/game/names.hpp): the tables, the number type
 // and the containers keyed by numbers, then the scenario's zone and nation tables
-// and the catalog's unit type and unit class tables.
+// and the catalog's unit type and unit class tables, then the mark table and
+// the sets of marks keyed by it.
 #include "game/campaign.hpp"
 #include "game/catalog.hpp"
+#include "game/marks.hpp"
 #include "game/names.hpp"
 
 #include <algorithm>
@@ -74,6 +76,9 @@ static_assert(!std::is_constructible_v<NationId, const char*> && !std::is_constr
 static_assert(!std::is_constructible_v<NationId, int> && !std::is_constructible_v<ZoneId, std::size_t>);
 static_assert(!std::is_constructible_v<UnitTypeId, NationId> && !std::is_constructible_v<UnitTypeId, std::string>);
 static_assert(!std::is_constructible_v<UnitClassId, UnitTypeId> && !std::is_constructible_v<UnitClassId, const char*>);
+// A mark key refers to its argument's text, so it cannot be made from a temporary string.
+static_assert(!std::is_constructible_v<MarkKey, MarkId, std::string&&> && std::is_constructible_v<MarkKey, MarkId, const std::string&>);
+static_assert(!std::is_convertible_v<const char*, MarkKey> && !std::is_convertible_v<std::string, MarkKey>);
 // Two names in braces are not a pair of iterators into a set of numbers.
 static_assert(!std::is_constructible_v<NumberSet<NationId>, const char*, const char*>);
 
@@ -244,6 +249,93 @@ void theCatalogNumbersItsUnitTypesAndClasses() {
     check(&knownUnitTypes(state) == &known && &knownUnitClasses(state) == &knownClasses,
           "The position reads other known names than its catalog's");
 }
+void marksAreNumberedInNameOrder() {
+    const auto names = markNames();
+    check(names.size() > 200 && std::is_sorted(names.begin(), names.end()), "The mark table is not sorted by name");
+    for (std::size_t at = 0; at < names.size(); ++at) {
+        const auto mark = markNumber(names[at]);
+        check(mark.index() == at && markName(mark) == names[at] && findMark(names[at]) == mark, "A mark's number is not its place");
+    }
+    check(markName(mark::campaign_started) == "__campaign_started" && mark::campaign_started.index() == 0 &&
+              markName(mark::placed_this_turn) == "placed_this_turn",
+          "A mark constant names another mark");
+    check(markTakesArgument(mark::naval_last_origin) && markArgument(mark::naval_last_origin) == "zone" &&
+              !markTakesArgument(mark::placed_this_turn) && markSeparator(mark::evolution_pending) == '_' &&
+              markSeparator(mark::in_port) == ':',
+          "A mark's argument or separator is wrong");
+    // Names round-trip, and a name the table lacks or whose argument does not fit is refused.
+    for (const std::string name : {"placed_this_turn", "naval_last_origin:sea_p15", "evolution_pending_ccp",
+                                   "economy_start_type:facility_a:airbase", "payment:0"})
+        check(parseMark(name).name() == name, "A mark name does not round-trip: " + name);
+    throwsWith<std::runtime_error>([] { parseMark("invented_mark"); }, "Unknown mark: invented_mark",
+                                   "An unknown mark is not reported by name");
+    rejects([] { parseMark("placed_this_turn:x"); }, "A mark without an argument took one");
+    rejects([] { parseMark("naval_last_origin"); }, "A mark with an argument lost it");
+    check(!findMarkKey("kmt_burma_road") && findMarkKey("in_port:x")->argument() == "x", "findMarkKey is wrong");
+    // Keys order as the names do, so a set of marks lists them in name order.
+    // The keys refer into `sample`, which therefore stays as it is.
+    const std::vector<std::string> sample {"skeleton_crew", "skeleton_crew_until_own_turn", "naval_last_origin:sea_p15",
+                                           "naval_last_origin:land_a", "naval_movement_spent", "evolution_pending_kmt",
+                                           "evolution_pending_ccp", "in_port:z", "in_port:a"};
+    std::vector<MarkKey> keys;
+    for (const auto& name : sample) keys.push_back(parseMark(name));
+    std::sort(keys.begin(), keys.end());
+    auto sorted = sample;
+    std::sort(sorted.begin(), sorted.end());
+    for (std::size_t at = 0; at < keys.size(); ++at) check(keys[at].name() == sorted[at], "Keys do not order as names");
+}
+
+void setsOfMarksListThemInNameOrder() {
+    Marks marks;
+    const std::string zone = "sea_p15";
+    marks[MarkKey(mark::naval_last_origin, zone)] = 2;
+    marks[mark::placed_this_turn] = 1;
+    marks[MarkKey(mark::economy_start_type, "facility_a:airbase")] = 1;
+    marks[MarkKey(mark::economy_start_type, "facility_b:major_factory")] = 0;
+    std::vector<std::string> names;
+    for (const auto& [key, value] : marks) names.push_back(key.name());
+    check(names == std::vector<std::string>({"economy_start_type:facility_a:airbase", "economy_start_type:facility_b:major_factory",
+                                             "naval_last_origin:sea_p15", "placed_this_turn"}),
+          "A set of marks does not list them in name order");
+    check(marks.value(MarkKey(mark::naval_last_origin, "sea_p15")) == 2 && marks.value(mark::naval_unloaded) == 0 &&
+              marks.contains(mark::placed_this_turn) && !marks.contains(mark::naval_unloaded) &&
+              marks.argumentAfter(mark::economy_start_type, "facility_a:") == "airbase" &&
+              !marks.argumentAfter(mark::economy_start_type, "facility_b:"),
+          "Looking marks up gives the wrong answer");
+    rejects([&] { marks[mark::naval_last_origin] = 1; }, "A mark with an argument was set without one");
+    rejects([&] { marks[MarkKey(mark::placed_this_turn, "x")] = 1; }, "A mark without an argument was set with one");
+    throwsWith<std::out_of_range>([&] { marks.at(mark::naval_unloaded); }, "Marks::at: no mark naval_unloaded",
+                                  "Reading an absent mark did not throw");
+    // A key read from the set itself can add a mark to it.
+    const auto from = *marks.begin();
+    marks[MarkKey(mark::in_port, from.first.argument())] = 3;
+    check(marks.value(MarkKey(mark::in_port, "facility_a:airbase")) == 3, "A key from the set itself was mangled");
+    // Copies are equal and independent; erasing many marks keeps the rest whole.
+    auto copy = marks;
+    check(copy == marks, "A copy differs");
+    copy[mark::placed_this_turn] = 5;
+    check(!(copy == marks) && marks.value(mark::placed_this_turn) == 1, "A copy shares values");
+    Marks many;
+    std::vector<std::string> texts;
+    for (int i = 0; i < 50; ++i) texts.push_back("facility_number_" + std::to_string(i));
+    for (const auto& text : texts) many[MarkKey(mark::economy_used, text)] = 1;
+    for (int i = 0; i < 45; ++i) many.erase(MarkKey(mark::economy_used, texts[static_cast<std::size_t>(i)]));
+    check(many.size() == 5 && many.contains(MarkKey(mark::economy_used, "facility_number_49")) &&
+              many.begin()->first.argument() == "facility_number_45",
+          "Erasing marks broke the others");
+    for (auto it = many.begin(); it != many.end();) it = it->first.argument().ends_with("7") ? many.erase(it) : std::next(it);
+    check(many.size() == 4 && !many.contains(MarkKey(mark::economy_used, "facility_number_47")), "Erasing while iterating failed");
+    // Clearing forgets the erased text too: erasing after it rewrites a whole buffer.
+    many.clear();
+    for (const auto& text : texts) many[MarkKey(mark::economy_used, text)] = 1;
+    for (int i = 0; i < 49; ++i) many.erase(MarkKey(mark::economy_used, texts[static_cast<std::size_t>(i)]));
+    check(many.size() == 1 && many.begin()->first.argument() == "facility_number_49", "Erasing after clearing broke the set");
+    // Commitments: a set of marks without values.
+    MarkSet set {mark::combat_move, MarkKey(mark::air_battle, "land_battle_9")};
+    check(set.insert(mark::retreated) && !set.insert(mark::retreated) && set.contains(MarkKey(mark::air_battle, "land_battle_9")) &&
+              set.size() == 3 && set.argumentAfter(mark::air_battle) == "land_battle_9" && set.erase(mark::combat_move) == 1,
+          "A set of commitments misbehaved");
+}
 }  // namespace
 
 int main() {
@@ -255,6 +347,8 @@ int main() {
         {"the scenario numbers its map zones", theScenarioNumbersItsMapZones},
         {"the scenario numbers its nations", theScenarioNumbersItsNations},
         {"the catalog numbers its unit types and classes", theCatalogNumbersItsUnitTypesAndClasses},
+        {"marks are numbered in name order", marksAreNumberedInNameOrder},
+        {"sets of marks list them in name order", setsOfMarksListThemInNameOrder},
     };
     int failures = 0;
     for (const auto& [name, test] : tests) {

@@ -19,10 +19,7 @@ template <class Message> void require(bool value, const Message &message) {
   if (!value)
     throw std::runtime_error(message);
 }
-int flag(const std::map<Id, int> &values, const Id &key) {
-  const auto it = values.find(key);
-  return it == values.end() ? 0 : it->second;
-}
+int flag(const Marks &values, const MarkKey &key) { return values.value(key); }
 bool hostile(const State &s, NationId a, NationId b) {
   return a != b && s.nations.at(a).atWarWith.contains(b);
 }
@@ -66,7 +63,7 @@ void decision(State &s, NationId nation, const Id &kind,
   require(!options.empty(), "Empty naval operation decision");
   const auto id =
       kind + "_" +
-      std::to_string(++s.flags["naval_operation_decision_sequence"]);
+      std::to_string(++s.flags[mark::naval_operation_decision_sequence]);
   for (auto &a : options)
     a.decision = id;
   s.decisions.push_back({id, kind, nationName(s, nation), nation != s.currentNation(),
@@ -79,8 +76,8 @@ void release(State &s, const Action &a) {
 }
 Id berth(const UnitState &u) {
   for (const auto &[k, v] : u.gameFlags)
-    if (v && k.rfind("in_port:", 0) == 0)
-      return k.substr(8);
+    if (v && k.base() == mark::in_port)
+      return std::string(k.argument());
   return {};
 }
 bool ship(const State &s, const UnitState &u) {
@@ -100,11 +97,11 @@ bool occupiedForAssault(const State &s, NationId owner, ZoneId zone,
   return false;
 }
 bool unavailable(const UnitState &u) {
-  return flag(u.gameFlags, "skeleton_crew_until_own_turn") ||
-         u.commitments.contains("repair") ||
-         u.commitments.contains("newly_placed") ||
-         flag(u.turnFlags, "placed_this_turn") ||
-         flag(u.turnFlags, "repairing");
+  return flag(u.gameFlags, mark::skeleton_crew_until_own_turn) ||
+         u.commitments.contains(mark::repair) ||
+         u.commitments.contains(mark::newly_placed) ||
+         flag(u.turnFlags, mark::placed_this_turn) ||
+         flag(u.turnFlags, mark::repairing);
 }
 // Each target's first valid shortest combat flight, in breadth-first order
 // from the aircraft's zone. Enemy Fighters may occupy only a path's final zone,
@@ -147,8 +144,8 @@ void moveAircraft(State &s, const Id &id, const std::vector<ZoneId> &path) {
     u.route.push_back(path[i]);
   u.zone = path.back();
   u.movementRemaining = u.movementRemaining.value_or(0) - result.cost;
-  u.turnFlags["air_in_flight"] = 1;
-  u.commitments.insert("combat_move");
+  u.turnFlags[mark::air_in_flight] = 1;
+  u.commitments.insert(mark::combat_move);
 }
 bool landingAfter(const State &s, const Id &id, const std::vector<ZoneId> &path) {
   return airFlightKeepsLandings(s, id, path);
@@ -210,8 +207,8 @@ std::vector<Id> shoreCandidates(const State &s, const BattleState &b) {
     const auto stats = s.definition->catalog->stats(
         u.type, u.damage, catalogContext(s, u.owner, u.zone));
     if (u.owner == b.attacker && u.zone == water && stats.bombardment &&
-        !unavailable(u) && !u.commitments.contains("naval_combat") &&
-        !u.commitments.contains("shore_bombardment") &&
+        !unavailable(u) && !u.commitments.contains(mark::naval_combat) &&
+        !u.commitments.contains(mark::shore_bombardment) &&
         std::find(selected.begin(), selected.end(), id) == selected.end())
       out.push_back(id);
   }
@@ -253,11 +250,11 @@ void beginAssaultLand(State &s, const Id &id) {
       continue;
     }
     detachCargo(s, transport, c, prep.zone);
-    u.commitments.insert("amphibious_assault");
-    u.commitments.insert("combat_move");
+    u.commitments.insert(mark::amphibious_assault);
+    u.commitments.insert(mark::combat_move);
     u.movementRemaining = 0;
-    u.turnFlags["from_attack_naval_transport"] = attackTransport;
-    u.gameFlags["amphibious_transport:" + transport] = 1;
+    u.turnFlags[mark::from_attack_naval_transport] = attackTransport;
+    u.gameFlags[MarkKey(mark::amphibious_transport, transport)] = 1;
     attackers.push_back(c);
     origins[c] = water;
   }
@@ -265,22 +262,22 @@ void beginAssaultLand(State &s, const Id &id) {
   if (!attackers.empty()) {
     const auto battle =
         registerLandBattle(s, prep.zone, prep.attacker, attackers, origins);
-    s.battles.at(battle).flags["amphibious_assault"] = 1;
-    s.battles.at(battle).flags["shore_resolved"] = 1;
+    s.battles.at(battle).flags[mark::amphibious_assault] = 1;
+    s.battles.at(battle).flags[mark::shore_resolved] = 1;
     if (prep.attacker == knownNations(s).japan) {
       auto &flags = s.nations.at(nationNumber(s, "japan")).turnFlags;
-      const bool selected = flag(flags, "surprise_attack_zone:" + waterName);
-      const bool seaUsed = flag(flags, "surprise_attack_naval_sea:" + waterName);
+      const bool selected = flag(flags, MarkKey(mark::surprise_attack_zone, waterName));
+      const bool seaUsed = flag(flags, MarkKey(mark::surprise_attack_naval_sea, waterName));
       const bool alreadyLinked =
           std::any_of(flags.begin(), flags.end(), [](const auto &entry) {
             return entry.second &&
-                   entry.first.rfind("surprise_attack_linked_land:", 0) == 0;
+                   entry.first.base() == mark::surprise_attack_linked_land;
           });
       if (!alreadyLinked &&
-          (seaUsed || (selected && !flag(flags, "surprise_attack_used")))) {
-        flags["surprise_attack_used"] = 1;
-        flags["surprise_attack_linked_land:" + zoneName(s, prep.zone)] = 1;
-        s.battles.at(battle).flags["japanese_surprise_attack"] = 1;
+          (seaUsed || (selected && !flag(flags, mark::surprise_attack_used)))) {
+        flags[mark::surprise_attack_used] = 1;
+        flags[MarkKey(mark::surprise_attack_linked_land, zoneName(s, prep.zone))] = 1;
+        s.battles.at(battle).flags[mark::japanese_surprise_attack] = 1;
       }
     }
     put(s.battles.at(battle), "amphibious_waiting", ids(waiting));
@@ -291,7 +288,7 @@ void beginAssaultLand(State &s, const Id &id) {
           b.stage == "awaiting_combat_rules") {
         put(b, "amphibious_waiting", ids(waiting));
         put(b, "amphibious_sea", V(waterName));
-        b.flags["amphibious_assault"] = 1;
+        b.flags[mark::amphibious_assault] = 1;
         break;
       }
   }
@@ -358,8 +355,7 @@ void rollShore(State &s, BattleState &b) {
   const auto water = b.data.require("sea").asString();
   for (const auto &[id, f] : s.facilities)
     if (f.zone == b.zone && f.type == "fortification" && !f.damage &&
-        (flag(f.flags, "border:" + water) || flag(f.flags, "border_" + water) ||
-         flag(f.flags, "towards_" + water)))
+        flag(f.flags, MarkKey(mark::border, water)))
       fort = true;
   std::set<Id> attackingShips;
   for (const auto &v : b.data.require("bombarding").asArray()) {
@@ -371,8 +367,8 @@ void rollShore(State &s, BattleState &b) {
         u.type, u.damage, catalogContext(s, u.owner, u.zone));
     if (!stats.bombardment)
       continue;
-    u.commitments.insert("shore_bombardment");
-    u.turnFlags["assault_zone:" + zoneName(s, b.zone)] = 1;
+    u.commitments.insert(mark::shore_bombardment);
+    u.turnFlags[MarkKey(mark::assault_zone, zoneName(s, b.zone))] = 1;
     attackingShips.insert(id);
     for (int n = 0; n < std::max(1, stats.bombardmentDice); ++n)
       shots.emplace_back(
@@ -387,7 +383,7 @@ void rollShore(State &s, BattleState &b) {
   for (auto &[id, f] : s.facilities)
     if (f.zone == b.zone && f.type == "coastal_artillery" && !f.damage) {
       bool border =
-          flag(f.flags, "border:" + water) || flag(f.flags, "towards_" + water);
+          flag(f.flags, MarkKey(mark::border, water));
       if (const auto *metadata = s.definition->geography.find("facilities"))
         if (const auto *entry = metadata->find(id))
           if (const auto *access = entry->find("sea_accesses"))
@@ -397,15 +393,15 @@ void rollShore(State &s, BattleState &b) {
       if (!border)
         continue;
       const auto turn = static_cast<int>(s.clock.playerTurnSerial + 1);
-      if (flag(f.flags, "coastal_fire_turn") != turn) {
-        f.flags["coastal_fire_turn"] = turn;
-        f.flags["coastal_shots_used"] = 0;
+      if (flag(f.flags, mark::coastal_fire_turn) != turn) {
+        f.flags[mark::coastal_fire_turn] = turn;
+        f.flags[mark::coastal_shots_used] = 0;
       }
       const int shotsAvailable =
-          std::max(0, 3 - flag(f.flags, "coastal_shots_used"));
+          std::max(0, 3 - flag(f.flags, mark::coastal_shots_used));
       const int count =
           std::min(shotsAvailable, static_cast<int>(targets.size()));
-      f.flags["coastal_shots_used"] += count;
+      f.flags[mark::coastal_shots_used] += count;
       for (int n = 0; n < count; ++n)
         shots.emplace_back(O{{"threshold", V(3.0)},
                              {"owner", V(nationName(s, b.attacker))},
@@ -430,8 +426,8 @@ bool canBerth(const State &s, const UnitState &u, const Id &facility) {
     return false;
   for (const auto &[id, other] : s.units)
     if (movementController(s, other.owner) &&
-        (flag(other.turnFlags, "air_in_flight") ||
-         flag(other.turnFlags, "must_withdraw_from_chinese_gift")))
+        (flag(other.turnFlags, mark::air_in_flight) ||
+         flag(other.turnFlags, mark::must_withdraw_from_chinese_gift)))
       return false;
   const auto &f = s.facilities.at(facility);
   if (f.damage || !s.territories.at(f.zone).possessor ||
@@ -452,18 +448,15 @@ bool canBerth(const State &s, const UnitState &u, const Id &facility) {
     return false;
   std::set<Id> assaults;
   for (const auto &[k, v] : u.turnFlags)
-    if (v && k.rfind("assault_zone:", 0) == 0)
-      assaults.insert(k.substr(13));
+    if (v && k.base() == mark::assault_zone)
+      assaults.insert(std::string(k.argument()));
   if (!assaults.empty() &&
       (assaults.size() != 1 || !assaults.contains(zoneName(s, f.zone)) ||
        *s.territories.at(f.zone).possessor != u.owner))
     return false;
   for (const auto &[key, value] : u.turnFlags)
-    if (value && key.rfind("naval_strategic_destination:", 0) == 0 &&
-        key.substr(Id("naval_strategic_destination:").size()) != facility)
-      return false;
-  for (const auto &c : u.commitments)
-    if (c.rfind("strategic_destination:", 0) == 0 && c.substr(22) != facility)
+    if (value && key.base() == mark::naval_strategic_destination &&
+        std::string(key.argument()) != facility)
       return false;
   return true;
 }
@@ -472,7 +465,7 @@ void beginEvacuationCombat(State &s, const Id &facility) {
     const auto &b = s.battles.at(id);
     const auto *port = b.data.find("port_evacuation");
     if (port && port->asString() == facility && b.stage == "naval_declared") {
-      s.flags["immediate_naval_battles"] = 1;
+      s.flags[mark::immediate_naval_battles] = 1;
       beginNavalBattle(s, id);
       return;
     }
@@ -487,7 +480,7 @@ void commitEvacuation(State &s, const Id &facility, int moved,
     auto &u = s.units.at(id);
     require(berth(u) == facility && !unavailable(u),
             "Selected evacuation ship is no longer available");
-    u.gameFlags.erase("in_port:" + facility);
+    u.gameFlags.erase(MarkKey(mark::in_port, facility));
     u.zone = water;
     for (const auto &cargo : u.cargo)
       s.units.at(cargo).zone = water;
@@ -511,12 +504,12 @@ void commitEvacuation(State &s, const Id &facility, int moved,
           (ship(s, u) || isAircraft(s, u))) {
         attackers.push_back(id);
         if (ship(s, u) && movementController(s, u.owner) &&
-            u.commitments.contains("combat_move") && !u.route.empty() &&
+            u.commitments.contains(mark::combat_move) && !u.route.empty() &&
             u.route.back() == water) {
           const auto origin =
               u.route.size() > 1 ? u.route[u.route.size() - 2] : u.turnOrigin;
           if (sea(s, origin) && adjacent(s, origin, water) &&
-              flag(u.turnFlags, "naval_last_origin:" + zoneName(s, origin)) ==
+              flag(u.turnFlags, MarkKey(mark::naval_last_origin, zoneName(s, origin))) ==
                   static_cast<int>(s.clock.playerTurnSerial + 1))
             origins[id] = origin;
         }
@@ -532,8 +525,8 @@ void commitEvacuation(State &s, const Id &facility, int moved,
             {"port_evacuation", V(facility)},
             {"evacuated", V(static_cast<double>(moved + selected.size()))},
             {"evacuation_selection_complete", V(true)}}));
-    s.battles.at(battle).flags["immediate"] = 1;
-    s.flags["immediate_naval_battles"] = 1;
+    s.battles.at(battle).flags[mark::immediate] = 1;
+    s.flags[mark::immediate_naval_battles] = 1;
   }
   beginEvacuationCombat(s, facility);
 }
@@ -585,11 +578,11 @@ void evacuationChoice(State &s, const Id &facility, int moved,
 // Puts a ship in port, unloading its own cargo there if asked.
 void berthShip(State &s, const Id &id, const Id &facility, bool unload) {
   auto &u = s.units.at(id);
-  s.flags["naval_berthing"] = 1;
+  s.flags[mark::naval_berthing] = 1;
   u.zone = s.facilities.at(facility).zone;
-  u.gameFlags["in_port:" + facility] = 1;
-  u.gameFlags.erase("raider");
-  u.commitments.erase("raider");
+  u.gameFlags[MarkKey(mark::in_port, facility)] = 1;
+  u.gameFlags.erase(mark::raider);
+  u.commitments.erase(mark::raider);
   for (const auto &c : u.cargo)
     s.units.at(c).zone = u.zone;
   // Militia end their move ashore in their Home Country (RB), as port entry
@@ -601,8 +594,8 @@ void berthShip(State &s, const Id &id, const Id &facility, bool unload) {
       continue;
     detachCargo(s, id, c, u.zone);
     v.movementRemaining = 0;
-    v.gameFlags["port_unloaded_round"] = s.clock.roundIndex + 1;
-    v.commitments.insert("transport_unloaded");
+    v.gameFlags[mark::port_unloaded_round] = s.clock.roundIndex + 1;
+    v.commitments.insert(mark::transport_unloaded);
   }
 }
 // Entering port ends every other naval move and patrol return for the rest of
@@ -631,12 +624,12 @@ std::vector<Action> navalOperationActions(const State &s) {
       !active) {
     if (s.clock.phase == Phase::CombatMovement &&
         s.currentNation() == knownNations(s).japan &&
-        flag(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_available")) {
+        flag(s.nations.at(nationNumber(s, "japan")).turnFlags, mark::surprise_attack_available)) {
       const auto &flags = s.nations.at(nationNumber(s, "japan")).turnFlags;
       const bool selected =
           std::any_of(flags.begin(), flags.end(), [](const auto &entry) {
             return entry.second &&
-                   entry.first.rfind("surprise_attack_zone:", 0) == 0;
+                   entry.first.base() == mark::surprise_attack_zone;
           });
       if (!selected)
         for (const auto zone : names(s).zones.numbers()) {
@@ -645,13 +638,12 @@ std::vector<Action> navalOperationActions(const State &s) {
           bool target = false;
           for (const auto &[unit, u] : s.units)
             if (u.zone == zone &&
-                flag(flags, "surprise_attack_target:" + nationName(s, u.owner)))
+                flag(flags, MarkKey(mark::surprise_attack_target, nationName(s, u.owner))))
               target = true;
           for (const auto land : mapNeighbors(s, zone)) {
             if (s.territories.contains(land) &&
                 s.territories.at(land).possessor &&
-                flag(flags, "surprise_attack_target:" +
-                                nationName(s, *s.territories.at(land).possessor)))
+                flag(flags, MarkKey(mark::surprise_attack_target, nationName(s, *s.territories.at(land).possessor))))
               target = true;
           }
           if (target)
@@ -663,15 +655,15 @@ std::vector<Action> navalOperationActions(const State &s) {
       if (!movementController(s, u.owner) || unavailable(u))
         continue;
       if (s.clock.phase == Phase::Combat &&
-          (!flag(u.turnFlags, "naval_screening_continuing") ||
-           u.commitments.contains("naval_combat")))
+          (!flag(u.turnFlags, mark::naval_screening_continuing) ||
+           u.commitments.contains(mark::naval_combat)))
         continue;
       // Aircraft on Maritime Air Patrol attack only Enemy ships in their own
       // sea zone, in the Combat Phase (RB 9.3.1): see naval_patrol_attack.
-      if (isAircraft(s, u) && !flag(u.gameFlags, "on_map") &&
-          !u.commitments.contains("combat") &&
-          !u.commitments.contains("air_battle") &&
-          !flag(u.turnFlags, "air_in_flight")) {
+      if (isAircraft(s, u) && !flag(u.gameFlags, mark::on_map) &&
+          !u.commitments.contains(mark::combat) &&
+          !u.commitments.contains(mark::air_battle) &&
+          !flag(u.turnFlags, mark::air_in_flight)) {
         std::optional<std::map<ZoneId, std::vector<ZoneId>>> paths;
         for (const auto zone : names(s).zones.numbers()) {
           if (!sea(s, zone))
@@ -723,8 +715,8 @@ std::vector<Action> navalOperationActions(const State &s) {
         // Militia may not be used by the Attacker (RB), from the sea either.
         if (!s.units.contains(c) || s.units.at(c).owner != u.owner ||
             !unitClass(s, s.units.at(c), knownUnitClasses(s).land) || s.units.at(c).type == knownUnitTypes(s).militia ||
-            s.units.at(c).commitments.contains("assault_declared") ||
-            u.commitments.contains("unloaded_noncombat"))
+            s.units.at(c).commitments.contains(mark::assault_declared) ||
+            u.commitments.contains(mark::unloaded_noncombat))
           continue;
         for (const auto land : mapNeighbors(s, u.zone)) {
           if (!s.territories.contains(land) ||
@@ -745,8 +737,8 @@ std::vector<Action> navalOperationActions(const State &s) {
         out.push_back(action(s, s.currentNation(), "naval_begin_assault",
                              {{"battle", V(id)}}));
     for (const auto &[id, u] : s.units)
-      if (movementController(s, u.owner) && flag(u.gameFlags, "on_map") &&
-          !u.commitments.contains("naval_combat")) {
+      if (movementController(s, u.owner) && flag(u.gameFlags, mark::on_map) &&
+          !u.commitments.contains(mark::naval_combat)) {
         // A declared patrol attack waits for its battle to begin. Declaring it
         // again would join the same battle and change nothing, so it is not
         // offered twice.
@@ -785,7 +777,7 @@ std::vector<Action> navalOperationActions(const State &s) {
           }
   if (s.clock.phase == Phase::PlaceUnits)
     for (const auto &[id, u] : s.units)
-      if (flag(u.gameFlags, "captured_port_pending:" + nationName(s, s.currentNation())))
+      if (flag(u.gameFlags, MarkKey(mark::captured_port_pending, nationName(s, s.currentNation()))))
         out.push_back(action(s, s.currentNation(), "naval_roll_capture",
                              {{"unit", V(id)}}));
   return out;
@@ -793,8 +785,7 @@ std::vector<Action> navalOperationActions(const State &s) {
 
 bool applyNavalOperationAction(State &s, const Action &a) {
   if (a.kind == "naval_select_surprise_zone") {
-    s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_zone:" +
-                                    a.parameters.require("zone").asString()] =
+    s.nations.at(nationNumber(s, "japan")).turnFlags[MarkKey(mark::surprise_attack_zone, a.parameters.require("zone").asString())] =
         1;
     return true;
   }
@@ -810,7 +801,7 @@ bool applyNavalOperationAction(State &s, const Action &a) {
     moveAircraft(s, id, path);
     // This is a declared Combat attack, as with shared land/strategic air
     // missions. Keep its aircraft committed until the naval battle resolves.
-    s.units.at(id).commitments.insert("air_combat");
+    s.units.at(id).commitments.insert(mark::air_combat);
     O options{{"context", V(Id(a.kind == "naval_port_attack" ? "port_attack"
                                                              : "standard"))}};
     if (a.kind == "naval_port_attack") {
@@ -843,11 +834,11 @@ bool applyNavalOperationAction(State &s, const Action &a) {
     require(chineseMovementAllowed(s, transport.owner, zone),
             "Unevolved CCP and KMT attack only within Chinese Home Country");
     transport.movementRemaining = 0;
-    transport.commitments.insert("unloaded_combat");
-    transport.turnFlags["naval_combat_unloaded"] = 1;
-    transport.turnFlags["naval_unloaded"] = 1;
-    transport.turnFlags["assault_zone:" + zoneName(s, zone)] = 1;
-    s.units.at(c).commitments.insert("assault_declared");
+    transport.commitments.insert(mark::unloaded_combat);
+    transport.turnFlags[mark::naval_combat_unloaded] = 1;
+    transport.turnFlags[mark::naval_unloaded] = 1;
+    transport.turnFlags[MarkKey(mark::assault_zone, zoneName(s, zone))] = 1;
+    s.units.at(c).commitments.insert(mark::assault_declared);
     BattleState *existing = nullptr;
     for (auto &[id, b] : s.battles)
       if (b.stage == "amphibious_declared" && b.zone == zone &&
@@ -856,12 +847,12 @@ bool applyNavalOperationAction(State &s, const Action &a) {
         existing = &b;
     if (!existing) {
       BattleState b;
-      b.id = "amphibious_" + std::to_string(++s.flags["amphibious_sequence"]);
+      b.id = "amphibious_" + std::to_string(++s.flags[mark::amphibious_sequence]);
       b.zone = zone;
       b.attacker = transport.owner;
       b.defender = *s.territories.at(zone).possessor;
       b.stage = "amphibious_declared";
-      b.flags["amphibious_preparation"] = 1;
+      b.flags[mark::amphibious_preparation] = 1;
       b.data = V(O{{"sea", V(zoneName(s, transport.zone))},
                    {"cargo", V(A{})},
                    {"bombarding", V(A{})}});
@@ -916,7 +907,7 @@ bool applyNavalOperationAction(State &s, const Action &a) {
       if (s.units.contains(candidate.asString()))
         players.insert(
             politicalPlayer(s, s.units.at(candidate.asString()).owner));
-    if (players.size() > 1 && !flag(b.flags, "shore_dispute_decided")) {
+    if (players.size() > 1 && !flag(b.flags, mark::shore_dispute_decided)) {
       put(b, "shore_proposal", V(unit));
       put(b, "shore_consents", V(O{}));
       chooseShoreCasualty(s, b);
@@ -928,7 +919,7 @@ bool applyNavalOperationAction(State &s, const Action &a) {
       ++u.damage;
     else
       removePoliticalUnits(s, {unit});
-    b.flags.erase("shore_dispute_decided");
+    b.flags.erase(mark::shore_dispute_decided);
     put(b, "shore_hit_index",
         V(static_cast<double>(b.data.require("shore_hit_index").asInt() + 1)));
     chooseShoreCasualty(s, b);
@@ -1029,7 +1020,7 @@ bool applyNavalOperationChance(State &s, const ChanceRequest &r,
       if (s.units.contains(v.asString()))
         options.push_back(action(s, owner, "naval_shore_casualty",
                                  {{"battle", V(b.id)}, {"unit", v}}));
-    b.flags["shore_dispute_decided"] = 1;
+    b.flags[mark::shore_dispute_decided] = 1;
     if (options.empty())
       chooseShoreCasualty(s, b);
     else
@@ -1058,10 +1049,10 @@ bool applyNavalOperationChance(State &s, const ChanceRequest &r,
     else {
       auto &u = s.units.at(r.continuation);
       u.owner = nationNumber(s, r.nation);
-      u.gameFlags.erase("captured_port_pending:" + r.nation);
-      if (flag(u.gameFlags, "skeleton_crew_until_own_turn") ||
-          flag(u.gameFlags, "skeleton_crew"))
-        u.gameFlags["skeleton_crew_until_own_turn"] =
+      u.gameFlags.erase(MarkKey(mark::captured_port_pending, r.nation));
+      if (flag(u.gameFlags, mark::skeleton_crew_until_own_turn) ||
+          flag(u.gameFlags, mark::skeleton_crew))
+        u.gameFlags[mark::skeleton_crew_until_own_turn] =
             navalCompletedTurns(s, u.owner) + 2;
       for (const auto &id : u.cargo)
         s.units.at(id).owner = u.owner;
@@ -1072,7 +1063,7 @@ bool applyNavalOperationChance(State &s, const ChanceRequest &r,
 }
 bool assaultCalledOff(const State &s, const BattleState &b) {
   return s.clock.phase == Phase::Combat && b.stage == "amphibious_declared" &&
-         flag(b.flags, "amphibious_preparation") &&
+         flag(b.flags, mark::amphibious_preparation) &&
          (occupiedForAssault(s, b.attacker, zoneNumber(s, b.data.require("sea").asString()),
                              assaultTransports(s, b)) ||
           assaultCargo(s, b).empty());
@@ -1094,7 +1085,7 @@ void callOffUnclearedAssaults(State &s) {
 }
 bool navalOperationPhaseComplete(const State &s) {
   for (const auto &[id, b] : s.battles)
-    if (flag(b.flags, "amphibious_preparation")) {
+    if (flag(b.flags, mark::amphibious_preparation)) {
       if ((s.clock.phase == Phase::CombatMovement &&
            b.stage == "amphibious_declared") ||
           assaultCalledOff(s, b))
@@ -1103,12 +1094,12 @@ bool navalOperationPhaseComplete(const State &s) {
     }
   if (s.clock.phase == Phase::PlaceUnits)
     for (const auto &[id, u] : s.units)
-      if (flag(u.gameFlags, "captured_port_pending:" + nationName(s, s.currentNation())))
+      if (flag(u.gameFlags, MarkKey(mark::captured_port_pending, nationName(s, s.currentNation()))))
         return false;
   return true;
 }
 void finishNavalOperationPhase(State &s) {
-  s.flags.erase("naval_berthing");
+  s.flags.erase(mark::naval_berthing);
   if (s.clock.phase == Phase::Combat) {
     std::vector<Id> lost;
     for (auto &[id, u] : s.units) {
@@ -1116,8 +1107,8 @@ void finishNavalOperationPhase(State &s) {
         continue;
       Id origin;
       for (const auto &c : u.commitments)
-        if (c.rfind("naval_scramble_origin:", 0) == 0)
-          origin = c.substr(22);
+        if (c.base() == mark::naval_scramble_origin)
+          origin = std::string(c.argument());
       if (origin.empty())
         continue;
       if (!s.facilities.contains(origin) ||
@@ -1129,25 +1120,25 @@ void finishNavalOperationPhase(State &s) {
         continue;
       }
       u.zone = s.facilities.at(origin).zone;
-      u.gameFlags["in_port:" + origin] = 1;
+      u.gameFlags[MarkKey(mark::in_port, origin)] = 1;
       for (const auto &cargo : u.cargo)
         s.units.at(cargo).zone = u.zone;
-      u.commitments.erase("naval_scramble_origin:" + origin);
-      u.commitments.erase("naval_scrambled");
+      u.commitments.erase(MarkKey(mark::naval_scramble_origin, origin));
+      u.commitments.erase(mark::naval_scrambled);
     }
     removePoliticalUnits(s, std::set<Id>(lost.begin(), lost.end()));
   }
 }
 void preparePortLandDefence(State &s, const Id &id) {
   auto &b = s.battles.at(id);
-  if (flag(b.flags, "port_crew_prepared"))
+  if (flag(b.flags, mark::port_crew_prepared))
     return;
-  b.flags["port_crew_prepared"] = 1;
+  b.flags[mark::port_crew_prepared] = 1;
   std::vector<UnitState> crews;
   for (const auto &[shipId, u] : s.units)
     if (u.zone == b.zone && !berth(u).empty() &&
         hostile(s, b.attacker, u.owner) &&
-        !flag(u.gameFlags, "skeleton_crew_until_own_turn") &&
+        !flag(u.gameFlags, mark::skeleton_crew_until_own_turn) &&
         (u.type == knownUnitTypes(s).heavy_cruiser || u.type == knownUnitTypes(s).battlecruiser ||
          unitClass(s, u, knownUnitClasses(s).carrier) || u.type == knownUnitTypes(s).battleship ||
          u.type == knownUnitTypes(s).heavy_battleship)) {
@@ -1157,7 +1148,7 @@ void preparePortLandDefence(State &s, const Id &id) {
       crew.owner = u.owner;
       crew.zone = crew.turnOrigin = b.zone;
       crew.movementAllowance = crew.movementRemaining = 0;
-      crew.gameFlags["ship_crew:" + shipId] = 1;
+      crew.gameFlags[MarkKey(mark::ship_crew, shipId)] = 1;
       crews.push_back(std::move(crew));
     }
   for (auto &u : crews) {
@@ -1168,7 +1159,7 @@ void preparePortLandDefence(State &s, const Id &id) {
 void resolveCapturedPorts(State &s, ZoneId landZone, NationId captor) {
   for (auto &[id, u] : s.units)
     if (u.zone == landZone && !berth(u).empty() && hostile(s, captor, u.owner))
-      u.gameFlags["captured_port_pending:" + nationName(s, captor)] = 1;
+      u.gameFlags[MarkKey(mark::captured_port_pending, nationName(s, captor))] = 1;
 }
 void queueDamagedPortEvacuation(State &s, const Id &facility) {
   evacuationChoice(s, facility, 0);
@@ -1202,10 +1193,10 @@ void releaseAmphibiousReserves(State &s, const Id &battle) {
         continue;
       detachCargo(s, transport, id, b.zone);
       auto &u = s.units.at(id);
-      u.commitments.insert("amphibious_assault");
-      u.commitments.insert("combat_move");
+      u.commitments.insert(mark::amphibious_assault);
+      u.commitments.insert(mark::combat_move);
       u.movementRemaining = 0;
-      u.gameFlags["amphibious_transport:" + transport] = 1;
+      u.gameFlags[MarkKey(mark::amphibious_transport, transport)] = 1;
       b.attackers.push_back(id);
       origins[id] = V(water);
     }

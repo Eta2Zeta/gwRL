@@ -212,10 +212,11 @@ def mcts_probe():
 def gil_release_probe():
     env = root(17)
     value = json.loads(env.serialize())
-    # A sizeable but valid unknown flag map makes ONE native restore long enough
-    # for the waiting Python thread to be scheduled. No throughput threshold or
-    # comparison between machine-dependent durations is used.
-    value["state"]["flags"].update({f"test_concurrency_padding:{index}": 0 for index in range(64_000)})
+    # A sizeable but valid flag map of fixture marks (include/game/marks.hpp)
+    # makes ONE native restore long enough for the waiting Python thread to be
+    # scheduled. No throughput threshold or comparison between machine-dependent
+    # durations is used.
+    value["state"]["flags"].update({f"fixture:test_concurrency_padding:{index}": 0 for index in range(64_000)})
     checkpoint = json.dumps(value, separators=(",", ":"))
     ready, go, ran = threading.Event(), threading.Event(), threading.Event()
 
@@ -241,7 +242,7 @@ def gil_release_probe():
         thread.join(timeout=5)
     require(not thread.is_alive(), "Heartbeat thread failed to exit")
     require(progressed_during_native_call, "Python heartbeat could not run during the native engine call")
-    require(env.observation()["state"]["flags"]["test_concurrency_padding:63999"] == 0,
+    require(env.observation()["state"]["flags"]["fixture:test_concurrency_padding:63999"] == 0,
             "Native restore did not preserve the complete state")
     return {"python_progress_during_native_call": True, "padded_flags": 64_000}
 

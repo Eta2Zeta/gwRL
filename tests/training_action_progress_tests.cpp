@@ -88,7 +88,7 @@ void raiderChoicesRemainReachableAndBounceStops() {
     Engine engine(source, trainingCampaignRules(), 17);
     check(offers(engine, "end_phase"), "Normal stationary role cannot finish the phase");
     choose(engine, "naval_designate_raider");
-    check(engine.state().units.at("raider").gameFlags.at("raider") == 1,
+    check(engine.state().units.at("raider").gameFlags.at(mark::raider) == 1,
           "Raider role outcome is unreachable");
     check(!offers(engine, "naval_remove_raider"), "Raider role can immediately toggle back");
     const auto raw = campaignRules()->actions(engine.state());
@@ -107,10 +107,10 @@ void raiderChoicesRemainReachableAndBounceStops() {
     check(engine.state().actionInterface.require("visited_configurations").asArray().empty(),
           "Physical movement retained stale configuration restrictions");
     choose(engine, "naval_remove_raider");
-    check(!engine.state().units.at("raider").gameFlags.contains("raider"),
+    check(!engine.state().units.at("raider").gameFlags.contains(mark::raider),
           "Role change after real progress was incorrectly removed");
 
-    source.units.at("raider").gameFlags["naval_raider"] = 1;
+    source.units.at("raider").gameFlags[mark::naval_raider] = 1;
     Engine alias(source, trainingCampaignRules(), 17);
     choose(alias, "naval_remove_raider");
     choose(alias, "naval_designate_raider");
@@ -157,9 +157,9 @@ void zeroMovementCarrierAssignmentsRemainReachable() {
 
 void inPortDeckLandAssignmentsCannotCycle() {
     auto source = fixture(Phase::NonCombatMovement);
-    source.facilities["test_port"] = {"test_port", "major_port", zoneNumber(source, honshu), 0, {{"border:" + sea, 1}}};
+    source.facilities["test_port"] = {"test_port", "major_port", zoneNumber(source, honshu), 0, {{MarkKey(mark::border, sea), 1}}};
     add(source, "carrier", "fleet_carrier", honshu);
-    source.units.at("carrier").gameFlags["in_port:test_port"] = 1;
+    source.units.at("carrier").gameFlags[MarkKey(mark::in_port, "test_port")] = 1;
     add(source, "plane", "fighter", honshu);
     attachCargo(source, "carrier", "plane");
     source.units.at("plane").movementRemaining = 0;
@@ -181,7 +181,7 @@ State railFixture(const Id& recipient) {
     source.territories.at(zoneNumber(source, "land_china_suiyuan")).possessor = nationNumber(source, recipient);
     source.captureTurnStart();
     beginEconomyTurn(source);
-    source.nations.at(nationNumber(source, "japan")).turnFlags["economy_research_finished"] = 1;
+    source.nations.at(nationNumber(source, "japan")).turnFlags[mark::economy_research_finished] = 1;
     return source;
 }
 

@@ -26,10 +26,7 @@ void rejects(const std::function<void()>& operation, const std::string& message)
     try { operation(); } catch (const std::exception&) { return; }
     throw std::runtime_error(message);
 }
-bool flagged(const std::map<Id, int>& flags, const Id& name) {
-    const auto found = flags.find(name);
-    return found != flags.end() && found->second != 0;
-}
+bool flagged(const Marks& flags, const MarkKey& name) { return flags.value(name) != 0; }
 const State& baseline() {
     // Verify source hashes once, then isolate mutable state for every case.
     static const auto state = loadScenario(root / "game_content/scenarios/japan_china_1936");
@@ -87,7 +84,7 @@ void prepareTwelveIppKmt(State& state) {
     for (const auto& zone : {beiping, hopeh, Id("land_kwangtung"), Id("land_china_yunnan")})
         state.territories.at(zoneNumber(state, zone)).possessor = nationNumber(state, "kmt");
     refreshPoliticalState(state);
-    check(state.nations.at(nationNumber(state, "kmt")).gameFlags.at("possessed_land_ipp") == 12,
+    check(state.nations.at(nationNumber(state, "kmt")).gameFlags.at(mark::possessed_land_ipp) == 12,
           "Hand-checked evolution fixture no longer totals 12 IPP");
     check(state.nations.at(nationNumber(state, "kmt")).powerStatus == "minor" && state.decisions.empty(),
           "A 12-IPP faction evolved");
@@ -131,7 +128,7 @@ void immediateEvolutionOutsideOwnTurn() {
     const auto cash = state.nations.at(nationNumber(state, "kmt")).treasury;
     const auto beforeFactories = factoryCount(state, nanking, "major_factory");
     changePossession(state, zoneNumber(state, "land_hainan"), nationNumber(state, "kmt"), PossessionCause::Alignment);
-    check(state.nations.at(nationNumber(state, "kmt")).powerStatus == "major" && state.nations.at(nationNumber(state, "kmt")).gameFlags.at("possessed_land_ipp") == 13,
+    check(state.nations.at(nationNumber(state, "kmt")).powerStatus == "major" && state.nations.at(nationNumber(state, "kmt")).gameFlags.at(mark::possessed_land_ipp) == 13,
           "The thirteenth possessed IPP did not evolve KMT immediately");
     check(state.nations.at(nationNumber(state, "kmt")).treasury == cash && !state.clock.incomeCollected,
           "Evolution was coupled to cash or income collection");
@@ -197,9 +194,9 @@ void oneChinaPointIsNotSurrenderBonus() {
         if (isNation(state, territory.possessor, "kmt")) territory.possessor = nationNumber(state, "japan");
     state.territories.at(zoneNumber(state, "land_hainan")).possessor = nationNumber(state, "kmt");
     refreshPoliticalState(state);
-    check(flagged(state.nations.at(nationNumber(state, "ccp")).gameFlags, "objective_one_china")
+    check(flagged(state.nations.at(nationNumber(state, "ccp")).gameFlags, mark::objective_one_china)
             && !state.politics.surrendered.contains(nationNumber(state, "kmt")), "Hainan-only KMT was mistaken for a surrendered faction");
-    check(!flagged(state.nations.at(nationNumber(state, "ccp")).gameFlags, "one_china_bonus_awarded"),
+    check(!flagged(state.nations.at(nationNumber(state, "ccp")).gameFlags, mark::one_china_bonus_awarded),
           "The victory-point condition incorrectly awarded units");
     const auto unitCount = state.units.size();
     changePossession(state, zoneNumber(state, "land_hainan"), nationNumber(state, "japan"), PossessionCause::Capture);
@@ -209,10 +206,10 @@ void oneChinaPointIsNotSurrenderBonus() {
           "Surrender retained KMT military units");
     check(state.units.size() < unitCount, "A surrender bonus was placed at an invented destination");
     std::map<Id, int> awards;
-    for (const auto& [id, project] : state.construction) if (flagged(project.flags, "national_objective_award")) {
+    for (const auto& [id, project] : state.construction) if (flagged(project.flags, mark::national_objective_award)) {
         ++awards[project.type];
         check(project.owner == nationNumber(state, "ccp") && project.paidIpp == 0 && project.remainingPayments.empty()
-                && !project.site && flagged(project.flags, "completed"), "One China entitlement is not a free completed placement project");
+                && !project.site && flagged(project.flags, mark::completed), "One China entitlement is not a free completed placement project");
     }
     check(awards == std::map<Id, int>({{"cavalry", 3}, {"infantry", 2}}), "Wrong One China unit entitlement");
     const auto projects = state.construction.size();
@@ -226,10 +223,10 @@ void oneChinaPointIsNotSurrenderBonus() {
     for (auto& [zone, territory] : ineligible.territories)
         if (isNation(ineligible, territory.possessor, "kmt")) territory.possessor = nationNumber(ineligible, "japan");
     refreshPoliticalState(ineligible);
-    check(!flagged(ineligible.nations.at(nationNumber(ineligible, "ccp")).gameFlags, "one_china_bonus_awarded"),
+    check(!flagged(ineligible.nations.at(nationNumber(ineligible, "ccp")).gameFlags, mark::one_china_bonus_awarded),
           "CCP with no land at surrender received the bonus");
     changePossession(ineligible, zoneNumber(ineligible, shensi), nationNumber(ineligible, "ccp"), PossessionCause::Transfer);
-    check(!flagged(ineligible.nations.at(nationNumber(ineligible, "ccp")).gameFlags, "one_china_bonus_awarded"),
+    check(!flagged(ineligible.nations.at(nationNumber(ineligible, "ccp")).gameFlags, mark::one_china_bonus_awarded),
           "Later CCP land recovery retroactively qualified for the bonus");
 }
 
@@ -239,7 +236,7 @@ void ccpNoUnitsIsNotSurrenderOrGameEnd() {
     for (const auto& [id, unit] : state.units) if (unit.owner == nationNumber(state, "ccp")) communistUnits.insert(id);
     removePoliticalUnits(state, communistUnits);
     refreshPoliticalState(state);
-    check(flagged(state.nations.at(nationNumber(state, "ccp")).gameFlags, "civil_war_eliminated")
+    check(flagged(state.nations.at(nationNumber(state, "ccp")).gameFlags, mark::civil_war_eliminated)
             && !state.politics.surrendered.contains(nationNumber(state, "ccp")) && !state.terminal,
           "No surviving CCP units became universal surrender or campaign termination");
     check(isNation(state, state.territories.at(zoneNumber(state, shensi)).possessor, "ccp"), "Elimination incorrectly erased CCP land");
@@ -299,9 +296,9 @@ void mandatoryLiberationAndProvenWithdrawal() {
     });
     PoliticsRules{}.apply(proven, give);
     check(isNation(proven, proven.territories.at(zoneNumber(proven, beiping)).possessor, "ccp")
-            && flagged(proven.units.at("conqueror").turnFlags, "must_withdraw_from_chinese_gift"),
+            && flagged(proven.units.at("conqueror").turnFlags, mark::must_withdraw_from_chinese_gift),
           "Proven unaligned gift lost the required subsequent withdrawal obligation");
-    check(!flagged(proven.units.at("returning_aircraft").turnFlags, "must_withdraw_from_chinese_gift"),
+    check(!flagged(proven.units.at("returning_aircraft").turnFlags, mark::must_withdraw_from_chinese_gift),
           "Aircraft received an additional land-conqueror withdrawal obligation instead of ordinary landing");
     check(originalNation(proven, zoneNumber(proven, beiping)) == nationNumber(proven, "warlord_beiping_hopeh"), "Gift erased original nationality");
     proven.validate();
@@ -356,7 +353,7 @@ void directAxisDadaoSurvivesJapan() {
     const auto& dadao = state.nations.at(nationNumber(state, "dadao"));
     check(dadao.player == "axis" && dadao.alliance == "axis" && !dadao.controllerNation
             && dadao.powerStatus == "minor" && !dadao.treasury && dadao.incomeKnown && dadao.incomeComponents.empty()
-            && flagged(dadao.gameFlags, "direct_axis_control_after_japan_surrender"),
+            && flagged(dadao.gameFlags, mark::direct_axis_control_after_japan_surrender),
           "Approved direct Axis Dadao control was not preserved");
     check(possessedLand(state, nationNumber(state, "dadao")) == zoneNumbers(state, {beiping, hopeh}) && dadao.atWarWith.contains(nationNumber(state, "kmt")),
           "Japan's surrender removed separate Dadao land or wars");
@@ -438,9 +435,9 @@ void declarationGatesAndUnknownAccounting() {
     check(!state.nations.at(nationNumber(state, "ccp")).allies.contains(nationNumber(state, "mongolia"))
             && !state.nations.at(nationNumber(state, "mongolia")).allies.contains(nationNumber(state, "ccp")),
           "The derived allies cache granted unsupported Mongolia/CCP alignment");
-    state.flags["strategic_naval_movement_in_progress"] = 1;
+    state.flags[mark::strategic_naval_movement_in_progress] = 1;
     check(PoliticsRules{}.interrupts(state).empty(), "Major-war interrupt occurred during strategic naval movement");
-    state.flags.erase("strategic_naval_movement_in_progress");
+    state.flags.erase(mark::strategic_naval_movement_in_progress);
     turn(state, "japan", Phase::PlaceUnits);
     const auto rules = std::make_shared<PoliticsRules>();
     Engine engine(state, rules);
@@ -494,9 +491,9 @@ void capitalChoicesFollowPossession() {
     only.kind = "politics_choose_capital";
     only.parameters = V(O{{"zone", V(beiping)}, {"factory", V(false)}});
     queuePoliticalDecision(lone, nationNumber(lone, "kmt"), "politics_evolution", {only});
-    lone.flags["evolution_pending_kmt"] = 1;
+    lone.flags[MarkKey(mark::evolution_pending, "kmt")] = 1;
     changePossession(lone, zoneNumber(lone, beiping), nationNumber(lone, "japan"), PossessionCause::Capture, nationNumber(lone, "japan"));
-    check(lone.decisions.empty() && !lone.flags.contains("evolution_pending_kmt"),
+    check(lone.decisions.empty() && !lone.flags.contains(MarkKey(mark::evolution_pending, "kmt")),
           "A capital choice without land stayed pending");
 }
 } // namespace

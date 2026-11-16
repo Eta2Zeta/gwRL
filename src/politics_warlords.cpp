@@ -12,17 +12,14 @@ using A = V::Array;
 
 const Id resolutionKey = "warlord_combat_resolution";
 Id alignmentKey(const State& state, NationId nation) { return "warlord_alignment:" + nationName(state, nation); }
-bool flag(const std::map<Id, int>& flags, const Id& key) {
-    const auto it = flags.find(key);
-    return it != flags.end() && it->second != 0;
-}
+bool flag(const Marks& flags, const MarkKey& key) { return flags.value(key) != 0; }
 bool chineseFaction(const Id& nation) {
     return nation == "ccp" || nation == "kmt" || nation == "dadao" || isWarlord(nation);
 }
 bool activeWarlord(const State& state, NationId nation) {
     const auto it = state.nations.find(nation);
     if (it == state.nations.end() || !isWarlord(nationName(state, nation))
-            || flag(it->second.gameFlags, "incorporated")
+            || flag(it->second.gameFlags, mark::incorporated)
             || state.politics.surrendered.contains(nation)) return false;
     return !possessedLand(state, nation).empty()
         || std::any_of(state.units.begin(), state.units.end(), [&](const auto& pair) {
@@ -81,30 +78,30 @@ void queueSharedBattles(State& state, NationId breaker) {
         battle.stage = "awaiting_combat_rules";
         battle.attackers = battle.attacker == ccp ? sides.first : sides.second;
         battle.defenders = battle.defender == ccp ? sides.first : sides.second;
-        battle.flags["chinese_truce_termination"] = 1;
+        battle.flags[mark::chinese_truce_termination] = 1;
         if (battle.attacker == kmt && state.nations.at(kmt).powerStatus == "minor")
-            battle.flags["truce_low_morale_eliminates"] = 1;
+            battle.flags[mark::truce_low_morale_eliminates] = 1;
         O origins;
         A landEntries;
         for (const auto& id : battle.attackers) {
             const auto& unit = state.units.at(id);
             // Routes are reset on the owning faction's turn, so off-turn routes
             // cannot establish an entry into this battle during the active turn.
-            if (unit.owner != active || !unit.commitments.contains("combat_move") ||
+            if (unit.owner != active || !unit.commitments.contains(mark::combat_move) ||
                 unit.route.empty() || unit.route.back() != zone) continue;
             const auto from = unit.route.size() > 1
                 ? unit.route[unit.route.size() - 2] : unit.turnOrigin;
             if (passableLandBorder(state, from, zone)) {
                 origins[id] = V(zoneName(state, from));
                 if (state.definition->catalog->unit(unit.type).classes.contains(knownUnitClasses(state).land) &&
-                    !unit.commitments.contains("airborne_assault") &&
-                    !unit.commitments.contains("amphibious_assault")) landEntries.emplace_back(zoneName(state, from));
+                    !unit.commitments.contains(mark::airborne_assault) &&
+                    !unit.commitments.contains(mark::amphibious_assault)) landEntries.emplace_back(zoneName(state, from));
             }
         }
         battle.data = V(O{{"round", V(1.0)}, {"origins", V(std::move(origins))},
                           {"land_entry_origins", V(std::move(landEntries))},
                           {"truce_breaker", V(nationName(state, breaker))}});
-        state.flags["immediate_land_battles"] = 1;
+        state.flags[mark::immediate_land_battles] = 1;
         if (state.battles.contains(battle.id))
             throw std::runtime_error("Chinese Truce battle already queued");
         state.battleOrder.push_back(battle.id);
@@ -157,7 +154,7 @@ void alignSurvivingNation(State& state, NationId warlord, NationId recipient, bo
         // this does not restore KMT's former units, possessions or treasury.
         if (!foreign || recipient != knownNations(state).kmt || !activeWarlord(state, warlord)) return;
         state.politics.surrendered.erase(recipient);
-        state.nations.at(recipient).gameFlags.erase("surrendered");
+        state.nations.at(recipient).gameFlags.erase(mark::surrendered);
     }
     incorporateNation(state, warlord, recipient);
 }

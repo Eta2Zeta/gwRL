@@ -19,9 +19,7 @@ using V = json::Value;
 using O = V::Object;
 using A = V::Array;
 V n(int x) { return V(static_cast<double>(x)); }
-int value(const std::map<Id,int> &flags, const Id &key) {
-    const auto i=flags.find(key); return i==flags.end()?0:i->second;
-}
+int value(const Marks &flags, const MarkKey &key) { return flags.value(key); }
 bool has(const State &s,const UnitState &u,UnitClassId c) {
     return s.definition->catalog->unit(u.type).classes.contains(c);
 }
@@ -137,8 +135,8 @@ std::vector<std::string> campaignInvariantFailures(const State&s) {
         if(!s.nations.at(enemy).atWarWith.contains(id))out.push_back("asymmetric war: "+ nationName(s, id)+" / "+ nationName(s, enemy));
     std::map<Id,Id> pendingAttacks;
     for(const auto&[battleId,b]:s.battles)
-        if(!value(b.flags,"finished")&&!value(b.flags,"naval_battle")&&!value(b.flags,"air_mission")&&
-           !value(b.flags,"amphibious_preparation")&&!value(b.flags,"naval_movement_plan"))
+        if(!value(b.flags,mark::finished)&&!value(b.flags,mark::naval_battle)&&!value(b.flags,mark::air_mission)&&
+           !value(b.flags,mark::amphibious_preparation)&&!value(b.flags,mark::naval_movement_plan))
             for(const auto&unit:b.attackers) {
                 if(pendingAttacks.contains(unit))out.push_back("unit in two unresolved land attacks: "+unit);
                 else pendingAttacks[unit]=battleId;
@@ -176,24 +174,24 @@ std::vector<std::string> campaignInvariantFailures(const State&s) {
             out.push_back("untransported land unit at sea: "+id);
         if(has(s,u,knownUnitClasses(s).naval)&&s.territories.contains(u.zone)) {
             bool berthed=false;
-            for(const auto&[flag,on]:u.gameFlags)if(on&&prefix(flag,"in_port:")) {
-                const auto facility=flag.substr(std::string("in_port:").size());
+            for(const auto&[flag,on]:u.gameFlags)if(on&&flag.base() == mark::in_port) {
+                const auto facility=std::string(flag.argument());
                 if(s.facilities.contains(facility)&&s.facilities.at(facility).zone==u.zone)berthed=true;
             }
             if(!berthed)out.push_back("unberthed ship in a land zone: "+id);
         }
     }
     for(const auto&[id,nation]:s.nations)for(const auto&[key,amount]:nation.turnFlags)
-        if(prefix(key,"economy_used:")) {
-            const auto fid=key.substr(std::string("economy_used:").size());
-            if(!s.facilities.contains(fid)||amount<0)out.push_back("invalid facility capacity use: "+key);
+        if(key.base() == mark::economy_used) {
+            const auto fid=std::string(key.argument());
+            if(!s.facilities.contains(fid)||amount<0)out.push_back("invalid facility capacity use: "+key.name());
             else {
                 const auto &f=s.facilities.at(fid);
                 const auto ctx=catalogContext(s,id,f.zone);
-                int highest=std::max(value(nation.turnFlags,"economy_production_cap:"+fid),value(nation.turnFlags,"economy_repair_cap:"+fid));
-                for(const auto&[startKey,flag]:nation.turnFlags)if(flag&&prefix(startKey,"economy_start_type:"+fid+":")) {
-                    const auto type=startKey.substr(("economy_start_type:"+fid+":").size());
-                    const int damage=value(nation.turnFlags,"economy_start_damage:"+fid);
+                int highest=std::max(value(nation.turnFlags,MarkKey(mark::economy_production_cap, fid)),value(nation.turnFlags,MarkKey(mark::economy_repair_cap, fid)));
+                for(const auto&[startKey,flag]:nation.turnFlags)if(flag&&startKey.base()==mark::economy_start_type&&startKey.argument().starts_with(fid+":")) {
+                    const auto type=std::string(startKey.argument().substr(fid.size()+1));
+                    const int damage=value(nation.turnFlags,MarkKey(mark::economy_start_damage, fid));
                     highest=std::max({highest,s.definition->catalog->productionCapacity(type,damage,ctx),s.definition->catalog->repairCapacity(type,damage,ctx)});
                 }
                 if(amount>highest)out.push_back("facility capacity exceeded: "+fid);
@@ -202,10 +200,10 @@ std::vector<std::string> campaignInvariantFailures(const State&s) {
     for(const auto&[id,nation]:s.nations)
         if(nation.incomeKnown&&nation.incomeComponents!=evaluateIncome(s,id).components)out.push_back("stale income: "+ nationName(s, id));
     if(s.terminal)for(const auto&[id,u]:s.units)
-        if(value(u.turnFlags,"air_in_flight")&&!value(u.gameFlags,"on_map"))out.push_back("terminal aircraft still in flight: "+id);
+        if(value(u.turnFlags,mark::air_in_flight)&&!value(u.gameFlags,mark::on_map))out.push_back("terminal aircraft still in flight: "+id);
     if(s.clock.phase==Phase::PlaceUnits&&s.battles.empty()&&s.decisions.empty()&&!s.chance)
         for(const auto&[id,u]:s.units)if(isAircraft(s,u)&&movementController(s,u.owner)&&
-            value(u.turnFlags,"air_in_flight")&&!value(u.gameFlags,"on_map"))
+            value(u.turnFlags,mark::air_in_flight)&&!value(u.gameFlags,mark::on_map))
             out.push_back("aircraft passed noncombat without landing: "+id);
     return out;
 }
@@ -253,8 +251,8 @@ void CampaignAuditLog::record(const State&before,const Engine&e,const std::strin
             }
             if(kind=="action"&&command=="recruitment_place_infantry")authorized=u.type== knownUnitTypes(before).infantry;
             if(kind=="action"&&command=="recruitment_place_militia")authorized=u.type== knownUnitTypes(before).militia;
-            if(prefix(id,"ship_crew_"))for(const auto&[flag,on]:u.gameFlags)if(on&&prefix(flag,"ship_crew:")) {
-                const auto ship=flag.substr(std::string("ship_crew:").size());
+            if(prefix(id,"ship_crew_"))for(const auto&[flag,on]:u.gameFlags)if(on&&flag.base() == mark::ship_crew) {
+                const auto ship=std::string(flag.argument());
                 authorized=before.units.contains(ship)&&u.type== knownUnitTypes(before).militia&&before.units.at(ship).owner==u.owner&&before.units.at(ship).zone==u.zone;
             }
             if(!authorized)throw std::runtime_error("Unit creation lacks a completed placement, recruitment choice, or ship-crew source: "+id);

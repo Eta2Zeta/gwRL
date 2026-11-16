@@ -278,12 +278,14 @@ void railroadRepairNamesItsBorder() {
 void unknownNamesAreCountedNotDropped() {
     CampaignEnv env(scenario, 1, true);
     auto s = env.engine().state().clone();
-    s.units.at("setup_japan_land_jap_hokkaido_infantry_1").turnFlags["zone_test_unknown_flag"] = 1;
+    // Every mark is in the engine's mark table, but the encoder's lists lack
+    // the four bombing-reduction marks (docs/questions.md, Q-003).
+    s.units.at("setup_japan_land_jap_hokkaido_infantry_1").turnFlags[MarkKey(mark::bombing_reduction, "x")] = 1;
     zoneEncodingUnknowns(true);
     const auto spec = zoneEncodingSpec(s);
     const auto z = encodeZoneInput(s, scheduleOf(env), {});
     const auto unknown = zoneEncodingUnknowns(true);
-    require(unknown.contains("actor_flag:zone_test_unknown_flag"), "Unknown flags are reported");
+    require(unknown.contains("actor_flag:bombing_reduction"), "Unknown flags are reported");
     require(zoneAnswers(*spec, z, "land_jap_hokkaido").at("unit_flag:axis:land:other") == 1,
             "Unknown flags still count in an other column");
 }
@@ -412,7 +414,7 @@ void nationQuestionsFollowTheRules() {
     tibet.player = tibet.alliance = "axis";
     s.nations.at(nationNumber(s, "ccp")).powerStatus = "major";
     s.nations.at(nationNumber(s, "ccp")).technologyStages["radar"] = 1;
-    s.nations.at(nationNumber(s, "ccp")).gameFlags["economy_researched_round:radar"] = 1;
+    s.nations.at(nationNumber(s, "ccp")).gameFlags[MarkKey(mark::economy_researched_round, "radar")] = 1;
     s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "mongolia"));
     s.nations.at(nationNumber(s, "ccp")).allies.insert(nationNumber(s, "kmt"));
     s.nations.at(nationNumber(s, "dadao")).atWarWith.insert(nationNumber(s, "warlord_yunnan"));
@@ -421,7 +423,7 @@ void nationQuestionsFollowTheRules() {
     s.politics.chinaInvader = nationNumber(s, "mongolia");
     s.politics.attackedWarlords[nationNumber(s, "warlord_yunnan")].insert(nationNumber(s, "dadao"));
     s.politics.alignmentQueue.push_back(nationNumber(s, "warlord_yunnan"));
-    s.flags["evolution_pending_ccp"] = 1;
+    s.flags[MarkKey(mark::evolution_pending, "ccp")] = 1;
     answers = positionAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}));
     require(zoneEncodingUnknowns(true).empty(), "Rare answers the rules allow are not reported");
     for (const std::string expected :
@@ -441,7 +443,7 @@ void nationQuestionsFollowTheRules() {
     mongolia.controllerNation = nationNumber(s, "japan");
     mongolia.powerStatus = "major";
     mongolia.technologyStages["radar"] = 2;
-    mongolia.gameFlags["economy_researched_round:radar"] = 1;
+    mongolia.gameFlags[MarkKey(mark::economy_researched_round, "radar")] = 1;
     mongolia.allies.insert(nationNumber(s, "ccp"));
     broken.nations.at(nationNumber(broken, "japan")).treasury.reset();
     broken.nations.at(nationNumber(broken, "warlord_tibet")).atWarWith.insert(nationNumber(broken, "warlord_yunnan"));
@@ -451,7 +453,7 @@ void nationQuestionsFollowTheRules() {
     broken.politics.chinaInvader = nationNumber(broken, "kmt");
     broken.politics.attackedWarlords[nationNumber(broken, "warlord_tibet")].insert(nationNumber(broken, "kmt"));
     broken.politics.alignmentQueue.push_back(nationNumber(broken, "japan"));
-    broken.flags["evolution_pending_japan"] = 1;
+    broken.flags[MarkKey(mark::evolution_pending, "japan")] = 1;
     answers = positionAnswers(*spec, encodeZoneInput(broken, scheduleOf(env), {}));
     const auto unknown = zoneEncodingUnknowns(true);
     for (const std::string family :
@@ -502,7 +504,7 @@ void battleNotesKeepTheirWords() {
         {"map_attack", V(true)},
         {"defenders", V(V::Array{V(lost)})}});
     s.battles.emplace(battle.id, battle);
-    s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_linked_land:" + zone] = 1;
+    s.nations.at(nationNumber(s, "japan")).turnFlags[MarkKey(mark::surprise_attack_linked_land, zone)] = 1;
     const auto spec = zoneEncodingSpec(s);
     zoneEncodingUnknowns(true);
     auto row = zoneAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}), zone);
@@ -538,7 +540,7 @@ void repairsAndRareValuesHaveColumns() {
     s.repairs.emplace("repair_land_china_beiping",
                       RepairJob{"repair_land_china_beiping", nationNumber(s, "ccp"), "land_china_beiping", 3, 0, false, std::nullopt});
     s.construction.emplace("economy_airbase_1", BuildProject{"economy_airbase_1", nationNumber(s, "japan"), "airbase",
-                                                             std::optional<Id>("land_formosa"), 1, 2, {2}, {{"damage", 1}}});
+                                                             std::optional<Id>("land_formosa"), 1, 2, {2}, {{mark::damage, 1}}});
     s.repairs.emplace("repair_economy_airbase_1",
                       RepairJob{"repair_economy_airbase_1", nationNumber(s, "japan"), "economy_airbase_1", 1, 0, false, std::nullopt});
     const auto spec = zoneEncodingSpec(s);
