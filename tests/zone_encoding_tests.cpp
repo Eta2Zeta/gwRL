@@ -263,7 +263,7 @@ void railroadRepairNamesItsBorder() {
     // A repair under way shows on the repaired side's row, toward the zone across.
     RepairJob job;
     job.id = "repair_" + id + "_" + western;
-    job.owner = "japan";
+    job.owner = nationNumber(s, "japan");
     job.target = id;
     job.remainingDamage = 1;
     job.restrictsAction = false;
@@ -309,9 +309,9 @@ void incomeQuestionsFollowTheRules() {
                 answers.at("income:ccp:territorial") == 2 && !answers.contains("income:~impossible") &&
                 zoneEncodingUnknowns(true).empty(),
             "The opening's incomes are read and nothing is reported");
-    s.nations.at("mongolia").incomeComponents["territorial"] = 2;
-    s.nations.at("kmt").incomeComponents["zone_test_income"] = 1;
-    s.nations.at("japan").incomeKnown = false;
+    s.nations.at(nationNumber(s, "mongolia")).incomeComponents["territorial"] = 2;
+    s.nations.at(nationNumber(s, "kmt")).incomeComponents["zone_test_income"] = 1;
+    s.nations.at(nationNumber(s, "japan")).incomeKnown = false;
     answers = positionAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}));
     const auto unknown = zoneEncodingUnknowns(true);
     require(answers.at("income:~impossible") == 3, "A ruled-out income still counts, in one shared column");
@@ -407,20 +407,20 @@ void nationQuestionsFollowTheRules() {
 
     // Rare answers the rules allow have their own questions.
     ensureDadao(s);
-    auto& tibet = s.nations.at("warlord_tibet");
-    tibet.controllerNation = "japan";
+    auto& tibet = s.nations.at(nationNumber(s, "warlord_tibet"));
+    tibet.controllerNation = nationNumber(s, "japan");
     tibet.player = tibet.alliance = "axis";
-    s.nations.at("ccp").powerStatus = "major";
-    s.nations.at("ccp").technologyStages["radar"] = 1;
-    s.nations.at("ccp").gameFlags["economy_researched_round:radar"] = 1;
-    s.nations.at("ccp").atWarWith.insert("mongolia");
-    s.nations.at("ccp").allies.insert("kmt");
-    s.nations.at("dadao").atWarWith.insert("warlord_yunnan");
-    s.politics.surrendered.insert("kmt");
-    s.politics.evolutionAwarded.insert("ccp");
-    s.politics.chinaInvader = "mongolia";
-    s.politics.attackedWarlords["warlord_yunnan"].insert("dadao");
-    s.politics.alignmentQueue.push_back("warlord_yunnan");
+    s.nations.at(nationNumber(s, "ccp")).powerStatus = "major";
+    s.nations.at(nationNumber(s, "ccp")).technologyStages["radar"] = 1;
+    s.nations.at(nationNumber(s, "ccp")).gameFlags["economy_researched_round:radar"] = 1;
+    s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "mongolia"));
+    s.nations.at(nationNumber(s, "ccp")).allies.insert(nationNumber(s, "kmt"));
+    s.nations.at(nationNumber(s, "dadao")).atWarWith.insert(nationNumber(s, "warlord_yunnan"));
+    s.politics.surrendered.insert(nationNumber(s, "kmt"));
+    s.politics.evolutionAwarded.insert(nationNumber(s, "ccp"));
+    s.politics.chinaInvader = nationNumber(s, "mongolia");
+    s.politics.attackedWarlords[nationNumber(s, "warlord_yunnan")].insert(nationNumber(s, "dadao"));
+    s.politics.alignmentQueue.push_back(nationNumber(s, "warlord_yunnan"));
     s.flags["evolution_pending_ccp"] = 1;
     answers = positionAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}));
     require(zoneEncodingUnknowns(true).empty(), "Rare answers the rules allow are not reported");
@@ -435,22 +435,22 @@ void nationQuestionsFollowTheRules() {
 
     // An answer the rules rule out is counted in its family's shared column and reported.
     auto broken = env.engine().state().clone();
-    auto& mongolia = broken.nations.at("mongolia");
+    auto& mongolia = broken.nations.at(nationNumber(broken, "mongolia"));
     mongolia.treasury = 3;
     mongolia.alliance = mongolia.player = "axis";
-    mongolia.controllerNation = "japan";
+    mongolia.controllerNation = nationNumber(s, "japan");
     mongolia.powerStatus = "major";
     mongolia.technologyStages["radar"] = 2;
     mongolia.gameFlags["economy_researched_round:radar"] = 1;
-    mongolia.allies.insert("ccp");
-    broken.nations.at("japan").treasury.reset();
-    broken.nations.at("warlord_tibet").atWarWith.insert("warlord_yunnan");
-    broken.completedTurns["dadao"] = 1;
-    broken.politics.surrendered.insert("ccp");
-    broken.politics.evolutionAwarded.insert("japan");
-    broken.politics.chinaInvader = "kmt";
-    broken.politics.attackedWarlords["warlord_tibet"].insert("kmt");
-    broken.politics.alignmentQueue.push_back("japan");
+    mongolia.allies.insert(nationNumber(s, "ccp"));
+    broken.nations.at(nationNumber(broken, "japan")).treasury.reset();
+    broken.nations.at(nationNumber(broken, "warlord_tibet")).atWarWith.insert(nationNumber(broken, "warlord_yunnan"));
+    broken.completedTurns[nationNumber(broken, "dadao")] = 1;
+    broken.politics.surrendered.insert(nationNumber(broken, "ccp"));
+    broken.politics.evolutionAwarded.insert(nationNumber(broken, "japan"));
+    broken.politics.chinaInvader = nationNumber(broken, "kmt");
+    broken.politics.attackedWarlords[nationNumber(broken, "warlord_tibet")].insert(nationNumber(broken, "kmt"));
+    broken.politics.alignmentQueue.push_back(nationNumber(broken, "japan"));
     broken.flags["evolution_pending_japan"] = 1;
     answers = positionAnswers(*spec, encodeZoneInput(broken, scheduleOf(env), {}));
     const auto unknown = zoneEncodingUnknowns(true);
@@ -481,12 +481,12 @@ void battleNotesKeepTheirWords() {
     const Id zone = "land_china_beiping", victim = "setup_warlord_beiping_hopeh_land_china_beiping_infantry_1";
     require(s.units.contains(victim), "Beiping holds a warlord infantry");
     const Id lost = "setup_zone_test_lost_unit";
-    s.turnStart.units.emplace(lost, std::pair{Id("kmt"), zoneNumber(s, zone)});
+    s.turnStart.units.emplace(lost, std::pair{nationNumber(s, "kmt"), zoneNumber(s, zone)});
     BattleState battle;
     battle.id = "land_battle_test";
     battle.zone = zoneNumber(s, zone);
-    battle.attacker = "japan";
-    battle.defender = "warlord_beiping_hopeh";
+    battle.attacker = nationNumber(s, "japan");
+    battle.defender = nationNumber(s, "warlord_beiping_hopeh");
     battle.stage = "choose_hits";
     battle.data = V(O{
         {"rolling_phase", V(std::string("defender_fire"))},
@@ -502,7 +502,7 @@ void battleNotesKeepTheirWords() {
         {"map_attack", V(true)},
         {"defenders", V(V::Array{V(lost)})}});
     s.battles.emplace(battle.id, battle);
-    s.nations.at("japan").turnFlags["surprise_attack_linked_land:" + zone] = 1;
+    s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_linked_land:" + zone] = 1;
     const auto spec = zoneEncodingSpec(s);
     zoneEncodingUnknowns(true);
     auto row = zoneAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}), zone);
@@ -536,11 +536,11 @@ void repairsAndRareValuesHaveColumns() {
     CampaignEnv env(scenario, 1, true);
     auto s = env.engine().state().clone();
     s.repairs.emplace("repair_land_china_beiping",
-                      RepairJob{"repair_land_china_beiping", "ccp", "land_china_beiping", 3, 0, false, std::nullopt});
-    s.construction.emplace("economy_airbase_1", BuildProject{"economy_airbase_1", "japan", "airbase",
+                      RepairJob{"repair_land_china_beiping", nationNumber(s, "ccp"), "land_china_beiping", 3, 0, false, std::nullopt});
+    s.construction.emplace("economy_airbase_1", BuildProject{"economy_airbase_1", nationNumber(s, "japan"), "airbase",
                                                              std::optional<Id>("land_formosa"), 1, 2, {2}, {{"damage", 1}}});
     s.repairs.emplace("repair_economy_airbase_1",
-                      RepairJob{"repair_economy_airbase_1", "japan", "economy_airbase_1", 1, 0, false, std::nullopt});
+                      RepairJob{"repair_economy_airbase_1", nationNumber(s, "japan"), "economy_airbase_1", 1, 0, false, std::nullopt});
     const auto spec = zoneEncodingSpec(s);
     Action intercept;
     intercept.id = "test_intercept";

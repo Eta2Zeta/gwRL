@@ -275,21 +275,29 @@ class Vocabulary {
         noteUnknown(family_, name);
         return other_;
     }
-    // The zone vocabulary lists the map's zones in name order, which is zone
-    // number order, so a zone's column is its number. numberByZones checks
-    // that when the context is built; only that vocabulary takes numbers.
-    void numberByZones(const NameTable<ZoneKind>& zones) {
-        if (names_ != zones.names() || other_ >= 0)
-            throw std::logic_error("Zone encoding's zone columns differ from the zone numbers");
-        zoneNumbered_ = true;
+    // A vocabulary whose first columns list all names of one kind in name
+    // order, which is number order (names.md), has each number's column equal
+    // to the number: the zone vocabulary lists the map's zones, and the nation
+    // vocabularies the nations, the nation-or-none one followed by "~none".
+    // numberBy checks that when the context is built; only a vocabulary so
+    // checked takes numbers, and only of that kind.
+    template <class Kind> void numberBy(const NameTable<Kind>& table) {
+        const auto& names = table.names();
+        if (names.size() > names_.size() || !std::equal(names.begin(), names.end(), names_.begin())
+            || (other_ >= 0 && static_cast<std::size_t>(other_) < names.size()))
+            throw std::logic_error("Zone encoding's " + family_ + " columns differ from the " + std::string(Kind::noun) + " numbers");
+        numberedKind_ = &kindTag<Kind>;
+        numbered_ = names.size();
     }
-    int find(ZoneId zone) const {
-        if (!zoneNumbered_) throw std::logic_error("Zone encoding " + family_ + " columns are not zone numbers");
-        return zone.valid() && zone.index() < names_.size() ? static_cast<int>(zone.index()) : -1;
+    // The column of a number, or -1 for an invalid number (no name).
+    template <class Kind> int find(Number<Kind> number) const {
+        if (numberedKind_ != &kindTag<Kind>)
+            throw std::logic_error("Zone encoding " + family_ + " columns are not " + std::string(Kind::noun) + " numbers");
+        return number.valid() && number.index() < numbered_ ? static_cast<int>(number.index()) : -1;
     }
-    int operator()(ZoneId zone) const {
-        if (const int index = find(zone); index >= 0) return index;
-        throw std::logic_error("Zone encoding has no zone with this number");
+    template <class Kind> int operator()(Number<Kind> number) const {
+        if (const int index = find(number); index >= 0) return index;
+        throw std::logic_error("Zone encoding has no " + std::string(Kind::noun) + " with this number");
     }
 
   private:
@@ -297,7 +305,10 @@ class Vocabulary {
     std::vector<std::string> names_;
     std::unordered_map<std::string, int> index_;
     int other_{-1};
-    bool zoneNumbered_{false};
+    // Which kind's numbers the vocabulary takes (one tag per kind), and how many.
+    template <class Kind> static constexpr char kindTag = 0;
+    const char* numberedKind_{nullptr};
+    std::size_t numbered_{0};
 };
 
 // A column list made of named families, each a grid over a few vocabularies.
@@ -393,6 +404,7 @@ struct Context {
     std::vector<int> wordKeyOfDataKey;  // Each battle-note key's row in battleWordKeys, or its other.
     std::unordered_map<std::string, int> roleOfKey;
     Layout zone, global, action;
+    int noNation{-1};  // The "~none" column of nationOrNone.
     // Zone families.
     int zPossessor, zStartPossessor, zChanged, zAligned, zTerritoryFlag, zCapitalOf, zDeclinedRail, zUnitNationType,
         zUnitStat, zUnitClassFlag, zUnitRef, zUnitAtFacility, zUnitFacilityBorder, zCarried, zNationHere, zFacility, zFacilityFlag, zFacilityBorder,
@@ -417,6 +429,16 @@ struct Context {
         aBattleStage, aProject, aProjectOwner, aRailEndpoint, aRailDamage, aRow, aNationRef, aTech, aEnum, aNumber, aTrue, aFalse, aNull,
         aListLength;
 };
+
+// A nation's column among nationOrNone; no nation (an empty optional or an
+// invalid number, such as a battle's unset defender) is the "~none" column.
+int nationOrNone(const Context& c, NationId nation) {
+    const int column = c.nationOrNone.find(nation);
+    return column >= 0 ? column : c.noNation;
+}
+int nationOrNone(const Context& c, const std::optional<NationId>& nation) {
+    return nation ? nationOrNone(c, *nation) : c.noNation;
+}
 
 std::string baseName(const std::string& name, std::string* argument = nullptr) {
     const auto colon = name.find(':');
@@ -461,12 +483,12 @@ int flagValue(const State& s, const std::string& base, int value) {
     return static_cast<int>(1 + std::clamp<long>(now - value, 0, 30));
 }
 
-std::optional<Id> playerOf(const State& s, const Id& nation, int depth = 0) {
+std::optional<Id> playerOf(const State& s, NationId nation, int depth = 0) {
     const auto found = s.nations.find(nation);
     if (found == s.nations.end() || depth > 4) return std::nullopt;
     if (found->second.player) return found->second.player;
     if (found->second.controllerNation) return playerOf(s, *found->second.controllerNation, depth + 1);
-    if (const auto it = s.politics.pending.find("warlord_defense_player:" + nation);
+    if (const auto it = s.politics.pending.find("warlord_defense_player:" + nationName(s, nation));
         it != s.politics.pending.end() && it->second.isString())
         return it->second.asString();
     return std::nullopt;
@@ -527,11 +549,14 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     unitStats.insert(unitStats.end(), topFlags.begin(), topFlags.end());
 
     c->zones = Vocabulary("zone", mapIds(s), false);
-    c->zones.numberByZones(names(s).zones);
+    c->zones.numberBy(names(s).zones);
     c->nations = Vocabulary("nation", nations, false);
+    c->nations.numberBy(names(s).nations);
     std::vector<std::string> nationOrNone = nations;
     nationOrNone.push_back("~none");
     c->nationOrNone = Vocabulary("nation", nationOrNone, false);
+    c->nationOrNone.numberBy(names(s).nations);
+    c->noNation = c->nationOrNone("~none");
     c->players = Vocabulary("player", {"allies", "axis", "comintern"}, false);
     c->playerOrNone = Vocabulary("player", {"allies", "axis", "comintern", "~none"}, false);
     c->unitTypes = Vocabulary("unit_type", types, false);
@@ -1090,7 +1115,7 @@ class Builder {
     int source_{-1}, target_{-1}, other_{-1};
 };
 
-int playerColumn(const Context& c, const State& s, const Id& nation) {
+int playerColumn(const Context& c, const State& s, NationId nation) {
     const auto player = playerOf(s, nation);
     return c.playerOrNone(player ? *player : "~none");
 }
@@ -1104,10 +1129,10 @@ struct UnitRoles {
     std::unordered_map<std::string, int> rank;
 };
 
-// Zones appear by number: the signature only tells units apart.
+// Zones and nations appear by number: the signature only tells units apart.
 std::string unitSignature(const UnitState& u) {
     const auto zoneText = [](ZoneId zone) { return zone.valid() ? std::to_string(zone.index()) : std::string(); };
-    std::string out = u.owner + '|' + u.type + '|' + zoneText(u.zone) + '|' + std::to_string(u.damage) + '|' +
+    std::string out = std::to_string(u.owner.index()) + '|' + u.type + '|' + zoneText(u.zone) + '|' + std::to_string(u.damage) + '|' +
                       std::to_string(u.movementRemaining.value_or(-1)) + '|' + std::to_string(u.movementAllowance.value_or(-1)) +
                       '|' + u.carriedBy.value_or("") + '|' + zoneText(u.turnOrigin) + '|';
     for (const auto& id : u.cargo) out += id + ',';
@@ -1219,10 +1244,10 @@ void encodeTerritories(const Context& c, const State& s, Builder& b) {
     for (const auto& [id, t] : s.territories) {
         const int zone = c.zones.find(id);
         if (zone < 0) continue;
-        b.zone(zone, c.zone.at(c.zPossessor, {c.nationOrNone(t.possessor ? *t.possessor : "~none")}), 1);
+        b.zone(zone, c.zone.at(c.zPossessor, {nationOrNone(c, t.possessor)}), 1);
         const auto start = s.turnStart.possessions.find(id);
-        const Id held = start != s.turnStart.possessions.end() && start->second ? *start->second : "~none";
-        b.zone(zone, c.zone.at(c.zStartPossessor, {c.nationOrNone(held)}), 1);
+        const auto held = start != s.turnStart.possessions.end() ? start->second : std::nullopt;
+        b.zone(zone, c.zone.at(c.zStartPossessor, {nationOrNone(c, held)}), 1);
         for (const auto& [name, value] : t.flags) {
             const auto base = baseName(name);
             if (base == "last_possession_change_turn") {
@@ -1429,7 +1454,7 @@ void encodeBattles(const Context& c, const State& s, Builder& b, UnitRoles& role
         b.zone(zone, c.zone.at(c.zBattleStage, {c.battleStages(battle.stage)}), 1);
         if (const int attacker = c.nations.find(battle.attacker); attacker >= 0)
             b.zone(zone, c.zone.at(c.zBattleAttacker, {attacker}), 1);
-        b.zone(zone, c.zone.at(c.zBattleDefender, {c.nationOrNone(c.nations.find(battle.defender) >= 0 ? battle.defender : "~none")}), 1);
+        b.zone(zone, c.zone.at(c.zBattleDefender, {nationOrNone(c, battle.defender)}), 1);
         for (const auto& [name, value] : battle.flags) {
             const auto base = baseName(name);
             b.zone(zone, c.zone.at(c.zBattleFlag, {c.recordFlags(base)}), flagValue(s, base, value));
@@ -1455,26 +1480,22 @@ void encodeBattles(const Context& c, const State& s, Builder& b, UnitRoles& role
 
 void encodeNations(const Context& c, const State& s, Builder& b) {
     for (const auto& [id, n] : s.nations) {
-        const int nation = c.nations.find(id);
-        if (nation < 0) {
-            noteUnknown("nation_state", id);
-            continue;
-        }
+        const int nation = c.nations(id);
         b.global(c.global.at(c.gPresent, {nation}), 1);
         b.global(c.global.at(c.gAlliance, {nation, c.playerOrNone(n.alliance ? *n.alliance : "~none")}), 1);
         b.global(c.global.at(c.gPlayer, {nation, c.playerOrNone(n.player ? *n.player : "~none")}), 1);
         b.global(c.global.at(c.gPower, {nation, c.powerStatuses(n.powerStatus)}), 1);
-        b.global(c.global.at(c.gController, {nation, c.nationOrNone(n.controllerNation ? *n.controllerNation : "~none")}), 1);
+        b.global(c.global.at(c.gController, {nation, nationOrNone(c, n.controllerNation)}), 1);
         // Whether a nation keeps a treasury never changes (keepsAccount), so the
         // position asks only how much is in it. A nation that should keep one
         // and has none would read as an empty one, so it is reported.
         if (n.treasury) b.global(c.global.at(c.gTreasury, {nation}), *n.treasury);
-        else if (keepsAccount(id)) noteUnknown("treasury_missing", id);
+        else if (keepsAccount(nationName(s, id))) noteUnknown("treasury_missing", nationName(s, id));
         for (const auto& [name, value] : n.incomeComponents)
             b.global(c.global.at(c.gIncome, {nation, c.incomeComponents(name)}), value);
         // Every income is worked out in a started campaign. One that is not
         // would read as no income, so it is reported.
-        if (!n.incomeKnown) noteUnknown("income_not_evaluated", id);
+        if (!n.incomeKnown) noteUnknown("income_not_evaluated", nationName(s, id));
         for (const auto& [name, stage] : n.technologyStages) b.global(c.global.at(c.gTech, {nation, c.technologies(name)}), stage);
         for (const auto& other : n.atWarWith)
             if (const int m = c.nations.find(other); m >= 0) b.global(c.global.at(c.gWar, {nation, m}), 1);
@@ -1697,7 +1718,7 @@ void optionValue(const Context& c, const State& s, Builder& b, const UnitRoles& 
             const auto& record = battle->second;
             b.option(c.action.at(c.aBattleStage, {role, c.battleStages(record.stage)}), 1, role);
             if (const int n = c.nations.find(record.attacker); n >= 0) b.option(c.action.at(c.aBattleAttacker, {role, n}), 1, role);
-            b.option(c.action.at(c.aBattleDefender, {role, c.nationOrNone(c.nations.find(record.defender) >= 0 ? record.defender : "~none")}), 1, role);
+            b.option(c.action.at(c.aBattleDefender, {role, nationOrNone(c, record.defender)}), 1, role);
             for (const auto* side : {&record.attackers, &record.defenders})
                 for (const auto& id : *side)
                     if (const auto u = s.units.find(id); u != s.units.end())

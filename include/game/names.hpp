@@ -3,9 +3,11 @@
 #include <array>
 #include <bit>
 #include <compare>
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <initializer_list>
 #include <iterator>
 #include <limits>
 #include <optional>
@@ -18,7 +20,7 @@
 
 // Names held as numbers.
 //
-// The scenario names its zones and other things with strings, such as
+// The scenario names its zones, nations and other things with strings, such as
 // "land_china_hopeh". Inside the engine such a name is held as a small number
 // of a type of its own for each kind of name, such as ZoneId for a zone, so
 // that comparing, copying and looking up names costs no more than for an
@@ -43,6 +45,11 @@ struct ZoneKind {
     using Rep = std::uint16_t;
     static constexpr std::size_t capacity = 1024;  // The full world map has 539 zones.
     static constexpr std::string_view noun = "zone";
+};
+struct NationKind {
+    using Rep = std::uint16_t;
+    static constexpr std::size_t capacity = 256;
+    static constexpr std::string_view noun = "nation";
 };
 
 // A name of one kind, held as its number in the definition's table of that
@@ -85,6 +92,7 @@ class Number {
 };
 
 using ZoneId = Number<ZoneKind>;
+using NationId = Number<NationKind>;
 
 // Every number below a count, ascending: the numbers a table holds.
 template <class Kind>
@@ -213,6 +221,10 @@ class NumberMap {
     NumberMap() = default;
     NumberMap(const NumberMap&) = default;
     NumberMap(NumberMap&&) noexcept = default;
+    // Like std::map's, a repeated key keeps its first value.
+    NumberMap(std::initializer_list<value_type> entries) {
+        for (const auto& [key, value] : entries) emplace(key, value);
+    }
     // Entries hold a const key, so copying over a map rebuilds its slots.
     NumberMap& operator=(const NumberMap& other) {
         if (this != &other) {
@@ -242,6 +254,8 @@ class NumberMap {
     }
 
     bool contains(Key key) const { return key.valid() && key.index() < slots_.size() && slots_[key.index()]; }
+    // A name the definition lacks, given as an empty optional, is never a key.
+    bool contains(const std::optional<Key>& key) const { return key && contains(*key); }
     size_type count(Key key) const { return contains(key) ? 1 : 0; }
     iterator find(Key key) { return contains(key) ? iterator(&slots_, key.index()) : end(); }
     const_iterator find(Key key) const { return contains(key) ? const_iterator(&slots_, key.index()) : end(); }
@@ -355,7 +369,10 @@ class NumberSet {
     NumberSet(std::initializer_list<Key> keys) {
         for (const auto key : keys) insert(key);
     }
-    template <class It>
+    // Only iterators over numbers: two string literals in braces would
+    // otherwise reach this constructor as a pair of iterators.
+    template <std::input_iterator It>
+        requires std::convertible_to<std::iter_reference_t<It>, Key>
     NumberSet(It first, It last) {
         for (; first != last; ++first) insert(*first);
     }
@@ -366,6 +383,8 @@ class NumberSet {
     bool contains(Key key) const {
         return key.valid() && (bits_[key.index() / bitsPerWord] >> (key.index() % bitsPerWord) & 1u);
     }
+    // A name the definition lacks, given as an empty optional, is never a member.
+    bool contains(const std::optional<Key>& key) const { return key && contains(*key); }
     size_type count(Key key) const { return contains(key) ? 1 : 0; }
     size_type size() const {
         size_type total = 0;
@@ -387,7 +406,8 @@ class NumberSet {
         word |= bit;
         return {const_iterator(this, key.index()), inserted};
     }
-    template <class It>
+    template <std::input_iterator It>
+        requires std::convertible_to<std::iter_reference_t<It>, Key>
     void insert(It first, It last) {
         for (; first != last; ++first) insert(*first);
     }

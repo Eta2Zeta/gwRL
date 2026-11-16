@@ -37,7 +37,7 @@ State fixture(Phase phase = Phase::NonCombatMovement) {
   state.clock.playerTurnSerial = 2;
   state.clock.phase = phase;
   for (const auto &nation : state.definition->turnOrder)
-    state.completedTurns[nation] = nation == "ccp" || nation == "mongolia" ? 1 : 0;
+    state.completedTurns[nationNumber(state, nation)] = nation == "ccp" || nation == "mongolia" ? 1 : 0;
   state.captureTurnStart();
   return state;
 }
@@ -47,10 +47,10 @@ void add(State &state, const Id &id, const Id &type, const Id &zone,
   UnitState unit;
   unit.id = id;
   unit.type = type;
-  unit.owner = owner;
+  unit.owner = nationNumber(state, owner);
   unit.zone = unit.turnOrigin = zoneNumber(state, zone);
   unit.movementAllowance = unit.movementRemaining =
-      state.definition->catalog->stats(type, 0, catalogContext(state, owner, zoneNumber(state, zone)))
+      state.definition->catalog->stats(type, 0, catalogContext(state, nationNumber(state, owner), zoneNumber(state, zone)))
           .movement;
   state.units.emplace(id, std::move(unit));
 }
@@ -114,8 +114,8 @@ void allFleetOrdersRemainAvailableAndEveryDraftTerminates() {
     add(state, "b", enemyAtOrigin ? "battleship" : "attack_naval_transport", p16);
     add(state, "c", "submarine", p16);
     if (enemyAtOrigin) {
-      state.nations.at("japan").atWarWith.insert("kmt");
-      state.nations.at("kmt").atWarWith.insert("japan");
+      state.nations.at(nationNumber(state, "japan")).atWarWith.insert(nationNumber(state, "kmt"));
+      state.nations.at(nationNumber(state, "kmt")).atWarWith.insert(nationNumber(state, "japan"));
       add(state, "enemy", "destroyer", p16, "kmt");
     }
     state.captureTurnStart();
@@ -289,8 +289,8 @@ void carriersMayJoinWaitingAircraftOneAtATime() {
 
 void screeningRetainsAllNonemptySubsetsAndItsRealContinuationChoice() {
   auto state = fixture(Phase::CombatMovement);
-  state.nations.at("japan").atWarWith.insert("kmt");
-  state.nations.at("kmt").atWarWith.insert("japan");
+  state.nations.at(nationNumber(state, "japan")).atWarWith.insert(nationNumber(state, "kmt"));
+  state.nations.at(nationNumber(state, "kmt")).atWarWith.insert(nationNumber(state, "japan"));
   for (const auto &id : {"a", "b", "c"}) {
     add(state, id, "destroyer", tokyo);
     state.units.at(id).gameFlags["in_port:" + tokyoPort] = 1;
@@ -358,10 +358,10 @@ void declarationsAndSubmarineReactionsRemainActualDecisions() {
     add(state, "ship", "destroyer", p16);
     add(state, "other", submarine ? "submarine" : "destroyer", p15, "kmt");
     if (submarine) {
-      state.nations.at("japan").atWarWith.insert("kmt");
-      state.nations.at("kmt").atWarWith.insert("japan");
+      state.nations.at(nationNumber(state, "japan")).atWarWith.insert(nationNumber(state, "kmt"));
+      state.nations.at(nationNumber(state, "kmt")).atWarWith.insert(nationNumber(state, "japan"));
     } else {
-      state.nations.at("kmt").powerStatus = "major";
+      state.nations.at(nationNumber(state, "kmt")).powerStatus = "major";
     }
     Engine human(state, campaignRules(), 71);
     Engine training(state, trainingCampaignRules(), 71);
@@ -393,8 +393,8 @@ void declarationsAndSubmarineReactionsRemainActualDecisions() {
 
 void laterBlockingSeasStartAFreshScreenSelection() {
   auto state = fixture(Phase::CombatMovement);
-  state.nations.at("japan").atWarWith.insert("kmt");
-  state.nations.at("kmt").atWarWith.insert("japan");
+  state.nations.at(nationNumber(state, "japan")).atWarWith.insert(nationNumber(state, "kmt"));
+  state.nations.at(nationNumber(state, "kmt")).atWarWith.insert(nationNumber(state, "japan"));
   for (const auto &id : {"a", "b", "c"})
     add(state, id, "destroyer", p16);
   add(state, "first_enemy", "destroyer", p15, "kmt");

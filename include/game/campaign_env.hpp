@@ -14,7 +14,7 @@ class CampaignEnv {
                                   std::uint64_t seed = 1, bool trainingActions = false);
     bool isTerminal() const { return engine_.state().terminal; }
     std::optional<Id> currentDecisionPlayer() const { return engine_.state().decisionPlayer(); }
-    Id currentNation() const { return engine_.state().currentNation(); }
+    Id currentNation() const { return engine_.state().currentNationName(); }
     std::string decisionKind() const;
     std::vector<Action> legalActions() const { return engine_.legalActions(); }
     std::vector<Action> legalInterrupts() const { return engine_.legalInterrupts(); }

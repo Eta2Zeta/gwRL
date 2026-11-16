@@ -31,9 +31,9 @@ State fixture(Phase phase = Phase::NonCombatMovement) {
   s.clock.playerTurnSerial = 2;
   s.clock.phase = phase;
   for (const auto &n : s.definition->turnOrder)
-    s.completedTurns[n] = (n == "ccp" || n == "mongolia") ? 1 : 0;
+    s.completedTurns[nationNumber(s, n)] = (n == "ccp" || n == "mongolia") ? 1 : 0;
   for (auto &[id, t] : s.territories)
-    t.possessor = "japan";
+    t.possessor = nationNumber(s, "japan");
   s.captureTurnStart();
   return s;
 }
@@ -42,11 +42,11 @@ void add(State &s, const Id &id, const Id &type, const Id &zone,
   UnitState u;
   u.id = id;
   u.type = type;
-  u.owner = n;
+  u.owner = nationNumber(s, n);
   u.zone = u.turnOrigin = zoneNumber(s, zone);
   u.damage = damage;
   u.movementAllowance = u.movementRemaining =
-      s.definition->catalog->stats(type, damage, catalogContext(s, n, zoneNumber(s, zone)))
+      s.definition->catalog->stats(type, damage, catalogContext(s, nationNumber(s, n), zoneNumber(s, zone)))
           .movement;
   s.units.emplace(id, std::move(u));
 }
@@ -197,12 +197,12 @@ void strategicCapacityEndpointsAndUnloading() {
                       "facility_tokyo_major_shipyard",
                       "facility_beiping_minor_port"};
   check(validateNavalRoute(s, r).allowed, "Supplied strategic voyage rejected");
-  s.nations.at("japan").turnFlags["strategic_naval_used"] = 1;
+  s.nations.at(nationNumber(s, "japan")).turnFlags["strategic_naval_used"] = 1;
   check(!validateNavalRoute(s, r).allowed, "Strategic capacity omitted cargo");
-  s.nations.at("japan").turnFlags.clear();
+  s.nations.at(nationNumber(s, "japan")).turnFlags.clear();
   Engine e(s, rules());
   move(e, "t", zoneNames(s, r.path), true, *r.destinationFacility);
-  check(e.state().nations.at("japan").turnFlags.at("strategic_naval_used") == 3,
+  check(e.state().nations.at(nationNumber(e.state(), "japan")).turnFlags.at("strategic_naval_used") == 3,
         "Strategic accounting does not count transport plus cargo");
   for (const auto &a : e.legalActions())
     if (a.kind == "naval_unload")
@@ -220,7 +220,7 @@ void strategicPickupAlongRoute() {
   choose(e, "naval_strategic_pickup");
   check(e.state().units.at("t").zone == zoneNumber(e.state(), p14) &&
             e.state().units.at("i").carriedBy == "t" &&
-            e.state().nations.at("japan").turnFlags.at(
+            e.state().nations.at(nationNumber(e.state(), "japan")).turnFlags.at(
                 "strategic_naval_used") == 2,
         "Intermediate pickup lost cargo or capacity");
 }
@@ -269,11 +269,11 @@ void patrolPlaneMayFightShipsItLetPass() {
   // entering later get a fresh choice (seed 9487 of the 2 November random
   // games had a KMT transport engage a bomber that had let it pass).
   auto s = fixture(Phase::CombatMovement);
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   // Evolved, so that the plane may land in Korea (RB 14.3.1).
-  s.nations.at("kmt").powerStatus = "major";
-  s.territories.at(zoneNumber(s, "land_korea")).possessor = "kmt";
+  s.nations.at(nationNumber(s, "kmt")).powerStatus = "major";
+  s.territories.at(zoneNumber(s, "land_korea")).possessor = nationNumber(s, "kmt");
   add(s, "patrol", "fighter", p15, "kmt");
   s.units.at("patrol").gameFlags["on_map"] = 1;
   s.units.at("patrol").gameFlags["map_range"] = 1;
@@ -379,9 +379,9 @@ void patrolPlaneMayFightShipsItLetPass() {
 // has no aircraft with an attack value present; a strategic bomber has none.
 void patrolPlaneCannotLetShipsPassUnderAttackingAircraft() {
   auto s = fixture(Phase::CombatMovement);
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
-  s.territories.at(zoneNumber(s, "land_korea")).possessor = "kmt";
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
+  s.territories.at(zoneNumber(s, "land_korea")).possessor = nationNumber(s, "kmt");
   add(s, "patrol", "fighter", p15, "kmt");
   s.units.at("patrol").gameFlags["on_map"] = 1;
   s.units.at("patrol").gameFlags["map_range"] = 1;
@@ -412,9 +412,9 @@ void patrolPlaneCannotLetShipsPassUnderAttackingAircraft() {
 // again, and once it stays out the screen can win and the rest sail on.
 void patrolPlaneInAScreeningBattle() {
   auto s = fixture(Phase::CombatMovement);
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
-  s.territories.at(zoneNumber(s, shantung)).possessor = "kmt";
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
+  s.territories.at(zoneNumber(s, shantung)).possessor = nationNumber(s, "kmt");
   add(s, "patrol", "fighter", p14, "kmt");
   s.units.at("patrol").gameFlags["on_map"] = 1;
   s.units.at("patrol").gameFlags["map_range"] = 1;
@@ -483,11 +483,11 @@ void patrolPlaneInAScreeningBattle() {
 // patrol bomber are unchanged.
 void patrolFighterBarsTheWayOn() {
   auto s = fixture(Phase::CombatMovement);
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   // Evolved, so that the plane may land in Korea (RB 14.3.1).
-  s.nations.at("kmt").powerStatus = "major";
-  s.territories.at(zoneNumber(s, "land_korea")).possessor = "kmt";
+  s.nations.at(nationNumber(s, "kmt")).powerStatus = "major";
+  s.territories.at(zoneNumber(s, "land_korea")).possessor = nationNumber(s, "kmt");
   add(s, "s1", "destroyer", p16);
   add(s, "s2", "destroyer", p16);
   add(s, "s3", "destroyer", p16);
@@ -627,19 +627,19 @@ void unevolvedChinaKeepsToChineseWaters() {
   // captured KMT transport to P16).
   auto s = fixture();
   s.clock.nationIndex = 3;
-  s.completedTurns["japan"] = 1;
+  s.completedTurns[nationNumber(s, "japan")] = 1;
   s.captureTurnStart();
   add(s, "t", "naval_transport", p32, "kmt");
   const auto sails = [&](std::vector<Id> path) { return validateNavalRoute(s, {{"t"}, zoneNumbers(s, path)}).allowed; };
   check(sails({p32, p41}) && sails({p32, p14}), "KMT transport could not sail beside China");
   check(!sails({p32, p33}) && !sails({p32, p15}), "Unevolved KMT transport left Chinese waters");
-  s.nations.at("kmt").powerStatus = "major";
+  s.nations.at(nationNumber(s, "kmt")).powerStatus = "major";
   check(sails({p32, p33}) && sails({p32, p15}), "Evolved KMT transport still kept to Chinese waters");
 }
 void strategicAndNoncombatBlockers() {
   auto s = fixture();
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   add(s, "t", "naval_transport", p16);
   add(s, "enemy", "naval_transport", p16, "kmt");
   NavalRouteRequest r{{"t"},
@@ -689,8 +689,8 @@ void noncombatPortExitCannotPassEnemyWarships() {
   // past Enemy Surface Warships needs a screening force, which is combat
   // movement (RB 9.4.2, 11.4, 11.5).
   auto s = fixture();
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   add(s, "dd", "destroyer", tokyo);
   s.units.at("dd").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
   add(s, "enemy", "destroyer", p16, "kmt");
@@ -707,8 +707,8 @@ void noncombatPortExitCannotPassEnemyWarships() {
 // be fought, a forced screen used to leave the phase with no legal action.
 void submarinesLeavePortPastSurfaceWarships() {
   auto s = fixture();
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   add(s, "sub", "submarine", tokyo);
   s.units.at("sub").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
   add(s, "enemy", "heavy_cruiser", p16, "kmt");
@@ -723,8 +723,8 @@ void submarinesLeavePortPastSurfaceWarships() {
 // screen and stay.
 void carrierRoutesKeepLandingsWhereverTheyCanEnd() {
   auto s = fixture(Phase::CombatMovement);
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   add(s, "cv", "light_carrier", p16);
   add(s, "convoy", "naval_transport", p15, "kmt");
   add(s, "f", "fighter", p15);
@@ -758,8 +758,8 @@ void carrierRoutesKeepLandingsWhereverTheyCanEnd() {
 // port while its own aircraft wait outside.
 void carrierRoutesAreNotHeldWhereTheForceSailsOn() {
   auto s = fixture(Phase::CombatMovement);
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   add(s, "cv", "light_carrier", p16);
   add(s, "patrol", "fighter", p15, "kmt");
   s.units.at("patrol").gameFlags["on_map"] = 1;
@@ -771,8 +771,8 @@ void carrierRoutesAreNotHeldWhereTheForceSailsOn() {
   check(validateNavalRoute(s, {{"cv"}, zoneNumbers(s, {p16, p15, p14}), true}).allowed,
         "A carrier was held behind an Enemy patrol that only reacts");
   auto sortie = fixture(Phase::CombatMovement);
-  sortie.nations.at("japan").atWarWith.insert("kmt");
-  sortie.nations.at("kmt").atWarWith.insert("japan");
+  sortie.nations.at(nationNumber(sortie, "japan")).atWarWith.insert(nationNumber(sortie, "kmt"));
+  sortie.nations.at(nationNumber(sortie, "kmt")).atWarWith.insert(nationNumber(sortie, "japan"));
   add(sortie, "cv", "light_carrier", tokyo);
   sortie.units.at("cv").gameFlags["in_port:facility_tokyo_major_shipyard"] = 1;
   add(sortie, "deck", "fighter", tokyo);
@@ -845,8 +845,8 @@ void carriersNeitherUnloadNorStrandPatrols() {
 // that needs the carrier to sail.
 void engagingCannotHoldACarrierItsAircraftNeed() {
   auto s = fixture(Phase::CombatMovement);
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   add(s, "cv", "light_carrier", p16);
   add(s, "sub", "submarine", p16, "kmt");
   auto alone = s.clone();
@@ -866,8 +866,8 @@ void engagingCannotHoldACarrierItsAircraftNeed() {
 }
 void blockadedPortKeepsContinuingShipsInBerth() {
   auto s = fixture(Phase::CombatMovement);
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   add(s, "screen", "destroyer", tokyo);
   add(s, "waiting", "naval_transport", tokyo);
   for (const auto &id : {Id("screen"), Id("waiting")})
@@ -935,8 +935,8 @@ void blockadedPortKeepsContinuingShipsInBerth() {
 }
 void immediateSubmarineReactionResumesTheVoyage() {
   auto s = fixture();
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   add(s, "dd", "destroyer", p16);
   add(s, "enemy", "submarine", p15, "kmt");
   Engine e(s, rules(), 7);
@@ -967,8 +967,8 @@ void immediateSubmarineReactionResumesTheVoyage() {
 }
 void defendingCarrierAircraftMayEngageMovingSubmarine() {
   auto s = fixture();
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   add(s, "sub", "submarine", p16);
   add(s, "carrier", "fleet_carrier", p15, "kmt");
   add(s, "fighter", "fighter", p15, "kmt");
@@ -989,7 +989,7 @@ void defendingCarrierAircraftMayEngageMovingSubmarine() {
 void controlledDadaoUsesControllerCalendarForCargo() {
   auto s = fixture();
   ensureDadao(s);
-  s.territories.at(zoneNumber(s, honshu)).possessor = "dadao";
+  s.territories.at(zoneNumber(s, honshu)).possessor = nationNumber(s, "dadao");
   add(s, "t", "naval_transport", p15, "dadao");
   add(s, "i", "infantry", honshu, "dadao");
   s.captureTurnStart();
@@ -1002,8 +1002,8 @@ void controlledDadaoUsesControllerCalendarForCargo() {
 }
 void peacefulSeaEntryWindowsAreSequentialAndReplayable() {
   auto s = fixture(Phase::CombatMovement);
-  s.nations.at("kmt").powerStatus = "major";
-  s.nations.at("ccp").powerStatus = "major";
+  s.nations.at(nationNumber(s, "kmt")).powerStatus = "major";
+  s.nations.at(nationNumber(s, "ccp")).powerStatus = "major";
   add(s, "dd", "destroyer", p16);
   add(s, "k", "destroyer", p15, "kmt");
   add(s, "c", "destroyer", p14, "ccp");
@@ -1039,9 +1039,9 @@ void peacefulSeaEntryWindowsAreSequentialAndReplayable() {
 }
 void defenderDeclarationQueuesCombatAndAllowsReinforcements() {
   auto s = fixture(Phase::CombatMovement);
-  s.nations.at("kmt").powerStatus = "major";
-  s.territories.at(zoneNumber(s, beiping)).possessor = "kmt";
-  s.politics.capitals["kmt"] = zoneNumber(s, beiping);
+  s.nations.at(nationNumber(s, "kmt")).powerStatus = "major";
+  s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "kmt");
+  s.politics.capitals[nationNumber(s, "kmt")] = zoneNumber(s, beiping);
   s.captureTurnStart();
   add(s, "dd", "destroyer", p16);
   add(s, "reinforcement", "destroyer", p16);
@@ -1050,7 +1050,7 @@ void defenderDeclarationQueuesCombatAndAllowsReinforcements() {
   move(e, "dd", {p16, p15});
   choose(e, "naval_entry_peaceful");
   choose(e, "naval_entry_defender_declare");
-  check(e.state().nations.at("kmt").atWarWith.contains("japan") &&
+  check(e.state().nations.at(nationNumber(e.state(), "kmt")).atWarWith.contains(nationNumber(e.state(), "japan")) &&
             e.state().clock.phase == Phase::CombatMovement &&
             e.state().battles.size() == 1 &&
             e.state().battles.begin()->second.stage == "naval_declared",
@@ -1062,8 +1062,8 @@ void defenderDeclarationQueuesCombatAndAllowsReinforcements() {
 }
 void optionalStationaryEngagementCommitsTheForce() {
   auto s = fixture(Phase::CombatMovement);
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   add(s, "sub", "submarine", p15);
   add(s, "enemy", "destroyer", p15, "kmt");
   Engine e(s, rules());
@@ -1086,8 +1086,8 @@ bool offers(const Engine &e, const std::string &kind) {
 }
 void raiderAttacksAlone() {
   auto s = fixture(Phase::CombatMovement);
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
   add(s, "bc", "battlecruiser", p15);
   add(s, "dd", "destroyer", p15);
   add(s, "dd2", "destroyer", p16);
@@ -1095,18 +1095,18 @@ void raiderAttacksAlone() {
   s.units.at("bc").gameFlags["raider"] = 1;
   // Selected together, a raider and another ship have no joint attack on offer.
   auto together = s.clone();
-  registerNavalBattle(together, zoneNumber(together, p15), "japan", {"dd"}, {{"dd", zoneNumber(together, p15)}});
+  registerNavalBattle(together, zoneNumber(together, p15), nationNumber(together, "japan"), {"dd"}, {{"dd", zoneNumber(together, p15)}});
   const auto attack = [&](State &state, const Id &unit) {
-    return registerNavalBattle(state, zoneNumber(state, p15), "japan", {unit}, {{unit, zoneNumber(state, p15)}});
+    return registerNavalBattle(state, zoneNumber(state, p15), nationNumber(state, "japan"), {unit}, {{unit, zoneNumber(state, p15)}});
   };
-  check(raiderWouldCombine(s, zoneNumber(s, p15), "japan", {"bc", "dd"}, "standard"),
+  check(raiderWouldCombine(s, zoneNumber(s, p15), nationNumber(s, "japan"), {"bc", "dd"}, "standard"),
         "A raider joined a joint attack");
-  check(!raiderWouldCombine(s, zoneNumber(s, p15), "japan", {"bc"}, "standard"),
+  check(!raiderWouldCombine(s, zoneNumber(s, p15), nationNumber(s, "japan"), {"bc"}, "standard"),
         "A lone raider could not attack");
   // Once it attacks, nobody joins it and no route ends in its battle.
   auto declared = s.clone();
   attack(declared, "bc");
-  check(raiderWouldCombine(declared, zoneNumber(declared, p15), "japan", {"dd"}, "standard"),
+  check(raiderWouldCombine(declared, zoneNumber(declared, p15), nationNumber(declared, "japan"), {"dd"}, "standard"),
         "A ship joined a raider's attack");
   Engine e(declared, rules(), 23);
   bool routed = false;
@@ -1138,8 +1138,8 @@ void raiderAttacksAlone() {
 void attackingRaiderSlipIsExplicitAndReplayable() {
   for (bool success : {false, true}) {
     auto s = fixture(Phase::CombatMovement);
-    s.nations.at("japan").atWarWith.insert("kmt");
-    s.nations.at("kmt").atWarWith.insert("japan");
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+    s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
     add(s, "bc", "battlecruiser", p16);
     add(s, "enemy", "destroyer", p15, "kmt");
     Engine e(s, rules(), 23);
@@ -1180,7 +1180,7 @@ void convoyMissionsRemainExcluded() {
 }
 void giftWithdrawalBoardsOnlyAUsableTransport() {
   auto s = fixture();
-  s.territories.at(zoneNumber(s, shantung)).possessor = "ccp";
+  s.territories.at(zoneNumber(s, shantung)).possessor = nationNumber(s, "ccp");
   add(s, "t", "naval_transport", p14);
   add(s, "gift", "infantry", shantung);
   auto &u = s.units.at("gift");

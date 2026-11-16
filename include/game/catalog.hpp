@@ -163,10 +163,10 @@ class Catalog {
     std::map<Id, BuildChartRow> rows_;
 };
 
-CatalogContext catalogContext(const State& state, const Id& nation, std::optional<ZoneId> zone = std::nullopt);
+CatalogContext catalogContext(const State& state, NationId nation, std::optional<ZoneId> zone = std::nullopt);
 // Catalog stats under catalogContext(state, nation, zone), reading the state's
 // flags in place instead of copying them into a context.
-CatalogStats catalogStats(const State& state, const Id& type, int damage, const Id& nation,
+CatalogStats catalogStats(const State& state, const Id& type, int damage, NationId nation,
                           std::optional<ZoneId> zone = std::nullopt);
 void initializeCatalogState(State& state);
 int completedAssetValue(const Definition& definition, const Id& type);

@@ -44,7 +44,7 @@ bool city(const State &s, ZoneId z) {
     auto p = node(s, z).find("is_city");
     return p && p->asBool();
 }
-bool tech(const State &s, const Id &nation, const Id &id) {
+bool tech(const State &s, NationId nation, const Id &id) {
     return flag(s.nations.at(nation).technologyStages, id) == 4;
 }
 bool has(const State &s, const UnitState &u, const Id &cls) {
@@ -59,10 +59,10 @@ bool transport(const UnitState &u) {
 bool bomber(const State &s, const UnitState &u) {
     return u.type == "medium_bomber" || has(s, u, "strategic_bomber");
 }
-bool friendly(const State &s, const Id &n, const Id &owner) {
+bool friendly(const State &s, NationId n, NationId owner) {
     return n == owner || politicallyFriendly(s, n, owner);
 }
-bool hostile(const State &s, const Id &n, const Id &owner) {
+bool hostile(const State &s, NationId n, NationId owner) {
     return n != owner && s.nations.at(n).atWarWith.contains(owner);
 }
 int carrierSlots(const UnitState &u) { return u.type == "medium_bomber" ? 2 : 1; }
@@ -178,9 +178,9 @@ Neighbors neighbors(const State &s, ZoneId z) {
 bool adjacent(const State &s, ZoneId a, ZoneId b) {
     return mapEdge(s, a, b) != nullptr;
 }
-bool enemyFighter(const State &s, const Id &nation, ZoneId z) {
+bool enemyFighter(const State &s, NationId nation, ZoneId z) {
     if (auto *facts = positionFacts(s))
-        return facts->zones(PositionFacts::Fact::HostileFighterZones, nation, [&] {
+        return facts->nationZones(PositionFacts::Fact::HostileFighterZones, nation, [&] {
             NumberSet<ZoneId> zones;
             for (const auto &[id, u] : s.units)
                 if (hostile(s, nation, u.owner) && fighter(s, u))
@@ -222,21 +222,21 @@ std::map<ZoneId, std::vector<ZoneId>> flightPaths(const State &s, const Id &id, 
     }
     return paths;
 }
-Action action(const State &s, const Id &nation, const Id &kind, O p = {}) {
+Action action(const State &s, NationId nation, const Id &kind, O p = {}) {
     Action a;
     a.kind = kind;
-    a.nation = nation;
+    a.nation = nationName(s, nation);
     a.player = politicalPlayer(s, nation);
     a.parameters = V(std::move(p));
     a.id = kind + ":" + contentDigest(canonicalJson(a.parameters));
     return a;
 }
-void decision(State &s, BattleState &b, const Id &nation, const Id &kind, std::vector<Action> choices) {
+void decision(State &s, BattleState &b, NationId nation, const Id &kind, std::vector<Action> choices) {
     require(!choices.empty(), "Empty air decision");
     Decision d;
     d.id = "air_decision_" + std::to_string(++s.flags["air_decision_sequence"]);
     d.kind = kind;
-    d.nation = nation;
+    d.nation = nationName(s, nation);
     d.reaction = nation != s.currentNation();
     d.continuation = b.id;
     for (auto &a : choices) {
@@ -250,9 +250,9 @@ void release(State &s, const Action &a) {
     require(!s.decisions.empty() && s.decisions.back().id == a.decision, "Wrong air decision");
     s.decisions.pop_back();
 }
-void roll(State &s, BattleState &b, const Id &purpose, const Id &nation, const std::vector<DieSpec> &dice) {
+void roll(State &s, BattleState &b, const Id &purpose, NationId nation, const std::vector<DieSpec> &dice) {
     require(!s.chance && !dice.empty(), "Invalid air roll");
-    s.chance = ChanceRequest{"air_roll_" + std::to_string(++s.flags["air_roll_sequence"]), purpose, nation,
+    s.chance = ChanceRequest{"air_roll_" + std::to_string(++s.flags["air_roll_sequence"]), purpose, nationName(s, nation),
                              b.id, dice};
 }
 void moveFlight(State &s, const Id &id, const std::vector<ZoneId> &path) {
@@ -465,7 +465,7 @@ void queueAirCasualty(State &s, BattleState &b) {
             continue;
         }
         std::vector<Action> options;
-        Id chooser = defender ? b.defender : b.attacker;
+        NationId chooser = defender ? b.defender : b.attacker;
         for (const auto &id : candidates) {
             if (politicalPlayer(s, s.units.at(id).owner) != politicalPlayer(s, chooser))
                 continue;
@@ -682,7 +682,7 @@ bool onMaritimeAirPatrol(const State &s, const UnitState &u) {
            (marked(u.gameFlags, "on_map") || marked(u.turnFlags, "on_map") ||
             u.commitments.contains("maritime_air_patrol"));
 }
-bool attackAircraftPresent(const State &s, const Id &nation, ZoneId zone) {
+bool attackAircraftPresent(const State &s, NationId nation, ZoneId zone) {
     return std::any_of(s.units.begin(), s.units.end(), [&](const auto &entry) {
         const auto &u = entry.second;
         return u.owner == nation && u.zone == zone && isAircraft(s, u) &&
@@ -850,7 +850,7 @@ struct LandingDeck {
 };
 // Zones an aircraft at `start` can still reach to land, as flightPaths finds
 // noncombat flights.
-NumberSet<ZoneId> returnZones(const State &s, const Id &owner, ZoneId start, int range) {
+NumberSet<ZoneId> returnZones(const State &s, NationId owner, ZoneId start, int range) {
     NumberSet<ZoneId> seen{start};
     std::deque<std::pair<ZoneId, int>> queue{{start, 0}};
     while (!queue.empty()) {
@@ -1980,11 +1980,11 @@ void AirRules::apply(State &s, const Action &a) const {
     auto &b = s.battles.at(bid);
     if (a.kind == "air_begin_bombing") {
         b.stage = "air_resolving";
-        if (b.attacker == "japan" &&
-            marked(s.nations.at("japan").turnFlags, "surprise_attack_zone:" + zoneName(s, b.zone)) &&
-            !marked(s.nations.at("japan").turnFlags, "surprise_attack_used")) {
+        if (b.attacker == knownNations(s).japan &&
+            marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_zone:" + zoneName(s, b.zone)) &&
+            !marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_used")) {
             b.flags["japanese_surprise_attack"] = 1;
-            s.nations.at("japan").turnFlags["surprise_attack_used"] = 1;
+            s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_used"] = 1;
         }
         put(b, "air_stage",
             V(std::string(marked(b.flags, "artillery_city_bombing") ? "damage" :

@@ -50,17 +50,17 @@ std::set<Id> terrains(const V *v) {
         out.insert(x.asString());
   return out;
 }
-bool hostile(const State &s, const Id &nation, const Id &other) {
+bool hostile(const State &s, NationId nation, NationId other) {
   return nation != other && s.nations.at(nation).atWarWith.contains(other);
 }
-bool logisticsFriendly(const State &s, const Id &nation, const Id &owner) {
+bool logisticsFriendly(const State &s, NationId nation, NationId owner) {
   return nation == owner || politicallyFriendly(s, nation, owner) ||
          controlledBy(s, owner, nation);
 }
-bool hostileFighterAt(const State &s, const Id &nation, ZoneId zone) {
+bool hostileFighterAt(const State &s, NationId nation, ZoneId zone) {
   if (auto *facts = positionFacts(s))
     return facts
-        ->zones(PositionFacts::Fact::HostileFighterClassZones, nation,
+        ->nationZones(PositionFacts::Fact::HostileFighterClassZones, nation,
                 [&] {
                   NumberSet<ZoneId> zones;
                   for (const auto &[id, u] : s.units)
@@ -83,12 +83,10 @@ bool restrictedTerrain(const std::set<Id> &t) {
       return true;
   return false;
 }
-bool inHome(const State &s, const Id &nation, ZoneId zone) {
-  auto i = s.definition->factions.find(nation);
-  return i != s.definition->factions.end() &&
-         i->second.homeZones.contains(zone);
+bool inHome(const State &s, NationId nation, ZoneId zone) {
+  return nationFaction(s, nation).homeZones.contains(zone);
 }
-bool hasTech(const State &s, const Id &nation, const Id &tech) {
+bool hasTech(const State &s, NationId nation, const Id &tech) {
   auto i = s.nations.at(nation).technologyStages.find(tech);
   return i != s.nations.at(nation).technologyStages.end() && i->second == 4;
 }
@@ -118,7 +116,7 @@ bool continuousInfrastructure(const State &s, const Id &id) {
   auto i = s.flags.find("logistics_start_damaged:" + id);
   return (i == s.flags.end() || i->second == 0) && !damagedThisTurn(s, id);
 }
-bool strategicPermission(const State &s, const Id &nation, ZoneId zone) {
+bool strategicPermission(const State &s, NationId nation, ZoneId zone) {
   const auto owner = s.territories.at(zone).possessor;
   if (!owner)
     return false;
@@ -129,7 +127,7 @@ bool strategicPermission(const State &s, const Id &nation, ZoneId zone) {
   // One alliance agent can give its own nations permission in this action.
   if (s.nations.at(nation).player == s.nations.at(*owner).player)
     return true;
-  return flag(s.nations.at(*owner).turnFlags, "rail_permission:" + nation);
+  return flag(s.nations.at(*owner).turnFlags, "rail_permission:" + nationName(s, nation));
 }
 bool gaugeChange(const State &s, ZoneId a, ZoneId b) {
   const auto *e = edge(s, a, b);
@@ -137,8 +135,8 @@ bool gaugeChange(const State &s, ZoneId a, ZoneId b) {
   if ((!e || !truth(*e, "railway_connection")) && !rails(s, a, b).empty()) {
     const std::set<Id> broad{"brazil",   "spain",      "finland",
                              "mongolia", "tannu_tuva", "ussr"};
-    return broad.contains(originalNation(s, a)) !=
-           broad.contains(originalNation(s, b));
+    return broad.contains(nationName(s, originalNation(s, a))) !=
+           broad.contains(nationName(s, originalNation(s, b)));
   }
   if (raw && raw->isBool())
     return raw->asBool();
@@ -152,7 +150,7 @@ bool gaugeChange(const State &s, ZoneId a, ZoneId b) {
     }
   throw std::runtime_error("Unreviewed railroad gauge at " + zoneName(s, a) + " -> " + zoneName(s, b));
 }
-bool opposingFortification(const State &s, const Id &nation, ZoneId from,
+bool opposingFortification(const State &s, NationId nation, ZoneId from,
                            ZoneId to) {
   if (!s.territories.at(to).possessor ||
       !hostile(s, nation, *s.territories.at(to).possessor))
@@ -182,7 +180,7 @@ bool navalFacilityType(const Id &t) {
   return t.find("port") != Id::npos || t.find("dockyard") != Id::npos ||
          t.find("shipyard") != Id::npos;
 }
-bool narrowBlocked(const State &s, const Id &nation, const V &e, bool combat,
+bool narrowBlocked(const State &s, NationId nation, const V &e, bool combat,
                    ZoneId target) {
   if (combat)
     for (const auto &[id, f] : s.facilities)
@@ -224,7 +222,7 @@ Action movementAction(const State &s, const RouteRequest &r) {
   return {"move_" + contentDigest(canonicalJson(params)),
           "movement_route",
           politicalPlayer(s, u.owner),
-          u.owner,
+          nationName(s, u.owner),
           std::nullopt,
           std::move(params)};
 }
@@ -241,7 +239,7 @@ RouteRequest requestFrom(const State &s, const Action &a) {
 }
 // A combat land move attacks, registering a battle, when its target has no
 // possessor or one that is neither the mover nor politically friendly to it.
-bool landRouteAttacks(const State &s, const Id &owner, const RouteRequest &r) {
+bool landRouteAttacks(const State &s, NationId owner, const RouteRequest &r) {
   const auto possessor = s.territories.at(r.path.back()).possessor;
   return r.combat && (!possessor || (*possessor != owner &&
                                      !politicallyFriendly(s, owner, *possessor)));
@@ -274,14 +272,14 @@ MovementMode parseMovementMode(const std::string &s) {
 bool unitClass(const State &s, const UnitState &u, const Id &c) {
   return s.definition->catalog->unit(u.type).classes.contains(c);
 }
-bool movementController(const State &s, const Id &nation) {
+bool movementController(const State &s, NationId nation) {
   return nation == s.currentNation() ||
          controlledBy(s, nation, s.currentNation()) ||
-         (nation == "dadao" && s.currentNation() == "japan" &&
+         (nation == knownNations(s).dadao && s.currentNation() == knownNations(s).japan &&
           flag(s.nations.at(nation).gameFlags,
                "direct_axis_control_after_japan_surrender"));
 }
-bool landAccess(const State &s, const Id &nation, ZoneId zone, bool combat) {
+bool landAccess(const State &s, NationId nation, ZoneId zone, bool combat) {
   if (!s.territories.contains(zone))
     return false;
   const auto owner = s.territories.at(zone).possessor;
@@ -296,7 +294,7 @@ bool landAccess(const State &s, const Id &nation, ZoneId zone, bool combat) {
   return hostile(s, nation, *owner) ||
          mayDeclareWar(s, nation, *owner, DeclarationMode::LandAttack).allowed;
 }
-bool aircraftFlightAccess(const State &s, const Id &nation, ZoneId zone,
+bool aircraftFlightAccess(const State &s, NationId nation, ZoneId zone,
                           bool combat) {
   if (!chineseMovementAllowed(s, nation, zone))
     return false;
@@ -315,7 +313,7 @@ bool aircraftFlightAccess(const State &s, const Id &nation, ZoneId zone,
     return false;
   return combat || !hostileFighterAt(s, nation, zone);
 }
-bool heldSinceTurnStart(const State &s, const Id &nation, ZoneId zone,
+bool heldSinceTurnStart(const State &s, NationId nation, ZoneId zone,
                         bool allowFriendly) {
   const auto t = s.territories.find(zone);
   const auto start = s.turnStart.possessions.find(zone);
@@ -329,7 +327,7 @@ bool heldSinceTurnStart(const State &s, const Id &nation, ZoneId zone,
   return *t->second.possessor == nation ||
          (allowFriendly && logisticsFriendly(s, nation, *t->second.possessor));
 }
-bool enterableThisTurn(const State &s, const Id &nation, ZoneId zone,
+bool enterableThisTurn(const State &s, NationId nation, ZoneId zone,
                        bool allowFriendly) {
   if (heldSinceTurnStart(s, nation, zone, allowFriendly))
     return true;
@@ -343,7 +341,7 @@ bool enterableThisTurn(const State &s, const Id &nation, ZoneId zone,
   return *t->second.possessor == nation ||
          (allowFriendly && logisticsFriendly(s, nation, *t->second.possessor));
 }
-bool heldSinceNationTurnStart(const State &s, const Id &nation, ZoneId zone,
+bool heldSinceNationTurnStart(const State &s, NationId nation, ZoneId zone,
                               bool allowFriendly) {
   const auto t = s.territories.find(zone);
   if (t == s.territories.end() || !t->second.possessor ||
@@ -400,7 +398,7 @@ bool railUndamaged(const State &s, ZoneId from, ZoneId to, bool since) {
   }
   return true;
 }
-bool riverRouteAvailable(const State &s, const Id &nation, ZoneId from,
+bool riverRouteAvailable(const State &s, NationId nation, ZoneId from,
                          ZoneId to) {
   if (!hasRiver(s, from, to))
     return false;
@@ -785,7 +783,7 @@ std::vector<ZoneId> navalFacilitySeaZones(const State &s, const Id &id) {
   return {out.begin(), out.end()};
 }
 namespace {
-bool blockadedNow(const State &s, const Id &nation, ZoneId sea) {
+bool blockadedNow(const State &s, NationId nation, ZoneId sea) {
   std::map<Id, int> count;
   for (const auto &[id, u] : s.units)
     if (u.zone == sea && unitClass(s, u, "surface_warship") &&
@@ -815,19 +813,19 @@ bool blockadedNow(const State &s, const Id &nation, ZoneId sea) {
   return false;
 }
 } // namespace
-bool seaBlockaded(const State &s, const Id &nation, ZoneId sea) {
+bool seaBlockaded(const State &s, NationId nation, ZoneId sea) {
   if (auto *facts = positionFacts(s))
     return facts->rememberAt(PositionFacts::Fact::SeaBlockaded, nation, sea,
                            [&] { return blockadedNow(s, nation, sea); });
   return blockadedNow(s, nation, sea);
 }
-bool facilityBlockaded(const State &s, const Id &nation, const Id &facility) {
+bool facilityBlockaded(const State &s, NationId nation, const Id &facility) {
   const auto seas = navalFacilitySeaZones(s, facility);
   return !seas.empty() &&
          std::all_of(seas.begin(), seas.end(),
                      [&](const auto &z) { return seaBlockaded(s, nation, z); });
 }
-bool navalFacilityUsable(const State &s, const Id &nation, const Id &id,
+bool navalFacilityUsable(const State &s, NationId nation, const Id &id,
                          bool held) {
   const auto i = s.facilities.find(id);
   if (i == s.facilities.end() || !navalFacilityType(i->second.type) ||
@@ -846,10 +844,10 @@ bool navalFacilityUsable(const State &s, const Id &nation, const Id &id,
 }
 
 namespace {
-SupplyRoute traceSupply(const State &s, const Id &nation, ZoneId destination,
-                        const std::optional<Id> &recipient, bool navalUnit) {
+SupplyRoute traceSupply(const State &s, NationId nation, ZoneId destination,
+                        std::optional<NationId> recipient, bool navalUnit) {
   SupplyRoute none;
-  if (!s.definition->factions.contains(nation) || !isZone(s, destination))
+  if (!nation.valid() || !isZone(s, destination))
     return none;
   auto permittedLand = [&](ZoneId zone) {
     if (heldSinceTurnStart(s, nation, zone))
@@ -873,7 +871,7 @@ SupplyRoute traceSupply(const State &s, const Id &nation, ZoneId destination,
       // A delivered lend-lease stops upon reaching recipient Home Country.
       if (recipient && s.territories.at(z).possessor == *recipient &&
           (inHome(s, *recipient, z) ||
-           (*recipient == "dadao" && nation == "japan" &&
+           (*recipient == knownNations(s).dadao && nation == knownNations(s).japan &&
             chineseHomeCountry(s, z))))
         continue;
       NumberSet<ZoneId> adjacent;
@@ -912,7 +910,7 @@ SupplyRoute traceSupply(const State &s, const Id &nation, ZoneId destination,
            !facilityBlockaded(s, *recipient, id);
   };
   std::vector<ZoneId> homes;
-  for (const auto home : s.definition->factions.at(nation).homeZones)
+  for (const auto home : nationFaction(s, nation).homeZones)
     if (s.territories.contains(home) &&
         heldSinceTurnStart(s, nation, home, false))
       homes.push_back(home);
@@ -1018,23 +1016,23 @@ SupplyRoute traceSupply(const State &s, const Id &nation, ZoneId destination,
   return none;
 }
 } // namespace
-SupplyRoute supplyRoute(const State &s, const Id &nation,
+SupplyRoute supplyRoute(const State &s, NationId nation,
                         ZoneId destination) {
   return traceSupply(s, nation, destination, std::nullopt, false);
 }
-SupplyRoute lendLeaseSupplyRoute(const State &s, const Id &sender,
-                                 const Id &recipient, ZoneId destination,
+SupplyRoute lendLeaseSupplyRoute(const State &s, NationId sender,
+                                 NationId recipient, ZoneId destination,
                                  bool navalUnit) {
   if (!s.nations.contains(recipient) || !s.territories.contains(destination) ||
       s.territories.at(destination).possessor != recipient)
     return {};
-  const bool dadao = recipient == "dadao" && sender == "japan" &&
+  const bool dadao = recipient == knownNations(s).dadao && sender == knownNations(s).japan &&
                      chineseHomeCountry(s, destination);
   if (!dadao && !inHome(s, recipient, destination))
     return {};
   return traceSupply(s, sender, destination, recipient, navalUnit);
 }
-bool inSupply(const State &s, const Id &nation, ZoneId zone) {
+bool inSupply(const State &s, NationId nation, ZoneId zone) {
   if (auto *facts = positionFacts(s))
     return facts->rememberAt(PositionFacts::Fact::InSupply, nation, zone, [&] {
       return supplyRoute(s, nation, zone).connected;
@@ -1043,8 +1041,8 @@ bool inSupply(const State &s, const Id &nation, ZoneId zone) {
 }
 bool burmaRoadOpen(const State &s, bool ledo) {
   const auto date = s.calendarDate();
-  if (date.first * 100 + date.second < 193807 || !s.nations.contains("japan") ||
-      !s.nations.contains("kmt") || !hostile(s, "kmt", "japan"))
+  if (date.first * 100 + date.second < 193807 || !s.nations.contains(knownNations(s).japan) ||
+      !s.nations.contains(knownNations(s).kmt) || !hostile(s, nationNumber(s, "kmt"), nationNumber(s, "japan")))
     return false;
   auto allied = [&](std::string_view name) {
     const auto z = findZone(s, name);
@@ -1054,12 +1052,12 @@ bool burmaRoadOpen(const State &s, bool ledo) {
   };
   const auto yunnan = findZone(s, "land_china_yunnan");
   const auto y = yunnan ? s.territories.find(*yunnan) : s.territories.end();
-  return y != s.territories.end() && y->second.possessor == "kmt" &&
+  return y != s.territories.end() && isNation(s, y->second.possessor, "kmt") &&
          allied("land_burma") && (!ledo || allied("land_bengal"));
 }
 bool ccpSovietRailConnected(const State &s, ZoneId zone) {
-  if (!s.nations.contains("ussr") || !s.territories.contains(zone) ||
-      s.territories.at(zone).possessor != "ccp")
+  if (!s.nations.contains(knownNations(s).ussr) || !s.territories.contains(zone) ||
+      !isNation(s, s.territories.at(zone).possessor, "ccp"))
     return false;
   std::deque<ZoneId> todo{zone};
   NumberSet<ZoneId> seen;
@@ -1068,7 +1066,7 @@ bool ccpSovietRailConnected(const State &s, ZoneId zone) {
     todo.pop_front();
     if (!seen.insert(z).second)
       continue;
-    if (s.territories.at(z).possessor == "ussr")
+    if (isNation(s, s.territories.at(z).possessor, "ussr"))
       return true;
     for (const auto &[id, r] : s.rails) {
       ZoneId next;
@@ -1079,8 +1077,8 @@ bool ccpSovietRailConnected(const State &s, ZoneId zone) {
       else
         continue;
       if (!s.territories.at(next).possessor ||
-          (*s.territories.at(next).possessor != "ccp" &&
-           *s.territories.at(next).possessor != "ussr"))
+          (*s.territories.at(next).possessor != knownNations(s).ccp &&
+           *s.territories.at(next).possessor != knownNations(s).ussr))
         continue;
       if (railUndamaged(s, z, next))
         todo.push_back(next);
@@ -1088,9 +1086,9 @@ bool ccpSovietRailConnected(const State &s, ZoneId zone) {
   }
   return false;
 }
-std::set<Id> withdrawalEligibleRecipients(const State &s, const Id &attacker,
-                                          ZoneId zone) {
-  std::set<Id> recipients;
+NumberSet<NationId> withdrawalEligibleRecipients(const State &s, NationId attacker,
+                                                 ZoneId zone) {
+  NumberSet<NationId> recipients;
   if (!s.territories.contains(zone) || !movementController(s, attacker))
     return recipients;
   State probe = s.clone();
@@ -1166,9 +1164,9 @@ std::set<Id> withdrawalEligibleRecipients(const State &s, const Id &attacker,
     return false;
   };
   if (!assign(0)) return recipients;
-  for (const auto &china : {"ccp", "kmt"})
-    if (s.nations.contains(china) && !s.politics.surrendered.contains(china))
-      recipients.insert(china);
+  for (const auto &name : {"ccp", "kmt"})
+    if (const auto china = findNation(s, name); china && s.nations.contains(*china) && !s.politics.surrendered.contains(*china))
+      recipients.insert(*china);
   return recipients;
 }
 void attachCargo(State &s, const Id &transport, const Id &cargo) {
@@ -1323,7 +1321,7 @@ std::vector<Action> MovementRules::actions(const State &s) const {
             out.push_back(
                 {"factory_rail_" + contentDigest(canonicalJson(params)),
                  "movement_factory_rail", politicalPlayer(s, s.currentNation()),
-                 s.currentNation(), std::nullopt, std::move(params)});
+                 s.currentNationName(), std::nullopt, std::move(params)});
           }
         }
       }
@@ -1368,10 +1366,10 @@ std::vector<Action> MovementRules::interrupts(const State &s) const {
   const auto active = s.currentNation();
   for (const auto &[owner, n] : s.nations)
     if (owner != active && politicallyFriendly(s, owner, active) &&
-        !flag(n.turnFlags, "rail_permission:" + active)) {
-      V p(O{{"requester", V(active)}});
-      out.push_back({"rail_permission_" + owner + "_" + active,
-                     "movement_grant_rail", politicalPlayer(s, owner), owner,
+        !flag(n.turnFlags, "rail_permission:" + nationName(s, active))) {
+      V p(O{{"requester", V(nationName(s, active))}});
+      out.push_back({"rail_permission_" + nationName(s, owner) + "_" + nationName(s, active),
+                     "movement_grant_rail", politicalPlayer(s, owner), nationName(s, owner),
                      std::nullopt, p});
     }
   return out;
@@ -1386,7 +1384,7 @@ bool MovementRules::phaseComplete(const State &s) const {
 }
 void MovementRules::apply(State &s, const Action &a) const {
   if (a.kind == "movement_grant_rail") {
-    s.nations.at(a.nation)
+    s.nations.at(nationNumber(s, a.nation))
         .turnFlags["rail_permission:" +
                    a.parameters.require("requester").asString()] = 1;
     return;
@@ -1415,7 +1413,7 @@ void MovementRules::apply(State &s, const Action &a) const {
   const auto result = validateRoute(s, r);
   require(result.allowed, result.reason);
   auto &u = s.units.at(r.unit);
-  require(u.owner == a.nation, "Movement action owner mismatch");
+  require(nationName(s, u.owner) == a.nation, "Movement action owner mismatch");
   const auto owner = u.owner;
   const auto from = u.zone;
   const bool attack = landRouteAttacks(s, owner, r);

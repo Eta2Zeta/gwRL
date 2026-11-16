@@ -323,11 +323,13 @@ PYBIND11_MODULE(gwrl_cpp, module) {
             return py::module_::import("json").attr("loads")(text);
         })
         .def("name_tables", [](const NativeCampaignEnv& self) {
-            const auto zones = self.call([](const CampaignEnv& env) {
-                return game::campaign::names(env.engine().state()).zones.names();
+            const auto [zones, nations] = self.call([](const CampaignEnv& env) {
+                const auto& names = game::campaign::names(env.engine().state());
+                return std::pair{names.zones.names(), names.nations.names()};
             });
             py::dict tables;
             tables["zones"] = zones;
+            tables["nations"] = nations;
             return tables;
         }, "The tables that number the definition's names, by kind: each kind's names listed in "
            "number order, so a name's number is its place in its list (include/game/names.hpp).")

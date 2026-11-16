@@ -48,24 +48,24 @@ State fixture(const Id &actor = "japan") {
     s.clock.playerTurnSerial = s.clock.nationIndex;
     s.clock.phase = Phase::Combat;
     for (std::size_t k = 0; k < s.definition->turnOrder.size(); ++k)
-        s.completedTurns[s.definition->turnOrder[k]] =
+        s.completedTurns[nationNumber(s, s.definition->turnOrder[k])] =
             k < static_cast<std::size_t>(s.clock.nationIndex) ? 1 : 0;
-    s.nations.at("japan").atWarWith.insert("kmt");
-    s.nations.at("kmt").atWarWith.insert("japan");
-    s.territories.at(zoneNumber(s, hopeh)).possessor = "kmt";
-    s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
-    s.territories.at(zoneNumber(s, shantung)).possessor = "japan";
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+    s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
+    s.territories.at(zoneNumber(s, hopeh)).possessor = nationNumber(s, "kmt");
+    s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "japan");
+    s.territories.at(zoneNumber(s, shantung)).possessor = nationNumber(s, "japan");
     s.captureTurnStart();
     return s;
 }
 void add(State &s, const Id &id, const Id &nation, const Id &zone, const Id &type = "infantry") {
     UnitState u;
     u.id = id;
-    u.owner = nation;
+    u.owner = nationNumber(s, nation);
     u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.type = type;
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, 0, catalogContext(s, nation, zoneNumber(s, zone))).movement;
+        s.definition->catalog->stats(type, 0, catalogContext(s, nationNumber(s, nation), zoneNumber(s, zone))).movement;
     s.units.emplace(id, u);
 }
 Action select(
@@ -81,7 +81,7 @@ Id battle(State &s, std::vector<Id> a = {"a"}, std::map<Id, Id> origins = {{"a",
     std::map<Id, ZoneId> entries;
     for (const auto &[unit, name] : origins)
         entries.emplace(unit, zoneNumber(s, name));
-    return registerLandBattle(s, zoneNumber(s, zone), nation, a, entries);
+    return registerLandBattle(s, zoneNumber(s, zone), nationNumber(s, nation), a, entries);
 }
 void begin(Engine &e) {
     e.step(select(e.legalActions(), "land_begin_battle"));
@@ -276,9 +276,9 @@ void targetSelectionAndFallback() {
 void kmtLowMoraleEmptyAndOrigins() {
     auto s = fixture("kmt");
     clearTerrain(s, hopeh);
-    s.territories.at(zoneNumber(s, hopeh)).possessor = "japan";
-    s.territories.at(zoneNumber(s, beiping)).possessor = "kmt";
-    s.territories.at(zoneNumber(s, shantung)).possessor = "kmt";
+    s.territories.at(zoneNumber(s, hopeh)).possessor = nationNumber(s, "japan");
+    s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "kmt");
+    s.territories.at(zoneNumber(s, shantung)).possessor = nationNumber(s, "kmt");
     add(s, "a", "kmt", hopeh);
     add(s, "b", "kmt", hopeh, "cavalry");
     auto id = battle(s, {"a", "b"}, {{"a", beiping}, {"b", shantung}}, hopeh, "kmt");
@@ -289,14 +289,14 @@ void kmtLowMoraleEmptyAndOrigins() {
     e.resolveChance();
     check(e.state().units.at("a").zone == zoneNumber(e.state(), beiping) && e.state().units.at("b").zone == zoneNumber(e.state(), shantung),
           "Low Morale lost contingent origins");
-    check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "japan", "Retreated force captured empty territory");
+    check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "japan"), "Retreated force captured empty territory");
     check(e.state().battles.at(id).flags.at("finished"), "Empty low morale attack stuck");
 }
 void lowMoraleUnitsCannotBeCasualties() {
     auto s = fixture("kmt");
     clearTerrain(s, hopeh);
-    s.territories.at(zoneNumber(s, hopeh)).possessor = "japan";
-    s.territories.at(zoneNumber(s, beiping)).possessor = "kmt";
+    s.territories.at(zoneNumber(s, hopeh)).possessor = nationNumber(s, "japan");
+    s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "kmt");
     add(s, "a", "kmt", hopeh);
     add(s, "b", "kmt", hopeh);
     add(s, "d", "japan", hopeh);
@@ -317,8 +317,8 @@ void lowMoraleWithoutALegalRetreatIsEliminated() {
     // the sea it landed from, is eliminated; the others retreat or fight on.
     auto s = fixture("kmt");
     clearTerrain(s, hopeh);
-    s.territories.at(zoneNumber(s, hopeh)).possessor = "japan";
-    s.territories.at(zoneNumber(s, beiping)).possessor = "kmt";
+    s.territories.at(zoneNumber(s, hopeh)).possessor = nationNumber(s, "japan");
+    s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "kmt");
     add(s, "a", "kmt", hopeh);
     add(s, "b", "kmt", hopeh);
     add(s, "c", "kmt", hopeh);
@@ -331,18 +331,18 @@ void lowMoraleWithoutALegalRetreatIsEliminated() {
     check(e.state().units.at("b").zone == zoneNumber(e.state(), beiping), "Low Morale unit with a legal retreat did not retreat");
     drain(e);
     check(e.state().battles.at(id).flags.at("finished"), "Battle stuck after a Low Morale elimination");
-    check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "kmt", "The remaining attacker did not take the empty land");
+    check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt"), "The remaining attacker did not take the empty land");
 }
 void lowMoraleRetreatersDefendBeforeTheirNextTurn() {
     const Id counterOrigin = "land_china_suiyuan";
     auto s = fixture("kmt");
     clearTerrain(s, hopeh);
     clearTerrain(s, beiping);
-    s.territories.at(zoneNumber(s, hopeh)).possessor = "japan";
-    s.territories.at(zoneNumber(s, beiping)).possessor = "kmt";
-    s.territories.at(zoneNumber(s, counterOrigin)).possessor = "ccp";
-    s.nations.at("ccp").atWarWith.insert("kmt");
-    s.nations.at("kmt").atWarWith.insert("ccp");
+    s.territories.at(zoneNumber(s, hopeh)).possessor = nationNumber(s, "japan");
+    s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "kmt");
+    s.territories.at(zoneNumber(s, counterOrigin)).possessor = nationNumber(s, "ccp");
+    s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "kmt"));
+    s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "ccp"));
     add(s, "retreater", "kmt", hopeh);
     add(s, "counter", "ccp", counterOrigin);
     const auto firstBattle = battle(s, {"retreater"}, {{"retreater", beiping}}, hopeh, "kmt");
@@ -362,7 +362,7 @@ void lowMoraleRetreatersDefendBeforeTheirNextTurn() {
     check(excluded.size() == 1 && excluded.front().asString() == "retreater",
           "Low Morale exclusion was not recorded in its actual battle");
     choose(e, "land_progress_battle");
-    for (int step = 0; step < 80 && !(e.state().currentNation() == "ccp" &&
+    for (int step = 0; step < 80 && !(e.state().currentNationName() == "ccp" &&
              e.state().clock.phase == Phase::CombatMovement); ++step) {
         const auto actions = e.legalActions();
         const auto end = std::find_if(actions.begin(), actions.end(),
@@ -370,7 +370,7 @@ void lowMoraleRetreatersDefendBeforeTheirNextTurn() {
         if (end != actions.end()) e.step(*end);
         else e.step(select(actions, "economy_finish_research"));
     }
-    check(e.state().currentNation() == "ccp" && e.state().clock.phase == Phase::CombatMovement,
+    check(e.state().currentNationName() == "ccp" && e.state().clock.phase == Phase::CombatMovement,
           "Counterattack fixture did not reach the intervening CCP turn");
     check(flag(e.state().units.at("retreater").turnFlags, "land_retreating") &&
               e.state().units.at("retreater").commitments.contains("retreated"),
@@ -387,7 +387,7 @@ void lowMoraleRetreatersDefendBeforeTheirNextTurn() {
               e.state().battles.at(e.state().chance->continuation).data.require("shots").asArray()
                   .front().require("unit").asString() == "retreater",
           "Retreated KMT infantry was suppressed as an intervening-turn defender");
-    check(e.state().territories.at(zoneNumber(e.state(), beiping)).possessor == "kmt" && e.state().units.contains("retreater"),
+    check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), beiping)).possessor, "kmt") && e.state().units.contains("retreater"),
           "Enemy captured a territory while its retreated defender was still alive");
     const auto checkpoint = e.serialize();
     auto clone = e.clone();
@@ -401,7 +401,7 @@ void lowMoraleRetreatersDefendBeforeTheirNextTurn() {
           "Retreated defender checkpoint lost its return fire");
     drain(e);
     check(e.state().units.contains("retreater") && !e.state().units.contains("counter") &&
-              e.state().territories.at(zoneNumber(e.state(), beiping)).possessor == "kmt",
+              isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), beiping)).possessor, "kmt"),
           "Retreated defender could not defeat the later counterattack");
     auto replayed = Engine::replay(s.definition, gameplay, initial, e.state().history);
     check(replayed.exactReplayIdentity() == e.exactReplayIdentity(),
@@ -487,7 +487,7 @@ void terrainAndJapaneseModifiers() {
           "Positive mountain/city bonuses stacked");
     auto t = fixture("kmt");
     const Id tokyo = "land_jap_tokyo";
-    t.territories.at(zoneNumber(t, tokyo)).possessor = "japan";
+    t.territories.at(zoneNumber(t, tokyo)).possessor = nationNumber(t, "japan");
     add(t, "a", "kmt", tokyo);
     add(t, "d", "japan", tokyo);
     auto bid = battle(t, {"a"}, {{"a", "land_jap_honshu"}}, tokyo, "kmt");
@@ -522,7 +522,7 @@ void attritionIsSeparateAndNoReturnFire() {
     add(s, "a", "japan", beiping, "advanced_artillery");
     add(s, "d", "kmt", hopeh);
     s.captureTurnStart();
-    auto id = registerAttritionBattle(s, zoneNumber(s, hopeh), "japan", {"a"});
+    auto id = registerAttritionBattle(s, zoneNumber(s, hopeh), nationNumber(s, "japan"), {"a"});
     Engine e(s, rules());
     e.setDiceTapeForTesting({1});
     begin(e);
@@ -530,13 +530,13 @@ void attritionIsSeparateAndNoReturnFire() {
     choose(e, "land_take_casualty", "d");
     check(!e.state().chance && e.state().units.at("a").zone == zoneNumber(e.state(), beiping),
           "Attrition moved artillery or allowed return fire");
-    check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "kmt" && e.state().battles.at(id).flags.at("finished"),
+    check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt") && e.state().battles.at(id).flags.at("finished"),
           "Attrition captured territory or continued rounds");
     auto t = fixture();
     add(t, "a", "japan", beiping, "advanced_artillery");
     t.captureTurnStart();
     t.units.at("a").route = zoneNumbers(t, {beiping});
-    rejects([&] { registerAttritionBattle(t, zoneNumber(t, hopeh), "japan", {"a"}); },
+    rejects([&] { registerAttritionBattle(t, zoneNumber(t, hopeh), nationNumber(t, "japan"), {"a"}); },
             "Moved artillery made attrition attack");
 }
 void choiceChangesPlanningKeyAndForgedCasualtyRollsBack() {
@@ -605,7 +605,7 @@ void strategicRocketsAreNotCombatCasualties() {
         check(!e.state().units.contains("rocket"), "Unsupported Rocket survived enemy land occupation");
         drain(e);
         check(flag(e.state().battles.at(id).flags, "finished"), "Rocket prevented combat completion");
-        check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == (attackingRocket ? "kmt" : "japan"),
+        check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == nationNumber(e.state(), attackingRocket ? "kmt" : "japan"),
               "Rocket changed conquest after the last escort fell");
         auto replay = Engine::replay(s.definition, rules(), initial, e.state().history);
         check(replay.exactReplayIdentity() == e.exactReplayIdentity(),
@@ -633,7 +633,7 @@ void unsupportedRocketsFallOnEnemyLandEntry() {
         begin(e);
         drain(e);
         check(flag(e.state().battles.at(id).flags, "finished"), "Unsupported Rocket battle stuck");
-        check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == (attackingRocket ? "kmt" : "japan"),
+        check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == nationNumber(e.state(), attackingRocket ? "kmt" : "japan"),
               "Unsupported Rockets blocked conquest or conquered enemy defenders");
     }
 }
@@ -662,7 +662,7 @@ void airOnlyAttacksPreserveStrategicRockets() {
               "Air-only Rocket attack omitted normal aircraft return");
         choose(e, "air_land");
         check(e.state().units.at("a").zone != zoneNumber(e.state(), hopeh) && e.state().units.contains("rocket") &&
-                  e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "kmt" &&
+                  isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt") &&
                   flag(e.state().battles.at(id).flags, "finished"),
               "Air-only Rocket attack captured land or failed to finish");
         auto replay = Engine::replay(s.definition, rules(), initial, e.state().history);
@@ -684,7 +684,7 @@ void strategicRocketSurvivesMutualEscortLossAndAttrition() {
     e.resolveChance();
     choose(e, "land_take_casualty", "a");
     check(e.state().units.contains("rocket") && e.state().units.size() == 1 &&
-              e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "kmt" &&
+              isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt") &&
               flag(e.state().battles.at(id).flags, "finished"),
           "Rocket was destroyed despite no enemy land surviving simultaneous fire");
 
@@ -693,14 +693,14 @@ void strategicRocketSurvivesMutualEscortLossAndAttrition() {
     add(t, "a", "japan", beiping, "advanced_artillery");
     add(t, "rocket", "kmt", hopeh, "strategic_rocket");
     t.captureTurnStart();
-    auto attrition = registerAttritionBattle(t, zoneNumber(t, hopeh), "japan", {"a"});
+    auto attrition = registerAttritionBattle(t, zoneNumber(t, hopeh), nationNumber(t, "japan"), {"a"});
     Engine remote(t, rules());
     remote.setDiceTapeForTesting({1});
     begin(remote);
     remote.resolveChance();
     check(remote.state().units.contains("rocket") && !remote.state().chance &&
               remote.state().decisions.empty() && flag(remote.state().battles.at(attrition).flags, "finished") &&
-              remote.state().territories.at(zoneNumber(remote.state(), hopeh)).possessor == "kmt",
+              isNation(remote.state(), remote.state().territories.at(zoneNumber(remote.state(), hopeh)).possessor, "kmt"),
           "Remote attrition selected a Rocket casualty or treated adjacent artillery as occupying land");
 }
 void fightersPrioritizeAircraft() {
@@ -855,7 +855,7 @@ void firstStrikeFighterKeepsPriorityAndFiresOnce() {
     add(s, "defending_aaa", "kmt", hopeh, "anti_aircraft_artillery");
     add(s, "defending_infantry", "kmt", hopeh);
     s.units.at("a").turnFlags["air_in_flight"] = 1;
-    s.nations.at("japan").turnFlags["surprise_attack_zone:" + hopeh] = 1;
+    s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_zone:" + hopeh] = 1;
     auto id = battle(s, {"a", "i"}, {{"a", beiping}, {"i", beiping}});
     Engine e(s, rules());
     e.setDiceTapeForTesting({1, 12, 12, 12, 12, 12});
@@ -936,7 +936,7 @@ void airborneAircraftCasualtiesRetainOnlyTheirUnfiredRoll() {
           "Attacking casualty survived its roll or defending aircraft lost its return roll");
     e.resolveChance();
     check(!e.state().units.contains("am") && !e.state().units.contains("dm") &&
-              e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "kmt" &&
+              isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt") &&
               e.state().battles.at(id).data.require("airborne_return_fire").asArray().empty(),
           "Selected aircraft survived into another round or changed possession");
     auto replay = Engine::replay(s.definition, rules(), checkpoint, e.state().history);
@@ -987,7 +987,7 @@ void airborneInfantryFallbackCasualtiesGetTheirUnfiredRoll() {
               "Selected infantry did not get exactly one normal roll");
         e.resolveChance();
         choose(e, "land_take_casualty", attackingCasualty ? "da" : "para");
-        check(!e.state().units.contains("i") && e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "kmt",
+        check(!e.state().units.contains("i") && isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt"),
               "Selected infantry survived its return roll or captured land");
         if (!attackingCasualty) choose(e, "air_land", "af");
         auto replay = Engine::replay(s.definition, rules(), checkpoint, e.state().history);
@@ -1035,8 +1035,8 @@ void jointDefendersConsentAndDiceDispute() {
     auto s = fixture();
     clearTerrain(s, hopeh);
     s.politics.chineseTruce = true;
-    s.nations.at("japan").atWarWith.insert("ccp");
-    s.nations.at("ccp").atWarWith.insert("japan");
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "ccp"));
+    s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "japan"));
     add(s, "a", "japan", hopeh);
     add(s, "d", "kmt", hopeh);
     add(s, "c", "ccp", hopeh);
@@ -1066,15 +1066,15 @@ void directAxisDadaoUsesJapanCalendarSlot() {
     auto s = fixture();
     clearTerrain(s, hopeh);
     ensureDadao(s);
-    s.politics.surrendered.insert("japan");
-    auto &n = s.nations.at("dadao");
+    s.politics.surrendered.insert(nationNumber(s, "japan"));
+    auto &n = s.nations.at(nationNumber(s, "dadao"));
     n.controllerNation.reset();
     n.player = "axis";
     n.alliance = "axis";
     n.gameFlags["direct_axis_control_after_japan_surrender"] = 1;
-    n.atWarWith.insert("kmt");
-    s.nations.at("kmt").atWarWith.insert("dadao");
-    s.territories.at(zoneNumber(s, beiping)).possessor = "dadao";
+    n.atWarWith.insert(nationNumber(s, "kmt"));
+    s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "dadao"));
+    s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "dadao");
     add(s, "a", "dadao", hopeh);
     auto id = battle(s, {"a"}, {{"a", beiping}}, hopeh, "dadao");
     Engine e(s, rules());
@@ -1084,9 +1084,9 @@ void directAxisDadaoUsesJapanCalendarSlot() {
           "Controlled Dadao ordinary action stole a nation calendar slot");
     e.step(beginAction);
     e.resolveChance();
-    check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "dadao" && e.state().units.at("a").owner == "dadao",
+    check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "dadao") && e.state().units.at("a").owner == nationNumber(e.state(), "dadao"),
           "Dadao capture changed national identity");
-    check(e.state().politics.surrendered.contains("japan") && e.state().battles.at(id).flags.at("finished"),
+    check(e.state().politics.surrendered.contains(nationNumber(e.state(), "japan")) && e.state().battles.at(id).flags.at("finished"),
           "Direct Axis fallback did not finish Dadao combat");
     choose(e, "land_progress_battle");
     check(e.state().battles.empty(), "Finished minor battle could not be cleaned up in Japan slot");
@@ -1096,10 +1096,10 @@ void replayableGroundCampaignAndCounterattack() {
     auto s = fixture("ccp");
     clearTerrain(s, hopeh);
     s.clock.phase = Phase::CombatMovement;
-    s.territories.at(zoneNumber(s, beiping)).possessor = "ccp";
-    s.territories.at(zoneNumber(s, shantung)).possessor = "kmt";
-    s.nations.at("ccp").atWarWith.insert("kmt");
-    s.nations.at("kmt").atWarWith.insert("ccp");
+    s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "ccp");
+    s.territories.at(zoneNumber(s, shantung)).possessor = nationNumber(s, "kmt");
+    s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "kmt"));
+    s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "ccp"));
     add(s, "a", "ccp", beiping);
     add(s, "d", "kmt", hopeh, "militia");
     add(s, "counter", "kmt", shantung, "cavalry");
@@ -1118,9 +1118,9 @@ void replayableGroundCampaignAndCounterattack() {
     begin(e);
     drain(e);
     choose(e, "land_progress_battle");
-    check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "ccp", "Opening ground attack did not capture");
+    check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "ccp"), "Opening ground attack did not capture");
     for (int k = 0;
-         k < 30 && !(e.state().currentNation() == "kmt" && e.state().clock.phase == Phase::CombatMovement);
+         k < 30 && !(e.state().currentNationName() == "kmt" && e.state().clock.phase == Phase::CombatMovement);
          ++k) {
         auto actions = e.legalActions();
         auto skip = std::find_if(actions.begin(), actions.end(),
@@ -1130,7 +1130,7 @@ void replayableGroundCampaignAndCounterattack() {
         else
             e.step(select(actions, "economy_finish_research"));
     }
-    check(e.state().currentNation() == "kmt" && e.state().clock.phase == Phase::CombatMovement,
+    check(e.state().currentNationName() == "kmt" && e.state().clock.phase == Phase::CombatMovement,
           "Ground campaign did not advance calendar slots");
     e.step(select(e.legalActions(), "movement_route", [](const Action &a) {
         return a.parameters.require("unit").asString() == "counter" &&
@@ -1140,8 +1140,8 @@ void replayableGroundCampaignAndCounterattack() {
     begin(e);
     drain(e);
     choose(e, "land_progress_battle");
-    check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "kmt", "Counterattack did not restore KMT possession");
-    check(e.state().nations.at("ccp").treasury.value() > 2, "Intermediate income was not collected");
+    check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt"), "Counterattack did not restore KMT possession");
+    check(e.state().nations.at(nationNumber(e.state(), "ccp")).treasury.value() > 2, "Intermediate income was not collected");
     auto replay = Engine::replay(s.definition, gameplay, checkpoint, e.state().history);
     check(replay.exactReplayIdentity() == e.exactReplayIdentity(),
           "Multi-turn movement/combat/accounting replay diverged");

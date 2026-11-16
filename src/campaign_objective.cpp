@@ -12,7 +12,7 @@ namespace {
 using V = json::Value;
 using O = V::Object;
 
-std::optional<std::size_t> recipient(const State& s, const std::optional<Id>& nation) {
+std::optional<std::size_t> recipient(const State& s, std::optional<NationId> nation) {
     if (!nation) return std::nullopt;
     // A temporary policy assigned to independent warlord defense is deliberately
     // absent from NationState.player and must not acquire its neutral assets.
@@ -23,7 +23,7 @@ std::optional<std::size_t> recipient(const State& s, const std::optional<Id>& na
     return static_cast<std::size_t>(it - allianceOrder.begin());
 }
 
-int prepaidRepair(const State& s, const Id& target, const Id& owner,
+int prepaidRepair(const State& s, const Id& target, NationId owner,
                   std::optional<ZoneId> endpoint = std::nullopt) {
     int damage = 0;
     for (const auto& [id, job] : s.repairs)

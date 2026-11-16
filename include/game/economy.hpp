@@ -31,18 +31,18 @@ bool incomePartPossible(const Id &nation, const Id &part);
 bool researchPossible(const Id &nation);
 // The nation's income as the position stands: its parts, whether the nation
 // may collect it, and the total it would collect.
-IncomeBreakdown evaluateIncome(const State &, const Id &nation);
+IncomeBreakdown evaluateIncome(const State &, NationId nation);
 // Stores the parts of every nation's income in the state. EconomyRules::settle
 // does this at the end of every transition, so a recorded position never
 // carries an income from before land changed hands.
 void refreshIncome(State &);
-void reconcileCapturedFacilities(State &, ZoneId zone, const std::optional<Id> &oldOwner,
-                                 const Id &newOwner);
-bool lendLeasePermitted(const State &, const Id &sender, const Id &recipient);
+void reconcileCapturedFacilities(State &, ZoneId zone, std::optional<NationId> oldOwner,
+                                 NationId newOwner);
+bool lendLeasePermitted(const State &, NationId sender, NationId recipient);
 std::vector<Action> lendLeaseActions(const State &);
 bool applyLendLeaseAction(State &, const Action &);
 // Beginning-of-turn capacities are caps; damage and lost supply can lower them.
-int facilityCapacity(const State &, const Id &nation, const Id &facility, bool repair = false);
+int facilityCapacity(const State &, NationId nation, const Id &facility, bool repair = false);
 void beginEconomyTurn(State &);
 void finishEconomyPlacement(State &);
 // Used by strategic bombing. Setbacks undo progress, never refund payments.

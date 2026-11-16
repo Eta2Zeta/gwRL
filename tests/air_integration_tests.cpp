@@ -38,11 +38,11 @@ State fixture(Phase phase = Phase::CombatMovement) {
     s.clock.nationIndex = 2;
     s.clock.playerTurnSerial = 2;
     s.clock.phase = phase;
-    s.completedTurns["ccp"] = s.completedTurns["mongolia"] = 1;
-    s.nations.at("japan").atWarWith.insert("kmt");
-    s.nations.at("kmt").atWarWith.insert("japan");
-    s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
-    s.territories.at(zoneNumber(s, hopeh)).possessor = "kmt";
+    s.completedTurns[nationNumber(s, "ccp")] = s.completedTurns[nationNumber(s, "mongolia")] = 1;
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+    s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
+    s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "japan");
+    s.territories.at(zoneNumber(s, hopeh)).possessor = nationNumber(s, "kmt");
     s.captureTurnStart();
     return s;
 }
@@ -50,10 +50,10 @@ void add(State &s, const Id &id, const Id &type, const Id &owner, const Id &zone
     UnitState u;
     u.id = id;
     u.type = type;
-    u.owner = owner;
+    u.owner = nationNumber(s, owner);
     u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, 0, catalogContext(s, owner, zoneNumber(s, zone))).movement;
+        s.definition->catalog->stats(type, 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone))).movement;
     s.units.emplace(id, std::move(u));
 }
 std::shared_ptr<const Rules> rules() {
@@ -106,7 +106,7 @@ void actualAirborneEntryFacesCityAAAndReplays() {
                   [](const Action &a) { return a.parameters.require("unit").asString() == "transport"; }));
     check(!e.state().units.contains("transport") && !e.state().units.contains("paratrooper"),
           "City AA transport casualty landed cargo or let it attack");
-    check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "kmt", "Failed assault captured the city");
+    check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt"), "Failed assault captured the city");
     auto replayed = Engine::replay(s.definition, rules(), checkpoint, e.state().history);
     check(replayed.exactReplayIdentity() == e.exactReplayIdentity(), "Actual airborne entry replay diverged");
 }
@@ -149,7 +149,7 @@ void actualAirborneEntryResolvesFightersAndAaaBeforeLanding() {
               !e.state().units.contains("escort") && !e.state().units.contains("defending_fighter") &&
               !e.state().chance && e.state().decisions.empty() &&
               e.state().battles.at(battle).flags.at("finished") &&
-              e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "kmt",
+              isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt"),
           "Step-4 losses landed, lost simultaneous return fire, or prolonged an eliminated assault");
     auto replay = Engine::replay(s.definition, rules(), checkpoint, e.state().history);
     check(replay.exactReplayIdentity() == e.exactReplayIdentity(), "Actual airborne step-4 entry replay diverged");
@@ -172,12 +172,12 @@ void controlledMinorsRetainSeparateAttackingForces() {
     add(s, "dadao", "infantry", "dadao", hopeh);
     rejects(
         [&] {
-            registerLandBattle(s, zoneNumber(s, hopeh), "japan", {"japanese", "dadao"},
+            registerLandBattle(s, zoneNumber(s, hopeh), nationNumber(s, "japan"), {"japanese", "dadao"},
                                {{"japanese", zoneNumber(s, beiping)}, {"dadao", zoneNumber(s, beiping)}});
         },
         "Controlling Japan and Dadao combined an attack");
-    registerLandBattle(s, zoneNumber(s, hopeh), "dadao", {"dadao"}, {{"dadao", zoneNumber(s, beiping)}});
-    check(s.battles.size() == 1 && s.battles.begin()->second.attacker == "dadao",
+    registerLandBattle(s, zoneNumber(s, hopeh), nationNumber(s, "dadao"), {"dadao"}, {{"dadao", zoneNumber(s, beiping)}});
+    check(s.battles.size() == 1 && s.battles.begin()->second.attacker == nationNumber(s, "dadao"),
           "Separate Dadao attack lost its identity");
 }
 void aircraftLaunchesFromCarrierAndReplaysCargoLinks() {
@@ -307,7 +307,7 @@ void ownerChoosesWhoIsLostWhenCombatSinksACarrier() {
     // Two fighters attack from two carriers. Should combat sink one carrier, the
     // returning fighters have one seat between them and their owner decides who
     // is lost; with a seat for each, landing needs no such choice.
-    auto s=fixture();s.territories.at(zoneNumber(s, beiping)).possessor="kmt";s.captureTurnStart();
+    auto s=fixture();s.territories.at(zoneNumber(s, beiping)).possessor=nationNumber(s, "kmt");s.captureTurnStart();
     add(s,"c1","light_carrier","japan","sea_p14");add(s,"c2","light_carrier","japan","sea_p14");
     for(const auto& [fighter,carrier]:{std::pair<Id,Id>{"f1","c1"},{"f2","c2"}}){
         add(s,fighter,"fighter","japan","sea_p14");attachCargo(s,carrier,fighter);s.units.at(fighter).movementRemaining=2;

@@ -126,7 +126,7 @@ V railSignature(const State& state, const Action& action) {
     const auto& border = action.parameters.require("border").asString();
     const auto recipient = state.territories.at(zoneNumber(state, border)).possessor;
     require(recipient.has_value(), "Railroad consent has no recipient");
-    return V(O{{"sender", V(action.nation)}, {"recipient", V(*recipient)},
+    return V(O{{"sender", V(action.nation)}, {"recipient", V(nationName(state, *recipient))},
                {"parameters", action.parameters}});
 }
 
@@ -342,7 +342,7 @@ void validateTrainingActionState(const State& state) {
     for (const auto& request : records(state, "declined_rail_requests")) {
         exactKeys(request, {"sender", "recipient", "parameters"}, "railroad request");
         for (const auto* field : {"sender", "recipient"})
-            require(request.require(field).isString() && state.nations.contains(request.require(field).asString()),
+            require(request.require(field).isString() && hasNation(state, request.require(field).asString()),
                     "Invalid railroad request nation");
         const auto& parameters = request.require("parameters");
         require(parameters.isObject(), "Railroad request parameters must be an object");
@@ -354,9 +354,9 @@ void validateTrainingActionState(const State& state) {
             const auto zone = findZone(state, parameters.require(field).asString());
             require(zone && state.territories.contains(*zone), "Invalid railroad request endpoint");
         }
-        require(request.require("sender").asString() == state.currentNation() &&
-                state.territories.at(zoneNumber(state, parameters.require("border").asString())).possessor ==
-                    std::optional<Id>(request.require("recipient").asString()) &&
+        require(request.require("sender").asString() == state.currentNationName() &&
+                isNation(state, state.territories.at(zoneNumber(state, parameters.require("border").asString())).possessor,
+                         request.require("recipient").asString()) &&
                 request.require("sender").asString() != request.require("recipient").asString(),
                 "Railroad request belongs to a different decision context");
         if (const auto* project = parameters.find("project"))

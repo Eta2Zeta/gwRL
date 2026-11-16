@@ -304,21 +304,21 @@ State navalFixture() {
   state.clock.playerTurnSerial = 2;
   state.clock.phase = Phase::Combat;
   for (const auto &nation : state.definition->turnOrder)
-    state.completedTurns[nation] = nation == "ccp" || nation == "mongolia" ? 1 : 0;
-  state.nations.at("japan").atWarWith.insert("kmt");
-  state.nations.at("kmt").atWarWith.insert("japan");
+    state.completedTurns[nationNumber(state, nation)] = nation == "ccp" || nation == "mongolia" ? 1 : 0;
+  state.nations.at(nationNumber(state, "japan")).atWarWith.insert(nationNumber(state, "kmt"));
+  state.nations.at(nationNumber(state, "kmt")).atWarWith.insert(nationNumber(state, "japan"));
   for (const auto &[id, owner] : {std::pair<Id, Id>{"attacker", "japan"}, {"defender", "kmt"}}) {
     UnitState unit;
     unit.id = id;
     unit.type = "destroyer";
-    unit.owner = owner;
+    unit.owner = nationNumber(state, owner);
     unit.zone = unit.turnOrigin = zoneNumber(state, "sea_p15");
     unit.movementAllowance = unit.movementRemaining =
-        state.definition->catalog->stats("destroyer", 0, catalogContext(state, owner, zoneNumber(state, "sea_p15"))).movement;
+        state.definition->catalog->stats("destroyer", 0, catalogContext(state, unit.owner, zoneNumber(state, "sea_p15"))).movement;
     state.units.emplace(id, std::move(unit));
   }
   state.captureTurnStart();
-  registerNavalBattle(state, zoneNumber(state, "sea_p15"), "japan", {"attacker"}, {{"attacker", zoneNumber(state, "sea_p14")}},
+  registerNavalBattle(state, zoneNumber(state, "sea_p15"), nationNumber(state, "japan"), {"attacker"}, {{"attacker", zoneNumber(state, "sea_p14")}},
                       V(O{{"no_scramble", V(true)}}));
   return state;
 }

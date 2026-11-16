@@ -21,14 +21,14 @@ bool marked(const std::map<Id, int>& flags, const Id& key) {
 bool has(const State& s, const UnitState& u, const Id& c) {
     return s.definition->catalog->unit(u.type).classes.contains(c);
 }
-bool hostile(const State& s, const Id& a, const Id& b) {
+bool hostile(const State& s, NationId a, NationId b) {
     return a != b && s.nations.at(a).atWarWith.contains(b);
 }
 bool sub(const State& s, const UnitState& u) { return has(s, u, "submarine"); }
 bool plane(const State& s, const UnitState& u) { return has(s, u, "aircraft"); }
 bool fighter(const State& s, const UnitState& u) { return has(s, u, "fighter"); }
 bool transport(const State& s, const UnitState& u) { return has(s, u, "naval_transport"); }
-bool tech(const State& s, const Id& owner, const Id& t) {
+bool tech(const State& s, NationId owner, const Id& t) {
     const auto it = s.nations.at(owner).technologyStages.find(t);
     return it != s.nations.at(owner).technologyStages.end() && it->second == 4;
 }
@@ -53,14 +53,14 @@ std::vector<Id> readIds(const V& v) {
 bool listed(const A& list, const Id& id) {
     return std::any_of(list.begin(), list.end(), [&](const V& v) { return v.asString() == id; });
 }
-Action action(const State& s, const Id& nation, const Id& kind, O parameters = {}) {
-    Action a; a.kind = kind; a.nation = nation; a.player = politicalPlayer(s, nation);
+Action action(const State& s, NationId nation, const Id& kind, O parameters = {}) {
+    Action a; a.kind = kind; a.nation = nationName(s, nation); a.player = politicalPlayer(s, nation);
     a.parameters = V(std::move(parameters)); a.id = kind + ":" + contentDigest(canonicalJson(a.parameters)); return a;
 }
-void decision(State& s, BattleState& b, const Id& nation, const Id& kind, std::vector<Action> options) {
+void decision(State& s, BattleState& b, NationId nation, const Id& kind, std::vector<Action> options) {
     require(!options.empty(), "Empty naval decision");
     Decision d; d.id = b.id + "_decision_" + std::to_string(++s.flags["naval_decision_sequence"]);
-    d.nation = nation; d.kind = kind; d.reaction = nation != s.currentNation(); d.continuation = b.id;
+    d.nation = nationName(s, nation); d.kind = kind; d.reaction = nation != s.currentNation(); d.continuation = b.id;
     for (auto& a : options) a.decision = d.id;
     d.options = std::move(options); s.decisions.push_back(std::move(d));
 }
@@ -162,7 +162,7 @@ void takeHit(State& s, BattleState& b, const Id& id, bool immediate) {
 void roll(State& s, BattleState& b, const Id& purpose, int count) {
     require(!s.chance && count > 0, "Invalid naval roll");
     ChanceRequest c; c.id = b.id + "_roll_" + std::to_string(++s.flags["naval_roll_sequence"]);
-    c.purpose = purpose; c.nation = b.attacker; c.continuation = b.id;
+    c.purpose = purpose; c.nation = nationName(s, b.attacker); c.continuation = b.id;
     for (int i = 0; i < count; ++i) c.dice.push_back(DieSpec{});
     s.chance = std::move(c);
 }
@@ -229,7 +229,7 @@ void shoot(State& s, BattleState& b, const Id& stage) {
             }
             A classes; for (const auto& c : targetClasses) classes.emplace_back(c);
             for (int n = 0; n < dice; ++n)
-                shots.emplace_back(O{{"unit", V(id)}, {"nation", V(u.owner)}, {"victim_attacker", V(!attacking)},
+                shots.emplace_back(O{{"unit", V(id)}, {"nation", V(nationName(s, u.owner))}, {"victim_attacker", V(!attacking)},
                                      {"threshold", num(*threshold)}, {"target", num(target)},
                                      {"target_classes", V(classes)}, {"eligible", V(ids(eligible))},
                                      {"air_priority", V(air)},
@@ -272,7 +272,7 @@ bool isTargeted(const State& s, const V& hit, const std::vector<Id>& eligible) {
             if (has(s, s.units.at(id), c.asString())) return true;
     return false;
 }
-Id casualtyOwner(const State& s, const BattleState& b, const V& hit, const std::vector<Id>& candidates) {
+NationId casualtyOwner(const State& s, const BattleState& b, const V& hit, const std::vector<Id>& candidates) {
     const auto primary = hit.require("victim_attacker").asBool() ? b.attacker : b.defender;
     for (const auto& id : candidates)
         if (politicalPlayer(s, s.units.at(id).owner) == politicalPlayer(s, primary)) return primary;
@@ -287,7 +287,7 @@ void chooseHit(State& s, BattleState& b) {
         if (candidates.empty()) { put(b, "naval_hit_index", num(++index)); continue; }
         const bool targeted = isTargeted(s, hit, candidates);
         const auto victim = casualtyOwner(s, b, hit, candidates);
-        Id chooser = targeted ? hit.require("nation").asString() : victim;
+        NationId chooser = targeted ? nationNumber(s, hit.require("nation").asString()) : victim;
         const auto proposal = string(b, "naval_casualty_proposal");
         if (!targeted && !proposal.empty()) {
             const auto consents = object(b, "naval_casualty_consents");
@@ -617,13 +617,13 @@ bool designatedRaider(const State& s, const Id& id) {
 bool hasRaider(const State& s, const std::vector<Id>& units) {
     return std::any_of(units.begin(), units.end(), [&](const Id& id) { return designatedRaider(s, id); });
 }
-bool joinsDeclaredBattle(const BattleState& existing, ZoneId zone, const Id& attacker, const Id& context) {
+bool joinsDeclaredBattle(const BattleState& existing, ZoneId zone, NationId attacker, const Id& context) {
     return marked(existing.flags, "naval_battle") && existing.stage == "naval_declared" && existing.zone == zone &&
            existing.attacker == attacker && string(existing, "context") == context;
 }
 } // namespace
 
-bool raiderWouldCombine(const State& s, ZoneId zone, const Id& attacker,
+bool raiderWouldCombine(const State& s, ZoneId zone, NationId attacker,
                         const std::vector<Id>& attackers, const Id& context) {
     if (attackers.size() > 1 && hasRaider(s, attackers)) return true;
     return std::any_of(s.battles.begin(), s.battles.end(), [&](const auto& entry) {
@@ -633,7 +633,7 @@ bool raiderWouldCombine(const State& s, ZoneId zone, const Id& attacker,
     });
 }
 
-Id registerNavalBattle(State& s, ZoneId zone, const Id& attacker,
+Id registerNavalBattle(State& s, ZoneId zone, NationId attacker,
                        const std::vector<Id>& attackers, const std::map<Id, ZoneId>& origins, const V& options) {
     require(isZone(s, zone) && s.nations.contains(attacker) && !attackers.empty(),
             "Invalid naval battle registration");
@@ -681,14 +681,14 @@ Id registerNavalBattle(State& s, ZoneId zone, const Id& attacker,
             s.units.at(id).zone == s.facilities.at(string(b, "facility")).zone;
         require(s.units.contains(id) && (s.units.at(id).zone == zone || inPort) && hostile(s, attacker, s.units.at(id).owner),
                 "Invalid naval defender");
-        if (b.defender.empty()) b.defender = s.units.at(id).owner;
+        if (!b.defender.valid()) b.defender = s.units.at(id).owner;
     }
     if (evacuation)
         for (const auto& id : b.attackers)
             require(std::all_of(b.defenders.begin(), b.defenders.end(), [&](const Id& defender) {
                 return hostile(s, s.units.at(id).owner, s.units.at(defender).owner);
             }), "Port evacuation attacker is not hostile to the evacuating fleet");
-    if (b.defender.empty()) b.defender = attacker;
+    if (!b.defender.valid()) b.defender = attacker;
     put(b, "origins", V(originData)); put(b, "naval_entry_origins", V(entries)); put(b, "round", num(1));
     const auto id = b.id; s.battleOrder.push_back(id); s.battles.emplace(id, std::move(b));
     if (s.clock.phase != Phase::Combat && immediateBattle(s.battles.at(id)))
@@ -701,11 +701,11 @@ void beginNavalBattle(State& s, const Id& id) {
             "Naval battle cannot begin now");
     const ZoneId targetZone = string(b, "context") == "port_attack" && b.data.find("facility") &&
         s.facilities.contains(string(b, "facility")) ? s.facilities.at(string(b, "facility")).zone : b.zone;
-    if (b.attacker == "japan" && marked(s.nations.at("japan").turnFlags, "surprise_attack_zone:" + zoneName(s, targetZone)) &&
-        !marked(s.nations.at("japan").turnFlags, "surprise_attack_used")) {
+    if (b.attacker == knownNations(s).japan && marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_zone:" + zoneName(s, targetZone)) &&
+        !marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_used")) {
         b.flags["japanese_surprise_attack"] = 1;
-        s.nations.at("japan").turnFlags["surprise_attack_used"] = 1;
-        if (string(b, "context") != "port_attack") s.nations.at("japan").turnFlags["surprise_attack_naval_sea:" + zoneName(s, b.zone)] = 1;
+        s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_used"] = 1;
+        if (string(b, "context") != "port_attack") s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_naval_sea:" + zoneName(s, b.zone)] = 1;
     }
     b.stage = "naval_patrol_choices"; advance(s, b);
 }
@@ -764,14 +764,14 @@ bool applyNavalCombatAction(State& s, const Action& a) {
         release(s, a); put(b, "naval_discovering_raider", a.parameters.require("unit")); roll(s, b, "naval_raider_discovery", 2); return true;
     }
     if (a.kind == "naval_casualty_accept") {
-        release(s, a); auto consents = object(b, "naval_casualty_consents"); consents[politicalPlayer(s, a.nation)] = V(true);
+        release(s, a); auto consents = object(b, "naval_casualty_consents"); consents[politicalPlayer(s, nationNumber(s, a.nation))] = V(true);
         put(b, "naval_casualty_consents", V(consents)); chooseHit(s, b); return true;
     }
     if (a.kind == "naval_casualty_dispute") {
         release(s, a); put(b, "naval_casualty_proposal", V(std::string{}));
-        std::map<Id, Id> nations; const auto hit = array(b, "naval_hits").at(static_cast<std::size_t>(integer(b, "naval_hit_index")));
+        std::map<Id, NationId> nations; const auto hit = array(b, "naval_hits").at(static_cast<std::size_t>(integer(b, "naval_hit_index")));
         for (const auto& id : eligibleHit(s, b, hit)) nations[politicalPlayer(s, s.units.at(id).owner)] = s.units.at(id).owner;
-        A list; for (const auto& [player, nation] : nations) list.emplace_back(nation);
+        A list; for (const auto& [player, nation] : nations) list.emplace_back(nationName(s, nation));
         put(b, "naval_disputing_nations", V(list)); roll(s, b, "naval_casualty_dispute", static_cast<int>(list.size())); return true;
     }
     if (a.kind == "naval_patrol_engage" || a.kind == "naval_patrol_decline") {
@@ -858,7 +858,7 @@ bool applyNavalCombatChance(State& s, const ChanceRequest& request, const Chance
         const int top = *std::max_element(results.begin(), results.end()); A tied;
         for (std::size_t i = 0; i < results.size(); ++i) if (results[i] == top) tied.push_back(nations[i]);
         if (tied.size() > 1) { put(b, "naval_disputing_nations", V(tied)); roll(s, b, "naval_casualty_dispute", static_cast<int>(tied.size())); return true; }
-        const auto chooser = tied.front().asString();
+        const auto chooser = nationNumber(s, tied.front().asString());
         const auto hit = array(b, "naval_hits").at(static_cast<std::size_t>(integer(b, "naval_hit_index")));
         std::vector<Action> options; for (const auto& unit : eligibleHit(s, b, hit))
             options.push_back(action(s, chooser, "naval_take_casualty", {{"battle", V(b.id)}, {"unit", V(unit)}, {"targeted", V(false)}}));
@@ -869,7 +869,7 @@ bool applyNavalCombatChance(State& s, const ChanceRequest& request, const Chance
         A hits; auto eligible = living(s, b, true);
         eligible.erase(std::remove_if(eligible.begin(), eligible.end(), [&](const Id& id) { return !plane(s, s.units.at(id)); }), eligible.end());
         for (const auto result : results) if (result <= 3)
-            hits.emplace_back(O{{"victim_attacker", V(true)}, {"nation", V(b.defender)}, {"targeted", V(false)},
+            hits.emplace_back(O{{"victim_attacker", V(true)}, {"nation", V(nationName(s, b.defender))}, {"targeted", V(false)},
                                 {"target_classes", V(A{})}, {"eligible", V(ids(eligible))}, {"air_priority", V(false)}});
         put(b, "naval_hits", V(hits)); put(b, "naval_hit_index", num(0)); put(b, "naval_after_roll", V(std::string("naval_round_end")));
         put(b, "naval_immediate_hits", V(true)); b.stage = "naval_choose_hits"; chooseHit(s, b); return true;

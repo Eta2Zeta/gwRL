@@ -15,7 +15,7 @@ State initial(){static const auto s=loadScenario(std::filesystem::path(GWRL_SOUR
 void authoritativeInitialStateAndDomainDiagnostics() {
     auto s=initial();requireCampaignInvariants(s);
     check(s.units.size()==99,"Initial campaign piece count changed");
-    auto broken=s.clone();broken.nations.at("japan").atWarWith.insert("kmt");
+    auto broken=s.clone();broken.nations.at(nationNumber(broken, "japan")).atWarWith.insert(nationNumber(broken, "kmt"));
     const auto warFailures=campaignInvariantFailures(broken);
     check(std::find(warFailures.begin(),warFailures.end(),"asymmetric war: japan / kmt")!=warFailures.end(),"Asymmetric war escaped domain audit");
     broken=s.clone();
@@ -34,13 +34,13 @@ void authoritativeInitialStateAndDomainDiagnostics() {
     const auto aircraftFailures=campaignInvariantFailures(broken);
     check(std::find(aircraftFailures.begin(),aircraftFailures.end(),"non-transport aircraft carries cargo: "+fighter.id)!=aircraftFailures.end(),"Fighter carrying land cargo escaped audit");
     broken=s.clone();const Id factory="setup_japan_tokyo_major_factory";
-    broken.nations.at("japan").turnFlags["economy_production_cap:"+factory]=5;
-    broken.nations.at("japan").turnFlags["economy_used:"+factory]=6;
+    broken.nations.at(nationNumber(broken, "japan")).turnFlags["economy_production_cap:"+factory]=5;
+    broken.nations.at(nationNumber(broken, "japan")).turnFlags["economy_used:"+factory]=6;
     const auto capacityFailures=campaignInvariantFailures(broken);
     check(std::find(capacityFailures.begin(),capacityFailures.end(),"facility capacity exceeded: "+factory)!=capacityFailures.end(),"Excess facility use escaped audit");
     const auto started=Engine::start(initial(),campaignRules(),1936).state().clone();
-    check(started.nations.at("japan").incomeKnown&&campaignInvariantFailures(started).empty(),"A new campaign's first position has no evaluated income");
-    broken=started.clone();broken.territories.at(zoneNumber(broken, "land_china_nanking")).possessor="japan";
+    check(started.nations.at(nationNumber(started, "japan")).incomeKnown&&campaignInvariantFailures(started).empty(),"A new campaign's first position has no evaluated income");
+    broken=started.clone();broken.territories.at(zoneNumber(broken, "land_china_nanking")).possessor=nationNumber(broken, "japan");
     const auto incomeFailures=campaignInvariantFailures(broken);
     check(std::find(incomeFailures.begin(),incomeFailures.end(),"stale income: japan")!=incomeFailures.end()&&
           std::find(incomeFailures.begin(),incomeFailures.end(),"stale income: kmt")!=incomeFailures.end(),"A stored income that no longer matches the land held escaped audit");
@@ -57,20 +57,20 @@ void transitionAuditAndExactReplay() {
     const auto report=log.report(e);check(report.require("transitions").asArray().size()==5,"Audit lost an input transition");
     const auto replay=Engine::replay(s.definition,rules,checkpoint,e.state().history);
     check(replay.exactReplayIdentity()==e.exactReplayIdentity(),"Recorded first national turn does not replay");
-    check(e.state().completedTurns.at("ccp")==1,"Five legal phases failed to finish first national turn");
+    check(e.state().completedTurns.at(nationNumber(e.state(), "ccp"))==1,"Five legal phases failed to finish first national turn");
 }
 void carpetBombingParticipatesOnceAndCannotBeHitByInfantry() {
     // Conditional capability fixture, not a fabricated continuation of the
     // July1936 setup: explicit units/technology isolate RB10.6.5 at the engine.
     auto s=initial();s.units.clear();s.facilities.clear();s.construction.clear();s.repairs.clear();
     s.clock.nationIndex=2;s.clock.playerTurnSerial=2;s.clock.phase=Phase::CombatMovement;
-    s.completedTurns["ccp"]=s.completedTurns["mongolia"]=1;
-    s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");
+    s.completedTurns[nationNumber(s, "ccp")]=s.completedTurns[nationNumber(s, "mongolia")]=1;
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
     const Id origin="land_china_beiping",target="land_china_hopeh";
-    s.territories.at(zoneNumber(s, origin)).possessor="japan";s.territories.at(zoneNumber(s, target)).possessor="kmt";
+    s.territories.at(zoneNumber(s, origin)).possessor=nationNumber(s, "japan");s.territories.at(zoneNumber(s, target)).possessor=nationNumber(s, "kmt");
     auto add=[&](const Id&id,const Id&type,const Id&owner,const Id&zone){
-        UnitState u;u.id=id;u.type=type;u.owner=owner;u.zone=u.turnOrigin = zoneNumber(s, zone);
-        u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(type,0,catalogContext(s,owner,zoneNumber(s, zone))).movement;s.units[id]=u;
+        UnitState u;u.id=id;u.type=type;u.owner=nationNumber(s, owner);u.zone=u.turnOrigin = zoneNumber(s, zone);
+        u.movementAllowance=u.movementRemaining=s.definition->catalog->stats(type,0,catalogContext(s,nationNumber(s, owner),zoneNumber(s, zone))).movement;s.units[id]=u;
     };
     add("carpet_bomber","heavy_strategic_bomber","japan",origin);
     add("ordinary_aircraft","tactical_bomber","japan",origin);
@@ -79,7 +79,7 @@ void carpetBombingParticipatesOnceAndCannotBeHitByInfantry() {
     auto rules=campaignRules();
     const auto beforeTechnology=AirRules{}.actions(s);
     check(std::none_of(beforeTechnology.begin(),beforeTechnology.end(),[](const auto&a){return a.kind=="air_ground_attack"&&a.parameters.require("unit").asString()=="carpet_bomber";}),"Carpet bombing became available without Heavy Strategic Bombers technology");
-    s.nations.at("japan").technologyStages["heavy_strategic_bombers"]=4;
+    s.nations.at(nationNumber(s, "japan")).technologyStages["heavy_strategic_bombers"]=4;
     Engine e(s,rules,68);e.setDiceTapeForTesting({12,12,12,12,12,12,12,12,1,12,12,12,12,12});
     const auto checkpoint=e.serialize();CampaignAuditLog log(e);
     auto choose=[&](const Id&kind,const Id&unit=Id{}){
@@ -118,7 +118,7 @@ void carpetBombingParticipatesOnceAndCannotBeHitByInfantry() {
     chance();chance();choose("land_retreat_begin");choose("land_retreat_unit","attacker_b");
     choose("air_land","ordinary_aircraft");
     for(int count=0;count<3&&!e.state().battles.empty();++count)choose("land_progress_battle");
-    check(e.state().battles.empty()&&e.state().units.at("carpet_bomber").zone==zoneNumber(e.state(), origin)&&e.state().territories.at(zoneNumber(e.state(), target)).possessor=="kmt","Conditional carpet combat did not return the bomber and preserve uncaptured land");
+    check(e.state().battles.empty()&&e.state().units.at("carpet_bomber").zone==zoneNumber(e.state(), origin)&&isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), target)).possessor, "kmt"),"Conditional carpet combat did not return the bomber and preserve uncaptured land");
     const auto replay=Engine::replay(s.definition,rules,checkpoint,e.state().history);
     check(replay.exactReplayIdentity()==e.exactReplayIdentity(),"Carpet bombing combined-engine trace replay diverged");
 }
@@ -156,7 +156,7 @@ void randomLegalChoicesPreserveDomainAndReplay() {
         check(replay.exactReplayIdentity()==e.exactReplayIdentity(),"Random legal action/chance/interrupt trace replay diverged");
     }
 }
-std::map<Id,std::map<Id,int>> storedIncomes(const State&s){std::map<Id,std::map<Id,int>> out;for(const auto&[id,n]:s.nations)out[id]=n.incomeComponents;return out;}
+std::map<Id,std::map<Id,int>> storedIncomes(const State&s){std::map<Id,std::map<Id,int>> out;for(const auto&[id,n]:s.nations)out[nationName(s,id)]=n.incomeComponents;return out;}
 void storedIncomeFollowsLandThatChangesHands() {
     // Land changes hands in battles, political events and surrenders, which the
     // economy module never handles. After any move, in either interface, each

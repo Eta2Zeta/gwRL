@@ -33,7 +33,7 @@ void turn(State& s, const Id& nation, Phase phase) {
     s.clock.phase = phase;
     s.clock.incomeCollected = false;
     for (std::size_t i = 0; i < order.size(); ++i)
-        s.completedTurns[order[i]] = i < static_cast<std::size_t>(s.clock.nationIndex) ? 1 : 0;
+        s.completedTurns[nationNumber(s, order[i])] = i < static_cast<std::size_t>(s.clock.nationIndex) ? 1 : 0;
     s.captureTurnStart();
     MovementRules{}.beginTurn(s);
     beginEconomyTurn(s);
@@ -49,9 +49,9 @@ State fixture(const Id& nation = "japan", Phase phase = Phase::Production, bool 
 }
 void add(State& s, const Id& id, const Id& type, const Id& owner, const Id& zone) {
     UnitState u;
-    u.id = id; u.type = type; u.owner = owner; u.zone = u.turnOrigin = zoneNumber(s, zone);
+    u.id = id; u.type = type; u.owner = nationNumber(s, owner); u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, 0, catalogContext(s, owner, zoneNumber(s, zone))).movement;
+        s.definition->catalog->stats(type, 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone))).movement;
     s.units.emplace(id, std::move(u));
 }
 Action pick(const Engine& e, const Id& kind,
@@ -156,12 +156,12 @@ void stagedShipsScoreOnlyPaidInstallments() {
     near(cruiser.total(), ready.total(), "Ship completion manufactured wealth");
     const auto serial = e.state().clock.playerTurnSerial;
     for (int i = 0; i < 30; ++i) {
-        if (e.state().currentNation() == "japan" && e.state().clock.phase == Phase::Production &&
+        if (e.state().currentNationName() == "japan" && e.state().clock.phase == Phase::Production &&
             e.state().clock.playerTurnSerial > serial) break;
         research(e);
         choose(e, "end_phase");
     }
-    check(e.state().currentNation() == "japan" && e.state().clock.phase == Phase::Production,
+    check(e.state().currentNationName() == "japan" && e.state().clock.phase == Phase::Production,
           "Did not advance through real intervening national turns");
     research(e);
     const auto lastPayment = allianceWealth(e.state())[0];
@@ -183,13 +183,13 @@ void stagedShipsScoreOnlyPaidInstallments() {
 
 void bombingAndPaidRepairCannotCreateValue() {
     auto s = fixture("japan", Phase::CombatMovement, true);
-    s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
-    s.territories.at(zoneNumber(s, hopeh)).possessor = "kmt";
-    s.nations.at("japan").atWarWith.insert("kmt");
-    s.nations.at("kmt").atWarWith.insert("japan");
-    s.nations.at("kmt").powerStatus = "major";
-    s.politics.capitals["kmt"] = zoneNumber(s, "land_china_nanking");
-    s.politics.evolutionAwarded.insert("kmt");
+    s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "japan");
+    s.territories.at(zoneNumber(s, hopeh)).possessor = nationNumber(s, "kmt");
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+    s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
+    s.nations.at(nationNumber(s, "kmt")).powerStatus = "major";
+    s.politics.capitals[nationNumber(s, "kmt")] = zoneNumber(s, "land_china_nanking");
+    s.politics.evolutionAwarded.insert(nationNumber(s, "kmt"));
     s.facilities["target_factory"] = {"target_factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
     add(s, "bomber", "medium_bomber", "japan", beiping);
     s.captureTurnStart();
@@ -231,7 +231,7 @@ void bombingAndPaidRepairCannotCreateValue() {
     check(repaired.serialize() == exact, "Rejected duplicate repair changed state");
     placementPhase(repaired);
     const auto beforeFinish = allianceWealth(repaired.state())[1];
-    const auto income = evaluateIncome(repaired.state(), "kmt").total;
+    const auto income = evaluateIncome(repaired.state(), nationNumber(repairState, "kmt")).total;
     choose(repaired, "end_phase");
     check(repaired.state().facilities.at("target_factory").damage == 0 && repaired.state().repairs.empty(),
           "Placement did not consume the paid repair");
@@ -244,10 +244,10 @@ void bombingAndPaidRepairCannotCreateValue() {
 
 void conquestTransfersAssetsAndDoesNotRewardDeclarations() {
     auto s = fixture("japan", Phase::CombatMovement, true);
-    s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
-    s.territories.at(zoneNumber(s, hopeh)).possessor = "kmt";
-    s.nations.at("japan").atWarWith.insert("kmt");
-    s.nations.at("kmt").atWarWith.insert("japan");
+    s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "japan");
+    s.territories.at(zoneNumber(s, hopeh)).possessor = nationNumber(s, "kmt");
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+    s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
     s.facilities["captured_factory"] = {"captured_factory", "minor_factory", zoneNumber(s, hopeh), 0, {}};
     add(s, "attacker", "infantry", "japan", beiping);
     s.captureTurnStart();
@@ -265,7 +265,7 @@ void conquestTransfersAssetsAndDoesNotRewardDeclarations() {
     near(allianceWealth(e.state())[1].infrastructure, facilityValue, "Moving before combat stole the defender's factory");
     choose(e, "end_phase");
     choose(e, "land_begin_battle");
-    for (int i = 0; i < 20 && e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor != "japan"; ++i) {
+    for (int i = 0; i < 20 && !isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "japan"); ++i) {
         if (e.state().chance) e.resolveChance();
         else if (offers(e, "politics_keep_capture")) choose(e, "politics_keep_capture");
         else if (offers(e, "land_progress_battle")) choose(e, "land_progress_battle");
@@ -275,7 +275,7 @@ void conquestTransfersAssetsAndDoesNotRewardDeclarations() {
             throw std::runtime_error("Uncontested capture did not finish; offered " + kinds);
         }
     }
-    check(e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor == "japan", "Undefended enemy land was not captured");
+    check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "japan"), "Undefended enemy land was not captured");
     const auto captured = allianceWealth(e.state());
     near(captured[0].infrastructure, before[0].infrastructure + facilityValue, "Captured factory was not credited to its possessor");
     near(captured[1].infrastructure, 0, "Former owner retained captured infrastructure value");
@@ -313,8 +313,8 @@ void recruitmentAndAlignmentAreOnceOnlyRealAssets() {
     e.step(influence);
     e.resolveChance();
     const auto aligned = allianceWealth(e.state())[2];
-    check(e.state().units.at("clique_infantry").owner == "ccp" &&
-          e.state().units.at("clique_militia").owner == "ccp", "Whole-warlord military assets did not transfer");
+    check(e.state().units.at("clique_infantry").owner == nationNumber(e.state(), "ccp") &&
+          e.state().units.at("clique_militia").owner == nationNumber(e.state(), "ccp"), "Whole-warlord military assets did not transfer");
     near(aligned.units, recruited.units + 5, "Neutral warlord assets were omitted or already credited before alignment");
     near(aligned.incomeRate, recruited.incomeRate + 3, "Whole-warlord possession did not update tracked income once");
     near(aligned.treasury, recruited.treasury, "Zero-spend influence minted a treasury");

@@ -7,9 +7,9 @@ namespace game::campaign {
 
 // Movement supplies the final approach zone independently for every contingent.
 // Registration does not resolve combat or roll dice, including empty attacks.
-Id registerLandBattle(State &, ZoneId zone, const Id &attacker, const std::vector<Id> &units,
+Id registerLandBattle(State &, ZoneId zone, NationId attacker, const std::vector<Id> &units,
                       const std::map<Id, ZoneId> &origins);
-Id registerAttritionBattle(State &, ZoneId zone, const Id &attacker, const std::vector<Id> &units);
+Id registerAttritionBattle(State &, ZoneId zone, NationId attacker, const std::vector<Id> &units);
 void beginLandBattle(State &, const Id &battle);
 
 struct LandCombatStats {
@@ -21,7 +21,7 @@ struct LandCombatStats {
 };
 LandCombatStats landCombatStats(const State &, const BattleState &, const Id &unit, bool attacking,
                                 int round);
-bool citySurrounded(const State &, ZoneId zone, const Id &defender);
+bool citySurrounded(const State &, ZoneId zone, NationId defender);
 std::set<ZoneId> landRetreatOrigins(const State &, const BattleState &);
 std::vector<Id> blitzEligible(const State &, const BattleState &);
 // The combat menu's "progress battle" actions that clear finished land battles.

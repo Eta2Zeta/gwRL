@@ -35,11 +35,11 @@ State fixture(Phase phase = Phase::CombatMovement) {
   s.clock.nationIndex = 2;
   s.clock.playerTurnSerial = 2;
   s.clock.phase = phase;
-  s.completedTurns["ccp"] = s.completedTurns["mongolia"] = 1;
-  s.nations.at("japan").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("japan");
-  s.territories.at(zoneNumber(s, shantung)).possessor = "kmt";
-  s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
+  s.completedTurns[nationNumber(s, "ccp")] = s.completedTurns[nationNumber(s, "mongolia")] = 1;
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
+  s.territories.at(zoneNumber(s, shantung)).possessor = nationNumber(s, "kmt");
+  s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "japan");
   s.captureTurnStart();
   return s;
 }
@@ -48,10 +48,10 @@ void add(State &s, const Id &id, const Id &type, const Id &owner,
   UnitState u;
   u.id = id;
   u.type = type;
-  u.owner = owner;
+  u.owner = nationNumber(s, owner);
   u.zone = u.turnOrigin = zoneNumber(s, zone);
   u.movementAllowance = u.movementRemaining =
-      s.definition->catalog->stats(type, 0, catalogContext(s, owner, zoneNumber(s, zone)))
+      s.definition->catalog->stats(type, 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone)))
           .movement;
   s.units.emplace(id, std::move(u));
 }
@@ -129,7 +129,7 @@ void uncontestedAssaultAndReplay() {
   choose(e, "end_phase");
   choose(e, "naval_begin_assault");
   finishBattles(e);
-  check(e.state().territories.at(zoneNumber(e.state(), shantung)).possessor == "japan" &&
+  check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), shantung)).possessor, "japan") &&
             e.state().units.at("infantry").zone == zoneNumber(e.state(), shantung) &&
             !e.state().units.at("infantry").carriedBy,
         "Uncontested assault did not land and capture");
@@ -144,8 +144,8 @@ void unevolvedChinaLandsOnlyInChina() {
   // Country, so from P14 it may land on Japanese-held Beiping but not Korea.
   auto s = fixture();
   s.clock.nationIndex = 3;
-  s.completedTurns["japan"] = 1;
-  s.territories.at(zoneNumber(s, "land_korea")).possessor = "japan";
+  s.completedTurns[nationNumber(s, "japan")] = 1;
+  s.territories.at(zoneNumber(s, "land_korea")).possessor = nationNumber(s, "japan");
   s.captureTurnStart();
   add(s, "t", "naval_transport", "kmt", p14);
   add(s, "i", "infantry", "kmt", p14);
@@ -161,7 +161,7 @@ void unevolvedChinaLandsOnlyInChina() {
   const auto minor = targets(s);
   check(minor.contains(beiping) && !minor.contains("land_korea"),
         "Unevolved KMT could land outside Chinese Home Country");
-  s.nations.at("kmt").powerStatus = "major";
+  s.nations.at(nationNumber(s, "kmt")).powerStatus = "major";
   check(targets(s).contains("land_korea"), "Evolved KMT could not land on Korea");
 }
 void seaMustBeClearedBeforeAssault() {
@@ -268,16 +268,16 @@ void capturedShipRollPreservesDamage() {
   s.units.at("bb").gameFlags["skeleton_crew"] = 1;
   s.units.at("bb").gameFlags["skeleton_crew_until_own_turn"] = 1;
   s.facilities["port"] = {"port", "major_port", zoneNumber(s, beiping), 0, {}};
-  resolveCapturedPorts(s, zoneNumber(s, beiping), "japan");
+  resolveCapturedPorts(s, zoneNumber(s, beiping), nationNumber(s, "japan"));
   Engine e(s, rules());
   e.setDiceTapeForTesting({10});
   choose(e, "naval_roll_capture");
   e.resolveChance();
-  check(e.state().units.at("bb").owner == "japan" &&
+  check(e.state().units.at("bb").owner == nationNumber(e.state(), "japan") &&
             e.state().units.at("bb").damage == 1,
         "Capture failed to preserve damaged ship state");
   check(e.state().units.at("bb").gameFlags.at("skeleton_crew_until_own_turn") ==
-            navalCompletedTurns(e.state(), "japan") + 2,
+            navalCompletedTurns(e.state(), nationNumber(s, "japan")) + 2,
         "Captured skeleton crew did not retain the next full own-turn lock");
   auto loss = s.clone();
   Engine scuttle(loss, rules());
@@ -328,7 +328,7 @@ void temporaryCrewAndSkeletonRestriction() {
   s.units.at("cruiser").gameFlags["in_port:port"] = 1;
   s.facilities["port"] = {"port", "major_port", zoneNumber(s, shantung), 0, {}};
   add(s, "attacker", "infantry", "japan", shantung);
-  const auto b = registerLandBattle(s, zoneNumber(s, shantung), "japan", {"attacker"},
+  const auto b = registerLandBattle(s, zoneNumber(s, shantung), nationNumber(s, "japan"), {"attacker"},
                                     {{"attacker", zoneNumber(s, beiping)}});
   preparePortLandDefence(s, b);
   int crews = 0;
@@ -350,8 +350,8 @@ void amphibiousDoubleCasualtiesAndExemptions() {
     for (const auto &id : {Id("first"), Id("second")})
       s.units.at(id).commitments.insert("amphibious_assault");
     if (mode == "doctrine")
-      s.nations.at("japan").technologyStages["amphibious_doctrine"] = 4;
-    registerLandBattle(s, zoneNumber(s, shantung), "japan", {"first", "second"},
+      s.nations.at(nationNumber(s, "japan")).technologyStages["amphibious_doctrine"] = 4;
+    registerLandBattle(s, zoneNumber(s, shantung), nationNumber(s, "japan"), {"first", "second"},
                        {{"first", zoneNumber(s, p14)}, {"second", zoneNumber(s, p14)}});
     Engine e(s, rules());
     e.setDiceTapeForTesting({12, 12, 1});
@@ -426,8 +426,8 @@ void thirdPartyEvacuationUsesFleetRolesAndPreservesBombing() {
   attachCargo(s, "enemy_transport", "enemy_cargo");
   s.facilities["port"] = {
       "port", "major_port", zoneNumber(s, shantung), 0, {{"border:" + p14, 1}}};
-  s.nations.at("ccp").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("ccp");
+  s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "ccp"));
   Engine e(s, rules());
   // Bombing damage, two shots from the outside destroyers, the evacuating
   // cruisers' return fire, round two, the last unopposed transport, then AA.
@@ -457,7 +457,7 @@ void thirdPartyEvacuationUsesFleetRolesAndPreservesBombing() {
         "Outside fleet did not make the first attacking volley together");
   const auto battle = e.state().chance->continuation;
   const auto &b = e.state().battles.at(battle);
-  check(b.attacker == "ccp" && b.defender == "kmt" && b.attackers.size() == 3 &&
+  check(b.attacker == nationNumber(e.state(), "ccp") && b.defender == nationNumber(e.state(), "kmt") && b.attackers.size() == 3 &&
             b.defenders.size() == 3 &&
             b.data.require("naval_entry_origins").asArray().empty(),
         "Third-party evacuation roles, full enemy fleet, or port origin wrong");
@@ -505,7 +505,7 @@ void thirdPartyEvacuationUsesFleetRolesAndPreservesBombing() {
         "Three completed escape choices restarted evacuation or lost bombing");
   choose(e, "air_resume_bombing");
   finishBattles(e);
-  check(e.state().currentNation() == "japan" &&
+  check(e.state().currentNationName() == "japan" &&
             canonicalJson(e.state().toJson(false).require("clock")) == clock &&
             e.state().completedTurns == completed,
         "Third-party combat advanced the active calendar or national turn");
@@ -521,8 +521,8 @@ void activeEnemyAttacksEvacuationAndSelectionMayStop() {
   }
   add(s, "active_enemy", "destroyer", "japan", p14);
   add(s, "neutral", "destroyer", "mongolia", p14);
-  s.nations.at("mongolia").atWarWith.erase("kmt");
-  s.nations.at("kmt").atWarWith.erase("mongolia");
+  s.nations.at(nationNumber(s, "mongolia")).atWarWith.erase(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.erase(nationNumber(s, "mongolia"));
   s.facilities["port"] = {
       "port", "major_port", zoneNumber(s, shantung), 1, {{"border:" + p14, 1}}};
   queueDamagedPortEvacuation(s, "port");
@@ -536,7 +536,7 @@ void activeEnemyAttacksEvacuationAndSelectionMayStop() {
   check(e.state().chance && e.state().chance->nation == "japan",
         "Active enemy did not become the attacking fleet");
   const auto &battle = e.state().battles.at(e.state().chance->continuation);
-  check(battle.attacker == "japan" && battle.defender == "kmt" &&
+  check(battle.attacker == nationNumber(e.state(), "japan") && battle.defender == nationNumber(e.state(), "kmt") &&
             battle.attackers == std::vector<Id>{"active_enemy"} &&
             battle.defenders == std::vector<Id>{"cruiser"},
         "Calendar nation or neutral ships corrupted evacuation participants");
@@ -656,8 +656,8 @@ void multinationalOutsideFleetUsesActualCasualtyPolicies() {
   s.units.at("cruiser").gameFlags["in_port:port"] = 1;
   add(s, "axis_ship", "destroyer", "japan", p14);
   add(s, "comintern_ship", "destroyer", "ccp", p14);
-  s.nations.at("ccp").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("ccp");
+  s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "ccp"));
   s.facilities["port"] = {
       "port", "major_port", zoneNumber(s, shantung), 1, {{"border:" + p14, 1}}};
   queueDamagedPortEvacuation(s, "port");
@@ -753,10 +753,10 @@ void mandatoryEvacuationDoesNotMergeOrdinaryNavalDeclarations() {
         {"port_evacuation", V(Id("port"))},
         {"defenders", V(V::Array{V(Id("evacuated"))})}});
     const auto first = registerNavalBattle(
-        s, zoneNumber(s, p14), "japan", {"outside"}, {},
+        s, zoneNumber(s, p14), nationNumber(s, "japan"), {"outside"}, {},
         evacuationFirst ? evacuation : ordinary);
     const auto second = registerNavalBattle(
-        s, zoneNumber(s, p14), "japan", {"outside"}, {},
+        s, zoneNumber(s, p14), nationNumber(s, "japan"), {"outside"}, {},
         evacuationFirst ? ordinary : evacuation);
     check(first != second && s.battles.size() == 2 &&
               s.battles.at(first).defenders.size() == 1 &&
@@ -768,15 +768,15 @@ void mandatoryEvacuationDoesNotMergeOrdinaryNavalDeclarations() {
 void separateEvacuationSeasResolveBeforeCalendarResumes() {
   auto s = fixture(Phase::NonCombatMovement);
   const Id p15 = "sea_p15";
-  s.territories.at(zoneNumber(s, tokyo)).possessor = "kmt";
+  s.territories.at(zoneNumber(s, tokyo)).possessor = nationNumber(s, "kmt");
   for (const auto &id : {Id("first"), Id("second")}) {
     add(s, id, "heavy_cruiser", "kmt", tokyo);
     s.units.at(id).gameFlags["in_port:port"] = 1;
   }
   add(s, "enemy_first", "destroyer", "ccp", p15);
   add(s, "enemy_second", "destroyer", "ccp", p16);
-  s.nations.at("ccp").atWarWith.insert("kmt");
-  s.nations.at("kmt").atWarWith.insert("ccp");
+  s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "kmt"));
+  s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "ccp"));
   s.facilities["port"] = {"port",
                           "major_port",
                           zoneNumber(s, tokyo),
@@ -816,8 +816,8 @@ void separateEvacuationSeasResolveBeforeCalendarResumes() {
 void sharedShoreCasualtiesNeedBothPolicies() {
   auto s = fixture();
   s.politics.chineseTruce = true;
-  s.nations.at("japan").atWarWith.insert("ccp");
-  s.nations.at("ccp").atWarWith.insert("japan");
+  s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "ccp"));
+  s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "japan"));
   add(s, "t", "naval_transport", "japan", p14);
   add(s, "i", "infantry", "japan", p14);
   add(s, "bb", "battleship", "japan", p14);
@@ -982,7 +982,7 @@ void japanToChinaVoyageAndLanding(const Id &variant) {
                 e.state().units.at("transport").movementRemaining == 0 &&
                 e.state().units.at("origin_enemy").zone == zoneNumber(e.state(), p16) &&
                 e.state().units.at("origin_enemy").damage == 0 &&
-                e.state().territories.at(zoneNumber(e.state(), shantung)).possessor == "kmt" &&
+                isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), shantung)).possessor, "kmt") &&
                 !offered(e, "naval_declare_assault"),
             "Lost screening failed to return continuing ships/cargo or allowed "
             "landing");
@@ -1023,7 +1023,7 @@ void japanToChinaVoyageAndLanding(const Id &variant) {
   e.resolveChance();
   choose(e, "naval_shore_casualty");
   finishBattles(e);
-  check(e.state().territories.at(zoneNumber(e.state(), shantung)).possessor == "japan" &&
+  check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), shantung)).possessor, "japan") &&
             e.state().units.at("marine").zone == zoneNumber(e.state(), shantung) &&
             e.state().units.at("reinforcement").zone == zoneNumber(e.state(), shantung) &&
             !e.state().units.at("marine").carriedBy &&
@@ -1032,7 +1032,7 @@ void japanToChinaVoyageAndLanding(const Id &variant) {
             e.state().facilities.find("coast") == e.state().facilities.end(),
         "Japan-to-China reinforcement/assault did not capture and unload "
         "exactly");
-  check(e.state().currentNation() == "japan" &&
+  check(e.state().currentNationName() == "japan" &&
             e.state().clock.phase == Phase::Combat &&
             e.state().clock.playerTurnSerial == 2,
         "Combined screening and amphibious trace changed the calendar");
@@ -1062,7 +1062,7 @@ void berthWaitsForMandatoryLandingAndWithdrawal() {
           "Finished landing failed to release end-of-movement berthing");
   }
   auto gift = fixture(Phase::NonCombatMovement);
-  gift.territories.at(zoneNumber(gift, honshu)).possessor = "ccp";
+  gift.territories.at(zoneNumber(gift, honshu)).possessor = nationNumber(gift, "ccp");
   add(gift, "transport", "naval_transport", "japan", p16);
   add(gift, "gift", "infantry", "japan", honshu);
   gift.units.at("gift").turnFlags["must_withdraw_from_chinese_gift"] = 1;
@@ -1079,7 +1079,7 @@ void berthWaitsForMandatoryLandingAndWithdrawal() {
 void adjacentLandAndAmphibiousAttacksResolveTogether() {
   auto s = fixture();
   const Id origin = "land_china_hopeh";
-  s.territories.at(zoneNumber(s, origin)).possessor = "japan";
+  s.territories.at(zoneNumber(s, origin)).possessor = nationNumber(s, "japan");
   add(s, "transport", "naval_transport", "japan", p14);
   add(s, "amphibious", "infantry", "japan", p14);
   add(s, "overland", "infantry", "japan", origin);
@@ -1114,7 +1114,7 @@ void adjacentLandAndAmphibiousAttacksResolveTogether() {
     for (auto &[id, b] : independent.battles)
       if (b.flags.contains("amphibious_preparation")) {
         if (otherNation)
-          b.attacker = "ccp";
+          b.attacker = nationNumber(independent, "ccp");
         else
           b.zone = zoneNumber(independent, beiping);
       }
@@ -1154,7 +1154,7 @@ void adjacentLandAndAmphibiousAttacksResolveTogether() {
             e.state().units.at("amphibious").zone == zoneNumber(e.state(), shantung),
         "Overland retreat moved the amphibious attackers with it");
   finishBattles(e);
-  check(e.state().territories.at(zoneNumber(e.state(), shantung)).possessor == "japan" &&
+  check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), shantung)).possessor, "japan") &&
             e.state().units.at("overland").zone == zoneNumber(e.state(), origin) &&
             e.state().units.at("amphibious").zone == zoneNumber(e.state(), shantung),
         "Remaining amphibious force failed to resolve its combined attack");
@@ -1396,7 +1396,7 @@ void unclearedAssaultsAreCalledOffAsCombatEnds() {
       }
       choose(e, "naval_begin_assault");
       finishBattles(e);
-      check(e.state().territories.at(zoneNumber(e.state(), shantung)).possessor == "japan" &&
+      check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), shantung)).possessor, "japan") &&
                 e.state().units.at("infantry2").zone == zoneNumber(e.state(), shantung) &&
                 (retreating == 0
                      ? e.state().units.at("infantry1").zone == zoneNumber(e.state(), shantung)
@@ -1411,7 +1411,7 @@ void unclearedAssaultsAreCalledOffAsCombatEnds() {
 void calledOffAssaultsDoNotHoldUpLandBattles() {
   auto s = fixture();
   const Id origin = "land_china_hopeh";
-  s.territories.at(zoneNumber(s, origin)).possessor = "japan";
+  s.territories.at(zoneNumber(s, origin)).possessor = nationNumber(s, "japan");
   add(s, "transport", "naval_transport", "japan", p14);
   add(s, "amphibious", "infantry", "japan", p14);
   add(s, "overland", "infantry", "japan", origin);

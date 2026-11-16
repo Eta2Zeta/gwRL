@@ -44,8 +44,8 @@ bool flag(const std::map<Id, int> &flags, const Id &key) {
 const V &node(const State &s, ZoneId zone) {
     return mapNode(s, zone);
 }
-bool home(const State &s, const Id &nation, ZoneId zone) {
-    return s.definition->factions.at(nation).homeZones.contains(zone);
+bool home(const State &s, NationId nation, ZoneId zone) {
+    return nationFaction(s, nation).homeZones.contains(zone);
 }
 bool city(const State &s, ZoneId zone) {
     const auto *v = node(s, zone).find("is_city");
@@ -77,18 +77,18 @@ Id unique(State &s, const Id &prefix) {
 Action action(const State &s, const Id &kind, O args = {}) {
     Action a;
     a.kind = kind;
-    a.nation = s.currentNation();
-    a.player = politicalPlayer(s, a.nation);
+    a.nation = s.currentNationName();
+    a.player = politicalPlayer(s, s.currentNation());
     a.parameters = V(std::move(args));
     a.id = kind + ":" + contentDigest(canonicalJson(a.parameters));
     return a;
 }
-void debit(State &s, const Id &nation, int amount) {
+void debit(State &s, NationId nation, int amount) {
     auto &cash = s.nations.at(nation).treasury;
     require(amount >= 0 && cash && *cash >= amount, "Insufficient IPP");
     *cash -= amount;
 }
-bool ownsHeld(const State &s, const Id &nation, ZoneId zone) {
+bool ownsHeld(const State &s, NationId nation, ZoneId zone) {
     return s.territories.contains(zone) && s.territories.at(zone).possessor == nation &&
            heldSinceTurnStart(s, nation, zone, false);
 }
@@ -132,17 +132,17 @@ const BuildChartRow *projectRow(const State &s, const BuildProject &p) {
         return &s.definition->catalog->row(*id);
     const auto &status = s.nations.at(p.owner).powerStatus;
     for (const auto &[id, r] : s.definition->catalog->rows())
-        if (r.nation == p.owner && r.powerStatus == status && r.type == p.type && r.kind == "purchase")
+        if (r.nation == nationName(s, p.owner) && r.powerStatus == status && r.type == p.type && r.kind == "purchase")
             return &r;
     return nullptr;
 }
 bool ready(const BuildProject &p) {
     return p.remainingPayments.empty() || flag(p.flags, "completed");
 }
-int slotsUsed(const State &s, const Id &nation, const Id &facility) {
+int slotsUsed(const State &s, NationId nation, const Id &facility) {
     return value(s.nations.at(nation).turnFlags, "economy_used:" + facility);
 }
-int capacity(const State &s, const Id &nation, const Id &facility, bool repair) {
+int capacity(const State &s, NationId nation, const Id &facility, bool repair) {
     const auto &f = s.facilities.at(facility);
     const auto owner = s.territories.at(f.zone).possessor;
     if (!owner || (!repair && *owner != nation))
@@ -171,7 +171,7 @@ int capacity(const State &s, const Id &nation, const Id &facility, bool repair) 
     }
     return std::max(0, std::min(snapshot, current) - slotsUsed(s, nation, facility));
 }
-int totalCapacity(const State &s, const Id &nation, bool ships, bool capitals = false) {
+int totalCapacity(const State &s, NationId nation, bool ships, bool capitals = false) {
     int sum = 0;
     for (const auto &[id, f] : s.facilities)
         if (ships ? (capitals ? f.type == "major_shipyard" : f.type.find("shipyard") != Id::npos)
@@ -179,7 +179,7 @@ int totalCapacity(const State &s, const Id &nation, bool ships, bool capitals = 
             sum += capacity(s, nation, id, false);
     return sum;
 }
-int queuedCapacity(const State &s, const Id &nation, bool ships, bool capitals = false) {
+int queuedCapacity(const State &s, NationId nation, bool ships, bool capitals = false) {
     int n = 0;
     for (const auto &[id, p] : s.construction)
         if (p.owner == nation && ready(p) && !facilityType(s, p.type) && !marker(p.flags, "target:") &&
@@ -196,7 +196,7 @@ int queuedCapacity(const State &s, const Id &nation, bool ships, bool capitals =
         }
     return n;
 }
-bool canFactoryBuy(const State &s, const Id &nation, const Id &type, bool completion) {
+bool canFactoryBuy(const State &s, NationId nation, const Id &type, bool completion) {
     if (facilityType(s, type) || type == "militia")
         return true;
     const auto &u = s.definition->catalog->unit(type);
@@ -212,7 +212,7 @@ bool canFactoryBuy(const State &s, const Id &nation, const Id &type, bool comple
     }
     return queuedCapacity(s, nation, false) < totalCapacity(s, nation, false);
 }
-int militiaAllowance(const State &s, const Id &nation, ZoneId zone) {
+int militiaAllowance(const State &s, NationId nation, ZoneId zone) {
     if (!ownsHeld(s, nation, zone))
         return 0;
     const int limit = std::max(1, effectiveTerritorialIpp(s, zone));
@@ -229,12 +229,14 @@ int militiaAllowance(const State &s, const Id &nation, ZoneId zone) {
 }
 bool siteLegal(const State &s, const BuildChartRow &r, ZoneId zone, std::optional<ZoneId> border = {},
                const std::optional<Id> &exclude = {}, bool foreignRequest = false) {
-    if (!ownsHeld(s, r.nation, zone))
+    // A build chart row names its nation; a nation the scenario lacks owns no site.
+    const auto rowNation = findNation(s, r.nation);
+    if (!rowNation || !ownsHeld(s, *rowNation, zone))
         return false;
     // Construction sites, flags and permissions name zones.
     const auto &site = zoneName(s, zone);
     const auto borderName = border ? std::optional<Id>(zoneName(s, *border)) : std::nullopt;
-    if (r.placement.contains("home_country") && !home(s, r.nation, zone))
+    if (r.placement.contains("home_country") && !home(s, *rowNation, zone))
         return false;
     if (r.placement.contains("coastal_border") &&
         (!border || s.territories.contains(*border) || !edge(s, zone, *border)))
@@ -282,11 +284,11 @@ bool siteLegal(const State &s, const BuildChartRow &r, ZoneId zone, std::optiona
         const auto owner = s.territories.at(*border).possessor;
         if (!owner)
             return false;
-        if (*owner != r.nation) {
-            if (s.nations.at(r.nation).atWarWith.contains(*owner) || !s.nations.at(*owner).player)
+        if (*owner != *rowNation) {
+            if (s.nations.at(*rowNation).atWarWith.contains(*owner) || !s.nations.at(*owner).player)
                 return false;
-            const auto permission = "rail_build_permission:" + *owner + ":" + site + ":" + *borderName;
-            if (!foreignRequest && value(s.nations.at(r.nation).turnFlags, permission) != serial(s))
+            const auto permission = "rail_build_permission:" + nationName(s, *owner) + ":" + site + ":" + *borderName;
+            if (!foreignRequest && value(s.nations.at(*rowNation).turnFlags, permission) != serial(s))
                 return false;
         }
         for (const auto &[id, rail] : s.rails)
@@ -312,13 +314,13 @@ bool upgradeFacilityLegal(const State &s, const BuildChartRow &row, const Facili
         if (!seas.empty())
             border = seas.front();
     }
-    return s.territories.at(f.zone).possessor == row.nation && row.upgradesFrom == f.type &&
+    return isNation(s, s.territories.at(f.zone).possessor, row.nation) && row.upgradesFrom == f.type &&
            !flag(f.flags, "moved_this_turn") && siteLegal(s, row, f.zone, border, f.id);
 }
 // RB 12.3 needs a Supply Path to the land zone the unit is in, so a unit aboard
 // a ship at sea, in no land zone, cannot be upgraded until it is ashore or in
 // port (RCL-021).
-bool upgradeUnitLegal(const State &s, const Id &nation, const BuildChartRow &row, const UnitState &u,
+bool upgradeUnitLegal(const State &s, NationId nation, const BuildChartRow &row, const UnitState &u,
                       const Id &type) {
     return u.owner == nation && row.upgradesFrom == u.type && !flag(u.turnFlags, "placed_this_turn") &&
            s.territories.contains(u.zone) && inSupply(s, nation, u.zone) && upgradeKeepsCargo(s, u, type) &&
@@ -369,10 +371,10 @@ std::vector<Action> placements(const State &s, const BuildProject &p) {
             !value(p.flags, "damage")) {
             const auto marked = marker(p.flags, "border:");
             const auto border = marked ? std::optional<ZoneId>(zoneNumber(s, *marked)) : std::nullopt;
-            std::optional<Id> foreign;
+            std::optional<NationId> foreign;
             if (border && s.territories.contains(*border))
                 foreign = s.territories.at(*border).possessor;
-            const bool approved = foreign && flag(p.flags, "foreign_consent:" + *foreign);
+            const bool approved = foreign && flag(p.flags, "foreign_consent:" + nationName(s, *foreign));
             if (!row || siteLegal(s, *row, *site, border, p.id, approved))
                 out.push_back(action(s, "economy_place", {{"project", V(p.id)}, {"zone", V(*p.site)}}));
             else if (row->type == "railroad" && foreign && *foreign != n &&
@@ -426,21 +428,21 @@ int effectiveTerritorialIpp(const State &s, ZoneId zone) {
     return std::max(0, node(s, zone).require("ipp_value").asInt() -
                            std::max(value(flags, "city_ipp_lost"), value(flags, "city_damage") / 20));
 }
-bool keepsAccount(const Id &nation) {
+bool keepsAccount(const Id& nation) {
     return nation == "japan" || nation == "kmt" || nation == "ccp";
 }
-bool incomePartPossible(const Id &nation, const Id &part) {
+bool incomePartPossible(const Id& nation, const Id &part) {
     if (part == "territorial")
         return keepsAccount(nation);
     return part == "china_control_bonus" && nation == "japan";
 }
-bool researchPossible(const Id &nation) {
+bool researchPossible(const Id& nation) {
     return canBeMajorPower(nation);
 }
-IncomeBreakdown evaluateIncome(const State &s, const Id &nation) {
+IncomeBreakdown evaluateIncome(const State &s, NationId nation) {
     IncomeBreakdown out;
     const auto &n = s.nations.at(nation);
-    const bool account = nation == "japan" || nation == "kmt" || nation == "ccp" || n.powerStatus == "major";
+    const bool account = nation == knownNations(s).japan || nation == knownNations(s).kmt || nation == knownNations(s).ccp || n.powerStatus == "major";
     if (!account || !n.treasury || s.politics.surrendered.contains(nation))
         return out;
     const auto cap = s.politics.capitals.find(nation);
@@ -451,7 +453,7 @@ IncomeBreakdown evaluateIncome(const State &s, const Id &nation) {
         if (t.possessor == nation)
             territorial += effectiveTerritorialIpp(s, zone);
     out.components["territorial"] = territorial;
-    if (nation == "japan") {
+    if (nation == knownNations(s).japan) {
         int bonus = 0;
         for (const auto *name : {"land_china_beiping", "land_china_hopeh", "land_china_shantung",
                                  "land_china_nanking", "land_china_hunan", "land_kwangtung"}) {
@@ -476,16 +478,16 @@ void refreshIncome(State &s) {
         n.incomeKnown = true;
     }
 }
-void reconcileCapturedFacilities(State &s, ZoneId zone, const std::optional<Id> &oldOwner,
-                                 const Id &newOwner) {
+void reconcileCapturedFacilities(State &s, ZoneId zone, std::optional<NationId> oldOwner,
+                                 NationId newOwner) {
     for (auto &[id, f] : s.facilities)
         if (f.zone == zone && factory(f.type)) {
             if (!marker(f.flags, "original_owner:"))
-                f.flags["original_owner:" + oldOwner.value_or(originalNation(s, zone))] = 1;
+                f.flags["original_owner:" + nationName(s, oldOwner.value_or(originalNation(s, zone)))] = 1;
             if (!marker(f.flags, "original_type:"))
                 f.flags["original_type:" + f.type] = 1;
             const auto originalType = *marker(f.flags, "original_type:");
-            if (marker(f.flags, "original_owner:") == newOwner) {
+            if (marker(f.flags, "original_owner:") == nationName(s, newOwner)) {
                 f.type = originalType;
                 f.flags.erase("captured_max_damage");
             } else if (originalType == "medium_factory" || originalType == "major_factory") {
@@ -495,7 +497,7 @@ void reconcileCapturedFacilities(State &s, ZoneId zone, const std::optional<Id> 
             }
         }
 }
-int facilityCapacity(const State &s, const Id &nation, const Id &facility, bool repair) {
+int facilityCapacity(const State &s, NationId nation, const Id &facility, bool repair) {
     return capacity(s, nation, facility, repair);
 }
 void beginEconomyTurn(State &s) {
@@ -739,7 +741,7 @@ bool applyEconomyAction(State &s, const Action &a) {
             const auto sender = payload.require("sender").asString();
             const auto zone = payload.require("parameters").require("zone").asString();
             const auto border = payload.require("parameters").require("border").asString();
-            s.nations.at(sender).turnFlags["rail_build_permission:" + a.nation + ":" + zone + ":" + border] =
+            s.nations.at(nationNumber(s, sender)).turnFlags["rail_build_permission:" + a.nation + ":" + zone + ":" + border] =
                 serial(s);
             if (const auto *project = payload.require("parameters").find("project"))
                 s.construction.at(project->asString()).flags["foreign_consent:" + a.nation] = 1;
@@ -748,7 +750,7 @@ bool applyEconomyAction(State &s, const Action &a) {
                 applyEconomyAction(s, original);
             }
         } else if (const auto *project = payload.require("parameters").find("project"))
-            s.nations.at(payload.require("sender").asString())
+            s.nations.at(nationNumber(s, payload.require("sender").asString()))
                 .turnFlags["rail_declined:" + project->asString()] = 1;
         return true;
     }
@@ -761,7 +763,8 @@ bool applyEconomyAction(State &s, const Action &a) {
                                V(O{{"sender", V(a.nation)}, {"parameters", a.parameters}}));
         return true;
     }
-    auto &n = s.nations.at(a.nation);
+    const auto actor = nationNumber(s, a.nation);
+    auto &n = s.nations.at(actor);
     const auto &catalog = *s.definition->catalog;
     if (a.kind == "economy_finish_research") {
         n.turnFlags["economy_research_finished"] = 1;
@@ -785,15 +788,15 @@ bool applyEconomyAction(State &s, const Action &a) {
     }
     if (a.kind == "economy_purchase") {
         const auto &r = catalog.row(a.parameters.require("row").asString());
-        const auto prices = catalog.priceOptions(r.id, catalogContext(s, a.nation));
+        const auto prices = catalog.priceOptions(r.id, catalogContext(s, actor));
         const auto method = a.parameters.require("price").asString();
         const auto price =
             std::find_if(prices.begin(), prices.end(), [&](const auto &x) { return x.method == method; });
         require(price != prices.end(), "Unknown price option");
-        debit(s, a.nation, price->payments.front());
+        debit(s, actor, price->payments.front());
         BuildProject p;
         p.id = unique(s, r.type);
-        p.owner = a.nation;
+        p.owner = actor;
         p.type = r.type;
         p.paidIpp = price->payments.front();
         p.remainingPayments.assign(price->payments.begin() + 1, price->payments.end());
@@ -810,8 +813,8 @@ bool applyEconomyAction(State &s, const Action &a) {
         if (r.type == "railroad")
             if (const auto border = marker(p.flags, "border:")) {
                 const auto owner = s.territories.at(zoneNumber(s, *border)).possessor;
-                if (owner && *owner != a.nation)
-                    p.flags["foreign_consent:" + *owner] = 1;
+                if (owner && *owner != actor)
+                    p.flags["foreign_consent:" + nationName(s, *owner)] = 1;
             }
         if (r.kind == "upgrade")
             p.flags[facilityType(s, r.type) ? "facility_upgrade" : "unit_upgrade"] = 1;
@@ -829,7 +832,7 @@ bool applyEconomyAction(State &s, const Action &a) {
     if (a.kind == "economy_advance") {
         auto &p = s.construction.at(a.parameters.require("project").asString());
         const int payment = p.remainingPayments.front();
-        debit(s, a.nation, payment);
+        debit(s, actor, payment);
         p.paidIpp += payment;
         p.remainingPayments.erase(p.remainingPayments.begin());
         p.queuePosition = std::max(1, static_cast<int>(p.remainingPayments.size()) + 1);
@@ -844,10 +847,10 @@ bool applyEconomyAction(State &s, const Action &a) {
         const int damage = a.parameters.require("damage").asInt();
         const bool ship = s.units.contains(target);
         if (!ship)
-            debit(s, a.nation, damage);
+            debit(s, actor, damage);
         RepairJob job;
         job.id = "repair_" + target;
-        job.owner = a.nation;
+        job.owner = actor;
         job.target = target;
         job.remainingDamage = damage;
         job.remainingCost = 0;
@@ -913,7 +916,7 @@ bool applyEconomyAction(State &s, const Action &a) {
                 f.type = p.type;
                 f.zone = zone;
                 f.flags["placed_this_turn"] = 1;
-                f.flags["original_owner:" + p.owner] = 1;
+                f.flags["original_owner:" + nationName(s, p.owner)] = 1;
                 f.flags["original_type:" + p.type] = 1;
                 for (const auto &[key, v] : p.flags)
                     if (key.rfind("border:", 0) == 0)
@@ -949,14 +952,15 @@ bool applyEconomyChance(State &s, const ChanceRequest &request, const ChanceOutc
     if (request.purpose.rfind("economy_research:", 0) != 0)
         return false;
     const auto tech = request.purpose.substr(17);
-    auto &n = s.nations.at(request.nation);
+    const auto researcher = nationNumber(s, request.nation);
+    auto &n = s.nations.at(researcher);
     auto &stage = n.technologyStages[tech];
     const int face = effectiveResults(request, outcome).at(0);
     if (face <= s.definition->catalog->technology(tech).thresholds.at(static_cast<std::size_t>(stage))) {
         ++stage;
         if (stage == 4)
             for (auto &[id, u] : s.units)
-                if (u.owner == request.nation) {
+                if (u.owner == researcher) {
                     const auto conversions = s.definition->catalog->automaticConversions(
                         u.type, catalogContext(s, u.owner, u.zone));
                     if (!conversions.empty())
@@ -984,9 +988,10 @@ void finishEconomyPlacement(State &s) {
         }
         const auto wait = s.nations.at(job.owner).gameFlags.find("lease_repair_wait:" + job.target);
         if (wait != s.nations.at(job.owner).gameFlags.end()) {
-            const auto controller = s.completedTurns.contains(job.owner)
-                                        ? job.owner
-                                        : s.nations.at(job.owner).controllerNation.value_or("japan");
+            const auto &controllerNation = s.nations.at(job.owner).controllerNation;
+            const auto controller = s.completedTurns.contains(job.owner) ? job.owner
+                                    : controllerNation ? *controllerNation
+                                                       : nationNumber(s, "japan");
             if (s.completedTurns.at(controller) < wait->second) {
                 ++it;
                 continue;

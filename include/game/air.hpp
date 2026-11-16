@@ -19,7 +19,7 @@ bool onMaritimeAirPatrol(const State &, const UnitState &);
 // Whether this nation has an aircraft with an attack value in the zone,
 // carried or not. A patrol plane may decline combat with its ships only when
 // it has none (RB 9.3.1 and 9.4).
-bool attackAircraftPresent(const State &, const Id &nation, ZoneId zone);
+bool attackAircraftPresent(const State &, NationId nation, ZoneId zone);
 FlightResult validateFlight(const State &, const Id &unit, const std::vector<ZoneId> &path, bool combat,
                             bool attackDestination = false);
 // Where an airborne aircraft may land: zone names and carrier unit ids.

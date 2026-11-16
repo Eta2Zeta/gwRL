@@ -105,7 +105,7 @@ Action endPhaseAction(const State& state, const Id& player) {
     action.id = "end_phase";
     action.kind = "end_phase";
     action.player = player;
-    action.nation = state.currentNation();
+    action.nation = state.currentNationName();
     return action;
 }
 
@@ -388,13 +388,14 @@ std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
             require(action.nation == decision.nation && action.decision == decision.id,
                     "Rules action does not match pending decision");
         } else {
-            require(state_.nations.contains(action.nation),"Rules action names an unknown nation");
-            const auto &nation=state_.nations.at(action.nation);
-            const bool directAxis=action.nation=="dadao" && state_.currentNation()=="japan" &&
+            const auto acting=findNation(state_,action.nation);
+            require(state_.nations.contains(acting),"Rules action names an unknown nation");
+            const auto &nation=state_.nations.at(*acting);
+            const bool directAxis=*acting==knownNations(state_).dadao && state_.currentNation()==knownNations(state_).japan &&
                 nation.gameFlags.contains("direct_axis_control_after_japan_surrender") &&
                 nation.gameFlags.at("direct_axis_control_after_japan_surrender")!=0;
-            require((action.nation == state_.currentNation() ||
-                     controlledBy(state_,action.nation,state_.currentNation()) || directAxis) && !action.decision,
+            require((*acting == state_.currentNation() ||
+                     controlledBy(state_,*acting,state_.currentNation()) || directAxis) && !action.decision,
                     "Rules action does not match active nation");
         }
         action.neuralSourceKey=std::make_shared<const std::string>(canonicalJson(actionJson(action)));
@@ -487,7 +488,8 @@ std::shared_ptr<const Engine::ActionMenu> Engine::interruptMenu() const {
     for(auto& action:actions) {
         require(!reserved(action)&&!action.id.empty()&&ids.insert(action.id).second,
                 "Invalid political interrupt identity");
-        require(state_.nations.contains(action.nation)&&state_.nations.at(action.nation).player==action.player,
+        const auto acting=findNation(state_,action.nation);
+        require(state_.nations.contains(acting)&&state_.nations.at(*acting).player==action.player,
                 "Interrupt entitlement mismatch");
         require(!action.decision&&action.parameters.isObject(),"Invalid interrupt payload");
         action.neuralSourceKey=std::make_shared<const std::string>(canonicalJson(actionJson(action)));

@@ -37,11 +37,23 @@ struct FactionDefinition {
     NumberSet<ZoneId> homeZones;
 };
 
+// The nations the rules name in their code, by number: empty for a nation a
+// definition lacks. A rule compares a nation with one of these as it would
+// with the name (`owner == known.japan`), at the cost of an integer compare.
+// Never compare one with another optional, such as a territory's possessor:
+// an empty possessor would equal a nation the definition lacks.
+// isNation(state, possessor, "kmt") asks that question instead.
+struct KnownNations {
+    std::optional<NationId> japan, kmt, ccp, dadao, ussr, mongolia;
+};
+
 // The definition's tables of names held as numbers (include/game/names.hpp),
 // built by freezeDefinition from the definition's own data. Never serialized:
 // the names, not the numbers, are what a definition's fingerprint covers.
 struct Names {
     NameTable<ZoneKind> zones;  // The keys of geography["nodes"].
+    NameTable<NationKind> nations;  // The keys of factions, dormant ones too.
+    KnownNations known;
 };
 
 // Derived solely from frozen map geometry, indexed by zone number. Neighbors
@@ -76,7 +88,11 @@ struct Definition {
     json::Value rules;
     std::shared_ptr<const Catalog> catalog;
     std::map<Id, FactionDefinition> factions;
+    // factions by nation number, copied by freezeDefinition: nationFaction reads
+    // a nation's faction without looking its name up.
+    std::vector<FactionDefinition> nationFactions;
     std::vector<Id> turnOrder;
+    std::vector<NationId> turnNations;  // turnOrder as numbers; freezeDefinition fills it.
     std::set<Id> players;
     int startYear {1936};
     int startMonth {7};
@@ -94,6 +110,18 @@ bool isZone(const State&, ZoneId);  // Whether the number names one of the defin
 const std::string& zoneName(const State&, ZoneId);
 std::vector<ZoneId> zoneNumbers(const State&, const std::vector<Id>& names);
 std::vector<Id> zoneNames(const State&, const std::vector<ZoneId>& zones);
+// A nation's number and name, as for zones.
+NationId nationNumber(const State&, std::string_view name);  // Throws "Unknown nation: <name>".
+std::optional<NationId> findNation(const State&, std::string_view name);  // Empty for a name that is no nation.
+const std::string& nationName(const State&, NationId);
+const FactionDefinition& nationFaction(const State&, NationId);  // Throws for a number naming no nation.
+const KnownNations& knownNations(const State&);
+// Whether a nation, or a possessor that may be empty, is the nation of this
+// name. False for an empty possessor and for a name the definition lacks.
+bool isNation(const State&, NationId, std::string_view name);
+bool isNation(const State&, const std::optional<NationId>&, std::string_view name);
+// Whether the position holds a nation of this name.
+bool hasNation(const State&, std::string_view name);
 // A railroad's name from the two land zones it connects, in either order.
 Id railroadId(const State&, ZoneId a, ZoneId b);
 // Map reads for rule hot paths. Each matches reading the definition's map JSON
@@ -119,7 +147,7 @@ class Neighbors {
 Neighbors mapNeighbors(const State&, ZoneId zone);
 
 struct NationState {
-    std::optional<Id> controllerNation;
+    std::optional<NationId> controllerNation;
     std::optional<Id> player;
     std::optional<Id> alliance;
     std::string powerStatus {"minor"};
@@ -127,21 +155,21 @@ struct NationState {
     std::map<Id, int> incomeComponents;  // The parts of its income as the position stands.
     bool incomeKnown {false};  // An unevaluated rate is not a zero-income ruling.
     std::map<Id, int> technologyStages;
-    std::set<Id> atWarWith;
-    std::set<Id> allies;
+    NumberSet<NationId> atWarWith;
+    NumberSet<NationId> allies;
     std::map<Id, int> turnFlags;
     std::map<Id, int> gameFlags;
 };
 
 struct TerritoryState {
-    std::optional<Id> possessor;
+    std::optional<NationId> possessor;
     std::map<Id, int> flags;
 };
 
 struct UnitState {
     Id id;
     Id type;
-    Id owner;
+    NationId owner;
     ZoneId zone;
     // Null is reserved for catalog-free foundation fixtures, never zero movement.
     std::optional<int> movementRemaining;
@@ -180,7 +208,7 @@ inline Id railroadId(const Id& a, const Id& b) {
 
 struct BuildProject {
     Id id;
-    Id owner;
+    NationId owner;
     Id type;
     std::optional<Id> site;
     int queuePosition {1};
@@ -191,7 +219,7 @@ struct BuildProject {
 
 struct RepairJob {
     Id id;
-    Id owner;
+    NationId owner;
     Id target;
     int remainingDamage {0};
     int remainingCost {0};
@@ -223,8 +251,8 @@ struct Decision {
 struct BattleState {
     Id id;
     ZoneId zone;
-    Id attacker;
-    Id defender;
+    NationId attacker;
+    NationId defender;
     std::string stage;
     std::vector<Id> attackers;
     std::vector<Id> defenders;
@@ -255,8 +283,8 @@ struct ChanceOutcome {
 };
 
 struct TurnSnapshot {
-    NumberMap<ZoneId, std::optional<Id>> possessions;
-    std::map<Id, std::pair<Id, ZoneId>> units;  // Stable unit ID -> (owner, zone).
+    NumberMap<ZoneId, std::optional<NationId>> possessions;
+    std::map<Id, std::pair<NationId, ZoneId>> units;  // Stable unit ID -> (owner, zone).
 };
 
 struct Clock {
@@ -273,12 +301,12 @@ struct PoliticalState {
     bool trucePermanentlyEnded {false};
     bool foreignChinaWarPending {false};
     bool truceOfferPending {false};
-    std::optional<Id> chinaInvader;
-    std::map<Id, std::set<Id>> attackedWarlords;
-    std::vector<Id> alignmentQueue;
-    std::map<Id, ZoneId> capitals;
-    std::set<Id> surrendered;
-    std::set<Id> evolutionAwarded;
+    std::optional<NationId> chinaInvader;
+    NumberMap<NationId, NumberSet<NationId>> attackedWarlords;
+    std::vector<NationId> alignmentQueue;
+    NumberMap<NationId, ZoneId> capitals;
+    NumberSet<NationId> surrendered;
+    NumberSet<NationId> evolutionAwarded;
     std::map<Id, json::Value> pending;
 };
 
@@ -342,7 +370,7 @@ class EventLog {
 
 struct State {
     std::shared_ptr<const Definition> definition;
-    std::map<Id, NationState> nations;
+    NumberMap<NationId, NationState> nations;
     NumberMap<ZoneId, TerritoryState> territories;
     std::map<Id, UnitState> units;
     std::map<Id, FacilityState> facilities;
@@ -352,7 +380,7 @@ struct State {
     Clock clock;
     PoliticalState politics;
     TurnSnapshot turnStart;
-    std::map<Id, int> completedTurns;
+    NumberMap<NationId, int> completedTurns;
     std::vector<Decision> decisions;  // Last entry owns the current choice.
     std::map<Id, BattleState> battles;
     std::vector<Id> battleOrder;
@@ -367,7 +395,8 @@ struct State {
     State clone() const;  // Value-copy mutable data; share immutable definition.
     // A transition starts at the events it added: recorded events never change.
     void validate(std::size_t historyFrom = 0) const;
-    const Id& currentNation() const;
+    NationId currentNation() const;
+    const Id& currentNationName() const;
     std::optional<Id> decisionPlayer() const;
     std::pair<int, int> calendarDate() const;
     void captureTurnStart();

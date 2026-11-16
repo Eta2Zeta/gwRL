@@ -1,4 +1,4 @@
-"""The zone numbers docs/engine/names.md lists are the ones the engine builds."""
+"""The numbers docs/engine/names.md lists for zones and nations are the ones the engine builds."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -12,13 +12,16 @@ from print_name_tables import SCENARIO, table, tables  # noqa: E402
 
 
 class NameTablesTest(unittest.TestCase):
-    def test_the_page_lists_the_engines_zone_numbers(self):
+    def test_the_page_lists_the_engines_numbers(self):
         page = (ROOT / "docs/engine/names.md").read_text(encoding="utf-8")
-        zones = tables(SCENARIO)["zones"]
-        self.assertEqual(zones, sorted(zones), "Zone numbers do not follow the names' sorted order")
-        self.assertIn(table(zones), page,
-                      "docs/engine/names.md lists other zone numbers than the engine: "
-                      "print them with tools/print_name_tables.py --kind zones")
+        found = tables(SCENARIO)
+        self.assertEqual(sorted(found), ["nations", "zones"], "The engine numbers other kinds of name")
+        for kind, names in found.items():
+            with self.subTest(kind=kind):
+                self.assertEqual(names, sorted(names), f"{kind.capitalize()} numbers do not follow the names' sorted order")
+                self.assertIn(table(names), page,
+                              f"docs/engine/names.md lists other {kind} numbers than the engine: "
+                              f"print them with tools/print_name_tables.py --kind {kind}")
 
 
 if __name__ == "__main__":

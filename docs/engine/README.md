@@ -36,10 +36,11 @@ Everything about a game at one moment is its *state* (`State` in
 | The clock | The round, the nation whose turn it is and the phase | round 1, the CCP, Production |
 | Pending work | Decisions waiting for an answer, and a dice roll waiting to be made | none |
 
-The state holds zones as numbers: a zone's place in the sorted list of the
-map's zone names (zone 0 is `land_china_beiping`). Everything else, and
-everything the engine reads or writes, uses names; [names held as
-numbers](names.md) explains the numbering and lists the campaign's zones.
+The state holds zones and nations as numbers: each one's place in the sorted
+list of the definition's names of its kind (zone 0 is `land_china_beiping`,
+nation 0 is `ccp`). Everything else, and everything the engine reads or writes,
+uses names; [names held as numbers](names.md) explains the numbering and lists
+the campaign's zones and nations.
 
 Two things are kept beside the state:
 

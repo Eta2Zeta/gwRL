@@ -398,20 +398,20 @@ void scenarioIntegration(const Catalog& catalog) {
           "Setup-only valuation overrides or printed completed value changed");
     rejects([&] { completedAssetValue(*state.definition, "coastal_defense_ship"); }, "Unapproved setup-only value guessed");
 
-    auto& nation = state.nations.at("japan");
+    auto& nation = state.nations.at(nationNumber(state, "japan"));
     nation.technologyStages["long_range_aircraft"] = 3;
-    check(!catalogContext(state, "japan").technologies.contains("long_range_aircraft"), "Stage III treated as completed technology");
+    check(!catalogContext(state, nationNumber(state, "japan")).technologies.contains("long_range_aircraft"), "Stage III treated as completed technology");
     nation.technologyStages["long_range_aircraft"] = 4;
-    check(catalogContext(state, "japan").technologies.contains("long_range_aircraft"), "Completed technology absent from query context");
+    check(catalogContext(state, nationNumber(state, "japan")).technologies.contains("long_range_aircraft"), "Completed technology absent from query context");
     nation.turnFlags["purchased:marine"] = 2;
-    check(!catalog.purchaseEligibility("japan_major_marine", catalogContext(state, "japan")).allowed,
+    check(!catalog.purchaseEligibility("japan_major_marine", catalogContext(state, nationNumber(state, "japan"))).allowed,
           "State purchase accounting not exposed to catalog");
-    state.nations.at("ccp").gameFlags["ccp_soviet_rail_production"] = 1;
-    const auto ccp = catalogContext(state, "ccp");
+    state.nations.at(nationNumber(state, "ccp")).gameFlags["ccp_soviet_rail_production"] = 1;
+    const auto ccp = catalogContext(state, nationNumber(state, "ccp"));
     check(!catalog.purchaseEligibility("ccp_minor_artillery", ccp).allowed,
           "Mongolia/control flag bypasses absent Soviet railroad");
-    state.nations.at("kmt").gameFlags["kmt_burma_road"] = 1;
-    check(!catalog.purchaseEligibility("kmt_minor_artillery", catalogContext(state, "kmt")).allowed,
+    state.nations.at(nationNumber(state, "kmt")).gameFlags["kmt_burma_road"] = 1;
+    check(!catalog.purchaseEligibility("kmt_minor_artillery", catalogContext(state, nationNumber(state, "kmt"))).allowed,
           "Burma exclusion bypassed by a saved flag");
 
     Id land, sea;
@@ -426,7 +426,7 @@ void scenarioIntegration(const Catalog& catalog) {
             UnitState u;
             u.id = "catalog_" + type + "_" + std::to_string(damage);
             u.type = type;
-            u.owner = "japan";
+            u.owner = nationNumber(state, "japan");
             u.zone = zoneNumber(state, definition.classes.contains("naval") ? sea : land);
             u.turnOrigin = u.zone;
             u.damage = damage;

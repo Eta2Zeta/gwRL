@@ -44,11 +44,11 @@ State initialState() {
         nation.player = id == "japan" ? "axis" : id == "kmt" ? "allies" : "comintern";
         nation.alliance = nation.player;
         if (id != "mongolia") nation.treasury = 2;
-        state.nations[id] = nation;
-        state.completedTurns[id] = 0;
+        state.nations[nationNumber(state, id)] = nation;
+        state.completedTurns[nationNumber(state, id)] = 0;
     }
-    state.territories[zoneNumber(state, "land_a")] = TerritoryState{"ccp", {}};
-    state.territories[zoneNumber(state, "land_b")] = TerritoryState{"japan", {}};
+    state.territories[zoneNumber(state, "land_a")] = TerritoryState{nationNumber(state, "ccp"), {}};
+    state.territories[zoneNumber(state, "land_b")] = TerritoryState{nationNumber(state, "japan"), {}};
     state.captureTurnStart();
     state.validate();
     return state;
@@ -73,8 +73,8 @@ class FixtureRules : public Rules {
             Action action;
             action.id = kind;
             action.kind = kind;
-            action.nation = state.currentNation();
-            action.player = *state.nations.at(action.nation).player;
+            action.nation = state.currentNationName();
+            action.player = *state.nations.at(state.currentNation()).player;
             action.parameters = V(O{{"value", V(7.0)}});
             actions.push_back(action);
         }
@@ -126,9 +126,9 @@ class FixtureRules : public Rules {
         if (throwOnChance) throw std::runtime_error("Synthetic chance failure");
     }
     void finishTurn(State& state) const override {
-        ++state.flags["finished:" + state.currentNation()];
+        ++state.flags["finished:" + state.currentNationName()];
         if (!missingIncome) state.clock.incomeCollected = true;
-        if (finalPendingWork && state.currentNation() == "kmt" && state.clock.roundIndex == 10
+        if (finalPendingWork && state.currentNationName() == "kmt" && state.clock.roundIndex == 10
                 && !state.flags.contains("final_work_created")) {
             state.flags["final_work_created"] = 1;
             state.chance = chance("kmt");
@@ -136,21 +136,21 @@ class FixtureRules : public Rules {
             BattleState battle;
             battle.id = "final_battle";
             battle.zone = zoneNumber(state, "land_b");
-            battle.attacker = "kmt";
-            battle.defender = "japan";
+            battle.attacker = nationNumber(state, "kmt");
+            battle.defender = nationNumber(state, "japan");
             battle.stage = "fixture_pending";
             state.battles[battle.id] = battle;
             state.battleOrder.push_back(battle.id);
         }
     }
     void beginTurn(State& state) const override {
-        ++state.flags["began:" + state.currentNation()];
-        if (moveOnInitialBegin && state.currentNation() == "ccp") {
-            state.territories.at(zoneNumber(state, "land_a")).possessor = "kmt";
+        ++state.flags["began:" + state.currentNationName()];
+        if (moveOnInitialBegin && state.currentNationName() == "ccp") {
+            state.territories.at(zoneNumber(state, "land_a")).possessor = nationNumber(state, "kmt");
             state.units.at("ccp_unit").zone = zoneNumber(state, "land_b");
         }
-        if (moveOnBegin && state.currentNation() == "mongolia") {
-            state.territories.at(zoneNumber(state, "land_a")).possessor = "mongolia";
+        if (moveOnBegin && state.currentNationName() == "mongolia") {
+            state.territories.at(zoneNumber(state, "land_a")).possessor = nationNumber(state, "mongolia");
             state.units.at("mongolian_unit").zone = zoneNumber(state, "land_b");
         }
     }
@@ -365,14 +365,14 @@ void defenderDecisionPausesClock() {
     auto rules = std::make_shared<FixtureRules>();
     Engine engine(initialState(), rules);
     engine.step(findAction(engine, "request_reaction"));
-    require(engine.state().currentNation() == "ccp" && engine.state().decisionPlayer() == "allies", "Defender decision was routed to attacker");
+    require(engine.state().currentNationName() == "ccp" && engine.state().decisionPlayer() == "allies", "Defender decision was routed to attacker");
     require(engine.legalActions().size() == 1 && !hasAction(engine, "end_phase"), "Pending decision did not suspend ordinary actions");
     auto action = findAction(engine, "react");
     auto forged = action; forged.player = "comintern";
     rejects([&] { engine.step(forged); }, "Attacker answered defender choice");
     engine.step(action);
     require(engine.state().decisions.empty() && engine.state().clock.phase == Phase::Production
-            && engine.state().currentNation() == "ccp", "Reaction advanced national clock");
+            && engine.state().currentNationName() == "ccp", "Reaction advanced national clock");
 }
 
 void fivePhasesAndElevenFullRounds() {
@@ -382,7 +382,7 @@ void fivePhasesAndElevenFullRounds() {
     for (int round = 0; round < 11; ++round) {
         for (const auto& nation : engine.state().definition->turnOrder) {
             for (const auto phase : phases) {
-                require(!engine.state().terminal && engine.state().currentNation() == nation && engine.state().clock.phase == phase, "Five-phase national ordering changed");
+                require(!engine.state().terminal && engine.state().currentNationName() == nation && engine.state().clock.phase == phase, "Five-phase national ordering changed");
                 endPhase(engine);
             }
         }
@@ -391,9 +391,9 @@ void fivePhasesAndElevenFullRounds() {
     require(engine.state().calendarDate() == std::pair<int, int>{1941, 7}, "Terminal date is not July 1941");
     require(engine.legalActions().empty(), "Terminal campaign still offered actions");
     for (const auto& nation : engine.state().definition->turnOrder) {
-        require(engine.state().completedTurns.at(nation) == 11 && engine.state().flags.at("finished:" + nation) == 11, "Income/accounting hook was skipped or repeated");
+        require(engine.state().completedTurns.at(nationNumber(engine.state(), nation)) == 11 && engine.state().flags.at("finished:" + nation) == 11, "Income/accounting hook was skipped or repeated");
         require(engine.state().flags.at("began:" + nation) == 11, "Initial or later beginTurn hook was skipped/repeated");
-        if (engine.state().nations.at(nation).treasury) require(*engine.state().nations.at(nation).treasury == 2, "Foundation invented income");
+        if (engine.state().nations.at(nationNumber(engine.state(), nation)).treasury) require(*engine.state().nations.at(nationNumber(engine.state(), nation)).treasury == 2, "Foundation invented income");
     }
 }
 
@@ -402,12 +402,12 @@ void freshCampaignStartAndRestoreBoundary() {
     rules->moveOnInitialBegin = true;
     auto state = initialState();
     UnitState unit;
-    unit.id = "ccp_unit"; unit.owner = "ccp"; unit.type = "fixture_unit";
+    unit.id = "ccp_unit"; unit.owner = nationNumber(state, "ccp"); unit.type = "fixture_unit";
     unit.zone = zoneNumber(state, "land_a"); unit.turnOrigin = zoneNumber(state, "land_b"); unit.route = zoneNumbers(state, {"land_b", "land_a"});
     unit.movementAllowance = 3; unit.movementRemaining = 0;
     unit.turnFlags["used"] = 1; unit.commitments.insert("spent");
     state.units[unit.id] = unit;
-    state.nations.at("ccp").turnFlags["used"] = 1;
+    state.nations.at(nationNumber(state, "ccp")).turnFlags["used"] = 1;
     state.territories.at(zoneNumber(state, "land_b")).flags["aligned_turn"] = 0;
     state.territories.at(zoneNumber(state, "land_b")).flags["kept"] = 1;
     auto engine = Engine::start(state, rules, 42);
@@ -415,9 +415,9 @@ void freshCampaignStartAndRestoreBoundary() {
     require(!engine.state().territories.at(zoneNumber(engine.state(), "land_b")).flags.contains("aligned_turn")
             && engine.state().territories.at(zoneNumber(engine.state(), "land_b")).flags.at("kept") == 1,
             "A new turn kept an old alignment mark or lost another territory flag");
-    require(engine.state().turnStart.possessions.at(zoneNumber(engine.state(), "land_a")) == "ccp"
+    require(isNation(engine.state(), engine.state().turnStart.possessions.at(zoneNumber(engine.state(), "land_a")), "ccp")
             && engine.state().turnStart.units.at(unit.id).second == zoneNumber(engine.state(), "land_a"), "Initial snapshot followed hook effects");
-    require(engine.state().territories.at(zoneNumber(engine.state(), "land_a")).possessor == "kmt"
+    require(isNation(engine.state(), engine.state().territories.at(zoneNumber(engine.state(), "land_a")).possessor, "kmt")
             && engine.state().units.at(unit.id).zone == zoneNumber(engine.state(), "land_b"), "Initial beginTurn effects were skipped");
     require(engine.state().units.at(unit.id).movementRemaining == 3
             && engine.state().units.at(unit.id).turnFlags.empty()
@@ -457,12 +457,12 @@ void accountingFailureAndTurnStartSnapshot() {
     auto state = initialState();
     state.clock.phase = Phase::PlaceUnits;
     UnitState unit;
-    unit.id = "mongolian_unit"; unit.owner = "mongolia"; unit.type = "fixture_unit";
+    unit.id = "mongolian_unit"; unit.owner = nationNumber(state, "mongolia"); unit.type = "fixture_unit";
     unit.zone = zoneNumber(state, "land_a"); unit.turnOrigin = zoneNumber(state, "land_a"); unit.route = zoneNumbers(state, {"land_a"});
     unit.movementAllowance = 2; unit.movementRemaining = 0;
     unit.turnFlags["used"] = 1; unit.gameFlags["keep"] = 1; unit.commitments.insert("spent");
     state.units[unit.id] = unit;
-    state.nations.at("mongolia").turnFlags["used"] = 1;
+    state.nations.at(nationNumber(state, "mongolia")).turnFlags["used"] = 1;
     Engine engine(state, rules);
     rules->missingIncome = true;
     const auto before = engine.serialize();
@@ -471,8 +471,8 @@ void accountingFailureAndTurnStartSnapshot() {
     rules->missingIncome = false;
     rules->moveOnBegin = true;
     endPhase(engine);
-    require(engine.state().currentNation() == "mongolia", "Next national slot wrong");
-    require(engine.state().turnStart.possessions.at(zoneNumber(engine.state(), "land_a")) == "ccp"
+    require(engine.state().currentNationName() == "mongolia", "Next national slot wrong");
+    require(isNation(engine.state(), engine.state().turnStart.possessions.at(zoneNumber(engine.state(), "land_a")), "ccp")
             && engine.state().turnStart.units.at(unit.id).second == zoneNumber(engine.state(), "land_a"), "Snapshot was taken after beginTurn effects");
     const auto& reset = engine.state().units.at(unit.id);
     require(reset.zone == zoneNumber(state, "land_b") && reset.movementRemaining == 2 && reset.turnFlags.empty()
@@ -779,7 +779,7 @@ class HistoryRules : public FixtureRules {
             for (const auto& event : events) state.history.push_back(event);
         }
         else if (action.kind == "clear_history") state.history.clear();
-        else if (action.kind == "corrupt_state") state.nations.at("ccp").treasury = -1;
+        else if (action.kind == "corrupt_state") state.nations.at(nationNumber(state, "ccp")).treasury = -1;
         else FixtureRules::apply(state, action);
     }
 };

@@ -15,18 +15,18 @@ bool activeNavalBattle(const State &s) {
 }
 } // namespace
 
-int navalCompletedTurns(const State &s, const Id &nation) {
+int navalCompletedTurns(const State &s, NationId nation) {
   if (const auto found = s.completedTurns.find(nation);
       found != s.completedTurns.end())
     return found->second;
   const auto &n = s.nations.at(nation);
   if (n.controllerNation && s.completedTurns.contains(*n.controllerNation))
     return s.completedTurns.at(*n.controllerNation);
-  if (nation == "dadao" &&
+  if (nation == knownNations(s).dadao &&
       n.gameFlags.contains("direct_axis_control_after_japan_surrender"))
-    return s.completedTurns.at("japan");
+    return s.completedTurns.at(nationNumber(s, "japan"));
   throw std::runtime_error("Nation has no operational calendar turn: " +
-                           nation);
+                           nationName(s, nation));
 }
 
 NavalRules::NavalRules(std::shared_ptr<const Rules> gameplay)

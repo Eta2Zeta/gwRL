@@ -67,8 +67,8 @@ void entityObservationsAndRandomIsolation() {
 
 void reactionAndChanceEntitlements() {
     auto s = loadScenario(scenario);
-    const auto action = politicalAction(s, "kmt", "test_reaction");
-    queuePoliticalDecision(s, "kmt", "test_reaction", {action});
+    const auto action = politicalAction(s, nationNumber(s, "kmt"), "test_reaction");
+    queuePoliticalDecision(s, nationNumber(s, "kmt"), "test_reaction", {action});
     CampaignEnv env(Engine(s, campaignRules(), 7));
     require(env.currentNation() == "ccp" && env.currentDecisionPlayer() == "allies", "Defender decision routed to calendar owner");
     require(env.decisionKind() == "test_reaction" && env.legalActions().size() == 1, "Pending reaction concealed");
@@ -225,7 +225,7 @@ void searchCopiesKeepTheirSourceEnvironment() {
 
 void failedSearchCopiesRefuseEveryCall() {
     auto s = loadScenario(scenario);
-    queuePoliticalDecision(s, "kmt", "test_reaction", {politicalAction(s, "kmt", "test_reaction")});
+    queuePoliticalDecision(s, nationNumber(s, "kmt"), "test_reaction", {politicalAction(s, nationNumber(s, "kmt"), "test_reaction")});
     CampaignEnv env(Engine(s, campaignRules(), 7));
     const auto checkpoint = env.serialize();
     const auto key = env.planningKey();
@@ -269,7 +269,7 @@ void setupValuesAndNoDoubleCounting() {
     near(initial[0].units - allianceWealth(s)[0].units, 5, "Unbuildable setup type lost approved price");
     auto bare = emptyAssets();
     UnitState battleship;
-    battleship.id = "battleship"; battleship.type = "battleship"; battleship.owner = "japan";
+    battleship.id = "battleship"; battleship.type = "battleship"; battleship.owner = nationNumber(s, "japan");
     battleship.zone = battleship.turnOrigin = zoneNumber(s, "sea_p15");
     battleship.movementAllowance = battleship.movementRemaining = 2;
     bare.units.emplace(battleship.id, battleship);
@@ -278,7 +278,7 @@ void setupValuesAndNoDoubleCounting() {
     ship.damage = 1;
     near(allianceWealth(bare)[0].units, undamaged, "Invented a capital ship damage discount despite free repair");
     UnitState crew;
-    crew.id = "crew"; crew.owner = "japan"; crew.type = "militia"; crew.zone = crew.turnOrigin = zoneNumber(s, "land_jap_honshu");
+    crew.id = "crew"; crew.owner = nationNumber(s, "japan"); crew.type = "militia"; crew.zone = crew.turnOrigin = zoneNumber(s, "land_jap_honshu");
     crew.gameFlags["ship_crew:" + ship.id] = 1;
     bare.units.emplace(crew.id, crew);
     near(allianceWealth(bare)[0].units, undamaged, "Temporary crew was counted as another purchased asset");
@@ -297,33 +297,33 @@ void repairsRailAndNeutralAttribution() {
     s.facilities.emplace(factory.id, factory);
     near(allianceWealth(s)[0].infrastructure, -2, "Negative surviving facility value was clamped");
     const auto before = allianceWealth(s)[0].total();
-    *s.nations.at("japan").treasury -= 3;
-    s.repairs.emplace("paid", RepairJob{"paid", "japan", "factory", 3, 0, false, std::nullopt});
+    *s.nations.at(nationNumber(s, "japan")).treasury -= 3;
+    s.repairs.emplace("paid", RepairJob{"paid", nationNumber(s, "japan"), "factory", 3, 0, false, std::nullopt});
     near(allianceWealth(s)[0].total(), before, "Prepaid repair lost both cash and repair value");
     auto captured = emptyAssets();
     captured.facilities.emplace("yard", FacilityState{"yard", "major_shipyard", zoneNumber(s, "land_jap_honshu"), 3});
-    captured.repairs.emplace("old_repair", RepairJob{"old_repair", "japan", "yard", 3, 0, false, std::nullopt});
+    captured.repairs.emplace("old_repair", RepairJob{"old_repair", nationNumber(captured, "japan"), "yard", 3, 0, false, std::nullopt});
     near(allianceWealth(captured)[0].infrastructure, 10, "Current owner's prepaid repair was not credited");
-    captured.territories.at(zoneNumber(captured, "land_jap_honshu")).possessor = "kmt";
+    captured.territories.at(zoneNumber(captured, "land_jap_honshu")).possessor = nationNumber(captured, "kmt");
     near(allianceWealth(captured)[1].infrastructure, 7, "Old owner's cancelled repair inflated the captured asset");
     auto railState = loadScenario(scenario);
     railState.units.clear(); railState.facilities.clear(); railState.construction.clear();
     require(!railState.rails.empty(), "No retained rail asset");
     const auto rail = railState.rails.begin()->second;
     railState.rails = {{rail.id, rail}};
-    railState.territories.at(rail.endpointA).possessor = "japan";
-    railState.territories.at(rail.endpointB).possessor = "kmt";
+    railState.territories.at(rail.endpointA).possessor = nationNumber(railState, "japan");
+    railState.territories.at(rail.endpointB).possessor = nationNumber(railState, "kmt");
     const auto split = allianceWealth(railState);
     near(split[0].infrastructure, split[1].infrastructure, "Rail endpoint halves differ");
-    railState.territories.at(rail.endpointB).possessor = "japan";
+    railState.territories.at(rail.endpointB).possessor = nationNumber(railState, "japan");
     near(allianceWealth(railState)[0].infrastructure, split[0].infrastructure * 2, "Same-side rail endpoints double-count border");
-    const auto neutral = std::find_if(railState.nations.begin(), railState.nations.end(), [](const auto& x) { return x.first.rfind("warlord_", 0) == 0; })->first;
+    const auto neutral = std::find_if(railState.nations.begin(), railState.nations.end(), [&](const auto& x) { return isWarlord(nationName(railState, x.first)); })->first;
     railState.territories.at(rail.endpointB).possessor = neutral;
     near(allianceWealth(railState)[0].infrastructure, split[0].infrastructure, "Neutral endpoint granted free wealth");
     railState.rails.at(rail.id).damageByEndpoint[rail.endpointA] = 1;
-    railState.repairs.emplace("rail_paid", RepairJob{"rail_paid", "japan", rail.id, 1, 0, false, rail.endpointA});
+    railState.repairs.emplace("rail_paid", RepairJob{"rail_paid", nationNumber(railState, "japan"), rail.id, 1, 0, false, rail.endpointA});
     const auto prepaidRail = allianceWealth(railState)[0].infrastructure;
-    railState.territories.at(rail.endpointA).possessor = "kmt";
+    railState.territories.at(rail.endpointA).possessor = nationNumber(railState, "kmt");
     near(allianceWealth(railState)[1].infrastructure, prepaidRail - 0.5,
          "Previous endpoint owner's cancelled rail repair inflated the new owner's half");
 }

@@ -131,7 +131,7 @@ std::vector<Id> living(const State &s, const BattleState &b, bool attacker) {
             out.push_back(id);
     return out;
 }
-bool opposing(const State &s, const Id &a, const Id &b) {
+bool opposing(const State &s, NationId a, NationId b) {
     return a != b && s.nations.at(a).atWarWith.contains(b);
 }
 // The zone a unit entered the battle from, or no zone for one that did not.
@@ -181,26 +181,26 @@ bool fortActive(const State &s, const BattleState &b) {
             return true;
     return false;
 }
-Action action(const State &s, const Id &nation, const Id &kind, O p = {}) {
+Action action(const State &s, NationId nation, const Id &kind, O p = {}) {
     Action a;
     a.kind = kind;
-    a.nation = nation;
+    a.nation = nationName(s, nation);
     a.player = politicalPlayer(s, nation);
     a.parameters = V(std::move(p));
     a.id = kind + "_" + contentDigest(canonicalJson(a.parameters)).substr(0, 20);
     return a;
 }
-void decision(State &s, BattleState &b, const Id &nation, const Id &kind, std::vector<Action> options) {
+void decision(State &s, BattleState &b, NationId nation, const Id &kind, std::vector<Action> options) {
     require(!options.empty(), "Empty land battle decision");
     Decision d;
     d.id = b.id + "_" + kind + "_" + std::to_string(++s.flags["land_decision_sequence"]);
     d.kind = kind;
-    d.nation = nation;
+    d.nation = nationName(s, nation);
     d.reaction = nation != s.currentNation();
     d.continuation = b.id;
     for (auto &a : options) {
         a.decision = d.id;
-        a.nation = nation;
+        a.nation = nationName(s, nation);
         a.player = politicalPlayer(s, nation);
     }
     d.options = std::move(options);
@@ -395,8 +395,8 @@ void chooseHit(State &s, BattleState &b) {
         if (targeted)
             candidates = std::move(targets);
         const bool victimAttacker = hit.require("victim_attacker").asBool();
-        Id chooser =
-            targeted ? hit.require("firing_nation").asString() : (victimAttacker ? b.attacker : b.defender);
+        NationId chooser =
+            targeted ? nationNumber(s, hit.require("firing_nation").asString()) : (victimAttacker ? b.attacker : b.defender);
         // Joint defense is explicit: propose a casualty, then every other
         // defending player may accept it or request the rulebook dice dispute.
         auto proposal = string(b, "casualty_proposal");
@@ -507,7 +507,7 @@ void requestShots(State &s, BattleState &b, A shots, const Id &after) {
     ChanceRequest c;
     c.id = b.id + "_roll_" + std::to_string(++s.flags["land_roll_sequence"]);
     c.continuation = b.id;
-    c.nation = b.attacker;
+    c.nation = nationName(s, b.attacker);
     c.purpose = "land_combat_roll";
     for (std::size_t i = 0; i < shots.size(); ++i)
         c.dice.push_back(DieSpec{12, 0, {}, 0});
@@ -552,7 +552,7 @@ void shoot(State &s, BattleState &b, const Id &which) {
             for (const auto &id : living(s, b, true)) {
                 const auto &u = s.units.at(id);
                 if (aircraft(s, u) && airborne(u) && !u.cargo.empty())
-                    addShot(shots, "city_aaa", b.defender, true, 3, 0, {},
+                    addShot(shots, "city_aaa", nationName(s, b.defender), true, 3, 0, {},
                             {{"eligible", ids({id})}, {"air_only", V(true)}});
             }
         requestShots(s, b, std::move(shots), "first_strike");
@@ -571,7 +571,7 @@ void shoot(State &s, BattleState &b, const Id &which) {
             const auto &definition = s.definition->catalog->unit(u.type);
             auto stats = landCombatStats(s, b, id, attacking, round);
             if (which == "attrition_fire") {
-                addShot(shots, id, u.owner, false, fortActive(s, b) ? 1 : 2, 0, {}, {{"land_only", V(true)}});
+                addShot(shots, id, nationName(s, u.owner), false, fortActive(s, b) ? 1 : 2, 0, {}, {{"land_only", V(true)}});
                 continue;
             }
             if (first) {
@@ -584,7 +584,7 @@ void shoot(State &s, BattleState &b, const Id &which) {
                     // Corrected airborne step 4 resolves both sides' AAA and
                     // Fighters together before surviving transports land.
                     for (int n = 0; n < std::min(3, enemyAircraft); ++n)
-                        addShot(shots, id, u.owner, !attacking, 3, 0, {}, {{"air_only", V(true)}});
+                        addShot(shots, id, nationName(s, u.owner), !attacking, 3, 0, {}, {{"air_only", V(true)}});
                     continue;
                 }
                 if (!fighter(u) || stats.firstStrike)
@@ -608,7 +608,7 @@ void shoot(State &s, BattleState &b, const Id &which) {
                          s.definition->catalog->modes(u.type, catalogContext(s, u.owner, u.zone), u.damage))
                         if (m.id == "carpet_bombing")
                             for (int n = 0; n < m.dice; ++n)
-                                addShot(shots, id, u.owner, false,
+                                addShot(shots, id, nationName(s, u.owner), false,
                                         std::max(1, m.threshold.value_or(2) -
                                                         (city(s, b.zone) && fortActive(s, b) ? 1 : 0)),
                                         0, {}, {{"land_only", V(true)}});
@@ -617,9 +617,9 @@ void shoot(State &s, BattleState &b, const Id &which) {
             if (!stats.threshold) {
                 // Minor KMT must still roll every attacking Infantry/Cavalry
                 // even if the destination was empty or an attack value is N/A.
-                if (attacking && u.owner == "kmt" && s.nations.at("kmt").powerStatus != "major" &&
+                if (attacking && u.owner == knownNations(s).kmt && s.nations.at(nationNumber(s, "kmt")).powerStatus != "major" &&
                     (u.type == "infantry" || u.type == "cavalry"))
-                    addShot(shots, id, u.owner, false, 0, 0, {}, {{"low_morale", V(true)}});
+                    addShot(shots, id, nationName(s, u.owner), false, 0, 0, {}, {{"low_morale", V(true)}});
                 continue;
             }
             O extra;
@@ -630,7 +630,7 @@ void shoot(State &s, BattleState &b, const Id &which) {
                         eligible.push_back(target);
                 extra["eligible"] = ids(eligible);
             }
-            if (attacking && u.owner == "kmt" && s.nations.at("kmt").powerStatus != "major" &&
+            if (attacking && u.owner == knownNations(s).kmt && s.nations.at(nationNumber(s, "kmt")).powerStatus != "major" &&
                 (u.type == "infantry" || u.type == "cavalry"))
                 extra["low_morale"] = V(true);
             if (fighter(u) && round == 1)
@@ -649,7 +649,7 @@ void shoot(State &s, BattleState &b, const Id &which) {
                 extra["fort_eligible"] = ids(eligible);
             }
             for (int n = 0; n < stats.dice; ++n)
-                addShot(shots, id, u.owner, !attacking, *stats.threshold, stats.targetSelection,
+                addShot(shots, id, nationName(s, u.owner), !attacking, *stats.threshold, stats.targetSelection,
                         stats.targetClasses, extra);
         }
     }
@@ -666,7 +666,7 @@ void shoot(State &s, BattleState &b, const Id &which) {
                 if (doctrine)
                     continue;
                 for (int n = 0; n < 2; ++n)
-                    addShot(shots, id, b.defender, true, 5, 0, {}, {{"eligible", ids(eligible)}});
+                    addShot(shots, id, nationName(s, b.defender), true, 5, 0, {}, {{"eligible", ids(eligible)}});
                 for (const auto &unit : eligible)
                     if (s.units.contains(unit))
                         s.units.at(unit).turnFlags["crossed_enemy_fortification"] = 1;
@@ -991,7 +991,7 @@ void advance(State &s, BattleState &b) {
 }
 } // namespace
 
-bool citySurrounded(const State &s, ZoneId zone, const Id &defender) {
+bool citySurrounded(const State &s, ZoneId zone, NationId defender) {
     if (!city(s, zone))
         return false;
     bool landNeighbor = false;
@@ -1035,7 +1035,7 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
     result.firstStrike =
         round == 1 &&
         (d.classes.contains("artillery_class") ||
-         (attacking && u.owner == "japan" && aircraft(s, u) && marked(b.flags, "japanese_surprise_attack")));
+         (attacking && u.owner == knownNations(s).japan && aircraft(s, u) && marked(b.flags, "japanese_surprise_attack")));
     for (const auto &mode : catalog.modes(u.type, catalogContext(s, u.owner, u.zone), u.damage))
         if (mode.id == "target_selection") {
             const auto *enabled = mode.parameters.find(attacking ? "attack" : "defense");
@@ -1106,8 +1106,8 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
     }
     if (!attacking && round == 1 && has(s, u, "infantry_class") && fortActive(s, b))
         bonus(2);
-    if (!attacking && u.owner == "japan" && has(s, u, "infantry_class") &&
-        s.definition->factions.at("japan").homeZones.contains(b.zone))
+    if (!attacking && u.owner == knownNations(s).japan && has(s, u, "infantry_class") &&
+        nationFaction(s, u.owner).homeZones.contains(b.zone))
         extra += 1;
     if (!attacking && round == 1 && marked(b.flags, "japanese_surprise_attack"))
         extra -= 1;
@@ -1127,7 +1127,7 @@ LandCombatStats landCombatStats(const State &s, const BattleState &b, const Id &
     return result;
 }
 
-Id registerLandBattle(State &s, ZoneId zone, const Id &attacker, const std::vector<Id> &units,
+Id registerLandBattle(State &s, ZoneId zone, NationId attacker, const std::vector<Id> &units,
                       const std::map<Id, ZoneId> &origins) {
     require(s.territories.contains(zone) && s.nations.contains(attacker) && !units.empty(),
             "Invalid land battle registration");
@@ -1198,7 +1198,7 @@ Id registerLandBattle(State &s, ZoneId zone, const Id &attacker, const std::vect
     eliminateUnsupportedRockets(s,s.battles.at(id));
     return id;
 }
-Id registerAttritionBattle(State &s, ZoneId zone, const Id &attacker, const std::vector<Id> &units) {
+Id registerAttritionBattle(State &s, ZoneId zone, NationId attacker, const std::vector<Id> &units) {
     require(!units.empty(), "Attrition attack has no artillery");
     std::map<Id, ZoneId> origins;
     for (const auto &id : units) {
@@ -1260,10 +1260,10 @@ void beginLandBattle(State &s, const Id &id) {
         return;
     }
     preparePortLandDefence(s, id);
-    if (b.attacker == "japan" && marked(s.nations.at("japan").turnFlags, "surprise_attack_zone:" + zoneName(s, b.zone)) &&
-        !marked(s.nations.at("japan").turnFlags, "surprise_attack_used")) {
+    if (b.attacker == knownNations(s).japan && marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_zone:" + zoneName(s, b.zone)) &&
+        !marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_used")) {
         b.flags["japanese_surprise_attack"] = 1;
-        s.nations.at("japan").turnFlags["surprise_attack_used"] = 1;
+        s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_used"] = 1;
     }
     setStage(b, "awaiting_air_defence");
     beginAirDefence(s, id);
@@ -1323,17 +1323,17 @@ std::vector<Action> LandCombatRules::actions(const State &s) const {
     auto out = gameplay_ ? gameplay_->actions(s) : std::vector<Action>{};
     if (s.chance || !s.decisions.empty())
         return out;
-    if (s.currentNation() == "japan" && s.clock.phase == Phase::CombatMovement &&
-        marked(s.nations.at("japan").turnFlags, "surprise_attack_available")) {
+    if (s.currentNation() == knownNations(s).japan && s.clock.phase == Phase::CombatMovement &&
+        marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_available")) {
         bool selected = false;
-        for (const auto &[key, value] : s.nations.at("japan").turnFlags)
+        for (const auto &[key, value] : s.nations.at(nationNumber(s, "japan")).turnFlags)
             if (value && key.rfind("surprise_attack_zone:", 0) == 0)
                 selected = true;
         if (!selected)
             for (const auto &[zone, t] : s.territories)
                 if (t.possessor &&
-                    marked(s.nations.at("japan").turnFlags, "surprise_attack_target:" + *t.possessor))
-                    out.push_back(action(s, "japan", "land_select_surprise_zone", {{"zone", V(zoneName(s, zone))}}));
+                    marked(s.nations.at(nationNumber(s, "japan")).turnFlags, "surprise_attack_target:" + nationName(s, *t.possessor)))
+                    out.push_back(action(s, nationNumber(s, "japan"), "land_select_surprise_zone", {{"zone", V(zoneName(s, zone))}}));
     }
     if (s.clock.phase == Phase::CombatMovement) {
         for (const auto &[id, u] : s.units)
@@ -1398,7 +1398,7 @@ void LandCombatRules::apply(State &s, const Action &a) const {
         throw std::runtime_error("Unknown land combat action");
     }
     if (a.kind == "land_select_surprise_zone") {
-        s.nations.at("japan").turnFlags["surprise_attack_zone:" + a.parameters.require("zone").asString()] =
+        s.nations.at(nationNumber(s, "japan")).turnFlags["surprise_attack_zone:" + a.parameters.require("zone").asString()] =
             1;
         return;
     }
@@ -1510,15 +1510,15 @@ void LandCombatRules::apply(State &s, const Action &a) const {
         put(b, "casualty_consents", V(O{}));
         std::map<Id, Id> players;
         for (const auto &d : living(s, b, false)) {
-            const auto &n = s.units.at(d).owner;
-            players[politicalPlayer(s, n)] = n;
+            const auto n = s.units.at(d).owner;
+            players[politicalPlayer(s, n)] = nationName(s, n);
         }
         A nations;
         ChanceRequest c;
         c.id = b.id + "_casualty_dispute";
         c.purpose = "land_casualty_dispute";
         c.continuation = b.id;
-        c.nation = b.defender;
+        c.nation = nationName(s, b.defender);
         for (const auto &[player, nation] : players) {
             nations.emplace_back(nation);
             c.dice.push_back(DieSpec{12, 0, {}, 0});
@@ -1583,7 +1583,7 @@ void LandCombatRules::applyChance(State &s, const ChanceRequest &request,
         auto hit = hits.at(static_cast<std::size_t>(integer(b, "hit_index")));
         auto candidates = eligibleHits(s, b, hit);
         std::vector<Action> options;
-        auto winner = nations.at(tied.front()).asString();
+        auto winner = nationNumber(s, nations.at(tied.front()).asString());
         for (const auto &unit : candidates)
             options.push_back(action(s, winner, "land_take_casualty",
                                      {{"battle", V(b.id)}, {"unit", V(unit)}, {"targeted", V(false)}}));

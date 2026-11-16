@@ -11,7 +11,7 @@ using O = V::Object;
 using A = V::Array;
 
 const Id resolutionKey = "warlord_combat_resolution";
-Id alignmentKey(const Id& nation) { return "warlord_alignment:" + nation; }
+Id alignmentKey(const State& state, NationId nation) { return "warlord_alignment:" + nationName(state, nation); }
 bool flag(const std::map<Id, int>& flags, const Id& key) {
     const auto it = flags.find(key);
     return it != flags.end() && it->second != 0;
@@ -19,9 +19,9 @@ bool flag(const std::map<Id, int>& flags, const Id& key) {
 bool chineseFaction(const Id& nation) {
     return nation == "ccp" || nation == "kmt" || nation == "dadao" || isWarlord(nation);
 }
-bool activeWarlord(const State& state, const Id& nation) {
+bool activeWarlord(const State& state, NationId nation) {
     const auto it = state.nations.find(nation);
-    if (it == state.nations.end() || !isWarlord(nation)
+    if (it == state.nations.end() || !isWarlord(nationName(state, nation))
             || flag(it->second.gameFlags, "incorporated")
             || state.politics.surrendered.contains(nation)) return false;
     return !possessedLand(state, nation).empty()
@@ -31,10 +31,10 @@ bool activeWarlord(const State& state, const Id& nation) {
 }
 bool maySignTruce(const State& state) {
     return !state.politics.chineseTruce && !state.politics.trucePermanentlyEnded
-        && state.nations.contains("ccp") && state.nations.contains("kmt")
-        && state.nations.at("ccp").powerStatus != "major"
-        && state.nations.at("kmt").powerStatus != "major"
-        && !state.politics.surrendered.contains("kmt");
+        && state.nations.contains(knownNations(state).ccp) && state.nations.contains(knownNations(state).kmt)
+        && state.nations.at(nationNumber(state, "ccp")).powerStatus != "major"
+        && state.nations.at(nationNumber(state, "kmt")).powerStatus != "major"
+        && !state.politics.surrendered.contains(knownNations(state).kmt);
 }
 void requireDecision(const State& state, const Action& action, const Id& kind) {
     if (state.decisions.empty() || state.decisions.back().kind != kind
@@ -54,34 +54,35 @@ std::map<ZoneId, std::pair<std::vector<Id>, std::vector<Id>>> mixedChineseStacks
     for (const auto& [id, unit] : state.units) {
         // The rule applies in land zones, including aircraft sharing that land.
         if (!state.territories.contains(unit.zone) || unit.carriedBy) continue;
-        if (unit.owner == "ccp") stacks[unit.zone].first.push_back(id);
-        if (unit.owner == "kmt") stacks[unit.zone].second.push_back(id);
+        if (unit.owner == knownNations(state).ccp) stacks[unit.zone].first.push_back(id);
+        if (unit.owner == knownNations(state).kmt) stacks[unit.zone].second.push_back(id);
     }
     std::erase_if(stacks, [](const auto& entry) {
         return entry.second.first.empty() || entry.second.second.empty();
     });
     return stacks;
 }
-void queueSharedBattles(State& state, const Id& breaker) {
+void queueSharedBattles(State& state, NationId breaker) {
     for (const auto& [zone, sides] : mixedChineseStacks(state)) {
         BattleState battle;
         battle.id = "truce_shared_" + std::to_string(state.clock.playerTurnSerial) + "_" + zoneName(state, zone);
         battle.zone = zone;
         const auto possessor = state.territories.at(zone).possessor;
-        if (!possessor || (*possessor != "ccp" && *possessor != "kmt"))
+        if (!possessor || (*possessor != knownNations(state).ccp && *possessor != knownNations(state).kmt))
             throw std::runtime_error("Shared Chinese armies require a Chinese land possessor");
         // RB 0.2 makes the active Chinese faction the attacker, including an
         // automatic termination during its own turn. The developer ruling
         // reported in RCL-012 makes the possessor defend on a third party's turn.
         const auto active = state.currentNation();
-        battle.attacker = active == "ccp" || active == "kmt"
-            ? active : (*possessor == "ccp" ? "kmt" : "ccp");
-        battle.defender = battle.attacker == "ccp" ? "kmt" : "ccp";
+        const auto ccp = nationNumber(state, "ccp");
+        const auto kmt = nationNumber(state, "kmt");
+        battle.attacker = active == ccp || active == kmt ? active : (*possessor == ccp ? kmt : ccp);
+        battle.defender = battle.attacker == ccp ? kmt : ccp;
         battle.stage = "awaiting_combat_rules";
-        battle.attackers = battle.attacker == "ccp" ? sides.first : sides.second;
-        battle.defenders = battle.defender == "ccp" ? sides.first : sides.second;
+        battle.attackers = battle.attacker == ccp ? sides.first : sides.second;
+        battle.defenders = battle.defender == ccp ? sides.first : sides.second;
         battle.flags["chinese_truce_termination"] = 1;
-        if (battle.attacker == "kmt" && state.nations.at("kmt").powerStatus == "minor")
+        if (battle.attacker == kmt && state.nations.at(kmt).powerStatus == "minor")
             battle.flags["truce_low_morale_eliminates"] = 1;
         O origins;
         A landEntries;
@@ -102,7 +103,7 @@ void queueSharedBattles(State& state, const Id& breaker) {
         }
         battle.data = V(O{{"round", V(1.0)}, {"origins", V(std::move(origins))},
                           {"land_entry_origins", V(std::move(landEntries))},
-                          {"truce_breaker", V(breaker)}});
+                          {"truce_breaker", V(nationName(state, breaker))}});
         state.flags["immediate_land_battles"] = 1;
         if (state.battles.contains(battle.id))
             throw std::runtime_error("Chinese Truce battle already queued");
@@ -110,27 +111,27 @@ void queueSharedBattles(State& state, const Id& breaker) {
         state.battles.emplace(battle.id, std::move(battle));
     }
 }
-void snapshotAlignment(State& state, const Id& warlord, const std::optional<Id>& directRecipient) {
+void snapshotAlignment(State& state, NationId warlord, std::optional<NationId> directRecipient) {
     bool ccp = false;
     bool dadao = false;
     if (!directRecipient) {
         for (const auto& zone : possessedLand(state, warlord)) {
             for (const auto& [neighbor, territory] : state.territories) {
-                if ((territory.possessor == "ccp" || territory.possessor == "dadao")
+                if ((isNation(state, territory.possessor, "ccp") || isNation(state, territory.possessor, "dadao"))
                         && passableLandBorder(state, zone, neighbor)) {
-                    ccp = ccp || territory.possessor == "ccp";
-                    dadao = dadao || territory.possessor == "dadao";
+                    ccp = ccp || isNation(state, territory.possessor, "ccp");
+                    dadao = dadao || isNation(state, territory.possessor, "dadao");
                 }
             }
         }
     }
     state.politics.alignmentQueue.push_back(warlord);
-    state.politics.pending[alignmentKey(warlord)] = V(O{
-        {"warlord", V(warlord)}, {"ccp_neighbor", V(ccp)}, {"dadao_neighbor", V(dadao)},
-        {"recipient", directRecipient ? V(*directRecipient) : V(nullptr)}});
+    state.politics.pending[alignmentKey(state, warlord)] = V(O{
+        {"warlord", V(nationName(state, warlord))}, {"ccp_neighbor", V(ccp)}, {"dadao_neighbor", V(dadao)},
+        {"recipient", directRecipient ? V(nationName(state, *directRecipient)) : V(nullptr)}});
 }
 void considerDadaoAlignment(State& state) {
-    if (!state.nations.contains("dadao") || !controlledBy(state, "dadao", "japan")) {
+    if (!state.nations.contains(knownNations(state).dadao) || !controlledBy(state, nationNumber(state, "dadao"), nationNumber(state, "japan"))) {
         state.politics.pending.erase("dadao_attacked_by");
         return;
     }
@@ -140,22 +141,23 @@ void considerDadaoAlignment(State& state) {
         align = !chineseFaction(attack->second.asString());
         state.politics.pending.erase(attack);
     }
-    if (state.currentNation() == "japan" && atWarWithMajor(state, "japan")) {
-        const auto& enemies = state.nations.at("japan").atWarWith;
-        align = align || std::any_of(enemies.begin(), enemies.end(), [](const Id& enemy) {
-            return enemy == "ccp" || enemy == "kmt" || isWarlord(enemy);
+    if (state.currentNation() == knownNations(state).japan && atWarWithMajor(state, nationNumber(state, "japan"))) {
+        const auto& enemies = state.nations.at(nationNumber(state, "japan")).atWarWith;
+        align = align || std::any_of(enemies.begin(), enemies.end(), [&](NationId enemy) {
+            const auto& name = nationName(state, enemy);
+            return name == "ccp" || name == "kmt" || isWarlord(name);
         });
     }
-    if (align) incorporateNation(state, "dadao", "japan");
+    if (align) incorporateNation(state, nationNumber(state, "dadao"), nationNumber(state, "japan"));
 }
-void alignSurvivingNation(State& state, const Id& warlord, const Id& recipient, bool foreign) {
+void alignSurvivingNation(State& state, NationId warlord, NationId recipient, bool foreign) {
     if (state.politics.surrendered.contains(recipient)) {
         // RB 4.9's defeated-KMT exception applies only to CCP/Dadao attacks.
         // The foreign-invasion table still awards KMT the surviving warlord;
         // this does not restore KMT's former units, possessions or treasury.
-        if (!foreign || recipient != "kmt" || !activeWarlord(state, warlord)) return;
-        state.politics.surrendered.erase("kmt");
-        state.nations.at("kmt").gameFlags.erase("surrendered");
+        if (!foreign || recipient != knownNations(state).kmt || !activeWarlord(state, warlord)) return;
+        state.politics.surrendered.erase(recipient);
+        state.nations.at(recipient).gameFlags.erase("surrendered");
     }
     incorporateNation(state, warlord, recipient);
 }
@@ -164,7 +166,7 @@ void alignSurvivingNation(State& state, const Id& warlord, const Id& recipient, 
 std::vector<Action> warlordActions(const State& state) {
     if (state.terminal || state.chance || !state.decisions.empty()
             || state.clock.phase != Phase::Combat || !state.politics.chineseTruce
-            || (state.currentNation() != "ccp" && state.currentNation() != "kmt")) return {};
+            || (state.currentNation() != knownNations(state).ccp && state.currentNation() != knownNations(state).kmt)) return {};
     return {politicalAction(state, state.currentNation(), "truce_break")};
 }
 
@@ -173,16 +175,16 @@ bool applyWarlordAction(State& state, const Action& action) {
         const auto actions = warlordActions(state);
         if (actions.empty() || canonicalJson(actionJson(actions.front())) != canonicalJson(actionJson(action)))
             throw std::runtime_error("Chinese Truce may only be broken during the faction's own Combat Phase");
-        terminateChineseTruce(state, action.nation);
+        terminateChineseTruce(state, nationNumber(state, action.nation));
         return true;
     }
     if (action.kind == "truce_offer" || action.kind == "truce_decline_offer") {
         requireDecision(state, action, "truce_offer_decision");
         popDecision(state);
         if (action.kind == "truce_offer" && maySignTruce(state)) {
-            queuePoliticalDecision(state, "kmt", "truce_response_decision", {
-                politicalAction(state, "kmt", "truce_accept"),
-                politicalAction(state, "kmt", "truce_reject")});
+            queuePoliticalDecision(state, nationNumber(state, "kmt"), "truce_response_decision", {
+                politicalAction(state, nationNumber(state, "kmt"), "truce_accept"),
+                politicalAction(state, nationNumber(state, "kmt"), "truce_reject")});
         } else {
             state.politics.truceOfferPending = false;
             continueCombatPoliticalResolution(state);
@@ -229,9 +231,9 @@ void beginCombatPoliticalResolution(State& state) {
         else {
             const auto attacked = state.politics.attackedWarlords.find(nation);
             if (attacked != state.politics.attackedWarlords.end()
-                    && (attacked->second.contains("ccp") || attacked->second.contains("dadao"))
-                    && !state.politics.surrendered.contains("kmt"))
-                snapshotAlignment(state, nation, Id("kmt"));
+                    && (attacked->second.contains(knownNations(state).ccp) || attacked->second.contains(knownNations(state).dadao))
+                    && !state.politics.surrendered.contains(knownNations(state).kmt))
+                snapshotAlignment(state, nation, nationNumber(state, "kmt"));
         }
     }
     state.politics.foreignChinaWarPending = false;
@@ -243,8 +245,8 @@ void beginCombatPoliticalResolution(State& state) {
 bool continueCombatPoliticalResolution(State& state) {
     if (state.chance || !state.decisions.empty() || !state.politics.pending.contains(resolutionKey)) return false;
     while (!state.politics.alignmentQueue.empty()) {
-        const Id nation = state.politics.alignmentQueue.front();
-        const V snapshot = state.politics.pending.at(alignmentKey(nation));
+        const NationId nation = state.politics.alignmentQueue.front();
+        const V snapshot = state.politics.pending.at(alignmentKey(state, nation));
         const bool ccp = snapshot.require("ccp_neighbor").asBool();
         const bool dadao = snapshot.require("dadao_neighbor").asBool();
         const V& direct = snapshot.require("recipient");
@@ -255,8 +257,9 @@ bool continueCombatPoliticalResolution(State& state) {
             return true;
         }
         state.politics.alignmentQueue.erase(state.politics.alignmentQueue.begin());
-        state.politics.pending.erase(alignmentKey(nation));
-        alignSurvivingNation(state, nation, direct.isNull() ? Id("kmt") : direct.asString(), direct.isNull());
+        state.politics.pending.erase(alignmentKey(state, nation));
+        alignSurvivingNation(state, nation,
+            direct.isNull() ? nationNumber(state, "kmt") : nationNumber(state, direct.asString()), direct.isNull());
         refreshPoliticalState(state);
         if (state.chance || !state.decisions.empty()) return true;
     }
@@ -269,9 +272,9 @@ bool continueCombatPoliticalResolution(State& state) {
     refreshPoliticalState(state);
     if (truceEligible && maySignTruce(state)) {
         state.politics.truceOfferPending = true;
-        queuePoliticalDecision(state, "ccp", "truce_offer_decision", {
-            politicalAction(state, "ccp", "truce_offer"),
-            politicalAction(state, "ccp", "truce_decline_offer")});
+        queuePoliticalDecision(state, nationNumber(state, "ccp"), "truce_offer_decision", {
+            politicalAction(state, nationNumber(state, "ccp"), "truce_offer"),
+            politicalAction(state, nationNumber(state, "ccp"), "truce_decline_offer")});
     }
     return true;
 }
@@ -280,7 +283,7 @@ bool applyWarlordChance(State& state, const ChanceRequest& request, const Chance
     if (request.purpose != "warlord_alignment") return false;
     const auto results = effectiveResults(request, outcome);
     const V parameters = pendingPolitical(state, request.continuation);
-    const Id nation = parameters.require("warlord").asString();
+    const NationId nation = nationNumber(state, parameters.require("warlord").asString());
     if (results.size() != 1 || state.politics.alignmentQueue.empty()
             || state.politics.alignmentQueue.front() != nation)
         throw std::runtime_error("Unexpected whole-warlord alignment continuation");
@@ -291,17 +294,17 @@ bool applyWarlordChance(State& state, const ChanceRequest& request, const Chance
     if (ccp && dadao) recipient = roll <= 5 ? "ccp" : roll <= 10 ? "kmt" : "dadao";
     else if (roll <= 6 && (ccp || dadao)) recipient = ccp ? "ccp" : "dadao";
     state.politics.alignmentQueue.erase(state.politics.alignmentQueue.begin());
-    state.politics.pending.erase(alignmentKey(nation));
+    state.politics.pending.erase(alignmentKey(state, nation));
     erasePoliticalContinuation(state, request.continuation);
-    alignSurvivingNation(state, nation, recipient, true);
+    alignSurvivingNation(state, nation, nationNumber(state, recipient), true);
     refreshPoliticalState(state);
     continueCombatPoliticalResolution(state);
     return true;
 }
 
-void terminateChineseTruce(State& state, const Id& breaker, bool evolution) {
+void terminateChineseTruce(State& state, NationId breaker, bool evolution) {
     if (!state.politics.chineseTruce) return;
-    if (breaker != "ccp" && breaker != "kmt") throw std::runtime_error("Only a Chinese faction can terminate its truce");
+    if (breaker != knownNations(state).ccp && breaker != knownNations(state).kmt) throw std::runtime_error("Only a Chinese faction can terminate its truce");
     if (!evolution && (state.clock.phase != Phase::Combat || state.currentNation() != breaker))
         throw std::runtime_error("Voluntary Chinese Truce termination requires the faction's Combat Phase");
     state.politics.chineseTruce = false;

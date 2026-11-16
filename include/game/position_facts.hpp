@@ -41,13 +41,13 @@ class PositionFacts {
         answers_.emplace(std::make_tuple(fact, first, second), answer);
         return answer;
     }
-    // The same for a question about one zone.
+    // The same for a question about one nation and one zone.
     template <class Compute>
-    bool rememberAt(Fact fact, const Id& first, ZoneId zone, Compute&& compute) {
-        if (const auto found = zoneAnswers_.find(std::tie(fact, first, zone)); found != zoneAnswers_.end())
+    bool rememberAt(Fact fact, NationId nation, ZoneId zone, Compute&& compute) {
+        if (const auto found = zoneAnswers_.find(std::tie(fact, nation, zone)); found != zoneAnswers_.end())
             return found->second;
         const bool answer = compute();
-        zoneAnswers_.emplace(std::make_tuple(fact, first, zone), answer);
+        zoneAnswers_.emplace(std::make_tuple(fact, nation, zone), answer);
         return answer;
     }
 
@@ -63,17 +63,25 @@ class PositionFacts {
         return answer;
     }
 
+    // Zones found for one unit, by its id.
     template <class Compute>
-    const NumberSet<ZoneId>& zones(Fact fact, const Id& nation, Compute&& compute) {
-        if (const auto found = zones_.find(std::tie(fact, nation)); found != zones_.end()) return found->second;
-        return zones_.emplace(std::make_tuple(fact, nation), compute()).first->second;
+    const NumberSet<ZoneId>& zones(Fact fact, const Id& unit, Compute&& compute) {
+        if (const auto found = zones_.find(std::tie(fact, unit)); found != zones_.end()) return found->second;
+        return zones_.emplace(std::make_tuple(fact, unit), compute()).first->second;
+    }
+    // Zones found for one nation.
+    template <class Compute>
+    const NumberSet<ZoneId>& nationZones(Fact fact, NationId nation, Compute&& compute) {
+        if (const auto found = nationZones_.find(std::tie(fact, nation)); found != nationZones_.end()) return found->second;
+        return nationZones_.emplace(std::make_tuple(fact, nation), compute()).first->second;
     }
 
   private:
     std::map<std::tuple<Fact, Id, Id>, bool, std::less<>> answers_;
-    std::map<std::tuple<Fact, Id, ZoneId>, bool, std::less<>> zoneAnswers_;
+    std::map<std::tuple<Fact, NationId, ZoneId>, bool, std::less<>> zoneAnswers_;
     std::map<std::tuple<Fact, std::string, ZoneId>, int, std::less<>> numbers_;
     std::map<std::tuple<Fact, Id>, NumberSet<ZoneId>, std::less<>> zones_;
+    std::map<std::tuple<Fact, NationId>, NumberSet<ZoneId>, std::less<>> nationZones_;
 };
 
 // Facts for this exact State object while a scope for it is open, else null.

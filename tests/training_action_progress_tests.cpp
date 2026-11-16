@@ -35,7 +35,7 @@ State fixture(Phase phase) {
     state.clock.nationIndex = 2;
     state.clock.playerTurnSerial = 2;
     state.clock.phase = phase;
-    state.completedTurns["ccp"] = state.completedTurns["mongolia"] = 1;
+    state.completedTurns[nationNumber(state, "ccp")] = state.completedTurns[nationNumber(state, "mongolia")] = 1;
     state.captureTurnStart();
     return state;
 }
@@ -44,10 +44,10 @@ void add(State& state, const Id& id, const Id& type, const Id& zone, const Id& o
     UnitState unit;
     unit.id = id;
     unit.type = type;
-    unit.owner = owner;
+    unit.owner = nationNumber(state, owner);
     unit.zone = unit.turnOrigin = zoneNumber(state, zone);
     unit.movementAllowance = unit.movementRemaining =
-        state.definition->catalog->stats(type, 0, catalogContext(state, owner, zoneNumber(state, zone))).movement;
+        state.definition->catalog->stats(type, 0, catalogContext(state, nationNumber(state, owner), zoneNumber(state, zone))).movement;
     state.units.emplace(id, std::move(unit));
 }
 
@@ -78,10 +78,10 @@ void raiderChoicesRemainReachableAndBounceStops() {
     auto source = fixture(Phase::CombatMovement);
     // Combat Movement land moves must start a combat (RB 9.1), so the walker's
     // real progress is an attack on KMT-held Hopeh.
-    source.nations.at("japan").atWarWith.insert("kmt");
-    source.nations.at("kmt").atWarWith.insert("japan");
-    source.territories.at(zoneNumber(source, beiping)).possessor = "japan";
-    source.territories.at(zoneNumber(source, hopeh)).possessor = "kmt";
+    source.nations.at(nationNumber(source, "japan")).atWarWith.insert(nationNumber(source, "kmt"));
+    source.nations.at(nationNumber(source, "kmt")).atWarWith.insert(nationNumber(source, "japan"));
+    source.territories.at(zoneNumber(source, beiping)).possessor = nationNumber(source, "japan");
+    source.territories.at(zoneNumber(source, hopeh)).possessor = nationNumber(source, "kmt");
     add(source, "raider", "battlecruiser", sea);
     add(source, "walker", "infantry", beiping);
     source.captureTurnStart();
@@ -173,15 +173,15 @@ void inPortDeckLandAssignmentsCannotCycle() {
 State railFixture(const Id& recipient) {
     auto source = fixture(Phase::Production);
     ensureDadao(source);
-    source.nations.at("japan").treasury = 100;
-    source.nations.at("japan").atWarWith.erase(recipient);
-    source.nations.at(recipient).atWarWith.erase("japan");
-    source.territories.at(zoneNumber(source, "land_manchuria_rehe")).possessor = "japan";
-    source.territories.at(zoneNumber(source, "land_china_hopeh")).possessor = "japan";
-    source.territories.at(zoneNumber(source, "land_china_suiyuan")).possessor = recipient;
+    source.nations.at(nationNumber(source, "japan")).treasury = 100;
+    source.nations.at(nationNumber(source, "japan")).atWarWith.erase(nationNumber(source, recipient));
+    source.nations.at(nationNumber(source, recipient)).atWarWith.erase(nationNumber(source, "japan"));
+    source.territories.at(zoneNumber(source, "land_manchuria_rehe")).possessor = nationNumber(source, "japan");
+    source.territories.at(zoneNumber(source, "land_china_hopeh")).possessor = nationNumber(source, "japan");
+    source.territories.at(zoneNumber(source, "land_china_suiyuan")).possessor = nationNumber(source, recipient);
     source.captureTurnStart();
     beginEconomyTurn(source);
-    source.nations.at("japan").turnFlags["economy_research_finished"] = 1;
+    source.nations.at(nationNumber(source, "japan")).turnFlags["economy_research_finished"] = 1;
     return source;
 }
 
@@ -193,10 +193,10 @@ void declinedRailRequestsAreBoundedAndResetAfterProgress() {
             return action.parameters.require("zone").asString() == "land_manchuria_rehe" &&
                    action.parameters.require("border").asString() == "land_china_suiyuan";
         });
-        const auto cash = engine.state().nations.at("japan").treasury;
+        const auto cash = engine.state().nations.at(nationNumber(engine.state(), "japan")).treasury;
         engine.step(request);
         choose(engine, "economy_decline_rail");
-        check(engine.state().nations.at("japan").treasury == cash && engine.state().construction.empty(),
+        check(engine.state().nations.at(nationNumber(engine.state(), "japan")).treasury == cash && engine.state().construction.empty(),
               "Declined railroad consumed money or created a project");
         const auto same = [&](const Action& action) { return canonicalJson(action.parameters) == canonicalJson(request.parameters); };
         check(!offers(engine, "economy_request_rail", same), "Identical declined request can repeat");

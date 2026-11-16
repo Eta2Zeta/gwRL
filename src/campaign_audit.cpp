@@ -27,14 +27,14 @@ bool has(const State &s,const UnitState &u,const Id &c) {
 }
 V unitJson(const State &s,const UnitState &u) {
     A cargo;for(const auto&id:u.cargo)cargo.emplace_back(id);
-    return V(O{{"id",V(u.id)},{"type",V(u.type)},{"owner",V(u.owner)},{"zone",V(zoneName(s,u.zone))},
+    return V(O{{"id",V(u.id)},{"type",V(u.type)},{"owner",V(nationName(s,u.owner))},{"zone",V(zoneName(s,u.zone))},
         {"damage",n(u.damage)},{"movement",u.movementRemaining?n(*u.movementRemaining):V(nullptr)},
         {"carried_by",u.carriedBy?V(*u.carriedBy):V(nullptr)},{"cargo",V(cargo)}});
 }
 V clockJson(const State&s) {
     const auto[y,m]=s.calendarDate();
     return V(O{{"year",n(y)},{"month",n(m)},{"round",n(s.clock.roundIndex)},
-        {"serial",V(std::to_string(s.clock.playerTurnSerial))},{"nation",V(s.currentNation())},
+        {"serial",V(std::to_string(s.clock.playerTurnSerial))},{"nation",V(s.currentNationName())},
         {"phase",V(toString(s.clock.phase))},{"terminal",V(s.terminal)}});
 }
 V eventsJson(const EventLog&events,std::size_t from) {
@@ -59,7 +59,7 @@ double actionScore(const State&s,const Action&a,int phaseCount,std::uint64_t see
     // Preserve one exposed starting cruiser and the Chinese production city so
     // later evolved Chinese aircraft can exercise real naval combat.
     if(unit=="setup_japan_sea_p14_heavy_cruiser_1"&&(k=="naval_start_move"||k=="naval_enter_port"))return -1000+jitter;
-    if(s.currentNation()=="japan"&&s.clock.roundIndex<4) {
+    if(s.currentNation()== knownNations(s).japan&&s.clock.roundIndex<4) {
         auto zone=text(a.parameters,"zone");
         if(const auto*p=a.parameters.find("path");p&&!p->asArray().empty())zone=p->asArray().back().asString();
         if(zone=="land_china_nanking"&&(k=="movement_route"||k=="air_ground_attack"||k=="air_support"||k=="naval_declare_assault"))return -1000+jitter;
@@ -89,7 +89,7 @@ double actionScore(const State&s,const Action&a,int phaseCount,std::uint64_t see
     if(k=="economy_advance")return 750+jitter;
     if(k=="economy_purchase") {
         const auto type=s.definition->catalog->row(a.parameters.require("row").asString()).type;
-        if(s.currentNation()=="japan"&&phaseCount>=5)return -20+jitter;
+        if(s.currentNation()== knownNations(s).japan&&phaseCount>=5)return -20+jitter;
         if(type=="fighter")return 700+jitter;
         if(type=="infantry")return 600+jitter;
         if(type=="artillery")return 550+jitter;
@@ -107,7 +107,7 @@ double actionScore(const State&s,const Action&a,int phaseCount,std::uint64_t see
         if(path&&!path->asArray().empty()) {
             const auto zone=findZone(s,path->asArray().back().asString());
             if(zone&&s.territories.contains(*zone)&&s.territories.at(*zone).possessor&&
-               s.territories.at(*zone).possessor!=a.nation) {
+               !isNation(s,s.territories.at(*zone).possessor,a.nation)) {
                 // Keep Japan's first turn available for Dadao influence.
                 if(a.nation=="japan"&&s.clock.roundIndex==0)return -30+jitter;
                 return 600+jitter;
@@ -134,7 +134,7 @@ std::vector<std::string> campaignInvariantFailures(const State&s) {
     std::vector<std::string> out;
     try{s.validate();}catch(const std::exception&e){out.push_back(std::string("structural: ")+e.what());return out;}
     for(const auto &[id,nation]:s.nations)for(const auto&enemy:nation.atWarWith)
-        if(!s.nations.at(enemy).atWarWith.contains(id))out.push_back("asymmetric war: "+id+" / "+enemy);
+        if(!s.nations.at(enemy).atWarWith.contains(id))out.push_back("asymmetric war: "+ nationName(s, id)+" / "+ nationName(s, enemy));
     std::map<Id,Id> pendingAttacks;
     for(const auto&[battleId,b]:s.battles)
         if(!value(b.flags,"finished")&&!value(b.flags,"naval_battle")&&!value(b.flags,"air_mission")&&
@@ -200,7 +200,7 @@ std::vector<std::string> campaignInvariantFailures(const State&s) {
             }
         }
     for(const auto&[id,nation]:s.nations)
-        if(nation.incomeKnown&&nation.incomeComponents!=evaluateIncome(s,id).components)out.push_back("stale income: "+id);
+        if(nation.incomeKnown&&nation.incomeComponents!=evaluateIncome(s,id).components)out.push_back("stale income: "+ nationName(s, id));
     if(s.terminal)for(const auto&[id,u]:s.units)
         if(value(u.turnFlags,"air_in_flight")&&!value(u.gameFlags,"on_map"))out.push_back("terminal aircraft still in flight: "+id);
     if(s.clock.phase==Phase::PlaceUnits&&s.battles.empty()&&s.decisions.empty()&&!s.chance)
@@ -216,10 +216,10 @@ void requireCampaignInvariants(const State&s) {
 V campaignSnapshot(const State&s) {
     O units,land,cash,income,status,turns;A battles,decisions;
     for(const auto&[id,u]:s.units)units[id]=unitJson(s,u);
-    for(const auto&[id,t]:s.territories)land[zoneName(s,id)]=t.possessor?V(*t.possessor):V(nullptr);
-    for(const auto&[id,t]:s.nations){cash[id]=t.treasury?n(*t.treasury):V(nullptr);income[id]=n(evaluateIncome(s,id).total);status[id]=V(t.powerStatus);}
-    for(const auto&[id,c]:s.completedTurns)turns[id]=n(c);
-    for(const auto&[id,b]:s.battles)battles.emplace_back(O{{"id",V(id)},{"zone",V(zoneName(s,b.zone))},{"attacker",V(b.attacker)},{"defender",V(b.defender)},{"stage",V(b.stage)}});
+    for(const auto&[id,t]:s.territories)land[zoneName(s,id)]=t.possessor?V(nationName(s, *t.possessor)):V(nullptr);
+    for(const auto&[id,t]:s.nations){const auto& name=nationName(s,id);cash[name]=t.treasury?n(*t.treasury):V(nullptr);income[name]=n(evaluateIncome(s,id).total);status[name]=V(t.powerStatus);}
+    for(const auto&[id,c]:s.completedTurns)turns[nationName(s,id)]=n(c);
+    for(const auto&[id,b]:s.battles)battles.emplace_back(O{{"id",V(id)},{"zone",V(zoneName(s,b.zone))},{"attacker",V(nationName(s,b.attacker))},{"defender",V(nationName(s,b.defender))},{"stage",V(b.stage)}});
     for(const auto&d:s.decisions)decisions.emplace_back(O{{"kind",V(d.kind)},{"nation",V(d.nation)}});
     return V(O{{"clock",clockJson(s)},{"units",V(units)},{"territories",V(land)},{"treasuries",V(cash)},
         {"incomes",V(income)},{"power_status",V(status)},{"completed_turns",V(turns)},
@@ -262,7 +262,7 @@ void CampaignAuditLog::record(const State&before,const Engine&e,const std::strin
     }
     for(const auto&[id,u]:before.units)if(!after.units.contains(id))removed.push_back(unitJson(before,u));
     if(command=="economy_purchase"||command=="economy_advance") {
-        const auto nation=text(input,"nation");int paid=0;
+        const auto nation=nationNumber(after,text(input,"nation"));int paid=0;
         for(const auto&[id,p]:after.construction)if(p.owner==nation)
             paid+=p.paidIpp-(before.construction.contains(id)?before.construction.at(id).paidIpp:0);
         if(!before.nations.at(nation).treasury||!after.nations.at(nation).treasury||
@@ -271,8 +271,8 @@ void CampaignAuditLog::record(const State&before,const Engine&e,const std::strin
     }
     if(!removed.empty()&&(command=="economy_purchase"||command=="economy_advance"||command=="economy_research"||command=="economy_finish_research"||command=="influence_roll"||command=="recruitment_roll"))
         throw std::runtime_error("Financial/roll-declaration action removed deployed units: "+command);
-    for(const auto&[id,t]:after.territories)if(before.territories.at(id).possessor!=t.possessor)possessions[zoneName(after,id)]=t.possessor?V(*t.possessor):V(nullptr);
-    for(const auto&[id,nation]:after.nations)if(!before.nations.contains(id)||before.nations.at(id).treasury!=nation.treasury)cash[id]=nation.treasury?n(*nation.treasury):V(nullptr);
+    for(const auto&[id,t]:after.territories)if(before.territories.at(id).possessor!=t.possessor)possessions[zoneName(after,id)]=t.possessor?V(nationName(before, *t.possessor)):V(nullptr);
+    for(const auto&[id,nation]:after.nations)if(!before.nations.contains(id)||before.nations.at(id).treasury!=nation.treasury)cash[nationName(after,id)]=nation.treasury?n(*nation.treasury):V(nullptr);
     auto snapshot=campaignSnapshot(after).asObject();snapshot.erase("units");
     transitions_.emplace_back(O{{"index",n(static_cast<int>(transitions_.size()))},{"kind",V(kind)},{"input",input},
         {"before",clockJson(before)},{"after",clockJson(after)},{"unit_creation",V(added)},
@@ -307,25 +307,25 @@ void runCampaignTrace(Engine&e,CampaignAuditLog&log,const CampaignTraceOptions&o
         if(before.chance) {
             const auto request=before.chance->id;e.resolveChance();log.record(before,e,"chance",V(O{{"request_id",V(request)}}));continue;
         }
-        if(options.delayedJapaneseWar&&before.decisions.empty()&&before.currentNation()=="japan"&&before.clock.phase==Phase::CombatMovement&&before.nations.at("kmt").powerStatus=="major") {
+        if(options.delayedJapaneseWar&&before.decisions.empty()&&before.currentNation()== knownNations(before).japan&&before.clock.phase==Phase::CombatMovement&&before.nations.at(nationNumber(before, "kmt")).powerStatus=="major") {
             const auto interrupts=e.legalInterrupts();
             const auto declaration=std::find_if(interrupts.begin(),interrupts.end(),[](const auto&a){return a.kind=="politics_declare_war"&&a.nation=="japan"&&a.parameters.require("target").asString()=="kmt";});
             if(declaration!=interrupts.end()) {const auto a=*declaration;e.interrupt(a);log.record(before,e,"interrupt",actionJson(a));continue;}
         }
         std::vector<Action> legal;
         try{legal=e.legalActions();}catch(const std::exception&error){throw std::runtime_error("Trace action enumeration at "+marker+": "+error.what());}
-        if(legal.empty())throw std::runtime_error("Trace dead end at "+marker+" "+before.currentNation());
+        if(legal.empty())throw std::runtime_error("Trace dead end at "+marker+" "+ nationName(before, before.currentNation()));
         auto best=legal.begin();double bestScore=-1e99;
         for(auto i=legal.begin();i!=legal.end();++i) {
             double score=actionScore(before,*i,optional,options.policySeed);
-            if(options.delayedJapaneseWar&&before.currentNation()=="japan"&&before.nations.at("kmt").powerStatus!="major"&&before.clock.phase==Phase::CombatMovement) {
+            if(options.delayedJapaneseWar&&before.currentNation()== knownNations(before).japan&&before.nations.at(nationNumber(before, "kmt")).powerStatus!="major"&&before.clock.phase==Phase::CombatMovement) {
                 const auto&k=i->kind;
                 if(k=="movement_route"||k=="air_ground_attack"||k=="air_support"||k=="air_bomb"||k=="naval_declare_assault"||k=="naval_port_attack"||k=="naval_air_attack")score-=5000;
             }
-            if(options.delayedJapaneseWar&&(i->nation=="kmt"||i->nation=="ccp")&&!before.nations.at("japan").atWarWith.contains(i->nation)) {
+            if(options.delayedJapaneseWar&&(i->nation=="kmt"||i->nation=="ccp")&&!before.nations.at(nationNumber(before, "japan")).atWarWith.contains(findNation(before,i->nation))) {
                 auto target=text(i->parameters,"zone");
                 if(const auto*path=i->parameters.find("path");path&&!path->asArray().empty())target=path->asArray().back().asString();
-                const auto targetZone=findZone(before,target);if((targetZone&&before.territories.contains(*targetZone)&&before.territories.at(*targetZone).possessor=="japan")||i->kind=="naval_air_attack"||i->kind=="naval_port_attack")score-=5000;
+                const auto targetZone=findZone(before,target);if((targetZone&&before.territories.contains(*targetZone)&&isNation(before, before.territories.at(*targetZone).possessor, "japan"))||i->kind=="naval_air_attack"||i->kind=="naval_port_attack")score-=5000;
             }
             const auto key=i->kind+":"+canonicalJson(i->parameters);
             score-=choices[key]*10000;

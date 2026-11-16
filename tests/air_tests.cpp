@@ -30,12 +30,12 @@ State fixture(Phase phase = Phase::CombatMovement) {
     s.clock.nationIndex = 2;
     s.clock.playerTurnSerial = 2;
     s.clock.phase = phase;
-    s.completedTurns["ccp"] = s.completedTurns["mongolia"] = 1;
-    s.nations.at("japan").atWarWith.insert("kmt");
-    s.nations.at("kmt").atWarWith.insert("japan");
-    s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
-    s.territories.at(zoneNumber(s, hopeh)).possessor = "kmt";
-    s.territories.at(zoneNumber(s, shantung)).possessor = "japan";
+    s.completedTurns[nationNumber(s, "ccp")] = s.completedTurns[nationNumber(s, "mongolia")] = 1;
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+    s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
+    s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "japan");
+    s.territories.at(zoneNumber(s, hopeh)).possessor = nationNumber(s, "kmt");
+    s.territories.at(zoneNumber(s, shantung)).possessor = nationNumber(s, "japan");
     s.captureTurnStart();
     return s;
 }
@@ -43,10 +43,10 @@ void add(State &s, const Id &id, const Id &type, const Id &owner, const Id &zone
     UnitState u;
     u.id = id;
     u.type = type;
-    u.owner = owner;
+    u.owner = nationNumber(s, owner);
     u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, 0, catalogContext(s, owner, zoneNumber(s, zone))).movement;
+        s.definition->catalog->stats(type, 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone))).movement;
     s.units[id] = u;
 }
 std::shared_ptr<const Rules> rules() {
@@ -120,7 +120,7 @@ void landingTimingAndCarrierCapacity() {
     auto s = fixture();
     add(s, "f", "fighter", "japan", beiping);
     check(airLandingAvailable(s, "f", beiping), "Held friendly land unavailable");
-    s.territories.at(zoneNumber(s, hopeh)).possessor = "japan";
+    s.territories.at(zoneNumber(s, hopeh)).possessor = nationNumber(s, "japan");
     s.territories.at(zoneNumber(s, hopeh)).flags["last_possession_change_turn"] = 2;
     check(!airLandingAvailable(s, "f", hopeh), "Newly captured landing allowed");
     add(s, "cv", "fleet_carrier", "japan", beiping);
@@ -135,8 +135,8 @@ void landingTimingAndCarrierCapacity() {
 void ordinaryFlightsKeepALandingContinuation() {
     const Id formosa = "land_formosa", hainan = "land_hainan";
     auto s = fixture(Phase::NonCombatMovement);
-    s.nations.at("japan").atWarWith.insert("warlord_kwangtung_hainan");
-    s.nations.at("warlord_kwangtung_hainan").atWarWith.insert("japan");
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "warlord_kwangtung_hainan"));
+    s.nations.at(nationNumber(s, "warlord_kwangtung_hainan")).atWarWith.insert(nationNumber(s, "japan"));
     add(s, "b", "tactical_bomber", "japan", tokyo);
     s.units.at("b").movementAllowance = s.units.at("b").movementRemaining = 5;
     const std::vector<Id> stranded{tokyo, honshu, "sea_p15", "sea_p32", "sea_p41", hainan};
@@ -174,8 +174,8 @@ void ordinaryFlightsKeepALandingContinuation() {
     check(replay.exactReplayIdentity() == e.exactReplayIdentity(), "Split flight replay diverged");
 
     auto culdesac = fixture(Phase::NonCombatMovement);
-    culdesac.nations.at("japan").atWarWith.insert("warlord_kwangtung_hainan");
-    culdesac.nations.at("warlord_kwangtung_hainan").atWarWith.insert("japan");
+    culdesac.nations.at(nationNumber(culdesac, "japan")).atWarWith.insert(nationNumber(culdesac, "warlord_kwangtung_hainan"));
+    culdesac.nations.at(nationNumber(culdesac, "warlord_kwangtung_hainan")).atWarWith.insert(nationNumber(culdesac, "japan"));
     add(culdesac, "b", "strategic_bomber", "japan", tokyo);
     culdesac.units.at("b").movementAllowance = culdesac.units.at("b").movementRemaining = 6;
     Engine oneFuel(culdesac, rules());
@@ -289,7 +289,7 @@ void railroadSideAndAllTracks() {
 }
 void cityPermanentIPPAndDestruction() {
     auto s = fixture();
-    s.territories.at(zoneNumber(s, nanking)).possessor = "kmt";
+    s.territories.at(zoneNumber(s, nanking)).possessor = nationNumber(s, "kmt");
     applyCityBombDamage(s, zoneNumber(s, nanking), 20);
     check(effectiveTerritorialIpp(s, zoneNumber(s, nanking)) == 1, "City IPP not reduced");
     s.territories.at(zoneNumber(s, nanking)).flags["city_damage"] = 0;
@@ -301,7 +301,7 @@ void cityPermanentIPPAndDestruction() {
 }
 void improvedConstructionPerPlayerTurn() {
     auto s = fixture();
-    s.nations.at("kmt").technologyStages["improved_construction"] = 4;
+    s.nations.at(nationNumber(s, "kmt")).technologyStages["improved_construction"] = 4;
     s.facilities["factory"] = {"factory", "major_factory", zoneNumber(s, hopeh), 0, {}};
     applyFacilityBombDamage(s, "factory", 4);
     applyFacilityBombDamage(s, "factory", 4);
@@ -419,7 +419,7 @@ void strandedAttackersStillEndCombatMovement() {
 void noAircraftCapture() {
     auto s = fixture();
     add(s, "f", "fighter", "japan", hopeh);
-    check(s.territories.at(zoneNumber(s, hopeh)).possessor == "kmt", "Fixture owner");
+    check(isNation(s, s.territories.at(zoneNumber(s, hopeh)).possessor, "kmt"), "Fixture owner");
     Engine e(s, rules());
     check(!offered(e, "movement_route"), "Aircraft got ordinary land capture route");
 }
@@ -535,7 +535,7 @@ void alliedTransportBoardsAfterItsOwnersTurn() {
     auto s = fixture(Phase::NonCombatMovement);
     s.clock.nationIndex = 3;  // KMT, after CCP, Mongolia and Japan
     s.clock.playerTurnSerial = 3;
-    s.completedTurns["japan"] = 1;
+    s.completedTurns[nationNumber(s, "japan")] = 1;
     s.politics.chineseTruce = true;
     add(s, "lift", "air_transport", "ccp", hopeh);
     s.units.at("lift").commitments.insert("combat_move");  // From CCP's own Combat Movement.
@@ -558,7 +558,7 @@ void aRaidOnAVanishedProjectDoesNothing() {
     // before the damage roll (seed 8215 of the 2 November random games).
     auto s = fixture();
     add(s, "b", "medium_bomber", "japan", beiping);
-    s.construction["project"] = BuildProject{"project", "kmt", "medium_factory", hopeh, 1, 3, {3}};
+    s.construction["project"] = BuildProject{"project", nationNumber(s, "kmt"), "medium_factory", hopeh, 1, 3, {3}};
     Engine e(s, rules(), 4);
     choose(e, "air_bomb",
            [](const auto &a) { return a.parameters.require("target").asString() == "project"; });

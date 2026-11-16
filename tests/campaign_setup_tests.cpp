@@ -53,21 +53,21 @@ int main() {
         require(state.definition->turnOrder == std::vector<Id> {"ccp", "mongolia", "japan", "kmt"}, "Turn order changed");
         std::map<Id, int> units;
         for (const auto& [id, unit] : state.units) {
-            ++units[unit.owner];
+            ++units[nationName(state, unit.owner)];
             require(unit.movementRemaining && unit.movementAllowance, "Catalog movement missing");
         }
         require(units["japan"] == 48 && units["kmt"] == 12 && units["ccp"] == 5 && units["mongolia"] == 2,
                 "National setup counts changed");
-        require(state.nations.at("japan").treasury == 15 && state.nations.at("kmt").treasury == 6
-                && state.nations.at("ccp").treasury == 2, "Opening accounts changed");
-        require(!state.nations.at("mongolia").treasury && !state.nations.contains("ussr")
-                && !state.nations.contains("fec"), "An excluded account was restored");
-        require(state.nations.at("mongolia").player == "comintern"
-                && !state.nations.at("mongolia").controllerNation, "Mongolia became another nation");
-        require(state.nations.at("kmt").atWarWith.contains("ccp")
-                && state.nations.at("ccp").atWarWith.contains("kmt")
-                && state.nations.at("japan").atWarWith.empty(), "Initial diplomacy changed");
-        require(state.currentNation() == "ccp" && state.decisionPlayer() == "comintern", "Initial decision owner wrong");
+        require(state.nations.at(nationNumber(state, "japan")).treasury == 15 && state.nations.at(nationNumber(state, "kmt")).treasury == 6
+                && state.nations.at(nationNumber(state, "ccp")).treasury == 2, "Opening accounts changed");
+        require(!state.nations.at(nationNumber(state, "mongolia")).treasury && !hasNation(state, "ussr")
+                && !hasNation(state, "fec"), "An excluded account was restored");
+        require(state.nations.at(nationNumber(state, "mongolia")).player == "comintern"
+                && !state.nations.at(nationNumber(state, "mongolia")).controllerNation, "Mongolia became another nation");
+        require(state.nations.at(nationNumber(state, "kmt")).atWarWith.contains(nationNumber(state, "ccp"))
+                && state.nations.at(nationNumber(state, "ccp")).atWarWith.contains(nationNumber(state, "kmt"))
+                && state.nations.at(nationNumber(state, "japan")).atWarWith.empty(), "Initial diplomacy changed");
+        require(state.currentNationName() == "ccp" && state.decisionPlayer() == "comintern", "Initial decision owner wrong");
         require(state.calendarDate() == std::pair {1936, 7}, "Initial date wrong");
         std::cout << "PASS all retained setup, national accounts, politics and turn routing\n";
 
@@ -78,7 +78,7 @@ int main() {
         int paid = 0;
         require(state.construction.size() == 2, "National construction queues lost");
         for (const auto& [id, project] : state.construction) {
-            require(!project.site && project.owner == "japan", "A queue was assigned an invented site");
+            require(!project.site && project.owner == nationNumber(state, "japan"), "A queue was assigned an invented site");
             paid += project.paidIpp;
         }
         require(paid == 10, "Paid construction changed");
@@ -92,17 +92,17 @@ int main() {
         require(state.definition->factions.at("mongolia").homeCountryKnown
                 && state.definition->factions.at("mongolia").homeCountry.size()==4,
                 "Original mainland home-country predicate unresolved");
-        require(!state.nations.at("japan").incomeKnown, "Printed IPP was silently treated as evaluated legal income");
+        require(!state.nations.at(nationNumber(state, "japan")).incomeKnown, "Printed IPP was silently treated as evaluated legal income");
         std::cout << "PASS carrier identities, queues, source names and independent home-country membership\n";
 
         require(State::fromJson(state.definition, game::json::parse(state.serialize())).serialize() == state.serialize(),
                 "Actual campaign setup fails round trip");
         State clone = state.clone();
         require(clone.definition == state.definition, "Clone copied immutable definition");
-        clone.nations.at("japan").treasury = 0;
-        clone.territories.at(zoneNumber(clone, "land_china_beiping")).possessor = "kmt";
-        require(state.nations.at("japan").treasury == 15
-                && state.territories.at(zoneNumber(state, "land_china_beiping")).possessor == "warlord_beiping_hopeh", "Clone leaked mutations");
+        clone.nations.at(nationNumber(clone, "japan")).treasury = 0;
+        clone.territories.at(zoneNumber(clone, "land_china_beiping")).possessor = nationNumber(clone, "kmt");
+        require(state.nations.at(nationNumber(state, "japan")).treasury == 15
+                && isNation(state, state.territories.at(zoneNumber(state, "land_china_beiping")).possessor, "warlord_beiping_hopeh"), "Clone leaked mutations");
         require(state.definition->geography.require("nodes").require("land_china_beiping").require("original_owner").asString() == "Zhili Clique",
                 "Possession rewrote original nationality");
         std::cout << "PASS real setup clone isolation and serialization\n";

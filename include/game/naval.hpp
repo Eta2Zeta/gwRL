@@ -32,8 +32,8 @@ bool patrolLetPass(const State &, const UnitState &plane, const std::vector<Id> 
 // included, by a route that meets no unfriendly unit before its last zone, so
 // that no encounter, screen or peace entry can stop it short.
 NumberSet<ZoneId> navalEndZones(const State &, const Id &ship);
-int strategicNavalCapacity(const State &, const Id &nation);
-int navalCompletedTurns(const State &, const Id &nation);
+int strategicNavalCapacity(const State &, NationId nation);
+int navalCompletedTurns(const State &, NationId nation);
 bool navalCargoFits(const State &, const Id &transport, const std::vector<Id> &cargo);
 // Whether a ship may carry land units of these types together: a naval
 // transport two land units or rockets, at most one of them not infantry-class;
@@ -57,12 +57,12 @@ void continueNavalMovement(State &, const Id &completedBattle);
 
 // A designated raider attacks alone (RB 9.4.4). True when these attackers mix one
 // with other units, or would merge with a declared battle where either side has one.
-bool raiderWouldCombine(const State &, ZoneId zone, const Id &attacker,
+bool raiderWouldCombine(const State &, ZoneId zone, NationId attacker,
                         const std::vector<Id> &attackers, const Id &context);
 
 // Options are serialized in BattleState.data. Contexts distinguish ordinary
 // combat from movement reactions, screening, raiders and port attacks.
-Id registerNavalBattle(State &, ZoneId zone, const Id &attacker,
+Id registerNavalBattle(State &, ZoneId zone, NationId attacker,
                        const std::vector<Id> &attackers, const std::map<Id, ZoneId> &origins,
                        const json::Value &options = json::Value(json::Value::Object{}));
 void beginNavalBattle(State &, const Id &);
@@ -84,7 +84,7 @@ void finishNavalOperationPhase(State &);
 bool assaultCalledOff(const State &, const BattleState &);
 void callOffUnclearedAssaults(State &);
 void preparePortLandDefence(State &, const Id &battle);
-void resolveCapturedPorts(State &, ZoneId landZone, const Id &captor);
+void resolveCapturedPorts(State &, ZoneId landZone, NationId captor);
 void queueDamagedPortEvacuation(State &, const Id &facility);
 void resumeDamagedPortEvacuation(State &, const Id &facility, int moved);
 void releaseAmphibiousReserves(State &, const Id &battle);

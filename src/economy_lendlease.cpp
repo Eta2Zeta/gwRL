@@ -27,8 +27,8 @@ std::optional<Id> marker(const std::map<Id, int> &flags, const Id &prefix) {
 }
 Action action(const State &s, const Id &kind, O args = {}) {
     Action a;
-    a.nation = s.currentNation();
-    a.player = politicalPlayer(s, a.nation);
+    a.nation = s.currentNationName();
+    a.player = politicalPlayer(s, s.currentNation());
     a.kind = kind;
     a.parameters = V(std::move(args));
     a.id = kind + ":" + contentDigest(canonicalJson(a.parameters));
@@ -37,10 +37,10 @@ Action action(const State &s, const Id &kind, O args = {}) {
 Id unique(State &s, const Id &prefix) {
     return "economy_" + prefix + "_" + std::to_string(++s.flags["economy_sequence"]);
 }
-bool recipientHome(const State &s, const Id &recipient, ZoneId zone) {
+bool recipientHome(const State &s, NationId recipient, ZoneId zone) {
     return s.territories.at(zone).possessor == recipient &&
-           (s.definition->factions.at(recipient).homeZones.contains(zone) ||
-            (recipient == "dadao" && chineseHomeCountry(s, zone)));
+           (nationFaction(s, recipient).homeZones.contains(zone) ||
+            (recipient == knownNations(s).dadao && chineseHomeCountry(s, zone)));
 }
 bool baseType(const Id &type) {
     return type == "airbase" || type == "seaplane_base" || type == "submarine_base";
@@ -49,7 +49,7 @@ bool techUnit(const State &s, const BuildProject &p) {
     if (p.type == "elite_airborne_infantry")
         return false; // RB47 expressly permits its lend-lease conversion.
     for (const auto &[id, row] : s.definition->catalog->rows())
-        if (row.nation == p.owner && row.type == p.type && row.kind == "purchase" &&
+        if (row.nation == nationName(s, p.owner) && row.type == p.type && row.kind == "purchase" &&
             !row.requiredTechnologies.empty())
             return true;
     return false;
@@ -61,14 +61,14 @@ bool available(const State &s, const BuildProject &p) {
     const auto gate = marker(p.flags, "lease_wait_controller:");
     if (!gate)
         return true;
-    return s.completedTurns.at(*gate) >= value(p.flags, "lease_available_after_turns");
+    return s.completedTurns.at(nationNumber(s, *gate)) >= value(p.flags, "lease_available_after_turns");
 }
-Id controllerTurn(const State &s, const Id &nation) {
+NationId controllerTurn(const State &s, NationId nation) {
     if (s.completedTurns.contains(nation))
         return nation;
     if (s.nations.at(nation).controllerNation)
         return *s.nations.at(nation).controllerNation;
-    return "japan";
+    return nationNumber(s, "japan");
 }
 std::vector<std::pair<Id, ZoneId>> senderFactories(const State &s, const BuildProject &p) {
     std::vector<std::pair<Id, ZoneId>> out;
@@ -111,7 +111,7 @@ std::vector<Action> recipientPlacements(const State &s, const BuildProject &p) {
             if (value(p.flags, "lease_militia_upgrade")) {
                 const auto sender = marker(p.flags, "lease_sender:");
                 const bool supplied = inSupply(s, p.owner, zone) ||
-                                      (sender && lendLeaseSupplyRoute(s, *sender, p.owner, zone).connected);
+                                      (sender && lendLeaseSupplyRoute(s, nationNumber(s, *sender), p.owner, zone).connected);
                 for (const auto &[id, u] : s.units)
                     if (supplied && value(s.nations.at(p.owner).turnFlags, "economy_militia_upgrades") < 2 &&
                         u.owner == p.owner && u.zone == zone && u.type == "militia" &&
@@ -155,7 +155,7 @@ std::vector<Action> recipientPlacements(const State &s, const BuildProject &p) {
 }
 } // namespace
 
-bool lendLeasePermitted(const State &s, const Id &sender, const Id &recipient) {
+bool lendLeasePermitted(const State &s, NationId sender, NationId recipient) {
     if (sender == recipient || !s.nations.contains(sender) || !s.nations.contains(recipient) ||
         s.politics.surrendered.contains(sender) || s.politics.surrendered.contains(recipient))
         return false;
@@ -166,9 +166,9 @@ bool lendLeasePermitted(const State &s, const Id &sender, const Id &recipient) {
         for (const auto &enemy : s.nations.at(recipient).atWarWith)
             if (s.nations.at(enemy).alliance == n.alliance)
                 return false;
-    if (sender == "japan" && recipient == "dadao" && controlledBy(s, recipient, sender))
+    if (sender == knownNations(s).japan && recipient == knownNations(s).dadao && controlledBy(s, recipient, sender))
         return true;
-    if (sender != "japan" && sender != "kmt" && sender != "ccp")
+    if (sender != knownNations(s).japan && sender != knownNations(s).kmt && sender != knownNations(s).ccp)
         return false;
     return atWarWithMajor(s, recipient);
 }
@@ -181,7 +181,7 @@ std::vector<Action> lendLeaseActions(const State &s) {
     if (s.clock.phase == Phase::Production && value(n.turnFlags, "economy_research_finished")) {
         for (const auto &[recipient, r] : s.nations)
             if (lendLeasePermitted(s, sender, recipient) &&
-                !value(n.turnFlags, "lease_declared:" + recipient)) {
+                !value(n.turnFlags, "lease_declared:" + nationName(s, recipient))) {
                 for (const auto &[id, p] : s.construction)
                     if (p.owner == sender && ready(p) && !value(p.flags, "national_objective_award") &&
                         !marker(p.flags, "lend_to:") && !marker(p.flags, "target:") &&
@@ -190,14 +190,14 @@ std::vector<Action> lendLeaseActions(const State &s) {
                         (!s.definition->catalog->facilities().contains(p.type) || baseType(p.type)) &&
                         !techUnit(s, p))
                         out.push_back(action(s, "economy_lease_declare",
-                                             {{"project", V(id)}, {"recipient", V(recipient)}}));
+                                             {{"project", V(id)}, {"recipient", V(nationName(s, recipient))}}));
                 if (n.treasury && *n.treasury >= 2)
-                    out.push_back(action(s, "economy_lease_upgrade", {{"recipient", V(recipient)}}));
+                    out.push_back(action(s, "economy_lease_upgrade", {{"recipient", V(nationName(s, recipient))}}));
                 for (const auto &[id, f] : s.facilities)
                     if (s.territories.at(f.zone).possessor == recipient && f.damage > 0 && n.treasury &&
                         *n.treasury >= f.damage)
                         out.push_back(action(s, "economy_lease_repair",
-                                             {{"recipient", V(recipient)}, {"target", V(id)}}));
+                                             {{"recipient", V(nationName(s, recipient))}, {"target", V(id)}}));
             }
     }
     if (s.clock.phase != Phase::PlaceUnits)
@@ -208,9 +208,10 @@ std::vector<Action> lendLeaseActions(const State &s) {
             out.insert(out.end(), choices.begin(), choices.end());
             continue;
         }
-        const auto recipient = marker(p.flags, "lend_to:");
+        const auto recipientName = marker(p.flags, "lend_to:");
+        const auto recipient = recipientName ? findNation(s, *recipientName) : std::nullopt;
         if (p.owner != sender || !recipient || !ready(p) || !lendLeasePermitted(s, sender, *recipient) ||
-            value(n.turnFlags, "lease_delivered:" + *recipient))
+            value(n.turnFlags, "lease_delivered:" + *recipientName))
             continue;
         for (const auto &[zone, t] : s.territories)
             if (recipientHome(s, *recipient, zone)) {
@@ -261,21 +262,21 @@ bool applyLendLeaseAction(State &s, const Action &a) {
         auto &p = s.construction.at(a.parameters.require("project").asString());
         const auto recipient = a.parameters.require("recipient").asString();
         p.flags["lend_to:" + recipient] = 1;
-        s.nations.at(a.nation).turnFlags["lease_declared:" + recipient] = 1;
+        s.nations.at(nationNumber(s, a.nation)).turnFlags["lease_declared:" + recipient] = 1;
         return true;
     }
     if (a.kind == "economy_lease_upgrade" || a.kind == "economy_lease_repair") {
         const auto recipient = a.parameters.require("recipient").asString();
         BuildProject p;
         p.id = unique(s, "lease");
-        p.owner = a.nation;
+        p.owner = nationNumber(s, a.nation);
         p.type = a.kind == "economy_lease_upgrade"
                      ? "infantry"
                      : s.facilities.at(a.parameters.require("target").asString()).type;
         const int cost = a.kind == "economy_lease_upgrade"
                              ? 2
                              : s.facilities.at(a.parameters.require("target").asString()).damage;
-        *s.nations.at(a.nation).treasury -= cost;
+        *s.nations.at(nationNumber(s, a.nation)).treasury -= cost;
         p.paidIpp = cost;
         p.flags["completed"] = 1;
         p.flags["lend_to:" + recipient] = 1;
@@ -283,7 +284,7 @@ bool applyLendLeaseAction(State &s, const Action &a) {
         if (const auto *target = a.parameters.find("target"))
             p.flags["lease_repair_target:" + target->asString()] = 1;
         s.construction.emplace(p.id, std::move(p));
-        s.nations.at(a.nation).turnFlags["lease_declared:" + recipient] = 1;
+        s.nations.at(nationNumber(s, a.nation)).turnFlags["lease_declared:" + recipient] = 1;
         return true;
     }
     if (a.kind == "economy_lease_place") {
@@ -302,7 +303,7 @@ bool applyLendLeaseAction(State &s, const Action &a) {
             f.zone = zoneNumber(s, a.parameters.require("zone").asString());
             f.type = p.type;
             f.flags["placed_this_turn"] = 1;
-            f.flags["original_owner:" + p.owner] = 1;
+            f.flags["original_owner:" + nationName(s, p.owner)] = 1;
             f.flags["original_type:" + p.type] = 1;
             if (const auto *border = a.parameters.find("border"))
                 f.flags["border:" + border->asString()] = 1;
@@ -316,11 +317,13 @@ bool applyLendLeaseAction(State &s, const Action &a) {
     if (a.kind == "economy_lease_deliver") {
         const auto id = a.parameters.require("project").asString();
         auto &p = s.construction.at(id);
-        const auto recipient = *marker(p.flags, "lend_to:");
+        const auto recipientName = *marker(p.flags, "lend_to:");
+        const auto recipient = nationNumber(s, recipientName);
+        const auto sender = nationNumber(s, a.nation);
         const auto zone = zoneNumber(s, a.parameters.require("zone").asString());
-        s.nations.at(a.nation).turnFlags["lease_delivered:" + recipient] = 1;
+        s.nations.at(sender).turnFlags["lease_delivered:" + recipientName] = 1;
         if (const auto *factory = a.parameters.find("factory"))
-            ++s.nations.at(a.nation).turnFlags["economy_used:" + factory->asString()];
+            ++s.nations.at(sender).turnFlags["economy_used:" + factory->asString()];
         if (value(p.flags, "lease_repair")) {
             const auto target = marker(p.flags, "lease_repair_target:");
             require(target && s.facilities.contains(*target) &&
@@ -335,18 +338,18 @@ bool applyLendLeaseAction(State &s, const Action &a) {
             s.repairs.emplace(job.id, std::move(job));
             s.nations.at(recipient).gameFlags["lease_repair_wait:" + *target] =
                 s.completedTurns.at(controllerTurn(s, recipient)) +
-                (controllerTurn(s, recipient) == a.nation ? 1 : 0);
+                (controllerTurn(s, recipient) == sender ? 1 : 0);
             s.construction.erase(id);
         } else if (value(p.flags, "lease_militia_upgrade") || baseType(p.type)) {
-            p.flags.erase("lend_to:" + recipient);
+            p.flags.erase("lend_to:" + recipientName);
             p.owner = recipient;
             p.site.reset();
             p.flags["lease_received"] = 1;
             p.flags["lease_sender:" + a.nation] = 1;
             const auto controller = controllerTurn(s, recipient);
-            p.flags["lease_wait_controller:" + controller] = 1;
+            p.flags["lease_wait_controller:" + nationName(s, controller)] = 1;
             p.flags["lease_available_after_turns"] =
-                s.completedTurns.at(controller) + (controller == a.nation ? 1 : 0);
+                s.completedTurns.at(controller) + (controller == sender ? 1 : 0);
         } else {
             UnitState u;
             u.id = unique(s, "lease_unit");

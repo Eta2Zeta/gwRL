@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Print the tables that number the scenario's names.
 
-Inside the engine a zone is held as a number, not as its name: its place in the
-sorted list of the map's zone names, counted from 0 (include/game/names.hpp and
-docs/engine/names.md). Saved positions, actions and the Python interface keep
-the names. This prints each kind's table, number and name, as Markdown, for the
-scenario the training plays, or for another scenario folder:
+Inside the engine a zone or a nation is held as a number, not as its name: its
+place in the sorted list of the definition's names of that kind, counted from 0
+(include/game/names.hpp and docs/engine/names.md). Saved positions, actions and
+the Python interface keep the names. This prints each kind's table, number and
+name, as Markdown, for the scenario the training plays, or for another scenario
+folder:
 
     .venv/bin/python tools/print_name_tables.py
-    .venv/bin/python tools/print_name_tables.py --kind zones --scenario game_content/scenarios/japan_china_1936
+    .venv/bin/python tools/print_name_tables.py --kind nations --scenario game_content/scenarios/japan_china_1936
 """
 from __future__ import annotations
 
@@ -39,7 +40,7 @@ def table(names: list[str]) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--scenario", type=Path, default=SCENARIO, help="Scenario folder (default: the training scenario)")
-    parser.add_argument("--kind", help="Print only this kind of name, such as zones")
+    parser.add_argument("--kind", help="Print only this kind of name, such as zones or nations")
     args = parser.parse_args(argv)
     found = tables(args.scenario)
     kinds = [args.kind] if args.kind else sorted(found)

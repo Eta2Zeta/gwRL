@@ -20,7 +20,9 @@ bool marked(const std::map<Id,int>& flags,const Id& key) {
     const auto it=flags.find(key);return it!=flags.end()&&it->second!=0;
 }
 bool chinese(const Id& nation) {return nation=="ccp"||nation=="kmt"||nation=="dadao"||isWarlord(nation);}
-bool hasUnits(const State& s,const Id& nation) {
+bool chinese(const State& s,NationId nation) {return chinese(nationName(s,nation));}
+bool warlord(const State& s,NationId nation) {return isWarlord(nationName(s,nation));}
+bool hasUnits(const State& s,NationId nation) {
     return std::any_of(s.units.begin(),s.units.end(),[&](const auto& item){return item.second.owner==nation;});
 }
 Id uniqueContinuation(State& s,const Id& kind) {
@@ -34,7 +36,7 @@ void refreshUnitMovement(State& s,UnitState& unit) {
     unit.movementAllowance=allowance;
     if(allowance)unit.movementRemaining=marked(unit.turnFlags,"placed_this_turn")?0:std::max(0,*allowance-used);
 }
-void warPair(State& s,const Id& first,const Id& second) {
+void warPair(State& s,NationId first,NationId second) {
     if(first==second)return;
     s.nations.at(first).atWarWith.insert(second);s.nations.at(second).atWarWith.insert(first);
 }
@@ -44,17 +46,17 @@ void releaseDecision(State& s,const Action& action) {
 }
 // A pending capital choice offers only land its nation still possesses. With
 // none left it is withdrawn, so a later evolution offers the land held then.
-void pruneCapitalChoices(State& s,const Id& nation,ZoneId zone) {
+void pruneCapitalChoices(State& s,NationId nation,ZoneId zone) {
     for(auto it=s.decisions.begin();it!=s.decisions.end();) {
-        if(it->kind!="politics_evolution"||it->nation!=nation) {++it;continue;}
+        if(it->kind!="politics_evolution"||it->nation!=nationName(s,nation)) {++it;continue;}
         std::erase_if(it->options,[&](const Action& option){return option.parameters.require("zone").asString()==zoneName(s,zone);});
         if(!it->options.empty()) {++it;continue;}
-        erasePoliticalContinuation(s,it->continuation);s.flags.erase("evolution_pending_"+nation);it=s.decisions.erase(it);
+        erasePoliticalContinuation(s,it->continuation);s.flags.erase("evolution_pending_"+ nationName(s, nation));it=s.decisions.erase(it);
     }
 }
-void chooseEvolution(State& s,const Id& nation) {
+void chooseEvolution(State& s,NationId nation) {
     if(s.politics.evolutionAwarded.contains(nation))return;
-    const auto key="evolution_pending_"+nation;
+    const auto key="evolution_pending_"+ nationName(s, nation);
     if(marked(s.flags,key))return;
     std::vector<Action> options;
     for(const auto& zone:possessedLand(s,nation)) {
@@ -66,12 +68,13 @@ void chooseEvolution(State& s,const Id& nation) {
     queuePoliticalDecision(s,nation,"politics_evolution",std::move(options));
 }
 void queueObjectiveBonus(State& s) {
-    if(!s.nations.contains("ccp"))return;
-    auto& ccp=s.nations.at("ccp");
+    const auto ccpNation=knownNations(s).ccp;
+    if(!s.nations.contains(ccpNation))return;
+    auto& ccp=s.nations.at(*ccpNation);
     if(!marked(ccp.gameFlags,"one_china_bonus_eligible_at_surrender")||marked(ccp.gameFlags,"one_china_bonus_awarded"))return;
     for(const auto& [type,count]:std::vector<std::pair<Id,int>>{{"cavalry",3},{"infantry",2}}) {
         for(int i=0;i<count;++i) {
-            BuildProject award;award.id=uniqueContinuation(s,"one_china_award");award.owner="ccp";award.type=type;
+            BuildProject award;award.id=uniqueContinuation(s,"one_china_award");award.owner=*ccpNation;award.type=type;
             award.flags["completed"]=1;award.flags["national_objective_award"]=1;
             s.construction.emplace(award.id,std::move(award));
         }
@@ -79,7 +82,7 @@ void queueObjectiveBonus(State& s) {
     ccp.gameFlags["one_china_bonus_awarded"]=1;
 }
 
-std::vector<ZoneId> nearestFriendlyLand(const State& s,const Id& owner,ZoneId origin) {
+std::vector<ZoneId> nearestFriendlyLand(const State& s,NationId owner,ZoneId origin) {
     std::deque<ZoneId> queue{origin};std::map<ZoneId,int> distances{{origin,0}};
     std::vector<ZoneId> destinations;int nearest=std::numeric_limits<int>::max();
     while(!queue.empty()) {
@@ -114,7 +117,7 @@ void destroyUnrelocatableNeutralUnit(State& s,const Id& unit,ZoneId origin) {
     A destroyed;
     for(const auto& id:removed) {
         const auto& u=s.units.at(id);
-        destroyed.emplace_back(O{{"id",V(id)},{"type",V(u.type)},{"owner",V(u.owner)},
+        destroyed.emplace_back(O{{"id",V(id)},{"type",V(u.type)},{"owner",V(nationName(s,u.owner))},
             {"zone",V(zoneName(s,u.zone))},{"carried_by",u.carriedBy?V(*u.carriedBy):V(nullptr)}});
     }
     removePoliticalUnits(s,removed);
@@ -154,15 +157,15 @@ void queueNeutralRelocation(State& s,ZoneId origin,const std::vector<Id>& units)
     s.politics.pending[key]=V(O{{"origin",V(zoneName(s,origin))},{"units",V(pending)}});continueNeutralRelocation(s,key);
 }
 
-bool ownCapital(const State& s,const Id& nation) {
+bool ownCapital(const State& s,NationId nation) {
     const auto it=s.politics.capitals.find(nation);
     return it!=s.politics.capitals.end()&&s.territories.at(it->second).possessor==nation;
 }
-void commitDeclaration(State& s,const Id& actor,const Id& target) {
-    if(actor=="japan"&&s.nations.at(target).alliance=="allies"&&s.nations.at(target).powerStatus=="major"&&!marked(s.nations.at(actor).gameFlags,"first_allies_major_war_declared")) {
+void commitDeclaration(State& s,NationId actor,NationId target) {
+    if(actor== knownNations(s).japan&&s.nations.at(target).alliance=="allies"&&s.nations.at(target).powerStatus=="major"&&!marked(s.nations.at(actor).gameFlags,"first_allies_major_war_declared")) {
         s.nations.at(actor).gameFlags["first_allies_major_war_declared"]=1;
         s.nations.at(actor).turnFlags["surprise_attack_available"]=1;
-        s.nations.at(actor).turnFlags["surprise_attack_target:"+target]=1;
+        s.nations.at(actor).turnFlags["surprise_attack_target:"+nationName(s,target)]=1;
     }
     warPair(s,actor,target);
     // Sharing an alliance alone grants neither passage nor combined defense.
@@ -175,19 +178,19 @@ void commitDeclaration(State& s,const Id& actor,const Id& target) {
     }
     refreshPoliticalState(s);
 }
-void queueDeclarationPriority(State& s,const Id& actor,const Id& target) {
+void queueDeclarationPriority(State& s,NationId actor,NationId target) {
     const auto active=s.currentNation();
     std::vector<Action> options;
     for(const auto& [nation,n]:s.nations) {
         if(nation!=active&&(!n.alliance||n.alliance!=s.nations.at(active).alliance))continue;
         for(const auto& [enemy,e]:s.nations)if(mayDeclareWar(s,nation,enemy).allowed) {
             options.push_back(politicalAction(s,active,"politics_priority_declare",
-                V(O{{"declaring_nation",V(nation)},{"target",V(enemy)}})));
+                V(O{{"declaring_nation",V(nationName(s,nation))},{"target",V(nationName(s,enemy))}})));
         }
     }
     options.push_back(politicalAction(s,active,"politics_priority_decline"));
     queuePoliticalDecision(s,active,"politics_declaration_priority",std::move(options),
-        V(O{{"actor",V(actor)},{"target",V(target)}}));
+        V(O{{"actor",V(nationName(s,actor))},{"target",V(nationName(s,target))}}));
 }
 }
 
@@ -264,19 +267,19 @@ bool warlordAttackPossible(const Id& warlord,const Id& attacker) {
     return isWarlord(warlord)&&!isWarlord(attacker)&&attacker!="kmt";
 }
 
-Id originalNation(const State& s,ZoneId zone) {
+NationId originalNation(const State& s,ZoneId zone) {
     const auto& name=zoneName(s,zone);
     const auto* index=s.definition->rules.find("faction_index");
-    if(index)return index->require("land_original_owners").require(name).require("original_faction_id").asString();
+    if(index)return nationNumber(s,index->require("land_original_owners").require(name).require("original_faction_id").asString());
     const auto& original=mapNode(s,zone).require("original_owner").asString();
-    if(s.definition->factions.contains(original))return original;
-    for(const auto& [id,f]:s.definition->factions)if(f.displayName==original)return id;
+    if(s.definition->factions.contains(original))return nationNumber(s,original);
+    for(const auto& [id,f]:s.definition->factions)if(f.displayName==original)return nationNumber(s,id);
     throw std::runtime_error("Unresolved original nationality: "+name);
 }
-std::vector<ZoneId> possessedLand(const State& s,const Id& nation) {
+std::vector<ZoneId> possessedLand(const State& s,NationId nation) {
     std::vector<ZoneId> out;for(const auto& [id,t]:s.territories)if(t.possessor==nation)out.push_back(id);return out;
 }
-std::vector<ZoneId> originalLand(const State& s,const Id& nation) {
+std::vector<ZoneId> originalLand(const State& s,NationId nation) {
     std::vector<ZoneId> out;for(const auto& [id,t]:s.territories)if(originalNation(s,id)==nation)out.push_back(id);return out;
 }
 bool passableLandBorder(const State& s,ZoneId from,ZoneId to) {
@@ -292,18 +295,18 @@ bool passableLandBorder(const State& s,ZoneId from,ZoneId to) {
         return true;
     }return false;
 }
-bool controlledBy(const State& s,const Id& minor,const Id& controller) {
+bool controlledBy(const State& s,NationId minor,NationId controller) {
     const auto it=s.nations.find(minor);
     return it!=s.nations.end()&&minor!=controller&&it->second.controllerNation==controller
         &&!marked(it->second.gameFlags,"incorporated")&&!s.politics.surrendered.contains(minor);
 }
-bool atWarWithMajor(const State& s,const Id& nation) {
+bool atWarWithMajor(const State& s,NationId nation) {
     for(const auto& other:s.nations.at(nation).atWarWith)if(s.nations.at(other).powerStatus=="major")return true;
     return false;
 }
-bool politicallyFriendly(const State& s,const Id& a,const Id& b) {
+bool politicallyFriendly(const State& s,NationId a,NationId b) {
     if(a==b)return true;
-    if(s.politics.chineseTruce&&((a=="ccp"&&b=="kmt")||(a=="kmt"&&b=="ccp")))return true;
+    if(s.politics.chineseTruce&&((a== knownNations(s).ccp&&b== knownNations(s).kmt)||(a== knownNations(s).kmt&&b== knownNations(s).ccp)))return true;
     const auto& first=s.nations.at(a);const auto& second=s.nations.at(b);
     if(first.atWarWith.contains(b))return false;
     if(controlledBy(s,a,b)||controlledBy(s,b,a))return false; // control grants named permissions, not alignment
@@ -316,32 +319,33 @@ bool politicallyFriendly(const State& s,const Id& a,const Id& b) {
     return false;
 }
 bool chineseHomeCountry(const State& s,ZoneId zone) {
-    const auto& f=s.definition->factions.at("ccp");return f.homeCountryKnown&&f.homeZones.contains(zone);
+    const auto& ccp=knownNations(s).ccp;require(ccp.has_value(),"Unknown nation: ccp");
+    const auto& f=nationFaction(s,*ccp);return f.homeCountryKnown&&f.homeZones.contains(zone);
 }
-bool chineseMovementAllowed(const State& s,const Id& nation,ZoneId zone) {
-    if(nation!="ccp"&&nation!="kmt")return true;
+bool chineseMovementAllowed(const State& s,NationId nation,ZoneId zone) {
+    if(nation!= knownNations(s).ccp&&nation!= knownNations(s).kmt)return true;
     const auto n=s.nations.find(nation);
     if(n==s.nations.end()||n->second.powerStatus=="major"||chineseHomeCountry(s,zone))return true;
     if(mapNode(s,zone).require("type").asString()!="sea")return false;
     for(const auto next:mapNeighbors(s,zone))if(chineseHomeCountry(s,next))return true;
     return false;
 }
-bool decentralizedProduction(const State& s,const Id& nation) {
-    if(nation!="ccp"&&nation!="kmt")return false;
+bool decentralizedProduction(const State& s,NationId nation) {
+    if(nation!= knownNations(s).ccp&&nation!= knownNations(s).kmt)return false;
     const auto& n=s.nations.at(nation);if(n.powerStatus!="major")return true;
     const auto it=n.gameFlags.find("evolved_turn_serial");
     return s.currentNation()==nation&&marked(n.gameFlags,"evolved_during_own_turn")
         &&it!=n.gameFlags.end()&&it->second==static_cast<int>(s.clock.playerTurnSerial);
 }
-Id politicalPlayer(const State& s,const Id& nation) {
+Id politicalPlayer(const State& s,NationId nation) {
     const auto& n=s.nations.at(nation);if(n.player)return *n.player;
     if(n.controllerNation)return politicalPlayer(s,*n.controllerNation);
-    if(const auto it=s.politics.pending.find("warlord_defense_player:"+nation);it!=s.politics.pending.end()) {
+    if(const auto it=s.politics.pending.find("warlord_defense_player:"+ nationName(s, nation));it!=s.politics.pending.end()) {
         const auto player=it->second.asString();require(s.definition->players.contains(player),"Invalid temporary warlord defense player");return player;
     }
-    throw std::runtime_error("Political nation has no controlling player: "+nation);
+    throw std::runtime_error("Political nation has no controlling player: "+ nationName(s, nation));
 }
-void addPoliticalUnit(State& s,const Id& nation,const Id& type,ZoneId zone,int count) {
+void addPoliticalUnit(State& s,NationId nation,const Id& type,ZoneId zone,int count) {
     require(count>0&&s.territories.at(zone).possessor==nation,"Invalid political unit placement");
     for(int i=0;i<count;++i) {
         UnitState u;u.id=uniqueContinuation(s,"political_"+type);u.type=type;u.owner=nation;u.zone=zone;u.turnOrigin=zone;
@@ -358,14 +362,15 @@ void removePoliticalUnits(State& s,const std::set<Id>& ids) {
     for(auto& [id,b]:s.battles)for(auto* group:{&b.attackers,&b.defenders})group->erase(std::remove_if(group->begin(),group->end(),[&](const auto& x){return removed.contains(x);}),group->end());
 }
 void ensureDadao(State& s) {
-    if(s.nations.contains("dadao"))return;
+    if(s.nations.contains(knownNations(s).dadao))return;
     require(s.definition->factions.contains("dadao"),"Definition lacks dormant Dadao identity");
-    NationState n;n.controllerNation="japan";n.player=politicalPlayer(s,"japan");n.alliance="axis";n.incomeKnown=true;
-    s.nations.emplace("dadao",std::move(n));
+    const auto japan=nationNumber(s,"japan");
+    NationState n;n.controllerNation=japan;n.player=politicalPlayer(s,japan);n.alliance="axis";n.incomeKnown=true;
+    s.nations.emplace(nationNumber(s, "dadao"),std::move(n));
 }
-void incorporateNation(State& s,const Id& minor,const Id& recipient) {
+void incorporateNation(State& s,NationId minor,NationId recipient) {
     require(minor!=recipient&&s.nations.contains(minor)&&s.nations.contains(recipient),"Invalid faction incorporation");
-    require(minor!="ccp"&&minor!="kmt"&&s.nations.at(minor).powerStatus!="major",
+    require(minor!= knownNations(s).ccp&&minor!= knownNations(s).kmt&&s.nations.at(minor).powerStatus!="major",
             "Chinese national factions and Major Powers retain their identities");
     require(!s.politics.surrendered.contains(recipient),"Cannot align with a surrendered nation");
     // Aligned land is not captured land: it may be entered this turn (RB 4.6, 11.1).
@@ -394,22 +399,23 @@ void incorporateNation(State& s,const Id& minor,const Id& recipient) {
             controlledBy(s,recipient,other)||controlledBy(s,other,recipient))continue;
         warPair(s,recipient,other);
     }
-    s.politics.pending.erase("warlord_defense_player:"+minor);
+    s.politics.pending.erase("warlord_defense_player:"+ nationName(s, minor));
 }
-Action politicalAction(const State& s,const Id& nation,const Id& kind,V parameters,const std::optional<Id>& decision) {
-    Action a;a.kind=kind;a.nation=nation;a.player=politicalPlayer(s,nation);a.parameters=std::move(parameters);a.decision=decision;
-    a.id=kind+"_"+nation+"_"+contentDigest(canonicalJson(a.parameters)).substr(0,16);return a;
+Action politicalAction(const State& s,NationId nation,const Id& kind,V parameters,const std::optional<Id>& decision) {
+    Action a;a.kind=kind;a.nation=nationName(s,nation);a.player=politicalPlayer(s,nation);a.parameters=std::move(parameters);a.decision=decision;
+    a.id=kind+"_"+ nationName(s, nation)+"_"+contentDigest(canonicalJson(a.parameters)).substr(0,16);return a;
 }
-void queuePoliticalDecision(State& s,const Id& nation,const Id& kind,std::vector<Action> options,V continuation) {
+void queuePoliticalDecision(State& s,NationId nation,const Id& kind,std::vector<Action> options,V continuation) {
     require(!options.empty(),"Political decision needs an option");
-    Decision d;d.id=uniqueContinuation(s,kind);d.kind=kind;d.nation=nation;d.reaction=nation!=s.currentNation();d.continuation=d.id;
+    Decision d;d.id=uniqueContinuation(s,kind);d.kind=kind;d.nation=nationName(s,nation);d.reaction=nation!=s.currentNation();d.continuation=d.id;
     s.politics.pending[d.continuation]=std::move(continuation);
-    for(auto& option:options){option.nation=nation;option.player=politicalPlayer(s,nation);option.decision=d.id;}
+    const auto player=politicalPlayer(s,nation);
+    for(auto& option:options){option.nation=d.nation;option.player=player;option.decision=d.id;}
     d.options=std::move(options);s.decisions.push_back(std::move(d));
 }
-void requestPoliticalRoll(State& s,const Id& nation,const Id& kind,int sides,V parameters,int dice) {
+void requestPoliticalRoll(State& s,NationId nation,const Id& kind,int sides,V parameters,int dice) {
     require(!s.chance&&dice>0,"Political chance is already pending or empty");
-    ChanceRequest c;c.id=uniqueContinuation(s,kind);c.purpose=kind;c.nation=nation;c.continuation=c.id;
+    ChanceRequest c;c.id=uniqueContinuation(s,kind);c.purpose=kind;c.nation=nationName(s,nation);c.continuation=c.id;
     for(int i=0;i<dice;++i)c.dice.push_back(DieSpec{sides,0,{},0});
     s.politics.pending[c.continuation]=std::move(parameters);s.chance=std::move(c);
 }
@@ -421,8 +427,10 @@ void refreshPoliticalState(State& s) {
         int total=0;for(const auto& zone:possessedLand(s,id))total+=effectiveTerritorialIpp(s,zone);
         n.gameFlags["possessed_land_ipp"]=total;
     }
-    for(const auto& nation:{"ccp","kmt"}) {
-        if(!s.nations.contains(nation))continue;
+    for(const char* name:{"ccp","kmt"}) {
+        const auto found=findNation(s,name);
+        if(!s.nations.contains(found))continue;
+        const auto nation=*found;
         auto& n=s.nations.at(nation);
         n.gameFlags["civil_war_eliminated"]=hasUnits(s,nation)?0:1;
         if(n.powerStatus=="major"||s.politics.surrendered.contains(nation))continue;
@@ -437,14 +445,15 @@ void refreshPoliticalState(State& s) {
         if(s.politics.chineseTruce)terminateChineseTruce(s,nation,true);
         chooseEvolution(s,nation);
     }
-    if(s.nations.contains("kmt")&&!s.politics.surrendered.contains("kmt")&&possessedLand(s,"kmt").empty()) {
+    const auto& known=knownNations(s);
+    if(s.nations.contains(known.kmt)&&!s.politics.surrendered.contains(known.kmt)&&possessedLand(s,*known.kmt).empty()) {
         const auto* invader=s.politics.pending.contains("last_conqueror_kmt")?&s.politics.pending.at("last_conqueror_kmt"):nullptr;
-        surrenderNation(s,"kmt",invader?invader->asString():s.currentNation());
+        surrenderNation(s,*known.kmt,invader?nationNumber(s,invader->asString()):s.currentNation());
     }
-    if(s.nations.contains("ccp")&&s.nations.contains("kmt")) {
+    if(s.nations.contains(known.ccp)&&s.nations.contains(known.kmt)) {
         bool objective=true;
-        for(const auto zone:possessedLand(s,"kmt"))if(chineseHomeCountry(s,zone)&&zoneName(s,zone)!="land_hainan"&&zoneName(s,zone)!="land_formosa")objective=false;
-        s.nations.at("ccp").gameFlags["objective_one_china"]=objective;
+        for(const auto zone:possessedLand(s,*known.kmt))if(chineseHomeCountry(s,zone)&&zoneName(s,zone)!="land_hainan"&&zoneName(s,zone)!="land_formosa")objective=false;
+        s.nations.at(*known.ccp).gameFlags["objective_one_china"]=objective;
     }
     queueObjectiveBonus(s);
     refreshAlliances(s);
@@ -457,7 +466,7 @@ void refreshAlliances(State& s) {
     }
 }
 
-void changePossession(State& s,ZoneId zone,const Id& recipient,PossessionCause cause,const std::optional<Id>& conqueror) {
+void changePossession(State& s,ZoneId zone,NationId recipient,PossessionCause cause,std::optional<NationId> conqueror) {
     require(s.nations.contains(recipient)&&!s.politics.surrendered.contains(recipient),"Invalid possession recipient");
     auto& territory=s.territories.at(zone);const auto old=territory.possessor;
     if(old==recipient)return;
@@ -477,14 +486,14 @@ void changePossession(State& s,ZoneId zone,const Id& recipient,PossessionCause c
         }
         for(auto it=s.repairs.begin();it!=s.repairs.end();)if(removed.contains(it->second.target))it=s.repairs.erase(it);else ++it;
     }
-    if(old)s.politics.pending["last_conqueror_"+*old]=V(conqueror.value_or(recipient));
+    if(old)s.politics.pending["last_conqueror_"+ nationName(s, *old)]=V(nationName(s, conqueror.value_or(recipient)));
     // Current territorial value is tracked at the transfer event, independently
     // of later legal-income evaluation and income collection.
     for(auto& [id,n]:s.nations) {int total=0;for(const auto& z:possessedLand(s,id))total+=effectiveTerritorialIpp(s,z);n.gameFlags["possessed_land_ipp"]=total;}
     refreshPoliticalState(s);
     if(s.definition->catalog)enforcePatrolLandingAvailability(s);
 }
-void captureLand(State& s,const Id& attacker,ZoneId zone,const std::set<Id>& withdrawalEligibleRecipients) {
+void captureLand(State& s,NationId attacker,ZoneId zone,const NumberSet<NationId>& withdrawalEligibleRecipients) {
     require(s.nations.contains(attacker),"Unknown land conqueror");
     require(std::any_of(s.units.begin(),s.units.end(),[&](const auto& item){const auto& u=item.second;return u.owner==attacker&&u.zone==zone&&s.definition->catalog->unit(u.type).classes.contains("land");}),"Land capture requires a surviving attacking land unit");
     std::vector<Id> neutralNonparticipants;const auto previous=s.territories.at(zone).possessor;
@@ -492,19 +501,22 @@ void captureLand(State& s,const Id& attacker,ZoneId zone,const std::set<Id>& wit
         if(u.zone==zone&&!u.carriedBy&&u.owner!=attacker&&u.owner!=*previous&&
             !s.nations.at(attacker).atWarWith.contains(u.owner)&&politicallyFriendly(s,u.owner,*previous)&&
             !s.definition->catalog->unit(u.type).classes.contains("naval"))neutralNonparticipants.push_back(id);
-    const Id original=originalNation(s,zone);Id recipient=attacker;
+    const NationId original=originalNation(s,zone);NationId recipient=attacker;
     if(original!=attacker&&s.nations.at(original).powerStatus=="major"&&s.nations.at(original).alliance==s.nations.at(attacker).alliance&&!s.politics.surrendered.contains(original))recipient=original;
     changePossession(s,zone,recipient,recipient==attacker?PossessionCause::Capture:PossessionCause::Liberation,attacker);
     // RB 10.10.1 lets an outside Major Power give conquered Chinese land to a
     // Chinese faction; the CCP and KMT themselves simply keep what they conquer.
-    if(recipient==attacker&&attacker!="ccp"&&attacker!="kmt"&&s.nations.at(attacker).powerStatus=="major"&&
+    if(recipient==attacker&&attacker!= knownNations(s).ccp&&attacker!= knownNations(s).kmt&&s.nations.at(attacker).powerStatus=="major"&&
        chineseHomeCountry(s,zone)&&original!=attacker) {
         std::vector<Action> options{politicalAction(s,attacker,"politics_keep_capture",V(O{{"zone",V(zoneName(s,zone))}}))};
-        for(const auto& china:{"ccp","kmt"})if(!s.politics.surrendered.contains(china)
-                &&(politicallyFriendly(s,attacker,china)||withdrawalEligibleRecipients.contains(china)))
-            options.push_back(politicalAction(s,attacker,"politics_give_capture",V(O{
-                {"zone",V(zoneName(s,zone))},{"recipient",V(std::string(china))},
-                {"requires_withdrawal",V(!politicallyFriendly(s,attacker,china))}})));
+        for(const char* name:{"ccp","kmt"}) {
+            const auto china=nationNumber(s,name);
+            if(!s.politics.surrendered.contains(china)
+                    &&(politicallyFriendly(s,attacker,china)||withdrawalEligibleRecipients.contains(china)))
+                options.push_back(politicalAction(s,attacker,"politics_give_capture",V(O{
+                    {"zone",V(zoneName(s,zone))},{"recipient",V(std::string(name))},
+                    {"requires_withdrawal",V(!politicallyFriendly(s,attacker,china))}})));
+        }
         // An unaligned transfer needs an actual friendly retreat/transport path.
         // The movement module supplies that proof; a policy flag never substitutes for validation.
         if(options.size()>1)queuePoliticalDecision(s,attacker,"politics_chinese_liberation",std::move(options));
@@ -512,80 +524,83 @@ void captureLand(State& s,const Id& attacker,ZoneId zone,const std::set<Id>& wit
     queueNeutralRelocation(s,zone,neutralNonparticipants);
 }
 
-PoliticalPermission mayDeclareWar(const State& s,const Id& actor,const Id& target,DeclarationMode mode) {
+PoliticalPermission mayDeclareWar(const State& s,NationId actor,NationId target,DeclarationMode mode) {
     if(!s.nations.contains(actor)||!s.nations.contains(target)||actor==target)return {false,"Unknown/self declaration"};
     const auto& a=s.nations.at(actor);const auto& b=s.nations.at(target);
     if(s.politics.surrendered.contains(actor)||marked(a.gameFlags,"incorporated"))return {false,"Inactive declaring nation"};
     if(s.politics.surrendered.contains(target)||marked(b.gameFlags,"incorporated"))return {false,"Inactive target nation"};
     if(a.atWarWith.contains(target))return {false,"Already at war"};
     if(a.alliance&&a.alliance==b.alliance)return {false,"Same alliance"};
-    if(s.politics.chineseTruce&&((actor=="ccp"&&target=="kmt")||(actor=="kmt"&&target=="ccp")))return {false,"Use Chinese Truce termination"};
+    const auto& known=knownNations(s);
+    if(s.politics.chineseTruce&&((actor==known.ccp&&target==known.kmt)||(actor==known.kmt&&target==known.ccp)))return {false,"Use Chinese Truce termination"};
     if(b.powerStatus!="major"&&mode!=DeclarationMode::LandAttack)return {false,"Minor declarations require land combat movement"};
     if(mode==DeclarationMode::LandAttack&&(s.clock.phase!=Phase::CombatMovement||(actor!=s.currentNation()&&!controlledBy(s,actor,s.currentNation()))))return {false,"Land attack outside actor's combat movement"};
-    if(actor=="kmt"&&(isWarlord(target)||target=="mongolia")) {
-        if(hasUnits(s,"ccp"))return {false,"CCP has not been eliminated"};
+    if(actor==known.kmt&&(warlord(s,target)||target==known.mongolia)) {
+        if(hasUnits(s,nationNumber(s, "ccp")))return {false,"CCP has not been eliminated"};
         return {mode==DeclarationMode::LandAttack,"KMT warlord/Mongolia attack requires combat movement"};
     }
-    if(actor=="ccp"&&isWarlord(target))return {mode==DeclarationMode::LandAttack,"Warlord attack requires combat movement"};
-    if(actor=="ccp"||actor=="kmt") {
+    if(actor==known.ccp&&warlord(s,target))return {mode==DeclarationMode::LandAttack,"Warlord attack requires combat movement"};
+    if(actor== knownNations(s).ccp||actor== knownNations(s).kmt) {
         if(a.powerStatus=="major")return {true,{}};
         bool present=false;
         for(const auto& zone:possessedLand(s,target))present=present||chineseHomeCountry(s,zone);
         for(const auto& [id,u]:s.units)if(u.owner==target&&s.territories.contains(u.zone))present=present||chineseHomeCountry(s,u.zone);
         return {present,present?"":"Target has no presence in Chinese Home Country"};
     }
-    if(actor=="japan")return {true,{}};
-    if(actor=="dadao"&&chinese(target))return {mode==DeclarationMode::LandAttack,"Dadao Chinese attack exception"};
+    if(actor== knownNations(s).japan)return {true,{}};
+    if(actor==known.dadao&&chinese(s,target))return {mode==DeclarationMode::LandAttack,"Dadao Chinese attack exception"};
     return {false,"Controlled minors cannot initiate a new war"};
 }
-void declareWar(State& s,const Id& actor,const Id& target,DeclarationMode mode) {
+void declareWar(State& s,NationId actor,NationId target,DeclarationMode mode) {
     const auto permission=mayDeclareWar(s,actor,target,mode);require(permission.allowed,"Illegal declaration: "+permission.reason);
     commitDeclaration(s,actor,target);
 }
-void recordLandAttack(State& s,const Id& attacker,ZoneId zone) {
+void recordLandAttack(State& s,NationId attacker,ZoneId zone) {
     require(s.territories.contains(zone),"Land attack target is not land");
     const auto defender=s.territories.at(zone).possessor;
     require(defender!=attacker,"Cannot attack one's own possession");
-    if(defender&&s.politics.chineseTruce&&((attacker=="ccp"&&*defender=="kmt")||(attacker=="kmt"&&*defender=="ccp")))
+    if(defender&&s.politics.chineseTruce&&((attacker== knownNations(s).ccp&&*defender== knownNations(s).kmt)||(attacker== knownNations(s).kmt&&*defender== knownNations(s).ccp)))
         throw std::runtime_error("Chinese Truce prevents attacking the other faction");
     bool newChinaDeclaration=false;
-    if(!chinese(attacker))for(const auto& china:{"ccp","kmt"}) {
+    if(!chinese(s,attacker))for(const char* name:{"ccp","kmt"}) {
+        const auto china=findNation(s,name);  // Empty if absent: then neither set holds it.
         if(!s.politics.surrendered.contains(china)&&!s.nations.at(attacker).atWarWith.contains(china))newChinaDeclaration=true;
     }
     if(defender&&*defender!=attacker&&!s.nations.at(attacker).atWarWith.contains(*defender))declareWar(s,attacker,*defender,DeclarationMode::LandAttack);
     const auto original=originalNation(s,zone);
-    if(defender&&isWarlord(*defender)) {
-        if(attacker=="kmt") {incorporateNation(s,*defender,"ccp");refreshPoliticalState(s);}
+    if(defender&&warlord(s,*defender)) {
+        if(attacker== knownNations(s).kmt) {incorporateNation(s,*defender,nationNumber(s, "ccp"));refreshPoliticalState(s);}
         else {
             s.politics.attackedWarlords[*defender].insert(attacker);
             // RB4.9: warlords count as KMT to foreign powers, and those attacked
             // by CCP/Dadao join KMT only after Combat. RB4.5 assigns defense
             // choices before formal control. This records the defending policy
             // only; it grants no control, alignment, possession or asset credit.
-            s.politics.pending["warlord_defense_player:"+*defender]=V(politicalPlayer(s,"kmt"));
+            s.politics.pending["warlord_defense_player:"+ nationName(s, *defender)]=V(politicalPlayer(s,nationNumber(s, "kmt")));
         }
     }
-    if(defender=="dadao"&&!chinese(attacker))s.politics.pending["dadao_attacked_by"]=V(attacker);
-    if(!chinese(attacker)&&(original=="ccp"||original=="kmt"||isWarlord(original))&&defender!="dadao") {
+    if(isNation(s, defender, "dadao")&&!chinese(s,attacker))s.politics.pending["dadao_attacked_by"]=V(nationName(s,attacker));
+    const auto& known=knownNations(s);
+    if(!chinese(s,attacker)&&(original==known.ccp||original==known.kmt||warlord(s,original))&&!isNation(s, defender, "dadao")) {
         s.politics.foreignChinaWarPending=true;s.politics.chinaInvader=attacker;
         if(newChinaDeclaration)s.politics.pending["truce_foreign_declaration"]=V(true);
-        for(auto& [id,n]:s.nations)if((id=="ccp"||id=="kmt"||isWarlord(id))&&!s.politics.surrendered.contains(id)&&!marked(n.gameFlags,"incorporated"))warPair(s,attacker,id);
+        for(auto& [id,n]:s.nations)if((id==known.ccp||id==known.kmt||warlord(s,id))&&!s.politics.surrendered.contains(id)&&!marked(n.gameFlags,"incorporated"))warPair(s,attacker,id);
     }
 }
-void surrenderNation(State& s,const Id& nation,const Id& attacker) {
+void surrenderNation(State& s,NationId nation,NationId attacker) {
     if(s.politics.surrendered.contains(nation))return;
-    require(nation!="ccp","CCP never surrenders");
+    require(nation!= knownNations(s).ccp,"CCP never surrenders");
     s.politics.surrendered.insert(nation);
-    if(nation=="kmt"&&s.nations.contains("ccp"))s.nations.at("ccp").gameFlags["one_china_bonus_eligible_at_surrender"]=!possessedLand(s,"ccp").empty();
+    if(nation== knownNations(s).kmt&&s.nations.contains(knownNations(s).ccp))s.nations.at(nationNumber(s, "ccp")).gameFlags["one_china_bonus_eligible_at_surrender"]=!possessedLand(s,nationNumber(s, "ccp")).empty();
     std::set<Id> removed;for(const auto& [id,u]:s.units)if(u.owner==nation)removed.insert(id);removePoliticalUnits(s,removed);
     for(auto& [id,t]:s.territories)if(t.possessor==nation)t.possessor.reset();
     auto& n=s.nations.at(nation);n.gameFlags["surrendered"]=1;if(n.treasury)n.treasury=0;
     for(auto it=s.repairs.begin();it!=s.repairs.end();)if(it->second.owner==nation)it=s.repairs.erase(it);else ++it;
     for(auto& [id,minor]:s.nations)if(id!=nation&&minor.controllerNation==nation&&!marked(minor.gameFlags,"incorporated")) {
-        std::optional<Id> controller;
+        std::optional<NationId> controller;
         for(const auto& [candidate,other]:s.nations)if(candidate!=nation&&other.alliance==n.alliance&&other.powerStatus=="major"&&!s.politics.surrendered.contains(candidate)) {controller=candidate;break;}
         minor.controllerNation=controller;if(controller)minor.player=s.nations.at(*controller).player;
-        else if(nation=="japan"&&id=="dadao") {
+        else if(nation== knownNations(s).japan&&id== knownNations(s).dadao) {
             minor.player="axis";minor.alliance="axis";minor.gameFlags["direct_axis_control_after_japan_surrender"]=1;
         } else {minor.player.reset();minor.gameFlags["controller_unresolved"]=1;}
     }
@@ -595,7 +610,7 @@ void surrenderNation(State& s,const Id& nation,const Id& attacker) {
     }
     if(!ships.empty()) {
         require(!s.chance,"Cannot queue surrender dice over another chance event");
-        requestPoliticalRoll(s,attacker,"politics_surrender_queues",12,V(O{{"nation",V(nation)},{"attacker",V(attacker)},{"ships",V(ships)}}),static_cast<int>(ships.size()));
+        requestPoliticalRoll(s,attacker,"politics_surrender_queues",12,V(O{{"nation",V(nationName(s,nation))},{"attacker",V(nationName(s,attacker))},{"ships",V(ships)}}),static_cast<int>(ships.size()));
     }
     queueObjectiveBonus(s);
 }
@@ -614,7 +629,7 @@ std::vector<Action> PoliticsRules::interrupts(const State& s) const {
     std::vector<Action> out;
     for(const auto& [actor,a]:s.nations) {
         if(!a.player)continue;
-        for(const auto& [target,b]:s.nations)if(mayDeclareWar(s,actor,target).allowed)out.push_back(politicalAction(s,actor,"politics_declare_war",V(O{{"target",V(target)}})));
+        for(const auto& [target,b]:s.nations)if(mayDeclareWar(s,actor,target).allowed)out.push_back(politicalAction(s,actor,"politics_declare_war",V(O{{"target",V(nationName(s,target))}})));
     }
     return out;
 }
@@ -623,17 +638,19 @@ bool PoliticsRules::phaseComplete(const State& s) const {
 }
 void PoliticsRules::apply(State& s,const Action& a) const {
     if(a.kind=="politics_declare_war") {
-        const auto target=a.parameters.require("target").asString();
-        if(a.nation!=s.currentNation()&&s.nations.at(a.nation).alliance!=s.nations.at(s.currentNation()).alliance) {
-            queueDeclarationPriority(s,a.nation,target);
-        }else declareWar(s,a.nation,target,DeclarationMode::MajorPowerDeclaration);
+        const auto actor=nationNumber(s,a.nation);
+        const auto target=nationNumber(s,a.parameters.require("target").asString());
+        if(actor!=s.currentNation()&&s.nations.at(actor).alliance!=s.nations.at(s.currentNation()).alliance) {
+            queueDeclarationPriority(s,actor,target);
+        }else declareWar(s,actor,target,DeclarationMode::MajorPowerDeclaration);
         return;
     }
     if(a.kind=="politics_priority_decline"||a.kind=="politics_priority_declare") {
         const auto context=pendingPolitical(s,s.decisions.back().continuation);
         releaseDecision(s,a);
-        if(a.kind=="politics_priority_declare")declareWar(s,a.parameters.require("declaring_nation").asString(),a.parameters.require("target").asString(),DeclarationMode::MajorPowerDeclaration);
-        const auto actor=context.require("actor").asString(),target=context.require("target").asString();
+        if(a.kind=="politics_priority_declare")declareWar(s,nationNumber(s,a.parameters.require("declaring_nation").asString()),
+            nationNumber(s,a.parameters.require("target").asString()),DeclarationMode::MajorPowerDeclaration);
+        const auto actor=nationNumber(s,context.require("actor").asString()),target=nationNumber(s,context.require("target").asString());
         if(!s.nations.at(actor).atWarWith.contains(target)) {
             if(a.kind=="politics_priority_declare")queueDeclarationPriority(s,actor,target);
             else declareWar(s,actor,target,DeclarationMode::MajorPowerDeclaration);
@@ -641,8 +658,9 @@ void PoliticsRules::apply(State& s,const Action& a) const {
         return;
     }
     if(a.kind=="politics_choose_capital") {
-        const auto zone=zoneNumber(s,a.parameters.require("zone").asString());require(s.territories.at(zone).possessor==a.nation,"Capital choice lost possession");
-        releaseDecision(s,a);s.politics.capitals[a.nation]=zone;s.politics.evolutionAwarded.insert(a.nation);s.flags.erase("evolution_pending_"+a.nation);
+        const auto nation=nationNumber(s,a.nation);
+        const auto zone=zoneNumber(s,a.parameters.require("zone").asString());require(s.territories.at(zone).possessor==nation,"Capital choice lost possession");
+        releaseDecision(s,a);s.politics.capitals[nation]=zone;s.politics.evolutionAwarded.insert(nation);s.flags.erase("evolution_pending_"+a.nation);
         if(a.parameters.require("factory").asBool()) {
             const auto& node=mapNode(s,zone);const auto* city=node.find("is_city");
             FacilityState facility;facility.id=uniqueContinuation(s,"evolution_factory");facility.zone=zone;facility.type=city&&city->asBool()?"major_factory":"medium_factory";
@@ -665,12 +683,13 @@ void PoliticsRules::apply(State& s,const Action& a) const {
     if(a.kind=="politics_keep_capture"||a.kind=="politics_give_capture") {
         releaseDecision(s,a);
         if(a.kind=="politics_give_capture") {
+            const auto giver=nationNumber(s,a.nation);
             const auto zone=zoneNumber(s,a.parameters.require("zone").asString());
             if(a.parameters.require("requires_withdrawal").asBool())
-                for(auto& [id,u]:s.units)if(u.owner==a.nation&&u.zone==zone&&
+                for(auto& [id,u]:s.units)if(u.owner==giver&&u.zone==zone&&
                     s.definition->catalog->unit(u.type).classes.contains("land"))
                     u.turnFlags["must_withdraw_from_chinese_gift"]=1;
-            changePossession(s,zone,a.parameters.require("recipient").asString(),PossessionCause::Transfer,a.nation);
+            changePossession(s,zone,nationNumber(s,a.parameters.require("recipient").asString()),PossessionCause::Transfer,giver);
         }
         return;
     }
@@ -682,7 +701,7 @@ void PoliticsRules::applyChance(State& s,const ChanceRequest& request,const Chan
     if(request.purpose=="politics_surrender_queues") {
         const auto context=pendingPolitical(s,request.continuation);erasePoliticalContinuation(s,request.continuation);
         const auto faces=effectiveResults(request,outcome);const auto& ships=context.require("ships").asArray();
-        for(std::size_t i=0;i<ships.size();++i) {const auto id=ships[i].asString();if(faces[i]<=7)s.construction.erase(id);else s.construction.at(id).owner=context.require("attacker").asString();}
+        for(std::size_t i=0;i<ships.size();++i) {const auto id=ships[i].asString();if(faces[i]<=7)s.construction.erase(id);else s.construction.at(id).owner=nationNumber(s,context.require("attacker").asString());}
         continueCombatPoliticalResolution(s);return;
     }
     if(applyWarlordChance(s,request,outcome)||applyInfluenceChance(s,request,outcome))return;
@@ -691,7 +710,7 @@ void PoliticsRules::applyChance(State& s,const ChanceRequest& request,const Chan
 }
 void PoliticsRules::beginTurn(State& s) const {
     const auto active=s.currentNation();
-    for(auto& [id,n]:s.nations)if(controlledBy(s,id,active)||(id=="dadao"&&active=="japan"&&marked(n.gameFlags,"direct_axis_control_after_japan_surrender"))) {
+    for(auto& [id,n]:s.nations)if(controlledBy(s,id,active)||(id== knownNations(s).dadao&&active== knownNations(s).japan&&marked(n.gameFlags,"direct_axis_control_after_japan_surrender"))) {
         n.turnFlags.clear();
         for(auto& [unitId,u]:s.units)if(u.owner==id){u.turnFlags.clear();u.commitments.clear();u.route.clear();u.turnOrigin=u.zone;u.movementAllowance=s.definition->catalog->stats(u.type,u.damage,catalogContext(s,id,u.zone)).movement;u.movementRemaining=u.movementAllowance;}
     }
@@ -710,7 +729,7 @@ void PoliticsRules::finishTurn(State& s) const {
     else if(gameplay_)gameplay_->finishTurn(s);
     else {
         auto& n=s.nations.at(s.currentNation());
-        const bool incomeAccount=s.currentNation()=="japan"||s.currentNation()=="ccp"||s.currentNation()=="kmt"||n.powerStatus=="major";
+        const bool incomeAccount=s.currentNation()== knownNations(s).japan||s.currentNation()== knownNations(s).ccp||s.currentNation()== knownNations(s).kmt||n.powerStatus=="major";
         require(!incomeAccount||n.incomeKnown,"National income evaluation is not installed");
         int income=0;for(const auto& [id,value]:n.incomeComponents)income+=value;
         if(incomeAccount&&n.treasury&&(n.powerStatus!="major"||ownCapital(s,s.currentNation()))) {
@@ -718,9 +737,9 @@ void PoliticsRules::finishTurn(State& s) const {
         }
         s.clock.incomeCollected=true;
     }
-    if(s.currentNation()=="japan"&&!s.politics.surrendered.contains("japan")) {
-        const auto it=s.politics.capitals.find("japan");
-        if(it!=s.politics.capitals.end()) {const auto owner=s.territories.at(it->second).possessor;if(owner&&s.nations.at("japan").atWarWith.contains(*owner))surrenderNation(s,"japan",*owner);}
+    if(s.currentNation()== knownNations(s).japan&&!s.politics.surrendered.contains(knownNations(s).japan)) {
+        const auto it=s.politics.capitals.find(nationNumber(s, "japan"));
+        if(it!=s.politics.capitals.end()) {const auto owner=s.territories.at(it->second).possessor;if(owner&&s.nations.at(nationNumber(s, "japan")).atWarWith.contains(*owner))surrenderNation(s,nationNumber(s, "japan"),*owner);}
     }
 }
 void PoliticsRules::settle(State& s) const {

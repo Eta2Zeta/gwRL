@@ -31,9 +31,9 @@ State fixture(Phase phase = Phase::CombatMovement) {
     s.clock.nationIndex = 2;
     s.clock.playerTurnSerial = 2;
     s.clock.phase = phase;
-    s.completedTurns["ccp"] = s.completedTurns["mongolia"] = 1;
-    s.territories.at(zoneNumber(s, beiping)).possessor = "japan";
-    s.territories.at(zoneNumber(s, shantung)).possessor = "japan";
+    s.completedTurns[nationNumber(s, "ccp")] = s.completedTurns[nationNumber(s, "mongolia")] = 1;
+    s.territories.at(zoneNumber(s, beiping)).possessor = nationNumber(s, "japan");
+    s.territories.at(zoneNumber(s, shantung)).possessor = nationNumber(s, "japan");
     s.captureTurnStart();
     return s;
 }
@@ -41,10 +41,10 @@ void add(State &s, const Id &id, const Id &type, const Id &zone, const Id &owner
     UnitState u;
     u.id = id;
     u.type = type;
-    u.owner = owner;
+    u.owner = nationNumber(s, owner);
     u.zone = u.turnOrigin = zoneNumber(s, zone);
     u.movementAllowance = u.movementRemaining =
-        s.definition->catalog->stats(type, 0, catalogContext(s, owner, zoneNumber(s, zone))).movement;
+        s.definition->catalog->stats(type, 0, catalogContext(s, nationNumber(s, owner), zoneNumber(s, zone))).movement;
     s.units[id] = std::move(u);
 }
 bool offered(const State &s, const Id &kind) {
@@ -81,11 +81,11 @@ void endPatrolOnlyNoncombat() {
 void controlPermitsOverflightOnly() {
     auto s = fixture();
     ensureDadao(s);
-    s.territories.at(zoneNumber(s, shantung)).possessor = "dadao";
+    s.territories.at(zoneNumber(s, shantung)).possessor = nationNumber(s, "dadao");
     s.captureTurnStart();
     add(s, "aircraft", "fighter", beiping);
-    check(controlledBy(s, "dadao", "japan"), "Fixture lost Dadao control");
-    check(aircraftFlightAccess(s, "japan", zoneNumber(s, shantung), false), "Controlling nation cannot overfly its minor");
+    check(controlledBy(s, nationNumber(s, "dadao"), nationNumber(s, "japan")), "Fixture lost Dadao control");
+    check(aircraftFlightAccess(s, nationNumber(s, "japan"), zoneNumber(s, shantung), false), "Controlling nation cannot overfly its minor");
     check(!airLandingAvailable(s, "aircraft", shantung),
           "Control alone granted landing permission in minor's land");
 }
@@ -94,7 +94,7 @@ void baseMovementNeedsSupplyAndAge() {
     add(isolated, "aircraft", "fighter", beiping);
     isolated.facilities["base"] = {"base", "airbase", zoneNumber(isolated, beiping), 0, {}};
     const int ordinary = *isolated.units.at("aircraft").movementRemaining;
-    check(!inSupply(isolated, "japan", zoneNumber(isolated, beiping)), "Isolated-base fixture accidentally has supply");
+    check(!inSupply(isolated, nationNumber(isolated, "japan"), zoneNumber(isolated, beiping)), "Isolated-base fixture accidentally has supply");
     AirRules{}.beginTurn(isolated);
     check(isolated.units.at("aircraft").movementRemaining == ordinary,
           "Unsupplied airbase granted movement bonus");
@@ -165,15 +165,15 @@ void jointLandingUsesWeightedCarrierAssignments() {
     check(airLandingPlanAvailable(s),"Separate heavy carriers did not provide independent bomber capacity");
 }
 void scrambledAircraftReserveTheirOriginalCarrierSeats() {
-    auto s=fixture(Phase::Combat);s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");
-    s.territories.at(zoneNumber(s, "land_china_hopeh")).possessor="kmt";
+    auto s=fixture(Phase::Combat);s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
+    s.territories.at(zoneNumber(s, "land_china_hopeh")).possessor=nationNumber(s, "kmt");
     add(s,"carrier","heavy_fleet_carrier","sea_p14","kmt");
     for(const auto& id:{Id("a_scrambler"),Id("b_deck"),Id("c_deck")}){
         add(s,id,"fighter","sea_p14","kmt");attachCargo(s,"carrier",id);
     }
     add(s,"attacker","infantry","land_china_hopeh");add(s,"defender","militia","land_china_hopeh","kmt");
-    s.nations.at("kmt").technologyStages["radar"]=4;s.captureTurnStart();
-    const auto battle=registerLandBattle(s,zoneNumber(s, "land_china_hopeh"),"japan",{"attacker"},{{"attacker",zoneNumber(s, beiping)}});
+    s.nations.at(nationNumber(s, "kmt")).technologyStages["radar"]=4;s.captureTurnStart();
+    const auto battle=registerLandBattle(s,zoneNumber(s, "land_china_hopeh"),nationNumber(s, "japan"),{"attacker"},{{"attacker",zoneNumber(s, beiping)}});
     beginAirDefence(s,battle);
     auto choice=std::find_if(s.decisions.back().options.begin(),s.decisions.back().options.end(),[](const auto& a){return a.kind=="air_scramble";});
     check(choice!=s.decisions.back().options.end(),"Radar heavy carrier did not offer its fighter scramble");
@@ -224,8 +224,8 @@ void carriedAircraftAbleToFlyAshoreFreeTheirSeats() {
 // only while the two carriers can still swap zones.
 State fiveThousandNinety(bool lightCarrierCanSail) {
     auto s=fixture();
-    for(const auto& zone:{beiping,shantung,Id("land_china_hopeh")})s.territories.at(zoneNumber(s, zone)).possessor="kmt";
-    s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");s.captureTurnStart();
+    for(const auto& zone:{beiping,shantung,Id("land_china_hopeh")})s.territories.at(zoneNumber(s, zone)).possessor=nationNumber(s, "kmt");
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));s.captureTurnStart();
     add(s,"light","light_carrier","sea_p14");add(s,"fleet","fleet_carrier","sea_p15");
     if(!lightCarrierCanSail)s.units.at("light").turnFlags["naval_movement_spent"]=99;
     auto airborne=[&](const Id& id,const Id& type,const Id& zone,int fuel){
@@ -260,8 +260,8 @@ void secondBomberCannotTakeTheAttackersOnlySeat() {
           "Either carrier could not begin the swap that seats all three aircraft");
 }
 void attacksMayPrecedeTheCarrierTheyReturnTo() {
-    auto s=fixture();for(const auto& zone:{beiping,shantung,Id("land_china_hopeh")})s.territories.at(zoneNumber(s, zone)).possessor="kmt";
-    s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");
+    auto s=fixture();for(const auto& zone:{beiping,shantung,Id("land_china_hopeh")})s.territories.at(zoneNumber(s, zone)).possessor=nationNumber(s, "kmt");
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
     add(s,"cv","fleet_carrier","sea_p15");add(s,"f","fighter","land_jap_tokyo");
     s.facilities["base"]={"base","airbase",zoneNumber(s, "land_jap_tokyo"),0,{}};s.captureTurnStart();AirRules{}.beginTurn(s);
     auto actions=AirRules{}.actions(s);
@@ -305,7 +305,7 @@ void aSailingCarriersAircraftMayUseAnyCarrier() {
 void aControlledMinorsAircraftKeepTheirLandings() {
     // Japan moves Dadao's units, so a Dadao fighter's flights must keep its
     // landing. It may land only on Dadao land, not Japan's.
-    auto s=fixture(Phase::NonCombatMovement);ensureDadao(s);s.territories.at(zoneNumber(s, "land_china_hopeh")).possessor="dadao";s.captureTurnStart();
+    auto s=fixture(Phase::NonCombatMovement);ensureDadao(s);s.territories.at(zoneNumber(s, "land_china_hopeh")).possessor=nationNumber(s, "dadao");s.captureTurnStart();
     add(s,"leased","fighter","land_china_hopeh","dadao");s.units.at("leased").movementRemaining=2;
     const auto actions=AirRules{}.actions(s);
     std::vector<int> fuels;
@@ -321,8 +321,8 @@ void aircraftThatCannotLandDoNotBlockOtherMoves() {
     // seat, and Combat Movement may end at once.
     auto s=fixture();
     for(const Id zone:{"land_china_hopeh","land_china_shensi","land_china_suiyuan","land_china_szechwan","land_china_tsinghai"})
-        s.territories.at(zoneNumber(s, zone)).possessor="kmt";
-    s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");s.captureTurnStart();
+        s.territories.at(zoneNumber(s, zone)).possessor=nationNumber(s, "kmt");
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));s.captureTurnStart();
     add(s,"cv","light_carrier","sea_p16");
     for(const Id id:{"p1","p2"}){
         add(s,id,"fighter","sea_p16");auto &u=s.units.at(id);
@@ -418,7 +418,7 @@ void givingUpAMissionsLastBomberEndsTheMission() {
         s.units.at(id).commitments.insert("air_combat");
     }
     add(s,"esc","fighter",beiping);s.units.at("esc").turnFlags["air_in_flight"]=1;s.units.at("esc").commitments.insert("air_combat");
-    BattleState mission;mission.id="mission";mission.zone = zoneNumber(s, "land_china_hopeh");mission.attacker="japan";mission.defender="kmt";
+    BattleState mission;mission.id="mission";mission.zone = zoneNumber(s, "land_china_hopeh");mission.attacker=nationNumber(s, "japan");mission.defender=nationNumber(s, "kmt");
     mission.stage="air_declared";mission.flags["air_mission"]=1;mission.attackers={"a","esc"};
     s.battles.emplace(mission.id,mission);s.battleOrder.push_back(mission.id);
     giveUp(s,"a");
@@ -426,9 +426,9 @@ void givingUpAMissionsLastBomberEndsTheMission() {
           "A bombing mission kept its escort after losing its only bomber");
 }
 void attackDeclarationsRequireACombinedReturnPlan() {
-    auto s=fixture();s.territories.at(zoneNumber(s, beiping)).possessor="kmt";s.territories.at(zoneNumber(s, shantung)).possessor="kmt";
-    s.territories.at(zoneNumber(s, "land_china_hopeh")).possessor="kmt";
-    s.nations.at("japan").atWarWith.insert("kmt");s.nations.at("kmt").atWarWith.insert("japan");
+    auto s=fixture();s.territories.at(zoneNumber(s, beiping)).possessor=nationNumber(s, "kmt");s.territories.at(zoneNumber(s, shantung)).possessor=nationNumber(s, "kmt");
+    s.territories.at(zoneNumber(s, "land_china_hopeh")).possessor=nationNumber(s, "kmt");
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
     add(s,"carrier","fleet_carrier","sea_p14");
     for(const auto& id:{Id("a"),Id("b"),Id("c")})add(s,id,"fighter","land_jap_tokyo");
     s.facilities["base"]={"base","airbase",zoneNumber(s, "land_jap_tokyo"),0,{}};s.captureTurnStart();AirRules{}.beginTurn(s);
@@ -536,7 +536,7 @@ void startingCarrierAircraftDoNotOfferRedundantReattachment() {
     auto engine = Engine::start(
         loadScenario(std::filesystem::path(GWRL_SOURCE_DIR) / "game_content/scenarios/japan_china_1936"),
         campaignRules(), 713);
-    for (int step = 0; step < 40 && !(engine.state().currentNation() == "japan" &&
+    for (int step = 0; step < 40 && !(engine.state().currentNationName() == "japan" &&
                                     engine.state().clock.phase == Phase::NonCombatMovement); ++step) {
         const auto options = engine.legalActions();
         auto next = std::find_if(options.begin(), options.end(), [](const auto &a) { return a.kind == "end_phase"; });
@@ -546,7 +546,7 @@ void startingCarrierAircraftDoNotOfferRedundantReattachment() {
         engine.step(*next);
     }
     const auto &state = engine.state();
-    check(state.currentNation() == "japan" && state.clock.phase == Phase::NonCombatMovement,
+    check(state.currentNationName() == "japan" && state.clock.phase == Phase::NonCombatMovement,
           "Approved setup did not reach Japan Noncombat Movement");
     const auto &plane = state.units.at("japan_fighter_p15_fleet_carrier_1");
     check(plane.carriedBy == "japan_fleet_carrier_p15_setup_1", "Source setup aircraft lost its carrier");

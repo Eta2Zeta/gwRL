@@ -1,13 +1,13 @@
 # Names held as numbers
 
 The scenario names everything with strings: zones such as `land_china_hopeh`,
-nations such as `japan`, unit types such as `cavalry`. Inside the engine a
-zone is held as a number instead, a few bytes that compare, copy and look up as
-fast as any integer. This page says which names the engine holds as numbers,
-where each number comes from, where the engine turns names into numbers and
-back, and how to look a number up.
+nations such as `japan`, unit types such as `cavalry`. Inside the engine zones
+and nations are held as numbers instead, a few bytes that compare, copy and look
+up as fast as any integer. This page says which names the engine holds as
+numbers, where each number comes from, where the engine turns names into numbers
+and back, and how to look a number up.
 
-Only zones are numbers so far. Nations, unit types, the marks on units and the
+Zones and nations are numbers so far. Unit types, the marks on units and the
 units themselves are still held by name; [what is still a name](#what-is-still-a-name)
 lists them.
 
@@ -20,7 +20,10 @@ The position kept its zones, units, facilities and nations in maps keyed by
 name, and every rule check named them as strings. Holding zones as numbers took
 13.0% of the instructions out of listing a position's moves and 7.2% to 7.9%
 out of a searched game, with play unchanged
-([record](../archive/records/zone_numbers_2026_11_16.md)).
+([record](../archive/records/zone_numbers_2026_11_16.md)). Holding nations as
+numbers as well took a further 6.6% out of listing the moves and 3.9% to 4.7%
+out of a searched game: 11.6% fewer instructions than before either change
+([record](../archive/records/nation_numbers_2026_11_16.md)).
 
 ## 2. Where the numbers come from
 
@@ -33,25 +36,53 @@ table is saved, since the names they are made from are part of the definition.
 | Kind | Type | Its names | In the campaign |
 | --- | --- | --- | ---: |
 | Zones | `ZoneId` | The keys of the map's `nodes` | 37 |
+| Nations | `NationId` | The keys of the definition's `factions`, dormant ones included | 13 |
+
+The campaign's 13 nations are the 12 of its faction index
+(`game_content/scenarios/japan_china_1936/faction_index.json`) and Dadao, which
+`loadScenario` adds as a dormant faction (`src/campaign_setup.cpp`). So Dadao
+has a number from the start, though it enters the position only when
+`ensureDadao` creates it (`src/politics.cpp`).
 
 Because a number is a place in a sorted list:
 
 - **Numbers compare as their names do.** Zone 0, `land_china_beiping`, comes
-  before zone 1, `land_china_hopeh`, as the names do.
+  before zone 1, `land_china_hopeh`, and nation 2, `japan`, before nation 3,
+  `kmt`, as the names do.
 - **Play is unchanged.** A container keyed by numbers lists its entries in the
   order the same container keyed by names did, so every list of moves comes out
   in the same order as before. `tools/compare_engine_builds.py` found the same
-  moves and positions at every step of 300 random games and 4 searched games
-  ([record](../archive/records/zone_numbers_2026_11_16.md)).
-- **A number belongs to its definition.** Adding a zone to the map renumbers the
-  zones after it. Saved games, planning keys and moves hold names, so they are
-  unaffected; only the engine's memory holds numbers.
+  moves and positions at every step of 300 random games and 4 searched games,
+  once zones were numbers and again once nations were
+  ([zones](../archive/records/zone_numbers_2026_11_16.md),
+  [nations](../archive/records/nation_numbers_2026_11_16.md)).
+- **A number belongs to its definition.** Adding a zone to the map, or a nation
+  to the factions, renumbers those after it. Saved games, planning keys and
+  moves hold names, so they are unaffected; only the engine's memory holds
+  numbers.
 
-## 3. The zones of the campaign
+### The nations the rules name
 
-The campaign's map, `game_content/scenarios/japan_china_1936`, numbers its
-zones as follows. `tools/print_name_tables.py` prints this table from the
-engine, and `tests/test_name_tables.py` checks that it matches.
+The rules name six nations in their code: Japan, the KMT, the CCP, Dadao, the
+USSR and Mongolia. `freezeDefinition` looks their numbers up once
+(`KnownNations` in `include/game/campaign.hpp`), so a rule asks whether a unit
+is Japanese with `owner == known.japan`, an integer compare. A scenario may lack
+one of them, and the campaign has no USSR, so each is optional: empty for a
+nation the definition lacks. A nation number never equals an empty one, just as
+no nation's name ever equalled the name of a nation the scenario lacks.
+
+Two optionals are another matter: a territory nobody holds has an empty
+possessor, and it would equal the USSR's empty number. So no rule compares a
+possessor with a known nation; `isNation(state, possessor, "kmt")` asks the
+question instead, and is false for an empty possessor.
+
+## 3. The campaign's tables
+
+The campaign, `game_content/scenarios/japan_china_1936`, numbers its names as
+follows. `tools/print_name_tables.py` prints these tables from the engine, and
+`tests/test_name_tables.py` checks that they match.
+
+### Zones
 
 | Number | Name |
 | ---: | --- |
@@ -93,18 +124,36 @@ engine, and `tests/test_name_tables.py` checks that it matches.
 | 35 | `sea_p33` |
 | 36 | `sea_p41` |
 
+### Nations
+
+| Number | Name |
+| ---: | --- |
+| 0 | `ccp` |
+| 1 | `dadao` |
+| 2 | `japan` |
+| 3 | `kmt` |
+| 4 | `mongolia` |
+| 5 | `warlord_beiping_hopeh` |
+| 6 | `warlord_kwangtung_hainan` |
+| 7 | `warlord_sikang` |
+| 8 | `warlord_sinkiang` |
+| 9 | `warlord_suiyuan` |
+| 10 | `warlord_tibet` |
+| 11 | `warlord_tsinghai` |
+| 12 | `warlord_yunnan` |
+
 ## 4. Where names become numbers
 
 The engine holds numbers in its memory and names everywhere else:
 
 | Where | Holds | How it converts |
 | --- | --- | --- |
-| The position (`State`) | Numbers: each unit's zone, the zone it began its turn in and its route; each facility's zone; the territories, keyed by zone; a railroad's two ends and the damage on each side; a battle's zone; the side of a railroad a repair mends; the zones held at the start of the turn; capitals | — |
+| The position (`State`) | Numbers. Zones: each unit's zone, the zone it began its turn in and its route; each facility's zone; the territories, keyed by zone; a railroad's two ends and the damage on each side; a battle's zone; the side of a railroad a repair mends; the zones held at the start of the turn; capitals. Nations: the nations' records, keyed by nation, with each one's wars, allies and controller; the owner of each unit, construction project and repair job; each territory's possessor, now and at the start of the turn; a battle's attacker and defender; each nation's completed turns; the capitals, surrenders, evolutions, alignment queue, attacked warlords and China's invader | — |
 | The map index (`IndexedGeography`) | Numbers: each zone's JSON, its neighbors in source order, its first edge to each neighbor, the hops between zones | Built by `freezeDefinition` |
-| Saved positions, planning keys and observations | Names | `State::toJson` and the planning-key writer name the zones; `State::fromJson` numbers them again |
-| Moves | Names: a move's details, such as `zone` and `path`, name zones | A rule numbers a move's zones as it reads them and names them as it writes a move |
-| Marks on units, nations and territories, and battle notes | Names: such as `surprise_attack_zone:sea_p15` | A rule names the zone as it writes the mark |
-| The network input | Zone columns in name order, so a zone's number is its column | `numberByZones` in `src/zone_encoding.cpp` checks the order when the encoder is built |
+| Saved positions, planning keys and observations | Names | `State::toJson` and the planning-key writer name the zones and nations; `State::fromJson` numbers them again |
+| Moves, decisions and dice requests | Names: a move's details, such as `zone` and `path`, name zones, and the `nation` of a move, a decision or a dice request names the nation that acts | A rule numbers the names as it reads them, such as `nationNumber(state, move.nation)`, and names them as it writes a move |
+| Marks on units, nations and territories, and battle notes | Names: such as `surprise_attack_zone:sea_p15` or `last_conqueror_kmt` | A rule names the zone or nation as it writes the mark |
+| The network input | Zone and nation columns in name order, so a number is its column | `Vocabulary::numberBy` in `src/zone_encoding.cpp` checks the order when the encoder is built |
 | Python | Names only | `CampaignEnv.name_tables()` returns the tables |
 
 The functions that convert, declared in `include/game/campaign.hpp`:
@@ -116,33 +165,53 @@ The functions that convert, declared in `include/game/campaign.hpp`:
 | `zoneName(state, zone)` | A zone's name |
 | `zoneNumbers(state, names)`, `zoneNames(state, zones)` | The same for lists |
 | `isZone(state, zone)` | Whether a number names one of the definition's zones |
+| `nationNumber(state, name)` | A nation's number; throws `Unknown nation: <name>` for a name that is no nation |
+| `findNation(state, name)` | A nation's number, or nothing, for a name that may be no nation |
+| `nationName(state, nation)` | A nation's name |
+| `nationFaction(state, nation)` | A nation's faction definition, such as its home zones, without a name lookup (`Definition::nationFactions`) |
+| `knownNations(state)` | The numbers of [the nations the rules name](#the-nations-the-rules-name) |
+| `isNation(state, nation, name)` | Whether a nation, or a possessor that may be empty, is the nation of this name; false for an empty possessor and for a name the definition lacks |
+| `hasNation(state, name)` | Whether the position holds a nation of this name: Dadao has a number before it is in play |
+| `state.currentNation()`, `state.currentNationName()` | The nation whose turn it is, as a number and as a name |
+| `definition.turnNations` | The turn order as numbers; `definition.turnOrder` names it |
 
 ## 5. Containers keyed by numbers
 
 - **`NumberMap<Key, Value>`** keeps one slot per number in a vector. It has the
   parts of `std::map`'s interface the engine uses and lists its entries in
   number order, which is name order, but copies without allocating a node per
-  entry. The territories and the zones held at the start of the turn use it.
-- **`NumberSet<Key>`** keeps one bit per number, with no allocation. The
-  searches use it for the zones they have seen, and the position's fact cache
-  (`PositionFacts`) for the zone sets it keeps.
+  entry. The territories, the zones held at the start of the turn, the nations'
+  records, their completed turns and the capitals use it.
+- **`NumberSet<Key>`** keeps one bit per number, with no allocation. A nation's
+  wars and allies, the surrendered nations and the nations that have evolved
+  use it; so do the searches, for the zones they have seen, and the position's
+  fact cache (`PositionFacts`), for the zone sets it keeps.
 
 ## 6. Rules for code
 
-- **A number comes from a table.** `zoneNumber`, `findZone` and a table's
-  `numbers()` give numbers; only the tables and the containers make one from a
-  place (`ZoneId::fromIndex`). There is no conversion from an integer or a
-  string, not even an explicit one, so a string can never become a number by
-  accident: a list of two string literals would otherwise become a list of
-  zones through `std::vector`'s constructor from a pair of iterators.
-- **A default `ZoneId` names no zone.** `State::validate` refuses a position
-  holding one, as it refuses a number beyond the table.
-- **Convert at the edge.** A rule reads a move's zone names once, with
-  `zoneNumber`, and works with numbers from there on.
+- **A number comes from a table.** `zoneNumber`, `nationNumber`, `findZone`,
+  `findNation` and a table's `numbers()` give numbers; only the tables and the
+  containers make one from a place (`ZoneId::fromIndex`). There is no
+  conversion from an integer, a string or a number of another kind, not even an
+  explicit one, so a string can never become a number by accident: a list of
+  two string literals would otherwise become a list of zones through
+  `std::vector`'s constructor from a pair of iterators. `NumberSet`'s
+  constructor from two iterators takes only iterators over numbers, for the
+  same reason. `tests/names_tests.cpp` checks at compile time that no string,
+  integer or number of another kind becomes a number, and that two names in
+  braces do not make a set of numbers.
+- **A default number names nothing.** `State::validate` refuses a position
+  holding a default `ZoneId` or `NationId`, as it refuses a number beyond its
+  table.
+- **Convert at the edge.** A rule reads a move's names once, with `zoneNumber`
+  or `nationNumber`, and works with numbers from there on.
+- **Ask about a possessor with `isNation`.** A possessor may be empty, and so
+  may a known nation the scenario lacks; comparing the two would match
+  ([the nations the rules name](#the-nations-the-rules-name)).
 
 ## What is still a name
 
-Nations, alliances and players; unit, facility and technology types; units,
+Alliances and players; unit, facility and technology types; units,
 facilities, railroads, construction projects, repair jobs and battles; the
 marks on units, nations, territories and battles; a move's details and a
 battle's notes. Each is held as a string.

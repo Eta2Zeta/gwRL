@@ -1,0 +1,100 @@
+{
+ "date": "2026-11-16",
+ "question": "Does holding nations as numbers, after zones, leave play unchanged, and what does it save?",
+ "code": {
+  "before_any": "9519ea7",
+  "zones": "b6667b4",
+  "nations": "this change"
+ },
+ "machine": "Apple M4 Max: 10 performance and 4 efficiency cores, 36 GB",
+ "tool": "tools/compare_engine_builds.py",
+ "random_games": {
+  "seeds": "7000-7299",
+  "calendar_rounds": 11,
+  "processes": 4,
+  "games_compared": 300,
+  "identical": 300,
+  "steps": 443974,
+  "per_call": {
+   "legal_actions": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "before_any": 10.03,
+     "zones": 8.73,
+     "nations": 8.15,
+     "change_percent_from_zones": -6.6,
+     "change_percent_from_before_any": -18.7
+    },
+    "microseconds_per_call": {
+     "before_any": 640,
+     "zones": 546,
+     "nations": 503
+    }
+   },
+   "apply_action": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "before_any": 4.31,
+     "zones": 3.91,
+     "nations": 3.72,
+     "change_percent_from_zones": -4.9,
+     "change_percent_from_before_any": -13.7
+    },
+    "microseconds_per_call": {
+     "before_any": 311,
+     "zones": 281,
+     "nations": 269
+    }
+   },
+   "resolve_chance": {
+    "calls": 52134,
+    "million_instructions_per_call": {
+     "before_any": 3.2,
+     "zones": 3.04,
+     "nations": 2.89,
+     "change_percent_from_zones": -4.9,
+     "change_percent_from_before_any": -9.7
+    },
+    "microseconds_per_call": {
+     "before_any": 225,
+     "zones": 216,
+     "nations": 206
+    }
+   }
+  }
+ },
+ "searched_games": {
+  "seeds": "41-44",
+  "calendar_rounds": 11,
+  "simulations": 64,
+  "max_depth": 16,
+  "network": "64x2 networks with random-filled first-layer tables (tools/replay_coordinator_rounds.py --make-weights), evaluated one position at a time",
+  "games_compared": 4,
+  "identical": 4,
+  "events": 4985,
+  "billion_instructions": {
+   "before_any": 6782,
+   "zones_recorded_run": 6292,
+   "zones_bracketed_run": 6240,
+   "nations_runs": [
+    5996,
+    5994
+   ],
+   "change_percent_from_zones_recorded_run": -4.7,
+   "change_percent_from_zones_bracketed_run": -3.9,
+   "change_percent_from_before_any": -11.6
+  },
+  "cpu_seconds_bracketed": {
+   "nations_before": 485.3,
+   "zones": 509.6,
+   "nations_after": 491.0,
+   "change_percent": -4.2,
+   "load_average_after": 9.3
+  }
+ },
+ "notes": [
+  "The bracketed searched games ran in the order: this change, the zones build, this change, back to back on the same Mac.",
+  "The zones build's searched games ran 6,292 G, 6,248 G and 6,240 G instructions in three runs; this change's ran 5,996 G and 5,994 G.",
+  "Instructions do not depend on the Mac's other work; CPU seconds do."
+ ]
+}

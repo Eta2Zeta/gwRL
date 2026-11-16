@@ -49,7 +49,7 @@ void addUnits(State& state, const Id& owner, const Id& zone, const json::Value& 
         for (int index = 0; index < count; ++index) {
             UnitState unit;
             unit.type = type;
-            unit.owner = owner;
+            unit.owner = nationNumber(state, owner);
             unit.zone = zoneNumber(state, zone);
             unit.turnOrigin = unit.zone;
             unit.damage = integerOr(row, "damage_points", 0);
@@ -186,30 +186,30 @@ State loadScenario(const std::filesystem::path& directory) {
 
     State state;
     state.definition = freezeDefinition(std::move(definition));
-    state.politics.capitals["japan"]=zoneNumber(state,"land_jap_tokyo");
+    state.politics.capitals[nationNumber(state,"japan")]=zoneNumber(state,"land_jap_tokyo");
     for (const auto& [id, source] : index.document.require("factions").asObject()) {
         NationState nation;
         const auto& control = source.require("initial_control");
         nation.alliance = optionalId(control.find("alliance_id"));
         const auto controller = optionalId(control.find("controller_id"));
         if (controller) {
-            if (state.definition->factions.contains(*controller)) nation.controllerNation = *controller;
+            if (state.definition->factions.contains(*controller)) nation.controllerNation = nationNumber(state, *controller);
             else if (state.definition->players.contains(*controller)) nation.player = *controller;
             else throw std::runtime_error("Unknown initial controller: " + *controller);
         }
         if (id == japan.document.require("nation").asString()) {
             nation.powerStatus = "major";
-            nation.controllerNation = id;
+            nation.controllerNation = nationNumber(state, id);
         } else if (control.require("status").asString() == "unaligned_uncontrolled_warlord") {
             nation.powerStatus = "warlord";
         }
-        state.nations.emplace(id, std::move(nation));
+        state.nations.emplace(nationNumber(state, id), std::move(nation));
     }
     for (const auto& turn : contract.document.require("national_turn_order").asArray()) {
-        state.nations.at(turn.require("slot").asString()).player = turn.require("agent").asString();
+        state.nations.at(nationNumber(state, turn.require("slot").asString())).player = turn.require("agent").asString();
     }
     for (const auto& account : contract.document.require("starting_accounts").require("national_accounts").asArray()) {
-        auto& nation = state.nations.at(account.require("nation").asString());
+        auto& nation = state.nations.at(nationNumber(state, account.require("nation").asString()));
         nation.treasury = account.require("treasury_ipp").asInt();
     }
     for (auto& [id, nation] : state.nations) {
@@ -217,9 +217,9 @@ State loadScenario(const std::filesystem::path& directory) {
         if (!nation.treasury) nation.incomeKnown = true;
     }
     for (const auto& faction : china.document.require("factions").asArray()) {
-        auto& nation = state.nations.at(faction.require("id").asString());
+        auto& nation = state.nations.at(nationNumber(state, faction.require("id").asString()));
         if (const auto* wars = faction.find("at_war_with")) {
-            for (const auto& other : wars->asArray()) nation.atWarWith.insert(other.asString());
+            for (const auto& other : wars->asArray()) nation.atWarWith.insert(nationNumber(state, other.asString()));
         }
     }
     for (const auto& [zone, node] : nodes) {
@@ -228,7 +228,7 @@ State loadScenario(const std::filesystem::path& directory) {
         if (original.require("source_original_owner").asString() != node.require("original_owner").asString()) {
             throw std::runtime_error("Original owner differs from faction index: " + zone);
         }
-        state.territories.emplace(zoneNumber(state, zone), TerritoryState {original.require("original_faction_id").asString(), {}});
+        state.territories.emplace(zoneNumber(state, zone), TerritoryState {nationNumber(state, original.require("original_faction_id").asString()), {}});
     }
     for (const auto& [id, source] : map.document.require("facilities").asObject()) {
         state.facilities.emplace(id, FacilityState {
@@ -268,7 +268,7 @@ State loadScenario(const std::filesystem::path& directory) {
     }
     for (const auto& row : china.document.require("territories").asArray()) {
         const Id zone = row.require("node_id").asString();
-        state.territories.at(zoneNumber(state, zone)).possessor = row.require("owner_id").asString();
+        state.territories.at(zoneNumber(state, zone)).possessor = nationNumber(state, row.require("owner_id").asString());
         addUnits(state, row.require("owner_id").asString(), zone, row.require("units"));
         // Existing facility references are provenance, not new instances.
         for (const auto& facility : row.require("facilities").asArray()) {
@@ -283,7 +283,7 @@ State loadScenario(const std::filesystem::path& directory) {
     for (const auto& source : japan.document.require("starting_construction").asArray()) {
         BuildProject project;
         project.id = source.require("id").asString();
-        project.owner = japanId;
+        project.owner = nationNumber(state, japanId);
         project.type = source.require("type").asString();
         project.site = optionalId(source.find("node_id"));
         project.queuePosition = source.require("queue_stage").asInt();
@@ -295,7 +295,7 @@ State loadScenario(const std::filesystem::path& directory) {
             throw std::runtime_error("Duplicate construction ID");
         }
     }
-    for (const auto& nation : state.definition->turnOrder) state.completedTurns.emplace(nation, 0);
+    for (const auto nation : state.definition->turnNations) state.completedTurns.emplace(nation, 0);
     initializeCatalogState(state);
     state.captureTurnStart();
     state.validate();
