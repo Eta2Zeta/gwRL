@@ -137,7 +137,7 @@ The other three attacks differ only in the path's second zone. The fifth action,
 ending the phase, has the kind `end_phase` and no details. Long orders, such as a
 fleet's, are built one part at a time, each part a decision of its own with a
 bounded list of legal actions: see
-[the rules engine, section 3](../engine/README.md#3-positions-and-moves).
+[the rules engine, section 3](../engine/README.md#3-states-and-actions).
 
 ### 2.4 The final score
 

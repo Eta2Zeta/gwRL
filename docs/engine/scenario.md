@@ -3,18 +3,18 @@
 The engine plays one scenario: the Japan–China theatre of Global War 1936,
 from July 1936 to July 1941, cut out of the game's world map. This page says
 what is in it at the start and where each part of it is stored. The reasons for
-the choices are in the
+what the scenario includes and leaves out are in the
 [approved scenario decisions](../plans/japan_china_full_rules_plan.md#approved-scenario-decisions).
-The numbers below were read from the engine's starting position on 14 November
-2026.
+The numbers below were read from the state the engine starts a game in, on
+14 November 2026.
 
 ## 1. In brief
 
 | | |
 | --- | --- |
-| Calendar | 11 rounds of half a year: July 1936, then every January and July to July 1941 |
+| Calendar | 11 game rounds of half a year: July 1936, then every January and July to July 1941 |
 | Players | Three alliances: the Axis, the Allies and the Comintern |
-| Nations taking turns | The CCP, Mongolia, Japan and the KMT, in that order each round |
+| Nations taking turns | The CCP, Mongolia, Japan and the KMT, in that order each game round |
 | Other nations | Eight Chinese warlords, which take no turn until they join a side |
 | Map | 37 zones: 31 land and 6 sea |
 | Pieces at the start | 99 units, 22 facilities and 17 railroads |
@@ -27,8 +27,8 @@ the income it gives the nation that holds it.
 ## 2. Nations and alliances
 
 A *nation* owns units, holds land and, if it is a full participant, has a
-treasury and a turn. An *alliance* is a player: it chooses every move of the
-nations it plays.
+treasury and a turn. An *alliance* is a player: it chooses every action of
+the nations it plays.
 
 | Nation | Played by | Status at the start | Treasury | Units | At war with |
 | --- | --- | --- | ---: | ---: | --- |
@@ -60,7 +60,7 @@ Formosa, Tibet and Mongolia's four zones.
 
 ## 3. The map
 
-Each land zone has a value in IPP, a terrain, and at the start a nation that
+Each land zone has an IPP value, a terrain, and at the start a nation that
 holds it. A *city* is a zone marked as one, which changes combat and bombing
 there. Railroads join neighbouring land zones, at most one per border.
 
@@ -137,8 +137,8 @@ the scenario, and lives in `game_content/catalog/gw36_v43`
 
 | File | Holds |
 | --- | --- |
-| `land_air.json` | 37 land, air and rocket unit types: values, classes, abilities |
-| `naval.json` | 16 ship types, with their values in every damaged state |
+| `land_air.json` | 37 land, air and rocket unit types: printed values, classes, abilities |
+| `naval.json` | 16 ship types, with their printed values in every damaged state |
 | `facilities.json` | 15 facility types: factories, ports, shipyards, dockyards, bases, defences, the railroad |
 | `technologies.json` | 16 technologies: what each needs and what it unlocks |
 | `build_charts.json` | 207 purchase rows: what Japan, the KMT and the CCP may buy, when, and at what price |
@@ -146,16 +146,16 @@ the scenario, and lives in `game_content/catalog/gw36_v43`
 A unit type being in the catalog does not make it buyable: a nation buys only
 from its own rows of the build charts ([economy](economy.md)). Two of Japan's
 starting ship types, the Torpedo Boat Destroyer and the Coastal Submarine, have
-no purchase row; the scenario gives them values of 5 and 4 IPP for scoring.
+no purchase row; the scenario counts them as worth 5 and 4 IPP for scoring.
 
-## 6. The score
+## 6. The final score
 
-Nothing is scored before the end. After the last turn of round 11, each
-alliance's *wealth* is its income per turn plus a tenth of the value of its
-units, its facilities and railroads, its treasury and the money paid into
-unfinished construction. An alliance's score is its own wealth minus the other
-two alliances' wealth (`src/campaign_objective.cpp`). The exact definition,
-with its accounting choices, is in the
+Nothing is scored before the end. After the last turn of game round 11, each
+alliance's *wealth* is its income per turn plus a tenth of what its units, its
+facilities and railroads, its treasury and the money paid into unfinished
+construction are worth. An alliance's *final score* is its own wealth minus the
+other two alliances' wealth (`src/campaign_objective.cpp`). The exact
+definition, with its accounting decisions, is in the
 [plan](../plans/japan_china_full_rules_plan.md#wealth-definition-and-approved-accounting-decisions).
 
 At the start the Axis's wealth is 66.0, the Allies' 12.4 and the Comintern's

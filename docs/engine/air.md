@@ -37,15 +37,16 @@ can land ashore free their places. Moves of ships are held to the same rule
 
 **When an aircraft still cannot land.** Dice, or another nation's turn, can
 leave an aircraft with nowhere to go. Its owner then gives it up
-(`air_failed_landing`), choosing which aircraft where there is a choice.
-Combat Movement cannot end while an aircraft in the air has no landing; if
-nothing else is legal, the phase ends and those aircraft are lost.
+(`air_failed_landing`), choosing which aircraft when more than one could be
+given up. Combat Movement cannot end while an aircraft in the air has no
+landing; if no other action is legal, the phase ends and those aircraft are
+lost.
 
 ## 2. Missions
 
 All are declared in Combat Movement, as a flight to the target.
 
-| Move | Who flies it | What it is |
+| Kind of action | Who flies it | What it is |
 | --- | --- | --- |
 | `air_support` | fighters and bombers | Joins a land battle its nation has already registered in that zone |
 | `air_ground_attack` | fighters and bombers | Attacks an enemy zone where its nation has no battle yet. Aircraft alone cannot capture land. |
@@ -63,7 +64,7 @@ Bombers. Seaplanes and transports do not attack.
 ## 3. Aircraft in a land battle
 
 The attacker's aircraft arrive with the mission they declared. The defender
-answers before the first round:
+decides before the first combat round:
 
 - **Aircraft in the zone** either take part or stay on the ground, one decision
   for each (`air_defend`, `air_ground`).
@@ -71,10 +72,10 @@ answers before the first round:
   (`air_scramble`, or `air_decline_scramble`). A scramble uses the defender's
   holdings as of its own last turn, not the attacker's.
 
-In the battle, fighters and anti-aircraft artillery fire first in the opening
-round ([land combat](land_combat.md)). Carpet bombers fly home after the first
-round. When the battle is over, every surviving aircraft lands: its owner
-chooses where (`air_land`).
+In the battle, fighters and anti-aircraft artillery fire first in the first
+combat round ([land combat](land_combat.md)). Carpet bombers fly home after the
+first combat round. When the battle is over, every surviving aircraft lands:
+its owner chooses where (`air_land`).
 
 **Airborne assault.** The transports fly in with their Airborne Infantry. Both
 sides' fighters and anti-aircraft artillery fire first, and a transport that is
@@ -97,7 +98,7 @@ infantry, which fights the land battle and cannot retreat (RCL-001).
 | --- | --- |
 | A facility | Damage on the facility, up to its limit; a damaged factory produces less or nothing |
 | A project under construction | Every three points undo one paid stage ([economy](economy.md#5-repairs)) |
-| A city | City damage; every 20 points remove one IPP of the zone's value for good |
+| A city | City damage; every 20 points remove one IPP of the zone's IPP value for good |
 | A railroad | Damage on one side of one border; the attacker picks the border (`air_choose_rail_border`) |
 
 A raid can also cost the defender a technology in progress; the attacker
@@ -111,9 +112,10 @@ A patrol is an aircraft's whole combat move: it flies to a sea zone within
 patrol range of the land zone or carrier it takes off from (RB 9.3.1) and stays
 over it until Noncombat Movement, when it must land (`air_end_patrol`).
 
-A patrol plane fights enemy ships that enter its sea zone, for one round, and
-may be attacked by ships already there. Those choices are made in the naval
-module's moves and are described with it ([naval](naval.md#5-patrol-planes-and-ships)).
+A patrol plane fights enemy ships that enter its sea zone, for one combat
+round, and may be attacked by ships already there. Whether the plane fights, in
+either case, is decided through the naval module's actions and is described
+with them ([naval](naval.md#5-patrol-planes-and-ships)).
 
 ## 6. Air transport
 
@@ -129,9 +131,9 @@ module's moves and are described with it ([naval](naval.md#5-patrol-planes-and-s
 - **Militia** carried by air must be set down in their Home Country in the same
   phase.
 
-## 7. The moves
+## 7. The kinds of action
 
-| Move | Phase | Chosen by |
+| Kind of action | Phase | Chosen by |
 | --- | --- | --- |
 | The missions of [section 2](#2-missions) | Combat Movement | the alliance of the nation whose turn it is |
 | `air_begin_bombing`, `air_resume_bombing` | Combat | the attacker |
@@ -146,10 +148,10 @@ module's moves and are described with it ([naval](naval.md#5-patrol-planes-and-s
 | `air_load`, `air_unload`, `air_allied_load`, `air_allied_unload` | Combat Movement, Noncombat Movement | the same alliance |
 | `air_failed_landing` | Combat Movement, Noncombat Movement | the owner of the aircraft |
 
-In 240 random games 22 of the 30 air moves came up. Airborne assaults, rockets,
-artillery bombardment of cities, allied cargo, the blitz and the loss of a
-technology did not ([record](../archive/records/move_census_2026_11_14.md)); the
-tests cover them.
+In 240 random games 22 of the 30 kinds of air action came up. Airborne
+assaults, rockets, artillery bombardment of cities, allied cargo, the blitz and
+the loss of a technology did not
+([record](../archive/records/move_census_2026_11_14.md)); the tests cover them.
 
 Tests: `tests/air_tests.cpp`, `tests/air_logistics_tests.cpp`,
 `tests/air_integration_tests.cpp` and `tests/air_mission_tests.cpp`.

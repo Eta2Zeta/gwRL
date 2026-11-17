@@ -7,12 +7,14 @@ project. It is a C++ library (`include/game/`, `src/`), and Python reaches it as
 
 Three things hold everywhere in it:
 
-- **The engine never chooses for a player.** Every choice the rules give
-  someone, down to which unit takes a hit, is offered to the alliance entitled
-  to it.
-- **The engine rolls every die**, as a step of its own that no player controls.
-- **Only offered moves can be played.** A move that is not on the current list
-  is refused and changes nothing.
+- **The engine never chooses for a player.** Every decision the rules leave to
+  someone, down to which unit takes a hit, is put to the alliance entitled to
+  it.
+- **The engine rolls every die.** Each roll is a separate event in the game,
+  and no player controls it ([section 5](#5-dice)).
+- **Only a legal action can be played.** An action that is not on the current
+  list of legal actions ([section 3](#3-states-and-actions)) is refused and
+  changes nothing.
 
 This page explains how the engine is built. [The campaign](scenario.md) says
 what a game holds at the start, and [section 7](#7-the-rules-by-subject) lists
@@ -21,7 +23,7 @@ the pages on each part of the rules.
 ## 1. The state of a game
 
 Everything about a game at one moment is its *state* (`State` in
-`include/game/campaign.hpp`).
+`include/game/campaign.hpp`): in a board game's words, its position.
 
 | Part of the state | What it holds | At the start |
 | --- | --- | --- |
@@ -33,8 +35,8 @@ Everything about a game at one moment is its *state* (`State` in
 | Construction and repairs | Projects being paid for in stages, and repair jobs | 2 ships under construction |
 | Politics | The Chinese Truce, capitals, surrenders, warlords waiting to pick a side | the KMT and the CCP at war |
 | Battles | Every declared or running battle, with the stage it has reached | none |
-| The clock | The round, the nation whose turn it is and the phase | round 1, the CCP, Production |
-| Pending work | Decisions waiting for an answer, and a dice roll waiting to be made | none |
+| The clock | The game round, the nation whose turn it is and the phase | game round 1, the CCP, Production |
+| Pending work | Pending decisions: what a rule has asked an alliance to decide, such as which unit takes a hit; and a dice roll waiting to be made | none |
 
 The state holds zones, nations, unit types, facility types, technologies and
 the bases of marks as numbers: each one's place in the sorted list of the names
@@ -53,20 +55,20 @@ Two things are kept beside the state:
 
 - **The definition** never changes during a game: the map, the catalog of
   pieces, the rules data and the turn order. All copies of a game share one.
-- **The history** is a log of every move and roll. No rule reads it; it exists
-  for replays and for inspection.
+- **The history** is a log of every action and every dice roll. No rule reads
+  it; it exists for replays and for inspection.
 
-A rule may not keep anything of its own between moves. Whatever matters to a
-later decision is in the state, so a copy of the state is a complete copy of the
-game.
+A rule may not keep anything of its own from one action or dice roll to the
+next. Whatever matters to a later decision is in the state, so a copy of the
+state is a complete copy of the game.
 
 ## 2. The calendar
 
-A game is 11 *rounds* of half a year, from July 1936 to July 1941. In every
-round four nations take a *national turn*, always in the same order, and every
-national turn has five *phases*.
+A game is 11 *game rounds* of half a year, from July 1936 to July 1941. In every
+game round four nations take a *national turn*, always in the same order, and
+every national turn has five *phases*.
 
-![One round of the campaign. Four national turns in a fixed order: the CCP and then Mongolia, both played by the Comintern; Japan, played by the Axis; the KMT, played by the Allies. After the KMT's turn the next round begins, and after the KMT's turn of round 11 the game ends and is scored. Every national turn has five phases, in this order. Production: buy, pay for what is being built, repair, research. Combat Movement: move the units that will attack, and declare air and sea attacks. Combat: fight every battle; both sides choose casualties and retreats. Noncombat Movement: move everything else, land aircraft, bring ships into port. Place Units: place what was built, recruit, then collect income. The other alliances also choose during a turn: a defender picks its casualties and retreats and may scramble aircraft. A declaration of war on a major power can come between any two moves.](figures/campaign_round.svg)
+![One game round of the campaign. Four national turns in a fixed order: the CCP and then Mongolia, both played by the Comintern; Japan, played by the Axis; the KMT, played by the Allies. After the KMT's turn the next game round begins, and after the KMT's turn of game round 11 the game ends and is scored. Every national turn has five phases, in this order. Production: buy, pay for what is being built, repair, research. Combat Movement: move the units that will attack, and declare air and sea attacks. Combat: fight every battle; both sides choose casualties and retreats. Noncombat Movement: move everything else, land aircraft, bring ships into port. Place Units: place what was built, recruit, then collect income. The other alliances also choose during a turn: a defender picks its casualties and retreats and may scramble aircraft. A declaration of war on a major power can come between any two actions.](figures/game_round.svg)
 
 | Phase | What the nation whose turn it is does | Pages |
 | --- | --- | --- |
@@ -77,35 +79,38 @@ national turn has five *phases*.
 | Place Units | Puts finished units and facilities on the map and delivers lend-lease. The CCP and minors under an alliance recruit by a roll. The CCP and Japan may try to win over a warlord. | [Economy](economy.md), [politics](politics.md) |
 
 When Place Units ends, the nation collects its income and the next nation's
-turn begins. A phase can end only when its required work is done: nothing is
-waiting for an answer or a roll, and in Combat every battle has been fought or
-called off. The game ends after the KMT's turn of round 11 (`Engine::endPhase`
-in `src/campaign_runtime.cpp`).
+turn begins. A phase can end only when its required work is done: no decision
+is pending, no dice are waiting to be rolled, and in Combat every battle has
+been fought or called off. The game ends after the KMT's turn of game round 11
+(`Engine::endPhase` in `src/campaign_runtime.cpp`).
 
-Which phase each kind of move belongs to was read off 240 random games
+Which phase each kind of action belongs to was read off 240 random games
 ([record](../archive/records/move_census_2026_11_14.md)).
 
-## 3. Positions and moves
+## 3. States and actions
 
-A *position* is the state at one moment. It is one of three kinds:
+The state at any moment is one of three kinds:
 
-- **a decision:** one alliance must choose one move from a list;
+- **a decision:** one alliance must choose one *action* from a list of *legal
+  actions*, the actions the rules allow there;
 - **a chance event:** dice are waiting to be rolled;
-- **the end** of the game.
+- **the end** of the game, the *terminal state*.
 
-**The list of moves** at a decision comes from one of two places
+**The list of legal actions** at a decision comes from one of two places
 (`Engine::actionMenu`):
 
-- **Nothing is waiting.** The rules list every move the nation whose turn it is
-  may make in this phase. When the phase's required work is done, the list also
-  holds `end_phase`.
-- **A decision is waiting.** A rule has asked someone a question, such as which
-  unit takes a hit. The list holds that question's answers and nothing else.
-  The one who answers is often not the alliance whose turn it is.
+- **No decision is pending.** The rules list every action the nation whose
+  turn it is may take in this phase. When the phase's required work is done,
+  the list also holds `end_phase`.
+- **A decision is pending.** A rule has asked an alliance to decide one thing,
+  such as which unit takes a hit, and this *pending decision* waits in the
+  state ([section 1](#1-the-state-of-a-game)). The list holds only the legal
+  actions of the pending decision. The alliance that chooses is often not the
+  alliance whose turn it is.
 
-**A move is a small record:** its kind, the nation it is made for, and labelled
-details, such as the unit and its path. The engine's rules can produce 141
-kinds of move:
+**An action is a small record:** its kind, the nation it is taken for, and
+labelled details, such as the unit and its path. The engine's rules can produce
+141 kinds of action:
 
 | Family | Kinds | Examples | Page |
 | --- | ---: | --- | --- |
@@ -117,51 +122,54 @@ kinds of move:
 | `politics_`, `truce_`, `influence_`, `recruitment_` | 18 | `politics_declare_war`, `truce_offer`, `influence_roll`, `recruitment_roll` | [Politics](politics.md) |
 | `end_phase` | 1 | ends the current phase | this page |
 
-**Long orders are built step by step.** In training the engine uses an order
-interface made for agents (`trainingCampaignRules` in
+**Long orders are built one part at a time.** In training the engine uses an
+order interface made for agents (`trainingCampaignRules` in
 `src/campaign_actions.cpp`, version `campaign-orders-v2`). A fleet's move, for
-example, is several decisions: start an order, add ships one at a time, choose
-the route. Each step has a bounded list, an order can only go forward, and a
-finished battle is cleared away without a move. The same rules decide what is
-legal as in the interface for people, where an order can be edited.
+example, takes several decisions: start an order, add ships one at a time,
+choose the route. Each of these decisions has a bounded list of legal actions,
+an order can only go forward, and a finished battle is cleared away without an
+action. The same rules decide what is legal as in the interface for people,
+where an order can be edited.
 
-## 4. One step of the game
+## 4. Applying an action or a dice roll
 
 Three calls change a game (`Engine` in `include/game/campaign.hpp`), and each
 is all or nothing:
 
 | Call | When | What it does |
 | --- | --- | --- |
-| `step(move)` | At a decision | Checks that the move is on the list, exactly as offered, then lets the rules apply it |
-| `interrupt(move)` | Between moves | Applies a move made out of turn ([section 6](#6-moves-made-out-of-turn)) |
+| `step(action)` | At a decision | Checks that the action is on the list of legal actions, exactly as listed, then lets the rules apply it |
+| `interrupt(action)` | Between two actions | Applies an action taken out of turn ([section 6](#6-actions-taken-out-of-turn)) |
 | `resolveChance()` | At a chance event | Rolls the waiting dice and lets the rules apply the result |
 
-After the rules have applied a move or a roll, the engine lets them settle the
-position (`settle`). Each module brings the values it keeps about the position
+After the rules have applied an action or a dice roll, the engine lets them
+settle the state (`settle`). Each module brings what it stores about the state
 up to date, such as [every nation's income](economy.md#1-money), and the
-training interface takes any steps that offer no choice. The engine then checks
-the new state for consistency and adds the move to the history. If anything
-fails on the way, the game is left exactly as it was. A new game's first
-position is settled in the same way.
+training interface clears a finished battle, on land or at sea, itself as soon
+as the rules offer the action that clears it, exactly as if an alliance had
+chosen it ([land combat](land_combat.md#6-finished-battles)). The engine then
+checks the new state for consistency and adds the action or the dice roll to
+the history. If anything fails on the way, the game is left exactly as it was.
+A new game's first state is settled in the same way.
 
 ## 5. Dice
 
-A move never rolls dice inside itself. When a rule needs a roll, it posts a
+An action never rolls dice inside itself. When a rule needs a roll, it posts a
 *chance request* in the state: what the roll is for, which dice (six- or
-twelve-sided), their modifiers, and which faces are rolled again. The position
-is then a chance event. `resolveChance` rolls the dice and hands the faces to
-the rule that asked, which carries on from there.
+twelve-sided), their modifiers, and which faces are rolled again. The state is
+then a chance event. `resolveChance` rolls the dice and hands the faces to the
+rule that asked, which carries on from there.
 
-This split is what lets a search copy a game and try the same move with
-different dice: the move always leads to the same chance event, and only the
+This split is what lets a search copy a game and try the same action with
+different dice: the action always leads to the same chance event, and only the
 roll differs. The engine keeps separate random streams for the real game and
 for search copies, so that a search never uses up the real game's dice.
 
-## 6. Moves made out of turn
+## 6. Actions taken out of turn
 
-Answers to a waiting decision are one way an alliance moves during another's
-turn. There are two more, kept in a second list beside the moves
-(`legalInterrupts`):
+Choosing at a pending decision is one way an alliance acts during another's
+turn. There are two more, kept in a second list beside the list of legal
+actions (`legalInterrupts`):
 
 - **A declaration of war on a major power** (`politics_declare_war`) can be
   made at almost any moment, also during another nation's turn. War on a minor
@@ -170,20 +178,26 @@ turn. There are two more, kept in a second list beside the moves
   Movement, a nation friendly to the one whose turn it is may let that nation
   move by rail through its land this turn.
 
-The list is empty while a decision is waiting to be answered, and holds no
-declaration during a sea battle or a strategic naval move.
+The second list is empty while a decision is pending and while battles that
+must be fought at once are under way: a fight a fleet meets on its route in
+Combat Movement, or the battles that breaking the Chinese Truce starts. It
+holds no declaration during strategic naval movement either
+(`Engine::interruptMenu`, `PoliticsRules::interrupts`).
 
 The engine does not say who is asked first. The adapter the learner uses
-(`studies/shared/campaign_adapter.py`) turns the list into ordinary decisions.
-Before each of the active nation's moves, every alliance that has such a move
-is offered them, in the order Axis, Allies, Comintern, and may take one or pass
-(`pass_interrupt`). A pass holds until the position changes.
+(`studies/shared/campaign_adapter.py`) turns the second list into ordinary
+decisions. Before each action of the nation whose turn it is, every alliance
+with an action in the second list gets a decision of its own, in the order
+Axis, Allies, Comintern: take one of its actions there, or decline them all
+with the action `pass_interrupt`. An alliance that has declined is not asked
+again until the state changes.
 
 ## 7. The rules by subject
 
-The rules are six modules, each with its own page. Each module lists its moves,
-applies them, and passes everything else to the next module; together they are
-one set of rules (`campaignRules` in `src/campaign_audit.cpp`).
+The rules are six modules, each with its own page. Each module lists its
+actions, applies them, and hands everything else on to the next module;
+together they are one set of rules (`campaignRules` in
+`src/campaign_audit.cpp`).
 
 | Subject | Page | Code | Rules data |
 | --- | --- | --- | --- |
@@ -196,7 +210,7 @@ one set of rules (`campaignRules` in `src/campaign_audit.cpp`).
 
 Headers are in `include/game/`, sources in `src/` and rules data in
 `game_content/rules/`. The engine's own parts are `campaign.hpp` with
-`campaign_state.cpp` (the state), `campaign_runtime.cpp` (moves, dice, phases
+`campaign_state.cpp` (the state), `campaign_runtime.cpp` (actions, dice, phases
 and turns) and `campaign_setup.cpp` (loading the scenario).
 
 **Rules data.** Each module reads a profile, a JSON file that lists its rules
@@ -210,60 +224,66 @@ campaign, is in [Rules and data](../rules/README.md).
 
 | Operation | What it gives | Used for |
 | --- | --- | --- |
-| `clone` | An independent copy of the game | Playing on from a position without touching it |
+| `clone` | An independent copy of the game | Playing on from a state without touching it |
 | `cloneForSearch` | A copy that rolls from the search's own dice stream and is thrown away afterwards | The simulations of a search |
 | `serialize`, `restore` | The whole game as text, and back | Saved games |
-| `replay` | A saved game plus a list of recorded moves and rolls, played again | Checking that a recorded game is reproducible |
-| `planningKey` | A digest that identifies the position exactly: SHA-256 of a compact binary writing of the whole state, without the history and the dice streams | Recognising a position reached twice: the search's tree, the shared lists of moves, the recorded history |
-| `canonicalKey` | The same position's digest of its canonical text: equal exactly when the planning key is, but two to three times dearer | Comparing positions across builds of the engine (`tools/compare_engine_builds.py`) |
+| `replay` | A saved game plus a list of recorded actions and dice rolls, played again | Checking that a recorded game is reproducible |
+| `planningKey` | A digest that identifies the state exactly: SHA-256 of a compact binary writing of the whole state, without the history and the dice streams | Recognising a state reached twice: the search tree's nodes, the shared lists of legal actions, the recorded history |
+| `canonicalKey` | The same state's digest of its canonical text: equal exactly when the planning key is, but two to three times dearer | Comparing states across builds of the engine (`tools/compare_engine_builds.py`) |
 
-Two positions with the same planning key have the same list of moves, so the
-engine builds the list once and shares it between copies. The engine works out
-the planning key after every move and every dice roll, for the history and for
-that shared list, and the search names its tree's positions by it. Both keys
-come from one walk of the position (`writeState` in `src/campaign_state.cpp`),
-which writes either the canonical text, as saved games hold it, or a binary
-form without field names and quoting, with zones, nations and types as their
-numbers; so the two keys cover the same fields, and `tests/campaign_env_tests.cpp`
-checks over a random game that they always pair up. The binary form depends on
-the engine's numbering, so the planning key may change between builds; the
-canonical key changes only when the saved text does.
+Two states with the same planning key have the same list of legal actions, so
+the engine builds the list once and shares it between copies. The engine works
+out the planning key after every action and every dice roll, for the history
+and for that shared list, and the search names its tree's nodes by it. Both
+keys come from one walk of the state (`writeState` in
+`src/campaign_state.cpp`), which writes either the canonical text, as saved
+games hold it, or a binary form without field names and quoting, with zones,
+nations and types as their numbers; so the two keys cover the same fields, and
+`tests/campaign_env_tests.cpp` checks over a random game that they always pair
+up. The binary form depends on the engine's numbering, so the planning key may
+change between builds; the canonical key changes only when the saved text
+does.
 
 ## 9. How the engine is checked
 
-- **Before every step** the engine looks the chosen move up in the position's
-  list of moves, by its exact text, and refuses a move that is not there
-  (`Engine::step`). A rule module that would check a move against its own
-  options again skips that check for the move the engine has just found
-  (`MenuCheckedAction` in `include/game/campaign.hpp`). A move a module builds
-  for itself, such as the purchase a railroad consent completes, it still
-  checks.
-- **After every step** the engine validates the new state's structure
-  (`State::validate`).
+- **Before it applies an action** the engine looks the chosen action up in the
+  state's list of legal actions, by its exact text, and refuses an action that
+  is not there (`Engine::step`). A rule module that would check an action
+  against its own list of legal actions again skips that check for the action
+  the engine has just found (`MenuCheckedAction` in
+  `include/game/campaign.hpp`). An action a module builds for itself, such as
+  the purchase a railroad consent completes, it still checks.
+- **After every action and every dice roll** the engine validates the new
+  state's structure (`State::validate`).
 - **Rule checks across modules** (`campaignInvariantFailures` in
   `src/campaign_audit.cpp`) look for states no legal play can reach, such as a
   war only one side is in, or a stored income that no longer matches the
-  position. The integration tests run them after every step of random
-  campaigns four rounds long, in both move interfaces.
-- **Each module has its own test suite** in `tests/`, with small set-up
-  positions for each rule, and one for the name tables and the containers
-  keyed by numbers (`tests/names_tests.cpp`): 27 C++ suites in all.
-- **Random play** finds what set-up positions miss.
-  `tools/fuzz_campaign_dead_ends.py` plays random games looking for positions
-  with no legal move and for moves that change nothing.
+  state. The integration tests run them after every action and every dice roll
+  of random campaigns four game rounds long, in both interfaces: the one for
+  people and the one for agents.
+- **Each module has its own test suite** in `tests/`, with small states set up
+  by hand for each rule, and one for the name tables and the containers keyed
+  by numbers (`tests/names_tests.cpp`): 27 C++ suites in all.
+- **Random play** finds what states set up by hand miss.
+  `tools/fuzz_campaign_dead_ends.py` plays random games looking for dead ends,
+  states where the game has not ended and no legal action exists, and for
+  actions that leave the state unchanged.
 - **A change meant only for speed** must leave play the same.
-  `tools/compare_engine_builds.py` plays the same seeded random games, and
-  searched games evaluated one position at a time, on two builds, and compares
-  every step's legal moves, chosen move and position. It also measures the
-  instructions each build runs.
+  `tools/compare_engine_builds.py` plays the same games on two builds and
+  compares them: seeded random games at every action, by the legal actions,
+  the chosen action and the state reached, and after every dice roll by the
+  state reached; and searched games, whose network evaluations are made one
+  state at a time, by the actions and dice rolls in order and by the final
+  state. It also measures the instructions each build runs.
 
 ## 10. What the learner uses
 
 The learner sees the engine through `CampaignEnv`
 (`include/game/campaign_env.hpp`, `src/campaign_env.cpp`,
 `src/python_bindings.cpp`) and the adapter above it. It asks for the list of
-moves, plays one, has the dice rolled, copies the game for a search, and at the
-end reads the three scores. [How gwRL learns, section 2](../design/README.md#2-the-game-as-the-learner-sees-it)
+legal actions, applies one, has the dice rolled, copies the game for a search,
+and at the end reads the three final scores.
+[How gwRL learns, section 2](../design/README.md#2-the-game-as-the-learner-sees-it)
 describes the game from that side, and
-[section 5](../design/README.md#5-how-a-decision-becomes-numbers) how a position
-becomes the network's input (`src/zone_encoding.cpp`).
+[section 5](../design/README.md#5-how-a-decision-becomes-numbers) how a
+decision becomes the network's input (`src/zone_encoding.cpp`).

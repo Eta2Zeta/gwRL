@@ -3,8 +3,8 @@
 This module moves the ships and fights at sea: fleets and their routes,
 meetings with the enemy on the way, sea battles, transports and landings, and
 ports. It is the largest of the engine's six rules modules, with 62 of its 141
-kinds of move ([overview](README.md#7-the-rules-by-subject)). At the start only
-Japan has ships.
+kinds of action ([overview](README.md#7-the-rules-by-subject)). At the start
+only Japan has ships.
 
 Code: `include/game/naval.hpp`; `src/naval.cpp`, `src/naval_movement.cpp`
 (orders, routes and what happens on the way), `src/naval_combat.cpp` (sea
@@ -19,11 +19,12 @@ sea meet the enemy; ships in port do not fight at sea, but can be attacked
 there from the air and are at risk if the land is taken
 ([section 7](#7-ports)).
 
-## 2. Moving a fleet: an order in steps
+## 2. Moving a fleet: an order in parts
 
 Ships move as a *force*: one or more ships of one nation, from one sea zone,
-along one route. In training an order is built in steps, each a decision with a
-bounded list ([overview, section 3](README.md#3-positions-and-moves)):
+along one route. In training an order is built one part at a time, each part a
+decision with a bounded list of legal actions
+([overview, section 3](README.md#3-states-and-actions)):
 
 1. **Start** with one ship that can still move (`naval_start_move`).
 2. **Add** ships from the same sea zone, one at a time (`naval_force_add`).
@@ -52,7 +53,7 @@ where that is no longer possible.
 A force that enters a sea zone holding another nation's units may be stopped
 there. Each case is a decision for the side it concerns.
 
-| What the force meets | Who decides | Moves |
+| What the force meets | Who decides | Kinds of action |
 | --- | --- | --- |
 | Ships of a nation it is not at war with, where war could be declared | The mover: declare war, or enter in peace | `naval_entry_declare`, `naval_entry_peaceful` |
 | | Then the other nation: declare war, or let it pass | `naval_entry_defender_declare`, `naval_entry_neutral` |
@@ -75,7 +76,7 @@ force ends its combat move in a sea zone with enemy units, or attacks them
 where it is, and it is fought in the Combat Phase when the attacker begins it
 (`naval_begin_battle`).
 
-Before the first round the defender's side answers:
+Before the first combat round the defender's side decides:
 
 - **Aircraft at a base next to the sea zone** may scramble into the battle
   (`naval_scramble`, `naval_decline_scramble`).
@@ -85,11 +86,12 @@ Before the first round the defender's side answers:
 - **Destroyers** may be paired with a patrol plane of their side
   (`naval_pair_destroyer`, `naval_decline_pair`).
 
-Then the battle is fought in rounds, as on land: both sides roll twelve-sided
-dice, a shot hits when the die shows at most the unit's value, each side chooses
-its casualties (`naval_take_casualty`), and after each round the attacker goes
-on or retreats (`naval_continue_fighting`, `naval_retreat_begin`,
-`naval_retreat_unit`). Three things differ from land:
+Then the battle is fought in combat rounds, as on land: both sides roll
+twelve-sided dice, a shot hits when the die shows at most the unit's attack or
+defence value, each side chooses its casualties (`naval_take_casualty`), and
+after each combat round the attacker goes on or retreats
+(`naval_continue_fighting`, `naval_retreat_begin`, `naval_retreat_unit`).
+Three things differ from land:
 
 - **Big ships take more than one hit.** A capital ship is damaged before it is
   sunk, and a damaged ship fights and sails worse.
@@ -106,12 +108,12 @@ An aircraft on Maritime Air Patrol watches one sea zone
 ([air](air.md#5-maritime-air-patrol)). Four rules decide what happens between
 it and enemy ships.
 
-- **Ships that enter its zone.** The plane fights them for one round (RB 9.3.1),
-  or lets them pass. It may let them pass only if they have no aircraft with an
-  attack value with them.
-- **Sailing on.** After that round the surviving ships may continue their
-  move. Past a Fighter they may not: they must leave a screening force to hold
-  it, or end their move there (RB 9.4.2).
+- **Ships that enter its zone.** The plane fights them for one combat round
+  (RB 9.3.1), or lets them pass. It may let them pass only if they have no
+  aircraft with an attack value with them.
+- **Sailing on.** After that combat round the surviving ships may continue
+  their move. Past a Fighter they may not: they must leave a screening force to
+  hold it, or end their move there (RB 9.4.2).
 - **A plane that let ships pass** takes no part in their battles in its zone
   for the rest of the turn, and does not count against their landings. If they
   attack it anew, it chooses again (RCL-017).
@@ -153,8 +155,8 @@ zone waits for it.
 ## 7. Ports
 
 - **Entering port.** At the end of its Noncombat Movement a ship may berth at a
-  friendly facility on its sea zone (`naval_enter_port`). The move says whether
-  its cargo goes ashore.
+  friendly facility on its sea zone (`naval_enter_port`). The action says
+  whether its cargo goes ashore.
 - **Blockade.** A blockaded facility cannot be used
   ([movement](movement.md#5-supply)).
 - **Attack from the air.** Aircraft may attack ships in a port
@@ -182,9 +184,9 @@ crossings on the map, Hainan–Kwangtung and Honshu–Hokkaido, do not force shi
 through a passage
 ([Narrow crossings and naval passage](../rules/naval_geography.md)).
 
-## 9. The moves
+## 9. The kinds of action
 
-| Moves | Phase | Chosen by |
+| Kinds of action | Phase | Chosen by |
 | --- | --- | --- |
 | `naval_start_move`, `naval_force_add`, `naval_route`, `naval_engage_force` | Combat Movement, Noncombat Movement | the alliance of the nation whose turn it is |
 | `naval_force_remove`, `naval_cancel_move` | the same | the same, in the interface for people only |
@@ -208,7 +210,7 @@ through a passage
 | `naval_evacuate_port`, `naval_decline_evacuation`, `naval_finish_evacuation` | when a port is damaged | the owner of the ships |
 | `naval_roll_capture` | Place Units | the captor |
 
-In 240 random games 39 of the 62 naval moves came up
+In 240 random games 39 of the 62 kinds of naval action came up
 ([record](../archive/records/move_census_2026_11_14.md)). Among those that did
 not: peaceful entry, port evacuation, destroyer pairing, joint casualties and a
 raider slipping away. The tests cover them.

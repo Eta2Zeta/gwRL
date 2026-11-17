@@ -16,8 +16,9 @@ evolution, surrender), `src/politics_warlords.cpp` (warlords and the Truce),
 At the start the KMT and the CCP are at war with each other, and nobody else is
 at war. A war begins in one of two ways (`mayDeclareWar`):
 
-- **On a major power: by declaring it**, with the move `politics_declare_war`.
-  This can be done out of turn ([overview, section 6](README.md#6-moves-made-out-of-turn)).
+- **On a major power: by declaring it**, with the action `politics_declare_war`.
+  This can be done out of turn
+  ([overview, section 6](README.md#6-actions-taken-out-of-turn)).
 - **On a minor nation or a warlord: by attacking it.** Moving a land unit into
   its land during one's own Combat Movement declares the war.
 
@@ -124,7 +125,7 @@ power, may try once to win over an unaligned warlord (`influence_roll`).
   zones is the *threshold*.
 - **The roll:** one twelve-sided die. The nation may first pay IPP, at most the
   threshold and at most its treasury (RCL-002); each IPP lowers the roll by one.
-  The move names the warlord and the amount.
+  The action names the warlord and the amount.
 - **Success:** the lowered roll is at most the threshold. The warlord joins the
   CCP, or, for Japan, joins Dadao, which the first success creates.
 - **A natural 12** always sends the warlord to the KMT instead, whatever was
@@ -154,10 +155,10 @@ are the only evidence for this part.
 ## 4. Becoming a major power
 
 The KMT or the CCP becomes a major power the moment the land it holds is worth
-13 IPP, even in the middle of another nation's turn. Its alliance then answers
+13 IPP, even in the middle of another nation's turn. Its alliance then gets
 one decision (`politics_evolution`): which of its zones becomes its capital,
 and whether to take a free factory there (`politics_choose_capital`). A zone it
-loses before answering drops off the list.
+loses before choosing drops off the list of legal actions.
 
 From then on the nation may move and attack outside the Chinese Home Country
 and declare war on any major power. The CCP loses its minor-power recruitment
@@ -211,14 +212,14 @@ alliance chooses what the nation gets (`recruitment_choice`): an infantry
 placed in one of its zones, militia, the next stage of a ship it is building,
 or the repair of a facility.
 
-## 8. The moves
+## 8. The kinds of action
 
-| Move | Phase | Chosen by | What it does |
+| Kind of action | Phase | Chosen by | What it does |
 | --- | --- | --- | --- |
 | `politics_declare_war` | any, out of turn | the declaring alliance | Declares war on a major power |
 | `politics_priority_declare`, `politics_priority_decline` | when another alliance declares | the alliance whose turn it is | Declares first, or lets the declaration through |
 | `truce_offer`, `truce_decline_offer` | end of Combat | the Comintern, for the CCP | Offers the Truce or not |
-| `truce_accept`, `truce_reject` | end of Combat | the Allies, for the KMT | Answers the offer |
+| `truce_accept`, `truce_reject` | end of Combat | the Allies, for the KMT | Accepts or refuses the offer |
 | `truce_break` | Combat | the Chinese nation whose turn it is | Ends the Truce and starts the battles |
 | `politics_choose_capital` | at 13 IPP | the alliance of the new major power | Names the capital and takes the factory or not |
 | `politics_keep_capture`, `politics_give_capture` | Combat | the Axis, for Japan | Keeps captured Chinese land or gives it away |
@@ -229,13 +230,16 @@ or the repair of a facility.
 
 ## 9. What a nation can ever be
 
-Whatever happens in a game, the rules above leave each nation only a few
-possible answers to some questions. The functions declared at the top of
-`include/game/politics.hpp` state them, and the reason for each is beside its
-definition in `src/politics.cpp`. The network's input has only the features
-they allow
+Whatever happens in a game, the rules above make only some things possible for
+each nation: only some power statuses, alliances, controllers, wars and allies,
+and only for some nations a promotion to major power, a surrender, an invasion
+of China or a recorded attack on a warlord. The functions declared at the top of
+`include/game/politics.hpp` state what is possible, and the reason for each is
+beside its definition in `src/politics.cpp`. The network's input has only the
+features they allow
 ([the network's input](../design/network_input.md#what-the-global-features-ask-about-a-nation)),
-so a rule change that allows a new value must change its function too.
+so a rule change that makes something new possible for a nation must change
+its function too.
 
 | Function | What it states |
 | --- | --- |

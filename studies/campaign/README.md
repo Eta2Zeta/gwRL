@@ -206,7 +206,7 @@ The network's input is built in C++ by the engine's zone encoder. Reports name
 the input layout in `software.network_input`. Checkpoints and exports of the
 earlier graph-input network cannot be loaded.
 
-Self-play uses the versioned [AI order interface](../../docs/engine/README.md#3-positions-and-moves)
+Self-play uses the versioned [AI order interface](../../docs/engine/README.md#3-states-and-actions)
 by default. Fleet and screening selection make forward progress; undo/cancel
 editing is kept in the ordinary game API. Unchanged role/deck configuration
 cycles and repeated declined railway requests are also bounded. Finished

@@ -26,34 +26,34 @@ A nation's income is collected at the end of each of its turns
   collects nothing.
 
 Bombing a city lowers its zone's IPP value for good, by one for every 20 points
-of damage. Repairing the city does not bring the value back.
+of damage. Repairing the city does not bring the IPP value back.
 
 The other sources of income in the full game, such as trade and the Burma
 Road, need nations or routes this campaign leaves out.
 
-**The stored income.** The state also stores each nation's income as the
-position stands, part by part (`income_components`), because the network reads
-it as [global features](../design/network_input.md#5-the-global-features).
-Land changes hands in battles, political events and surrenders, which are not
-economy moves. So the module brings the stored income up to date when any move
-or dice roll ends, not only one of its own (`EconomyRules::settle`). The parts
-are stored even for a major power that has lost its capital and so collects
-nothing. Collection and the score do not read the stored income; they work it
-out again.
+**The stored income.** The state also stores each nation's income as things
+stand, part by part (`income_components`), because the network reads it as
+[global features](../design/network_input.md#5-the-global-features). Land
+changes hands in battles, political events and surrenders, which are not
+economy actions. So the module brings the stored income up to date after every
+action and every dice roll, not only after its own (`EconomyRules::settle`).
+The parts are stored even for a major power that has lost its capital and so
+collects nothing. Collection and the final scores do not read the stored
+income; they work it out again.
 
 ## 2. The Production Phase
 
-Production has two steps.
+Production has two parts.
 
 **Research first, for major powers.** A major power may make one research
 attempt per undamaged Major Factory it holds. It names a technology and a
 factory (`economy_research`), and the engine rolls a twelve-sided die. It ends
-the step with `economy_finish_research`. [Section 6](#6-research) explains the
+that part with `economy_finish_research`. [Section 6](#6-research) explains the
 roll.
 
 **Then spending**, in any order, while the money lasts:
 
-| Move | What it does |
+| Kind of action | What it does |
 | --- | --- |
 | `economy_purchase` | Starts a new unit, facility or upgrade and pays its first stage |
 | `economy_advance` | Pays the next stage of something already started |
@@ -99,7 +99,7 @@ two land zones:
 ## 4. Placing
 
 In the Place Units Phase the nation puts its ready projects on the map
-(`economy_place`). The move names the project and where it goes.
+(`economy_place`). The action names the project and where it goes.
 
 - **Where.** In a zone the nation has held since the turn began and that is in
   [supply](movement.md#5-supply). Land and air units appear at a factory with
@@ -129,14 +129,14 @@ damage undo one paid stage, and the money is not refunded
 ## 6. Research
 
 A technology has four stages. An attempt succeeds when the die shows at most
-the technology's threshold for its current stage, and moves it up one stage.
+the technology's threshold for its current stage, and raises it one stage.
 After the fourth, the technology is complete and works at once. Some
 technologies change units on completion: Airborne Doctrine, for example, turns
 Airborne Infantry into Elite Airborne Infantry.
 
 - **One attempt per Major Factory per turn**, and the factory cannot research
   in the turn it was placed or moved.
-- **One attempt per technology per round.**
+- **One attempt per technology per game round.**
 - **The third stage is locked before July 1939.**
 - **An attempt costs nothing.**
 
@@ -152,7 +152,7 @@ must be at war with a major power, and must not be at war with any nation of
 the giver's alliance. Japan may also give to Dadao while it controls it; RCL-010
 says where such a gift may be delivered.
 
-| Move | Phase | What it does |
+| Kind of action | Phase | What it does |
 | --- | --- | --- |
 | `economy_lease_declare` | Production | Names a ready project in the giver's queue and the nation that will get it |
 | `economy_lease_upgrade` | Production | Pays for a militia upgrade the receiver places later |
@@ -166,8 +166,9 @@ waits in the queue.
 ## 8. What the tests cover and what random play shows
 
 Tests: `tests/economy_tests.cpp` and `tests/catalog_tests.cpp`. In 240 random
-games every economy move came up except `economy_lease_repair`
+games every kind of economy action came up except `economy_lease_repair`
 ([record](../archive/records/move_census_2026_11_14.md)). The printed page
 behind each rule is recorded beside the rule in the rules data, and the page
-behind each price and value beside it in the catalog
+behind each price and each unit type's printed values beside them in the
+catalog
 ([where the numbers come from](../rules/README.md#where-the-scenarios-numbers-come-from)).
