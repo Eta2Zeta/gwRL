@@ -7,13 +7,14 @@
 #include <array>
 #include <charconv>
 #include <cmath>
+#include <cstring>
 #include <deque>
 #include <iomanip>
 #include <limits>
 #include <sstream>
 #include <stdexcept>
 #include <string_view>
-#if __ARM_FEATURE_SHA2
+#if __ARM_NEON
 #include <arm_neon.h>
 #endif
 
@@ -51,18 +52,37 @@ std::uint64_t readCounter(const V& v) {
     require(ec==std::errc{} && end==text.data()+text.size(), "Invalid decimal counter"); return n;
 }
 // Appends text with JSON's escapes, without quotes.
+// The length of the text's longest start needing no escape: no byte below 32,
+// no quote, no backslash. NEON checks sixteen bytes at a time; every planning
+// key escapes the whole position's text, so this scan is a hot loop.
+std::size_t plainPrefix(std::string_view text) {
+    std::size_t at=0;
+#if __ARM_NEON
+    const auto space=vdupq_n_u8(32),quote=vdupq_n_u8('"'),backslash=vdupq_n_u8('\\');
+    for (;at+16<=text.size();at+=16) {
+        const auto bytes=vld1q_u8(reinterpret_cast<const std::uint8_t*>(text.data()+at));
+        const auto special=vorrq_u8(vcltq_u8(bytes,space),vorrq_u8(vceqq_u8(bytes,quote),vceqq_u8(bytes,backslash)));
+        if (vmaxvq_u8(special)!=0) break;
+    }
+#endif
+    for (;at<text.size();++at) {
+        const unsigned char c=text[at];
+        if (c<32 || c=='"' || c=='\\') break;
+    }
+    return at;
+}
+// Almost all text holds nothing to escape, so it is appended in whole runs.
 void appendEscaped(std::string& out,std::string_view text) {
     static constexpr char hex[]="0123456789abcdef";
-    // Almost all text holds nothing to escape, so it is appended in whole runs.
-    std::size_t run=0;
-    for (std::size_t at=0;at<text.size();++at) {
-        const unsigned char c=text[at];
-        if (c>=32 && c!='"' && c!='\\') continue;
-        out.append(text.data()+run,at-run); run=at+1;
+    while (true) {
+        const auto plain=plainPrefix(text);
+        out.append(text.data(),plain);
+        if (plain==text.size()) return;
+        const unsigned char c=text[plain];
         if (c<32) { out+="\\u00"; out+=hex[c>>4]; out+=hex[c&15]; }
         else { out+='\\'; out+=static_cast<char>(c); }
+        text.remove_prefix(plain+1);
     }
-    out.append(text.data()+run,text.size()-run);
 }
 void writeString(std::string& out,std::string_view text) { out+='"'; appendEscaped(out,text); out+='"'; }
 // A mark by its name: base, then separator and argument.
@@ -183,38 +203,114 @@ ChanceRequest readChance(const V& v) { ChanceRequest c; c.id=v.require("id").asS
 // The canonical text of State::toJson without building the JSON tree first.
 // Objects list their keys in the sorted order canonicalJson gives a JSON
 // object; integers print as canonicalJson prints them as numbers.
+//
+// The same walk also writes the position in a compact binary form, which
+// State::planningKey digests (KeyWriter below): every helper here has a text
+// version, on std::string, and a binary one, so both forms always cover the
+// same fields.
 // An object's first key opens it; each later key follows a comma.
 template<std::size_t N> void writeKey(std::string& out,const char (&key)[N],bool first=false) { out+=first?'{':','; out+='"'; out.append(key,N-1); out.append("\":",2); }
 void writeInt(std::string& out,int value) { char buffer[16]; const auto end=std::to_chars(buffer,buffer+sizeof(buffer),value).ptr; out.append(buffer,end); }
 void writeBool(std::string& out,bool value) { out+=value?"true":"false"; }
-void writeOptionalId(std::string& out,const std::optional<Id>& value) { if(value)writeString(out,*value); else out+="null"; }
-void writeOptionalInt(std::string& out,const std::optional<int>& value) { if(value)writeInt(out,*value); else out+="null"; }
-template<class C> void writeStrings(std::string& out,const C& values) { out+='['; bool first=true; for(const auto& v:values) { if(!first)out+=','; first=false; writeString(out,v); } out+=']'; }
-void writeInts(std::string& out,const std::vector<int>& values) { out+='['; bool first=true; for(int v:values) { if(!first)out+=','; first=false; writeInt(out,v); } out+=']'; }
-void writeIntMap(std::string& out,const std::map<Id,int>& values) { out+='{'; bool first=true; for(const auto& [k,v]:values) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; writeInt(out,v); } out+='}'; }
+// Names of numbered kinds, by name in the text.
+void writeZone(std::string& out,const NameTable<ZoneKind>& zones,ZoneId zone) { writeString(out,zones.name(zone)); }
+void writeNation(std::string& out,const NameTable<NationKind>& nations,NationId nation) { writeString(out,nations.name(nation)); }
+void writeUnitType(std::string& out,const State& s,UnitTypeId type) { writeString(out,unitTypeName(s,type)); }
+void writeFacilityType(std::string& out,const State& s,FacilityTypeId type) { writeString(out,facilityTypeName(s,type)); }
+void writeBuildType(std::string& out,const State& s,BuildType type) { writeString(out,buildTypeName(s,type)); }
+void writeTechnology(std::string& out,const State& s,TechnologyId technology) { writeString(out,technologyName(s,technology)); }
+
+// The binary form, which the planning key digests. Every value starts with a tag byte, text carries its
+// length, and containers are closed, so two positions give the same bytes
+// exactly when they give the same text. It leaves out what the text spells
+// for a reader: field names, which the walk writes in a fixed order, quotes
+// and escapes, and the names of zones, nations, unit types, facility types and
+// technologies, which it writes as their numbers.
+struct KeyWriter {
+    std::vector<unsigned char> buffer;  // Keeps its size between keys; size counts what is written.
+    std::size_t size {0};
+    void clear() { size=0; }
+    std::string_view written() const { return {reinterpret_cast<const char*>(buffer.data()),size}; }
+    // Room for n more bytes, as a pointer to write them through. Every token
+    // asks for room, so the common case must inline: growing is out of line.
+    unsigned char* room(std::size_t n) {
+        if(size+n>buffer.size()) [[unlikely]] grow(n);
+        return buffer.data()+size;
+    }
+    [[gnu::noinline]] void grow(std::size_t n) { buffer.resize(std::max(2*buffer.size(),size+n+(1<<16))); }
+    void byte(unsigned char c) { *room(1)=c; ++size; }
+    // An unsigned number in seven-bit groups, low first, each but the last
+    // flagged: small numbers take one byte, and no number is a start of another.
+    void count(std::uint64_t value) {
+        auto* at=room(10); const auto* begin=at;
+        while(value>=0x80) { *at++=static_cast<unsigned char>(value|0x80); value>>=7; }
+        *at++=static_cast<unsigned char>(value);
+        size+=static_cast<std::size_t>(at-begin);
+    }
+    // A signed number, zigzagged first so that small negative numbers stay short.
+    void integer(std::int64_t value) { count((static_cast<std::uint64_t>(value)<<1)^static_cast<std::uint64_t>(value>>63)); }
+    void text(std::string_view value) { count(value.size()); std::memcpy(room(value.size()),value.data(),value.size()); size+=value.size(); }
+    KeyWriter& operator+=(char c) { byte(static_cast<unsigned char>(c)); return *this; }
+    KeyWriter& operator+=(const char* text) { const auto n=std::strlen(text); std::memcpy(room(n),text,n); size+=n; return *this; }
+};
+template<std::size_t N> void writeKey(KeyWriter& out,const char (&)[N],bool first=false) { if(first)out+='{'; }
+void writeInt(KeyWriter& out,int value) { out+='I'; out.integer(value); }
+void writeBool(KeyWriter& out,bool value) { out+=value?'T':'F'; }
+void writeString(KeyWriter& out,std::string_view text) { out+='S'; out.text(text); }
+void writeString(KeyWriter& out,const MarkKey& key) {
+    out+='K'; out.count(key.base().index());
+    if(key.hasArgument()) { out+='A'; out.text(key.argument()); } else out+='-';
+}
+void writeJson(KeyWriter& out,const V& v) {
+    if (v.isNull()) out+='n';
+    else if (v.isBool()) out+=v.asBool()?'t':'f';
+    else if (v.isNumber()) {
+        // The text prints 0 for both zeros and every other number exactly.
+        const double d=v.asNumber(); require(std::isfinite(d),"JSON numbers must be finite");
+        const double canonical=d==0?0.0:d; unsigned char bits[sizeof canonical]; std::memcpy(bits,&canonical,sizeof canonical);
+        out+='d'; std::memcpy(out.room(sizeof bits),bits,sizeof bits); out.size+=sizeof bits;
+    } else if (v.isString()) { out+='s'; out.text(v.asString()); }
+    else if (v.isArray()) { out+='a'; for (const auto& x:v.asArray()) writeJson(out,x); out+=']'; }
+    else { out+='o'; for (const auto& [k,x]:v.asObject()) { out.text(k); writeJson(out,x); } out+='}'; }
+}
+void writeZone(KeyWriter& out,const NameTable<ZoneKind>&,ZoneId zone) { out+='Z'; out.count(zone.index()); }
+void writeNation(KeyWriter& out,const NameTable<NationKind>&,NationId nation) { out+='N'; out.count(nation.index()); }
+void writeUnitType(KeyWriter& out,const State&,UnitTypeId type) { out+='U'; out.count(type.index()); }
+void writeFacilityType(KeyWriter& out,const State&,FacilityTypeId type) { out+='F'; out.count(type.index()); }
+void writeBuildType(KeyWriter& out,const State&,BuildType type) {
+    out+=type.isUnit()?'U':'F'; out.count(type.isUnit()?type.unit().index():type.facility().index());
+}
+void writeTechnology(KeyWriter& out,const State&,TechnologyId technology) { out+='H'; out.count(technology.index()); }
+
+// Helpers built from those, for either form.
+template<class Out> void writeOptionalId(Out& out,const std::optional<Id>& value) { if(value)writeString(out,*value); else out+="null"; }
+template<class Out> void writeOptionalInt(Out& out,const std::optional<int>& value) { if(value)writeInt(out,*value); else out+="null"; }
+template<class Out,class C> void writeStrings(Out& out,const C& values) { out+='['; bool first=true; for(const auto& v:values) { if(!first)out+=','; first=false; writeString(out,v); } out+=']'; }
+template<class Out> void writeInts(Out& out,const std::vector<int>& values) { out+='['; bool first=true; for(int v:values) { if(!first)out+=','; first=false; writeInt(out,v); } out+=']'; }
+template<class Out> void writeIntMap(Out& out,const std::map<Id,int>& values) { out+='{'; bool first=true; for(const auto& [k,v]:values) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; writeInt(out,v); } out+='}'; }
+template<class Out> void writeTechnologyStages(Out& out,const State& s,const NumberMap<TechnologyId,int>& values) { out+='{'; bool first=true; for(const auto& [k,v]:values) { if(!first)out+=','; first=false; writeTechnology(out,s,k); out+=':'; writeInt(out,v); } out+='}'; }
 // Marks list themselves in the order of their names, as the object needs.
-void writeTechnologyStages(std::string& out,const State& s,const NumberMap<TechnologyId,int>& values) { out+='{'; bool first=true; for(const auto& [k,v]:values) { if(!first)out+=','; first=false; writeString(out,technologyName(s,k)); out+=':'; writeInt(out,v); } out+='}'; }
-void writeIntMap(std::string& out,const Marks& values) { out+='{'; bool first=true; for(const auto& [k,v]:values) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; writeInt(out,v); } out+='}'; }
-template<class M,class F> void writeEntries(std::string& out,const M& entries,F&& write) { out+='{'; bool first=true; for(const auto& [k,v]:entries) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; write(v); } out+='}'; }
-// The same for entries keyed by zone number, written under the zones' names.
-template<class M,class F> void writeZoneEntries(std::string& out,const NameTable<ZoneKind>& zones,const M& entries,F&& write) { out+='{'; bool first=true; for(const auto& [k,v]:entries) { if(!first)out+=','; first=false; writeString(out,zones.name(k)); out+=':'; write(v); } out+='}'; }
-void writeZones(std::string& out,const NameTable<ZoneKind>& zones,const std::vector<ZoneId>& values) { out+='['; bool first=true; for(const auto zone:values) { if(!first)out+=','; first=false; writeString(out,zones.name(zone)); } out+=']'; }
-// Entries keyed by nation number, and lists of nations, written by name.
-template<class M,class F> void writeNationEntries(std::string& out,const NameTable<NationKind>& nations,const M& entries,F&& write) { out+='{'; bool first=true; for(const auto& [k,v]:entries) { if(!first)out+=','; first=false; writeString(out,nations.name(k)); out+=':'; write(v); } out+='}'; }
-template<class C> void writeNations(std::string& out,const NameTable<NationKind>& nations,const C& values) { out+='['; bool first=true; for(const auto nation:values) { if(!first)out+=','; first=false; writeString(out,nations.name(nation)); } out+=']'; }
-void writeOptionalNation(std::string& out,const NameTable<NationKind>& nations,const std::optional<NationId>& value) { if(value)writeString(out,nations.name(*value)); else out+="null"; }
-void writeState(std::string& out,const State& s,bool includeHistory) {
+template<class Out> void writeIntMap(Out& out,const Marks& values) { out+='{'; bool first=true; for(const auto& [k,v]:values) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; writeInt(out,v); } out+='}'; }
+template<class Out,class M,class F> void writeEntries(Out& out,const M& entries,F&& write) { out+='{'; bool first=true; for(const auto& [k,v]:entries) { if(!first)out+=','; first=false; writeString(out,k); out+=':'; write(v); } out+='}'; }
+// Zone-keyed entries are written in zone number order, which is name order.
+template<class Out,class M,class F> void writeZoneEntries(Out& out,const NameTable<ZoneKind>& zones,const M& entries,F&& write) { out+='{'; bool first=true; for(const auto& [k,v]:entries) { if(!first)out+=','; first=false; writeZone(out,zones,k); out+=':'; write(v); } out+='}'; }
+template<class Out> void writeZones(Out& out,const NameTable<ZoneKind>& zones,const std::vector<ZoneId>& values) { out+='['; bool first=true; for(const auto zone:values) { if(!first)out+=','; first=false; writeZone(out,zones,zone); } out+=']'; }
+// Nation-keyed entries and nation sets are written in nation number order, which is name order.
+template<class Out,class M,class F> void writeNationEntries(Out& out,const NameTable<NationKind>& nations,const M& entries,F&& write) { out+='{'; bool first=true; for(const auto& [k,v]:entries) { if(!first)out+=','; first=false; writeNation(out,nations,k); out+=':'; write(v); } out+='}'; }
+template<class Out,class C> void writeNations(Out& out,const NameTable<NationKind>& nations,const C& values) { out+='['; bool first=true; for(const auto nation:values) { if(!first)out+=','; first=false; writeNation(out,nations,nation); } out+=']'; }
+template<class Out> void writeOptionalNation(Out& out,const NameTable<NationKind>& nations,const std::optional<NationId>& value) { if(value)writeNation(out,nations,*value); else out+="null"; }
+template<class Out> void writeState(Out& out,const State& s,bool includeHistory) {
     require(s.definition!=nullptr,"State has no definition");
     const auto& zones=names(s).zones; const auto& nations=names(s).nations;
     const bool interface=!s.actionInterface.asObject().empty();
     if(interface) { writeKey(out,"action_interface",true); writeJson(out,s.actionInterface); }
     writeKey(out,"battle_order",!interface); writeStrings(out,s.battleOrder);
     writeKey(out,"battles"); writeEntries(out,s.battles,[&](const BattleState& x) {
-        writeKey(out,"attacker",true); writeString(out,nations.name(x.attacker)); writeKey(out,"attackers"); writeStrings(out,x.attackers);
-        writeKey(out,"data"); writeJson(out,x.data); writeKey(out,"defender"); writeString(out,nations.name(x.defender));
+        writeKey(out,"attacker",true); writeNation(out,nations,x.attacker); writeKey(out,"attackers"); writeStrings(out,x.attackers);
+        writeKey(out,"data"); writeJson(out,x.data); writeKey(out,"defender"); writeNation(out,nations,x.defender);
         writeKey(out,"defenders"); writeStrings(out,x.defenders); writeKey(out,"flags"); writeIntMap(out,x.flags);
         writeKey(out,"id"); writeString(out,x.id); writeKey(out,"pending_hits"); writeIntMap(out,x.pendingHits);
-        writeKey(out,"stage"); writeString(out,x.stage); writeKey(out,"zone"); writeString(out,zones.name(x.zone)); out+='}'; });
+        writeKey(out,"stage"); writeString(out,x.stage); writeKey(out,"zone"); writeZone(out,zones,x.zone); out+='}'; });
     writeKey(out,"chance"); if(s.chance)writeJson(out,chanceJson(*s.chance)); else out+="null";
     writeKey(out,"clock"); writeKey(out,"completed_rounds",true); writeInt(out,s.clock.completedRounds);
     writeKey(out,"income_collected"); writeBool(out,s.clock.incomeCollected); writeKey(out,"nation_index"); writeInt(out,s.clock.nationIndex);
@@ -222,15 +318,15 @@ void writeState(std::string& out,const State& s,bool includeHistory) {
     writeKey(out,"round_index"); writeInt(out,s.clock.roundIndex); out+='}';
     writeKey(out,"completed_turns"); writeNationEntries(out,nations,s.completedTurns,[&](int turns) { writeInt(out,turns); });
     writeKey(out,"construction"); writeEntries(out,s.construction,[&](const BuildProject& x) {
-        writeKey(out,"flags",true); writeIntMap(out,x.flags); writeKey(out,"id"); writeString(out,x.id); writeKey(out,"owner"); writeString(out,nations.name(x.owner));
+        writeKey(out,"flags",true); writeIntMap(out,x.flags); writeKey(out,"id"); writeString(out,x.id); writeKey(out,"owner"); writeNation(out,nations,x.owner);
         writeKey(out,"paid_ipp"); writeInt(out,x.paidIpp); writeKey(out,"queue_position"); writeInt(out,x.queuePosition);
         writeKey(out,"remaining_payments"); writeInts(out,x.remainingPayments); writeKey(out,"site"); writeOptionalId(out,x.site);
-        writeKey(out,"type"); writeString(out,buildTypeName(s,x.type)); out+='}'; });
+        writeKey(out,"type"); writeBuildType(out,s,x.type); out+='}'; });
     writeKey(out,"decisions"); out+='['; for(std::size_t i=0;i<s.decisions.size();++i) { if(i)out+=','; writeJson(out,decisionJson(s.decisions[i])); } out+=']';
     writeKey(out,"definition_fingerprint"); writeString(out,s.definition->fingerprint);
     writeKey(out,"facilities"); writeEntries(out,s.facilities,[&](const FacilityState& x) {
         writeKey(out,"damage",true); writeInt(out,x.damage); writeKey(out,"flags"); writeIntMap(out,x.flags); writeKey(out,"id"); writeString(out,x.id);
-        writeKey(out,"type"); writeString(out,facilityTypeName(s,x.type)); writeKey(out,"zone"); writeString(out,zones.name(x.zone)); out+='}'; });
+        writeKey(out,"type"); writeFacilityType(out,s,x.type); writeKey(out,"zone"); writeZone(out,zones,x.zone); out+='}'; });
     writeKey(out,"flags"); writeIntMap(out,s.flags);
     if(includeHistory) {
         writeKey(out,"history"); out+='['; bool first=true;
@@ -251,11 +347,11 @@ void writeState(std::string& out,const State& s,bool includeHistory) {
     writeKey(out,"politics"); writeJson(out,politicsJson(names(s),s.politics));
     writeKey(out,"rails"); writeEntries(out,s.rails,[&](const RailState& x) {
         writeKey(out,"damage_by_endpoint",true); writeZoneEntries(out,zones,x.damageByEndpoint,[&](int damage) { writeInt(out,damage); });
-        writeKey(out,"endpoint_a"); writeString(out,zones.name(x.endpointA));
-        writeKey(out,"endpoint_b"); writeString(out,zones.name(x.endpointB)); writeKey(out,"id"); writeString(out,x.id); out+='}'; });
+        writeKey(out,"endpoint_a"); writeZone(out,zones,x.endpointA);
+        writeKey(out,"endpoint_b"); writeZone(out,zones,x.endpointB); writeKey(out,"id"); writeString(out,x.id); out+='}'; });
     writeKey(out,"repairs"); writeEntries(out,s.repairs,[&](const RepairJob& x) {
-        writeKey(out,"endpoint",true); if(x.endpoint)writeString(out,zones.name(*x.endpoint)); else out+="null";
-        writeKey(out,"id"); writeString(out,x.id); writeKey(out,"owner"); writeString(out,nations.name(x.owner));
+        writeKey(out,"endpoint",true); if(x.endpoint)writeZone(out,zones,*x.endpoint); else out+="null";
+        writeKey(out,"id"); writeString(out,x.id); writeKey(out,"owner"); writeNation(out,nations,x.owner);
         writeKey(out,"remaining_cost"); writeInt(out,x.remainingCost); writeKey(out,"remaining_damage"); writeInt(out,x.remainingDamage);
         writeKey(out,"restricts_action"); writeBool(out,x.restrictsAction); writeKey(out,"target"); writeString(out,x.target); out+='}'; });
     writeKey(out,"schema_version"); out+='1';
@@ -265,16 +361,16 @@ void writeState(std::string& out,const State& s,bool includeHistory) {
     writeKey(out,"turn_start"); writeKey(out,"possessions",true);
     writeZoneEntries(out,zones,s.turnStart.possessions,[&](const std::optional<NationId>& owner) { writeOptionalNation(out,nations,owner); });
     writeKey(out,"units"); writeEntries(out,s.turnStart.units,[&](const std::pair<NationId,ZoneId>& entry) {
-        out+='['; writeString(out,nations.name(entry.first)); out+=','; writeString(out,zones.name(entry.second)); out+=']'; });
+        out+='['; writeNation(out,nations,entry.first); out+=','; writeZone(out,zones,entry.second); out+=']'; });
     out+='}';
     writeKey(out,"units"); writeEntries(out,s.units,[&](const UnitState& x) {
         writeKey(out,"cargo",true); writeStrings(out,x.cargo); writeKey(out,"carried_by"); writeOptionalId(out,x.carriedBy);
         writeKey(out,"commitments"); writeStrings(out,x.commitments); writeKey(out,"damage"); writeInt(out,x.damage);
         writeKey(out,"game_flags"); writeIntMap(out,x.gameFlags); writeKey(out,"id"); writeString(out,x.id);
         writeKey(out,"movement_allowance"); writeOptionalInt(out,x.movementAllowance); writeKey(out,"movement_remaining"); writeOptionalInt(out,x.movementRemaining);
-        writeKey(out,"owner"); writeString(out,nations.name(x.owner)); writeKey(out,"route"); writeZones(out,zones,x.route);
-        writeKey(out,"turn_flags"); writeIntMap(out,x.turnFlags); writeKey(out,"turn_origin"); writeString(out,zones.name(x.turnOrigin));
-        writeKey(out,"type"); writeString(out,unitTypeName(s,x.type)); writeKey(out,"zone"); writeString(out,zones.name(x.zone)); out+='}'; });
+        writeKey(out,"owner"); writeNation(out,nations,x.owner); writeKey(out,"route"); writeZones(out,zones,x.route);
+        writeKey(out,"turn_flags"); writeIntMap(out,x.turnFlags); writeKey(out,"turn_origin"); writeZone(out,zones,x.turnOrigin);
+        writeKey(out,"type"); writeUnitType(out,s,x.type); writeKey(out,"zone"); writeZone(out,zones,x.zone); out+='}'; });
     out+='}';
 }
 }
@@ -309,7 +405,7 @@ void compressHardware(DigestWords& h,const unsigned char* block) {
     vst1q_u32(h.data(),vaddq_u32(abcd,startAbcd));vst1q_u32(h.data()+4,vaddq_u32(efgh,startEfgh));
 }
 #endif
-template<void (*compress)(DigestWords&,const unsigned char*)> std::string digestWith(const std::string& value) {
+template<void (*compress)(DigestWords&,const unsigned char*)> std::string digestWith(std::string_view value) {
     DigestWords h={0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19};
     // Whole blocks straight from the input, then the padded tail: the last
     // bytes, 0x80, zeros and the big-endian bit length in one or two blocks.
@@ -327,14 +423,14 @@ template<void (*compress)(DigestWords&,const unsigned char*)> std::string digest
 }
 
 // SHA-256 over exact canonical bytes; no platform hash or external dependency.
-std::string contentDigest(const std::string& value) {
+std::string contentDigest(std::string_view value) {
 #if __ARM_FEATURE_SHA2
     return digestWith<compressHardware>(value);
 #else
     return digestWith<compressPortable>(value);
 #endif
 }
-std::string portableContentDigest(const std::string& value) { return digestWith<compressPortable>(value); }
+std::string portableContentDigest(std::string_view value) { return digestWith<compressPortable>(value); }
 
 std::shared_ptr<const Definition> freezeDefinition(Definition d) {
     require(!d.scenarioId.empty(),"Missing scenario identity"); require(d.geography.isObject() && d.rules.isObject(),"Definition geography/rules must be objects");
@@ -537,7 +633,20 @@ State State::fromJson(std::shared_ptr<const Definition> definition,const V& v) {
     s.validate();return s;
 }
 std::string State::serialize() const { validate();std::string out;out.reserve(1<<17);writeState(out,*this,true);return out; }
-std::string State::planningKey() const { std::string out;out.reserve(1<<17);writeState(out,*this,false);return contentDigest(out); }
+// Each key is the digest of its form of the position, written into a buffer
+// per thread that keeps its size, so no key allocates.
+std::string State::planningKey() const {
+    thread_local KeyWriter key;
+    key.clear();
+    writeState(key,*this,false);
+    return contentDigest(key.written());
+}
+std::string State::canonicalKey() const {
+    thread_local std::string text;
+    text.clear();
+    writeState(text,*this,false);
+    return contentDigest(text);
+}
 V State::observation() const { auto object=toJson(false).asObject();object.erase("definition_fingerprint");return V(std::move(object)); }
 
 void State::validate(std::size_t historyFrom) const {

@@ -9,6 +9,7 @@
 #include <functional>
 #include <future>
 #include <iostream>
+#include <map>
 #include <stdexcept>
 
 namespace {
@@ -162,6 +163,45 @@ void cachedPlanningKeysTrackEveryMutation() {
     env.resolveChance();
     checkKey(env, "Chance resolution retained a stale planning key");
     require(env.planningKey() != chanceKey, "Resolved chance retained its pending decision identity");
+}
+
+// The planning key digests a binary writing of the position and the canonical
+// key its canonical text; both writings come from one walk of the position, so
+// two positions share a planning key exactly when they share a canonical key.
+// Over a random game the pairing never splits: a field the binary writing
+// missed would give two positions one planning key and two canonical keys.
+void planningKeysMatchCanonicalKeys() {
+    CampaignEnv env(scenario, 31);
+    std::map<std::string, std::string> canonicalOf, planningOf;
+    std::size_t positions = 0;
+    std::uint64_t draw = 31;
+    const auto record = [&](const State& state) {
+        const auto planning = state.planningKey(), canonical = state.canonicalKey();
+        require(planning.size() == 64 && canonical.size() == 64 && planning != canonical, "A key is not a SHA-256 digest");
+        const auto [byPlanning, newPlanning] = canonicalOf.emplace(planning, canonical);
+        const auto [byCanonical, newCanonical] = planningOf.emplace(canonical, planning);
+        require(byPlanning->second == canonical && byCanonical->second == planning,
+                "Two positions share one key but not the other");
+        ++positions;
+    };
+    for (int step = 0; step < 700 && !env.isTerminal(); ++step) {
+        record(env.engine().state());
+        require(env.engine().canonicalKey() != env.engine().planningKey(), "The engine's two identities agree by accident");
+        if (env.decisionKind() == "chance") { env.resolveChance(); continue; }
+        const auto actions = env.legalActions();
+        require(!actions.empty(), "A random game reached no move");
+        draw = draw * 6364136223846793005ull + 1442695040888963407ull;
+        env.applyAction(actions[(draw >> 33) % actions.size()]);
+    }
+    // A copy whose one mark differs differs in both keys; restoring it, in neither.
+    auto state = env.engine().state().clone();
+    const auto planning = state.planningKey(), canonical = state.canonicalKey();
+    auto& flags = state.nations.begin()->second.turnFlags;
+    flags[MarkKey(mark::fixture, "key_check")] = 1;
+    require(state.planningKey() != planning && state.canonicalKey() != canonical, "A mark escaped a key");
+    flags.erase(MarkKey(mark::fixture, "key_check"));
+    require(state.planningKey() == planning && state.canonicalKey() == canonical, "A key remembered an erased mark");
+    require(positions > 500, "The random game ended too early to test the keys");
 }
 
 void observationsAreSharedOnlyForTheSameDecisionState() {
@@ -346,6 +386,7 @@ int main() {
         {"registry observations and RNG separation", entityObservationsAndRandomIsolation},
         {"reaction and chance owner", reactionAndChanceEntitlements},
         {"planning key cache invalidation", cachedPlanningKeysTrackEveryMutation},
+        {"planning keys match canonical keys", planningKeysMatchCanonicalKeys},
         {"observation snapshot reuse", observationsAreSharedOnlyForTheSameDecisionState},
         {"search copies keep their source environment", searchCopiesKeepTheirSourceEnvironment},
         {"failed search copies refuse every call", failedSearchCopiesRefuseEveryCall},

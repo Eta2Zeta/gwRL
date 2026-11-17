@@ -430,7 +430,11 @@ PYBIND11_MODULE(gwrl_cpp, module) {
            "A search copy of this position whose dice continue source's search stream.")
         .def("planning_key", [](const NativeCampaignEnv& self) {
             return self.call([](const CampaignEnv& env) { return env.planningKey(); });
-        })
+        }, "The decision state's identity, which the search uses.")
+        .def("canonical_key", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) { return env.canonicalKey(); });
+        }, "The same identity from the position's canonical text: several times dearer, and "
+           "unchanged by changes to the engine's internal forms, so tools compare builds with it.")
         // Whether every airborne aircraft still has a reachable joint landing
         // plan, and how many no plan lands; random-play testing checks that
         // no move raises that number.

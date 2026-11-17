@@ -84,8 +84,11 @@ Because a number is a place in a sorted list:
   [marks](../archive/records/mark_numbers_2026_11_16.md)).
 - **A number belongs to its definition or catalog.** Adding a zone to the map,
   a nation to the factions or a unit type, facility type or technology to the
-  catalog renumbers those after it. Saved games, planning keys and moves hold
-  names, so they are unaffected; only the engine's memory holds numbers.
+  catalog renumbers those after it. Saved games and moves hold names, so they
+  are unaffected. The planning key digests a binary writing of the position
+  that holds numbers ([keys](README.md#8-copies-saved-games-and-replays)), but
+  it also digests the definition's fingerprint, so any change to the
+  definition changes it anyway.
 
 ### The nations the rules name
 
@@ -177,7 +180,7 @@ moves may give its units different slots, and a position read back from its
 saved form gives them slots in name order. A slot therefore has no order: no
 set or map can be keyed by slots, and anything listed in order is listed in
 name order, as a `SlotMap` lists its things. Saved positions, planning keys and
-moves name units and facilities as before.
+moves name units and facilities as before, never by slot.
 
 A `SlotMap` is also searched by name, through a hash table of its slots, so a
 lookup compares one name or two where a search in name order compared seven or
@@ -628,7 +631,8 @@ The engine holds numbers in its memory and names everywhere else:
 | The position (`State`) | Numbers. Zones: each unit's zone, the zone it began its turn in and its route; each facility's zone; the territories, keyed by zone; a railroad's two ends and the damage on each side; a battle's zone; the side of a railroad a repair mends; the zones held at the start of the turn; capitals. Nations: the nations' records, keyed by nation, with each one's wars, allies and controller; the owner of each unit, construction project and repair job; each territory's possessor, now and at the start of the turn; a battle's attacker and defender; each nation's completed turns; the capitals, surrenders, evolutions, alignment queue, attacked warlords and China's invader. Unit types: each unit's type. Facility types: each facility's type. Build types: each construction project's type. Technologies: each nation's research stages, keyed by technology. Marks: the base of each mark on a unit, a nation, a territory, a facility, a construction project, a battle or the position, and of each unit's commitments; the argument stays text | — |
 | The catalog (`Catalog`) | Numbers: the definitions of unit types, facility types and technologies, each kept in number order; each unit's classes; the type and upgrade source of each build-chart row and the technologies it requires or forbids; each upgrade's target and required technologies; each unit mode's required technologies; the types a technology unlocks; the capacities Improved Factories gives each facility type, read from that technology's rule once | Built by `Catalog::fromJson` |
 | The map index (`IndexedGeography`) | Numbers: each zone's JSON, its neighbors in source order, its first edge to each neighbor, the hops between zones | Built by `freezeDefinition` |
-| Saved positions, planning keys and observations | Names | `State::toJson` and the planning-key writer name the zones, nations, unit types, facility types, build types, technologies and marks; `State::fromJson` numbers them again and refuses a name its table lacks |
+| Saved positions, canonical keys and observations | Names | `State::toJson` and the canonical text's writer name the zones, nations, unit types, facility types, build types, technologies and marks; `State::fromJson` numbers them again and refuses a name its table lacks |
+| Planning keys | Numbers: the binary writing the planning key digests holds the numbers of zones, nations, unit types, facility types, technologies and mark bases, and names units, facilities and the rest | The same walk as the canonical text (`writeState`), with a binary writer |
 | Moves, decisions and dice requests | Names: a move's details, such as `zone` and `path`, name zones, and the `nation` of a move, a decision or a dice request names the nation that acts | A rule numbers the names as it reads them, such as `nationNumber(state, move.nation)`, and names them as it writes a move |
 | The scenario's setup | Names, and the map's own label `airfield` | `loadScenario` numbers each facility's and starting project's type, reading `airfield` as the airbase the scenario contract names |
 | A mark's argument | Text: the name of the zone, nation, facility, facility type or other thing the mark is about, as in `surprise_attack_zone:sea_p15` or `original_type:major_factory` | A rule names the zone, nation or type as it sets the mark, such as `MarkKey(mark::surprise_attack_zone, zoneName(state, zone))`, and numbers it as it reads the mark, such as `facilityTypeNumber(state, argument)` |

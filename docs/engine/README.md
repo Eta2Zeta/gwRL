@@ -214,10 +214,20 @@ campaign, is in [Rules and data](../rules/README.md).
 | `cloneForSearch` | A copy that rolls from the search's own dice stream and is thrown away afterwards | The simulations of a search |
 | `serialize`, `restore` | The whole game as text, and back | Saved games |
 | `replay` | A saved game plus a list of recorded moves and rolls, played again | Checking that a recorded game is reproducible |
-| `planningKey` | A text that identifies the position exactly: the whole state, without the history and the dice streams | Recognising a position reached twice |
+| `planningKey` | A digest that identifies the position exactly: SHA-256 of a compact binary writing of the whole state, without the history and the dice streams | Recognising a position reached twice: the search's tree, the shared lists of moves, the recorded history |
+| `canonicalKey` | The same position's digest of its canonical text: equal exactly when the planning key is, but two to three times dearer | Comparing positions across builds of the engine (`tools/compare_engine_builds.py`) |
 
 Two positions with the same planning key have the same list of moves, so the
-engine builds the list once and shares it between copies.
+engine builds the list once and shares it between copies. The engine works out
+the planning key after every move and every dice roll, for the history and for
+that shared list, and the search names its tree's positions by it. Both keys
+come from one walk of the position (`writeState` in `src/campaign_state.cpp`),
+which writes either the canonical text, as saved games hold it, or a binary
+form without field names and quoting, with zones, nations and types as their
+numbers; so the two keys cover the same fields, and `tests/campaign_env_tests.cpp`
+checks over a random game that they always pair up. The binary form depends on
+the engine's numbering, so the planning key may change between builds; the
+canonical key changes only when the saved text does.
 
 ## 9. How the engine is checked
 

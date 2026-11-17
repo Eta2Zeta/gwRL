@@ -1,0 +1,129 @@
+{
+ "date": "2026-11-16",
+ "question": "Does a planning key digesting a compact binary writing of the position, instead of its canonical text, leave play unchanged, and what does it save?",
+ "code": {
+  "before_any": "9519ea7",
+  "slot_maps": "525a542",
+  "planning_key": "this change"
+ },
+ "machine": "Apple M4 Max: 10 performance and 4 efficiency cores, 36 GB",
+ "tool": "tools/compare_engine_builds.py, identifying positions by canonical key",
+ "keys_in_one_searched_game": {
+  "seed": 41,
+  "planning_keys": 70672,
+  "after_moves": 53173,
+  "after_dice": 17485,
+  "menu_table_lookups": 54441,
+  "menu_table_hits": 9498,
+  "how": "a build of 525a542 counting key computations and menu table lookups (src/campaign_runtime.cpp, src/campaign_state.cpp), one searched game"
+ },
+ "profile_before": {
+  "how": "/usr/bin/sample, 60 s of searched game 41 from 25 s after it started, on 525a542",
+  "share_of_engine_samples_percent": {
+   "planning key": 15.6,
+   "writing its text": 11.1,
+   "its SHA-256": 4.0,
+   "appendEscaped within it": 7.0
+  }
+ },
+ "key_microseconds": {
+  "how": "positions of a random game (seed 7) every 150 steps, each key 200 times, one thread",
+  "steps": [
+   0,
+   150,
+   300,
+   450,
+   600,
+   750
+  ],
+  "binary_planning_key": [
+   20.9,
+   29.8,
+   28.5,
+   30.2,
+   32.3,
+   33.3
+  ],
+  "canonical_text_key": [
+   60.4,
+   78.9,
+   71.5,
+   73.3,
+   75.6,
+   79.0
+  ],
+  "canonical_text_key_before_this_change": [
+   68.5,
+   94.1,
+   75.6,
+   82.3,
+   82.1,
+   85.7
+  ]
+ },
+ "random_games": {
+  "seeds": "7000-7299",
+  "calendar_rounds": 11,
+  "processes": 4,
+  "games_compared": 300,
+  "identical_with_before_any": 300,
+  "identical_with_slot_maps": 300,
+  "steps": 443974,
+  "previous_records_rerun_and_identical_with_before_any": 300,
+  "per_call": {
+   "legal_actions": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "slot_maps": 5.74,
+     "planning_key": 5.68,
+     "change_percent": -1.0
+    }
+   },
+   "apply_action": {
+    "calls": 391840,
+    "million_instructions_per_call": {
+     "slot_maps": 3.02,
+     "planning_key": 2.08,
+     "change_percent": -31.1
+    }
+   },
+   "resolve_chance": {
+    "calls": 52134,
+    "million_instructions_per_call": {
+     "slot_maps": 2.41,
+     "planning_key": 1.47,
+     "change_percent": -39.0
+    }
+   }
+  }
+ },
+ "searched_games": {
+  "seeds": "41-44",
+  "simulations": 64,
+  "max_depth": 16,
+  "games_compared": 4,
+  "identical_with_before_any": 4,
+  "events": 4985,
+  "billion_instructions": {
+   "before_any": 6766,
+   "planning_key": 4886,
+   "change_percent_from_before_any": -27.8,
+   "slot_maps_bracketed": 5170,
+   "planning_key_bracketed": [
+    4889,
+    4883
+   ],
+   "change_percent_from_slot_maps": -5.5
+  },
+  "cpu_seconds_bracketed": {
+   "planning_key_before": 396.0,
+   "slot_maps": 433.9,
+   "planning_key_after": 377.8,
+   "change_percent": -10.8
+  }
+ },
+ "notes": [
+  "Searched games are compared by each event's kind and move and the final canonical key, because planning keys differ between the builds.",
+  "The bracketed trio ran in the order: this change, the slot maps build, this change. The Mac's other work peaked at a five-minute load average near 18 during it, so CPU seconds are rough; instruction counts of repeated runs of one build differ by about 1%."
+ ]
+}

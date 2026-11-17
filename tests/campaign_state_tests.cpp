@@ -330,12 +330,12 @@ void canonicalStringsEscapeEveryByte() {
         same(text);
     }
 }
-// Saves and planning keys write the state's canonical text directly; it must
+// Saves and canonical keys write the state's canonical text directly; it must
 // equal the text of the JSON tree, including decisions, battles and history.
 void directTextMatchesJsonTree() {
     const auto same=[](const State& state) {
         check(state.serialize()==canonicalJson(state.toJson()),"Direct saved text differs from the JSON tree");
-        check(state.planningKey()==contentDigest(canonicalJson(state.toJson(false))),"Direct planning text differs from the JSON tree");
+        check(state.canonicalKey()==contentDigest(canonicalJson(state.toJson(false))),"Direct canonical text differs from the JSON tree");
     };
     same(fixture());
     auto engine=Engine::start(loadScenario(std::filesystem::path(GWRL_SOURCE_DIR)/"game_content/scenarios/japan_china_1936"),

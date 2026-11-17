@@ -37,6 +37,7 @@ class CampaignEnv {
     CampaignEnv cloneForSearch(std::uint64_t seed) const;
     CampaignEnv cloneForSearchContinuing(const CampaignEnv& source) const;
     std::string planningKey() const;
+    std::string canonicalKey() const { return engine_.canonicalKey(); }
     std::string serialize() const { return engine_.serialize(); }
     // Inspection of already recorded events only. No execution RNG or future
     // dice are exposed, and reading does not advance or invalidate the state.

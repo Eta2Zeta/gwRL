@@ -180,9 +180,12 @@ struct Engine::DecisionCache {
     std::mutex mutex;
     std::shared_ptr<const ActionMenu> actions;
     std::shared_ptr<const ActionMenu> interrupts;
-    // Seeded only from a newly computed final runtime-event key; loaded event
-    // history can contain intermediate/stale keys and is never trusted here.
+    // The state's planning key (State::planningKey), seeded only from a newly
+    // computed final runtime-event key; loaded event history can contain
+    // intermediate/stale keys and is never trusted here.
     std::optional<std::string> stateKey;
+    // Its canonical key (State::canonicalKey), worked out only when asked for.
+    std::optional<std::string> canonicalKey;
 };
 
 struct Engine::MenuTable {
@@ -705,6 +708,13 @@ std::string Engine::planningKey() const {
     std::lock_guard lock(decisionCache_->mutex);
     if(!decisionCache_->stateKey)decisionCache_->stateKey=state_.planningKey();
     return contentDigest(canonicalJson(V(O{{"rules_id", V(rules_->id())}, {"state_key", V(*decisionCache_->stateKey)}})));
+}
+
+std::string Engine::canonicalKey() const {
+    requireIntact();
+    std::lock_guard lock(decisionCache_->mutex);
+    if(!decisionCache_->canonicalKey)decisionCache_->canonicalKey=state_.canonicalKey();
+    return contentDigest(canonicalJson(V(O{{"rules_id", V(rules_->id())}, {"state_key", V(*decisionCache_->canonicalKey)}})));
 }
 
 }  // namespace game::campaign

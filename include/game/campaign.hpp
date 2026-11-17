@@ -375,7 +375,7 @@ struct PoliticalState {
 struct Event {
     std::string kind;
     json::Value payload;
-    std::string afterStateKey;
+    std::string afterStateKey;  // The state's planning key after the event (State::planningKey).
 };
 
 // An append-only audit log whose copies share the recorded events, so copying
@@ -465,15 +465,24 @@ struct State {
     json::Value toJson(bool includeHistory = true) const;
     static State fromJson(std::shared_ptr<const Definition>, const json::Value&);
     std::string serialize() const;
-    std::string planningKey() const;  // Complete decision state, excludes history and all RNG.
+    // The complete decision state, without history or any random stream, as a
+    // SHA-256 digest of a compact binary writing of it: what the menu cache,
+    // the move history and the search identify positions by. The engine works
+    // one out after every move and dice roll.
+    std::string planningKey() const;
+    // The same state as a digest of its canonical text, which is equal exactly
+    // when the planning key is but costs several times more. It changes only
+    // when the canonical text does, so tools compare positions across builds
+    // of the engine with it; nothing in play reads it.
+    std::string canonicalKey() const;
     json::Value observation() const;  // No execution RNG or future test tape exists in State.
 };
 
 // JSON is canonical and finite. Large execution counters use decimal strings.
 std::string canonicalJson(const json::Value& value);
-std::string contentDigest(const std::string& value);
+std::string contentDigest(std::string_view value);
 // The same digest without hardware instructions, which tests compare it with.
-std::string portableContentDigest(const std::string& value);
+std::string portableContentDigest(std::string_view value);
 json::Value actionJson(const Action& action);
 Action actionFromJson(const json::Value& value);
 json::Value outcomeJson(const ChanceOutcome& outcome);
@@ -572,7 +581,11 @@ class Engine {
     static Engine replay(std::shared_ptr<const Definition>, std::shared_ptr<const Rules>,
                          const std::string& checkpoint, const std::vector<Event>& events);
     std::string exactReplayIdentity() const;
+    // The decision state's identity with the rules: from the state's planning
+    // key, which the search uses, or from its canonical key, for comparing
+    // positions across builds (State::planningKey, State::canonicalKey).
     std::string planningKey() const;
+    std::string canonicalKey() const;
     void requireIntact() const {
         if (unfinished_) throw std::runtime_error("Search copy failed during a transition");
     }

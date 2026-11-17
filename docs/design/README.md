@@ -141,7 +141,7 @@ wealth minus the other two alliances' wealth combined
 ### 2.5 What the learner asks of the engine
 
 The legal moves, play a move, roll the dice, is the game over, the final scores,
-a copy of the game for search, and the position's *planning key*, a text that
+a copy of the game for search, and the position's *planning key*, a digest that
 identifies a position exactly.
 
 ## 3. What a network gives at a decision
@@ -1963,7 +1963,10 @@ measured and what would settle it.
   Checking a naval route copies the whole position, and the copy works out its
   carriers' reach and supply again with no cache
   ([record](../archive/records/naval_route_checks_2026_11_16.md)). Every move
-  and every dice roll writes out the whole position for its planning key. When the Mac's
+  and every dice roll works out the position's planning key, a digest of a
+  compact binary writing of the whole position, about 21 to 33 µs a position
+  where the digest of its canonical text took 60 to 80 µs
+  ([record](../archive/records/planning_key_2026_11_16.md)). When the Mac's
   other work needs more than one core, part of the training runs on the
   efficiency cores
   ([record](../archive/records/self_play_limits_2026_11_16.md)).
@@ -2266,7 +2269,7 @@ Terms in the order the document introduces them.
 - **Chance event:** a position where the engine rolls dice.
 - **Final score:** an alliance's wealth minus the other two alliances' combined
   wealth at the end of the game.
-- **Planning key:** a text that identifies a position exactly.
+- **Planning key:** a digest that identifies a position exactly.
 - **Decision 612:** the running example: round 5 of a game played on 5 November,
   the Comintern choosing the CCP's Combat Movement from 5 legal moves.
 

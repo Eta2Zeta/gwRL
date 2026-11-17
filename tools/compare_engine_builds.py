@@ -9,15 +9,16 @@ and records them, so that two checkouts' records can be compared:
            Each move is drawn with random.Random("trace:<seed>"), and ending the
            phase is chosen with a probability of 2%, 5% or 10% by seed. Every
            step adds the legal moves, the chosen move and the position reached,
-           by its planning key, to a running digest. Each engine call's thread
+           by its canonical key, to a running digest. Each engine call's thread
            CPU time is measured, and on macOS the instructions the process ran
            during it (tools/log_process_load.py).
   search   Complete games searched as in training (64 simulations, depth 16),
            with networks whose first-layer tables hold random numbers
            (tools/replay_coordinator_rounds.py --make-weights), evaluated one
            position at a time on one thread, so that a game plays the same on
-           every run. Every event's positions and move go into the digest; the
-           process's instructions and CPU time are measured.
+           every run. Every event's kind and move go into the digest, and the
+           final position's canonical key is kept; the process's instructions
+           and CPU time are measured.
   compare  Whether two records hold the same games, step by step, and what each
            cost.
 
@@ -56,6 +57,15 @@ def _instruction_reader(root: str):
     return lambda: read(pid)["instructions"]
 
 
+def position_key(env) -> str:
+    """A position's identity that every build gives the same position: the digest
+    of its canonical text. Builds older than the canonical key had their planning
+    key computed that way, so it serves for them."""
+    raw = getattr(env, "raw", env)
+    canonical = getattr(raw, "canonical_key", None)
+    return canonical() if canonical is not None else raw.planning_key()
+
+
 def play_random(task: tuple[str, int, int]) -> dict:
     root, seed, rounds = task
     sys.path.insert(0, root)
@@ -80,7 +90,7 @@ def play_random(task: tuple[str, int, int]) -> dict:
     while not env.is_terminal():
         if env.decision_kind() == "chance":
             timed("resolve_chance", env.resolve_chance)
-            rolling.update(b"chance|" + env.planning_key().encode())
+            rolling.update(b"chance|" + position_key(env).encode())
         else:
             options = list(timed("legal_actions", env.legal_actions))
             if not options:
@@ -94,10 +104,10 @@ def play_random(task: tuple[str, int, int]) -> dict:
             except (RuntimeError, ValueError) as caught:
                 error = f"{type(caught).__name__}: {caught}"
                 break
-            rolling.update(b"|" + env.planning_key().encode())
+            rolling.update(b"|" + position_key(env).encode())
         digests.append(rolling.hexdigest()[:16])
     return {"kind": "random", "seed": seed, "steps": len(digests), "terminal": env.is_terminal(), "error": error,
-            "final": env.planning_key(), "digests": digests, "calls": cost}
+            "final": position_key(env), "digests": digests, "calls": cost}
 
 
 def play_search(task: tuple[str, int, int, str]) -> dict:
@@ -121,12 +131,14 @@ def play_search(task: tuple[str, int, int, str]) -> dict:
                               environment_seed=seed, max_transitions=100000)
     spent, cpu = (instructions() - counted) if instructions else 0, time.process_time() - started
     digests, rolling = [], hashlib.sha256()
+    # The events' positions are planning keys, whose form a build may change, so
+    # the digest takes each event's kind and move, and the final position by
+    # its canonical key.
     for event in result["events"]:
-        rolling.update(json.dumps([event.get("kind"), event.get("before"), event.get("after"),
-                                   str(event.get("action"))]).encode())
+        rolling.update(json.dumps([event.get("kind"), str(event.get("action"))]).encode())
         digests.append(rolling.hexdigest()[:16])
     return {"kind": "search", "seed": seed, "steps": len(digests), "decisions": result["counts"]["decisions"],
-            "terminal": result["terminal"], "error": None, "final": env.planning_key(), "digests": digests,
+            "terminal": result["terminal"], "error": None, "final": position_key(env), "digests": digests,
             "process": {"cpu_seconds": cpu, "instructions": spent}}
 
 
