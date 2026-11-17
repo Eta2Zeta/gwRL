@@ -211,6 +211,101 @@ def _by_network(x: Tensor, sizes: Sequence[int], layers: Sequence[Any],
     return torch.cat([apply(layer, rows) for (layer, _), rows in zip(parts, x.split([size for _, size in parts]))])
 
 
+_APPLY = {"linear": _linear, "norm": _norm, "block": _apply_block, "head": _apply_head}
+
+
+@dataclass(frozen=True)
+class _GroupedLayers:
+    """One kind of layer of several networks, stacked for grouped matrix products.
+
+    `first` and `second` are the linear layers' weights, transposed as
+    torch._grouped_mm reads them: groups x inputs x outputs. Each bias is an extra
+    input, which a column of ones multiplies (_GROUP_PAD columns, the rest zeros,
+    since the product needs rows of a multiple of 16 bytes), and the outputs are
+    padded with zeros to a multiple of _GROUP_PAD; `outputs` is the second layer's
+    true number. `scale` and `shift` are the layer normalization's, one row per
+    group.
+    """
+    first: Tensor | None = None
+    second: Tensor | None = None
+    outputs: int = 0
+    scale: Tensor | None = None
+    shift: Tensor | None = None
+    eps: float = 1e-5
+
+
+_GROUP_PAD = 4  # Four 32-bit numbers: torch._grouped_mm needs strides of a multiple of 16 bytes.
+
+
+def _with_bias(layer: nn.Linear) -> Tensor:
+    """The layer's weights, its bias as one more input and zeros to pad inputs and outputs."""
+    outputs, inputs = layer.weight.shape
+    padded = layer.weight.new_zeros((-(-outputs // _GROUP_PAD) * _GROUP_PAD, inputs + _GROUP_PAD))
+    padded[:outputs, :inputs] = layer.weight
+    padded[:outputs, inputs] = layer.bias
+    return padded
+
+
+def _stack_layers(layers: Sequence[Any], kind: str) -> _GroupedLayers:
+    def linear(index: int) -> Tensor:
+        return torch.stack([_with_bias(layer if index < 0 else layer[index]) for layer in layers]).transpose(1, 2)
+
+    def norm(pick: Callable[[Any], nn.LayerNorm]) -> dict[str, Any]:
+        norms = [pick(layer) for layer in layers]
+        return {"scale": torch.stack([n.weight for n in norms]), "shift": torch.stack([n.bias for n in norms]),
+                "eps": norms[0].eps}
+
+    if kind == "linear":
+        return _GroupedLayers(first=linear(-1))
+    if kind == "norm":
+        return _GroupedLayers(**norm(lambda layer: layer))
+    if kind == "block":
+        return _GroupedLayers(first=linear(0), **norm(lambda block: block[2]))
+    return _GroupedLayers(first=linear(0), second=linear(2), outputs=layers[0][2].out_features)  # A head.
+
+
+def _grouped_here(x: Tensor) -> bool:
+    """Grouped matrix products pay on the CPU, for inference; on the Mac's GPU they were slower."""
+    return _GROUPED_MM and x.device.type == "cpu" and not torch.is_grad_enabled()
+
+
+_GROUPED_MM = hasattr(torch, "_grouped_mm")
+
+
+def _per_network(networks: Any, key: tuple, parts: Tensor | tuple[Tensor, ...], sizes: Sequence[int],
+                 layers: Sequence[Any], kind: str) -> Tensor:
+    """Each layer, of `kind` linear, norm, block or head, on its own rows of the parts
+    joined side by side; rows come in layer order, sizes[i] for layers[i].
+
+    Where it can (a network stack, on the CPU, without gradients, with rows for
+    more than one layer), each step is one call for every layer at once: a grouped
+    matrix product (torch._grouped_mm, which multiplies each group of rows by its
+    own matrix), with each bias as a column of ones joined to the input, and one
+    layer normalization whose scale and shift are then each row's own. Otherwise
+    each layer is applied to its own rows in turn (_by_network). Both give the
+    same outputs up to floating-point rounding.
+    """
+    parts = parts if isinstance(parts, tuple) else (parts,)
+    if (not hasattr(networks, "stacked_layers") or sum(1 for size in sizes if size) < 2
+            or not _grouped_here(parts[0]) or sum(part.shape[1] for part in parts) % _GROUP_PAD):
+        x = parts[0] if len(parts) == 1 else torch.cat(parts, dim=1)
+        return _by_network(x, sizes, layers, _APPLY[kind])
+    stacked, sizes = networks.stacked_layers(key, layers, kind), tuple(sizes)
+    rows = sum(sizes)
+    if kind == "norm":
+        x = parts[0] if len(parts) == 1 else torch.cat(parts, dim=1)
+        return networks.scale_and_shift(F.layer_norm(x, (x.shape[1],), eps=stacked.eps), stacked, sizes)
+    offsets = networks.offsets(sizes)
+    y = torch._grouped_mm(torch.cat((*parts, networks.ones(rows)), dim=1), stacked.first, offs=offsets)
+    if kind == "linear":
+        return y
+    y = F.gelu(y)
+    if kind == "block":
+        return networks.scale_and_shift(F.layer_norm(y, (y.shape[1],), eps=stacked.eps), stacked, sizes)
+    y = torch._grouped_mm(torch.cat((y, networks.ones(rows)), dim=1), stacked.second, offs=offsets)
+    return y if y.shape[1] == stacked.outputs else y[:, :stacked.outputs]
+
+
 def _border_indices(spec_sources: Tensor, spec_targets: Tensor, in_degree: Tensor, positions: int,
                     zones: int) -> tuple[Tensor, Tensor, Tensor]:
     """Every position's borders as rows of the batch's zone vectors, and each zone's in-degree."""
@@ -278,6 +373,48 @@ class NetworkStack:
                            for layer in range(first.config.message_layers)]
         self._borders: dict[int, tuple[Tensor, Tensor, Tensor]] = {}
         self._repeated: dict[tuple[int, int, int], Tensor] = {}
+        # For grouped matrix products (_per_network): each kind of layer's weights,
+        # stacked once like the tables, and small tensors that depend only on how
+        # many rows each network has, kept for the passes that repeat them.
+        self._stacked: dict[tuple, _GroupedLayers] = {}
+        self._offsets: dict[tuple[int, ...], Tensor] = {}
+        self._row_layers: dict[tuple[int, ...], Tensor] = {}
+        self._ones: dict[int, Tensor] = {}
+
+    def stacked_layers(self, key: tuple, layers: Sequence[Any], kind: str) -> _GroupedLayers:
+        found = self._stacked.get(key)
+        if found is None:
+            with torch.inference_mode():
+                found = self._stacked[key] = _stack_layers(layers, kind)
+        return found
+
+    def offsets(self, sizes: tuple[int, ...]) -> Tensor:
+        """Where each group's rows end, as torch._grouped_mm reads them."""
+        found = self._offsets.get(sizes)
+        if found is None:
+            if len(self._offsets) > 4096:
+                self._offsets.clear()
+            found = self._offsets[sizes] = torch.tensor(np.cumsum(sizes), dtype=torch.int32)
+        return found
+
+    def ones(self, rows: int) -> Tensor:
+        """A column of ones, the input that each linear layer's bias multiplies, and zeros to pad it."""
+        found = self._ones.get(rows)
+        if found is None:
+            if len(self._ones) > 4096:
+                self._ones.clear()
+            found = self._ones[rows] = torch.zeros((rows, _GROUP_PAD))
+            found[:, 0] = 1.0
+        return found
+
+    def scale_and_shift(self, normed: Tensor, stacked: _GroupedLayers, sizes: tuple[int, ...]) -> Tensor:
+        """Each row's own layer normalization scale and shift, after normalizing all rows at once."""
+        rows = self._row_layers.get(sizes)
+        if rows is None:
+            if len(self._row_layers) > 4096:
+                self._row_layers.clear()
+            rows = self._row_layers[sizes] = torch.repeat_interleave(torch.arange(len(sizes)), torch.tensor(sizes))
+        return torch.addcmul(stacked.shift.index_select(0, rows), normed, stacked.scale.index_select(0, rows))
 
     def _single(self, batch: ZoneBatch) -> int | None:
         present = [index for index, size in enumerate(batch.network_positions) if size]
@@ -341,43 +478,49 @@ def _forward(networks: Any, batch: ZoneBatch, *, non_blocking: bool = False) -> 
     identity, facts = networks.zone_terms(batch, t)
     local = _bag(networks.zone_table, t["zone_column"], t["zone_weight"], t["zone_bags"])
     local = local.view(positions, zones, dim) + identity + facts
-    h = _by_network(local.view(nodes, dim), node_sizes, [m.zone_norm for m in models], _norm)
-    u = _by_network(_bag(networks.global_table, t["global_column"], t["global_weight"], t["global_bags"]),
-                    sizes, [m.global_norm for m in models], _norm)
+    h = _per_network(networks, ("zone_norm",), local.view(nodes, dim), node_sizes,
+                     [m.zone_norm for m in models], "norm")
+    u = _per_network(networks, ("global_norm",),
+                     _bag(networks.global_table, t["global_column"], t["global_weight"], t["global_bags"]),
+                     sizes, [m.global_norm for m in models], "norm")
     sources, targets, degree = networks.borders(positions, zones)
     for layer in range(model.config.message_layers):
-        sent = F.gelu(_by_network(h, node_sizes, [m.messages[layer] for m in models], _linear).index_select(0, sources)
+        sent = F.gelu(_per_network(networks, ("messages", layer), h, node_sizes,
+                                   [m.messages[layer] for m in models], "linear").index_select(0, sources)
                       + networks.border_terms(layer, batch, t))
         # Zeros of the messages' own type, so that a pass under automatic mixed
         # precision, whose messages are half-precision, can add them up.
         received = sent.new_zeros((nodes, dim)).index_add_(0, targets, sent) / degree
-        h = h + _by_network(torch.cat((h, received, u.repeat_interleave(zones, 0)), dim=1), node_sizes,
-                            [m.zone_updates[layer] for m in models], _apply_block)
-        u = u + _by_network(torch.cat((u, h.view(positions, zones, dim).mean(1)), dim=1), sizes,
-                            [m.position_updates[layer] for m in models], _apply_block)
+        h = h + _per_network(networks, ("zone_updates", layer), (h, received, u.repeat_interleave(zones, 0)),
+                             node_sizes, [m.zone_updates[layer] for m in models], "block")
+        u = u + _per_network(networks, ("position_updates", layer), (u, h.view(positions, zones, dim).mean(1)),
+                             sizes, [m.position_updates[layer] for m in models], "block")
     grid = h.view(positions, zones, dim)
-    states = _by_network(torch.cat((u, grid.mean(1), grid.amax(1)), dim=1), sizes,
-                         [m.state_encoder for m in models], _apply_block)
-    values = _by_network(states, sizes, [m.value_head for m in models], _apply_head)  # Raw-value/value_scale units.
+    states = _per_network(networks, ("state_encoder",), (u, grid.mean(1), grid.amax(1)), sizes,
+                          [m.state_encoder for m in models], "block")
+    # Raw-value/value_scale units.
+    values = _per_network(networks, ("value_head",), states, sizes, [m.value_head for m in models], "head")
     if not batch.options:
         return values.new_empty((0,)), values
     option_sizes = batch.network_options
-    options = _by_network(_bag(networks.option_table, t["action_column"], t["action_weight"], t["action_bags"]),
-                          option_sizes, [m.option_norm for m in models], _norm)
+    options = _per_network(networks, ("option_norm",),
+                           _bag(networks.option_table, t["action_column"], t["action_weight"], t["action_bags"]),
+                           option_sizes, [m.option_norm for m in models], "norm")
     bank = torch.cat((h, networks.no_zone))
     path = h.new_zeros((batch.options, dim)).index_add_(
         0, t["path_option"], bank.index_select(0, t["path_zone"])) * t["path_scale"]
-    latent = _by_network(torch.cat((options, bank.index_select(0, t["action_source"]),
-                                    bank.index_select(0, t["action_target"]), path), dim=1),
-                         option_sizes, [m.option_encoder for m in models], _apply_block)
-    scores = _by_network(torch.cat((states.index_select(0, t["action_position"]), latent), dim=1), option_sizes,
-                         [m.policy_head for m in models], _apply_head).squeeze(1)
+    latent = _per_network(networks, ("option_encoder",),
+                          (options, bank.index_select(0, t["action_source"]),
+                           bank.index_select(0, t["action_target"]), path),
+                          option_sizes, [m.option_encoder for m in models], "block")
+    scores = _per_network(networks, ("policy_head",), (states.index_select(0, t["action_position"]), latent),
+                          option_sizes, [m.policy_head for m in models], "head").squeeze(1)
     if model.config.policy_factorization:
-        scores = _readout(models, states, latent, scores, t, batch)
+        scores = _readout(networks, states, latent, scores, t, batch)
     return scores, values
 
 
-def _readout(models: Sequence[Any], states: Tensor, latent: Tensor, scores: Tensor, t: dict[str, Tensor],
+def _readout(networks: Any, states: Tensor, latent: Tensor, scores: Tensor, t: dict[str, Tensor],
              batch: ZoneBatch) -> Tensor:
     """Normalize kind -> what acts -> how it travels -> what it acts on -> exact option.
 
@@ -390,9 +533,9 @@ def _readout(models: Sequence[Any], states: Tensor, latent: Tensor, scores: Tens
     groups = batch.groups
     means = latent.new_zeros((groups, latent.shape[1])).index_add_(
         0, t["readout_owners"], latent.repeat(GROUP_LEVELS, 1)) / t["readout_counts"]
-    heads = [model.factor_heads[level] for level in range(GROUP_LEVELS) for model in models]
-    group_scores = _by_network(torch.cat((states.index_select(0, t["readout_rows"]), means), dim=1),
-                               batch.readout_sizes, heads, _apply_head).squeeze(1)
+    heads = [model.factor_heads[level] for level in range(GROUP_LEVELS) for model in networks.models]
+    group_scores = _per_network(networks, ("factor_heads",), (states.index_select(0, t["readout_rows"]), means),
+                                batch.readout_sizes, heads, "head").squeeze(1)
     normalized = _conditional_log_softmax(torch.cat((group_scores, scores)), t["readout_segments"],
                                           batch.positions + groups)
     return normalized.index_select(0, t["readout_terms"]).view(GROUP_LEVELS + 1, -1).sum(0)
