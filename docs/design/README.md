@@ -656,8 +656,9 @@ Which plays better, and how big a network this game needs, is
 In the usual picture of a neural network, the lines of answers of section 5 are
 its *input layer*, and learned layers follow. Section 6.2 defines a learned
 layer, and section 6.3 shows the first one, the layer that reads the answers.
-Nothing else stands between the answers and the network: the rest of this
-section builds on that first layer.
+Nothing else stands between the answers and the network. The first layer turns
+each line into a vector of its own, and section 6.3 ends with a plan of how the
+later layers combine those vectors; section 6.9 draws the whole network.
 
 ### 6.1 Vectors
 
@@ -748,6 +749,20 @@ own first layer and so its own table:
 A question's number is its row's number: `units:ccp:mountain_infantry` is
 question 188 of the zone questions, and its row is row 188 of the zone table. In
 machine-learning terms a table is an *embedding table* and a row an *embedding*.
+
+**One vector per line.** A first layer reads one line at a time and gives each
+line its own 64 outputs, its own vector. At decision 612 the input has 43 lines,
+37 for the zones, one for the position and 5 for the legal moves, so the first
+layers give 43 vectors of 64 numbers: one for each zone, one for the position
+and one for each move, not one vector for the whole decision. All 37 zone lines
+go through the zone table, with the same weights for every zone, and all 5 move
+lines through the move table. In the units-and-links picture, the Shensi figure
+above is drawn once for every zone, each time with the same links. No first
+layer adds one line's answers to another's (`_bag` in
+`studies/campaign/neural.py` makes one sum per line): the vectors meet only in
+the layers after it, as the plan at the end of this section shows.
+
+![Decision 612 of the 5 November sample game. Left, the input layer: 43 lines of answers, each drawn as a bar with a tick for every non-zero answer at its column. The board has 37 zone lines of 42,532 inputs each, 840 non-zero answers in all: shown are Shensi with 9, Hopeh 28, Suiyuan 12, Szechwan 2, Tsinghai 13, 31 more zones, and sea zone P14 with 86. The position has 1 line of 4,076 inputs with 176 non-zero answers. The moves have 5 lines of 12,627 inputs each, 80 non-zero answers in all: the attacks on Hopeh, Suiyuan, Szechwan and Tsinghai with 19 each, and ending the phase with 4. Middle, the first layers: every zone line goes through the zone table, 42,532 rows of 64, the same weights for all 37 zones; the position line through the position table, 4,076 rows of 64; every move line through the move table, 12,627 rows of 64, the same weights for all 5 moves. Each line goes through on its own. Right, the outputs: one vector of 64 numbers per line, 43 in all: 37 zone vectors, 1 position vector and 5 move vectors. No first layer adds one line to another; the vectors meet only in the layers after it.](figures/first_layers.svg)
 
 **Skipping the zeros: a column lookup.** Each output adds up all 42,532 inputs,
 each times its weight, so the 64 outputs together are the sum of every input
@@ -850,6 +865,24 @@ training (0.0076 against 0.0081) and the same policy loss
 Computing a first layer by adding up the rows of its non-zero inputs is common
 wherever inputs are mostly 0; chess programs compute theirs the same way
 ([section 6.10](#610-more-detail-how-other-game-networks-read-their-input)).
+
+**What the 43 vectors become.** Each of the 43 vectors so far describes one zone,
+the position or one move, from that line's answers alone. The layers after the
+first bring them together, in this order (`_forward` in
+`studies/campaign/neural.py`):
+
+| Step | What it reads | What it gives at decision 612 | Section |
+| --- | --- | --- | --- |
+| Zone vectors | each zone's first-layer vector, its identity vector and its fixed facts | 37 zone vectors, one per zone | [6.4](#64-a-zones-vector) |
+| Position and move vectors | the position's and each move's first-layer vector | 1 position vector and 5 move vectors | [6.5](#65-the-position-vector-and-the-move-vectors) |
+| Two message layers | each zone's vector, its neighbours' vectors along the borders and the position vector; for the position vector, itself and the average zone vector | 37 zone vectors and 1 position vector, each now informed by the others | [6.6](#66-messages-along-the-borders) |
+| Summary and values | the position vector, and the average and the largest of the 37 zone vectors | 1 summary vector, then 3 values | [6.7](#67-the-values) |
+| Move probabilities | each move vector, the vectors of the zones the move is linked to, and the summary | 5 logits, then 5 probabilities | [6.8](#68-the-move-probabilities) |
+
+The move vectors take no part in the message layers or the values: a move meets
+the board only in the last step, through the zones it is linked to, so the values
+do not depend on which moves are legal. Section 6.9 draws the whole plan in one
+figure.
 
 ### 6.4 A zone's vector
 
@@ -1019,7 +1052,7 @@ count as "what acts" and so on comes from the roles explained in
 
 All the bricks together, for decision 612:
 
-![For decision 612 at width 64: the board's 840 answers, filed by zone, go through the zone table of 42,532 rows to 37 zone vectors; the position's 176 answers through the position table of 4,076 rows to one position vector; the moves' 80 answers, filed by move, through the move table of 12,627 rows to 5 move vectors. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. A learned layer turns the position vector and the zones' mean and maximum into a summary vector, and the value head turns that into three values, one per alliance. Each move vector is joined with the vectors of the zones it starts from, acts on and passes through; with the summary, the policy head turns it into the move's logit, giving 5 logits and 5 probabilities, built in stages.](figures/network_structure.svg)
+![For decision 612 at width 64: the board's 37 lines, one per zone, with 840 answers in all, go through the zone table of 42,532 rows, the first layer, each on its own, to 37 zone vectors; the position's line, with 176 answers, through the position table of 4,076 rows to one position vector; the 5 move lines, with 80 answers in all, through the move table of 12,627 rows to 5 move vectors, one per move. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. A learned layer turns the position vector and the zones' mean and maximum into a summary vector, and the value head turns that into three values, one per alliance. Each move vector is joined with the vectors of the zones it starts from, acts on and passes through; with the summary, the policy head turns it into the move's logit, giving 5 logits and 5 probabilities, built in stages.](figures/network_structure.svg)
 
 **Its size.** A 64×2 network has 3,924,424 parameters. Most, 3.79 million or 97%,
 are the rows of the three first layers; the other layers hold the rest. At 256×8
