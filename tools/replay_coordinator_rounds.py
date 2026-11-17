@@ -24,8 +24,13 @@ every reply, so that two runs' replies can be compared with --compare:
 
 --device runs the networks on another device, such as mps or cuda. --merge K
 answers K consecutive saved rounds together, as one round, to see larger passes
-of real positions. --autocast float16 or bfloat16 runs every pass under
-PyTorch's automatic mixed precision, which does matrix products in half
+of real positions. --networks one gives every position to the Axis network, so
+that one network evaluates the same positions, as one network shared by the
+three alliances would; --networks padded also adds copies of the round's
+positions, in order, up to three times as many as its largest network has, so
+that one network evaluates as many positions as a layout padding each network
+to the largest network's count would hold. --autocast float16 or bfloat16 runs
+every pass under PyTorch's automatic mixed precision, which does matrix products in half
 precision. --compile compiles the pass with torch.compile, shapes dynamic,
 and reports how often it compiled; --no-grad runs the rounds under
 torch.no_grad instead of the coordinator's torch.inference_mode, which a
@@ -136,6 +141,24 @@ def merge_rounds(rounds, merge: int):
         return rounds
     return [[request for saved in rounds[start:start + merge] for request in saved]
             for start in range(0, len(rounds) - merge + 1, merge)]
+
+
+def one_network(rounds, padded: bool):
+    """Every position of each round given to the Axis network; with `padded`, followed
+    by copies of the round's positions, in order, up to three times as many as the
+    round's largest network has (a chance position counts once for each network)."""
+    alliances = ("axis", "allies", "comintern")
+    changed = []
+    for saved in rounds:
+        one = [("axis", count, arrays) for _, count, arrays in saved]
+        if padded:
+            counts = dict.fromkeys(alliances, 0)
+            for actor, _, _ in saved:
+                for alliance in (alliances if actor is None else (actor,)):
+                    counts[alliance] += 1
+            one += [one[index % len(one)] for index in range(3 * max(counts.values()) - len(one))]
+        changed.append(one)
+    return changed
 
 
 def positions_in(saved) -> int:
@@ -303,6 +326,9 @@ def main(argv=None) -> int:
     parser.add_argument("--device", default="cpu", help="Where the networks run: cpu, mps or cuda")
     parser.add_argument("--threads", type=int, default=1, help="PyTorch's CPU threads, 1 as in the coordinator")
     parser.add_argument("--merge", type=int, default=1, help="Answer this many consecutive saved rounds as one")
+    parser.add_argument("--networks", choices=("three", "one", "padded"), default="three",
+                        help="Replay the rounds as saved, through one network, or through one network "
+                             "over as many positions as a padded layout of the three would hold")
     parser.add_argument("--autocast", choices=("float16", "bfloat16"),
                         help="Run every pass under automatic mixed precision of this type")
     parser.add_argument("--compile", action="store_true", help="Compile the pass with torch.compile")
@@ -333,6 +359,8 @@ def main(argv=None) -> int:
     rounds = merge_rounds(pickle.loads(args.rounds.read_bytes()), args.merge)
     if args.limit:
         rounds = rounds[:args.limit]
+    if args.networks != "three":
+        rounds = one_network(rounds, padded=args.networks == "padded")
     models, config = load_models(args.weights, device)
     if args.no_grad:  # The server enters torch.inference_mode itself; make that no_grad.
         torch.inference_mode = _no_grad_for_inference_mode(torch)
@@ -342,6 +370,7 @@ def main(argv=None) -> int:
     report = report_of(rounds, passes, root=args.root.resolve(), device=device, config=config,
                        merge=args.merge, autocast=args.autocast, compiled=args.compile, warm_up=warm_up)
     report["no_grad"] = args.no_grad
+    report["networks"] = args.networks
     summary = {key: value for key, value in report.items() if key not in ("per_round", "pass_seconds")}
     print(json.dumps(summary, indent=1))
     if args.report:

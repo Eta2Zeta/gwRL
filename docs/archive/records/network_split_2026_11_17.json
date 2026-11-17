@@ -1,0 +1,7103 @@
+{
+ "record": "docs/archive/records/network_split_2026_11_17.md",
+ "commit_replayed": "86c6d6b",
+ "inference_batches": "tmp/coordinator-rounds-2026-11-17/profile.rounds.pickle (853 saved on 17 November)",
+ "shares": {
+  "state_share": {
+   "axis": 0.6627190904784462,
+   "allies": 0.20590557397757778,
+   "comintern": 0.13137533554397599
+  },
+  "legal_action_share": {
+   "axis": 0.641141408817511,
+   "allies": 0.3421474855831835,
+   "comintern": 0.016711105599305512
+  },
+  "inference_batches_where_largest": {
+   "comintern": 18,
+   "axis": 753,
+   "allies": 82
+  },
+  "largest_share_quartiles": [
+   0.5833333333333334,
+   0.7272727272727273,
+   1.0
+  ],
+  "padding": {
+   "merge_1": {
+    "inference_batches": 853,
+    "states_each": 7.424384525205158,
+    "padded_states_times": 2.0701089531027947,
+    "padded_legal_actions_times": 2.3711826440131456,
+    "padded_groups_one_product_times": 4.370335178811911,
+    "padded_groups_per_level_times": 2.3747269190483316
+   },
+   "merge_3": {
+    "inference_batches": 284,
+    "states_each": 22.295774647887324,
+    "padded_states_times": 2.0377447883765005,
+    "padded_legal_actions_times": 2.194341523912875,
+    "padded_groups_one_product_times": 4.051760031873046,
+    "padded_groups_per_level_times": 2.2239305975635077
+   },
+   "merge_8": {
+    "inference_batches": 106,
+    "states_each": 59.698113207547166,
+    "padded_states_times": 2.0286030341340076,
+    "padded_legal_actions_times": 2.1077687040521407,
+    "padded_groups_one_product_times": 3.891229981969027,
+    "padded_groups_per_level_times": 2.1488538255433163
+   },
+   "merge_16": {
+    "inference_batches": 53,
+    "states_each": 119.39622641509433,
+    "padded_states_times": 1.9949431099873578,
+    "padded_legal_actions_times": 2.0615172734855394,
+    "padded_groups_one_product_times": 3.8034680132788847,
+    "padded_groups_per_level_times": 2.102641734118982
+   }
+  }
+ },
+ "gpu": {
+  "64x2-m1-three": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 2680.7266596976356,
+    "states_per_inference_batch": 9.126666666666667,
+    "inference_batches": 300,
+    "steps_us": {
+     "reading": 30.812377566083647,
+     "laying_out": 211.3706739328336,
+     "making_calls": 1551.0848601115867,
+     "collecting": 866.3058668025769,
+     "rest": 21.152881284554798
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 1512.069865646881,
+      "per_position": 128.0485895599804
+     },
+     "making_calls": {
+      "fixed": 851.279227921321,
+      "per_position": 76.67702324948128
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 2714.1735737677664,
+     "states_per_inference_batch": 9.126666666666667,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 31.75381862092763,
+      "laying_out": 206.77013681658235,
+      "making_calls": 1600.695922873759,
+      "collecting": 854.8692994130154,
+      "rest": 20.084396043481927
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1522.5730869871645,
+       "per_position": 130.56250768231575
+      },
+      "making_calls": {
+       "fixed": 849.6943401075861,
+       "per_position": 82.28651381660039
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 2680.7266596976356,
+     "states_per_inference_batch": 9.126666666666667,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 30.812377566083647,
+      "laying_out": 211.3706739328336,
+      "making_calls": 1551.0848601115867,
+      "collecting": 866.3058668025769,
+      "rest": 21.152881284554798
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1512.069865646881,
+       "per_position": 128.0485895599804
+      },
+      "making_calls": {
+       "fixed": 851.279227921321,
+       "per_position": 76.67702324948128
+      }
+     }
+    }
+   ]
+  },
+  "64x2-m1-one": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 1781.345300648051,
+    "states_per_inference_batch": 9.12,
+    "inference_batches": 300,
+    "steps_us": {
+     "reading": 30.92025590982909,
+     "laying_out": 205.9042759356089,
+     "making_calls": 910.623549571028,
+     "collecting": 614.9385964575533,
+     "rest": 18.958622774031635
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 1444.9644248211944,
+      "per_position": 36.88386796347114
+     },
+     "making_calls": {
+      "fixed": 822.2424580276664,
+      "per_position": 9.690909160456314
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 1781.345300648051,
+     "states_per_inference_batch": 9.12,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 30.92025590982909,
+      "laying_out": 205.9042759356089,
+      "making_calls": 910.623549571028,
+      "collecting": 614.9385964575533,
+      "rest": 18.958622774031635
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1444.9644248211944,
+       "per_position": 36.88386796347114
+      },
+      "making_calls": {
+       "fixed": 822.2424580276664,
+       "per_position": 9.690909160456314
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 1786.714576446684,
+     "states_per_inference_batch": 9.12,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 30.20407573785633,
+      "laying_out": 217.9509395500645,
+      "making_calls": 902.5818366596164,
+      "collecting": 613.6308268469293,
+      "rest": 22.346897652217496
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1441.417352639693,
+       "per_position": 37.861537698134974
+      },
+      "making_calls": {
+       "fixed": 822.4432510689118,
+       "per_position": 8.787125613015867
+      }
+     }
+    }
+   ]
+  },
+  "64x2-m1-padded": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 2152.353046743277,
+    "states_per_inference_batch": 19.8,
+    "inference_batches": 300,
+    "steps_us": {
+     "reading": 63.7671175354626,
+     "laying_out": 370.90808332626085,
+     "making_calls": 939.957383767857,
+     "collecting": 749.0481800535539,
+     "rest": 28.672282060142606
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 1530.7367966435863,
+      "per_position": 31.394760106044988
+     },
+     "making_calls": {
+      "fixed": 864.4723102136743,
+      "per_position": 3.8123774522314426
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 2176.2964192021172,
+     "states_per_inference_batch": 19.8,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 65.77378046737672,
+      "laying_out": 364.92040676724474,
+      "making_calls": 962.2366365996035,
+      "collecting": 754.742536713214,
+      "rest": 28.623058654678363
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1538.265375281305,
+       "per_position": 32.22379009701071
+      },
+      "making_calls": {
+       "fixed": 902.8043449540731,
+       "per_position": 3.0016308911884013
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 2152.353046743277,
+     "states_per_inference_batch": 19.8,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 63.7671175354626,
+      "laying_out": 370.90808332626085,
+      "making_calls": 939.957383767857,
+      "collecting": 749.0481800535539,
+      "rest": 28.672282060142606
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1530.7367966435863,
+       "per_position": 31.394760106044988
+      },
+      "making_calls": {
+       "fixed": 864.4723102136743,
+       "per_position": 3.8123774522314426
+      }
+     }
+    }
+   ]
+  },
+  "64x2-m3-three": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 3539.010852146533,
+    "states_per_inference_batch": 22.295774647887324,
+    "inference_batches": 284,
+    "steps_us": {
+     "reading": 73.17358397134304,
+     "laying_out": 412.8313458481193,
+     "making_calls": 1951.2495354845182,
+     "collecting": 1069.9137432900795,
+     "rest": 31.842643552472893
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 1910.7136852959834,
+      "per_position": 73.03164803941189
+     },
+     "making_calls": {
+      "fixed": 1130.3895593469288,
+      "per_position": 36.816840370037184
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 3573.5927108682617,
+     "states_per_inference_batch": 22.295774647887324,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 72.55421818191395,
+      "laying_out": 406.3333346980663,
+      "making_calls": 1982.2517290738456,
+      "collecting": 1081.0712469015336,
+      "rest": 31.382182012902387
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1899.9955473590458,
+       "per_position": 75.06342300009752
+      },
+      "making_calls": {
+       "fixed": 1125.7554212089954,
+       "per_position": 38.415185002150594
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 3539.010852146533,
+     "states_per_inference_batch": 22.295774647887324,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 73.17358397134304,
+      "laying_out": 412.8313458481193,
+      "making_calls": 1951.2495354845182,
+      "collecting": 1069.9137432900795,
+      "rest": 31.842643552472893
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1910.7136852959834,
+       "per_position": 73.03164803941189
+      },
+      "making_calls": {
+       "fixed": 1130.3895593469288,
+       "per_position": 36.816840370037184
+      }
+     }
+    }
+   ]
+  },
+  "64x2-m3-one": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 2249.9090636827045,
+    "states_per_inference_batch": 22.288732394366196,
+    "inference_batches": 284,
+    "steps_us": {
+     "reading": 72.79967978550776,
+     "laying_out": 413.36942248703895,
+     "making_calls": 935.0842185188118,
+     "collecting": 790.3108694143823,
+     "rest": 38.344873476963706
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 1524.5726443572553,
+      "per_position": 32.54273982439614
+     },
+     "making_calls": {
+      "fixed": 868.3735236139773,
+      "per_position": 2.993023278510738
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 2323.363278521074,
+     "states_per_inference_batch": 22.288732394366196,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 72.47333064376915,
+      "laying_out": 422.93222193133977,
+      "making_calls": 987.0013277129186,
+      "collecting": 803.3913099879242,
+      "rest": 37.56508824512244
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1646.2496841067864,
+       "per_position": 30.379188122220796
+      },
+      "making_calls": {
+       "fixed": 957.262861636658,
+       "per_position": 1.3342376565020468
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 2249.9090636827045,
+     "states_per_inference_batch": 22.288732394366196,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 72.79967978550776,
+      "laying_out": 413.36942248703895,
+      "making_calls": 935.0842185188118,
+      "collecting": 790.3108694143823,
+      "rest": 38.344873476963706
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1524.5726443572553,
+       "per_position": 32.54273982439614
+      },
+      "making_calls": {
+       "fixed": 868.3735236139773,
+       "per_position": 2.993023278510738
+      }
+     }
+    }
+   ]
+  },
+  "64x2-m3-padded": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 3081.8906934271095,
+    "states_per_inference_batch": 45.433098591549296,
+    "inference_batches": 284,
+    "steps_us": {
+     "reading": 146.44497848717612,
+     "laying_out": 764.6279367511685,
+     "making_calls": 1067.1188236967641,
+     "collecting": 1044.1705915223458,
+     "rest": 59.52836296965473
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 1559.3854767334644,
+      "per_position": 33.51092626063669
+     },
+     "making_calls": {
+      "fixed": 856.6351517249745,
+      "per_position": 4.632826694566242
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 3303.715932700688,
+     "states_per_inference_batch": 45.433098591549296,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 145.7416573186851,
+      "laying_out": 796.7809473945674,
+      "making_calls": 1228.8535251851936,
+      "collecting": 1068.7123132401482,
+      "rest": 63.6274895620939
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1806.8194921037207,
+       "per_position": 32.94726723471586
+      },
+      "making_calls": {
+       "fixed": 1063.58551979862,
+       "per_position": 3.6376124567764765
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 3081.8906934271095,
+     "states_per_inference_batch": 45.433098591549296,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 146.44497848717612,
+      "laying_out": 764.6279367511685,
+      "making_calls": 1067.1188236967641,
+      "collecting": 1044.1705915223458,
+      "rest": 59.52836296965473
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1559.3854767334644,
+       "per_position": 33.51092626063669
+      },
+      "making_calls": {
+       "fixed": 856.6351517249745,
+       "per_position": 4.632826694566242
+      }
+     }
+    }
+   ]
+  },
+  "64x2-m8-three": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 4724.1780940687095,
+    "states_per_inference_batch": 59.698113207547166,
+    "inference_batches": 106,
+    "steps_us": {
+     "reading": 194.3442356313649,
+     "laying_out": 951.5291126005633,
+     "making_calls": 2079.5726881226315,
+     "collecting": 1420.6341037829845,
+     "rest": 78.09795393116492
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 2274.63233724316,
+      "per_position": 41.03221400497919
+     },
+     "making_calls": {
+      "fixed": 1379.2312798912494,
+      "per_position": 11.731382628401786
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 5110.338518757347,
+     "states_per_inference_batch": 59.698113207547166,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 187.85400565972833,
+      "laying_out": 1009.2075568742454,
+      "making_calls": 2311.0969326258987,
+      "collecting": 1514.6395556446394,
+      "rest": 87.54046795283497
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2354.676252998027,
+       "per_position": 46.159955779154224
+      },
+      "making_calls": {
+       "fixed": 1453.318776414233,
+       "per_position": 14.368597433381254
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 4724.1780940687095,
+     "states_per_inference_batch": 59.698113207547166,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 194.3442356313649,
+      "laying_out": 951.5291126005633,
+      "making_calls": 2079.5726881226315,
+      "collecting": 1420.6341037829845,
+      "rest": 78.09795393116492
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2274.63233724316,
+       "per_position": 41.03221400497919
+      },
+      "making_calls": {
+       "fixed": 1379.2312798912494,
+       "per_position": 11.731382628401786
+      }
+     }
+    }
+   ]
+  },
+  "64x2-m8-one": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 3367.485810880646,
+    "states_per_inference_batch": 59.679245283018865,
+    "inference_batches": 106,
+    "steps_us": {
+     "reading": 200.94411304870727,
+     "laying_out": 975.8605006456216,
+     "making_calls": 979.8537446943744,
+     "collecting": 1139.4386983395307,
+     "rest": 71.3887541524117
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 1591.779752541237,
+      "per_position": 29.754164113812422
+     },
+     "making_calls": {
+      "fixed": 858.8258242454376,
+      "per_position": 2.0279733745790876
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 3378.1513866072273,
+     "states_per_inference_batch": 59.679245283018865,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 188.28146844412603,
+      "laying_out": 980.1748487659079,
+      "making_calls": 989.0969989289758,
+      "collecting": 1146.0475378147028,
+      "rest": 74.55053265351485
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1575.8151143934297,
+       "per_position": 30.20038647718346
+      },
+      "making_calls": {
+       "fixed": 842.7268096872842,
+       "per_position": 2.45261461581083
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 3367.485810880646,
+     "states_per_inference_batch": 59.679245283018865,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 200.94411304870727,
+      "laying_out": 975.8605006456216,
+      "making_calls": 979.8537446943744,
+      "collecting": 1139.4386983395307,
+      "rest": 71.3887541524117
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1591.779752541237,
+       "per_position": 29.754164113812422
+      },
+      "making_calls": {
+       "fixed": 858.8258242454376,
+       "per_position": 2.0279733745790876
+      }
+     }
+    }
+   ]
+  },
+  "64x2-m8-padded": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 5289.101018378169,
+    "states_per_inference_batch": 121.10377358490567,
+    "inference_batches": 106,
+    "steps_us": {
+     "reading": 380.07903997325076,
+     "laying_out": 1894.7806309816376,
+     "making_calls": 1056.1422821856984,
+     "collecting": 1811.6953023017454,
+     "rest": 146.40376293583648
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 1679.5753691860082,
+      "per_position": 29.80522854361369
+     },
+     "making_calls": {
+      "fixed": 907.1216737122446,
+      "per_position": 1.2305199422128281
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 5289.101018378169,
+     "states_per_inference_batch": 121.10377358490567,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 380.07903997325076,
+      "laying_out": 1894.7806309816376,
+      "making_calls": 1056.1422821856984,
+      "collecting": 1811.6953023017454,
+      "rest": 146.40376293583648
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1679.5753691860082,
+       "per_position": 29.80522854361369
+      },
+      "making_calls": {
+       "fixed": 907.1216737122446,
+       "per_position": 1.2305199422128281
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 5315.651717092755,
+     "states_per_inference_batch": 121.10377358490567,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 386.14565353370534,
+      "laying_out": 1889.2043484605515,
+      "making_calls": 1072.937480991109,
+      "collecting": 1812.2173388069057,
+      "rest": 155.14689530048273
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1667.8423928373236,
+       "per_position": 30.121351434998484
+      },
+      "making_calls": {
+       "fixed": 934.9154654468176,
+       "per_position": 1.1397003698445787
+      }
+     }
+    }
+   ]
+  },
+  "64x2-m16-three": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 6432.432319720732,
+    "states_per_inference_batch": 119.39622641509433,
+    "inference_batches": 53,
+    "steps_us": {
+     "reading": 391.3100322879815,
+     "laying_out": 1855.735056967703,
+     "making_calls": 2003.7067173826422,
+     "collecting": 2026.1146611411052,
+     "rest": 155.56585194130056
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 2470.2241999620346,
+      "per_position": 33.185371420229295
+     },
+     "making_calls": {
+      "fixed": 1492.179651039016,
+      "per_position": 4.284281687138459
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 6969.644565339516,
+     "states_per_inference_batch": 119.39622641509433,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 387.82488730437353,
+      "laying_out": 1953.7901315280185,
+      "making_calls": 2275.8411700433157,
+      "collecting": 2147.4780767435595,
+      "rest": 204.71029972024965
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 3052.4331644332406,
+       "per_position": 32.808502567641064
+      },
+      "making_calls": {
+       "fixed": 1936.1156092728586,
+       "per_position": 2.845362629714638
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 6432.432319720732,
+     "states_per_inference_batch": 119.39622641509433,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 391.3100322879815,
+      "laying_out": 1855.735056967703,
+      "making_calls": 2003.7067173826422,
+      "collecting": 2026.1146611411052,
+      "rest": 155.56585194130056
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2470.2241999620346,
+       "per_position": 33.185371420229295
+      },
+      "making_calls": {
+       "fixed": 1492.179651039016,
+       "per_position": 4.284281687138459
+      }
+     }
+    }
+   ]
+  },
+  "64x2-m16-one": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 5262.27992531,
+    "states_per_inference_batch": 119.35849056603773,
+    "inference_batches": 53,
+    "steps_us": {
+     "reading": 374.9073432530013,
+     "laying_out": 1852.613998706593,
+     "making_calls": 1103.1100936102207,
+     "collecting": 1779.1273567127064,
+     "rest": 152.52113302747875
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 1854.4063414147427,
+      "per_position": 28.551580769277372
+     },
+     "making_calls": {
+      "fixed": 1014.8512408982799,
+      "per_position": 0.7394434387816727
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 5299.959981644895,
+     "states_per_inference_batch": 119.35849056603773,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 376.43839995034114,
+      "laying_out": 1889.1478111123984,
+      "making_calls": 1133.4591317276102,
+      "collecting": 1750.7217167151812,
+      "rest": 150.1929221393646
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1790.2840122236157,
+       "per_position": 29.404493578774556
+      },
+      "making_calls": {
+       "fixed": 995.9283016803504,
+       "per_position": 1.1522500778540572
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 5262.27992531,
+     "states_per_inference_batch": 119.35849056603773,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 374.9073432530013,
+      "laying_out": 1852.613998706593,
+      "making_calls": 1103.1100936102207,
+      "collecting": 1779.1273567127064,
+      "rest": 152.52113302747875
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1854.4063414147427,
+       "per_position": 28.551580769277372
+      },
+      "making_calls": {
+       "fixed": 1014.8512408982799,
+       "per_position": 0.7394434387816727
+      }
+     }
+    }
+   ]
+  },
+  "64x2-m16-padded": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 9131.4505105333,
+    "states_per_inference_batch": 238.18867924528303,
+    "inference_batches": 53,
+    "steps_us": {
+     "reading": 748.9265144785059,
+     "laying_out": 3712.6981514343497,
+     "making_calls": 1283.4859064138793,
+     "collecting": 3074.4850189635918,
+     "rest": 311.8549192429714
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 1544.18205896598,
+      "per_position": 31.854026293810822
+     },
+     "making_calls": {
+      "fixed": 978.3750743411373,
+      "per_position": 1.280962777238223
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 10090.911999522743,
+     "states_per_inference_batch": 238.18867924528303,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 810.2974386002763,
+      "laying_out": 4200.608547796706,
+      "making_calls": 1454.5652822630902,
+      "collecting": 3227.943433712254,
+      "rest": 397.4972971504168
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1411.8554911292613,
+       "per_position": 36.43773724214627
+      },
+      "making_calls": {
+       "fixed": 927.4663987145758,
+       "per_position": 2.212946833655835
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 9131.4505105333,
+     "states_per_inference_batch": 238.18867924528303,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 748.9265144785059,
+      "laying_out": 3712.6981514343497,
+      "making_calls": 1283.4859064138793,
+      "collecting": 3074.4850189635918,
+      "rest": 311.8549192429714
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 1544.18205896598,
+       "per_position": 31.854026293810822
+      },
+      "making_calls": {
+       "fixed": 978.3750743411373,
+       "per_position": 1.280962777238223
+      }
+     }
+    }
+   ]
+  },
+  "256x8-m1-three": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 5842.964703527589,
+    "states_per_inference_batch": 9.126666666666667,
+    "inference_batches": 300,
+    "steps_us": {
+     "reading": 30.26633508852683,
+     "laying_out": 210.5421930415711,
+     "making_calls": 3106.6919228760526,
+     "collecting": 2473.687772532382,
+     "rest": 21.776479989057407
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 2775.655343899906,
+      "per_position": 336.0821066063934
+     },
+     "making_calls": {
+      "fixed": 1670.332074748943,
+      "per_position": 157.3805531183831
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 6483.200810568329,
+     "states_per_inference_batch": 9.126666666666667,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 32.14672290293189,
+      "laying_out": 210.55625674004358,
+      "making_calls": 3607.37995695672,
+      "collecting": 2609.5081895861463,
+      "rest": 23.60968438248771
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 3438.023369194861,
+       "per_position": 333.6571338247044
+      },
+      "making_calls": {
+       "fixed": 2224.8924567331233,
+       "per_position": 151.47781229623047
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 5842.964703527589,
+     "states_per_inference_batch": 9.126666666666667,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 30.26633508852683,
+      "laying_out": 210.5421930415711,
+      "making_calls": 3106.6919228760526,
+      "collecting": 2473.687772532382,
+      "rest": 21.776479989057407
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2775.655343899906,
+       "per_position": 336.0821066063934
+      },
+      "making_calls": {
+       "fixed": 1670.332074748943,
+       "per_position": 157.3805531183831
+      }
+     }
+    }
+   ]
+  },
+  "256x8-m1-one": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 3614.7340504006324,
+    "states_per_inference_batch": 9.12,
+    "inference_batches": 300,
+    "steps_us": {
+     "reading": 31.24292862291137,
+     "laying_out": 230.73059011949226,
+     "making_calls": 1686.7271102091763,
+     "collecting": 1641.1186364227128,
+     "rest": 24.914785026339814
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 2810.5504964054485,
+      "per_position": 88.17802127140179
+     },
+     "making_calls": {
+      "fixed": 1683.2225947970953,
+      "per_position": 0.38426704079834983
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 3656.339576652196,
+     "states_per_inference_batch": 9.12,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 30.055934669993196,
+      "laying_out": 205.21345655045783,
+      "making_calls": 1729.124292905908,
+      "collecting": 1671.7672202018243,
+      "rest": 20.178672324012343
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2884.0045148688687,
+       "per_position": 84.68586203764549
+      },
+      "making_calls": {
+       "fixed": 1739.463866484645,
+       "per_position": -1.133725173107108
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 3614.7340504006324,
+     "states_per_inference_batch": 9.12,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 31.24292862291137,
+      "laying_out": 230.73059011949226,
+      "making_calls": 1686.7271102091763,
+      "collecting": 1641.1186364227128,
+      "rest": 24.914785026339814
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2810.5504964054485,
+       "per_position": 88.17802127140179
+      },
+      "making_calls": {
+       "fixed": 1683.2225947970953,
+       "per_position": 0.38426704079834983
+      }
+     }
+    }
+   ]
+  },
+  "256x8-m1-padded": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 4609.871229816539,
+    "states_per_inference_batch": 19.8,
+    "inference_batches": 300,
+    "steps_us": {
+     "reading": 63.64848484129955,
+     "laying_out": 393.4344768640585,
+     "making_calls": 1646.3462862884626,
+     "collecting": 2474.887236652042,
+     "rest": 31.55474517067584
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 2642.3181067883315,
+      "per_position": 99.37136984990944
+     },
+     "making_calls": {
+      "fixed": 1643.2270321453943,
+      "per_position": 0.15753808803374864
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 4793.459616921609,
+     "states_per_inference_batch": 19.8,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 65.57882254128344,
+      "laying_out": 384.6710139381078,
+      "making_calls": 1835.1094392225302,
+      "collecting": 2475.9064266982023,
+      "rest": 32.19391452148557
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2776.767503542198,
+       "per_position": 101.85313703936419
+      },
+      "making_calls": {
+       "fixed": 1785.8507055009945,
+       "per_position": 2.4878148344209996
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 4609.871229816539,
+     "states_per_inference_batch": 19.8,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 63.64848484129955,
+      "laying_out": 393.4344768640585,
+      "making_calls": 1646.3462862884626,
+      "collecting": 2474.887236652042,
+      "rest": 31.55474517067584
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2642.3181067883315,
+       "per_position": 99.37136984990944
+      },
+      "making_calls": {
+       "fixed": 1643.2270321453943,
+       "per_position": 0.15753808803374864
+      }
+     }
+    }
+   ]
+  },
+  "256x8-m3-three": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 7531.757440670512,
+    "states_per_inference_batch": 22.295774647887324,
+    "inference_batches": 284,
+    "steps_us": {
+     "reading": 73.76704699299167,
+     "laying_out": 429.25471156912624,
+     "making_calls": 3296.714151000627,
+     "collecting": 3692.9748833206527,
+     "rest": 39.04664778711379
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 3341.740409076723,
+      "per_position": 187.92874873225458
+     },
+     "making_calls": {
+      "fixed": 2026.2509152271673,
+      "per_position": 56.982242413086304
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 7797.56934827392,
+     "states_per_inference_batch": 22.295774647887324,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 74.38947099037992,
+      "laying_out": 436.723165094777,
+      "making_calls": 3454.9066263089503,
+      "collecting": 3792.8437145958114,
+      "rest": 38.70637128400144
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 3656.1272402142167,
+       "per_position": 185.75008823262093
+      },
+      "making_calls": {
+       "fixed": 2303.6921703935186,
+       "per_position": 51.63375007580268
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 7531.757440670512,
+     "states_per_inference_batch": 22.295774647887324,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 73.76704699299167,
+      "laying_out": 429.25471156912624,
+      "making_calls": 3296.714151000627,
+      "collecting": 3692.9748833206527,
+      "rest": 39.04664778711379
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 3341.740409076723,
+       "per_position": 187.92874873225458
+      },
+      "making_calls": {
+       "fixed": 2026.2509152271673,
+       "per_position": 56.982242413086304
+      }
+     }
+    }
+   ]
+  },
+  "256x8-m3-one": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 4958.454651758485,
+    "states_per_inference_batch": 22.288732394366196,
+    "inference_batches": 284,
+    "steps_us": {
+     "reading": 73.01267493896606,
+     "laying_out": 417.058549277832,
+     "making_calls": 1692.010105229278,
+     "collecting": 2744.678433065903,
+     "rest": 31.694889246505802
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 2665.709314932519,
+      "per_position": 102.86566756059625
+     },
+     "making_calls": {
+      "fixed": 1571.742195201349,
+      "per_position": 5.395906231900762
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 4958.454651758485,
+     "states_per_inference_batch": 22.288732394366196,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 73.01267493896606,
+      "laying_out": 417.058549277832,
+      "making_calls": 1692.010105229278,
+      "collecting": 2744.678433065903,
+      "rest": 31.694889246505802
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2665.709314932519,
+       "per_position": 102.86566756059625
+      },
+      "making_calls": {
+       "fixed": 1571.742195201349,
+       "per_position": 5.395906231900762
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 5229.940936772782,
+     "states_per_inference_batch": 22.288732394366196,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 71.99132263670268,
+      "laying_out": 420.8329226227287,
+      "making_calls": 1965.944986039458,
+      "collecting": 2736.4760708095814,
+      "rest": 34.69563466431179
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2942.0775324160963,
+       "per_position": 102.64663615123204
+      },
+      "making_calls": {
+       "fixed": 1844.8229904776156,
+       "per_position": 5.434225393295917
+      }
+     }
+    }
+   ]
+  },
+  "256x8-m3-padded": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 7682.439845051653,
+    "states_per_inference_batch": 45.433098591549296,
+    "inference_batches": 284,
+    "steps_us": {
+     "reading": 144.91348661003556,
+     "laying_out": 782.4165349261357,
+     "making_calls": 2019.7826475774032,
+     "collecting": 4671.140950731441,
+     "rest": 64.18622520663709
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 3034.807843023773,
+      "per_position": 102.29617054761822
+     },
+     "making_calls": {
+      "fixed": 1992.119710984273,
+      "per_position": 0.6088718896728579
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 7682.439845051653,
+     "states_per_inference_batch": 45.433098591549296,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 144.91348661003556,
+      "laying_out": 782.4165349261357,
+      "making_calls": 2019.7826475774032,
+      "collecting": 4671.140950731441,
+      "rest": 64.18622520663709
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 3034.807843023773,
+       "per_position": 102.29617054761822
+      },
+      "making_calls": {
+       "fixed": 1992.119710984273,
+       "per_position": 0.6088718896728579
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 7874.445112923843,
+     "states_per_inference_batch": 45.433098591549296,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 142.37382718317645,
+      "laying_out": 799.727113087396,
+      "making_calls": 2178.2627357514316,
+      "collecting": 4688.9361661336625,
+      "rest": 65.14527076817589
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 3802.3771359043185,
+       "per_position": 89.62778466043127
+      },
+      "making_calls": {
+       "fixed": 2711.543083674823,
+       "per_position": -11.737705867646536
+      }
+     }
+    }
+   ]
+  },
+  "256x8-m8-three": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 12045.57272614933,
+    "states_per_inference_batch": 59.698113207547166,
+    "inference_batches": 106,
+    "steps_us": {
+     "reading": 193.09910141669636,
+     "laying_out": 991.0035182399024,
+     "making_calls": 3559.635142149966,
+     "collecting": 7216.195803369563,
+     "rest": 85.63916097320441
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 3544.040987743014,
+      "per_position": 142.40871748910712
+     },
+     "making_calls": {
+      "fixed": 2272.940235390036,
+      "per_position": 21.553359689720708
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 12045.57272614933,
+     "states_per_inference_batch": 59.698113207547166,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 193.09910141669636,
+      "laying_out": 991.0035182399024,
+      "making_calls": 3559.635142149966,
+      "collecting": 7216.195803369563,
+      "rest": 85.63916097320441
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 3544.040987743014,
+       "per_position": 142.40871748910712
+      },
+      "making_calls": {
+       "fixed": 2272.940235390036,
+       "per_position": 21.553359689720708
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 12335.183528331021,
+     "states_per_inference_batch": 59.698113207547166,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 190.384970030106,
+      "laying_out": 997.4295756382041,
+      "making_calls": 3743.286971892406,
+      "collecting": 7299.196517604561,
+      "rest": 104.8854931657431
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 3969.5919075773927,
+       "per_position": 140.13159162450768
+      },
+      "making_calls": {
+       "fixed": 2532.5445545988723,
+       "per_position": 20.281083475523786
+      }
+     }
+    }
+   ]
+  },
+  "256x8-m8-one": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 8800.763376952227,
+    "states_per_inference_batch": 59.679245283018865,
+    "inference_batches": 106,
+    "steps_us": {
+     "reading": 196.75206498985335,
+     "laying_out": 977.2790759804062,
+     "making_calls": 1634.8439809385213,
+     "collecting": 5900.125782816003,
+     "rest": 91.7624722274442
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 2572.5168869364625,
+      "per_position": 104.36201832780131
+     },
+     "making_calls": {
+      "fixed": 1504.4521484659233,
+      "per_position": 2.184877369917072
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 8907.839715868491,
+     "states_per_inference_batch": 59.679245283018865,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 191.71997042096064,
+      "laying_out": 1045.933934499703,
+      "making_calls": 1692.6132080217667,
+      "collecting": 5896.685538453244,
+      "rest": 80.8870644728161
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2730.9866027328926,
+       "per_position": 103.50085836110864
+      },
+      "making_calls": {
+       "fixed": 1635.7959426352304,
+       "per_position": 0.9520439663251395
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 8800.763376952227,
+     "states_per_inference_batch": 59.679245283018865,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 196.75206498985335,
+      "laying_out": 977.2790759804062,
+      "making_calls": 1634.8439809385213,
+      "collecting": 5900.125782816003,
+      "rest": 91.7624722274442
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2572.5168869364625,
+       "per_position": 104.36201832780131
+      },
+      "making_calls": {
+       "fixed": 1504.4521484659233,
+       "per_position": 2.184877369917072
+      }
+     }
+    }
+   ]
+  },
+  "256x8-m8-padded": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 15438.16040574248,
+    "states_per_inference_batch": 121.10377358490567,
+    "inference_batches": 106,
+    "steps_us": {
+     "reading": 380.9763652927084,
+     "laying_out": 1901.7153774840615,
+     "making_calls": 1772.2157266140337,
+     "collecting": 11233.020499584765,
+     "rest": 150.23243676690944
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 2587.3772028856365,
+      "per_position": 106.11381315749982
+     },
+     "making_calls": {
+      "fixed": 1535.9174772888985,
+      "per_position": 1.9512046762066158
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 15498.433245224043,
+     "states_per_inference_batch": 121.10377358490567,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 380.48579826520506,
+      "laying_out": 1910.9464807321651,
+      "making_calls": 1816.840462369036,
+      "collecting": 11242.708320732729,
+      "rest": 147.452183124908
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2486.957387414952,
+       "per_position": 107.44071363463142
+      },
+      "making_calls": {
+       "fixed": 1539.5399263642728,
+       "per_position": 2.2897761795205183
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 15438.16040574248,
+     "states_per_inference_batch": 121.10377358490567,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 380.9763652927084,
+      "laying_out": 1901.7153774840615,
+      "making_calls": 1772.2157266140337,
+      "collecting": 11233.020499584765,
+      "rest": 150.23243676690944
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2587.3772028856365,
+       "per_position": 106.11381315749982
+      },
+      "making_calls": {
+       "fixed": 1535.9174772888985,
+       "per_position": 1.9512046762066158
+      }
+     }
+    }
+   ]
+  },
+  "256x8-m16-three": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 18448.798036980355,
+    "states_per_inference_batch": 119.39622641509433,
+    "inference_batches": 53,
+    "steps_us": {
+     "reading": 382.5165103475194,
+     "laying_out": 1861.1815854147042,
+     "making_calls": 3520.046415429053,
+     "collecting": 12476.470187978537,
+     "rest": 208.58333781054066
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 4271.341123039381,
+      "per_position": 118.74292295178124
+     },
+     "making_calls": {
+      "fixed": 2780.3503798603424,
+      "per_position": 6.1953049755280745
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 18448.798036980355,
+     "states_per_inference_batch": 119.39622641509433,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 382.5165103475194,
+      "laying_out": 1861.1815854147042,
+      "making_calls": 3520.046415429053,
+      "collecting": 12476.470187978537,
+      "rest": 208.58333781054066
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4271.341123039381,
+       "per_position": 118.74292295178124
+      },
+      "making_calls": {
+       "fixed": 2780.3503798603424,
+       "per_position": 6.1953049755280745
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 18610.699661021157,
+     "states_per_inference_batch": 119.39622641509433,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 381.408819109465,
+      "laying_out": 1887.1045486896105,
+      "making_calls": 3603.275150899723,
+      "collecting": 12564.585621870685,
+      "rest": 174.32552045167267
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4521.697661145017,
+       "per_position": 118.00207111147843
+      },
+      "making_calls": {
+       "fixed": 2833.518767013581,
+       "per_position": 6.447074643799859
+      }
+     }
+    }
+   ]
+  },
+  "256x8-m16-one": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 15290.661093082614,
+    "states_per_inference_batch": 119.35849056603773,
+    "inference_batches": 53,
+    "steps_us": {
+     "reading": 381.20607935542347,
+     "laying_out": 1886.7083222776616,
+     "making_calls": 1951.9796025530734,
+     "collecting": 10912.909566749871,
+     "rest": 157.85752214658302
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 2808.0542949383034,
+      "per_position": 104.58080308277718
+     },
+     "making_calls": {
+      "fixed": 1732.2257436975754,
+      "per_position": 1.8411246473824534
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 15290.661093082614,
+     "states_per_inference_batch": 119.35849056603773,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 381.20607935542347,
+      "laying_out": 1886.7083222776616,
+      "making_calls": 1951.9796025530734,
+      "collecting": 10912.909566749871,
+      "rest": 157.85752214658302
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2808.0542949383034,
+       "per_position": 104.58080308277718
+      },
+      "making_calls": {
+       "fixed": 1732.2257436975754,
+       "per_position": 1.8411246473824534
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 15340.649339431931,
+     "states_per_inference_batch": 119.35849056603773,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 386.400850333783,
+      "laying_out": 1940.7712078525878,
+      "making_calls": 1887.1926231955547,
+      "collecting": 10926.435471464054,
+      "rest": 199.8491865859525
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2575.756701082004,
+       "per_position": 106.94582830106643
+      },
+      "making_calls": {
+       "fixed": 1670.6104908169732,
+       "per_position": 1.8145515358939015
+      }
+     }
+    }
+   ]
+  },
+  "256x8-m16-padded": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 28797.316093674315,
+    "states_per_inference_batch": 238.18867924528303,
+    "inference_batches": 53,
+    "steps_us": {
+     "reading": 745.9602520783556,
+     "laying_out": 3839.699716750919,
+     "making_calls": 2130.3285847918814,
+     "collecting": 21762.816849898303,
+     "rest": 318.51069015485916
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 2488.3182141928664,
+      "per_position": 110.4544429350853
+     },
+     "making_calls": {
+      "fixed": 1708.2595975011102,
+      "per_position": 1.7719943224343215
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 28797.316093674315,
+     "states_per_inference_batch": 238.18867924528303,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 745.9602520783556,
+      "laying_out": 3839.699716750919,
+      "making_calls": 2130.3285847918814,
+      "collecting": 21762.816849898303,
+      "rest": 318.51069015485916
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2488.3182141928664,
+       "per_position": 110.4544429350853
+      },
+      "making_calls": {
+       "fixed": 1708.2595975011102,
+       "per_position": 1.7719943224343215
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 29114.984263356262,
+     "states_per_inference_batch": 238.18867924528303,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 755.6453341714827,
+      "laying_out": 4040.4378856040257,
+      "making_calls": 2211.2758880160436,
+      "collecting": 21763.057378230547,
+      "rest": 344.5677773341677
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 2670.5212154075307,
+       "per_position": 111.02317344275055
+      },
+      "making_calls": {
+       "fixed": 1915.6653524869923,
+       "per_position": 1.24107718496829
+      }
+     }
+    }
+   ]
+  },
+  "512x16-m1-three": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 11905.621840123786,
+    "states_per_inference_batch": 9.126666666666667,
+    "inference_batches": 300,
+    "steps_us": {
+     "reading": 31.161401566350833,
+     "laying_out": 234.03295325503373,
+     "making_calls": 4816.852373526975,
+     "collecting": 6793.37943312324,
+     "rest": 30.195678652186565
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 4925.64547090753,
+      "per_position": 764.7892296438556
+     },
+     "making_calls": {
+      "fixed": 2902.1102058945357,
+      "per_position": 209.79643911239285
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 11905.621840123786,
+     "states_per_inference_batch": 9.126666666666667,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 31.161401566350833,
+      "laying_out": 234.03295325503373,
+      "making_calls": 4816.852373526975,
+      "collecting": 6793.37943312324,
+      "rest": 30.195678652186565
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4925.64547090753,
+       "per_position": 764.7892296438556
+      },
+      "making_calls": {
+       "fixed": 2902.1102058945357,
+       "per_position": 209.79643911239285
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 12227.696697033633,
+     "states_per_inference_batch": 9.126666666666667,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 29.86588112738294,
+      "laying_out": 280.5684835281378,
+      "making_calls": 5024.370546986272,
+      "collecting": 6852.79621980347,
+      "rest": 40.09556558836872
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 5186.359232226816,
+       "per_position": 771.5125052746693
+      },
+      "making_calls": {
+       "fixed": 3061.2122437914577,
+       "per_position": 215.10134804910302
+      }
+     }
+    }
+   ]
+  },
+  "512x16-m1-one": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 7726.522913144436,
+    "states_per_inference_batch": 9.12,
+    "inference_batches": 300,
+    "steps_us": {
+     "reading": 30.889771151123572,
+     "laying_out": 239.11652591777965,
+     "making_calls": 2736.9857106532436,
+     "collecting": 4680.723193450831,
+     "rest": 38.80771197145805
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 4666.016781661955,
+      "per_position": 335.58181266255275
+     },
+     "making_calls": {
+      "fixed": 2810.7195651060993,
+      "per_position": -8.084852461935913
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 7899.112489394612,
+     "states_per_inference_batch": 9.12,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 31.6228475033616,
+      "laying_out": 276.9747535542895,
+      "making_calls": 2842.2445833469587,
+      "collecting": 4712.944762432016,
+      "rest": 35.32554255798459
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4515.680923523166,
+       "per_position": 370.99030327537776
+      },
+      "making_calls": {
+       "fixed": 2789.641272433814,
+       "per_position": 5.7679068983711375
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 7726.522913144436,
+     "states_per_inference_batch": 9.12,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 30.889771151123572,
+      "laying_out": 239.11652591777965,
+      "making_calls": 2736.9857106532436,
+      "collecting": 4680.723193450831,
+      "rest": 38.80771197145805
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4666.016781661955,
+       "per_position": 335.58181266255275
+      },
+      "making_calls": {
+       "fixed": 2810.7195651060993,
+       "per_position": -8.084852461935913
+      }
+     }
+    }
+   ]
+  },
+  "512x16-m1-padded": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 12115.150116636263,
+    "states_per_inference_batch": 19.8,
+    "inference_batches": 300,
+    "steps_us": {
+     "reading": 65.47245463783231,
+     "laying_out": 368.94180385085446,
+     "making_calls": 2868.89428331051,
+     "collecting": 8778.213693779739,
+     "rest": 33.62788105732761
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 4286.665298358416,
+      "per_position": 395.3780211251438
+     },
+     "making_calls": {
+      "fixed": 2824.7960391306224,
+      "per_position": 2.2271840494892836
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 12296.487093553878,
+     "states_per_inference_batch": 19.8,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 64.91637051415941,
+      "laying_out": 404.9009732261766,
+      "making_calls": 2988.8589829109455,
+      "collecting": 8802.094293302313,
+      "rest": 35.716473600283884
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4382.338901631138,
+       "per_position": 399.70445413751213
+      },
+      "making_calls": {
+       "fixed": 2876.3935368212037,
+       "per_position": 5.680073034835451
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 12115.150116636263,
+     "states_per_inference_batch": 19.8,
+     "inference_batches": 300,
+     "steps_us": {
+      "reading": 65.47245463783231,
+      "laying_out": 368.94180385085446,
+      "making_calls": 2868.89428331051,
+      "collecting": 8778.213693779739,
+      "rest": 33.62788105732761
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4286.665298358416,
+       "per_position": 395.3780211251438
+      },
+      "making_calls": {
+       "fixed": 2824.7960391306224,
+       "per_position": 2.2271840494892836
+      }
+     }
+    }
+   ]
+  },
+  "512x16-m3-three": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 18440.409647462755,
+    "states_per_inference_batch": 22.295774647887324,
+    "inference_batches": 284,
+    "steps_us": {
+     "reading": 71.68560698349684,
+     "laying_out": 491.72210226099423,
+     "making_calls": 5471.198781660732,
+     "collecting": 12363.662865616687,
+     "rest": 42.14029094084612
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 6220.97113251002,
+      "per_position": 548.0607293503754
+     },
+     "making_calls": {
+      "fixed": 3697.8050624894245,
+      "per_position": 79.53945297609779
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 18440.409647462755,
+     "states_per_inference_batch": 22.295774647887324,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 71.68560698349684,
+      "laying_out": 491.72210226099423,
+      "making_calls": 5471.198781660732,
+      "collecting": 12363.662865616687,
+      "rest": 42.14029094084612
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 6220.97113251002,
+       "per_position": 548.0607293503754
+      },
+      "making_calls": {
+       "fixed": 3697.8050624894245,
+       "per_position": 79.53945297609779
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 18524.575415655603,
+     "states_per_inference_batch": 22.295774647887324,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 74.43810420842107,
+      "laying_out": 497.87030960506974,
+      "making_calls": 5624.836394007884,
+      "collecting": 12276.416806164721,
+      "rest": 51.013801669501895
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 6575.788755039694,
+       "per_position": 535.9215747970495
+      },
+      "making_calls": {
+       "fixed": 4024.985652827755,
+       "per_position": 71.7557818217241
+      }
+     }
+    }
+   ]
+  },
+  "512x16-m3-one": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 13098.900964880004,
+    "states_per_inference_batch": 22.288732394366196,
+    "inference_batches": 284,
+    "steps_us": {
+     "reading": 72.49359485183344,
+     "laying_out": 454.47772198469823,
+     "making_calls": 2823.971960821491,
+     "collecting": 9705.923549582098,
+     "rest": 42.03413763988606
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 4391.598511973334,
+      "per_position": 390.65938335315866
+     },
+     "making_calls": {
+      "fixed": 2601.1492063286173,
+      "per_position": 9.997103045177877
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 13489.679457897706,
+     "states_per_inference_batch": 22.288732394366196,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 71.55636788885319,
+      "laying_out": 681.6781019487805,
+      "making_calls": 2956.4871970059116,
+      "collecting": 9730.650245818279,
+      "rest": 49.30754523588226
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4626.346693442101,
+       "per_position": 397.6597954352911
+      },
+      "making_calls": {
+       "fixed": 2833.0611155388287,
+       "per_position": 5.537599863610025
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 13098.900964880004,
+     "states_per_inference_batch": 22.288732394366196,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 72.49359485183344,
+      "laying_out": 454.47772198469823,
+      "making_calls": 2823.971960821491,
+      "collecting": 9705.923549582098,
+      "rest": 42.03413763988606
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4391.598511973334,
+       "per_position": 390.65938335315866
+      },
+      "making_calls": {
+       "fixed": 2601.1492063286173,
+       "per_position": 9.997103045177877
+      }
+     }
+    }
+   ]
+  },
+  "512x16-m3-padded": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 22344.36212298969,
+    "states_per_inference_batch": 45.433098591549296,
+    "inference_batches": 284,
+    "steps_us": {
+     "reading": 145.74458512303772,
+     "laying_out": 938.6568416515038,
+     "making_calls": 3199.7567365719924,
+     "collecting": 17959.409933071995,
+     "rest": 100.79402657115871
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 4378.858911486768,
+      "per_position": 395.4276456689784
+     },
+     "making_calls": {
+      "fixed": 2792.9977853057667,
+      "per_position": 8.952921193490512
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 22720.836387083516,
+     "states_per_inference_batch": 45.433098591549296,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 150.39312127325027,
+      "laying_out": 935.5752603446042,
+      "making_calls": 3486.2791509228155,
+      "collecting": 18055.08008415722,
+      "rest": 93.50877038562263
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4760.1204343594945,
+       "per_position": 395.3222762592902
+      },
+      "making_calls": {
+       "fixed": 3115.093202740777,
+       "per_position": 8.169945693536302
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 22344.36212298969,
+     "states_per_inference_batch": 45.433098591549296,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 145.74458512303772,
+      "laying_out": 938.6568416515038,
+      "making_calls": 3199.7567365719924,
+      "collecting": 17959.409933071995,
+      "rest": 100.79402657115871
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4378.858911486768,
+       "per_position": 395.4276456689784
+      },
+      "making_calls": {
+       "fixed": 2792.9977853057667,
+       "per_position": 8.952921193490512
+      }
+     }
+    }
+   ]
+  },
+  "512x16-m8-three": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 34746.54481191087,
+    "states_per_inference_batch": 59.698113207547166,
+    "inference_batches": 106,
+    "steps_us": {
+     "reading": 190.91769175951035,
+     "laying_out": 991.0445185356228,
+     "making_calls": 6151.736244989805,
+     "collecting": 27321.29400815125,
+     "rest": 91.552348474682
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 6784.253920286799,
+      "per_position": 468.39488535274205
+     },
+     "making_calls": {
+      "fixed": 4047.4242000640966,
+      "per_position": 35.24922199148626
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 34746.54481191087,
+     "states_per_inference_batch": 59.698113207547166,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 190.91769175951035,
+      "laying_out": 991.0445185356228,
+      "making_calls": 6151.736244989805,
+      "collecting": 27321.29400815125,
+      "rest": 91.552348474682
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 6784.253920286799,
+       "per_position": 468.39488535274205
+      },
+      "making_calls": {
+       "fixed": 4047.4242000640966,
+       "per_position": 35.24922199148626
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 35329.663131428875,
+     "states_per_inference_batch": 59.698113207547166,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 191.45753047371917,
+      "laying_out": 1042.098311305415,
+      "making_calls": 6597.893055855683,
+      "collecting": 27399.480348081714,
+      "rest": 98.73388571234175
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 7836.024156930027,
+       "per_position": 460.5445213806697
+      },
+      "making_calls": {
+       "fixed": 5084.269334898125,
+       "per_position": 25.35463249391612
+      }
+     }
+    }
+   ]
+  },
+  "512x16-m8-one": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 27576.134019566456,
+    "states_per_inference_batch": 59.679245283018865,
+    "inference_batches": 106,
+    "steps_us": {
+     "reading": 198.90986279175914,
+     "laying_out": 1151.5978671322612,
+     "making_calls": 2846.8691500920786,
+     "collecting": 23256.32783006613,
+     "rest": 122.42930948422378
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 4144.191994086028,
+      "per_position": 392.6313396618598
+     },
+     "making_calls": {
+      "fixed": 2526.762757237342,
+      "per_position": 5.363780847708199
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 27576.134019566456,
+     "states_per_inference_batch": 59.679245283018865,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 198.90986279175914,
+      "laying_out": 1151.5978671322612,
+      "making_calls": 2846.8691500920786,
+      "collecting": 23256.32783006613,
+      "rest": 122.42930948422378
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4144.191994086028,
+       "per_position": 392.6313396618598
+      },
+      "making_calls": {
+       "fixed": 2526.762757237342,
+       "per_position": 5.363780847708199
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 27611.136368095857,
+     "states_per_inference_batch": 59.679245283018865,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 193.87215969508583,
+      "laying_out": 1170.7853869357111,
+      "making_calls": 2870.909113383123,
+      "collecting": 23258.235763383913,
+      "rest": 117.33394469802249
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4226.161583985613,
+       "per_position": 391.8443451020686
+      },
+      "making_calls": {
+       "fixed": 2539.833836907176,
+       "per_position": 5.547578138863467
+      }
+     }
+    }
+   ]
+  },
+  "512x16-m8-padded": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 52576.36349991992,
+    "states_per_inference_batch": 121.10377358490567,
+    "inference_batches": 106,
+    "steps_us": {
+     "reading": 390.30344473672506,
+     "laying_out": 1930.4489436557183,
+     "making_calls": 2887.2791126388,
+     "collecting": 47201.24925452698,
+     "rest": 167.08274436170095
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 3772.814810550364,
+      "per_position": 402.98949607175916
+     },
+     "making_calls": {
+      "fixed": 2498.8815877953343,
+      "per_position": 3.2071463452058393
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 52789.289349298,
+     "states_per_inference_batch": 121.10377358490567,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 385.16909207485367,
+      "laying_out": 2064.1760762236167,
+      "making_calls": 3037.2770840053904,
+      "collecting": 47095.318791898026,
+      "rest": 207.34830509612055
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 3997.169107520036,
+       "per_position": 402.8951270256652
+      },
+      "making_calls": {
+       "fixed": 2583.727640810957,
+       "per_position": 3.745130558433432
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 52576.36349991992,
+     "states_per_inference_batch": 121.10377358490567,
+     "inference_batches": 106,
+     "steps_us": {
+      "reading": 390.30344473672506,
+      "laying_out": 1930.4489436557183,
+      "making_calls": 2887.2791126388,
+      "collecting": 47201.24925452698,
+      "rest": 167.08274436170095
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 3772.814810550364,
+       "per_position": 402.98949607175916
+      },
+      "making_calls": {
+       "fixed": 2498.8815877953343,
+       "per_position": 3.2071463452058393
+      }
+     }
+    }
+   ]
+  },
+  "512x16-m16-three": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 61762.13679405781,
+    "states_per_inference_batch": 119.39622641509433,
+    "inference_batches": 53,
+    "steps_us": {
+     "reading": 384.0437036486483,
+     "laying_out": 2148.069131335261,
+     "making_calls": 6806.7059624843505,
+     "collecting": 52174.93081054615,
+     "rest": 248.38718604340374
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 8271.767780465809,
+      "per_position": 448.00719938691157
+     },
+     "making_calls": {
+      "fixed": 5984.445205182894,
+      "per_position": 6.886823662607021
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 61943.81845317658,
+     "states_per_inference_batch": 119.39622641509433,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 386.0697736700048,
+      "laying_out": 2115.5149616050658,
+      "making_calls": 7351.953585144519,
+      "collecting": 51844.657302113636,
+      "rest": 245.62283064335372
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 8024.295818552644,
+       "per_position": 451.6015644176784
+      },
+      "making_calls": {
+       "fixed": 5128.93703789186,
+       "per_position": 18.618817478569994
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 61762.13679405781,
+     "states_per_inference_batch": 119.39622641509433,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 384.0437036486483,
+      "laying_out": 2148.069131335261,
+      "making_calls": 6806.7059624843505,
+      "collecting": 52174.93081054615,
+      "rest": 248.38718604340374
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 8271.767780465809,
+       "per_position": 448.00719938691157
+      },
+      "making_calls": {
+       "fixed": 5984.445205182894,
+       "per_position": 6.886823662607021
+      }
+     }
+    }
+   ]
+  },
+  "512x16-m16-one": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 52332.43318743573,
+    "states_per_inference_batch": 119.35849056603773,
+    "inference_batches": 53,
+    "steps_us": {
+     "reading": 378.55418609841814,
+     "laying_out": 2062.041773724387,
+     "making_calls": 3351.7955661804044,
+     "collecting": 46317.90637647083,
+     "rest": 222.1352849616933
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 4359.95765822853,
+      "per_position": 401.91925435472365
+     },
+     "making_calls": {
+      "fixed": 2843.121795844995,
+      "per_position": 4.2617309244035235
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 52628.26496124584,
+     "states_per_inference_batch": 119.35849056603773,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 378.027350206877,
+      "laying_out": 2171.1658674867754,
+      "making_calls": 3441.84747285359,
+      "collecting": 46371.049528836076,
+      "rest": 266.17474186251746
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4342.342306753162,
+       "per_position": 404.54535262221185
+      },
+      "making_calls": {
+       "fixed": 2930.9311726223546,
+       "per_position": 4.280519113540227
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 52332.43318743573,
+     "states_per_inference_batch": 119.35849056603773,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 378.55418609841814,
+      "laying_out": 2062.041773724387,
+      "making_calls": 3351.7955661804044,
+      "collecting": 46317.90637647083,
+      "rest": 222.1352849616933
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4359.95765822853,
+       "per_position": 401.91925435472365
+      },
+      "making_calls": {
+       "fixed": 2843.121795844995,
+       "per_position": 4.2617309244035235
+      }
+     }
+    }
+   ]
+  },
+  "512x16-m16-padded": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 102796.83094418976,
+    "states_per_inference_batch": 238.18867924528303,
+    "inference_batches": 53,
+    "steps_us": {
+     "reading": 765.9047880464777,
+     "laying_out": 4125.953528136102,
+     "making_calls": 3730.6258106222026,
+     "collecting": 93795.31679134641,
+     "rest": 379.03002603858147
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 3696.279941338362,
+      "per_position": 416.05903066786476
+     },
+     "making_calls": {
+      "fixed": 3036.655893386149,
+      "per_position": 2.9135302292071326
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 102796.83094418976,
+     "states_per_inference_batch": 238.18867924528303,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 765.9047880464777,
+      "laying_out": 4125.953528136102,
+      "making_calls": 3730.6258106222026,
+      "collecting": 93795.31679134641,
+      "rest": 379.03002603858147
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 3696.279941338362,
+       "per_position": 416.05903066786476
+      },
+      "making_calls": {
+       "fixed": 3036.655893386149,
+       "per_position": 2.9135302292071326
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 103028.96214948906,
+     "states_per_inference_batch": 238.18867924528303,
+     "inference_batches": 53,
+     "steps_us": {
+      "reading": 798.7457469219938,
+      "laying_out": 4224.396264070715,
+      "making_calls": 3834.88683058564,
+      "collecting": 93768.2083208786,
+      "rest": 402.7249870321028
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 4080.1112791696214,
+       "per_position": 415.42214006075176
+      },
+      "making_calls": {
+       "fixed": 3048.8559384893247,
+       "per_position": 3.3000346388707777
+      }
+     }
+    }
+   ]
+  }
+ },
+ "one_core": {
+  "cpu-64x2-m1-three": {
+   "best": {
+    "run": "c",
+    "us_per_inference_batch": 1277.8253902364272,
+    "states_per_inference_batch": 7.424384525205158,
+    "inference_batches": 853,
+    "steps_us": {
+     "reading": 26.28186234021352,
+     "laying_out": 190.07687931028735,
+     "making_calls": 1015.7210046369779,
+     "collecting": 28.335678917006454,
+     "rest": 17.40996503194189
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 304.39527245408146,
+      "per_position": 131.11256757750527
+     },
+     "making_calls": {
+      "fixed": 210.36434098235532,
+      "per_position": 108.47453562251587
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 1321.4816740353167,
+     "states_per_inference_batch": 7.424384525205158,
+     "inference_batches": 853,
+     "steps_us": {
+      "reading": 26.42689790147611,
+      "laying_out": 193.021630414255,
+      "making_calls": 1053.9128955071224,
+      "collecting": 28.49010205014247,
+      "rest": 19.630148162320694
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 354.6707997651607,
+       "per_position": 130.22101306686295
+      },
+      "making_calls": {
+       "fixed": 259.42123629711296,
+       "per_position": 107.01111405434044
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 1280.4425426368227,
+     "states_per_inference_batch": 7.424384525205158,
+     "inference_batches": 853,
+     "steps_us": {
+      "reading": 26.69447360550472,
+      "laying_out": 193.01441815752176,
+      "making_calls": 1013.1030422595798,
+      "collecting": 29.16711978974631,
+      "rest": 18.46348882447011
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 297.40341048147286,
+       "per_position": 132.40681821072374
+      },
+      "making_calls": {
+       "fixed": 203.30171454096637,
+       "per_position": 109.07319320132278
+      }
+     }
+    },
+    {
+     "run": "c",
+     "us_per_inference_batch": 1277.8253902364272,
+     "states_per_inference_batch": 7.424384525205158,
+     "inference_batches": 853,
+     "steps_us": {
+      "reading": 26.28186234021352,
+      "laying_out": 190.07687931028735,
+      "making_calls": 1015.7210046369779,
+      "collecting": 28.335678917006454,
+      "rest": 17.40996503194189
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 304.39527245408146,
+       "per_position": 131.11256757750527
+      },
+      "making_calls": {
+       "fixed": 210.36434098235532,
+       "per_position": 108.47453562251587
+      }
+     }
+    }
+   ]
+  },
+  "cpu-64x2-m1-one": {
+   "best": {
+    "run": "b",
+    "us_per_inference_batch": 1080.5080434713338,
+    "states_per_inference_batch": 7.422039859320047,
+    "inference_batches": 853,
+    "steps_us": {
+     "reading": 27.149212443606068,
+     "laying_out": 190.51708194513446,
+     "making_calls": 817.7545544588207,
+     "collecting": 28.6552824264508,
+     "rest": 16.431912197322003
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 318.8762692799286,
+      "per_position": 102.61758069582513
+     },
+     "making_calls": {
+      "fixed": 224.9870960795988,
+      "per_position": 79.86584141485963
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 1089.3679156261828,
+     "states_per_inference_batch": 7.422039859320047,
+     "inference_batches": 853,
+     "steps_us": {
+      "reading": 27.146856671069276,
+      "laying_out": 190.4313105854816,
+      "making_calls": 826.4832124887864,
+      "collecting": 28.465109280745114,
+      "rest": 16.841426600100515
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 312.01987708824765,
+       "per_position": 104.73509348805223
+      },
+      "making_calls": {
+       "fixed": 217.0720618085844,
+       "per_position": 82.10831014535023
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 1080.5080434713338,
+     "states_per_inference_batch": 7.422039859320047,
+     "inference_batches": 853,
+     "steps_us": {
+      "reading": 27.149212443606068,
+      "laying_out": 190.51708194513446,
+      "making_calls": 817.7545544588207,
+      "collecting": 28.6552824264508,
+      "rest": 16.431912197322003
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 318.8762692799286,
+       "per_position": 102.61758069582513
+      },
+      "making_calls": {
+       "fixed": 224.9870960795988,
+       "per_position": 79.86584141485963
+      }
+     }
+    },
+    {
+     "run": "c",
+     "us_per_inference_batch": 1122.5525496673856,
+     "states_per_inference_batch": 7.422039859320047,
+     "inference_batches": 853,
+     "steps_us": {
+      "reading": 26.450121956375174,
+      "laying_out": 190.40767298664696,
+      "making_calls": 860.9698616076863,
+      "collecting": 28.41423928234311,
+      "rest": 16.310653834334047
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 324.5086002141072,
+       "per_position": 107.5235332307134
+      },
+      "making_calls": {
+       "fixed": 231.34931616112408,
+       "per_position": 84.83119969450601
+      }
+     }
+    }
+   ]
+  },
+  "cpu-64x2-m3-three": {
+   "best": {
+    "run": "a",
+    "us_per_inference_batch": 3060.0698517728106,
+    "states_per_inference_batch": 22.295774647887324,
+    "inference_batches": 284,
+    "steps_us": {
+     "reading": 78.99644927893975,
+     "laying_out": 425.8146796467334,
+     "making_calls": 2449.12353148938,
+     "collecting": 67.9489465665669,
+     "rest": 38.186244791189964
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 306.9582085773304,
+      "per_position": 123.48131817238098
+     },
+     "making_calls": {
+      "fixed": 204.58172753787267,
+      "per_position": 100.67117377167217
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 3060.0698517728106,
+     "states_per_inference_batch": 22.295774647887324,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 78.99644927893975,
+      "laying_out": 425.8146796467334,
+      "making_calls": 2449.12353148938,
+      "collecting": 67.9489465665669,
+      "rest": 38.186244791189964
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 306.9582085773304,
+       "per_position": 123.48131817238098
+      },
+      "making_calls": {
+       "fixed": 204.58172753787267,
+       "per_position": 100.67117377167217
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 3145.6912921116077,
+     "states_per_inference_batch": 22.295774647887324,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 76.82959439477253,
+      "laying_out": 447.79448176022544,
+      "making_calls": 2507.542679178558,
+      "collecting": 67.67768610816476,
+      "rest": 45.846850669887054
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 509.21612267207456,
+       "per_position": 118.24999180682683
+      },
+      "making_calls": {
+       "fixed": 388.88468189471223,
+       "per_position": 95.02509021298361
+      }
+     }
+    },
+    {
+     "run": "c",
+     "us_per_inference_batch": 3128.3331869340595,
+     "states_per_inference_batch": 22.295774647887324,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 78.70937959933785,
+      "laying_out": 434.9086056733963,
+      "making_calls": 2506.1524157395133,
+      "collecting": 67.95080992906406,
+      "rest": 40.61197599274776
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 462.91923840107165,
+       "per_position": 119.54794083755031
+      },
+      "making_calls": {
+       "fixed": 347.67446369174877,
+       "per_position": 96.81107681326044
+      }
+     }
+    }
+   ]
+  },
+  "cpu-64x2-m3-one": {
+   "best": {
+    "run": "c",
+    "us_per_inference_batch": 2616.778323883896,
+    "states_per_inference_batch": 22.288732394366196,
+    "inference_batches": 284,
+    "steps_us": {
+     "reading": 77.93726630117023,
+     "laying_out": 413.36517276416174,
+     "making_calls": 2027.9340775155556,
+     "collecting": 65.98021093555923,
+     "rest": 31.56159636744914
+    },
+    "fit_us": {
+     "round": {
+      "fixed": 384.7047160071306,
+      "per_position": 100.14358683048994
+     },
+     "making_calls": {
+      "fixed": 278.14519152317666,
+      "per_position": 78.50553611719361
+     }
+    }
+   },
+   "runs": [
+    {
+     "run": "a",
+     "us_per_inference_batch": 2672.744154756722,
+     "states_per_inference_batch": 22.288732394366196,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 76.69494070668547,
+      "laying_out": 415.9599402939907,
+      "making_calls": 2076.155351947101,
+      "collecting": 64.97933369041354,
+      "rest": 38.95458811853067
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 420.37337277573715,
+       "per_position": 101.05423413627166
+      },
+      "making_calls": {
+       "fixed": 318.0598546837507,
+       "per_position": 78.8782182026527
+      }
+     }
+    },
+    {
+     "run": "b",
+     "us_per_inference_batch": 2661.9090839772007,
+     "states_per_inference_batch": 22.288732394366196,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 78.21451927925473,
+      "laying_out": 416.0164361577776,
+      "making_calls": 2063.262440009259,
+      "collecting": 65.45891168135428,
+      "rest": 38.956776849554956
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 388.3468523377028,
+       "per_position": 102.00500375760149
+      },
+      "making_calls": {
+       "fixed": 280.57919266712975,
+       "per_position": 79.98136528359633
+      }
+     }
+    },
+    {
+     "run": "c",
+     "us_per_inference_batch": 2616.778323883896,
+     "states_per_inference_batch": 22.288732394366196,
+     "inference_batches": 284,
+     "steps_us": {
+      "reading": 77.93726630117023,
+      "laying_out": 413.36517276416174,
+      "making_calls": 2027.9340775155556,
+      "collecting": 65.98021093555923,
+      "rest": 31.56159636744914
+     },
+     "fit_us": {
+      "round": {
+       "fixed": 384.7047160071306,
+       "per_position": 100.14358683048994
+      },
+      "making_calls": {
+       "fixed": 278.14519152317666,
+       "per_position": 78.50553611719361
+      }
+     }
+    }
+   ]
+  }
+ },
+ "operations": {
+  "operations-256x8-m8": {
+   "weights": "tmp/coordinator-rounds-2026-11-17/replays/weights-256x8.pt",
+   "config": {
+    "hidden_dim": 256,
+    "message_layers": 8
+   },
+   "device": "mps",
+   "torch": "2.14.0",
+   "merge": 8,
+   "repeat": 20,
+   "states_per_inference_batch": 87.0,
+   "forward_pass_ms": 12.540569664755216,
+   "operations_ms": 14.377292234469985,
+   "share_by_part": {
+    "the rest": 0.3794832836615424,
+    "linear layers": 0.4129579724527001,
+    "per-border work": 0.20755874388575743
+   },
+   "inference_batches": [
+    {
+     "states": 100,
+     "network_states": [
+      20,
+      4,
+      76
+     ],
+     "forward_pass_seconds": 0.01240141699963715,
+     "operations": 527,
+     "seconds": 0.014682189351151464,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 1.3604498235508799e-06,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.0003492354000627529,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2149900430813432e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 3.850814755423927e-05,
+       "count": 41
+      },
+      "index_select.default": {
+       "seconds": 0.0009050605018273927,
+       "count": 26
+      },
+      "to.dtype": {
+       "seconds": 1.881249772850424e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.0003877833507431205,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 0.0014548643994203303,
+       "count": 26
+      },
+      "split_with_sizes.default": {
+       "seconds": 4.832714912481606e-05,
+       "count": 32
+      },
+      "layer_norm.default": {
+       "seconds": 0.0008506042009685188,
+       "count": 63
+      },
+      "cat.default": {
+       "seconds": 0.001262043601309415,
+       "count": 54
+      },
+      "linear.default": {
+       "seconds": 0.005833206406532554,
+       "count": 114
+      },
+      "gelu.default": {
+       "seconds": 0.0012875123953563171,
+       "count": 80
+      },
+      "new_zeros.default": {
+       "seconds": 0.00016056465101428328,
+       "count": 11
+      },
+      "index_add_.default": {
+       "seconds": 0.0010603229493426623,
+       "count": 11
+      },
+      "div.Tensor": {
+       "seconds": 0.0005427436997706537,
+       "count": 9
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 0.0002080354497593362,
+       "count": 8
+      },
+      "mean.dim": {
+       "seconds": 0.00011354169837431982,
+       "count": 9
+      },
+      "amax.default": {
+       "seconds": 1.2754149793181568e-05,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 2.9852100124116986e-05,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.1416501365602017e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 5.4185400222195314e-05,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 9.456249972572551e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.0402100451756269e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 1.7906249559018762e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 8.552100189263e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 8.94999975571409e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 1.1243749759159982e-05,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.005379047594760777,
+      "linear layers": 0.005833206406532554,
+      "per-border work": 0.0034699353498581333
+     },
+     "largest": [
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       0.00023643540043849498
+      ],
+      [
+       "to.dtype_layout",
+       [
+        106729
+       ],
+       "the rest",
+       0.00020238750003045424
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        256
+       ],
+       "linear layers",
+       0.00016745210014050825
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        256
+       ],
+       "linear layers",
+       0.00016299580020131543
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        256
+       ],
+       "linear layers",
+       0.00016219585013459436
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        256
+       ],
+       "linear layers",
+       0.00016098959968076089
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        256
+       ],
+       "linear layers",
+       0.00016094585007522255
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        256
+       ],
+       "linear layers",
+       0.00016090420031105167
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        256
+       ],
+       "linear layers",
+       0.00016052079954533837
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        256
+       ],
+       "linear layers",
+       0.00015993124980013819
+      ],
+      [
+       "to.dtype_layout",
+       [
+        75975
+       ],
+       "the rest",
+       0.00014684790003229863
+      ],
+      [
+       "add.Tensor",
+       [
+        16000,
+        256
+       ],
+       "per-border work",
+       0.00013617080039693975
+      ],
+      [
+       "add.Tensor",
+       [
+        16000,
+        256
+       ],
+       "per-border work",
+       0.00013587085049948655
+      ],
+      [
+       "add.Tensor",
+       [
+        16000,
+        256
+       ],
+       "per-border work",
+       0.0001345957993180491
+      ],
+      [
+       "add.Tensor",
+       [
+        16000,
+        256
+       ],
+       "per-border work",
+       0.00013421249968814664
+      ]
+     ]
+    },
+    {
+     "states": 90,
+     "network_states": [
+      65,
+      14,
+      11
+     ],
+     "forward_pass_seconds": 0.013577167002949864,
+     "operations": 527,
+     "seconds": 0.015512404408946173,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 5.708003300242126e-07,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.0003207291498256382,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2556149158626791e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 3.916255300282501e-05,
+       "count": 41
+      },
+      "index_select.default": {
+       "seconds": 0.0009233396034687756,
+       "count": 26
+      },
+      "to.dtype": {
+       "seconds": 1.7854006728157402e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.0005211354000493884,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 0.0012370395001198632,
+       "count": 26
+      },
+      "split_with_sizes.default": {
+       "seconds": 5.204565241001546e-05,
+       "count": 32
+      },
+      "layer_norm.default": {
+       "seconds": 0.0008843666008033325,
+       "count": 63
+      },
+      "cat.default": {
+       "seconds": 0.0014144959488476164,
+       "count": 54
+      },
+      "linear.default": {
+       "seconds": 0.006380594100482997,
+       "count": 114
+      },
+      "gelu.default": {
+       "seconds": 0.001252506499440642,
+       "count": 80
+      },
+      "new_zeros.default": {
+       "seconds": 0.00018648960030986927,
+       "count": 11
+      },
+      "index_add_.default": {
+       "seconds": 0.001134643700061133,
+       "count": 11
+      },
+      "div.Tensor": {
+       "seconds": 0.000586270801431965,
+       "count": 9
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 0.0001973520491446834,
+       "count": 8
+      },
+      "mean.dim": {
+       "seconds": 0.00011742510032490826,
+       "count": 9
+      },
+      "amax.default": {
+       "seconds": 1.3554150064010173e-05,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 7.697914988966659e-05,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.2375006917864083e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 9.298750010202638e-05,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 9.439599671168252e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.0800000018207356e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 1.7735399160301314e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 8.287499804282561e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 8.92704993020743e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 9.947949729394168e-06,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.006038581006578172,
+      "linear layers": 0.006380594100482997,
+      "per-border work": 0.003093229301885003
+     },
+     "largest": [
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       0.00026276249991497025
+      ],
+      [
+       "linear.default",
+       [
+        3383,
+        256
+       ],
+       "linear layers",
+       0.0002342020503419917
+      ],
+      [
+       "linear.default",
+       [
+        2184,
+        256
+       ],
+       "linear layers",
+       0.00017693749978207052
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       0.00016963750022114255
+      ],
+      [
+       "to.dtype_layout",
+       [
+        276050
+       ],
+       "the rest",
+       0.0001690103999862913
+      ],
+      [
+       "index_add_.default",
+       [
+        10774,
+        256
+       ],
+       "the rest",
+       0.00016710830022930167
+      ],
+      [
+       "to.dtype_layout",
+       [
+        175096
+       ],
+       "the rest",
+       0.00015171874983934685
+      ],
+      [
+       "cat.default",
+       [
+        5637,
+        1024
+       ],
+       "the rest",
+       0.00014468959998339414
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        256
+       ],
+       "linear layers",
+       0.0001441271000658162
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        256
+       ],
+       "linear layers",
+       0.0001438041501387488
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        256
+       ],
+       "linear layers",
+       0.00014273749984567986
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        256
+       ],
+       "linear layers",
+       0.0001418604500941001
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        256
+       ],
+       "linear layers",
+       0.00014126249952823856
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        256
+       ],
+       "linear layers",
+       0.00014088334937696346
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        256
+       ],
+       "linear layers",
+       0.00014055210049264134
+      ]
+     ]
+    },
+    {
+     "states": 71,
+     "network_states": [
+      52,
+      7,
+      12
+     ],
+     "forward_pass_seconds": 0.011643124991678633,
+     "operations": 527,
+     "seconds": 0.012937282943312312,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 5.916503141634166e-07,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.0003210791503079236,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2614497973117977e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 3.622700023697689e-05,
+       "count": 41
+      },
+      "index_select.default": {
+       "seconds": 0.0007829521477106027,
+       "count": 26
+      },
+      "to.dtype": {
+       "seconds": 1.7604499589651823e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.0003905916499206797,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 0.0008009187004063278,
+       "count": 26
+      },
+      "split_with_sizes.default": {
+       "seconds": 4.829999888897873e-05,
+       "count": 32
+      },
+      "layer_norm.default": {
+       "seconds": 0.0008137001997965854,
+       "count": 63
+      },
+      "cat.default": {
+       "seconds": 0.0010870039521250873,
+       "count": 54
+      },
+      "linear.default": {
+       "seconds": 0.005597851844504474,
+       "count": 114
+      },
+      "gelu.default": {
+       "seconds": 0.0011090167521615511,
+       "count": 80
+      },
+      "new_zeros.default": {
+       "seconds": 0.00015776875006849874,
+       "count": 11
+      },
+      "index_add_.default": {
+       "seconds": 0.0008624436995887663,
+       "count": 11
+      },
+      "div.Tensor": {
+       "seconds": 0.00044813120039179923,
+       "count": 9
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 0.00016075630046543667,
+       "count": 8
+      },
+      "mean.dim": {
+       "seconds": 0.00010863119896384887,
+       "count": 9
+      },
+      "amax.default": {
+       "seconds": 1.1960450501646847e-05,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 4.756249982165173e-05,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.2625001545529813e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 6.132705020718276e-05,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 9.810399933485315e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.153544944827445e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 2.5000000459840524e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 9.14999982342124e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 8.712499402463436e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 1.0622949776006863e-05,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.00495019760055584,
+      "linear layers": 0.005597851844504474,
+      "per-border work": 0.0023892334982519975
+     },
+     "largest": [
+      [
+       "linear.default",
+       [
+        2564,
+        256
+       ],
+       "linear layers",
+       0.00018480209982953965
+      ],
+      [
+       "to.dtype_layout",
+       [
+        167856
+       ],
+       "the rest",
+       0.0001624958502361551
+      ],
+      [
+       "to.dtype_layout",
+       [
+        114176
+       ],
+       "the rest",
+       0.00015858330007176847
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       0.0001556562499899883
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       0.00014541040000040084
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        256
+       ],
+       "linear layers",
+       0.00013122710006427952
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        256
+       ],
+       "linear layers",
+       0.00013052499998593702
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        256
+       ],
+       "linear layers",
+       0.0001303395998547785
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        256
+       ],
+       "linear layers",
+       0.00012849375052610413
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        256
+       ],
+       "linear layers",
+       0.00012630419951165095
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        256
+       ],
+       "linear layers",
+       0.00012610624980879948
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        256
+       ],
+       "linear layers",
+       0.0001260999997612089
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        256
+       ],
+       "linear layers",
+       0.00012417289981385692
+      ],
+      [
+       "linear.default",
+       [
+        2564,
+        256
+       ],
+       "linear layers",
+       0.00011122500000055879
+      ],
+      [
+       "linear.default",
+       [
+        2453,
+        256
+       ],
+       "linear layers",
+       0.00010603545015328564
+      ]
+     ]
+    }
+   ]
+  },
+  "operations-512x16-m16": {
+   "weights": "tmp/coordinator-rounds-2026-11-17/replays/weights-512x16.pt",
+   "config": {
+    "hidden_dim": 512,
+    "message_layers": 16
+   },
+   "device": "mps",
+   "torch": "2.14.0",
+   "merge": 16,
+   "repeat": 20,
+   "states_per_inference_batch": 170.33333333333334,
+   "forward_pass_ms": 79.02043065890514,
+   "operations_ms": 81.25628242632956,
+   "share_by_part": {
+    "the rest": 0.2624222038912367,
+    "linear layers": 0.42281180140870933,
+    "per-border work": 0.3147659947000539
+   },
+   "inference_batches": [
+    {
+     "states": 165,
+     "network_states": [
+      81,
+      5,
+      79
+     ],
+     "forward_pass_seconds": 0.07617116699111648,
+     "operations": 863,
+     "seconds": 0.07847668909162168,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 1.3458491594064981e-06,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.0003937395500543062,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2220700591569767e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 6.678109857602977e-05,
+       "count": 57
+      },
+      "index_select.default": {
+       "seconds": 0.006271268644923111,
+       "count": 42
+      },
+      "to.dtype": {
+       "seconds": 2.5208501028828323e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.0013810958502290306,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 0.009057960499922047,
+       "count": 50
+      },
+      "split_with_sizes.default": {
+       "seconds": 7.930639767437244e-05,
+       "count": 56
+      },
+      "layer_norm.default": {
+       "seconds": 0.002219802599574905,
+       "count": 111
+      },
+      "cat.default": {
+       "seconds": 0.007125452204491015,
+       "count": 94
+      },
+      "linear.default": {
+       "seconds": 0.032983276395680175,
+       "count": 186
+      },
+      "gelu.default": {
+       "seconds": 0.006951814402418676,
+       "count": 136
+      },
+      "new_zeros.default": {
+       "seconds": 0.0006785978992411402,
+       "count": 19
+      },
+      "index_add_.default": {
+       "seconds": 0.006523377050325507,
+       "count": 19
+      },
+      "div.Tensor": {
+       "seconds": 0.0028513709490653127,
+       "count": 17
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 0.0008107041998300701,
+       "count": 16
+      },
+      "mean.dim": {
+       "seconds": 0.000545439550478477,
+       "count": 17
+      },
+      "amax.default": {
+       "seconds": 3.3264550438616425e-05,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 0.00017694579946692102,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.13749920274131e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 0.0002470291503414046,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 8.916649676393718e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 9.995800064643845e-06,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 1.733745011733845e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 8.074999641394243e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 7.787500362610444e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 1.012499997159466e-05,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.020775833602965584,
+      "linear layers": 0.032983276395680175,
+      "per-border work": 0.02471757909297593
+     },
+     "largest": [
+      [
+       "linear.default",
+       [
+        7335,
+        512
+       ],
+       "linear layers",
+       0.001583331250003539
+      ],
+      [
+       "linear.default",
+       [
+        7335,
+        512
+       ],
+       "linear layers",
+       0.0008116249999147839
+      ],
+      [
+       "linear.default",
+       [
+        7090,
+        512
+       ],
+       "linear layers",
+       0.0007906792001449503
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       0.0006791396001062822
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       0.000559927050198894
+      ],
+      [
+       "linear.default",
+       [
+        4784,
+        512
+       ],
+       "linear layers",
+       0.0005494978999195155
+      ],
+      [
+       "linear.default",
+       [
+        2997,
+        512
+       ],
+       "linear layers",
+       0.0005299395998008549
+      ],
+      [
+       "linear.default",
+       [
+        2997,
+        512
+       ],
+       "linear layers",
+       0.0005274291499517858
+      ],
+      [
+       "linear.default",
+       [
+        2997,
+        512
+       ],
+       "linear layers",
+       0.000526187499781372
+      ],
+      [
+       "linear.default",
+       [
+        2923,
+        512
+       ],
+       "linear layers",
+       0.00052498330041999
+      ],
+      [
+       "linear.default",
+       [
+        2997,
+        512
+       ],
+       "linear layers",
+       0.000524870849767467
+      ],
+      [
+       "linear.default",
+       [
+        2997,
+        512
+       ],
+       "linear layers",
+       0.0005242499995802063
+      ],
+      [
+       "linear.default",
+       [
+        2997,
+        512
+       ],
+       "linear layers",
+       0.0005239958001766354
+      ],
+      [
+       "linear.default",
+       [
+        2997,
+        512
+       ],
+       "linear layers",
+       0.0005238833502517082
+      ],
+      [
+       "linear.default",
+       [
+        2997,
+        512
+       ],
+       "linear layers",
+       0.0005238729005213827
+      ]
+     ]
+    },
+    {
+     "states": 165,
+     "network_states": [
+      116,
+      31,
+      18
+     ],
+     "forward_pass_seconds": 0.07702458299172577,
+     "operations": 863,
+     "seconds": 0.07954987313714806,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 6.479007424786687e-07,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.00032993960048770536,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2370750482659785e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 6.995409858063794e-05,
+       "count": 57
+      },
+      "index_select.default": {
+       "seconds": 0.006181827151885956,
+       "count": 42
+      },
+      "to.dtype": {
+       "seconds": 3.4832999517675487e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.0014396250000572764,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 0.009075704198767201,
+       "count": 50
+      },
+      "split_with_sizes.default": {
+       "seconds": 8.583734525018373e-05,
+       "count": 56
+      },
+      "layer_norm.default": {
+       "seconds": 0.002173818802839377,
+       "count": 111
+      },
+      "cat.default": {
+       "seconds": 0.0070562271459493784,
+       "count": 94
+      },
+      "linear.default": {
+       "seconds": 0.03402648759802102,
+       "count": 186
+      },
+      "gelu.default": {
+       "seconds": 0.006989148046704942,
+       "count": 136
+      },
+      "new_zeros.default": {
+       "seconds": 0.0007044270489132032,
+       "count": 19
+      },
+      "index_add_.default": {
+       "seconds": 0.006578570949932327,
+       "count": 19
+      },
+      "div.Tensor": {
+       "seconds": 0.002879058249527588,
+       "count": 17
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 0.0008175771989044732,
+       "count": 16
+      },
+      "mean.dim": {
+       "seconds": 0.0005702917005692143,
+       "count": 17
+      },
+      "amax.default": {
+       "seconds": 3.5102100082440304e-05,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 0.00019250830009696074,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.820849865907803e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 0.00026369580009486524,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 8.945849549490958e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.0279149864800275e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 1.6710450290702282e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 7.78539979364723e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 8.097899990389123e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 9.931249951478095e-06,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.020722976989782177,
+      "linear layers": 0.03402648759802102,
+      "per-border work": 0.024800408549344868
+     },
+     "largest": [
+      [
+       "linear.default",
+       [
+        5202,
+        512
+       ],
+       "linear layers",
+       0.0011639479002042209
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007337521004956215
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007335437505389564
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007334812500630506
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007331250002607703
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007331145498028491
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007325770500756334
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007324707999941893
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007323042002099101
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007320728997001425
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007317479001358151
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007311375004064758
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007307354499062058
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007304104503418785
+      ],
+      [
+       "linear.default",
+       [
+        4292,
+        512
+       ],
+       "linear layers",
+       0.0007303979000425898
+      ]
+     ]
+    },
+    {
+     "states": 181,
+     "network_states": [
+      93,
+      56,
+      32
+     ],
+     "forward_pass_seconds": 0.0838655419938732,
+     "operations": 863,
+     "seconds": 0.0857422850502189,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 6.083500920794904e-07,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.00035442290027276613,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2418600090313702e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 7.319809737964531e-05,
+       "count": 57
+      },
+      "index_select.default": {
+       "seconds": 0.00684799164882861,
+       "count": 42
+      },
+      "to.dtype": {
+       "seconds": 3.5561999538913367e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.001609833350084955,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 0.010123693651257778,
+       "count": 50
+      },
+      "split_with_sizes.default": {
+       "seconds": 8.610425138613207e-05,
+       "count": 56
+      },
+      "layer_norm.default": {
+       "seconds": 0.0023353396492893823,
+       "count": 111
+      },
+      "cat.default": {
+       "seconds": 0.007689791701704964,
+       "count": 94
+      },
+      "linear.default": {
+       "seconds": 0.036058581451652555,
+       "count": 186
+      },
+      "gelu.default": {
+       "seconds": 0.007585280644707379,
+       "count": 136
+      },
+      "new_zeros.default": {
+       "seconds": 0.0007269104025908747,
+       "count": 19
+      },
+      "index_add_.default": {
+       "seconds": 0.00711870824889047,
+       "count": 19
+      },
+      "div.Tensor": {
+       "seconds": 0.0030786562492721714,
+       "count": 17
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 0.0008819292015687096,
+       "count": 16
+      },
+      "mean.dim": {
+       "seconds": 0.0005975813015538733,
+       "count": 17
+      },
+      "amax.default": {
+       "seconds": 3.798124962486327e-05,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 0.00018783124978654086,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.2062497262377293e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 0.00026264789994456805,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 9.779200627235696e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.1262499901931733e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 1.8827050371328366e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 8.535399683751165e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 8.98750004125759e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 1.062084993463941e-05,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.022471547550230748,
+      "linear layers": 0.036058581451652555,
+      "per-border work": 0.027212156048335597
+     },
+     "largest": [
+      [
+       "linear.default",
+       [
+        4063,
+        512
+       ],
+       "linear layers",
+       0.0009079062503587921
+      ],
+      [
+       "linear.default",
+       [
+        3725,
+        512
+       ],
+       "linear layers",
+       0.0008489312494930346
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       0.0007379937502264511
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       0.0006699333498545457
+      ],
+      [
+       "linear.default",
+       [
+        3441,
+        512
+       ],
+       "linear layers",
+       0.0006057041995518375
+      ],
+      [
+       "linear.default",
+       [
+        3441,
+        512
+       ],
+       "linear layers",
+       0.0006046271002560389
+      ],
+      [
+       "linear.default",
+       [
+        3441,
+        512
+       ],
+       "linear layers",
+       0.0006045333502697758
+      ],
+      [
+       "linear.default",
+       [
+        3441,
+        512
+       ],
+       "linear layers",
+       0.0006032104000041727
+      ],
+      [
+       "linear.default",
+       [
+        3441,
+        512
+       ],
+       "linear layers",
+       0.0006029749994922895
+      ],
+      [
+       "linear.default",
+       [
+        3441,
+        512
+       ],
+       "linear layers",
+       0.0006028041498211678
+      ],
+      [
+       "linear.default",
+       [
+        3441,
+        512
+       ],
+       "linear layers",
+       0.0006025125003361609
+      ],
+      [
+       "linear.default",
+       [
+        3441,
+        512
+       ],
+       "linear layers",
+       0.0006024750000506174
+      ],
+      [
+       "linear.default",
+       [
+        3441,
+        512
+       ],
+       "linear layers",
+       0.0006024582995451056
+      ],
+      [
+       "linear.default",
+       [
+        3441,
+        512
+       ],
+       "linear layers",
+       0.0006022832996677608
+      ],
+      [
+       "linear.default",
+       [
+        3441,
+        512
+       ],
+       "linear layers",
+       0.0006021541499649175
+      ]
+     ]
+    }
+   ]
+  },
+  "operations-512x16-m8": {
+   "weights": "tmp/coordinator-rounds-2026-11-17/replays/weights-512x16.pt",
+   "config": {
+    "hidden_dim": 512,
+    "message_layers": 16
+   },
+   "device": "mps",
+   "torch": "2.14.0",
+   "merge": 8,
+   "repeat": 20,
+   "states_per_inference_batch": 87.0,
+   "forward_pass_ms": 43.37044433244349,
+   "operations_ms": 46.94922439690952,
+   "share_by_part": {
+    "the rest": 0.27475538690984486,
+    "linear layers": 0.4479311402673322,
+    "per-border work": 0.2773134728228228
+   },
+   "inference_batches": [
+    {
+     "states": 100,
+     "network_states": [
+      20,
+      4,
+      76
+     ],
+     "forward_pass_seconds": 0.044947542002773844,
+     "operations": 863,
+     "seconds": 0.049376512600429134,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 1.3854500139132141e-06,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.0003837020994978957,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2766650615958498e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 6.462695091613568e-05,
+       "count": 57
+      },
+      "index_select.default": {
+       "seconds": 0.0037027999474958054,
+       "count": 42
+      },
+      "to.dtype": {
+       "seconds": 1.8979008018504828e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.0006272082995565142,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 0.005430939701909666,
+       "count": 50
+      },
+      "split_with_sizes.default": {
+       "seconds": 8.005225026863626e-05,
+       "count": 56
+      },
+      "layer_norm.default": {
+       "seconds": 0.001796112297597574,
+       "count": 111
+      },
+      "cat.default": {
+       "seconds": 0.004248322996863863,
+       "count": 94
+      },
+      "linear.default": {
+       "seconds": 0.021296285656717383,
+       "count": 186
+      },
+      "gelu.default": {
+       "seconds": 0.004561802099487979,
+       "count": 136
+      },
+      "new_zeros.default": {
+       "seconds": 0.0004829958495975006,
+       "count": 19
+      },
+      "index_add_.default": {
+       "seconds": 0.0038333102995238735,
+       "count": 19
+      },
+      "div.Tensor": {
+       "seconds": 0.0017207498996867797,
+       "count": 17
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 0.0006695374999253545,
+       "count": 16
+      },
+      "mean.dim": {
+       "seconds": 0.0002621792998979799,
+       "count": 17
+      },
+      "amax.default": {
+       "seconds": 1.508959976490587e-05,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 5.158955027582124e-05,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.0853997082449497e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 6.44333500531502e-05,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 9.616649913368747e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.0645799920894206e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 1.8383350106887522e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 8.95000048330985e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 8.804199751466513e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 1.1239550076425076e-05,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.013005850243644092,
+      "linear layers": 0.021296285656717383,
+      "per-border work": 0.015074376700067659
+     },
+     "largest": [
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.00048816874987096527
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.000487889550277032
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.00048704375003580933
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.0004869041498750448
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.00048659794993000105
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.00048624999981257134
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.00048620625020703303
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.0004859291497268714
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.00048550624997005797
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.0004851457997574471
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.0004851229503401555
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.00048481874982826413
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.0004843354494369123
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.00048416455028927886
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        512
+       ],
+       "linear layers",
+       0.00048393545002909375
+      ]
+     ]
+    },
+    {
+     "states": 90,
+     "network_states": [
+      65,
+      14,
+      11
+     ],
+     "forward_pass_seconds": 0.04846687499957625,
+     "operations": 863,
+     "seconds": 0.050721837495802925,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 6.45800173515454e-07,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.0003586728998925537,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2350100587354974e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 7.40563977160491e-05,
+       "count": 57
+      },
+      "index_select.default": {
+       "seconds": 0.003258889498101781,
+       "count": 42
+      },
+      "to.dtype": {
+       "seconds": 1.7750004190020262e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.0009427208504348527,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 0.004947443652054062,
+       "count": 50
+      },
+      "split_with_sizes.default": {
+       "seconds": 8.371060466743073e-05,
+       "count": 56
+      },
+      "layer_norm.default": {
+       "seconds": 0.0018484833992260974,
+       "count": 111
+      },
+      "cat.default": {
+       "seconds": 0.004528581493650565,
+       "count": 94
+      },
+      "linear.default": {
+       "seconds": 0.023024633247405297,
+       "count": 186
+      },
+      "gelu.default": {
+       "seconds": 0.0042908372524834695,
+       "count": 136
+      },
+      "new_zeros.default": {
+       "seconds": 0.0005172249497263692,
+       "count": 19
+      },
+      "index_add_.default": {
+       "seconds": 0.0037784061991260384,
+       "count": 19
+      },
+      "div.Tensor": {
+       "seconds": 0.0017544250506034585,
+       "count": 17
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 0.000657922848040471,
+       "count": 16
+      },
+      "mean.dim": {
+       "seconds": 0.00025576240077498366,
+       "count": 17
+      },
+      "amax.default": {
+       "seconds": 1.5177099703578278e-05,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 0.00013625625069835223,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.56874957610853e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 0.00016481460042996332,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 9.51664987951517e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.0997900244547053e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 1.8677100160857663e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 8.893750054994598e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 8.80625011632219e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 1.0587499855319037e-05,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.014312260749284189,
+      "linear layers": 0.023024633247405297,
+      "per-border work": 0.013384943499113438
+     },
+     "largest": [
+      [
+       "linear.default",
+       [
+        3383,
+        512
+       ],
+       "linear layers",
+       0.0007899916992755607
+      ],
+      [
+       "linear.default",
+       [
+        2184,
+        512
+       ],
+       "linear layers",
+       0.0005341062496881932
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       0.0005087708501378075
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        512
+       ],
+       "linear layers",
+       0.0004491979503654875
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        512
+       ],
+       "linear layers",
+       0.0004475228997762315
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        512
+       ],
+       "linear layers",
+       0.0004474104498513043
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        512
+       ],
+       "linear layers",
+       0.0004464874997211155
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        512
+       ],
+       "linear layers",
+       0.0004459458497876767
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        512
+       ],
+       "linear layers",
+       0.00044593749989871865
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        512
+       ],
+       "linear layers",
+       0.00044585625000763683
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        512
+       ],
+       "linear layers",
+       0.0004456499998923391
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        512
+       ],
+       "linear layers",
+       0.0004456416500033811
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        512
+       ],
+       "linear layers",
+       0.00044548125006258486
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        512
+       ],
+       "linear layers",
+       0.00044512914973893203
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        512
+       ],
+       "linear layers",
+       0.00044506664999062197
+      ]
+     ]
+    },
+    {
+     "states": 71,
+     "network_states": [
+      52,
+      7,
+      12
+     ],
+     "forward_pass_seconds": 0.03669691599498037,
+     "operations": 863,
+     "seconds": 0.04074932309449649,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 5.979505658615381e-07,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.0003172584001731593,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.224785009981133e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 6.795004665036686e-05,
+       "count": 57
+      },
+      "index_select.default": {
+       "seconds": 0.0025562271490343837,
+       "count": 42
+      },
+      "to.dtype": {
+       "seconds": 1.8063001334667206e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.0006840104506409261,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 0.004006308298994554,
+       "count": 50
+      },
+      "split_with_sizes.default": {
+       "seconds": 8.065399888437238e-05,
+       "count": 56
+      },
+      "layer_norm.default": {
+       "seconds": 0.001644050102186157,
+       "count": 111
+      },
+      "cat.default": {
+       "seconds": 0.0033649062497715923,
+       "count": 94
+      },
+      "linear.default": {
+       "seconds": 0.018769139952200923,
+       "count": 186
+      },
+      "gelu.default": {
+       "seconds": 0.0034243706941197187,
+       "count": 136
+      },
+      "new_zeros.default": {
+       "seconds": 0.00044428114924812686,
+       "count": 19
+      },
+      "index_add_.default": {
+       "seconds": 0.0029264061005960683,
+       "count": 19
+      },
+      "div.Tensor": {
+       "seconds": 0.0013931082990893628,
+       "count": 17
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 0.0005522374514839611,
+       "count": 16
+      },
+      "mean.dim": {
+       "seconds": 0.00023934590062708592,
+       "count": 17
+      },
+      "amax.default": {
+       "seconds": 1.3889600086258725e-05,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 8.20312496216502e-05,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.2625001545529813e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 9.802915010368452e-05,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 9.756250074133277e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.1399999493733048e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 1.9118800264550376e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 9.185450471704825e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 9.08124929992482e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 1.066250042640604e-05,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.01138054594994173,
+      "linear layers": 0.018769139952200923,
+      "per-border work": 0.01059963719235384
+     },
+     "largest": [
+      [
+       "linear.default",
+       [
+        2564,
+        512
+       ],
+       "linear layers",
+       0.0005997541506076231
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.00037462914988282134
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.0003722812500200234
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.0003720958004123531
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.0003720270498888567
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.00037175210018176587
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.00037145625028642824
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.00037141045031603427
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.00037036040012026203
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.00036962704980396665
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.0003695978994073812
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.0003693896003824193
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.00036930834976374173
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.00036919164995197207
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        512
+       ],
+       "linear layers",
+       0.0003691083504236303
+      ]
+     ]
+    }
+   ]
+  },
+  "operations-64x2-m1": {
+   "weights": "tmp/coordinator-rounds-2026-11-17/replays/weights-64x2.pt",
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "device": "mps",
+   "torch": "2.14.0",
+   "merge": 1,
+   "repeat": 20,
+   "states_per_inference_batch": 10.666666666666666,
+   "forward_pass_ms": 2.596513664078278,
+   "operations_ms": 3.1880392855479536,
+   "share_by_part": {
+    "the rest": 0.5386876795909956,
+    "linear layers": 0.417641497412177,
+    "per-border work": 0.04367082299682742
+   },
+   "inference_batches": [
+    {
+     "states": 11,
+     "network_states": [
+      0,
+      1,
+      10
+     ],
+     "forward_pass_seconds": 0.0026623329904396087,
+     "operations": 234,
+     "seconds": 0.0029985809000208966,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 1.2895507097709924e-06,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.00034379374919808465,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.237709948327392e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 2.0806200336664914e-05,
+       "count": 29
+      },
+      "index_select.default": {
+       "seconds": 0.00017598544873180798,
+       "count": 14
+      },
+      "to.dtype": {
+       "seconds": 1.5812496712896972e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.00012781669938703998,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 7.806244975654409e-05,
+       "count": 8
+      },
+      "split_with_sizes.default": {
+       "seconds": 1.777514917193912e-05,
+       "count": 14
+      },
+      "layer_norm.default": {
+       "seconds": 0.00021478540002135556,
+       "count": 18
+      },
+      "cat.default": {
+       "seconds": 0.0003097353524935897,
+       "count": 24
+      },
+      "linear.default": {
+       "seconds": 0.0011446144504589028,
+       "count": 40
+      },
+      "gelu.default": {
+       "seconds": 0.0002274999009387102,
+       "count": 26
+      },
+      "new_zeros.default": {
+       "seconds": 4.608750023180619e-05,
+       "count": 5
+      },
+      "index_add_.default": {
+       "seconds": 7.246039967867546e-05,
+       "count": 5
+      },
+      "div.Tensor": {
+       "seconds": 3.6568749783327804e-05,
+       "count": 3
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 2.7008349570678546e-05,
+       "count": 2
+      },
+      "mean.dim": {
+       "seconds": 3.2210400240728626e-05,
+       "count": 3
+      },
+      "amax.default": {
+       "seconds": 9.524999768473208e-06,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 1.0412499977974222e-05,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.1583499144762754e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 2.5187500432366507e-05,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 8.989550406113266e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 9.406249591847882e-06,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 1.6768700152169914e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 8.316650200868025e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 8.23125010356307e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 1.0127049608854578e-05,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.0016942373498750377,
+      "linear layers": 0.0011446144504589028,
+      "per-border work": 0.00015972909968695604
+     },
+     "largest": [
+      [
+       "to.dtype_layout",
+       [
+        6610
+       ],
+       "the rest",
+       0.0001905270997667685
+      ],
+      [
+       "to.dtype_layout",
+       [
+        5487
+       ],
+       "the rest",
+       0.00015326664943131617
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       7.04916994436644e-05
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       3.995209990534931e-05
+      ],
+      [
+       "linear.default",
+       [
+        37,
+        64
+       ],
+       "linear layers",
+       3.5279150324640796e-05
+      ],
+      [
+       "linear.default",
+       [
+        370,
+        64
+       ],
+       "linear layers",
+       3.350210026837885e-05
+      ],
+      [
+       "linear.default",
+       [
+        37,
+        64
+       ],
+       "linear layers",
+       3.30083494191058e-05
+      ],
+      [
+       "linear.default",
+       [
+        34,
+        1
+       ],
+       "linear layers",
+       3.2908350112847985e-05
+      ],
+      [
+       "linear.default",
+       [
+        37,
+        64
+       ],
+       "linear layers",
+       3.282710022176616e-05
+      ],
+      [
+       "linear.default",
+       [
+        37,
+        64
+       ],
+       "linear layers",
+       3.077709989156574e-05
+      ],
+      [
+       "linear.default",
+       [
+        370,
+        64
+       ],
+       "linear layers",
+       3.0625000363215804e-05
+      ],
+      [
+       "linear.default",
+       [
+        370,
+        64
+       ],
+       "linear layers",
+       3.057915018871427e-05
+      ],
+      [
+       "linear.default",
+       [
+        37,
+        64
+       ],
+       "linear layers",
+       3.05208501231391e-05
+      ],
+      [
+       "linear.default",
+       [
+        37,
+        64
+       ],
+       "linear layers",
+       2.9270799859659747e-05
+      ],
+      [
+       "linear.default",
+       [
+        370,
+        64
+       ],
+       "linear layers",
+       2.9260399605846034e-05
+      ]
+     ]
+    },
+    {
+     "states": 12,
+     "network_states": [
+      10,
+      1,
+      1
+     ],
+     "forward_pass_seconds": 0.002802540999255143,
+     "operations": 275,
+     "seconds": 0.003716026899928692,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 5.250498361419887e-07,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.0003047583006264176,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2748001608997583e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 2.0460300584090876e-05,
+       "count": 29
+      },
+      "index_select.default": {
+       "seconds": 0.00015849159681238234,
+       "count": 14
+      },
+      "to.dtype": {
+       "seconds": 1.700000575510785e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.00012772080081049352,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 7.636044974788093e-05,
+       "count": 8
+      },
+      "split_with_sizes.default": {
+       "seconds": 2.1668701083399356e-05,
+       "count": 14
+      },
+      "layer_norm.default": {
+       "seconds": 0.000295776948769344,
+       "count": 27
+      },
+      "cat.default": {
+       "seconds": 0.0003226189488486852,
+       "count": 24
+      },
+      "linear.default": {
+       "seconds": 0.001730316650355234,
+       "count": 60
+      },
+      "gelu.default": {
+       "seconds": 0.0003200103004928678,
+       "count": 38
+      },
+      "new_zeros.default": {
+       "seconds": 4.6537550952052696e-05,
+       "count": 5
+      },
+      "index_add_.default": {
+       "seconds": 6.920619998709298e-05,
+       "count": 5
+      },
+      "div.Tensor": {
+       "seconds": 3.602920041885227e-05,
+       "count": 3
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 2.171454907511361e-05,
+       "count": 2
+      },
+      "mean.dim": {
+       "seconds": 2.9558299866039305e-05,
+       "count": 3
+      },
+      "amax.default": {
+       "seconds": 9.833349758991972e-06,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 1.1612500384217127e-05,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.2271499144844712e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 2.3964599677128717e-05,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 9.837499965215101e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.0737500269897282e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 2.376039992668666e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 8.897899533621967e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 9.027049964061007e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 1.092710008379072e-05,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.001855895701010013,
+      "linear layers": 0.001730316650355234,
+      "per-border work": 0.000129814548563445
+     },
+     "largest": [
+      [
+       "to.dtype_layout",
+       [
+        38916
+       ],
+       "the rest",
+       0.00015282290041795932
+      ],
+      [
+       "to.dtype_layout",
+       [
+        24516
+       ],
+       "the rest",
+       0.0001519354002084583
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       6.712290050927549e-05
+      ],
+      [
+       "linear.default",
+       [
+        1,
+        64
+       ],
+       "linear layers",
+       3.319165043649264e-05
+      ],
+      [
+       "linear.default",
+       [
+        29,
+        1
+       ],
+       "linear layers",
+       3.308539962745272e-05
+      ],
+      [
+       "linear.default",
+       [
+        370,
+        64
+       ],
+       "linear layers",
+       3.227084962418303e-05
+      ],
+      [
+       "linear.default",
+       [
+        512,
+        64
+       ],
+       "linear layers",
+       3.161040003760718e-05
+      ],
+      [
+       "linear.default",
+       [
+        35,
+        64
+       ],
+       "linear layers",
+       3.1608300196239726e-05
+      ],
+      [
+       "linear.default",
+       [
+        256,
+        64
+       ],
+       "linear layers",
+       3.1543750083073974e-05
+      ],
+      [
+       "linear.default",
+       [
+        475,
+        64
+       ],
+       "linear layers",
+       3.1079150357982146e-05
+      ],
+      [
+       "cat.default",
+       [
+        1568,
+        1
+       ],
+       "the rest",
+       3.100210014963523e-05
+      ],
+      [
+       "linear.default",
+       [
+        512,
+        64
+       ],
+       "linear layers",
+       3.091874968959018e-05
+      ],
+      [
+       "linear.default",
+       [
+        293,
+        64
+       ],
+       "linear layers",
+       3.0862499988870697e-05
+      ],
+      [
+       "linear.default",
+       [
+        37,
+        64
+       ],
+       "linear layers",
+       3.073959960602224e-05
+      ],
+      [
+       "linear.default",
+       [
+        256,
+        64
+       ],
+       "linear layers",
+       3.0714600143255666e-05
+      ]
+     ]
+    },
+    {
+     "states": 9,
+     "network_states": [
+      8,
+      1,
+      0
+     ],
+     "forward_pass_seconds": 0.0023246670025400817,
+     "operations": 234,
+     "seconds": 0.0028495100566942708,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 5.916503141634166e-07,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.00030815629943390375,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2204251834191383e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 1.9981202058261257e-05,
+       "count": 29
+      },
+      "index_select.default": {
+       "seconds": 0.00015596259981975888,
+       "count": 14
+      },
+      "to.dtype": {
+       "seconds": 1.6771002265159042e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.00011585414977162145,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 7.531455121352337e-05,
+       "count": 8
+      },
+      "split_with_sizes.default": {
+       "seconds": 1.7454098269809037e-05,
+       "count": 14
+      },
+      "layer_norm.default": {
+       "seconds": 0.00019360204969416374,
+       "count": 18
+      },
+      "cat.default": {
+       "seconds": 0.0002988061991345602,
+       "count": 24
+      },
+      "linear.default": {
+       "seconds": 0.001119441402261145,
+       "count": 40
+      },
+      "gelu.default": {
+       "seconds": 0.0002160875003028195,
+       "count": 26
+      },
+      "new_zeros.default": {
+       "seconds": 4.538749999483116e-05,
+       "count": 5
+      },
+      "index_add_.default": {
+       "seconds": 6.328954987111501e-05,
+       "count": 5
+      },
+      "div.Tensor": {
+       "seconds": 3.957295120926574e-05,
+       "count": 3
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 2.2529150010086595e-05,
+       "count": 2
+      },
+      "mean.dim": {
+       "seconds": 2.985204992000945e-05,
+       "count": 3
+      },
+      "amax.default": {
+       "seconds": 9.741650137584656e-06,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 1.14562499220483e-05,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.2021002476103603e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 2.315835008630529e-05,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 9.052100358530879e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.0045799717772752e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 2.3554149811388926e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 7.791650568833575e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 8.397900091949851e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 9.345850412501022e-06,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.0016019394046452363,
+      "linear layers": 0.001119441402261145,
+      "per-border work": 0.00012812924978788945
+     },
+     "largest": [
+      [
+       "to.dtype_layout",
+       [
+        17773
+       ],
+       "the rest",
+       0.00015499794972129166
+      ],
+      [
+       "to.dtype_layout",
+       [
+        27374
+       ],
+       "the rest",
+       0.0001531583497126121
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       5.697919987142086e-05
+      ],
+      [
+       "linear.default",
+       [
+        40,
+        64
+       ],
+       "linear layers",
+       3.1874999694991854e-05
+      ],
+      [
+       "linear.default",
+       [
+        542,
+        64
+       ],
+       "linear layers",
+       3.082080002059229e-05
+      ],
+      [
+       "linear.default",
+       [
+        296,
+        64
+       ],
+       "linear layers",
+       3.030204970855266e-05
+      ],
+      [
+       "linear.default",
+       [
+        343,
+        64
+       ],
+       "linear layers",
+       3.0166649958118795e-05
+      ],
+      [
+       "linear.default",
+       [
+        296,
+        64
+       ],
+       "linear layers",
+       3.0083350429777057e-05
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       2.9933299811091273e-05
+      ],
+      [
+       "linear.default",
+       [
+        37,
+        64
+       ],
+       "linear layers",
+       2.9608350450871514e-05
+      ],
+      [
+       "linear.default",
+       [
+        513,
+        64
+       ],
+       "linear layers",
+       2.9431250004563482e-05
+      ],
+      [
+       "linear.default",
+       [
+        37,
+        64
+       ],
+       "linear layers",
+       2.9366649687290192e-05
+      ],
+      [
+       "linear.default",
+       [
+        250,
+        64
+       ],
+       "linear layers",
+       2.923125066445209e-05
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       2.8941650089109317e-05
+      ],
+      [
+       "linear.default",
+       [
+        296,
+        64
+       ],
+       "linear layers",
+       2.8885400388389827e-05
+      ]
+     ]
+    }
+   ]
+  },
+  "operations-64x2-m8": {
+   "weights": "tmp/coordinator-rounds-2026-11-17/replays/weights-64x2.pt",
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "device": "mps",
+   "torch": "2.14.0",
+   "merge": 8,
+   "repeat": 20,
+   "states_per_inference_batch": 87.0,
+   "forward_pass_ms": 3.896041671396233,
+   "operations_ms": 4.233424417179776,
+   "share_by_part": {
+    "the rest": 0.5127363533915748,
+    "linear layers": 0.4240028580446563,
+    "per-border work": 0.06326078856376893
+   },
+   "inference_batches": [
+    {
+     "states": 100,
+     "network_states": [
+      20,
+      4,
+      76
+     ],
+     "forward_pass_seconds": 0.0044432499998947605,
+     "operations": 275,
+     "seconds": 0.004299833596451207,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 1.30414919112809e-06,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.0003571271001419518,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2948000949108973e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 2.1416597883217035e-05,
+       "count": 29
+      },
+      "index_select.default": {
+       "seconds": 0.00022124790193629452,
+       "count": 14
+      },
+      "to.dtype": {
+       "seconds": 1.641749986447394e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.00023798750044079497,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 0.00013256670063128693,
+       "count": 8
+      },
+      "split_with_sizes.default": {
+       "seconds": 2.0510448666755114e-05,
+       "count": 14
+      },
+      "layer_norm.default": {
+       "seconds": 0.0003507397486828267,
+       "count": 27
+      },
+      "cat.default": {
+       "seconds": 0.0003528686007484794,
+       "count": 24
+      },
+      "linear.default": {
+       "seconds": 0.001789489550719736,
+       "count": 60
+      },
+      "gelu.default": {
+       "seconds": 0.0003588459483580664,
+       "count": 38
+      },
+      "new_zeros.default": {
+       "seconds": 5.2072949620196604e-05,
+       "count": 5
+      },
+      "index_add_.default": {
+       "seconds": 0.00013344779872568322,
+       "count": 5
+      },
+      "div.Tensor": {
+       "seconds": 7.139994922908955e-05,
+       "count": 3
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 2.744170051300898e-05,
+       "count": 2
+      },
+      "mean.dim": {
+       "seconds": 3.309789972263388e-05,
+       "count": 3
+      },
+      "amax.default": {
+       "seconds": 1.0360449959989636e-05,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 1.4281249605119228e-05,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.170850737253204e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 2.947920002043247e-05,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 9.679150389274583e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.0868749814108015e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 1.8654199811862783e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 8.925000292947516e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 8.958349644672125e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 1.1302100028842688e-05,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.0021944107473245815,
+      "linear layers": 0.001789489550719736,
+      "per-border work": 0.00031593329840688965
+     },
+     "largest": [
+      [
+       "to.dtype_layout",
+       [
+        106729
+       ],
+       "the rest",
+       0.00021034585006418638
+      ],
+      [
+       "to.dtype_layout",
+       [
+        75975
+       ],
+       "the rest",
+       0.00014678125007776542
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       0.00010897290048887953
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       8.680625032866373e-05
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        64
+       ],
+       "linear layers",
+       4.234579973854125e-05
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       4.220834962325171e-05
+      ],
+      [
+       "index_add_.default",
+       [
+        3700,
+        64
+       ],
+       "per-border work",
+       4.15082999097649e-05
+      ],
+      [
+       "index_add_.default",
+       [
+        3700,
+        64
+       ],
+       "per-border work",
+       4.100829974049702e-05
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        64
+       ],
+       "linear layers",
+       3.9052100328262894e-05
+      ],
+      [
+       "linear.default",
+       [
+        2812,
+        64
+       ],
+       "linear layers",
+       3.731459946720861e-05
+      ],
+      [
+       "linear.default",
+       [
+        740,
+        64
+       ],
+       "linear layers",
+       3.693125036079437e-05
+      ],
+      [
+       "linear.default",
+       [
+        1338,
+        64
+       ],
+       "linear layers",
+       3.499375015962869e-05
+      ],
+      [
+       "add.Tensor",
+       [
+        16000,
+        64
+       ],
+       "per-border work",
+       3.429374992265366e-05
+      ],
+      [
+       "linear.default",
+       [
+        740,
+        64
+       ],
+       "linear layers",
+       3.40062499162741e-05
+      ],
+      [
+       "linear.default",
+       [
+        792,
+        1
+       ],
+       "linear layers",
+       3.391249993001111e-05
+      ]
+     ]
+    },
+    {
+     "states": 90,
+     "network_states": [
+      65,
+      14,
+      11
+     ],
+     "forward_pass_seconds": 0.0037355000094976276,
+     "operations": 275,
+     "seconds": 0.0043314881528203845,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 5.770998541265726e-07,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.0003233458992326632,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2764600978698582e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 2.2189651645021516e-05,
+       "count": 29
+      },
+      "index_select.default": {
+       "seconds": 0.00021531054953811694,
+       "count": 14
+      },
+      "to.dtype": {
+       "seconds": 1.758400321705267e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.00022902080017956906,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 0.00011202915193280205,
+       "count": 8
+      },
+      "split_with_sizes.default": {
+       "seconds": 2.16207503399346e-05,
+       "count": 14
+      },
+      "layer_norm.default": {
+       "seconds": 0.0003326021484099329,
+       "count": 27
+      },
+      "cat.default": {
+       "seconds": 0.0003788459012866951,
+       "count": 24
+      },
+      "linear.default": {
+       "seconds": 0.001810183501947904,
+       "count": 60
+      },
+      "gelu.default": {
+       "seconds": 0.000352327147993492,
+       "count": 38
+      },
+      "new_zeros.default": {
+       "seconds": 5.888540035812185e-05,
+       "count": 5
+      },
+      "index_add_.default": {
+       "seconds": 0.00016627500008326024,
+       "count": 5
+      },
+      "div.Tensor": {
+       "seconds": 9.324585043941624e-05,
+       "count": 3
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 2.622500032885e-05,
+       "count": 2
+      },
+      "mean.dim": {
+       "seconds": 3.254169932915829e-05,
+       "count": 3
+      },
+      "amax.default": {
+       "seconds": 1.0685450251912699e-05,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 2.523749935789965e-05,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.9208004232496022e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 4.299584979889914e-05,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 8.562499715480953e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.0110450239153579e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 1.6708298790035767e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 7.883350190240889e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 8.131250069709495e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 9.504149784334003e-06,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.0022514003983815202,
+      "linear layers": 0.001810183501947904,
+      "per-border work": 0.00026990425249096006
+     },
+     "largest": [
+      [
+       "to.dtype_layout",
+       [
+        276050
+       ],
+       "the rest",
+       0.00017225419942406005
+      ],
+      [
+       "to.dtype_layout",
+       [
+        175096
+       ],
+       "the rest",
+       0.00015109169980860316
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       8.550624988856725e-05
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       7.845000000088476e-05
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       6.506455029011703e-05
+      ],
+      [
+       "index_add_.default",
+       [
+        10774,
+        64
+       ],
+       "the rest",
+       5.059789982624352e-05
+      ],
+      [
+       "linear.default",
+       [
+        3383,
+        64
+       ],
+       "linear layers",
+       4.763750039273873e-05
+      ],
+      [
+       "div.Tensor",
+       [
+        10774,
+        64
+       ],
+       "the rest",
+       4.700210047303699e-05
+      ],
+      [
+       "repeat.default",
+       [
+        22548,
+        64
+       ],
+       "the rest",
+       4.299584979889914e-05
+      ],
+      [
+       "index_add_.default",
+       [
+        3330,
+        64
+       ],
+       "per-border work",
+       4.1741650056792424e-05
+      ],
+      [
+       "linear.default",
+       [
+        2184,
+        64
+       ],
+       "linear layers",
+       3.9947950426721945e-05
+      ],
+      [
+       "index_add_.default",
+       [
+        3330,
+        64
+       ],
+       "per-border work",
+       3.758960010600276e-05
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        64
+       ],
+       "linear layers",
+       3.709169977810234e-05
+      ],
+      [
+       "linear.default",
+       [
+        3228,
+        64
+       ],
+       "linear layers",
+       3.7037499714642764e-05
+      ],
+      [
+       "linear.default",
+       [
+        2405,
+        64
+       ],
+       "linear layers",
+       3.682710012071766e-05
+      ]
+     ]
+    },
+    {
+     "states": 71,
+     "network_states": [
+      52,
+      7,
+      12
+     ],
+     "forward_pass_seconds": 0.0035093750047963113,
+     "operations": 275,
+     "seconds": 0.004068951502267737,
+     "by_operation": {
+      "lift_fresh.default": {
+       "seconds": 5.353998858481646e-07,
+       "count": 2
+      },
+      "to.dtype_layout": {
+       "seconds": 0.0003123833004792687,
+       "count": 2
+      },
+      "slice.Tensor": {
+       "seconds": 1.2743650586344302e-05,
+       "count": 21
+      },
+      "view.default": {
+       "seconds": 2.1122951875440776e-05,
+       "count": 29
+      },
+      "index_select.default": {
+       "seconds": 0.00018702504821703765,
+       "count": 14
+      },
+      "to.dtype": {
+       "seconds": 1.9562496163416656e-06,
+       "count": 3
+      },
+      "embedding_bag.padding_idx": {
+       "seconds": 0.00020250829984433947,
+       "count": 3
+      },
+      "add.Tensor": {
+       "seconds": 9.5675000193296e-05,
+       "count": 8
+      },
+      "split_with_sizes.default": {
+       "seconds": 2.073954819934443e-05,
+       "count": 14
+      },
+      "layer_norm.default": {
+       "seconds": 0.00031105394955375224,
+       "count": 27
+      },
+      "cat.default": {
+       "seconds": 0.0003411312012758572,
+       "count": 24
+      },
+      "linear.default": {
+       "seconds": 0.0017852791039331354,
+       "count": 60
+      },
+      "gelu.default": {
+       "seconds": 0.00033776444761315363,
+       "count": 38
+      },
+      "new_zeros.default": {
+       "seconds": 5.601260127150454e-05,
+       "count": 5
+      },
+      "index_add_.default": {
+       "seconds": 0.0001253436494152993,
+       "count": 5
+      },
+      "div.Tensor": {
+       "seconds": 7.057495095068589e-05,
+       "count": 3
+      },
+      "repeat_interleave.self_int": {
+       "seconds": 2.553334998083301e-05,
+       "count": 2
+      },
+      "mean.dim": {
+       "seconds": 3.0854200304020196e-05,
+       "count": 3
+      },
+      "amax.default": {
+       "seconds": 1.0345850023441017e-05,
+       "count": 1
+      },
+      "mul.Tensor": {
+       "seconds": 1.8822899437509478e-05,
+       "count": 1
+      },
+      "squeeze.dim": {
+       "seconds": 1.7812497389968483e-06,
+       "count": 2
+      },
+      "repeat.default": {
+       "seconds": 3.0635399889433755e-05,
+       "count": 1
+      },
+      "new_full.default": {
+       "seconds": 9.691699960967527e-06,
+       "count": 1
+      },
+      "scatter_reduce_.two": {
+       "seconds": 1.155834979726933e-05,
+       "count": 1
+      },
+      "sub.Tensor": {
+       "seconds": 1.9187499856343496e-05,
+       "count": 2
+      },
+      "exp.default": {
+       "seconds": 9.13125040824525e-06,
+       "count": 1
+      },
+      "log.default": {
+       "seconds": 8.979150152299553e-06,
+       "count": 1
+      },
+      "sum.dim_IntList": {
+       "seconds": 1.0581249807728454e-05,
+       "count": 1
+      }
+     },
+     "by_part": {
+      "the rest": 0.0020660806483647318,
+      "linear layers": 0.0017852791039331354,
+      "per-border work": 0.00021759174996986984
+     },
+     "largest": [
+      [
+       "to.dtype_layout",
+       [
+        167856
+       ],
+       "the rest",
+       0.00016315625034621917
+      ],
+      [
+       "to.dtype_layout",
+       [
+        114176
+       ],
+       "the rest",
+       0.0001492270501330495
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       8.492499982821755e-05
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       6.356664962368087e-05
+      ],
+      [
+       "embedding_bag.padding_idx",
+       null,
+       "the rest",
+       5.401665039244108e-05
+      ],
+      [
+       "linear.default",
+       [
+        2564,
+        64
+       ],
+       "linear layers",
+       4.224584990879521e-05
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        64
+       ],
+       "linear layers",
+       4.115000047022477e-05
+      ],
+      [
+       "cat.default",
+       [
+        6072,
+        1
+       ],
+       "the rest",
+       3.650625003501773e-05
+      ],
+      [
+       "linear.default",
+       [
+        1924,
+        64
+       ],
+       "linear layers",
+       3.526665022945963e-05
+      ],
+      [
+       "index_add_.default",
+       [
+        6072,
+        64
+       ],
+       "the rest",
+       3.496874996926636e-05
+      ],
+      [
+       "div.Tensor",
+       [
+        6072,
+        64
+       ],
+       "the rest",
+       3.443750028964132e-05
+      ],
+      [
+       "linear.default",
+       [
+        2453,
+        64
+       ],
+       "linear layers",
+       3.3908349723787976e-05
+      ],
+      [
+       "linear.default",
+       [
+        28,
+        64
+       ],
+       "linear layers",
+       3.386875032447278e-05
+      ],
+      [
+       "linear.default",
+       [
+        2564,
+        64
+       ],
+       "linear layers",
+       3.3827099832706155e-05
+      ],
+      [
+       "linear.default",
+       [
+        444,
+        64
+       ],
+       "linear layers",
+       3.271250025136396e-05
+      ]
+     ]
+    }
+   ]
+  }
+ },
+ "replay_settings": {
+  "gpu_device": "mps",
+  "torch": "2.14.0",
+  "cpu_threads": 1,
+  "timed_passes": "best of 2 after an untimed one (GPU), best of 3 (one core)",
+  "as_saved_limit": "first 300 inference batches on the GPU; all 853 on one core"
+ }
+}

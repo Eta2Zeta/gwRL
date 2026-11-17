@@ -2075,9 +2075,11 @@ of its time for the GPU's arithmetic, a 64×2 inference batch only 30%
 ([record](../archive/records/coordinator_rounds_2026_11_17.md#replayed-rounds-on-the-gpu)).
 Three of the inference server's levers (below), half precision, compiling and
 fewer PyTorch calls, were tried on those inference batches and did not pay as
-they stand; whether fewer PyTorch calls would let the GPU do more, by another
-means than the one tried, is open. The rates used below, in states
-evaluated per second:
+they stand. Fewer PyTorch calls do let the GPU do more: the same states through
+one network instead of the three took 15% to 38% less time an inference batch
+([record](../archive/records/network_split_2026_11_17.md#inference-batches-on-the-gpu)),
+but no way to get there with three networks has paid (below). The rates used
+below, in states evaluated per second:
 
 | Network | Arithmetic per state | One CPU core, inference batches of 16 | GPU, inference batches of 64 | GPU, inference batches of 256 |
 | --- | ---: | ---: | ---: | ---: |
@@ -2246,9 +2248,21 @@ the others pay, and how much, is open:
   PyTorch calls to 176, with replies equal up to rounding, but on one core real
   inference batches were no faster, and on the Mac's GPU the grouped product is
   about twice as slow as the split, so it was removed
-  ([record](../archive/records/grouped_layers_2026_11_17.md)). On a GPU, one
-  padded product per layer (`torch.bmm`, each network's states padded to the
-  largest network's count) is untried.
+  ([record](../archive/records/grouped_layers_2026_11_17.md)). A *padded
+  product* would call each linear layer once with a standard batched matrix
+  product (`torch.baddbmm`), each network's states padded with empty ones to the
+  largest network's count. But in these games the Axis decides at two thirds of
+  the states, so the padding doubles the states and the arithmetic, in large
+  inference batches as in small. A stand-in for it, one network over that many
+  states, was faster than today's forward pass on the Mac's GPU only in small
+  inference batches of the two smaller networks, by 20% and 21% as saved, about
+  9 states, and by 13% at 64×2 with 22 states; it was slower from 60 states on,
+  by 12% to 66%, and at 512×16 never faster. It is not built
+  ([record](../archive/records/network_split_2026_11_17.md)). Only one network
+  for all three alliances makes a forward pass's PyTorch calls one network's
+  without padding: the same states through one network took 15% less time on
+  one core and 15% to 38% less on the GPU
+  ([open question](#one-network-per-alliance-or-one-shared-network)).
 - **Smaller call overheads: compiling.** PyTorch's compiler, `torch.compile`,
   reads a forward pass's PyTorch calls once, ahead of the forward passes it
   serves, and writes routines that each do the work of several PyTorch calls,
@@ -2258,6 +2272,16 @@ the others pay, and how much, is open:
   fixed sizes, and a forward pass's arrays change size with the inference batch
   size, so inference batches would be padded with empty states up to a few fixed
   sizes, each compiled once, at the cost of the empty states' arithmetic.
+  Fewer passes through memory would matter most on the GPU, where the matrix
+  products are only 41% to 45% of a forward pass's time at every size, and the
+  rest is operations that each read and write whole arrays with little
+  arithmetic, such as additions, GELU and joins of vectors side by side; at
+  512×16 the per-border work of the message-passing layers alone, along each
+  state's 160 borders, is 28% to 32%
+  ([record](../archive/records/network_split_2026_11_17.md#where-the-gpus-time-goes)).
+  With three networks each network's count of states sets the sizes of its
+  arrays, so each network would need its own fixed sizes; one network for all
+  three alliances would need them only for the whole inference batch.
   Compiled as it is written, the forward pass was never faster on the saved
   inference batches: 5% to 7% slower on the GPU and 12% to 21% slower on one
   core. PyTorch compiled it again for each new mix of states, up to its limit of
@@ -2308,8 +2332,11 @@ iteration (`tools/profile_coordinator.py --save-every`) and replayed through the
 inference server's code on one core or on the GPU, with a network of any size, as
 saved or merged into larger inference batches: the replay times each part of an
 inference batch's handling and compares two versions' replies
-(`tools/replay_coordinator_rounds.py`). `tools/benchmark_network_sizes.py` times
-forward passes of sampled states, as for the rates above.
+(`tools/replay_coordinator_rounds.py`; with `--networks one`, one network
+evaluates all the states). `tools/time_forward_operations.py` times each
+operation of a forward pass on such inference batches, and
+`tools/benchmark_network_sizes.py` times forward passes of sampled states, as
+for the rates above.
 
 Three things follow, inferred:
 
@@ -2677,13 +2704,25 @@ kept decision, but each policy only from its own alliance's decisions
 new state with the network of the alliance that decides there, so one search
 compares values that different networks gave.
 
-**Alternative.** One network told which alliance is choosing. Its policy would
-learn from all three alliances' decisions. Speed is not a reason for it: the
-inference server already evaluates the three networks in one forward pass
-([section 9.2](#92-running-training-on-the-mac)). **The catch:** one network must
-hold three different strategies.
+**Alternative.** One network told which alliance is choosing: the input already
+names it, in the global feature `deciding_player` (`src/zone_encoding.cpp`). Its
+policy would learn from all three alliances' decisions, and a search would
+compare values that one network gave. **The catch:** one network must hold three
+different strategies.
 
-**Measured** on 9 November, with networks after one network update
+**Speed, measured** on 17 November on inference batches saved from a training
+iteration ([record](../archive/records/network_split_2026_11_17.md)): the same
+states through one network took 15% less time an inference batch on one core,
+the inference server's device in the Mac profile, where it limits self-play
+([section 9.2](#92-running-training-on-the-mac)), and 15% to 38% less on the
+Mac's GPU at sizes from 64×2 to 512×16. The three networks' forward pass calls
+each linear layer once per network, on that network's states. Padding the three
+networks into one product would not get there, since the Axis decides at two
+thirds of the states, and with one network a compiled forward pass would need
+fixed sizes only for the whole inference batch
+([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)).
+
+**Agreement, measured** on 9 November, with networks after one network update
 ([record](../archive/records/depth_limit_2026_11_09.md#positions-rated-by-another-alliances-network)):
 at eight states that all three networks rated, their values for one alliance
 differed by 2.5 to 17 points, while the best and worst actions' average results in
@@ -2693,7 +2732,8 @@ and such a rating set the bottom of the scale in [section
 4.6](#46-a-real-search-decision-612)'s example. Whether the networks agree better
 after more training, and how much the disagreement changes searches, is not
 measured. **Would settle it:** those two measurements first, then an equal-compute
-comparison. The
+comparison; [Q-009](../questions.md#q-009-one-network-for-the-three-alliances)
+asks whether to make it. The
 [plan](../plans/japan_china_full_rules_plan.md#2-training-approach) lists sharing
 as optional future work.
 
