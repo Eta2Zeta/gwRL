@@ -38,8 +38,6 @@ Other open things stay in the pages that own them, and
 | [Q-004](#q-004-features-whose-value-never-changes) | Should the input drop features whose value never changes? | The network's input | Yes, in the same change as Q-003 |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
-| [Q-007](#q-007-self-play-stopping-at-each-training-iterations-end) | Should self-play go on through network updates, instead of standing still while a training iteration's last games finish and while the networks update? | Running training | Answered: B, being built |
-| [Q-008](#q-008-when-self-play-takes-up-new-networks) | In self-play that never stops, should a game take up new networks when it starts, or with every other game at once? | Running training | All games at once, between two inference batches |
 
 Q-001 to Q-004 were raised on 14 November 2026, while the global features
 about nations were being pruned (commit `bce7a4c`). Their numbers are in the
@@ -49,11 +47,6 @@ Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
 Q-006 was raised on 15 November 2026, while the printed sources of Q-001 were
 being looked up; its numbers are in the first record.
-Q-007 was raised on 17 November 2026, in the measurements of the inference
-server's inference batches; its numbers are in the
-[record of where an inference batch's time goes](archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail).
-Q-008 was raised the same day, in designing Q-007's answer; its numbers are in
-the [record of where an inference batch's time goes](archive/records/coordinator_rounds_2026_11_17.md#replayed-rounds-on-one-core).
 
 ## Q-001: Mongolia at war with the CCP
 
@@ -490,147 +483,6 @@ the game's developers.
 **If answered.** A ruling becomes the next rule clarification, with
 `mayDeclareWar`, its test and the politics page changed in the same commit.
 
-## Q-007: Self-play stopping at each training iteration's end
-
-**Answered on 17 November 2026: B**, self-play that never stops. It is being
-built; when it is, the training loop
-([section 9.1 of the design document](design/README.md#91-the-training-loop))
-will state it and this entry will shrink to one line under
-[Answered](#answered). How self-play takes up new networks is
-[Q-008](#q-008-when-self-play-takes-up-new-networks).
-
-**The question.** At the end of each training iteration self-play stands still
-twice: while the training iteration's last games finish one by one, and during
-the network update that follows. Should self-play go on through network updates,
-with the networks updated beside it (choice B below), or should each training
-iteration only play more games than it has game threads (choice A)?
-
-**What the program does now.** A training iteration plays as many games as it
-has game threads, 24 in the Mac profile, all started together with the networks
-fixed (`count = config.parallel_envs` in the loop over training iterations in
-`studies/campaign/run.py`, which the code calls batches;
-[a training iteration's games](design/README.md#71-a-training-iterations-games)).
-The network update starts when the last game has ended, and the next training
-iteration's games start when the network update is done, so no game plays
-during it
-([one training step, and one network update](design/README.md#84-one-training-step-and-one-network-update)).
-An interrupted training iteration is discarded and played again exactly, game
-for game (the comment in the same loop).
-
-**A real case** (17 November 2026, one training iteration of the Mac profile,
-timed with the profiler, eleven-round games, 64 simulations, the 64×2 network
-on one core).
-
-- **The tail.** The 24 games took 834 to 1,445 decisions. 23 of them ended
-  between 231 and 299 seconds; the longest played alone until 332 seconds. For
-  that last tenth of the playing time the inference batches held one state each
-  while the other 23 game threads waited, and on average 20.1 of the 24 games
-  were concurrent. The longest game made about 348 of its decisions alone.
-  Without them the training iteration would have played about 294,000 decisions
-  an hour instead of 268,000, so the tail cost about 9%
-  ([record](archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail)).
-- **The network update's pause.** That profile ran 50 training steps; the Mac
-  training command runs 525. A training step took 65 ms on 2 November and 70 ms
-  on 5 November ([record](archive/records/training_sample_2026_11_05.md#the-update-after-the-batch)),
-  so 525 take about 35 seconds: about a tenth of a training iteration's
-  wall-clock time beside its 300 or so seconds of self-play (worked out; not
-  measured with today's code).
-
-**Why it matters.** Together the two stops cost about a fifth of the wall-clock
-time (worked out), however fast the engine and the inference server get. Both
-grow with a larger network on the GPU: filling inference batches of 64 states
-takes about 128 concurrent games
-([section 9.3 of the design document](design/README.md#93-what-a-larger-network-and-a-longer-search-cost)),
-whose tail leaves more game threads waiting, and a larger network takes longer
-to update.
-
-**The choices.**
-
-| | A. More games than game threads | B. Self-play never stops | C. Leave it |
-| --- | --- | --- | --- |
-| How it works | A training iteration plays, say, 48 games on its 24 game threads, and a game thread that finishes a game starts the next one. | Game threads play one game after another. A trainer runs network updates beside them, and each new game starts with the newest networks. | As now. |
-| The tail | Still about as long, but half as large a share of a training iteration twice as long: about 4% to 5% instead of 9%. | Gone. | About 9%. |
-| The network update's pause | The same for each game: a network update with twice the training samples needs twice the training steps to draw each as often ([section 8.7](design/README.md#87-how-often-a-training-sample-is-drawn)). | Gone: network updates run on cores self-play leaves idle, about 2 of the 9 today. | About a tenth of the wall-clock time. |
-| Which networks play | The same networks for 48 games instead of 24. | Each new game, the newest networks. Training samples come from games of slightly older networks, as the replay buffer's already do. | Unchanged. |
-| Exact replay | An interrupted training iteration is still played again exactly. | A single game still replays exactly if its networks' version is recorded; a whole run no longer does, since which version a game gets depends on timing. | Unchanged. |
-| Work | A setting for the games per training iteration, and a queue of games for the game threads: small. | A trainer beside self-play; swapping networks between games; checkpoints that save the replay buffer and the trainer; and pacing training steps to the incoming training samples, so each is drawn as often as now: a few days. | None. |
-
-**Recommendation: B.** It removes both stops, about a fifth of the wall-clock
-time today, and long runs on the GPU need it most, since more concurrent games
-make the tail worse. It is how AlphaZero trained: one network updated
-continually rather than in iterations, self-play games always generated with
-its latest parameters, and 5,000 TPUs playing while 16 others trained
-([AlphaZero preprint](https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/alphazero-shedding-new-light-on-chess-shogi-and-go/alphazero_preprint.pdf),
-pages 3 and 4). Swapping networks only between games keeps every game played by
-one version, so each game can still be replayed. The price is a few days of work
-and exact replay of a whole run. A is small, but it recovers only about half of
-the tail and none of the pause, and the networks change half as often; it is
-worth doing only as a stopgap while B waits.
-
-**If answered.** B belongs in [the training loop](design/README.md#91-the-training-loop)
-and [a training iteration's games](design/README.md#71-a-training-iterations-games),
-and changes how the [campaign learning guide](../studies/campaign/README.md)
-describes a run. A belongs in section 7.1 too, in the guide and in the Mac
-profile.
-
-## Q-008: When self-play takes up new networks
-
-**The question.** In self-play that never stops (Q-007's answer), when should a
-game take up the networks of a new network update: when the game starts, so
-that each game is played by one version of the networks, or at once with every
-other game, between two inference batches?
-
-**What the program does now.** A training iteration's games are all played by
-one version of the three networks, held fixed, and every training sample
-records that version (`rollout_version` in `studies/campaign/learning.py`).
-The inference server answers each inference batch with one forward pass of
-that version's three networks (`NetworkStack` in `studies/campaign/neural.py`).
-Even now a game is not played again exactly from its seed and networks: an
-inference batch's mix of states changes a forward pass's outputs in their last
-digits (the module notes of `studies/campaign/episode_workers.py`).
-
-**A real case** (17 November 2026, the Mac profile's 64×2 network, inference
-batches saved from a training iteration and replayed). If each game kept the
-version it started with, the old version would stay in play until the last game
-begun under it ended, about one game's length, 231 to 332 seconds in that
-training iteration. A network update would finish after every 24 games, which
-also take about one game's length, so two versions would be in play almost all
-the time, and an inference batch would need two forward passes, one for each.
-The calls of a forward pass cost about 204 µs on one core whatever its states,
-so a second forward pass adds about 11% to an inference batch of 10 states,
-which takes about 1,840 µs. On the GPU a forward pass's fixed part is about
-1.0 ms of making calls, and an inference batch's about 1.7 ms in all, so a second
-would add about half again (worked out from lines through the replayed
-inference batches;
-[record](archive/records/coordinator_rounds_2026_11_17.md#replayed-rounds-on-one-core)).
-
-**Why it matters.** The inference server sets the pace of self-play
-([section 9.2 of the design document](design/README.md#92-running-training-on-the-mac)),
-so its extra work comes off decisions per hour almost one for one, and would
-eat most of what self-play that never stops gains.
-
-**The choices.**
-
-| | A. When the game starts | B. All games at once | C. When the game starts, after cheaper calls |
-| --- | --- | --- | --- |
-| How it works | New games get the newest networks; running games keep theirs until they end. | The inference server loads the new networks between two inference batches and answers every request with them from then on. | As A, once a forward pass can take several versions' states with few extra calls (the grouped matrix product of section 9.3). |
-| Versions in play | Almost always two. | One. | Almost always two, at little cost. |
-| Cost to the inference server | About 11% on one core and half again on the GPU (worked out). | Nothing. | Waits for that work, which is not built. |
-| A game's training samples | All from the game's own version. | From one version until the change, then from the next; each sample records the version that answered its search. | As A. |
-| Playing a game again | As now: from its seed and networks, not exactly. | The same, with the decision at which its networks changed, recorded with the game. | As A. |
-| Work | A version on every request, and two sets of networks in the inference server. | The least: the change happens between inference batches. | As A, after the grouped matrix product. |
-
-**Recommendation: B.** It costs the inference server nothing, needs the least
-work, and is how AlphaZero's self-play took up new parameters: its games always
-used the latest ones
-([AlphaZero preprint](https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/alphazero-shedding-new-light-on-chess-shogi-and-go/alphazero_preprint.pdf),
-page 3). A's one advantage, every game played by one version, buys no exact
-replay, since games are not played again exactly even now.
-
-**If answered.** The way self-play takes up new networks belongs in
-[the training loop](design/README.md#91-the-training-loop), with the rest of
-self-play that never stops.
-
 ## Open elsewhere
 
 These are open too, and stay in the pages that own them:
@@ -652,5 +504,13 @@ These are open too, and stay in the pages that own them:
 
 ## Answered
 
-None yet. An answered question is listed here with its number, the answer, the
-date and the page that now states it.
+An answered question is listed here with its number, the answer, the date and
+the page that now states it.
+
+- **Q-007**, self-play stopping at each training iteration's end. Answered on
+  17 November 2026: self-play never stops; network updates run beside the games.
+  Stated in [the training loop](design/README.md#91-the-training-loop) and
+  [running training on the Mac](design/README.md#92-running-training-on-the-mac).
+- **Q-008**, when self-play takes up new networks. Answered on 17 November 2026:
+  every game at once, between two inference batches. Stated in
+  [the training loop](design/README.md#91-the-training-loop).

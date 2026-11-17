@@ -74,7 +74,12 @@ class RemoteEvaluator:
     """One game thread's evaluator: one request in flight through its own pipe."""
 
     def __init__(self, connection: Connection, buffer_name: str, version: str) -> None:
+        # `version` labels the search's cache within one decision and never changes.
+        # `network_version` is the version of the networks that answered, which in
+        # self-play that never stops changes between two inference batches; the
+        # server names it in a reply only when it differs from the last it sent here.
         self.connection, self.version = connection, version
+        self.network_version: str | None = None
         self.memory = shared_memory.SharedMemory(name=buffer_name)
         self.stats = ClientStats()
 
@@ -93,12 +98,15 @@ class RemoteEvaluator:
         sent = time.perf_counter()
         try:
             self.connection.send((actor, len(actions), layout, header))
-            priors, values = self.connection.recv()
+            reply = self.connection.recv()
         except (EOFError, OSError) as error:  # BrokenPipeError is an OSError.
             raise EvaluatorClosed("The shared evaluator closed this game thread's pipe") from error
         self.stats.requests += 1
         self.stats.prepare_seconds += sent - started
         self.stats.wait_seconds += time.perf_counter() - sent
+        priors, values = reply[0], reply[1]
+        if len(reply) > 2:
+            self.network_version = reply[2]
         if len(priors) != len(actions):
             raise ValueError("The shared evaluator returned a different legal menu")
         return Evaluation(priors, vector(values))
@@ -189,6 +197,17 @@ class SharedEvaluatorServer:
                          for connection, name in zip(connections, buffer_names, strict=True)}
         self._stack = None
         self.stats = ServerStats()
+        # The version of `models`, named in a game thread's next reply whenever it
+        # differs from the last one sent there. None names no version.
+        self.network_version: str | None = None
+        self._named: dict[Connection, str] = {}
+
+    def take_up(self, weights: dict[str, Any], version: str) -> None:
+        """Answer every later request with these weights: between two inference batches."""
+        for player, model in self.models.items():
+            model.load_state_dict(weights[player])
+        self._stack = None  # The stack copied the old tables; the next batch builds a new one.
+        self.network_version = version
 
     @property
     def stack(self) -> Any:
@@ -254,8 +273,13 @@ class SharedEvaluatorServer:
         for row, found in chance.items():
             values[row] = [sum(value[i] for value in found) / len(PLAYERS) for i in range(3)]
         sending = time.perf_counter()
+        version = self.network_version
         for (connection, _), row_priors, value in zip(requests, priors, values, strict=True):
-            connection.send((row_priors, value))
+            if version is not None and self._named.get(connection) != version:
+                connection.send((row_priors, value, version))
+                self._named[connection] = version
+            else:
+                connection.send((row_priors, value))
         sent = time.perf_counter()
         if self.runtime_policy is not None:
             self.runtime_policy.completed(1)
@@ -334,7 +358,8 @@ def _game_process_main(target: Callable[..., None], *arguments: Any) -> None:
 def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, processes: int, games_per_process: int,
                       models: dict[str, Any], device: Any, runtime_policy: Any = None,
                       keep_playing: Callable[[SharedEvaluatorServer, list[Any]], bool] = lambda *_: True,
-                      exit_seconds: float = 20.0, stop_seconds: float = 20.0) -> tuple[list[Any], ServerStats]:
+                      exit_seconds: float = 20.0, stop_seconds: float = 20.0,
+                      feed: Callable[[], Any] | None = None) -> tuple[list[Any], ServerStats]:
     """Play tasks in game processes, evaluating every waiting position here.
 
     `target(slots, connections, buffer_names, tasks, results)` is the game process,
@@ -345,7 +370,15 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
     games. Processes get `exit_seconds` to exit after the last game and
     `stop_seconds` after a stop. Returns the records that arrived and the server's
     statistics.
+
+    With `feed`, games keep coming instead: `tasks` must be empty, and `feed()`
+    returns the next game's task, or None once no more games should start. A few
+    tasks wait queued beyond the game slots, so a slot that finishes a game starts
+    the next at once, and serving goes on until `keep_playing` returns false or
+    every game fed has reported.
     """
+    if feed is not None and tasks:
+        raise ValueError("Give either a list of tasks or a feed, not both")
     context = multiprocessing.get_context("spawn")
     slots = processes * games_per_process
     # A slot holds two pipe ends and its buffer mapped twice, and a shell's default
@@ -354,8 +387,24 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
     pipes = [context.Pipe() for _ in range(slots)]
     memories = [shared_memory.SharedMemory(create=True, size=BUFFER_BYTES) for _ in range(slots)]
     waiting, results = context.Queue(), context.Queue()
-    for task in [*tasks, *[None] * slots]:  # One stop marker per game slot.
-        waiting.put(task)
+    fed, fed_out = 0, feed is None
+
+    def top_up() -> None:
+        # Fed games beyond those already reported: the slots' games and a few queued.
+        nonlocal fed, fed_out
+        while not fed_out and fed - len(records) < slots + max(2, slots // 4):
+            task = feed()
+            if task is None:
+                fed_out = True
+                for _ in range(slots):  # One stop marker per game slot.
+                    waiting.put(None)
+                return
+            waiting.put(task)
+            fed += 1
+
+    if feed is None:
+        for task in [*tasks, *[None] * slots]:  # One stop marker per game slot.
+            waiting.put(task)
     spawned, records, unread, server = [], [], [], None
     finished, stopping = threading.Event(), False
 
@@ -375,6 +424,8 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
     receiver = threading.Thread(target=receive, name="campaign-game-records", daemon=True)
     try:
         receiver.start()
+        if feed is not None:
+            top_up()
         for index in range(processes):
             members = range(index * games_per_process, (index + 1) * games_per_process)
             process = context.Process(target=_game_process_main, daemon=True, args=(
@@ -388,18 +439,24 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
                                        [memory.name for memory in memories], runtime_policy)
 
         def keep_running() -> bool:
-            nonlocal stopping
+            nonlocal stopping, fed_out
             if unread:
                 raise unread[0]
             # Every game has reported, whatever else still holds a pipe open.
-            if len(records) >= len(tasks):
+            if fed_out and len(records) >= (len(tasks) if feed is None else fed):
                 return False
             # A stop comes first: its signal may have killed processes still starting.
             stopping = not keep_playing(server, records)
             if stopping:
+                if not fed_out:  # Queued games end at once, then each slot's marker stops it.
+                    fed_out = True
+                    for _ in range(slots):
+                        waiting.put(None)
                 return False
             if not all(process.is_alive() or process.exitcode == 0 for process in spawned):
                 raise ValueError("A game process exited abnormally")
+            if feed is not None:
+                top_up()
             return True
 
         server.serve(keep_running)
@@ -417,7 +474,7 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
         # What a clean exit flushed may still be in the pipe.
         clean = all(process.exitcode == 0 for process in spawned)
         stop = time.monotonic() + 5
-        while clean and len(records) < len(tasks) and time.monotonic() < stop:
+        while clean and len(records) < (len(tasks) if feed is None else fed) and time.monotonic() < stop:
             time.sleep(0.05)
     finally:
         finished.set()

@@ -174,9 +174,38 @@ class SharedEpisodeWorkers:
             raise RuntimeError("A game process lost a game's result")
         return sorted(records, key=lambda record: record["root"])
 
-    def report(self) -> dict[str, Any]:
-        """The last batch's evaluator traffic."""
-        stats = self.serving
+    def play_continuously(self, feed: Callable[[], Mapping[str, Any] | None], *, weights: Mapping[str, Any],
+                          version: str, keep_playing: Callable[[Any, list[dict[str, Any]]], bool]) -> list[dict[str, Any]]:
+        """Self-play that never stops: games from `feed` until it returns None or
+        `keep_playing(server, records)` returns false.
+
+        `keep_playing` runs between two inference batches, where it may give the
+        server new networks with `server.take_up(weights, version)`; every later
+        request is answered with them. A game thread labels its search's cache with
+        `version`, the version at the start, which the search needs to stay fixed
+        within a decision; each reply names the version of the networks that
+        answered. Returns every record that arrived, games stopped by a stop
+        included as failures.
+        """
+        from .shared_evaluator import play_shared_games
+        for player, model in self.models.items():
+            model.load_state_dict(weights[player])
+
+        def keep(server: Any, records: list[dict[str, Any]]) -> bool:
+            if server.network_version is None:  # Before the first inference batch.
+                server.network_version = version
+            return keep_playing(server, records)
+
+        records, self.serving = play_shared_games(partial(_shared_process, self.settings, version), [],
+                                                  processes=self.processes, games_per_process=self.games_per_process,
+                                                  models=self.models, device=self.device,
+                                                  runtime_policy=self.runtime_policy, keep_playing=keep,
+                                                  exit_seconds=120.0, stop_seconds=15.0, feed=feed)
+        return records
+
+    def report(self, server: Any = None) -> dict[str, Any]:
+        """The evaluator traffic of the last batch, or of a server still serving."""
+        stats = self.serving if server is None else server.stats
         return {"evaluations": stats.requests, "serving_rounds": stats.rounds, "network_passes": stats.passes,
                 "forward_seconds": stats.forward_seconds, "idle_seconds": stats.idle_seconds}
 

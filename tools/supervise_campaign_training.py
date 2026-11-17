@@ -347,14 +347,19 @@ def load_profile(name: str) -> dict:
 
 
 def profile_arguments(profile: dict, arguments: list[str]) -> list[str]:
-    """The profile's training flags, except those the command gives itself."""
+    """The profile's training flags, except those the command gives itself.
+
+    A true or false setting is a switch: `"continuous": true` adds `--continuous`
+    and false adds `--no-continuous`, unless the command gives either.
+    """
     given = {token.split("=", 1)[0] for token in arguments if token.startswith("--")}
     added = []
     for name, value in profile.get("training", {}).items():
-        if isinstance(value, bool):
-            raise ValueError("Profile training settings take values, not switches")
         flag = "--" + name.replace("_", "-")
-        if flag not in given:
+        if isinstance(value, bool):
+            if flag not in given and "--no-" + flag[2:] not in given:
+                added.append(flag if value else "--no-" + flag[2:])
+        elif flag not in given:
             added += [flag, str(value)]
     return added + arguments
 
@@ -401,8 +406,10 @@ def validate_training_arguments(arguments: list[str], config: SupervisorConfig):
     if min(values.values()) <= 0 or values["cpu-budget"] > config.cpu_budget - (0 if config.all_cores else 1):
         raise ValueError("Training CPU budget must leave one core for its supervisor")
     workers = [index for index, token in enumerate(arguments) if token == "--episode-workers"]
-    # Worker games and updates take turns, as the runner's own budget counts them.
-    busy = (max(int(arguments[workers[0] + 1]), values["threads"]) if workers
+    # Worker games and updates take turns, as the runner's own budget counts them,
+    # except in self-play that never stops, where network updates run beside the games.
+    continuous = "--continuous" in arguments and "--no-continuous" not in arguments
+    busy = (max(int(arguments[workers[0] + 1]), values["threads"]) + int(continuous) if workers
             else values["threads"] + values["parallel-envs"])
     if busy + 1 > values["cpu-budget"]:
         raise ValueError("Tensor threads, search workers and coordinator exceed training CPU budget")

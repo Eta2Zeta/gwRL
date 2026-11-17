@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="330" viewBox="0 0 960 330" role="img" aria-labelledby="title desc">
   <title id="title">The training loop</title>
-  <desc id="desc">The training loop. 1: a training iteration plays its games with the networks held fixed; at every decision the alliance to act searches, asking its network many times, and a random 5% of decisions are kept as training samples. When a game ends, its final scores are added to its training samples. 2: the training samples join a replay buffer of recent training samples; a training sample records what the network read, how many simulations began with each action and, once the game ends, the final scores. 3: the training steps of a network update train the three networks, one per alliance: each network's action probabilities shift toward the search's visit shares and its predicted final scores toward the real ones. 4: the saved networks play the next training iteration's games.</desc>
+  <desc id="desc">The training loop of self-play that never stops. 1: self-play plays game after game with the newest networks; at every decision the alliance to act searches, asking its network many times, and a random 5% of decisions are kept as training samples. When a game ends, its final scores are added to its training samples. 2: the training samples join a replay buffer of recent training samples; a training sample records what the network read, how many simulations began with each action and, once the game ends, the final scores. 3: after every 24 finished games, a network update's training steps train the three networks, one per alliance, beside self-play: each network's action probabilities shift toward the search's visit shares and its predicted final scores toward the real ones. 4: when the network update is done, every game takes up the new networks at once.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -20,8 +20,8 @@
   <rect x="24" y="30" width="236" height="190" rx="10" fill="#ddf4ff" stroke="#54aeff"/>
   <circle cx="48" cy="56" r="13" fill="#0969da"/>
   <text class="step" x="48" y="60.5" text-anchor="middle">1</text>
-  <text class="title" x="70" y="61">Play a training iteration's games</text>
-  <text class="sub" x="40" y="86">networks held fixed</text>
+  <text class="title" x="70" y="61">Self-play</text>
+  <text class="sub" x="40" y="86">game after game, the newest networks</text>
   <text class="body" x="40" y="112">At every decision, the alliance</text>
   <text class="body" x="40" y="130">to act searches: it asks its</text>
   <text class="body" x="40" y="148">network many times, then</text>
@@ -46,7 +46,7 @@
   <circle cx="720" cy="56" r="13" fill="#8250df"/>
   <text class="step" x="720" y="60.5" text-anchor="middle">3</text>
   <text class="title" x="742" y="61">Train three networks</text>
-  <text class="sub" x="712" y="86">one per alliance</text>
+  <text class="sub" x="712" y="86">one per alliance, beside self-play</text>
   <text class="body" x="712" y="112">Each network's action</text>
   <text class="body" x="712" y="130">probabilities shift toward the</text>
   <text class="body" x="712" y="148">search's visit shares, and its</text>
@@ -58,13 +58,13 @@
   <text class="label" x="309" y="100" text-anchor="middle">game over:</text>
   <text class="label" x="309" y="115" text-anchor="middle">scores added</text>
   <line x1="600" y1="125" x2="691" y2="125" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
-  <text class="label" x="645" y="100" text-anchor="middle">training</text>
-  <text class="label" x="645" y="115" text-anchor="middle">steps</text>
+  <text class="label" x="645" y="100" text-anchor="middle">every 24 games:</text>
+  <text class="label" x="645" y="115" text-anchor="middle">a network update</text>
 
   <!-- Return arrow -->
   <path d="M 814 222 L 814 268 Q 814 284 798 284 L 158 284 Q 142 284 142 268 L 142 226" fill="none" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
   <rect x="283" y="268" width="390" height="32" rx="16" fill="#ffffff" stroke="#d0d7de"/>
   <circle cx="302" cy="284" r="12" fill="#57606a"/>
   <text class="step" x="302" y="288.5" text-anchor="middle">4</text>
-  <text class="body" x="322" y="288.5" font-weight="600">Save the networks for the next training iteration</text>
+  <text class="body" x="322" y="288.5" font-weight="600">Every game takes up the new networks at once</text>
 </svg>

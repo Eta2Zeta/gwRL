@@ -139,6 +139,10 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
     pending: list[dict[str, Any]] = []
     events: list[dict[str, Any]] = []
     counts = dict(transitions=0, decisions=0, chance_events=0)
+    # In self-play that never stops the networks can change during a game: each
+    # decision records the version that answered its search's last evaluation,
+    # and `network_versions` lists the decisions at which the version changed.
+    network_versions: list[list[Any]] = []
     while not env.is_terminal() and counts["transitions"] < max_transitions:
         before = env.planning_key()
         if env.decision_kind() == "chance":
@@ -151,7 +155,10 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
                 seed=search_random.getrandbits(64), rules_version=rules_version, mode=config.mode,
                 root_dirichlet_alpha=config.root_dirichlet_alpha, root_dirichlet_epsilon=config.root_dirichlet_epsilon)
             result = VectorMCTS(evaluator, search).search(env, add_root_noise=config.root_noise, reuse_root=False)
-            event = _decide(env, result, pending, config=config, rng=policy_random, batch_version=batch_version)
+            version = getattr(evaluator, "network_version", None) or batch_version
+            if not network_versions or network_versions[-1][1] != version:
+                network_versions.append([counts["decisions"], version])
+            event = _decide(env, result, pending, config=config, rng=policy_random, batch_version=version)
             if sample_random.random() >= config.sample_fraction:
                 pending.pop()
             counts["decisions"] += 1
@@ -163,7 +170,8 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
     records = [{**sample, "values": target.copy(), "target_source": "terminal", "target_schema": TARGET_SCHEMA}
                for sample in pending] if terminal else []
     return {"terminal": terminal, "records": records, "events": events, "counts": counts,
-            "returns": target, "clock": env.observation()["state"]["clock"], "wealth": env.wealth()}
+            "returns": target, "clock": env.observation()["state"]["clock"], "wealth": env.wealth(),
+            "network_versions": network_versions}
 
 
 def validate_sample(sample: Any, *, labeled: bool, spec: Any) -> None:
@@ -407,13 +415,36 @@ class CampaignLearner:
         self.parallel_envs, self.parallel_pending = [], []
         self._freeze_policies()
 
+    def network_version(self) -> str:
+        """The version a training sample records for the live networks, as a frozen batch's."""
+        return _fingerprint({"models": self.model_versions(), "mode": self.config.mode,
+                             "model_config": self.model_config, "compatibility": self.compatibility})
+
     def _freeze_policies(self) -> None:
         self.frozen_models = {player: copy.deepcopy(self.models[player]).eval() for player in PLAYERS}
         self.frozen_versions = self.model_versions()
-        self.batch_version = _fingerprint({"models": self.frozen_versions, "mode": self.config.mode,
-                                           "model_config": self.model_config,
-                                           "compatibility": self.compatibility})
+        self.batch_version = self.network_version()
         self.pending, self.batch_records = [], []
+
+    def accept_episode(self, result: Mapping[str, Any]) -> int:
+        """A finished game's training samples join the replay buffer at once.
+
+        For self-play that never stops, where no batch is frozen: the game's
+        samples, labelled with its final scores, go to the end of the replay buffer,
+        and its counts and actions are added. Returns the number of samples.
+        """
+        if self.frozen_models is not None or self.pending or self.batch_records:
+            raise ValueError("A frozen rollout batch is active")
+        if not result.get("terminal"):
+            raise ValueError("Only a finished game's samples are accepted")
+        for record in result["records"]:
+            self._validate_sample(record, labeled=True)
+        self.replay = (self.replay + list(result["records"]))[-self.config.replay_capacity:]
+        for name in ("transitions", "decisions", "chance_events"):
+            self.counters[name] += result["counts"][name]
+        self.counters["episodes"] += 1
+        self.action_history.extend({**event, "root": result["root"]} for event in result["events"])
+        return len(result["records"])
 
     def begin_batch_many(self, envs: Any = None) -> None:
         roots = list(envs) if envs is not None else self.parallel_envs.copy()

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
   <title id="title">Where a training step's minibatch of 32 training samples comes from</title>
-  <desc id="desc">Where a training step's minibatch of 32 training samples comes from. 1: a training iteration plays 24 games at once, 6 game processes of 4 games each, with the networks held fixed; at each decision a random draw keeps it as a training sample with chance 5%, and when a game ends its final scores are added to its training samples; on 5 November one training iteration of 32 games kept 1,611 training samples from 33,062 decisions. 2: when all of the training iteration's games have ended, their training samples join the replay buffer in the main training process, the latest 8,000 training samples, about five training iterations' worth, drawn as five bars from the oldest training iteration, whose training samples leave first, to the newest; purple dots spread over all five bars mark one training step's minibatch of 32, drawn at random. 3: one training step, 525 per network update, each with a new minibatch: draw 32 different training samples at random from the whole replay buffer; each of the three networks reads all 32 at once; it compares its values with the final scores on all 32, and its action probabilities with the visit shares on its own alliance's training samples; each network takes one Adam step. 4: after the last training step the networks are saved for the next training iteration. With 64×2 networks on the CPU, a training iteration's 24 games take about 8 minutes to play and its 525 training steps under a minute; no game plays during the training steps.</desc>
+  <desc id="desc">Where a training step's minibatch of 32 training samples comes from. 1: self-play plays 24 games at a time, in 6 game processes of 4 games each, and a game that ends is replaced at once; at each decision a random draw keeps it as a training sample with chance 5%, and when a game ends its final scores are added to its training samples; on 5 November 32 games kept 1,611 training samples from 33,062 decisions. 2: when a game ends, its training samples join the replay buffer in the main training process, the latest 8,000 training samples, about five network updates' worth of games, drawn as five bars from the oldest games, whose training samples leave first, to the newest; purple dots spread over all five bars mark one training step's minibatch of 32, drawn at random. 3: one training step, 525 per network update, each with a new minibatch: draw 32 different training samples at random from the whole replay buffer; each of the three networks reads all 32 at once; it compares its values with the final scores on all 32, and its action probabilities with the visit shares on its own alliance's training samples; each network takes one Adam step. 4: after the last training step every game takes up the new networks at once. With 64×2 networks on the CPU, 24 games finish about every 6 minutes, and a network update's 525 training steps take about 40 seconds beside the games, which go on.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -25,17 +25,18 @@
   <rect x="24" y="24" width="226" height="294" rx="10" fill="#ddf4ff" stroke="#54aeff"/>
   <circle cx="48" cy="50" r="13" fill="#0969da"/>
   <text class="step" x="48" y="54.5" text-anchor="middle">1</text>
-  <text class="title" x="70" y="55">A training iteration's games</text>
-  <text class="sub" x="40" y="80">networks held fixed</text>
-  <text class="body" x="40" y="108">24 games at once: 6 game</text>
-  <text class="body" x="40" y="126">processes of 4 games each.</text>
-  <text class="body" x="40" y="152">At each decision, a random</text>
-  <text class="body" x="40" y="170">draw keeps it as a training</text>
-  <text class="body" x="40" y="188">sample with chance 5%. When a</text>
-  <text class="body" x="40" y="206">game ends, its final scores are</text>
-  <text class="body" x="40" y="224">added to its training samples.</text>
-  <text class="label" x="40" y="252">5 November: 32 games, 1,611 training</text>
-  <text class="label" x="40" y="268">samples from 33,062 decisions</text>
+  <text class="title" x="70" y="55">Self-play</text>
+  <text class="sub" x="40" y="80">game after game, newest networks</text>
+  <text class="body" x="40" y="108">24 games at a time, in 6 game</text>
+  <text class="body" x="40" y="126">processes of 4; a game that ends</text>
+  <text class="body" x="40" y="144">is replaced at once.</text>
+  <text class="body" x="40" y="170">At each decision, a random</text>
+  <text class="body" x="40" y="188">draw keeps it as a training</text>
+  <text class="body" x="40" y="206">sample with chance 5%. When a</text>
+  <text class="body" x="40" y="224">game ends, its final scores are</text>
+  <text class="body" x="40" y="242">added to its training samples.</text>
+  <text class="label" x="40" y="270">5 November: 32 games, 1,611 training</text>
+  <text class="label" x="40" y="286">samples from 33,062 decisions</text>
 
   <!-- 2. The replay buffer -->
   <rect x="306" y="24" width="294" height="294" rx="10" fill="#dafbe1" stroke="#4ac26b"/>
@@ -44,9 +45,9 @@
   <text class="title" x="352" y="55">The replay buffer</text>
   <text class="sub" x="322" y="80">in the main training process</text>
   <text class="body" x="322" y="108">The latest 8,000 training samples, about</text>
-  <text class="body" x="322" y="126">five training iterations'. Purple dots: one</text>
-  <text class="body" x="322" y="144">training step's minibatch, drawn at random.</text>
-  <text class="label" x="322" y="166">oldest training iteration: leaves first</text>
+  <text class="body" x="322" y="126">five network updates' games. Purple dots:</text>
+  <text class="body" x="322" y="144">one training step's minibatch, at random.</text>
+  <text class="label" x="322" y="166">oldest games: leave first</text>
   <rect x="322" y="174" width="262" height="18" rx="3" fill="url(#samples)" stroke="#4ac26b"/>
   <rect x="322" y="198" width="262" height="18" rx="3" fill="url(#samples)" stroke="#4ac26b"/>
   <rect x="322" y="222" width="262" height="18" rx="3" fill="url(#samples)" stroke="#4ac26b"/>
@@ -84,7 +85,7 @@
   <circle cx="392.4" cy="279.0" r="3.4" fill="#8250df"/>
   <circle cx="360.5" cy="231.0" r="3.4" fill="#8250df"/>
   <circle cx="340.5" cy="231.0" r="3.4" fill="#8250df"/>
-  <text class="label" x="322" y="306">newest training iteration: just joined</text>
+  <text class="label" x="322" y="306">newest games: join as they end</text>
 
   <!-- 3. One training step -->
   <rect x="656" y="24" width="280" height="294" rx="10" fill="#fbefff" stroke="#c297ff"/>
@@ -113,6 +114,6 @@
   <rect x="216" y="340" width="528" height="32" rx="16" fill="#ffffff" stroke="#d0d7de"/>
   <circle cx="235" cy="356" r="12" fill="#57606a"/>
   <text class="step" x="235" y="360.5" text-anchor="middle">4</text>
-  <text class="body bold" x="255" y="360.5">After the last training step: save the networks for the next training iteration</text>
-  <text class="label" x="480" y="402" text-anchor="middle">With 64×2 networks on the CPU, a training iteration's 24 games take about 8 minutes to play, and its 525 training steps under a minute. No game plays during the training steps.</text>
+  <text class="body bold" x="255" y="360.5">After the last training step: every game takes up the new networks at once</text>
+  <text class="label" x="480" y="402" text-anchor="middle">With 64×2 networks on the CPU, 24 games finish about every 6 minutes, and a network update's 525 training steps take about 40 seconds beside the games, which go on.</text>
 </svg>

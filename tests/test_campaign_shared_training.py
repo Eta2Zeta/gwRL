@@ -195,6 +195,39 @@ class SharedTrainingRunTests(unittest.TestCase):
         self.assertTrue(all(update["rollout"]["terminal"] and not update["rollout"]["bootstrap_samples"]
                             for update in updates))
 
+    def test_self_play_that_never_stops_trains_beside_its_games_and_resumes(self):
+        # Stopped after its first network update, then resumed from that checkpoint;
+        # the games in play at the stop are lost.
+        self.assertEqual(self.train(*ARGUMENTS, "--continuous", "--stop-after-waves", "1"), 130)
+        self.assertEqual(self.train("--resume", str(self.run_dir / "checkpoint.pt")), 0)
+        manifest = json.loads((self.run_dir / "manifest.json").read_text())
+        self.assertEqual(manifest["status"], "completed")
+        self.assertEqual(manifest["counters"]["updates"], 2)
+        updates = manifest["runner"]["updates"]
+        # Each network update trained on the samples of at least parallel_envs
+        # finished games, all of them complete.
+        self.assertTrue(all(update["rollout"]["games"] >= 4 and update["rollout"]["terminal"]
+                            and not update["rollout"]["bootstrap_samples"] for update in updates))
+        # The games went on through the first network update, and the inference
+        # server took up its networks: the second update's games were answered by a
+        # version no game before the first update saw.
+        first, second = (set(update["rollout"]["rollout_versions"]) for update in updates)
+        self.assertEqual(len(first), 1)
+        self.assertTrue(second - first)
+        self.assertTrue(all(update["evaluator"]["evaluations"] > 0 for update in updates))
+        self.assertTrue((self.run_dir / "models" / "generation-000002.pt").exists())
+        self.assertGreaterEqual(manifest["counters"]["episodes"], 8)
+
+    def test_self_play_that_never_stops_needs_one_cpu_inference_server(self):
+        with self.assertRaisesRegex(ValueError, "needs games per process"):
+            run.RunConfig(complete_episodes=True, parallel_envs=4, episode_workers=2, continuous=True)
+        with self.assertRaisesRegex(ValueError, "on the CPU"):
+            run.RunConfig(complete_episodes=True, parallel_envs=4, episode_workers=2, games_per_process=2,
+                          continuous=True, neural_device="mps")
+        config = run.RunConfig(complete_episodes=True, parallel_envs=4, episode_workers=2, games_per_process=2,
+                               continuous=True)
+        self.assertEqual(run.busy_cores(config), 4)  # Two game processes, the inference server, the trainer.
+
     def test_games_per_process_needs_episode_workers(self):
         with self.assertRaisesRegex(ValueError, "needs episode workers"):
             run.RunConfig(games_per_process=4)

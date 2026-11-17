@@ -38,8 +38,10 @@ July 1941 campaign result.
 ./.venv/bin/python -m studies.campaign.run train
 ```
 
-Add `--complete-episodes` to hold a training iteration's networks fixed until
-each game reaches its true end. Each new training iteration creates fresh games,
+Add `--complete-episodes` to play every game to its true end, with a training
+iteration's networks held fixed until its last game ends (self-play that never
+stops, below, changes them during the games instead). Each new training
+iteration creates fresh games,
 and every training sample receives an observed terminal target. A transition guard saves frozen pending work without
 bootstrapping or updating and exits with code 2; increase only that guard when
 resuming, with `--extend-episode-budget N`. `--calendar-rounds N` shortens the
@@ -89,7 +91,9 @@ generators, counters, configuration, scenario/rule/schema fingerprints and
 runtime source hashes. Resume rejects configuration, source or schema changes;
 a changed implementation needs an explicit migration or a new run. Only load
 trusted local Torch checkpoints produced by this runner. CPU thread count and
-software versions are part of exact continuation compatibility.
+software versions are part of exact continuation compatibility. In self-play
+that never stops a checkpoint is saved after a network update and holds no game
+in play: those games are lost on a resume, which starts new ones.
 
 ## Game processes and the GPU
 
@@ -163,10 +167,27 @@ eight game processes before 15 November 2026. `--batch-size` is the minibatch
 size and `--epochs` the number of training steps per network update. Repeat the same command to resume. Another
 machine gets its own file beside `mac.json`.
 
+The Mac profile runs *self-play that never stops* (`"continuous": true`, the flag
+`--continuous`). Its 24 game threads play one game after another. After every 24
+games that end, a network update runs beside them, on a thread of the inference
+server's process, and when it is done every game takes up the new networks
+between two inference batches
+([the training loop](../../docs/design/README.md#91-the-training-loop)). A
+training iteration is then those 24 games and their network update, and
+`--batches` counts network updates. Stopping a run, by a signal,
+`--stop-after-waves` or `--batches`, loses the games then in play. It needs
+`--games-per-process` and the inference server on the CPU; `--no-continuous`
+alternates instead, as the Windows profile does. On 17 November 2026, in two
+matched pairs of runs of four network updates, it played 6.5% and 12.5% more
+decisions per wall-clock hour in steady play than alternating training
+iterations ([record](../../docs/archive/records/self_play_never_stops_2026_11_17.md)).
+
 `--sample-fraction F` keeps that share of a worker game's decisions as training
 samples, from its own random stream, so the games play the same.
 `--no-new-batch-after EPOCH` finishes the running training iteration and ends
-the run as completed. `--initial-models EXPORT` starts a fresh run from an export's weights
+the run as completed; in self-play that never stops it starts no game after that
+time, and the run ends once the games in play have ended and a network update
+has trained on them. `--initial-models EXPORT` starts a fresh run from an export's weights
 and nothing else of that run, even if the sources have changed since, so a run
 stopped by a bug continues from its latest networks after the fix.
 `tools/record_campaign_games.py` plays recorded games from a model export, each in

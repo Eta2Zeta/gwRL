@@ -484,6 +484,7 @@ class MachineProfileTests(unittest.TestCase):
         validate_training_arguments(arguments, SupervisorConfig(seconds=2, **profile["supervisor"]))
         self.assertEqual((self.flag(arguments, "--neural-device"), self.flag(arguments, "--games-per-process")), ("cpu", "4"))
         self.assertEqual(self.flag(arguments, "--simulations"), "64")
+        self.assertIn("--continuous", arguments)  # Self-play that never stops.
         self.assertEqual(profile["unset_environment"], ["MallocNanoZone"])
 
     def test_the_windows_profile_is_a_valid_execution_layout(self):
@@ -498,6 +499,19 @@ class MachineProfileTests(unittest.TestCase):
         self.assertEqual(self.flag(arguments, "--threads"), "2")
         self.assertNotIn("--parallel-envs", arguments)
         self.assertEqual(self.flag(arguments, "--episode-workers"), "4")
+
+    def test_a_true_or_false_setting_is_a_switch_the_command_can_override(self):
+        profile = {"training": {"continuous": True, "threads": 1}}
+        self.assertEqual(profile_arguments(profile, ["--simulations", "8"]),
+                         ["--continuous", "--threads", "1", "--simulations", "8"])
+        self.assertEqual(profile_arguments(profile, ["--no-continuous"]), ["--threads", "1", "--no-continuous"])
+        self.assertEqual(profile_arguments({"training": {"continuous": False}}, []), ["--no-continuous"])
+
+    def test_self_play_that_never_stops_counts_its_trainer(self):
+        arguments = ["--threads", "1", "--parallel-envs", "24", "--cpu-budget", "8", "--episode-workers", "7"]
+        validate_training_arguments(arguments, SupervisorConfig(seconds=2, cpu_budget=9))
+        with self.assertRaisesRegex(ValueError, "exceed training CPU budget"):
+            validate_training_arguments([*arguments, "--continuous"], SupervisorConfig(seconds=2, cpu_budget=9))
 
     def test_an_unknown_profile_names_the_known_ones(self):
         with self.assertRaisesRegex(ValueError, "known profiles: .*mac"):

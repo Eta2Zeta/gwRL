@@ -76,11 +76,12 @@ AlphaZero:
   (section 4), guided by its own neural network (sections 3, 5 and 6).
 - **They keep some of their decisions** as *training samples*: each with what
   the search preferred there and how the game ended (section 7).
-- **They learn from them.** Training comes in *training iterations*. In each, the
-  agents play a set of self-play games with their networks held fixed, and then a
-  *network update* adjusts each network to propose what the search preferred and
-  to predict how games end (section 8). Better networks make the next searches
-  better, and the loop repeats (section 9).
+- **They learn from them, while they play.** Self-play never stops: after every
+  24 games that end, a *network update* adjusts each network to propose what the
+  search preferred and to predict how games end (section 8), while the games go
+  on, and every game takes up the new networks as soon as they are ready. Those
+  games and their network update make one *training iteration*. Better networks
+  make the next searches better, and the loop repeats (section 9).
 
 Whether that works for this game on this hardware is unproven: no training run
 has yet shown robust playing strength ([section 10](#10-measuring-strength)).
@@ -1188,16 +1189,21 @@ into the levels of section 6.8.
 
 ### 7.1 A training iteration's games
 
-Training alternates between playing and learning, in *training iterations*. Each
-training iteration first plays a set of self-play games with all three networks
-held fixed: 24 games at once, 6 game processes of 4 games each
-([section 9.2](#92-running-training-on-the-mac)), until the last of them ends.
-At every decision the alliance
-to act searches (section 4) and plays the action drawn from the visit shares.
-Then a network update trains the networks (section 8.4), and the next training
-iteration plays with them. The code and the dated records name a training
-iteration's games a *batch* (as in the flag `--transitions-per-batch`); this
-document keeps "batch" for the inference batches of section 9.2.
+Training learns from self-play in *training iterations*. In the Mac profile
+self-play never stops: 24 games are in play at a time, in 6 game processes of 4
+games each ([section 9.2](#92-running-training-on-the-mac)), and a game thread
+that finishes a game starts the next at once. After every 24 games that end, a
+network update trains the networks on their training samples and older ones
+(section 8.4), beside the games, which go on; when it is done, every game takes
+up the new networks at once ([section 9.1](#91-the-training-loop)). A training
+iteration is those 24 games and their network update. At every decision the
+alliance to act searches (section 4) and plays the action drawn from the visit
+shares. Training can also alternate between playing and learning, as the Windows
+profile does: a training iteration's 24 games then start together with the
+networks held fixed, and the network update runs when the last of them has
+ended. The code and the dated records name a training iteration's games a
+*batch* (as in the flag `--transitions-per-batch`); this document keeps "batch"
+for the inference batches of section 9.2.
 
 The settings in sections 7 and 8 are those of the Mac training command in the
 [campaign learning guide](../../studies/campaign/README.md#training-on-the-mac),
@@ -1212,10 +1218,12 @@ game's thousand-odd states are close to one another. A decision with only one
 legal action, played without a search, can be kept too: its visit share is 1, so
 it teaches only the values. Every game is played to its end. A guard,
 `--transitions-per-batch`, stops a game that runs far too long, 20,000 states in
-the Mac command against about 1,500 in a normal game; then the training
-iteration's games are discarded without training samples and the run stops, to
-be resumed with a higher guard (`--extend-episode-budget`), which replays the
-training iteration exactly.
+the Mac command against about 1,500 in a normal game. Then the run stops, to be
+resumed with a higher guard (`--extend-episode-budget`), and the game is
+discarded without training samples. In self-play that never stops, the other
+games then in play are lost too, and the resumed run starts new ones; in
+alternating training iterations, the training iteration's games are discarded
+and played again from the same seeds.
 
 ### 7.2 What a training sample stores
 
@@ -1257,7 +1265,7 @@ simulations that played through the battle did. Where the search finds a
 difference, its split is therefore a better judgment than the network's first
 guess. Training moves the network's probabilities toward the split, so the
 network's next first guesses come closer to what a search would conclude, and
-the next training iteration's searches start from them.
+the searches after the next network update start from them.
 
 **The final scores** are what really happened after the decision, so they teach
 the network to predict how a state will end.
@@ -1429,8 +1437,9 @@ trained on, so this measures fit, not foresight.
 **Where training samples wait: the replay buffer.** A training sample is made in
 a game process at the moment of its decision, and its final scores are added when
 its game ends. The game processes hand their training samples to the main
-training process, which adds them to its *replay buffer* once all the games of
-the training iteration have ended. The replay buffer is a list of the latest
+training process, which adds a game's training samples to its *replay buffer*
+when the game ends (in alternating training iterations, once all the games of
+the training iteration have ended). The replay buffer is a list of the latest
 training samples, at most 8,000, from which the oldest leave first. On 5 November
 one training iteration kept 1,611 training samples from 33,062 decisions, so a
 full replay buffer holds about the last five training iterations' training
@@ -1456,14 +1465,14 @@ step does four things (`CampaignLearner.update` in `studies/campaign/learning.py
    of its two losses; all three take theirs together.
 
 The next training step draws a new minibatch of 32. After the last, the networks
-are saved as a *model export*, and the next training iteration's games play with
-them. The networks after $k$ network updates are *generation* $k$; a fresh
+are saved as a *model export*, and every game takes them up at once
+(section 9.1). The networks after $k$ network updates are *generation* $k$; a fresh
 network is generation 0. Playing takes minutes and the training steps under a
 minute: on 5 November the 32 games took 851 seconds and the 700 training steps
 49, and on 15 November a training iteration of today's 24 games played in 499
 seconds, also 64×2.
 
-![Where a training step's minibatch of 32 training samples comes from. 1: a training iteration plays 24 games at once, 6 game processes of 4 games each, with the networks held fixed; at each decision a random draw keeps it as a training sample with chance 5%, and when a game ends its final scores are added to its training samples; on 5 November one training iteration of 32 games kept 1,611 training samples from 33,062 decisions. 2: when all of the training iteration's games have ended, their training samples join the replay buffer in the main training process, the latest 8,000 training samples, about five training iterations' worth, drawn as five bars from the oldest training iteration, whose training samples leave first, to the newest; purple dots spread over all five bars mark one training step's minibatch of 32, drawn at random. 3: one training step, 525 per network update, each with a new minibatch: draw 32 different training samples at random from the whole replay buffer; each of the three networks reads all 32 at once; it compares its values with the final scores on all 32, and its action probabilities with the visit shares on its own alliance's training samples; each network takes one Adam step. 4: after the last training step the networks are saved for the next training iteration. With 64×2 networks on the CPU, a training iteration's 24 games take about 8 minutes to play and its 525 training steps under a minute; no game plays during the training steps.](figures/training_update.svg)
+![Where a training step's minibatch of 32 training samples comes from. 1: self-play plays 24 games at a time, in 6 game processes of 4 games each, and a game that ends is replaced at once; at each decision a random draw keeps it as a training sample with chance 5%, and when a game ends its final scores are added to its training samples; on 5 November 32 games kept 1,611 training samples from 33,062 decisions. 2: when a game ends, its training samples join the replay buffer in the main training process, the latest 8,000 training samples, about five network updates' worth of games, drawn as five bars from the oldest games, whose training samples leave first, to the newest; purple dots spread over all five bars mark one training step's minibatch of 32, drawn at random. 3: one training step, 525 per network update, each with a new minibatch: draw 32 different training samples at random from the whole replay buffer; each of the three networks reads all 32 at once; it compares its values with the final scores on all 32, and its action probabilities with the visit shares on its own alliance's training samples; each network takes one Adam step. 4: after the last training step every game takes up the new networks at once. With 64×2 networks on the CPU, 24 games finish about every 6 minutes, and a network update's 525 training steps take about 40 seconds beside the games, which go on.](figures/training_update.svg)
 
 In the training command the minibatch size, 32, is `--batch-size` and the number
 of training steps per network update is `--epochs`. The second name misleads: a
@@ -1569,23 +1578,46 @@ on 5 November.
 
 ### 9.1 The training loop
 
-With all the bricks in place, training repeats one loop, one training iteration
-per turn of the loop:
+With all the bricks in place, training runs self-play and network updates side
+by side, in a loop of four steps:
 
-1. **Play a training iteration's games** (section 7.1). At every decision, the
-   alliance to act runs a search (section 4), guided by its own network
-   (sections 3, 5 and 6), and picks an action. The networks do not change during
-   the games.
+1. **Self-play, game after game** (section 7.1). At every decision, the alliance
+   to act runs a search (section 4), guided by its own network (sections 3, 5
+   and 6), and picks an action. A game thread that finishes a game starts the
+   next at once.
 2. **Keep some decisions as training samples** (section 7.2): what the network
    read, how the search split its simulations and, added when the game ends, the
-   final scores.
-3. **Train the three networks** in a network update on those training samples and
-   recent older ones from the replay buffer (section 8), so that their action
+   final scores. A finished game's training samples join the replay buffer at
+   once.
+3. **Train the three networks** in a network update after every 24 games that
+   end, on the replay buffer's training samples (section 8), so that their action
    probabilities come closer to the search's visit shares and their values closer
-   to the final scores.
-4. **Save the networks** and play the next training iteration's games with them.
+   to the final scores. The network update runs beside self-play, which goes on
+   with the networks it has.
+4. **Take up the new networks.** When the network update is done, the inference
+   server answers every game with the new networks from its next inference batch
+   on, and the run saves them.
 
-![The training loop. 1: a training iteration plays its games with the networks held fixed; at every decision the alliance to act searches, asking its network many times, and a random 5% of decisions are kept as training samples. When a game ends, its final scores are added to its training samples. 2: the training samples join a replay buffer of recent training samples; a training sample records what the network read, how many simulations began with each action and, once the game ends, the final scores. 3: the training steps of a network update train the three networks, one per alliance: each network's action probabilities shift toward the search's visit shares and its predicted final scores toward the real ones. 4: the saved networks play the next training iteration's games.](figures/training_loop.svg)
+![The training loop of self-play that never stops. 1: self-play plays game after game with the newest networks; at every decision the alliance to act searches, asking its network many times, and a random 5% of decisions are kept as training samples. When a game ends, its final scores are added to its training samples. 2: the training samples join a replay buffer of recent training samples; a training sample records what the network read, how many simulations began with each action and, once the game ends, the final scores. 3: after every 24 finished games, a network update's training steps train the three networks, one per alliance, beside self-play: each network's action probabilities shift toward the search's visit shares and its predicted final scores toward the real ones. 4: when the network update is done, every game takes up the new networks at once.](figures/training_loop.svg)
+
+A *training iteration* is one turn of this loop: 24 games that ended and the
+network update that trains on them. A game may so be played by more than one
+version of the networks. Each training sample records the version that answered
+its search's last evaluation, and each game the decisions at which its version
+changed (`network_versions` in `play_episode`, `studies/campaign/learning.py`).
+AlphaZero trained this way: its one network was updated continually instead of
+in iterations, and its self-play always used the latest parameters, while 5,000
+TPUs played and 16 others trained
+([preprint](https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/alphazero-shedding-new-light-on-chess-shogi-and-go/alphazero_preprint.pdf),
+pages 3 and 4). Here the network update runs on a thread of the inference
+server's process (`self_play_never_stops` in `studies/campaign/run.py`, run with
+`--continuous`), which needs the inference server on the CPU (section 9.2).
+
+Training can also alternate between playing and learning, as the Windows profile
+does, whose inference server runs on the GPU. A training iteration's 24 games
+then start together with the networks held fixed, and the network update runs
+when the last of them has ended, so self-play stands still while the last games
+finish and while the networks update (section 9.2).
 
 The idea comes from AlphaZero. The search chooses better than the bare network,
 the network learns to imitate the search and to predict outcomes, and a better
@@ -1595,13 +1627,16 @@ hardware is unproven: no training run has yet shown robust playing strength.
 ### 9.2 Running training on the Mac
 
 **Layout.** The Mac profile (`studies/campaign/profiles/mac.json`) runs 6 game
-processes of 4 games each. One *inference server*, a process of its own, runs the
-networks for all their states together, on the CPU: for this small network the
-GPU's cost per forward pass outweighs its speed. Training stays within the
+processes of 4 games each. One *inference server*, the main training process,
+runs the networks for all their states together, on the CPU: for this small
+network the GPU's cost per forward pass outweighs its speed. In self-play that
+never stops, the same process runs the network updates, on a thread of their own
+(section 9.1). Training stays within the
 owner's allowance of 9 cores, the Mac's 10 performance cores less one for
 everything else, and 30 GB of memory. `tools/supervise_campaign_training.py`
 handles the time budget, restarts and memory stops. It counts one core for each
-game process, one for the inference server and one for itself, but a game process
+game process, one for the inference server, one for the network updates in
+self-play that never stops and one for itself, but a game process
 keeps 1.2 to 1.5 cores busy, because its game threads can compute at once
 (below). So the layout was chosen by the load it puts on the Mac: 6 processes
 kept about 9 cores busy, and 7, which also fit the count, about 10
@@ -1878,21 +1913,26 @@ work, which of the inference server and the cores set the pace depended on the
 Mac's other work
 ([record](../archive/records/move_checks_2026_11_16.md#training-batches)).
 
-A training iteration also pays for its end. Its 24 games start together and its
-self-play ends with the last of them, so as games end fewer remain concurrent, and
-the longest plays alone. In a training iteration timed with the profiler on
-17 November, 23 games ended between 231 and 299 seconds and the longest, 1,445
-decisions, played alone until 332 seconds: for the last tenth of the playing time
-the inference server's inference batches held one state each and the other game
-threads waited. That cost the training iteration about 9% of its decisions an hour
-(worked out from each game's decisions and time;
+**Self-play that never stops.** Alternating training iterations pay for their
+end twice: self-play stands still while a training iteration's last games finish,
+and again while the networks update. In a training iteration timed with the
+profiler on 17 November, 23 games ended between 231 and 299 seconds and the
+longest, 1,445 decisions, played alone until 332 seconds: for the last tenth of
+the playing time the inference batches held one state each and the other game
+threads waited, which cost about 9% of the decisions an hour (worked out from
+each game's decisions and time;
 [record](../archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail)).
-Self-play also stands still during the network update that follows, about 35
-seconds for 525 training steps at the speed measured on 5 November (worked out;
-[record](../archive/records/training_sample_2026_11_05.md#the-update-after-the-batch)).
-Whether self-play should go on through network updates instead, as AlphaZero's
-did, is waiting for the owner's decision
-([Q-007](../questions.md#q-007-self-play-stopping-at-each-training-iterations-end)).
+The network update after it took about 22 seconds. Self-play that never stops
+(section 9.1) plays through both. In two matched pairs of runs of four network
+updates the same day, it played 6.5% and 12.5% more decisions per wall-clock hour
+in steady play, its inference batches held about 10.5 states against 8.5, and the
+cores the run kept busy no longer fell to about 2 at each training iteration's
+end ([record](../archive/records/self_play_never_stops_2026_11_17.md)). Its
+network updates take longer, 34 to 48 seconds, because the trainer thread runs
+in the inference server's process and the two take turns at Python's lock: while
+a network update runs, the inference server answers about 29% fewer evaluations
+a second, which costs about 3% of the decisions an hour (worked out;
+[record](../archive/records/self_play_never_stops_2026_11_17.md#the-inference-server-while-a-network-update-runs)).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept training sample was drawn 8 to 12 times
@@ -2235,9 +2275,10 @@ others pay, and how much, is open:
   asks for several network evaluations at once (both above, where an inference
   batch's states come from). On the GPU the inference server's core could also
   collate the next inference batch while the GPU computes the current one; now it
-  waits for each forward pass's outputs before its next inference batch. A
-  training iteration's end empties its inference batches too, since its last games
-  play alone ([Q-007](../questions.md#q-007-self-play-stopping-at-each-training-iterations-end)).
+  waits for each forward pass's outputs before its next inference batch. In
+  alternating training iterations, a training iteration's end empties its
+  inference batches too, since its last games play alone; self-play that never
+  stops has no such end (section 9.2).
 - **A second inference server**, serving half the game processes, would add
   capacity without making an inference batch cheaper: each inference server would
   find about half as many states waiting, and smaller inference batches cost more
@@ -2418,10 +2459,13 @@ measured and what would settle it.
   inference server about 0.62 ms besides 0.13 ms a state (section 9.2); a seventh
   game process, now that cores are idle, would fill its inference batches further,
   which is untested. The inference server's own levers, none of them built, are
-  listed in section 9.3, with the first measurements of two of them. Each
-  training iteration also ends with its longest game playing alone, which cost a
-  training iteration timed with the profiler about 9% of its decisions an hour
-  ([Q-007](../questions.md#q-007-self-play-stopping-at-each-training-iterations-end)). Within the engine, listing a state's legal actions now
+  listed in section 9.3, with the first measurements of two of them. In
+  self-play that never stops the network updates run on a thread of the
+  inference server's process, and while one runs the inference server answers
+  about 29% fewer evaluations a second, about 3% of the decisions an hour; a
+  trainer process of its own would avoid that, which is untested
+  ([record](../archive/records/self_play_never_stops_2026_11_17.md#the-inference-server-while-a-network-update-runs)).
+  Within the engine, listing a state's legal actions now
   costs the most each time, and checking a naval route copies the whole state and
   works out its carriers' reach and supply again with no cache
   ([record](../archive/records/naval_route_checks_2026_11_16.md)). When the
@@ -2856,10 +2900,15 @@ the dated records use instead.
 
 **Training samples and training (sections 7 and 8)**
 
-- **Training iteration:** one turn of the training loop: self-play games with the
-  networks held fixed, all at once (24 in the Mac profile, one per game thread),
-  then a network update. The code and the dated records call
-  a training iteration's games a batch.
+- **Training iteration:** one turn of the training loop: 24 games that ended (in
+  the Mac profile) and the network update that trains on them. In self-play that
+  never stops the games go on through the network update; in alternating
+  training iterations they start together with the networks held fixed, and the
+  network update follows the last of them. The code and the dated records call a
+  training iteration's games a batch.
+- **Self-play that never stops:** training in which the game threads play one
+  game after another while network updates run beside them, and every game takes
+  up new networks at once (section 9.1; `--continuous`).
 - **Training sample:** one saved decision: what the network read, who chose, how
   the search split its simulations among the legal actions and the final scores.
 - **Policy target:** a training sample's visit shares, the action probabilities a
@@ -2886,7 +2935,8 @@ the dated records use instead.
   for each. The training command names the number of training steps per network
   update `--epochs`.
 - **Network update:** the training steps after a training iteration's games, 525
-  in the Mac training command.
+  in the Mac training command; in self-play that never stops they run beside the
+  games.
 - **Generation:** the networks after a given number of network updates; a fresh
   network is generation 0.
 - **Model export:** the saved networks after a network update.

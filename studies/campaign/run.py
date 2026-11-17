@@ -13,6 +13,7 @@ import os
 import random
 import signal
 import tempfile
+import threading
 import time
 from collections import Counter
 from contextlib import contextmanager
@@ -65,6 +66,11 @@ class RunConfig:
     # evaluated together in the main process on neural_device. Zero plays one
     # game per process, evaluated there on CPU.
     games_per_process: int = 0
+    # Self-play that never stops: the game threads play one game after another,
+    # a trainer thread runs a network update after every parallel_envs finished
+    # games, and the inference server takes up the new networks between two
+    # inference batches (design document, section 9.1).
+    continuous: bool = False
 
     def __post_init__(self):
         if not isinstance(self.neural_device, str) or self.neural_device not in {"cpu", "mps", "cuda"} and not (
@@ -100,6 +106,12 @@ class RunConfig:
             raise ValueError("Games per process needs episode workers")
         if self.sample_fraction != 1.0 and not self.episode_workers:
             raise ValueError("Only episode workers keep a share of their samples")
+        if type(self.continuous) is not bool:
+            raise ValueError("continuous must be Boolean")
+        if self.continuous and not self.games_per_process:
+            raise ValueError("Self-play that never stops needs games per process, which share one inference server")
+        if self.continuous and self.neural_device != "cpu":
+            raise ValueError("Self-play that never stops runs its networks on the CPU for now")
         if self.cpu_budget is not None:
             if type(self.cpu_budget) is not int or self.cpu_budget <= 0 or self.cpu_budget > (os.cpu_count() or 1):
                 raise ValueError("CPU budget must fit available logical cores")
@@ -110,8 +122,9 @@ class RunConfig:
 def busy_cores(config: RunConfig) -> int:
     """Conservative concurrent cores: one per game process, or threads plus roots."""
     if config.episode_workers:
-        # Workers play while the coordinator waits; updates run after collection.
-        return max(config.episode_workers, config.threads) + 1
+        # Workers play while the coordinator waits; updates run after collection,
+        # or beside it, on a core of their own, in self-play that never stops.
+        return max(config.episode_workers, config.threads) + 1 + int(config.continuous)
     return config.threads + config.parallel_envs + 1
 
 
@@ -383,6 +396,152 @@ def train(args) -> int:
                 handle.write(json.dumps(value, sort_keys=True) + "\n")
                 handle.flush()
 
+    def self_play_never_stops() -> bool:
+        """Self-play that never stops; returns whether a game reached the transition guard.
+
+        The game threads play one game after another, fed new seeds as they finish.
+        A finished game's training samples join the replay buffer at once
+        (`accept_episode`). After every config.parallel_envs finished games a
+        trainer thread runs one network update, while the games go on with the
+        networks they have. When it is done, the inference server takes up the new
+        networks between two inference batches, for every game at once, and the
+        run exports them and saves a checkpoint when one is due; only then can the
+        next network update start. Games in play when the run stops are lost.
+        """
+        last_start = getattr(args, "no_new_batch_after", None)
+        state = {"version": learner.network_version(), "root": len(runner["training_environment_seeds"]),
+                 "fed": 0, "accepted": 0, "finished": [], "failed": 0, "feeding": True, "exhausted": False,
+                 "mark": None}
+
+        def serving_mark(server):
+            # The inference server's totals now, to time its work while an update runs and between updates.
+            stats = server.stats
+            return (time.perf_counter(), stats.requests, stats.rounds, stats.forward_seconds, stats.idle_seconds)
+
+        def serving_between(before, after):
+            seconds, requests, rounds, forward, idle = (b - a for a, b in zip(before, after))
+            return {"seconds": seconds, "evaluations": requests, "inference_batches": rounds,
+                    "answering_seconds": forward, "idle_seconds": idle}
+        trainer = {"thread": None, "result": None, "error": None, "seconds": 0.0, "episodes": [],
+                   "weights": None, "version": None}
+
+        def live_weights():
+            return {player: {name: tensor.detach().cpu().clone()
+                             for name, tensor in learner.models[player].state_dict().items()} for player in PLAYERS}
+
+        def feed():
+            if (not state["feeding"] or stopped or runner["batch_index"] >= config.batches
+                    or (last_start is not None and time.time() >= last_start)):
+                state["feeding"] = False
+                return None
+            seed = learner.environment_random.getrandbits(63)
+            runner["training_environment_seeds"].append(seed)
+            task = {"root": state["root"], "seed": seed, "batch_version": state["version"],
+                    "max_transitions": runner["episode_wave_limit"]}
+            state["root"] += 1
+            state["fed"] += 1
+            return task
+
+        def start_update(server):
+            episodes, state["finished"], state["failed"] = state["finished"], [], 0
+            trainer.update(result=None, error=None, episodes=episodes, started=serving_mark(server),
+                           before=state["mark"])
+
+            def work():
+                began = time.perf_counter()
+                try:
+                    trainer["result"] = learner.update()
+                    # Read here, where nothing else touches the live networks.
+                    trainer["weights"], trainer["version"] = live_weights(), learner.network_version()
+                except BaseException as error:  # Raised again in the serving thread.
+                    trainer["error"] = error
+                trainer["seconds"] = time.perf_counter() - began
+
+            trainer["thread"] = threading.Thread(target=work, name="campaign-trainer", daemon=True)
+            trainer["thread"].start()
+
+        def finish_update(server):
+            nonlocal stopped, signal_name
+            trainer["thread"].join()
+            trainer["thread"] = None
+            if trainer["error"] is not None:
+                raise trainer["error"]
+            timings["learning_updates"] += trainer["seconds"]
+            serving = {}
+            if server is not None:
+                ended = serving_mark(server)
+                serving["during_update"] = serving_between(trainer["started"], ended)
+                if trainer["before"] is not None:
+                    serving["before_update"] = serving_between(trainer["before"], trainer["started"])
+                server.take_up(trainer["weights"], trainer["version"])
+                state["mark"] = serving_mark(server)
+            state["version"] = trainer["version"]
+            episodes = trainer["episodes"]
+            samples = sum(len(result["records"]) for result in episodes)
+            runner["updates"].append({
+                "rollout": {"samples": samples, "terminal_samples": samples, "bootstrap_samples": 0,
+                            "terminal": True, "games": len(episodes),
+                            "rollout_versions": sorted({version for result in episodes
+                                                        for _, version in result["network_versions"]})},
+                "update": trainer["result"], "update_seconds": trainer["seconds"], "serving": serving,
+                "elapsed_seconds": time.perf_counter() - started, "counters": learner.counters.copy(),
+                "evaluator": workers.report(server),
+                "episodes": [{"root": result["root"], "seed": result["seed"], "terminal": result["terminal"],
+                              "transitions_this_batch": result["counts"]["transitions"],
+                              "decisions_by_actor": dict(Counter(event["owner"] for event in result["events"]
+                                                                 if event["owner"] is not None)),
+                              "action_counts": dict(Counter(event.get("action_kind", event["kind"])
+                                                            for event in result["events"])),
+                              "clock": result["clock"], "wealth": result["wealth"],
+                              "observed_terminal_returns": result["returns"], "worker_seconds": result["seconds"],
+                              "network_versions": result["network_versions"]} for result in episodes]})
+            runner["batch_index"] += 1
+            runner["total_waves"] += 1  # A network update counts as one wave, as a worker batch does.
+            learner.counters["batches"] += 1
+            export_model()
+            persist("running", recovery=recovery_checkpoint_due(config, runner["batch_index"],
+                                                                last_checkpoint_time, time.monotonic()))
+            progress("update")
+            if args.stop_after_waves is not None and runner["total_waves"] - initial_waves >= args.stop_after_waves:
+                stopped, signal_name = True, "bounded_smoke_stop"
+
+        def keep_playing(server, records):
+            while state["accepted"] < len(records):
+                result = records[state["accepted"]]
+                state["accepted"] += 1
+                if "failure" in result:
+                    _record_failed_games(output, runner, [result])
+                    state["failed"] += 1
+                    if state["failed"] * 2 > config.parallel_envs:
+                        raise RuntimeError(f"Most of a network update's games failed, last with {result['failure']}")
+                elif not result["terminal"]:
+                    state["exhausted"] = True  # The transition guard ended it, as in a batch.
+                else:
+                    learner.accept_episode(result)
+                    state["finished"].append(result)
+            if trainer["thread"] is not None and not trainer["thread"].is_alive():
+                finish_update(server)
+            if stopped or state["exhausted"] or runner["batch_index"] >= config.batches:
+                return False
+            if trainer["thread"] is None:
+                played_out = not state["feeding"] and state["accepted"] >= state["fed"]
+                if len(state["finished"]) >= config.parallel_envs or (played_out and state["finished"]):
+                    start_update(server)
+                elif played_out:
+                    return False  # Nothing left to play or to train on.
+            return True
+
+        nested = ("checkpoint_save", "model_export", "progress_reporting")
+        before = sum(timings[name] for name in nested)
+        began = time.perf_counter()
+        workers.play_continuously(feed, weights=live_weights(), version=state["version"], keep_playing=keep_playing)
+        # Self-play's own time, without the exports and checkpoints saved between two
+        # inference batches; network updates ran beside it and are timed apart.
+        timings["collection"] += time.perf_counter() - began - (sum(timings[name] for name in nested) - before)
+        if trainer["thread"] is not None:
+            finish_update(None)
+        return state["exhausted"]
+
     try:
         if config.episode_workers:
             if learner.env is None:
@@ -409,7 +568,9 @@ def train(args) -> int:
             # than a possibly newer manifest/export, is authoritative here.
             export_model()
         last_start = getattr(args, "no_new_batch_after", None)
-        while (runner["batch_index"] < config.batches and not stopped
+        if config.continuous:
+            exhausted = self_play_never_stops()
+        while (not config.continuous and runner["batch_index"] < config.batches and not stopped
                and (last_start is None or time.time() < last_start or learner.frozen_models is not None)
                and (config.max_episodes is None or learner.counters["episodes"] < config.max_episodes
                     or learner.frozen_models is not None)):
@@ -608,6 +769,11 @@ def main(argv=None) -> int:
         if field.name == "complete_episodes":
             training.add_argument("--complete-episodes", action=argparse.BooleanOptionalAction, default=None,
                                   help="Freeze each batch until all games finish; a guard saves without updating")
+            continue
+        if field.name == "continuous":
+            training.add_argument("--continuous", action=argparse.BooleanOptionalAction, default=None,
+                                  help="Self-play that never stops: network updates run beside the games, "
+                                       "one after every --parallel-envs finished games")
             continue
         kind = float if field.name in {"value_scale", "learning_rate", "checkpoint_interval_seconds",
                                        "sample_fraction"} else int
