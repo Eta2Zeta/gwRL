@@ -1,0 +1,162 @@
+{
+ "record": "docs/archive/records/grouped_layers_2026_11_17.md",
+ "experiment_commit": "4d1af03 (removed again in the commit of this record)",
+ "machine": "Apple M4 Max; PyTorch 2.14 (tmp/gpu-mps-env); one CPU thread; MallocNanoZone unset",
+ "calls_per_forward_pass_one_core": {
+  "before": {
+   "64x2": {
+    "one_position": 146,
+    "eight_one_alliance": 146,
+    "eight_three_alliances": 258,
+    "message_layer_three_alliances": 42
+   },
+   "256x8": {
+    "one_position": 266,
+    "eight_three_alliances": 510
+   },
+   "512x16": {
+    "one_position": 426,
+    "eight_three_alliances": 846
+   },
+   "source": "docs/archive/records/pass_calls_2026_11_17.json"
+  },
+  "grouped": {
+   "64x2": {
+    "one_position": 138,
+    "eight_one_alliance": 138,
+    "eight_three_alliances": 176,
+    "message_layer_three_alliances": 29
+   },
+   "256x8": {
+    "one_position": 258,
+    "eight_three_alliances": 350
+   },
+   "512x16": {
+    "one_position": 418,
+    "eight_three_alliances": 582
+   },
+   "tool": "tools/benchmark_network_sizes.py on the experiment's code"
+  }
+ },
+ "forward_pass_ms_one_core": {
+  "tool": "tools/benchmark_network_sizes.py ROOT OUT --device cpu --threads 1 --sizes 64x2 256x8 --batches 1 8 64 --seconds 2, run old, new, old, new",
+  "old": {
+   "64x2": {
+    "1": [
+     0.386,
+     0.387
+    ],
+    "8": [
+     1.424,
+     1.406
+    ],
+    "64": [
+     9.143,
+     8.983
+    ]
+   },
+   "256x8": {
+    "1": [
+     2.097,
+     2.258
+    ],
+    "8": [
+     10.847,
+     10.857
+    ],
+    "64": [
+     88.515,
+     88.273
+    ]
+   }
+  },
+  "new": {
+   "64x2": {
+    "1": [
+     0.415,
+     0.412
+    ],
+    "8": [
+     1.397,
+     1.325
+    ],
+    "64": [
+     10.347,
+     8.823
+    ]
+   },
+   "256x8": {
+    "1": [
+     1.838,
+     1.755
+    ],
+    "8": [
+     11.075,
+     10.527
+    ],
+    "64": [
+     88.715,
+     85.92
+    ]
+   }
+  }
+ },
+ "replayed_inference_batches_us_one_core": {
+  "tool": "tools/replay_coordinator_rounds.py on the 853 inference batches saved on 17 November, 64x2, best of 3 passes, run old, new, three times",
+  "old": [
+   1320.1,
+   1381.6,
+   1350.7
+  ],
+  "new": [
+   1315.7,
+   1388.2,
+   1309.3
+  ]
+ },
+ "replies_new_against_old": {
+  "replies": 6331,
+  "identical_replies": 144,
+  "max_prior_difference": 1.205814190718968e-07,
+  "mean_largest_prior_difference": 1.668518490094339e-08,
+  "replies_with_options": 6330,
+  "most_likely_move_changed": 0,
+  "max_value_difference": 3.790855407714844e-05,
+  "max_relative_value_difference": 0.021947101857062466
+ },
+ "single_layer_probe_us": {
+  "note": "torch._grouped_mm(x, w.transpose(1, 2), offs) against a split, one F.linear per network and a join, rows 111, 111 and 74 per network",
+  "cpu": {
+   "64_to_64": [
+    7.6,
+    19.5
+   ],
+   "192_to_64": [
+    13.4,
+    24.7
+   ],
+   "768_to_256": [
+    195.6,
+    228.5
+   ]
+  },
+  "mps": {
+   "64_to_64": [
+    188.6,
+    93.7
+   ],
+   "192_to_64": [
+    174.4,
+    84.7
+   ],
+   "768_to_256": [
+    208.9,
+    115.8
+   ]
+  },
+  "columns": [
+   "grouped",
+   "split"
+  ]
+ }
+}

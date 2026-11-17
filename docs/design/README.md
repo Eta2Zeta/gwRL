@@ -1764,6 +1764,13 @@ PyTorch call is not a training step either: a training step (section 8.4) reads 
 minibatch of 32 training samples and changes the network's weights once, and each
 of its parts is itself many PyTorch calls.
 
+On one core the call overhead is in fact well below the bound of 2.1 µs. A
+forward pass of 8 states of all three alliances made with 82 fewer PyTorch calls
+was only about 0.05 ms faster, about 0.7 µs a PyTorch call. And an 8-state
+forward pass of the 64×2 network spends about 1.1 ms of its 1.4 ms on FLOPs, at
+the rate one core reaches in large inference batches (worked out;
+[record](../archive/records/grouped_layers_2026_11_17.md#what-this-does-and-does-not-show)).
+
 **What a forward pass costs.** A forward pass costs much more than its
 arithmetic alone. In a training iteration timed with the profiler on 17 November,
 a forward pass of the 64×2 network on one core took 0.40 ms for one state,
@@ -1773,9 +1780,10 @@ Native samples of the inference server in that training iteration put about 43%
 of its busy time in arithmetic, the GELU activation function (section 6.2) alone
 14%, mostly in the border messages (section 6.6). About 31% went to Python's and
 PyTorch's own work around the PyTorch calls, where their call overheads lie, and
-12% to allocating and copying memory. Most of a forward pass's fixed cost is
-probably those call overheads, which by the bound above take at most about
-0.31 ms of a one-state forward pass (inferred).
+12% to allocating and copying memory. At about 0.7 µs each, the call overheads
+come to some 0.1 to 0.18 ms for 146 to 258 PyTorch calls, part of the forward
+pass's fixed cost of about 0.27 ms; the rest is the forward pass's own Python
+work and turning the inference batch's arrays into tensors (inferred).
 
 **What an inference batch costs.** An inference batch costs its forward pass and
 the *request handling* around it, the inference server's work outside the forward
@@ -2065,9 +2073,10 @@ than one core at 64×2 but 1.7 and 3.7 times as fast at 256×8 and 512×16. Merg
 16 at a time, 119 states an inference batch, a 512×16 inference batch waited 84%
 of its time for the GPU's arithmetic, a 64×2 inference batch only 30%
 ([record](../archive/records/coordinator_rounds_2026_11_17.md#replayed-rounds-on-the-gpu)).
-Two of the inference server's levers (below), half precision and compiling, were
-tried on those inference batches and did not pay as they stand; whether fewer
-PyTorch calls would let the GPU do more is open. The rates used below, in states
+Three of the inference server's levers (below), half precision, compiling and
+fewer PyTorch calls, were tried on those inference batches and did not pay as
+they stand; whether fewer PyTorch calls would let the GPU do more, by another
+means than the one tried, is open. The rates used below, in states
 evaluated per second:
 
 | Network | Arithmetic per state | One CPU core, inference batches of 16 | GPU, inference batches of 64 | GPU, inference batches of 256 |
@@ -2210,16 +2219,18 @@ inference server limits.
 weigh differently on the two devices. Larger inference batches gain little on one
 core beyond about 16 states, and much on the GPU: at least up to 256 states for
 the small networks, and up to about 64 for 512×16. Fewer PyTorch calls, or
-smaller call overheads, gain on both, most on the GPU in small inference batches
-of small networks, where the call overheads are most of a forward pass's time.
+smaller call overheads, gain little on one core, where a call overhead is under
+a microsecond and an inference batch is mostly FLOPs, and most on the GPU in
+small inference batches of small networks, where the call overheads are most of
+a forward pass's time.
 Cheaper arithmetic gains on one core in any inference batch, but on the GPU only
 in large inference batches of large networks, where the arithmetic fills it. From
 256×8 on the network needs the GPU, so there the inference server's speed is the
 GPU's, and these levers are what would raise it. The levers take the forms below,
 beside two changes around the forward pass: leaner request handling and a second
-inference server. None of them is built. Two were tried on real inference batches
-saved from a training iteration and did not pay as they stand; which of the
-others pay, and how much, is open:
+inference server. None of them is built. Three were tried on real inference
+batches saved from a training iteration and did not pay as they stand; which of
+the others pay, and how much, is open:
 
 - **Fewer PyTorch calls.** In a forward pass with states of all three alliances,
   43% to 50% of the PyTorch calls are ones that states of one alliance would not
@@ -2228,10 +2239,16 @@ others pay, and how much, is open:
   `studies/campaign/neural.py`;
   [record](../archive/records/pass_calls_2026_11_17.md#how-many-calls-a-pass-makes)).
   A *grouped matrix product*, one PyTorch call that multiplies each network's
-  states by that network's own weights, would call each linear layer once for all
+  states by that network's own weights, calls each linear layer once for all
   three networks, as for states of one alliance. PyTorch offers one only as a
-  private function, `torch._grouped_mm`, which gave the same products on the CPU
-  ([record](../archive/records/coordinator_one_pass_2026_11_14.md#other-ways-considered)).
+  private function, `torch._grouped_mm`. Tried on 17 November for every kind of
+  layer, it cut a three-alliance forward pass of the 64×2 network from 258
+  PyTorch calls to 176, with replies equal up to rounding, but on one core real
+  inference batches were no faster, and on the Mac's GPU the grouped product is
+  about twice as slow as the split, so it was removed
+  ([record](../archive/records/grouped_layers_2026_11_17.md)). On a GPU, one
+  padded product per layer (`torch.bmm`, each network's states padded to the
+  largest network's count) is untried.
 - **Smaller call overheads: compiling.** PyTorch's compiler, `torch.compile`,
   reads a forward pass's PyTorch calls once, ahead of the forward passes it
   serves, and writes routines that each do the work of several PyTorch calls,
@@ -2459,7 +2476,7 @@ measured and what would settle it.
   inference server about 0.62 ms besides 0.13 ms a state (section 9.2); a seventh
   game process, now that cores are idle, would fill its inference batches further,
   which is untested. The inference server's own levers, none of them built, are
-  listed in section 9.3, with the first measurements of two of them. In
+  listed in section 9.3, with the first measurements of three of them. In
   self-play that never stops the network updates run on a thread of the
   inference server's process, and while one runs the inference server answers
   about 29% fewer evaluations a second, about 3% of the decisions an hour; a
