@@ -65,6 +65,7 @@ the first learning stage.
 | 16 Nov | [Units and facilities in slot maps](records/slot_maps_2026_11_16.md) | Identical play again, also in a build that throws when a map changes while iterated; listing the moves takes a further 5.6% fewer instructions and a searched game 3.2% fewer, 23.9% fewer than before the names work. A first version that searched names in name order made listing the moves 6.7% dearer. |
 | 16 Nov | [A planning key from a binary writing of the position](records/planning_key_2026_11_16.md) | Identical play with positions compared by canonical key; playing a move takes 31% fewer instructions and rolling dice 39% fewer, a searched game 5.5% fewer and 27.8% fewer than before the names work; the key was 15.6% of the engine's samples. |
 | 16 Nov | [The faster engine in training batches](records/engine_speed_in_training_2026_11_16.md) | Two matched pairs against the engine before the names work: decisions per hour while playing up 26% (239,000 to 301,000), game processes' CPU per decision down 43%; the coordinator, busy 96%, now limits and the training keeps only about 7 cores busy. |
+| 17 Nov | [The PyTorch calls of a network pass](records/pass_calls_2026_11_17.md) | A pass of the 64×2 network is 146 calls on one core for one alliance's positions and 258 for all three's, 426 to 871 at 512×16; a message layer is 20 calls per network. A call starts in at most about 2 µs on one core; on the GPU the coordinator takes about 5.6 µs to make each, about two thirds of a 64×2 pass. |
 
 ### The engine
 

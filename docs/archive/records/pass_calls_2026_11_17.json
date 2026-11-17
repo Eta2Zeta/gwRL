@@ -1,0 +1,501 @@
+{
+ "record": "docs/archive/records/pass_calls_2026_11_17.md",
+ "network_code": "50aaa92 (studies/campaign/neural.py and shared_evaluator.py unchanged since)",
+ "tool": "tools/benchmark_network_sizes.py ROOT OUT --sizes 64x2 256x8 512x16 --batches 1 8 16 64 256, once with --device cpu --threads 1 and once with --device mps",
+ "machine": "Apple M4 Max, 14 CPU cores (10 performance, 4 efficiency), 36 GB, 32-core GPU",
+ "python": "tmp/gpu-mps-env/bin/python, PyTorch 2.14.0, MallocNanoZone unset",
+ "load_average": "1.7 to 2.8 before the runs, the benchmark not included",
+ "cpu": {
+  "device": "cpu",
+  "threads": 1,
+  "torch": "2.14.0",
+  "positions": 624,
+  "options_median": 14.0,
+  "options_p90": 118,
+  "sizes": {
+   "64x2": {
+    "hidden": 64,
+    "layers": 2,
+    "parameters": 3924424,
+    "table_parameters": 3791040,
+    "calls": {
+     "one_position": {
+      "calls": 146,
+      "view_calls": 41
+     },
+     "eight_one_alliance": {
+      "calls": 146,
+      "view_calls": 41
+     },
+     "eight_three_alliances": {
+      "calls": 258,
+      "view_calls": 54
+     },
+     "one_message_layer": {
+      "calls": 20,
+      "by_operator": {
+       "add": 3,
+       "cat": 2,
+       "div": 1,
+       "gelu": 3,
+       "index_add_": 1,
+       "index_select": 1,
+       "layer_norm": 2,
+       "linear": 3,
+       "mean": 1,
+       "new_zeros": 1,
+       "repeat_interleave": 1,
+       "view": 1
+      }
+     }
+    },
+    "passes": {
+     "1": {
+      "passes": 400,
+      "ms_per_pass": 0.452,
+      "ms_to_make_calls": 0.439,
+      "positions_per_second": 2212.2
+     },
+     "8": {
+      "passes": 400,
+      "ms_per_pass": 1.674,
+      "ms_to_make_calls": 1.629,
+      "positions_per_second": 4779.1
+     },
+     "16": {
+      "passes": 400,
+      "ms_per_pass": 2.669,
+      "ms_to_make_calls": 2.605,
+      "positions_per_second": 5994.4
+     },
+     "64": {
+      "passes": 205,
+      "ms_per_pass": 9.728,
+      "ms_to_make_calls": 9.517,
+      "positions_per_second": 6579.1
+     },
+     "256": {
+      "passes": 55,
+      "ms_per_pass": 36.54,
+      "ms_to_make_calls": 35.731,
+      "positions_per_second": 7006.1
+     }
+    },
+    "train_ms_per_step": 47.51,
+    "train_rows": 128,
+    "train_rows_per_second": 2694.0
+   },
+   "256x8": {
+    "hidden": 256,
+    "layers": 8,
+    "parameters": 19577608,
+    "table_parameters": 15164160,
+    "calls": {
+     "one_position": {
+      "calls": 266,
+      "view_calls": 47
+     },
+     "eight_one_alliance": {
+      "calls": 266,
+      "view_calls": 47
+     },
+     "eight_three_alliances": {
+      "calls": 510,
+      "view_calls": 84
+     },
+     "one_message_layer": {
+      "calls": 20,
+      "by_operator": {
+       "add": 3,
+       "cat": 2,
+       "div": 1,
+       "gelu": 3,
+       "index_add_": 1,
+       "index_select": 1,
+       "layer_norm": 2,
+       "linear": 3,
+       "mean": 1,
+       "new_zeros": 1,
+       "repeat_interleave": 1,
+       "view": 1
+      }
+     }
+    },
+    "passes": {
+     "1": {
+      "passes": 400,
+      "ms_per_pass": 1.851,
+      "ms_to_make_calls": 1.833,
+      "positions_per_second": 540.1
+     },
+     "8": {
+      "passes": 168,
+      "ms_per_pass": 11.721,
+      "ms_to_make_calls": 11.655,
+      "positions_per_second": 682.5
+     },
+     "16": {
+      "passes": 89,
+      "ms_per_pass": 22.497,
+      "ms_to_make_calls": 22.397,
+      "positions_per_second": 711.2
+     },
+     "64": {
+      "passes": 24,
+      "ms_per_pass": 85.335,
+      "ms_to_make_calls": 85.12,
+      "positions_per_second": 750.0
+     },
+     "256": {
+      "passes": 7,
+      "ms_per_pass": 329.865,
+      "ms_to_make_calls": 329.183,
+      "positions_per_second": 776.1
+     }
+    },
+    "train_ms_per_step": 379.67,
+    "train_rows": 128,
+    "train_rows_per_second": 337.1
+   },
+   "512x16": {
+    "hidden": 512,
+    "layers": 16,
+    "parameters": 60511752,
+    "table_parameters": 30328320,
+    "calls": {
+     "one_position": {
+      "calls": 426,
+      "view_calls": 55
+     },
+     "eight_one_alliance": {
+      "calls": 426,
+      "view_calls": 55
+     },
+     "eight_three_alliances": {
+      "calls": 846,
+      "view_calls": 124
+     },
+     "one_message_layer": {
+      "calls": 20,
+      "by_operator": {
+       "add": 3,
+       "cat": 2,
+       "div": 1,
+       "gelu": 3,
+       "index_add_": 1,
+       "index_select": 1,
+       "layer_norm": 2,
+       "linear": 3,
+       "mean": 1,
+       "new_zeros": 1,
+       "repeat_interleave": 1,
+       "view": 1
+      }
+     }
+    },
+    "passes": {
+     "1": {
+      "passes": 195,
+      "ms_per_pass": 10.376,
+      "ms_to_make_calls": 10.333,
+      "positions_per_second": 96.4
+     },
+     "8": {
+      "passes": 39,
+      "ms_per_pass": 53.526,
+      "ms_to_make_calls": 53.467,
+      "positions_per_second": 149.5
+     },
+     "16": {
+      "passes": 25,
+      "ms_per_pass": 78.728,
+      "ms_to_make_calls": 78.633,
+      "positions_per_second": 203.2
+     },
+     "64": {
+      "passes": 7,
+      "ms_per_pass": 323.237,
+      "ms_to_make_calls": 323.001,
+      "positions_per_second": 198.0
+     },
+     "256": {
+      "passes": 3,
+      "ms_per_pass": 1213.475,
+      "ms_to_make_calls": 1212.796,
+      "positions_per_second": 211.0
+     }
+    },
+    "train_ms_per_step": 1412.96,
+    "train_rows": 128,
+    "train_rows_per_second": 90.6
+   }
+  },
+  "seconds": 80.1
+ },
+ "gpu": {
+  "device": "mps",
+  "threads": 1,
+  "torch": "2.14.0",
+  "positions": 624,
+  "options_median": 14.0,
+  "options_p90": 118,
+  "sizes": {
+   "64x2": {
+    "hidden": 64,
+    "layers": 2,
+    "parameters": 3924424,
+    "table_parameters": 3791040,
+    "calls": {
+     "one_position": {
+      "calls": 171,
+      "view_calls": 66
+     },
+     "eight_one_alliance": {
+      "calls": 171,
+      "view_calls": 66
+     },
+     "eight_three_alliances": {
+      "calls": 283,
+      "view_calls": 79
+     },
+     "one_message_layer": {
+      "calls": 20,
+      "by_operator": {
+       "add": 3,
+       "cat": 2,
+       "div": 1,
+       "gelu": 3,
+       "index_add_": 1,
+       "index_select": 1,
+       "layer_norm": 2,
+       "linear": 3,
+       "mean": 1,
+       "new_zeros": 1,
+       "repeat_interleave": 1,
+       "view": 1
+      }
+     }
+    },
+    "passes": {
+     "1": {
+      "passes": 400,
+      "ms_per_pass": 1.478,
+      "ms_to_make_calls": 0.953,
+      "positions_per_second": 676.8
+     },
+     "8": {
+      "passes": 400,
+      "ms_per_pass": 3.023,
+      "ms_to_make_calls": 2.11,
+      "positions_per_second": 2646.1
+     },
+     "16": {
+      "passes": 400,
+      "ms_per_pass": 3.371,
+      "ms_to_make_calls": 2.34,
+      "positions_per_second": 4746.7
+     },
+     "64": {
+      "passes": 400,
+      "ms_per_pass": 4.791,
+      "ms_to_make_calls": 3.295,
+      "positions_per_second": 13357.2
+     },
+     "256": {
+      "passes": 178,
+      "ms_per_pass": 11.176,
+      "ms_to_make_calls": 7.538,
+      "positions_per_second": 22906.4
+     }
+    },
+    "train_ms_per_step": 46.35,
+    "train_rows": 128,
+    "train_rows_per_second": 2761.4
+   },
+   "256x8": {
+    "hidden": 256,
+    "layers": 8,
+    "parameters": 19577608,
+    "table_parameters": 15164160,
+    "calls": {
+     "one_position": {
+      "calls": 291,
+      "view_calls": 72
+     },
+     "eight_one_alliance": {
+      "calls": 291,
+      "view_calls": 72
+     },
+     "eight_three_alliances": {
+      "calls": 535,
+      "view_calls": 109
+     },
+     "one_message_layer": {
+      "calls": 20,
+      "by_operator": {
+       "add": 3,
+       "cat": 2,
+       "div": 1,
+       "gelu": 3,
+       "index_add_": 1,
+       "index_select": 1,
+       "layer_norm": 2,
+       "linear": 3,
+       "mean": 1,
+       "new_zeros": 1,
+       "repeat_interleave": 1,
+       "view": 1
+      }
+     }
+    },
+    "passes": {
+     "1": {
+      "passes": 400,
+      "ms_per_pass": 2.701,
+      "ms_to_make_calls": 1.652,
+      "positions_per_second": 370.2
+     },
+     "8": {
+      "passes": 349,
+      "ms_per_pass": 5.372,
+      "ms_to_make_calls": 3.353,
+      "positions_per_second": 1489.1
+     },
+     "16": {
+      "passes": 264,
+      "ms_per_pass": 7.572,
+      "ms_to_make_calls": 4.314,
+      "positions_per_second": 2113.0
+     },
+     "64": {
+      "passes": 157,
+      "ms_per_pass": 12.852,
+      "ms_to_make_calls": 5.368,
+      "positions_per_second": 4979.6
+     },
+     "256": {
+      "passes": 59,
+      "ms_per_pass": 34.342,
+      "ms_to_make_calls": 8.771,
+      "positions_per_second": 7454.4
+     }
+    },
+    "train_ms_per_step": 79.86,
+    "train_rows": 128,
+    "train_rows_per_second": 1602.8
+   },
+   "512x16": {
+    "hidden": 512,
+    "layers": 16,
+    "parameters": 60511752,
+    "table_parameters": 30328320,
+    "calls": {
+     "one_position": {
+      "calls": 451,
+      "view_calls": 80
+     },
+     "eight_one_alliance": {
+      "calls": 451,
+      "view_calls": 80
+     },
+     "eight_three_alliances": {
+      "calls": 871,
+      "view_calls": 149
+     },
+     "one_message_layer": {
+      "calls": 20,
+      "by_operator": {
+       "add": 3,
+       "cat": 2,
+       "div": 1,
+       "gelu": 3,
+       "index_add_": 1,
+       "index_select": 1,
+       "layer_norm": 2,
+       "linear": 3,
+       "mean": 1,
+       "new_zeros": 1,
+       "repeat_interleave": 1,
+       "view": 1
+      }
+     }
+    },
+    "passes": {
+     "1": {
+      "passes": 400,
+      "ms_per_pass": 4.656,
+      "ms_to_make_calls": 2.488,
+      "positions_per_second": 214.8
+     },
+     "8": {
+      "passes": 165,
+      "ms_per_pass": 12.534,
+      "ms_to_make_calls": 5.567,
+      "positions_per_second": 638.3
+     },
+     "16": {
+      "passes": 120,
+      "ms_per_pass": 16.607,
+      "ms_to_make_calls": 6.494,
+      "positions_per_second": 963.4
+     },
+     "64": {
+      "passes": 55,
+      "ms_per_pass": 36.339,
+      "ms_to_make_calls": 7.513,
+      "positions_per_second": 1761.2
+     },
+     "256": {
+      "passes": 17,
+      "ms_per_pass": 120.992,
+      "ms_to_make_calls": 12.158,
+      "positions_per_second": 2115.8
+     }
+    },
+    "train_ms_per_step": 195.16,
+    "train_rows": 128,
+    "train_rows_per_second": 655.9
+   }
+  },
+  "seconds": 62.5
+ },
+ "worked_out": {
+  "cpu_64x2_one_position": {
+   "ms_per_pass": 0.452,
+   "calls": 146,
+   "arithmetic_operations_per_position": 3400000.0,
+   "operations_per_second_in_passes_of_256": 23820470717,
+   "us_per_call_in_all": 3.1,
+   "us_per_call_besides_arithmetic_at_most": 2.1,
+   "method": "one position's arithmetic at the rate of passes of 256 (0.143 ms) taken from the pass; small arrays compute less efficiently, so the rest is an upper bound on the calls' starts"
+  },
+  "gpu_one_position_us_per_call_made": {
+   "64x2": 5.57,
+   "256x8": 5.68,
+   "512x16": 5.52
+  },
+  "gpu_share_of_pass_until_calls_made": {
+   "64x2": {
+    "1": 0.645,
+    "8": 0.698,
+    "16": 0.694,
+    "64": 0.688,
+    "256": 0.674
+   },
+   "256x8": {
+    "1": 0.612,
+    "8": 0.624,
+    "16": 0.57,
+    "64": 0.418,
+    "256": 0.255
+   },
+   "512x16": {
+    "1": 0.534,
+    "8": 0.444,
+    "16": 0.391,
+    "64": 0.207,
+    "256": 0.1
+   }
+  }
+ }
+}

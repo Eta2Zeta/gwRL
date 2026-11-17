@@ -9,17 +9,26 @@ stacks them (neural.NetworkStack), and passes are timed through
 shared_evaluator.forward_prepared and collect: laying the positions out, the
 pass, and the outputs' copy to the host with the softmax there. A pass's
 positions are a random sample, grouped by the alliance that decides. Each cell
-is the median pass over --seconds or 400 passes, after two passes of warm-up.
-It also times training steps of one network (forward, backward, Adam) with a
-stand-in loss, the squared outputs, on --train-rows decisions.
+is the median pass over --seconds or 400 passes, after two passes of warm-up,
+with the median time until the coordinator's code has laid the positions out
+and made every PyTorch call of the pass: on the CPU the calls compute in that
+time, on a GPU they are only handed to it, which computes until the outputs are
+copied back. It counts the PyTorch calls of one pass, as PyTorch's dispatcher
+sees them, for one position, for 8 positions of one alliance and for 8 of all
+three, separating calls that only give another view of an array, and the calls
+one more message layer adds for one position. It also times training steps of
+one network (forward, backward, Adam) with a stand-in loss, the squared
+outputs, on --train-rows decisions.
 
     tmp/gpu-mps-env/bin/python tools/benchmark_network_sizes.py . OUT.json --device mps
     tmp/gpu-mps-env/bin/python tools/benchmark_network_sizes.py . OUT.json --device cpu --threads 1
 
 Run with MallocNanoZone unset, as training runs do. Measured in
-docs/archive/records/network_and_search_cost_2026_11_14.md.
+docs/archive/records/network_and_search_cost_2026_11_14.md and, with the call
+counts, docs/archive/records/pass_calls_2026_11_17.md.
 """
 import argparse
+from collections import Counter
 import json
 import random
 import statistics
@@ -53,7 +62,38 @@ from studies.campaign.features import make_zone_input  # noqa: E402
 from studies.campaign.shared_evaluator import collect, forward_prepared  # noqa: E402  (the coordinator's path)
 from studies.shared.multiplayer_mcts import PLAYERS  # noqa: E402
 
+from torch.utils._python_dispatch import TorchDispatchMode  # noqa: E402
+
 device = neural.resolve_neural_device(args.device)
+
+
+def is_view(func):
+    """Whether an operator only returns another view of its input's numbers."""
+    return any(result.alias_info is not None and not result.alias_info.is_write for result in func._schema.returns)
+
+
+class CallCounter(TorchDispatchMode):
+    """Counts the PyTorch calls that reach the dispatcher, by operator name."""
+
+    def __init__(self):
+        super().__init__()
+        self.names, self.views = Counter(), 0
+
+    def __torch_dispatch__(self, func, types, args=(), kwargs=None):
+        self.names[func.overloadpacket.__name__] += 1
+        self.views += is_view(func)
+        return func(*args, **(kwargs or {}))
+
+
+def count_calls(stack, items, counts):
+    """The calls of one pass after a first, uncounted one has filled the stack's
+    caches of border indices and repeated border terms, as in training."""
+    counter = CallCounter()
+    with torch.inference_mode():
+        collect(stack, *forward_prepared(stack, items, device, counts))
+        with counter:
+            collect(stack, *forward_prepared(stack, items, device, counts))
+    return counter
 
 
 def positions():
@@ -116,21 +156,45 @@ for size in args.sizes:
     table_parameters = sum(m.weight.numel() for m in (models[0].zone_columns, models[0].global_columns,
                                                        models[0].option_columns))
     stack = neural.NetworkStack(models)
+    # Calls of one pass: one position, 8 of one alliance, 8 of all three (3, 3, 2).
+    by_owner = {player: [item for item, owner in arrays if owner == player] for player in PLAYERS}
+    first = next(player for player in PLAYERS if len(by_owner[player]) >= 8)
+    one_count = [8 if player == first else 0 for player in PLAYERS]
+    mixed = [item for player, take in zip(PLAYERS, (3, 3, 2)) for item in by_owner[player][:take]]
+    calls = {}
+    for name, items, counts in (("one_position", by_owner[first][:1], [1 if c else 0 for c in one_count]),
+                                ("eight_one_alliance", by_owner[first][:8], one_count),
+                                ("eight_three_alliances", mixed, [3, 3, 2])):
+        counter = count_calls(stack, items, counts)
+        calls[name] = {"calls": sum(counter.names.values()), "view_calls": counter.views}
+    # One more message layer, for one position: the calls a message layer adds.
+    deeper = neural.NetworkStack(make_models(hidden, layers + 1))
+    added = count_calls(deeper, by_owner[first][:1], [1 if c else 0 for c in one_count]).names
+    added.subtract(count_calls(stack, by_owner[first][:1], [1 if c else 0 for c in one_count]).names)
+    calls["one_message_layer"] = {"calls": sum(added.values()),
+                                  "by_operator": {name: n for name, n in sorted(added.items()) if n}}
+    del deeper
+    print(size, "calls", calls, flush=True)
     cells = {}
     for count in args.batches:
         batches = [batch_of(count) for _ in range(6)]
         with torch.inference_mode():
             for items, counts in batches[:2]:  # warm-up
                 collect(stack, *forward_prepared(stack, items, device, counts))
-            times, done, start = [], 0, time.perf_counter()
+            times, made, done, start = [], [], 0, time.perf_counter()
             while done < 3 or (time.perf_counter() - start < args.seconds and done < 400):
                 items, counts = batches[done % len(batches)]
+                sync()
                 t0 = time.perf_counter()
-                collect(stack, *forward_prepared(stack, items, device, counts))
+                outputs = forward_prepared(stack, items, device, counts)
+                t1 = time.perf_counter()
+                collect(stack, *outputs)
                 times.append(time.perf_counter() - t0)
+                made.append(t1 - t0)
                 done += 1
         median = statistics.median(times)
         cells[str(count)] = {"passes": done, "ms_per_pass": round(median * 1000, 3),
+                             "ms_to_make_calls": round(statistics.median(made) * 1000, 3),
                              "positions_per_second": round(count / median, 1)}
         print(size, count, cells[str(count)], flush=True)
     # Training steps of one network on train_rows decisions: forward, backward, Adam.
@@ -153,7 +217,7 @@ for size in args.sizes:
     model.eval()
     step = statistics.median(step_times)
     report["sizes"][size] = {"hidden": hidden, "layers": layers, "parameters": parameters,
-                             "table_parameters": table_parameters, "passes": cells,
+                             "table_parameters": table_parameters, "calls": calls, "passes": cells,
                              "train_ms_per_step": round(step * 1000, 2), "train_rows": args.train_rows,
                              "train_rows_per_second": round(args.train_rows / step, 1)}
     print(size, "train", report["sizes"][size]["train_ms_per_step"], "ms/step", flush=True)
