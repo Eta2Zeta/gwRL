@@ -38,6 +38,7 @@ Other open things stay in the pages that own them, and
 | [Q-004](#q-004-questions-whose-answer-never-changes) | Should the input stop asking questions whose answer never changes? | The network's input | Yes, in the same change as Q-003 |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
+| [Q-007](#q-007-a-batchs-last-game-played-alone) | Should a batch play more games than it has game threads, so that its longest game does not end it alone? | Running training | Yes: 48 games on 24 threads, measured in matched batches first |
 
 Q-001 to Q-004 were raised on 14 November 2026, while the position questions
 about nations were being pruned (commit `bce7a4c`). Their numbers are in the
@@ -47,6 +48,9 @@ Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
 Q-006 was raised on 15 November 2026, while the printed sources of Q-001 were
 being looked up; its numbers are in the first record.
+Q-007 was raised on 17 November 2026, in the measurements of the coordinator's
+rounds; its numbers are in the
+[record of where a coordinator round's time goes](archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail).
 
 ## Q-001: Mongolia at war with the CCP
 
@@ -481,6 +485,56 @@ the game's developers.
 
 **If answered.** A ruling becomes the next rule clarification, with
 `mayDeclareWar`, its test and the politics page changed in the same commit.
+
+## Q-007: A batch's last game, played alone
+
+**The question.** Should a batch keep its game threads busy to its end, by
+playing more games than it has game threads, instead of ending with its longest
+game playing alone?
+
+**What the program does now.** A batch plays as many games as it has game
+threads, 24 in the Mac profile, all started together, and the networks are
+updated only when the last of them has ended (`count = config.parallel_envs` in
+the batch loop of `studies/campaign/run.py`;
+[a batch of games](design/README.md#71-a-batch-of-games)). Games differ in
+length, so near the end of a batch fewer and fewer games are in flight, and its
+longest game ends it alone.
+
+**A real case** (17 November 2026, one profiled batch of the Mac profile,
+eleven-round games, 64 simulations, the 64×2 network on one core). The 24 games
+took 834 to 1,445 decisions. 23 of them ended between 231 and 299 seconds; the
+longest played alone until 332 seconds. For that last tenth of the playing time
+the coordinator's rounds held one position each, while the other 23 game threads
+waited; on average 20.1 of the 24 games were in flight. The longest game made
+about 348 of its decisions alone. Without them the batch would have played about
+294,000 decisions an hour instead of 268,000, so its tail cost about 9%
+([record](archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail)).
+
+**Why it matters.** Decisions per hour counts the whole playing time, so every
+batch pays for its tail, however fast the engine and the coordinator get. A
+larger network on the GPU pays more: the GPU uses a pass of one position worst,
+and filling passes of 64 positions takes about 128 games in flight
+([section 9.3 of the design document](design/README.md#93-what-a-larger-network-and-a-longer-search-cost)),
+whose tail would leave more threads waiting.
+
+**The choices.**
+
+| Choice | What it changes |
+| --- | --- |
+| A. More games than game threads | A batch plays, say, 48 games on its 24 threads, and a thread that finishes a game starts the next. Threads fall idle only once the batch's last games are under way, so the tail stays about as long but is about half as large a share of a batch twice as long. Each update then has twice the samples, and needs twice the training steps to draw each sample as often ([section 8.7](design/README.md#87-how-often-a-sample-is-drawn)); the networks change every 48 games instead of every 24. Needs a setting for the games per batch. |
+| B. Play on through updates | Game threads never stop: a finished game is replaced at once, and new networks are swapped in when an update is ready, as AlphaZero's players do. No tail, but a game may be played by two versions of the networks, and training runs beside play instead of between batches: a change to the training loop ([section 9.1](design/README.md#91-the-training-loop)). |
+| C. Leave it | Every batch keeps a tail, about a tenth of its playing time in this case, and decisions per hour stays comparable with earlier batches. |
+
+**Recommendation: A**, measured in matched batches before it replaces the
+profile's setting. It keeps the training loop as it is and needs only a
+setting, and its cost, fewer updates per game, can be offset by more training
+steps per update. B removes the tail entirely and suits larger runs, but it
+changes what a batch is.
+
+**If answered.** The number of games per batch belongs in
+[a batch of games](design/README.md#71-a-batch-of-games), in the
+[campaign learning guide](../studies/campaign/README.md) and in the Mac
+profile.
 
 ## Open elsewhere
 

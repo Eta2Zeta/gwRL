@@ -1,0 +1,2123 @@
+{
+ "record": "docs/archive/records/coordinator_rounds_2026_11_17.md",
+ "code": "9a88a57, and for the half-precision replays the change of the message sum to the messages' type",
+ "machine": "Apple M4 Max, 10 performance and 4 efficiency cores, macOS; PyTorch 2.14 in tmp/gpu-mps-env",
+ "batch_command": [
+  "--output",
+  "tmp/coordinator-rounds-2026-11-17/profile.json",
+  "--profile",
+  "mac",
+  "--control-dir",
+  "tmp/coordinator-rounds-2026-11-17/control",
+  "--run-dir",
+  "tmp/coordinator-rounds-2026-11-17/run",
+  "--seconds",
+  "1800",
+  "--save-every",
+  "200",
+  "--sample-at",
+  "120,240",
+  "--sample-seconds",
+  "20",
+  "--",
+  "--calendar-rounds",
+  "11",
+  "--complete-episodes",
+  "--batches",
+  "1",
+  "--simulations",
+  "64",
+  "--max-depth",
+  "16",
+  "--hidden-dim",
+  "64",
+  "--message-layers",
+  "2",
+  "--batch-size",
+  "32",
+  "--epochs",
+  "50",
+  "--replay-capacity",
+  "8000",
+  "--sample-fraction",
+  "0.05",
+  "--transitions-per-batch",
+  "20000",
+  "--seed",
+  "20261104"
+ ],
+ "batch": {
+  "games": 24,
+  "decisions": 24792,
+  "playing_seconds": 333.0247640000016,
+  "games_per_hour": 259.4401658370354,
+  "decisions_per_hour": 268001.6913096576
+ },
+ "peak_rss_bytes": 6355025920,
+ "load": {
+  "batch_cores": {
+   "mean_window": 6.79,
+   "median_window": 6.94,
+   "highest_window": 7.66
+  },
+  "other_work_cores": {
+   "mean_window": 2.85,
+   "median_window": 2.63
+  }
+ },
+ "coordinator": {
+  "requests": 1274778,
+  "rounds": 170712,
+  "passes": 170712,
+  "serve_wall_seconds": 332.63,
+  "serve_thread_cpu_seconds": 295.43,
+  "steps": {
+   "waiting": {
+    "seconds": 31.13,
+    "share": 0.0936,
+    "us_per_round": 182.3
+   },
+   "receiving": {
+    "seconds": 5.84,
+    "share": 0.0175,
+    "us_per_round": 34.2
+   },
+   "reading": {
+    "seconds": 5.96,
+    "share": 0.0179,
+    "us_per_round": 34.9
+   },
+   "packing": {
+    "seconds": 43.24,
+    "share": 0.13,
+    "us_per_round": 253.3
+   },
+   "forward": {
+    "seconds": 221.38,
+    "share": 0.6655,
+    "us_per_round": 1296.8
+   },
+   "collecting": {
+    "seconds": 7.76,
+    "share": 0.0233,
+    "us_per_round": 45.5
+   },
+   "replying": {
+    "seconds": 9.23,
+    "share": 0.0278,
+    "us_per_round": 54.1
+   },
+   "other": {
+    "seconds": 4.65,
+    "share": 0.014,
+    "us_per_round": 27.2
+   }
+  },
+  "passes_by_positions": {
+   "1": {
+    "passes": 28504,
+    "ms_per_pass": 0.404
+   },
+   "2": {
+    "passes": 7195,
+    "ms_per_pass": 0.522
+   },
+   "3": {
+    "passes": 6369,
+    "ms_per_pass": 0.675
+   },
+   "4": {
+    "passes": 6539,
+    "ms_per_pass": 0.815
+   },
+   "5": {
+    "passes": 7843,
+    "ms_per_pass": 0.96
+   },
+   "6": {
+    "passes": 8869,
+    "ms_per_pass": 1.089
+   },
+   "7": {
+    "passes": 10366,
+    "ms_per_pass": 1.259
+   },
+   "8": {
+    "passes": 12603,
+    "ms_per_pass": 1.408
+   },
+   "9": {
+    "passes": 15328,
+    "ms_per_pass": 1.537
+   },
+   "10": {
+    "passes": 17496,
+    "ms_per_pass": 1.656
+   },
+   "11": {
+    "passes": 17389,
+    "ms_per_pass": 1.772
+   },
+   "12": {
+    "passes": 14769,
+    "ms_per_pass": 1.873
+   },
+   "13": {
+    "passes": 9435,
+    "ms_per_pass": 2.013
+   },
+   "14": {
+    "passes": 4832,
+    "ms_per_pass": 2.162
+   },
+   "15": {
+    "passes": 2026,
+    "ms_per_pass": 2.543
+   },
+   "16": {
+    "passes": 737,
+    "ms_per_pass": 2.428
+   },
+   "17": {
+    "passes": 246,
+    "ms_per_pass": 2.569
+   },
+   "18": {
+    "passes": 103,
+    "ms_per_pass": 2.723
+   },
+   "19": {
+    "passes": 33,
+    "ms_per_pass": 2.991
+   },
+   "20": {
+    "passes": 15,
+    "ms_per_pass": 2.876
+   },
+   "21": {
+    "passes": 10,
+    "ms_per_pass": 4.017
+   },
+   "22": {
+    "passes": 4,
+    "ms_per_pass": 3.979
+   },
+   "23": {
+    "passes": 1,
+    "ms_per_pass": 3.401
+   }
+  },
+  "requests_per_round": {
+   "1": 28516,
+   "2": 7196,
+   "3": 6357,
+   "4": 6541,
+   "5": 7846,
+   "6": 8870,
+   "7": 10368,
+   "8": 12608,
+   "9": 15343,
+   "10": 17515,
+   "11": 17403,
+   "12": 14775,
+   "13": 9426,
+   "14": 4808,
+   "15": 2004,
+   "16": 727,
+   "17": 243,
+   "18": 103,
+   "19": 33,
+   "20": 15,
+   "21": 10,
+   "22": 4,
+   "23": 1
+  },
+  "saved_rounds": 853
+ },
+ "samples_by_kind": {
+  "profile.sample-120s.txt": {
+   "main_thread_samples": 14549,
+   "busy_samples": 14493,
+   "kinds_share_of_busy": {
+    "PyTorch routines: arithmetic and copies": 0.3814,
+    "Python interpreter": 0.1929,
+    "numpy": 0.1034,
+    "PyTorch: dispatch and bookkeeping": 0.088,
+    "memory: allocating, clearing, returning": 0.0802,
+    "matrix products": 0.0486,
+    "memory: copying": 0.0421,
+    "PyTorch: Python binding": 0.0259,
+    "other": 0.0187,
+    "pipes": 0.0187
+   },
+   "waiting_share": 0.0038
+  },
+  "profile.sample-240s.txt": {
+   "main_thread_samples": 15096,
+   "busy_samples": 15019,
+   "kinds_share_of_busy": {
+    "PyTorch routines: arithmetic and copies": 0.3805,
+    "Python interpreter": 0.1993,
+    "numpy": 0.0995,
+    "PyTorch: dispatch and bookkeeping": 0.0844,
+    "memory: allocating, clearing, returning": 0.0844,
+    "matrix products": 0.0518,
+    "memory: copying": 0.0395,
+    "PyTorch: Python binding": 0.0227,
+    "other": 0.0203,
+    "pipes": 0.0176
+   },
+   "waiting_share": 0.0051
+  }
+ },
+ "tail": {
+  "games_seconds_and_decisions": [
+   [
+    231.3,
+    834
+   ],
+   [
+    247.1,
+    842
+   ],
+   [
+    249.4,
+    857
+   ],
+   [
+    262.9,
+    933
+   ],
+   [
+    262.9,
+    960
+   ],
+   [
+    266.0,
+    956
+   ],
+   [
+    266.5,
+    925
+   ],
+   [
+    266.9,
+    980
+   ],
+   [
+    267.0,
+    960
+   ],
+   [
+    273.1,
+    1016
+   ],
+   [
+    274.6,
+    978
+   ],
+   [
+    281.2,
+    1021
+   ],
+   [
+    286.7,
+    1059
+   ],
+   [
+    287.0,
+    1063
+   ],
+   [
+    287.2,
+    1097
+   ],
+   [
+    287.3,
+    1038
+   ],
+   [
+    289.0,
+    1060
+   ],
+   [
+    289.3,
+    1070
+   ],
+   [
+    291.8,
+    1091
+   ],
+   [
+    294.0,
+    1118
+   ],
+   [
+    297.3,
+    1133
+   ],
+   [
+    298.4,
+    1164
+   ],
+   [
+    299.1,
+    1192
+   ],
+   [
+    332.0,
+    1445
+   ]
+  ],
+  "mean_games_in_flight": 20.08,
+  "median_decisions_per_second_of_the_other_23": 3.668,
+  "longest_game_decisions_alone_worked_out": 348,
+  "decisions_per_hour_measured": 268002,
+  "decisions_per_hour_ending_with_the_23rd_game_worked_out": 294247,
+  "saved_rounds_by_tenth": [
+   {
+    "mean_requests": 7.73,
+    "single_request_rounds": 7,
+    "rounds": 85
+   },
+   {
+    "mean_requests": 9.08,
+    "single_request_rounds": 0,
+    "rounds": 85
+   },
+   {
+    "mean_requests": 9.86,
+    "single_request_rounds": 0,
+    "rounds": 85
+   },
+   {
+    "mean_requests": 10.36,
+    "single_request_rounds": 0,
+    "rounds": 86
+   },
+   {
+    "mean_requests": 9.64,
+    "single_request_rounds": 0,
+    "rounds": 85
+   },
+   {
+    "mean_requests": 9.95,
+    "single_request_rounds": 0,
+    "rounds": 85
+   },
+   {
+    "mean_requests": 9.67,
+    "single_request_rounds": 0,
+    "rounds": 86
+   },
+   {
+    "mean_requests": 5.14,
+    "single_request_rounds": 1,
+    "rounds": 85
+   },
+   {
+    "mean_requests": 1.8,
+    "single_request_rounds": 46,
+    "rounds": 85
+   },
+   {
+    "mean_requests": 1.0,
+    "single_request_rounds": 86,
+    "rounds": 86
+   }
+  ]
+ },
+ "replays": {
+  "cpu-256x8-m1": {
+   "device": "cpu",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 256,
+    "message_layers": 8
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 2.605798207994667,
+   "rounds": 200,
+   "requests": 1709,
+   "positions": 1711,
+   "positions_per_round": 8.555,
+   "pass_seconds": [
+    2.5017752990461304,
+    2.329975968961662
+   ],
+   "best_pass_seconds": 2.329975968961662,
+   "best_us_per_round": 11649.87984480831,
+   "best_us_per_request": 1363.3563305802588,
+   "best_us_per_position": 1361.7626937239406,
+   "median_round_us": 11443.14600242069,
+   "steps_us_per_round": {
+    "reading": 32.92415574833285,
+    "laying_out": 256.26061022194335,
+    "making_calls": 11241.157934964576,
+    "collecting": 59.52585972408997,
+    "rest": 60.011284149368294
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 418.089903367174,
+     "per_position": 1312.8918692508635
+    },
+    "making_calls": {
+     "fixed": 249.84656637214175,
+     "per_position": 1284.7821588068305
+    }
+   }
+  },
+  "cpu-512x16-m1": {
+   "device": "cpu",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 512,
+    "message_layers": 16
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 4.4616007919976255,
+   "rounds": 100,
+   "requests": 778,
+   "positions": 778,
+   "positions_per_round": 7.78,
+   "pass_seconds": [
+    4.592833868999151,
+    4.718837795036961
+   ],
+   "best_pass_seconds": 4.592833868999151,
+   "best_us_per_round": 45928.338689991506,
+   "best_us_per_request": 5903.385435731557,
+   "best_us_per_position": 5903.385435731557,
+   "median_round_us": 44371.604002662934,
+   "steps_us_per_round": {
+    "reading": 32.38217992475256,
+    "laying_out": 285.51298019010574,
+    "making_calls": 45465.46704004868,
+    "collecting": 74.09699021081906,
+    "rest": 70.87949961714912
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 6581.840307800128,
+     "per_position": 5057.390537556732
+    },
+    "making_calls": {
+     "fixed": 6329.685634371868,
+     "per_position": 5030.306093274654
+    }
+   }
+  },
+  "cpu-64x2-m1-bf16": {
+   "device": "cpu",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 1,
+   "autocast": "bfloat16",
+   "compiled": false,
+   "warm_up_seconds": 2.4076421670033596,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    2.361937492110883,
+    2.422607161999622,
+    2.4770862059522187
+   ],
+   "best_pass_seconds": 2.361937492110883,
+   "best_us_per_round": 2768.9771302589484,
+   "best_us_per_request": 373.07494741918856,
+   "best_us_per_position": 372.9571280768803,
+   "median_round_us": 2837.7080016070977,
+   "steps_us_per_round": {
+    "reading": 29.09968010720918,
+    "laying_out": 223.15959206136472,
+    "making_calls": 2439.9019343418054,
+    "collecting": 42.6404196976445,
+    "rest": 34.17550405092452
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 363.55854898449434,
+     "per_position": 323.9889546545254
+    },
+    "making_calls": {
+     "fixed": 248.45161657940253,
+     "per_position": 295.16929118132475
+    }
+   },
+   "no_grad": false
+  },
+  "cpu-64x2-m1-final": {
+   "device": "cpu",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 1.1171702499996172,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    1.1040389701593085,
+    1.086585796016152,
+    1.1398633051067009
+   ],
+   "best_pass_seconds": 1.086585796016152,
+   "best_us_per_round": 1273.8403235828278,
+   "best_us_per_request": 171.62941020631052,
+   "best_us_per_position": 171.57520859247623,
+   "median_round_us": 1335.417000518646,
+   "steps_us_per_round": {
+    "reading": 26.905062064694423,
+    "laying_out": 187.46951945320674,
+    "making_calls": 1011.6348641930429,
+    "collecting": 29.279559103546585,
+    "rest": 18.551318768337083
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 315.8673381088139,
+     "per_position": 129.03062633970217
+    },
+    "making_calls": {
+     "fixed": 226.756710260947,
+     "per_position": 105.71625853530361
+    }
+   },
+   "no_grad": false
+  },
+  "cpu-64x2-m1-new": {
+   "device": "cpu",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 1.2316784580034437,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    1.1653053801783244,
+    1.195324878921383,
+    1.2159529030323029
+   ],
+   "best_pass_seconds": 1.1653053801783244,
+   "best_us_per_round": 1366.1258853204272,
+   "best_us_per_request": 184.06339917522106,
+   "best_us_per_position": 184.00527083188447,
+   "median_round_us": 1412.332996551413,
+   "steps_us_per_round": {
+    "reading": 26.84854531756483,
+    "laying_out": 199.89816303316346,
+    "making_calls": 1085.4350244466723,
+    "collecting": 32.60649586612837,
+    "rest": 21.33765665689813
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 337.8217763913899,
+     "per_position": 138.50361675611381
+    },
+    "making_calls": {
+     "fixed": 233.31133687469037,
+     "per_position": 114.77364684966064
+    }
+   },
+   "no_grad": false
+  },
+  "cpu-64x2-m1-nograd-compiled": {
+   "device": "cpu",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": true,
+   "warm_up_seconds": 18.017750084,
+   "compile_counters": {
+    "stats": {
+     "calls_captured": 2926,
+     "unique_graphs": 8
+    }
+   },
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    1.3967882830183953,
+    1.4518168978902395,
+    1.425963659916306
+   ],
+   "best_pass_seconds": 1.3967882830183953,
+   "best_us_per_round": 1637.5009179582594,
+   "best_us_per_request": 220.62680192993133,
+   "best_us_per_position": 220.55712664114878,
+   "median_round_us": 1670.7910035620444,
+   "steps_us_per_round": {
+    "reading": 29.20755083613471,
+    "laying_out": 213.90967064368968,
+    "making_calls": 1328.5970433833784,
+    "collecting": 38.240726850285434,
+    "rest": 27.54592624477112
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 473.41952397537557,
+     "per_position": 156.791635728312
+    },
+    "making_calls": {
+     "fixed": 367.1664492225118,
+     "per_position": 129.49633614704237
+    }
+   },
+   "no_grad": true
+  },
+  "cpu-64x2-m1-nograd": {
+   "device": "cpu",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 1.1570201670037932,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    1.1496329069632338,
+    1.1617288781344541,
+    1.1633150570487487
+   ],
+   "best_pass_seconds": 1.1496329069632338,
+   "best_us_per_round": 1347.7525286790549,
+   "best_us_per_request": 181.58788611013014,
+   "best_us_per_position": 181.5305395489079,
+   "median_round_us": 1404.8750017536804,
+   "steps_us_per_round": {
+    "reading": 26.828956366915165,
+    "laying_out": 193.88818421398628,
+    "making_calls": 1077.6644478053765,
+    "collecting": 29.82492030933685,
+    "rest": 19.54601998344022
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 352.8831323577233,
+     "per_position": 134.00025186516592
+    },
+    "making_calls": {
+     "fixed": 256.3842315124366,
+     "per_position": 110.61929962069755
+    }
+   },
+   "no_grad": true
+  },
+  "cpu-64x2-m1": {
+   "device": "cpu",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 1.259603500002413,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    1.2513396958602243,
+    1.2456512279823073,
+    1.229374188100337
+   ],
+   "best_pass_seconds": 1.229374188100337,
+   "best_us_per_round": 1441.2358594376753,
+   "best_us_per_request": 194.18325510983053,
+   "best_us_per_position": 194.12193085430872,
+   "median_round_us": 1490.8329976606183,
+   "steps_us_per_round": {
+    "reading": 27.29826847897626,
+    "laying_out": 209.00398475002794,
+    "making_calls": 1142.699466765422,
+    "collecting": 36.30608315766567,
+    "rest": 25.92805628558339
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 297.4321982471513,
+     "per_position": 154.06040154674199
+    },
+    "making_calls": {
+     "fixed": 204.0756305741603,
+     "per_position": 126.42446427777456
+    }
+   }
+  },
+  "cpu-64x2-m3-nograd-compiled": {
+   "device": "cpu",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 3,
+   "autocast": null,
+   "compiled": true,
+   "warm_up_seconds": 95.81733137500123,
+   "compile_counters": {
+    "stats": {
+     "calls_captured": 4194,
+     "unique_graphs": 8
+    },
+    "graph_break": {}
+   },
+   "rounds": 284,
+   "requests": 6330,
+   "positions": 6332,
+   "positions_per_round": 22.295774647887324,
+   "pass_seconds": [
+    1.1024653240237967,
+    1.4588398370688083,
+    1.0877352589814109
+   ],
+   "best_pass_seconds": 1.0877352589814109,
+   "best_us_per_round": 3830.053728807785,
+   "best_us_per_request": 171.83811358316126,
+   "best_us_per_position": 171.78383748916787,
+   "median_round_us": 4208.625505270902,
+   "steps_us_per_round": {
+    "reading": 88.12609287905245,
+    "laying_out": 505.8331797198675,
+    "making_calls": 3090.108137488206,
+    "collecting": 87.74665504563633,
+    "rest": 58.23966367502245
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 293.5861854981458,
+     "per_position": 158.61604268792442
+    },
+    "making_calls": {
+     "fixed": 216.66805811625,
+     "per_position": 128.87823476652488
+    }
+   },
+   "no_grad": true
+  },
+  "cpu-64x2-m3-nograd": {
+   "device": "cpu",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 3,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 0.9681961669994052,
+   "rounds": 284,
+   "requests": 6330,
+   "positions": 6332,
+   "positions_per_round": 22.295774647887324,
+   "pass_seconds": [
+    0.9677045369680854,
+    0.996248787996592,
+    0.9941376249698806
+   ],
+   "best_pass_seconds": 0.9677045369680854,
+   "best_us_per_round": 3407.4103414369206,
+   "best_us_per_request": 152.8759142129677,
+   "best_us_per_position": 152.82762744284358,
+   "median_round_us": 3773.583499423694,
+   "steps_us_per_round": {
+    "reading": 78.70655442697888,
+    "laying_out": 447.58596106450415,
+    "making_calls": 2758.0916586218887,
+    "collecting": 70.39661265390721,
+    "rest": 52.629554669641635
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 369.8463309622939,
+     "per_position": 136.23944709014435
+    },
+    "making_calls": {
+     "fixed": 268.7373667930174,
+     "per_position": 111.6513927478521
+    }
+   },
+   "no_grad": true
+  },
+  "cpu-64x2-m3": {
+   "device": "cpu",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 3,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 1.0244339170021703,
+   "rounds": 284,
+   "requests": 6330,
+   "positions": 6332,
+   "positions_per_round": 22.295774647887324,
+   "pass_seconds": [
+    1.0494045900341007,
+    0.9751643830750254,
+    1.0133607869793195
+   ],
+   "best_pass_seconds": 0.9751643830750254,
+   "best_us_per_round": 3433.6774051937514,
+   "best_us_per_request": 154.05440490916672,
+   "best_us_per_position": 154.005745905721,
+   "median_round_us": 3778.7705041409936,
+   "steps_us_per_round": {
+    "reading": 86.04995696579965,
+    "laying_out": 459.20288347344825,
+    "making_calls": 2748.4678553969065,
+    "collecting": 80.62536989213262,
+    "rest": 59.331339465464055
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 338.8316442951841,
+     "per_position": 138.8086222512939
+    },
+    "making_calls": {
+     "fixed": 233.05738796249216,
+     "per_position": 112.82005255075393
+    }
+   }
+  },
+  "cpu-64x2-m8": {
+   "device": "cpu",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 8,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 0.976593250001315,
+   "rounds": 106,
+   "requests": 6326,
+   "positions": 6328,
+   "positions_per_round": 59.698113207547166,
+   "pass_seconds": [
+    1.0577961279559531,
+    1.0245298339650617,
+    1.006895040976815
+   ],
+   "best_pass_seconds": 1.006895040976815,
+   "best_us_per_round": 9499.009820535988,
+   "best_us_per_request": 159.16772699601879,
+   "best_us_per_position": 159.11742114045748,
+   "median_round_us": 10895.08349832613,
+   "steps_us_per_round": {
+    "reading": 213.49340564689933,
+    "laying_out": 1167.8682740410914,
+    "making_calls": 7705.65059422054,
+    "collecting": 203.99836792867578,
+    "rest": 207.99917869878283
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 532.7763117928062,
+     "per_position": 150.1929127570761
+    },
+    "making_calls": {
+     "fixed": 369.5959517435931,
+     "per_position": 122.88587106551145
+    }
+   }
+  },
+  "mps-256x8-m1-compiled": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 256,
+    "message_layers": 8
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": true,
+   "warm_up_seconds": 69.58932712499518,
+   "compile_counters": {
+    "graph_break": {
+     "NotImplementedError/UnsupportedFakeTensorException when running FX node\n  Explanation: Dynamo failed to run FX node with fake tensors: call_function <Wrapped method <original astype>>(*(FakeTensor(...,\n               size=(s16 + s2 + s26 + s30 + 2*s38 + 3*s39 + s4 + s48 + s49 + s5 + s72 + s85 + s96,),\n               dtype=torch.int64), 'int64'), **{'copy': False}): got NotImplementedError('astype(..., copy=False is not implemented.')\n  Hint: Your code may result in an error when running in eager. Please double check that your code doesn't contain a similar error when actually running eager/uncompiled. You can do this by removing the `torch.compile` call, or by using `torch.compiler.set_stance(\"force_eager\")`. \n  Hint: If the op is a custom op, did you implement a fake tensor implementation? (e.g. with `@my_custom_op.register_fake`)\n  Hint: If the op is a PyTorch op, please file an issue to PyTorch.\n\n  Developer debug context: \n\n For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0087.html": 1
+    },
+    "stats": {
+     "calls_captured": 7151,
+     "unique_graphs": 8
+    }
+   },
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    5.326258560096903,
+    5.616201338030805,
+    5.7679854668385815
+   ],
+   "best_pass_seconds": 5.326258560096903,
+   "best_us_per_round": 6244.148370570812,
+   "best_us_per_request": 841.2981456479076,
+   "best_us_per_position": 841.0324585657513,
+   "median_round_us": 6538.417001138441,
+   "steps_us_per_round": {
+    "reading": 30.200234043495435,
+    "laying_out": 230.5069883284541,
+    "making_calls": 3614.779071411383,
+    "collecting": 2334.3797829266227,
+    "rest": 34.282293860857344
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 3325.028253096979,
+     "per_position": 393.18008214198323
+    },
+    "making_calls": {
+     "fixed": 2081.513818483345,
+     "per_position": 206.51748945959525
+    }
+   }
+  },
+  "mps-256x8-m1-fp16": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 256,
+    "message_layers": 8
+   },
+   "merge": 1,
+   "autocast": "float16",
+   "compiled": false,
+   "warm_up_seconds": 7.40623924999818,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    6.319150917188381,
+    6.566031890877639,
+    6.223229502051254
+   ],
+   "best_pass_seconds": 6.223229502051254,
+   "best_us_per_round": 7295.6969543391015,
+   "best_us_per_request": 982.9773340785428,
+   "best_us_per_position": 982.6669038451373,
+   "median_round_us": 7517.250000091735,
+   "steps_us_per_round": {
+    "reading": 32.42221830178278,
+    "laying_out": 285.10218767879434,
+    "making_calls": 4168.838262685931,
+    "collecting": 2741.610044382492,
+    "rest": 67.72424129010119
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 3816.7089871325275,
+     "per_position": 468.5894103943167
+    },
+    "making_calls": {
+     "fixed": 2259.5367613189146,
+     "per_position": 257.16630043677014
+    }
+   },
+   "no_grad": false
+  },
+  "mps-256x8-m1": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 256,
+    "message_layers": 8
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 6.599601999994775,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    5.176699135889066,
+    5.0642518741005915,
+    5.536776537832338
+   ],
+   "best_pass_seconds": 5.0642518741005915,
+   "best_us_per_round": 5936.989301407493,
+   "best_us_per_request": 799.9134219081649,
+   "best_us_per_position": 799.6608043740079,
+   "median_round_us": 6172.832996526267,
+   "steps_us_per_round": {
+    "reading": 30.736734958298417,
+    "laying_out": 258.13428943762216,
+    "making_calls": 3362.6994372283816,
+    "collecting": 2235.6005978239928,
+    "rest": 49.81824195919753
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 3486.717874288386,
+     "per_position": 330.03024274950235
+    },
+    "making_calls": {
+     "fixed": 2167.605797411524,
+     "per_position": 160.96871542140855
+    }
+   }
+  },
+  "mps-256x8-m16": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 256,
+    "message_layers": 8
+   },
+   "merge": 16,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 1.4564911249981378,
+   "rounds": 53,
+   "requests": 6326,
+   "positions": 6328,
+   "positions_per_round": 119.39622641509433,
+   "pass_seconds": [
+    1.0859243720187806,
+    1.0749465040498762,
+    1.0869594179821433
+   ],
+   "best_pass_seconds": 1.0749465040498762,
+   "best_us_per_round": 20282.009510375025,
+   "best_us_per_request": 169.92515081408098,
+   "best_us_per_position": 169.87144501420295,
+   "median_round_us": 23720.208002487198,
+   "steps_us_per_round": {
+    "reading": 419.378716373412,
+    "laying_out": 2297.5974528169486,
+    "making_calls": 4479.55507500084,
+    "collecting": 12770.288546991376,
+    "rest": 315.1897191924465
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 5157.579912782716,
+     "per_position": 126.67426812142737
+    },
+    "making_calls": {
+     "fixed": 3460.0107427468265,
+     "per_position": 8.539167131710286
+    }
+   }
+  },
+  "mps-256x8-m3": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 256,
+    "message_layers": 8
+   },
+   "merge": 3,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 3.3495331249941955,
+   "rounds": 284,
+   "requests": 6330,
+   "positions": 6332,
+   "positions_per_round": 22.295774647887324,
+   "pass_seconds": [
+    2.42056171294098,
+    2.4271734129506513,
+    2.4094159170490457
+   ],
+   "best_pass_seconds": 2.4094159170490457,
+   "best_us_per_round": 8483.858862848752,
+   "best_us_per_request": 380.6344260740988,
+   "best_us_per_position": 380.5142004183584,
+   "median_round_us": 9491.66700229398,
+   "steps_us_per_round": {
+    "reading": 82.54698280927161,
+    "laying_out": 578.8907184440586,
+    "making_calls": 4076.529302681234,
+    "collecting": 3651.438662082385,
+    "rest": 94.45319683180342
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 4053.8820963526314,
+     "per_position": 198.69131422692647
+    },
+    "making_calls": {
+     "fixed": 2649.3888456214013,
+     "per_position": 64.00945827621484
+    }
+   }
+  },
+  "mps-256x8-m8-fp16": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 256,
+    "message_layers": 8
+   },
+   "merge": 8,
+   "autocast": "float16",
+   "compiled": false,
+   "warm_up_seconds": 2.1858857499973965,
+   "rounds": 106,
+   "requests": 6326,
+   "positions": 6328,
+   "positions_per_round": 59.698113207547166,
+   "pass_seconds": [
+    1.5023184589954326,
+    1.5055883779932628,
+    1.5199731229367899
+   ],
+   "best_pass_seconds": 1.5023184589954326,
+   "best_us_per_round": 14172.815650900307,
+   "best_us_per_request": 237.48315823513002,
+   "best_us_per_position": 237.4081003469394,
+   "median_round_us": 15966.124999977183,
+   "steps_us_per_round": {
+    "reading": 206.78535643042468,
+    "laying_out": 1152.8546512533278,
+    "making_calls": 4946.199707842854,
+    "collecting": 7690.054632065476,
+    "rest": 176.92130330822624
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 5472.580585927457,
+     "per_position": 145.7371866130092
+    },
+    "making_calls": {
+     "fixed": 3535.2093952342757,
+     "per_position": 23.635425590472398
+    }
+   },
+   "no_grad": false
+  },
+  "mps-256x8-m8": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 256,
+    "message_layers": 8
+   },
+   "merge": 8,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 1.9062395830042078,
+   "rounds": 106,
+   "requests": 6326,
+   "positions": 6328,
+   "positions_per_round": 59.698113207547166,
+   "pass_seconds": [
+    1.4354553259981913,
+    1.4457445049774833,
+    1.4275951689560316
+   ],
+   "best_pass_seconds": 1.4275951689560316,
+   "best_us_per_round": 13467.878952415393,
+   "best_us_per_request": 225.67106685994807,
+   "best_us_per_position": 225.59974224968892,
+   "median_round_us": 15186.124997853767,
+   "steps_us_per_round": {
+    "reading": 231.66455743331375,
+    "laying_out": 1308.4095949554194,
+    "making_calls": 4523.417849960201,
+    "collecting": 7202.97134933578,
+    "rest": 201.4156007306773
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 4511.600461606098,
+     "per_position": 150.02615676766519
+    },
+    "making_calls": {
+     "fixed": 2983.2461501099788,
+     "per_position": 25.799336312282485
+    }
+   }
+  },
+  "mps-512x16-m1-fp16": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 512,
+    "message_layers": 16
+   },
+   "merge": 1,
+   "autocast": "float16",
+   "compiled": false,
+   "warm_up_seconds": 13.661565500005963,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    11.98681763591594,
+    12.036775453008886,
+    12.054407456962508
+   ],
+   "best_pass_seconds": 11.98681763591594,
+   "best_us_per_round": 14052.541190991724,
+   "best_us_per_request": 1893.352967290466,
+   "best_us_per_position": 1892.7550348833004,
+   "median_round_us": 14737.249999598134,
+   "steps_us_per_round": {
+    "reading": 30.011411513415343,
+    "laying_out": 314.6984572072649,
+    "making_calls": 6503.096806603784,
+    "collecting": 7135.308478413472,
+    "rest": 69.42603725378794
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 5698.580852231178,
+     "per_position": 1125.2057743506625
+    },
+    "making_calls": {
+     "fixed": 3040.050494389847,
+     "per_position": 466.44220816650693
+    }
+   },
+   "no_grad": false
+  },
+  "mps-512x16-m1": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 512,
+    "message_layers": 16
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 11.736304334001034,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    10.222562197959633,
+    10.01629293303995,
+    10.174349205903127
+   ],
+   "best_pass_seconds": 10.01629293303995,
+   "best_us_per_round": 11742.430167690445,
+   "best_us_per_request": 1582.1028167809113,
+   "best_us_per_position": 1581.6031790683642,
+   "median_round_us": 12612.792001164053,
+   "steps_us_per_round": {
+    "reading": 30.841629914388037,
+    "laying_out": 289.5614407474971,
+    "making_calls": 5371.800795983461,
+    "collecting": 5989.840914295213,
+    "rest": 60.38538674988531
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 5741.308998193823,
+     "per_position": 808.2988090289937
+    },
+    "making_calls": {
+     "fixed": 3549.241318050732,
+     "per_position": 245.4829045754963
+    }
+   }
+  },
+  "mps-512x16-m16": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 512,
+    "message_layers": 16
+   },
+   "merge": 16,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 3.6092811249982333,
+   "rounds": 53,
+   "requests": 6326,
+   "positions": 6328,
+   "positions_per_round": 119.39622641509433,
+   "pass_seconds": [
+    3.2857937090229825,
+    3.269037711965211,
+    3.261958376999246
+   ],
+   "best_pass_seconds": 3.261958376999246,
+   "best_us_per_round": 61546.38447168389,
+   "best_us_per_request": 515.6431199809115,
+   "best_us_per_position": 515.4801480719416,
+   "median_round_us": 73833.3750050515,
+   "steps_us_per_round": {
+    "reading": 415.0714539375842,
+    "laying_out": 2206.5535099586064,
+    "making_calls": 6750.547981800133,
+    "collecting": 51863.125018157145,
+    "rest": 311.0865078304174
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 7795.216192457854,
+     "per_position": 450.1915168772092
+    },
+    "making_calls": {
+     "fixed": 5243.555087998621,
+     "per_position": 12.621779925960835
+    }
+   }
+  },
+  "mps-512x16-m3": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 512,
+    "message_layers": 16
+   },
+   "merge": 3,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 6.055556499995873,
+   "rounds": 284,
+   "requests": 6330,
+   "positions": 6332,
+   "positions_per_round": 22.295774647887324,
+   "pass_seconds": [
+    5.50098528998933,
+    5.49989787893719,
+    5.468603171080758
+   ],
+   "best_pass_seconds": 5.468603171080758,
+   "best_us_per_round": 19255.64496859422,
+   "best_us_per_request": 863.9183524614152,
+   "best_us_per_position": 863.6454786924761,
+   "median_round_us": 21639.85450170003,
+   "steps_us_per_round": {
+    "reading": 90.20540377426019,
+    "laying_out": 657.9541970213669,
+    "making_calls": 6471.664320638987,
+    "collecting": 11923.258080751622,
+    "rest": 112.56296640798173
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 6391.60340350369,
+     "per_position": 576.9721737974907
+    },
+    "making_calls": {
+     "fixed": 3978.765299265091,
+     "per_position": 111.810379354104
+    }
+   }
+  },
+  "mps-512x16-m8-fp16": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 512,
+    "message_layers": 16
+   },
+   "merge": 8,
+   "autocast": "float16",
+   "compiled": false,
+   "warm_up_seconds": 4.818167290999554,
+   "rounds": 106,
+   "requests": 6326,
+   "positions": 6328,
+   "positions_per_round": 59.698113207547166,
+   "pass_seconds": [
+    4.168274207957438,
+    4.1467977139909635,
+    4.158401624030375
+   ],
+   "best_pass_seconds": 4.1467977139909635,
+   "best_us_per_round": 39120.73315085814,
+   "best_us_per_request": 655.5165529546259,
+   "best_us_per_position": 655.309373260266,
+   "median_round_us": 45715.14599956572,
+   "steps_us_per_round": {
+    "reading": 231.6188460236793,
+    "laying_out": 1342.0824718607794,
+    "making_calls": 8673.91662246038,
+    "collecting": 28628.298358561773,
+    "rest": 244.81685195153332
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 9897.674682580735,
+     "per_position": 489.5139376797418
+    },
+    "making_calls": {
+     "fixed": 6126.412495758395,
+     "per_position": 42.67310958129114
+    }
+   },
+   "no_grad": false
+  },
+  "mps-512x16-m8": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 512,
+    "message_layers": 16
+   },
+   "merge": 8,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 4.286132959001407,
+   "rounds": 106,
+   "requests": 6326,
+   "positions": 6328,
+   "positions_per_round": 59.698113207547166,
+   "pass_seconds": [
+    3.7764711210038513,
+    3.749926951000816,
+    3.7439768760086736
+   ],
+   "best_pass_seconds": 3.7439768760086736,
+   "best_us_per_round": 35320.53656611956,
+   "best_us_per_request": 591.8395314588482,
+   "best_us_per_position": 591.6524772453656,
+   "median_round_us": 41037.16649842681,
+   "steps_us_per_round": {
+    "reading": 211.9250220514588,
+    "laying_out": 1225.2123015746035,
+    "making_calls": 6613.535367576779,
+    "collecting": 27103.627320924854,
+    "rest": 166.236553991868
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 6731.478779651992,
+     "per_position": 478.8938251209802
+    },
+    "making_calls": {
+     "fixed": 4438.3506605031325,
+     "per_position": 36.43640628157499
+    }
+   }
+  },
+  "mps-64x2-m1-compiled": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": true,
+   "warm_up_seconds": 44.10347087500122,
+   "compile_counters": {
+    "graph_break": {
+     "NotImplementedError/UnsupportedFakeTensorException when running FX node\n  Explanation: Dynamo failed to run FX node with fake tensors: call_function <Wrapped method <original astype>>(*(FakeTensor(...,\n               size=(s16 + s2 + s26 + s30 + 2*s38 + 3*s39 + s4 + s48 + s49 + s5 + s72 + s85 + s96,),\n               dtype=torch.int64), 'int64'), **{'copy': False}): got NotImplementedError('astype(..., copy=False is not implemented.')\n  Hint: Your code may result in an error when running in eager. Please double check that your code doesn't contain a similar error when actually running eager/uncompiled. You can do this by removing the `torch.compile` call, or by using `torch.compiler.set_stance(\"force_eager\")`. \n  Hint: If the op is a custom op, did you implement a fake tensor implementation? (e.g. with `@my_custom_op.register_fake`)\n  Hint: If the op is a PyTorch op, please file an issue to PyTorch.\n\n  Developer debug context: \n\n For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0087.html": 1
+    },
+    "stats": {
+     "calls_captured": 3084,
+     "unique_graphs": 8
+    }
+   },
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    2.5298070449134684,
+    2.597897883031692,
+    2.5103717819802114
+   ],
+   "best_pass_seconds": 2.5103717819802114,
+   "best_us_per_round": 2942.991538077622,
+   "best_us_per_request": 396.5205784205041,
+   "best_us_per_position": 396.3953548050231,
+   "median_round_us": 2991.125002154149,
+   "steps_us_per_round": {
+    "reading": 27.683962420107317,
+    "laying_out": 212.24145720782988,
+    "making_calls": 1823.1277257674355,
+    "collecting": 856.0017128547344,
+    "rest": 23.93667982751449
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 1763.238653496251,
+     "per_position": 158.90244916278374
+    },
+    "making_calls": {
+     "fixed": 1076.0480174546933,
+     "per_position": 100.62513677416221
+    }
+   }
+  },
+  "mps-64x2-m1-final": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 3.6494626670028083,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    2.2382305718783755,
+    2.4061109089743695,
+    2.779657437946298
+   ],
+   "best_pass_seconds": 2.2382305718783755,
+   "best_us_per_round": 2623.9514324482716,
+   "best_us_per_request": 353.53507690386596,
+   "best_us_per_position": 353.42342837176307,
+   "median_round_us": 2648.916997713968,
+   "steps_us_per_round": {
+    "reading": 27.067819675064897,
+    "laying_out": 205.40597288046908,
+    "making_calls": 1546.8979145524147,
+    "collecting": 821.3386589538138,
+    "rest": 23.241066386508848
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 1639.7394391027992,
+     "per_position": 132.5647924086038
+    },
+    "making_calls": {
+     "fixed": 929.5529148163232,
+     "per_position": 83.15100028025992
+    }
+   },
+   "no_grad": false
+  },
+  "mps-64x2-m1-fp16": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 1,
+   "autocast": "float16",
+   "compiled": false,
+   "warm_up_seconds": 4.282662541998434,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    2.8027297131557134,
+    2.76980191902112,
+    2.8214229990626336
+   ],
+   "best_pass_seconds": 2.76980191902112,
+   "best_us_per_round": 3247.1300340224147,
+   "best_us_per_request": 437.4983287033833,
+   "best_us_per_position": 437.3601640646013,
+   "median_round_us": 3335.9590015606955,
+   "steps_us_per_round": {
+    "reading": 28.289890044793523,
+    "laying_out": 218.04882875593992,
+    "making_calls": 1964.0383433326363,
+    "collecting": 1006.1605004642862,
+    "rest": 30.592471424758802
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 1915.18931141972,
+     "per_position": 179.40082684037557
+    },
+    "making_calls": {
+     "fixed": 1113.2235421267428,
+     "per_position": 114.59735124405924
+    }
+   },
+   "no_grad": false
+  },
+  "mps-64x2-m1-new": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 3.7840044159966055,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    2.348107432066172,
+    2.914847584979725,
+    2.4102403700890136
+   ],
+   "best_pass_seconds": 2.348107432066172,
+   "best_us_per_round": 2752.7636952710104,
+   "best_us_per_request": 370.8904489126792,
+   "best_us_per_position": 370.7733194483139,
+   "median_round_us": 2868.165996915195,
+   "steps_us_per_round": {
+    "reading": 27.066000370057093,
+    "laying_out": 209.45494711876202,
+    "making_calls": 1671.0904583071247,
+    "collecting": 821.0177747393518,
+    "rest": 24.13451473571465
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 1759.6040855967067,
+     "per_position": 133.76995847973805
+    },
+    "making_calls": {
+     "fixed": 1085.8304787887068,
+     "per_position": 78.82942721130755
+    }
+   },
+   "no_grad": false
+  },
+  "mps-64x2-m1": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 1,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 5.225539416998799,
+   "rounds": 853,
+   "requests": 6331,
+   "positions": 6333,
+   "positions_per_round": 7.424384525205158,
+   "pass_seconds": [
+    2.345427972068137,
+    2.7597344608657295,
+    2.6245736250129994
+   ],
+   "best_pass_seconds": 2.345427972068137,
+   "best_us_per_round": 2749.622476047054,
+   "best_us_per_request": 370.4672203550998,
+   "best_us_per_position": 370.35022454889264,
+   "median_round_us": 2854.4589949888177,
+   "steps_us_per_round": {
+    "reading": 28.49688162196838,
+    "laying_out": 224.07684291689466,
+    "making_calls": 1618.0028242726016,
+    "collecting": 848.3115253519105,
+    "rest": 30.734401883678633
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 1704.3222553314113,
+     "per_position": 140.7928451398142
+    },
+    "making_calls": {
+     "fixed": 998.9052901899859,
+     "per_position": 83.38705140888543
+    }
+   }
+  },
+  "mps-64x2-m16": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 16,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 1.9246357090014499,
+   "rounds": 53,
+   "requests": 6326,
+   "positions": 6328,
+   "positions_per_round": 119.39622641509433,
+   "pass_seconds": [
+    0.3940345029623131,
+    0.39273454200156266,
+    0.3986216639750637
+   ],
+   "best_pass_seconds": 0.39273454200156266,
+   "best_us_per_round": 7410.085698142691,
+   "best_us_per_request": 62.08260227656698,
+   "best_us_per_position": 62.06298072085377,
+   "median_round_us": 8002.750000741798,
+   "steps_us_per_round": {
+    "reading": 403.9368865943408,
+    "laying_out": 2053.7908670310158,
+    "making_calls": 2504.8782270048077,
+    "collecting": 2208.033829618834,
+    "rest": 239.44588789369314
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 3586.4946323495124,
+     "per_position": 32.02438787721847
+    },
+    "making_calls": {
+     "fixed": 2309.24132893925,
+     "per_position": 1.638551769512417
+    }
+   }
+  },
+  "mps-64x2-m3": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 3,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 3.3775105419990723,
+   "rounds": 284,
+   "requests": 6330,
+   "positions": 6332,
+   "positions_per_round": 22.295774647887324,
+   "pass_seconds": [
+    1.1344095419626683,
+    1.1523343669832684,
+    1.2133914109363104
+   ],
+   "best_pass_seconds": 1.1344095419626683,
+   "best_us_per_round": 3994.399795643198,
+   "best_us_per_request": 179.2116180035811,
+   "best_us_per_position": 179.15501294419903,
+   "median_round_us": 4299.708496546373,
+   "steps_us_per_round": {
+    "reading": 80.08209184020377,
+    "laying_out": 475.52552444960355,
+    "making_calls": 2246.148778180162,
+    "collecting": 1132.9253205294149,
+    "rest": 59.718080643813686
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 2174.3197379845433,
+     "per_position": 81.63340751343303
+    },
+    "making_calls": {
+     "fixed": 1358.7584887830121,
+     "per_position": 39.80082788831184
+    }
+   }
+  },
+  "mps-64x2-m8-fp16": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 8,
+   "autocast": "float16",
+   "compiled": false,
+   "warm_up_seconds": 1.514806209001108,
+   "rounds": 106,
+   "requests": 6326,
+   "positions": 6328,
+   "positions_per_round": 59.698113207547166,
+   "pass_seconds": [
+    0.6448605769764981,
+    0.6713500420228229,
+    0.6827713299862808
+   ],
+   "best_pass_seconds": 0.6448605769764981,
+   "best_us_per_round": 6083.590348834888,
+   "best_us_per_request": 101.93812471964877,
+   "best_us_per_position": 101.90590660184863,
+   "median_round_us": 6570.208501216257,
+   "steps_us_per_round": {
+    "reading": 208.97508545873143,
+    "laying_out": 1100.4099530664291,
+    "making_calls": 2831.8407737215066,
+    "collecting": 1821.1089150528733,
+    "rest": 121.2556215353477
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 2578.427711502933,
+     "per_position": 58.71479765442275
+    },
+    "making_calls": {
+     "fixed": 1560.6418763952006,
+     "per_position": 21.29378683890462
+    }
+   },
+   "no_grad": false
+  },
+  "mps-64x2-m8": {
+   "device": "mps",
+   "torch": "2.14.0",
+   "threads": 1,
+   "config": {
+    "hidden_dim": 64,
+    "message_layers": 2
+   },
+   "merge": 8,
+   "autocast": null,
+   "compiled": false,
+   "warm_up_seconds": 2.8019292499957373,
+   "rounds": 106,
+   "requests": 6326,
+   "positions": 6328,
+   "positions_per_round": 59.698113207547166,
+   "pass_seconds": [
+    0.5948163760112948,
+    0.5596244970001862,
+    0.555092499962484
+   ],
+   "best_pass_seconds": 0.555092499962484,
+   "best_us_per_round": 5236.721697759283,
+   "best_us_per_request": 87.74778690522984,
+   "best_us_per_position": 87.72005372352781,
+   "median_round_us": 5667.375000484753,
+   "steps_us_per_round": {
+    "reading": 208.07685744004183,
+    "laying_out": 1093.8211605705117,
+    "making_calls": 2293.692216692264,
+    "collecting": 1533.3828962197142,
+    "rest": 107.7485668367513
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 2264.409119421782,
+     "per_position": 49.78905393548912
+    },
+    "making_calls": {
+     "fixed": 1369.5185203560548,
+     "per_position": 15.48078568451931
+    }
+   }
+  }
+ },
+ "replay_comparisons": {
+  "cpu-64x2-m1-bf16": {
+   "replies": 6331,
+   "identical_replies": 0,
+   "max_prior_difference": 0.006591108542238822,
+   "mean_largest_prior_difference": 0.0007282186275895383,
+   "replies_with_options": 6330,
+   "most_likely_move_changed": 170,
+   "max_value_difference": 0.6966991424560547,
+   "max_relative_value_difference": 158.84697805289815
+  },
+  "cpu-64x2-m1-final": {
+   "replies": 6331,
+   "identical_replies": 6331,
+   "max_prior_difference": 0.0,
+   "mean_largest_prior_difference": 0.0,
+   "replies_with_options": 6330,
+   "most_likely_move_changed": 0,
+   "max_value_difference": 0.0,
+   "max_relative_value_difference": 0.0
+  },
+  "cpu-64x2-m1-new": {
+   "replies": 6331,
+   "identical_replies": 6331,
+   "max_prior_difference": 0.0,
+   "mean_largest_prior_difference": 0.0,
+   "replies_with_options": 6330,
+   "most_likely_move_changed": 0,
+   "max_value_difference": 0.0,
+   "max_relative_value_difference": 0.0
+  },
+  "cpu-64x2-m1-nograd-compiled": {
+   "replies": 6331,
+   "identical_replies": 6010,
+   "max_prior_difference": 1.1771927582726605e-07,
+   "mean_largest_prior_difference": 6.97386797734188e-10,
+   "replies_with_options": 6330,
+   "most_likely_move_changed": 0,
+   "max_value_difference": 3.814697265625e-05,
+   "max_relative_value_difference": 0.0009182061923825615
+  },
+  "mps-256x8-m1-compiled": {
+   "replies": 6331,
+   "identical_replies": 2,
+   "max_prior_difference": 1.826156353912367e-07,
+   "mean_largest_prior_difference": 2.2931293983191514e-08,
+   "replies_with_options": 6330,
+   "most_likely_move_changed": 1,
+   "max_value_difference": 4.673004150390625e-05,
+   "max_relative_value_difference": 0.75
+  },
+  "mps-256x8-m1-fp16": {
+   "replies": 6331,
+   "identical_replies": 0,
+   "max_prior_difference": 0.00017429361259529985,
+   "mean_largest_prior_difference": 2.4320018783505836e-05,
+   "replies_with_options": 6330,
+   "most_likely_move_changed": 5,
+   "max_value_difference": 0.0843954086303711,
+   "max_relative_value_difference": 2443.24
+  },
+  "mps-256x8-m8-fp16": {
+   "replies": 6326,
+   "identical_replies": 0,
+   "max_prior_difference": 0.00017421125905658918,
+   "mean_largest_prior_difference": 2.4186982657606614e-05,
+   "replies_with_options": 6325,
+   "most_likely_move_changed": 3,
+   "max_value_difference": 0.08426952362060547,
+   "max_relative_value_difference": 1102.2654545454545
+  },
+  "mps-512x16-m1-fp16": {
+   "replies": 6331,
+   "identical_replies": 0,
+   "max_prior_difference": 0.00022962753841182515,
+   "mean_largest_prior_difference": 3.3444951924392e-05,
+   "replies_with_options": 6330,
+   "most_likely_move_changed": 10,
+   "max_value_difference": 0.10056304931640625,
+   "max_relative_value_difference": 32.17635652853792
+  },
+  "mps-512x16-m8-fp16": {
+   "replies": 6326,
+   "identical_replies": 0,
+   "max_prior_difference": 0.00022101241831884444,
+   "mean_largest_prior_difference": 3.333870008841217e-05,
+   "replies_with_options": 6325,
+   "most_likely_move_changed": 10,
+   "max_value_difference": 0.10404205322265625,
+   "max_relative_value_difference": 6.64490756302521
+  },
+  "mps-64x2-m1-compiled": {
+   "replies": 6331,
+   "identical_replies": 14,
+   "max_prior_difference": 1.487285662404858e-07,
+   "mean_largest_prior_difference": 1.4600239468355298e-08,
+   "replies_with_options": 6330,
+   "most_likely_move_changed": 0,
+   "max_value_difference": 2.09808349609375e-05,
+   "max_relative_value_difference": 0.009009009009009009
+  },
+  "mps-64x2-m1-final": {
+   "replies": 6331,
+   "identical_replies": 14,
+   "max_prior_difference": 1.6319102041917333e-07,
+   "mean_largest_prior_difference": 1.4433132025757317e-08,
+   "replies_with_options": 6330,
+   "most_likely_move_changed": 0,
+   "max_value_difference": 2.09808349609375e-05,
+   "max_relative_value_difference": 0.012387387387387387
+  },
+  "mps-64x2-m1-fp16": {
+   "replies": 6331,
+   "identical_replies": 0,
+   "max_prior_difference": 0.00014428193129101263,
+   "mean_largest_prior_difference": 2.0143819515149166e-05,
+   "replies_with_options": 6330,
+   "most_likely_move_changed": 3,
+   "max_value_difference": 0.0807342529296875,
+   "max_relative_value_difference": 36.777297297297295
+  },
+  "mps-64x2-m1-new": {
+   "replies": 6331,
+   "identical_replies": 21,
+   "max_prior_difference": 1.374253902897138e-07,
+   "mean_largest_prior_difference": 1.426092224994079e-08,
+   "replies_with_options": 6330,
+   "most_likely_move_changed": 0,
+   "max_value_difference": 2.09808349609375e-05,
+   "max_relative_value_difference": 0.0045045045045045045
+  },
+  "mps-64x2-m8-fp16": {
+   "replies": 6326,
+   "identical_replies": 0,
+   "max_prior_difference": 0.0001637049010070335,
+   "mean_largest_prior_difference": 2.0310524745551902e-05,
+   "replies_with_options": 6325,
+   "most_likely_move_changed": 4,
+   "max_value_difference": 0.08560609817504883,
+   "max_relative_value_difference": 40.23800904977376
+  }
+ },
+ "replays_that_failed": {
+  "cpu-64x2-m1-compiled": "AssertionError: Guard failed on the same frame it was created. This is a bug - please create an issue.Guard fail reason: 0/0: tensor '___from_numpy(batch.floats['zone_weight'])' dispatch key set mismatch. expected DispatchKeySet(CPU, BackendSelect, ADInplaceOrView), actual DispatchKeySet(CPU, BackendSelect)",
+  "mps-256x8-m8-compiled": "torch._inductor.exc.InductorError: SyntaxError: failed to compile #include <c10/metal/atomic.h>",
+  "mps-64x2-m8-compiled": "torch._inductor.exc.InductorError: SyntaxError: failed to compile #include <c10/metal/atomic.h>"
+ },
+ "replay_commands": [
+  "#!/bin/zsh\n# Replays of the saved rounds: one core and the GPU, three network sizes, merged rounds,\n# then half precision (autocast) and compiling, with outputs kept for comparison.\ncd /Users/home/Projects/gwRL\nOUT=tmp/coordinator-rounds-2026-11-17\nPY=tmp/gpu-mps-env/bin/python\nTOOL=tools/replay_coordinator_rounds.py\nROUNDS=$OUT/profile.rounds.pickle\nR=$OUT/replays\nmkdir -p $R\nrun() {  # name, then the tool's options\n  local name=$1; shift\n  echo \"== $name $(date +%H:%M:%S)\"\n  env -u MallocNanoZone $PY $TOOL . $ROUNDS --report $R/$name.json \"$@\" > $R/$name.log 2>&1 || echo \"FAILED $name\"\n}\nfor size in 64x2 256x8 512x16; do\n  env -u MallocNanoZone $PY $TOOL . --make-weights $R/weights-$size.pt --hidden-dim ${size%x*} --message-layers ${size#*x}\ndone\n# One core: the rounds as saved, and merged.\nrun cpu-64x2-m1 --weights $R/weights-64x2.pt --outputs $R/cpu-64x2-m1.out.pickle\nrun cpu-64x2-m3 --weights $R/weights-64x2.pt --merge 3\nrun cpu-64x2-m8 --weights $R/weights-64x2.pt --merge 8\nrun cpu-256x8-m1 --weights $R/weights-256x8.pt --limit 200 --repeat 2\nrun cpu-512x16-m1 --weights $R/weights-512x16.pt --limit 100 --repeat 2\n# The GPU: three sizes, the rounds as saved and merged.\nfor size in 64x2 256x8 512x16; do\n  for merge in 1 3 8 16; do\n    run mps-$size-m$merge --device mps --weights $R/weights-$size.pt --merge $merge --outputs $R/mps-$size-m$merge.out.pickle\n  done\ndone\n# Half precision under autocast, against the 32-bit outputs of the same device and merge.\nfor size in 64x2 256x8 512x16; do\n  for merge in 1 8; do\n    run mps-$size-m$merge-fp16 --device mps --weights $R/weights-$size.pt --merge $merge --autocast float16 --outputs $R/mps-$size-m$merge-fp16.out.pickle\n    env -u MallocNanoZone $PY $TOOL --compare $R/mps-$size-m$merge.out.pickle $R/mps-$size-m$merge-fp16.out.pickle > $R/compare-mps-$size-m$merge-fp16.json\n  done\ndone\nrun cpu-64x2-m1-bf16 --weights $R/weights-64x2.pt --autocast bfloat16 --outputs $R/cpu-64x2-m1-bf16.out.pickle\nenv -u MallocNanoZone $PY $TOOL --compare $R/cpu-64x2-m1.out.pickle $R/cpu-64x2-m1-bf16.out.pickle > $R/compare-cpu-64x2-m1-bf16.json\n# Compiling the pass.\nrun cpu-64x2-m1-compiled --weights $R/weights-64x2.pt --compile --outputs $R/cpu-64x2-m1-compiled.out.pickle\nenv -u MallocNanoZone $PY $TOOL --compare $R/cpu-64x2-m1.out.pickle $R/cpu-64x2-m1-compiled.out.pickle > $R/compare-cpu-64x2-m1-compiled.json\nfor size in 64x2 256x8; do\n  for merge in 1 8; do\n    run mps-$size-m$merge-compiled --device mps --weights $R/weights-$size.pt --merge $merge --compile --outputs $R/mps-$size-m$merge-compiled.out.pickle\n    env -u MallocNanoZone $PY $TOOL --compare $R/mps-$size-m$merge.out.pickle $R/mps-$size-m$merge-compiled.out.pickle > $R/compare-mps-$size-m$merge-compiled.json\n  done\ndone\necho \"all done $(date +%H:%M:%S)\"\n",
+  "#!/bin/zsh\n# After making the pass's message sum follow the messages' type: the same 32-bit replies,\n# half precision on the GPU and bfloat16 on one core, and compiling on one core under no_grad.\ncd /Users/home/Projects/gwRL\nOUT=tmp/coordinator-rounds-2026-11-17\nPY=tmp/gpu-mps-env/bin/python\nTOOL=tools/replay_coordinator_rounds.py\nROUNDS=$OUT/profile.rounds.pickle\nR=$OUT/replays\nrun() {\n  local name=$1; shift\n  echo \"== $name $(date +%H:%M:%S)\"\n  env -u MallocNanoZone $PY $TOOL . $ROUNDS --report $R/$name.json \"$@\" > $R/$name.log 2>&1 || echo \"FAILED $name\"\n}\ncmp() { env -u MallocNanoZone $PY $TOOL --compare $R/$1.out.pickle $R/$2.out.pickle > $R/compare-$2.json 2>&1 || echo \"FAILED compare $2\"; }\nrun cpu-64x2-m1-new --weights $R/weights-64x2.pt --outputs $R/cpu-64x2-m1-new.out.pickle\ncmp cpu-64x2-m1 cpu-64x2-m1-new\nrun mps-64x2-m1-new --device mps --weights $R/weights-64x2.pt --outputs $R/mps-64x2-m1-new.out.pickle\ncmp mps-64x2-m1 mps-64x2-m1-new\nfor size in 64x2 256x8 512x16; do\n  for merge in 1 8; do\n    run mps-$size-m$merge-fp16 --device mps --weights $R/weights-$size.pt --merge $merge --autocast float16 --outputs $R/mps-$size-m$merge-fp16.out.pickle\n    cmp mps-$size-m$merge mps-$size-m$merge-fp16\n  done\ndone\nrun cpu-64x2-m1-bf16 --weights $R/weights-64x2.pt --autocast bfloat16 --outputs $R/cpu-64x2-m1-bf16.out.pickle\ncmp cpu-64x2-m1 cpu-64x2-m1-bf16\nrun cpu-64x2-m1-nograd --weights $R/weights-64x2.pt --no-grad --outputs $R/cpu-64x2-m1-nograd.out.pickle\nrun cpu-64x2-m1-nograd-compiled --weights $R/weights-64x2.pt --no-grad --compile --outputs $R/cpu-64x2-m1-nograd-compiled.out.pickle\ncmp cpu-64x2-m1-nograd cpu-64x2-m1-nograd-compiled\nrun cpu-64x2-m3-nograd --weights $R/weights-64x2.pt --no-grad --merge 3\nrun cpu-64x2-m3-nograd-compiled --weights $R/weights-64x2.pt --no-grad --compile --merge 3\necho \"all done $(date +%H:%M:%S)\"\n"
+ ]
+}

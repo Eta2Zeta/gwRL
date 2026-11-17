@@ -1134,11 +1134,12 @@ the grouping of moves into the stages of section 6.8.
 
 Training alternates between playing and learning. A *batch* of games is played
 with all three networks frozen: 24 games at once, 6 game processes of 4 games
-each ([section 9.2](#92-running-training-on-the-mac)). At every decision the
+each ([section 9.2](#92-running-training-on-the-mac)), and it ends when the last
+of them ends. At every decision the
 alliance to move searches (section 4) and plays the move drawn from the shares.
 The settings in sections 7 and 8 are those of the Mac training command in the
 [campaign learning guide](../../studies/campaign/README.md#training-on-the-mac),
-which calls them the speed test's settings, not tuned values. The worked
+which names them the speed test's settings, not tuned values. The worked
 examples come from the 5 November run, when a batch was 32 games, in 8 game
 processes, and an update 700 training steps. Today an update is 525 steps,
 which draws each kept sample as often from batches of 24 games (section 8.7).
@@ -1632,23 +1633,34 @@ call is not a training step either: a training step (section 8.4) reads 32
 samples and changes the network's weights once, and each of its parts is itself
 many calls.
 
-**What a pass costs.** One pass per round matters because a pass costs much more
-than its share of arithmetic: in a profiled training batch, a pass of one
-network took 0.57 ms for one position and 1.02 ms for four, about 0.4 ms
-whatever its size
-([record](../archive/records/coordinator_one_pass_2026_11_14.md#where-the-coordinators-time-went)).
-Most of that fixed cost is probably the starts of the pass's calls, which by the
-bound above take at most about 0.31 ms of a one-position pass of the 64×2
-network (inferred). Of the arithmetic,
-the GELU curve (section 6.2) takes the most, mostly in the border messages
-(section 6.6). With one pass per round, the
-positions cost most of a round. In training batches of the Mac profile, whose 6
-game processes of 4 games keep 24 *games in flight*, that is, being played at
-the moment, a round held about 8 positions and took the coordinator about 0.62 ms plus 0.13 ms
-for each position, from reading the requests' arrays to the outputs, about
-0.21 ms a position in all, and the coordinator was busy about 96% of the time
+**What a pass costs.** A pass costs much more than its share of arithmetic. In a
+profiled training batch of 17 November, a pass of the 64×2 network on one core
+took 0.40 ms for one position, 0.82 ms for four and 1.41 ms for eight: about
+0.27 ms plus 0.14 ms a position
+([record](../archive/records/coordinator_rounds_2026_11_17.md#the-training-batch)).
+Native samples of the coordinator in that batch put about 43% of its busy time
+in arithmetic, the GELU curve (section 6.2) alone 14%, mostly in the border
+messages (section 6.6). About 31% went to Python's and PyTorch's own work around
+the calls, where their starts lie, and 12% to allocating and copying memory.
+Most of a pass's fixed cost is probably those starts, which by the bound above
+take at most about 0.31 ms of a one-position pass (inferred).
+
+**What a round costs.** A round is its pass and the round trip around it. In
+the same batch the coordinator spent two thirds of its time in passes, 13% laying
+the positions out, 6% reading the requests from the pipes and shared memory,
+turning the outputs into priors and sending the replies, and 9% waiting for
+requests ([record](../archive/records/coordinator_rounds_2026_11_17.md#the-training-batch)).
+In training batches of the Mac profile, whose 6 game processes of 4 games keep
+24 *games in flight*, that is, being played at the moment, a round held about 8
+positions and took the coordinator about 0.62 ms plus 0.13 ms for each
+position, from reading the requests' arrays to the outputs, about 0.21 ms a
+position in all, and the coordinator was busy about 96% of the time
 ([record](../archive/records/engine_speed_in_training_2026_11_16.md#what-limits-training-now)).
-So the more positions wait for a round, the less each costs.
+So the more positions wait for a round, the less each costs. While all 24 games
+play, a round holds about 10, fewer as the batch's games end, and one when its
+last game plays alone
+([record](../archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail);
+below).
 
 **What the cores and the GPU do.** In the Mac profile the GPU does nothing, and
 all the cores work at the same time. A game thread works in the engine and the
@@ -1763,6 +1775,18 @@ its work move elsewhere
 that work, which of the coordinator and the cores set the pace depended on the
 Mac's other work
 ([record](../archive/records/move_checks_2026_11_16.md#training-batches)).
+
+A batch also pays for its end. Its 24 games start together and the batch ends
+with the last of them, so as games end fewer remain in flight, and the longest
+plays alone. In a profiled batch of 17 November, 23 games ended between 231 and
+299 seconds and the longest, 1,445 decisions, played alone until 332 seconds: for the
+last tenth of the playing time the coordinator's rounds held one position each
+and the other game threads waited. That cost the batch about 9% of its decisions
+an hour (worked out from each game's decisions and time;
+[record](../archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail)).
+Whether to play more games than game threads in a batch is waiting for the
+owner's decision
+([Q-007](../questions.md#q-007-a-batchs-last-game-played-alone)).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept sample was drawn 8 to 12 times
@@ -1883,8 +1907,16 @@ work, laying the positions out and making the calls, is about two thirds of
 every 64×2 pass, 40% to 60% of a 256×8 pass of 8 to 64 positions, and only a
 tenth of a 512×16 pass of 256, where the GPU's arithmetic takes the rest
 ([record](../archive/records/pass_calls_2026_11_17.md#what-the-calls-cost)).
-Whether fewer calls or cheaper arithmetic would let the GPU do more is open (the
-coordinator's levers, below). The rates used below:
+Real rounds saved from a training batch, replayed through the coordinator's
+code, divide the same way. In the rounds as saved, 7.4 positions on average, making
+the calls took 1.6 ms of a 2.75 ms round at 64×2 and 5.4 ms of 11.7 ms at
+512×16, and the GPU was slower than one core at 64×2 but 1.7 and 3.7 times as
+fast at 256×8 and 512×16. Merged 16 at a time, 119 positions a round, a 512×16
+round waited 84% of its time for the GPU's arithmetic, a 64×2 round only 30%
+([record](../archive/records/coordinator_rounds_2026_11_17.md#replayed-rounds-on-the-gpu)).
+Two of the coordinator's levers (below), half precision and compiling, were
+tried on those rounds and did not pay as they stand; whether fewer calls would
+let the GPU do more is open. The rates used below:
 
 | Network | Arithmetic per position | One CPU core, 16 per pass | GPU, 64 per pass | GPU, 256 per pass |
 | --- | ---: | ---: | ---: | ---: |
@@ -1987,7 +2019,8 @@ half of them waiting in the pass while the other half work in the engine, and
 each holds its tree in memory. At 800 simulations 30 GB holds the trees of only
 about 115 games beside the processes' other memory, so passes hold about 57
 positions. Today's layout has 24 games in flight, and its rounds on the CPU
-hold about 8 positions (section 9.2). It could never fill a pass of 64, and in
+hold about 10 positions while all 24 play, about 8 over a whole batch, and one
+at its end (section 9.2). It could never fill a pass of 64, and in
 passes of 4 and of 16 positions the GPU gives 11% and 35% of its rate in passes
 of 64 at 64×2, and 25% and 56% at 512×16. So moving the network to the GPU
 means more games in flight as well. A search could instead ask about several
@@ -2026,8 +2059,9 @@ the GPU only in large passes of large networks, where the arithmetic fills it.
 From 256×8 on the network needs the GPU, so there the coordinator's speed is the
 GPU's, and these levers are what would raise it. The levers take the forms
 below, beside two changes around the pass: a leaner round trip and a second
-coordinator. None of them is built, and which of them pay, and how much, is
-open:
+coordinator. None of them is built. Two were tried on real rounds saved from a
+training batch and did not pay as they stand; which of the others pay, and how
+much, is open:
 
 - **Fewer calls.** In a pass with positions of all three alliances, 43% to 50%
   of the calls are ones that positions of one alliance would not need: the pass
@@ -2047,7 +2081,13 @@ open:
   and moves its numbers through memory fewer times. Its routines work best for
   arrays of fixed sizes, and a pass's arrays change size with its positions, so
   passes would be padded with empty positions up to a few fixed sizes, each
-  compiled once, at the cost of the empty positions' arithmetic. On an NVIDIA
+  compiled once, at the cost of the empty positions' arithmetic. Compiled as it
+  is written, the pass was never faster on the saved rounds: 5% to 7% slower on
+  the GPU and 12% to 21% slower on one core. PyTorch compiled it again for each
+  new mix of positions, up to its limit of 8, and rounds merged into larger
+  passes made it write GPU code that did not build
+  ([record](../archive/records/coordinator_rounds_2026_11_17.md#compiling)).
+  On an NVIDIA
   GPU, such as the Windows PC's (section 9.2), a *CUDA graph* goes further:
   PyTorch records a pass's calls on the GPU once, and each later pass of the
   same size replays the record from a single start.
@@ -2056,13 +2096,19 @@ open:
   section 6.3. *Half-precision* numbers take 16 bits and keep about 3. A pass in
   half precision moves half as many bytes, and many GPUs compute with such
   numbers faster, but its outputs differ from the 32-bit ones by much more than
-  rounding, so it would be checked like a change of the network.
+  rounding, so it would be checked like a change of the network. Under PyTorch's
+  automatic mixed precision, which does the matrix products in 16 bits and keeps
+  sums and normalizations in 32, the saved rounds ran 5% to 23% slower on the
+  GPU, since the conversions add calls, while priors moved by at most 0.00023
+  and values by at most 0.10; on one core bfloat16, another 16-bit format, made
+  them 92% slower
+  ([record](../archive/records/coordinator_rounds_2026_11_17.md#half-precision)).
 - **A leaner round trip.** Outside the pass, the coordinator reads the requests'
   notes from the pipes, lays the positions out in Python, turns the outputs into
   priors one position at a time and sends the replies through the pipes as lists
-  (section 9.2). On 14 November laying the positions out took 233 µs of a
-  1,603 µs round
-  ([record](../archive/records/coordinator_one_pass_2026_11_14.md#time-per-round-replayed)).
+  (section 9.2). In a profiled batch of 17 November laying the positions out
+  took 13% of the coordinator's time, and the rest of the round trip 6%
+  ([record](../archive/records/coordinator_rounds_2026_11_17.md#the-training-batch)).
   Writing the replies into shared memory, turning all the positions' outputs
   into priors at once, and laying the positions out in the engine's C++ with
   fewer copies would shorten that part of a round.
@@ -2071,7 +2117,8 @@ open:
   several positions at once (both above, where a pass's positions come from). On
   the GPU the coordinator's core could also lay out the next pass while the GPU
   computes the current one; now it waits for each pass's outputs before its next
-  round.
+  round. A batch's end empties its passes too, since its last games play alone
+  ([Q-007](../questions.md#q-007-a-batchs-last-game-played-alone)).
 - **A second coordinator**, serving half the game processes, would add capacity
   without making a round cheaper: each coordinator would find about half as many
   positions waiting, and smaller passes cost more per position. It was not built
@@ -2079,12 +2126,13 @@ open:
   ([record](../archive/records/coordinator_one_pass_2026_11_14.md#other-ways-considered));
   since the engine work of 16 November about 2 of the 9 are idle (section 9.2).
 
-Each form can be checked on one core on real rounds saved from a training batch
+Each form can be checked on real rounds saved from a training batch
 (`tools/profile_coordinator.py --save-every`) and replayed through the
-coordinator's code, which times the rounds and compares two versions' replies
-(`tools/replay_coordinator_rounds.py`). On the GPU, passes are timed through the
-coordinator's code by `tools/benchmark_network_sizes.py`, which measured the
-rates above.
+coordinator's code on one core or on the GPU, with a network of any size, as
+saved or merged into larger passes: the replay times each step of a round and
+compares two versions' replies (`tools/replay_coordinator_rounds.py`).
+`tools/benchmark_network_sizes.py` times passes of sampled positions, as for
+the rates above.
 
 Three things follow, inferred:
 
@@ -2248,7 +2296,10 @@ measured and what would settle it.
   the coordinator's rounds. A round costs the coordinator about 0.62 ms besides
   0.13 ms a position (section 9.2); a seventh game process, now that cores are
   idle, would fill its rounds further, which is untested. The coordinator's own
-  levers, none of them built, are listed in section 9.3. Within the engine,
+  levers, none of them built, are listed in section 9.3, with the first
+  measurements of two of them. Each batch also ends with its longest game
+  playing alone, which cost a profiled batch about 9% of its decisions an hour
+  ([Q-007](../questions.md#q-007-a-batchs-last-game-played-alone)). Within the engine,
   listing a position's legal moves now costs the most each time, and checking a
   naval route copies the whole position and works out its carriers' reach and
   supply again with no cache
@@ -2652,7 +2703,8 @@ Terms in the order the document introduces them.
 
 **Samples and training (sections 7 and 8)**
 
-- **Batch:** the games played between two updates, 32 at once.
+- **Batch:** the games played between two updates, all at once: 24 in the Mac
+  profile, one per game thread.
 - **Sample:** one saved decision: what the network read, who chose, how the
   search split its simulations among the moves and the final scores.
 - **Policy target:** a sample's shares, the move probabilities a network is
@@ -2675,7 +2727,7 @@ Terms in the order the document introduces them.
 - **Training step:** one draw of 32 samples from the replay buffer, read by the
   three networks, and one Adam step for each. The training command names the 32
   `--batch-size` and the steps per update `--epochs`.
-- **Update:** the 700 training steps after a batch.
+- **Update:** the training steps after a batch, 525 in the Mac training command.
 - **Model export:** the saved networks after an update.
 - **Checkpoint:** a full save of a run, for resuming it.
 

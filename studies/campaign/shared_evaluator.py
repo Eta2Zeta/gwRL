@@ -142,7 +142,8 @@ def collect(model: Any, scores: Any, lengths: Sequence[int], raw: Any,
 
     Reading them back waits for the device, after which `batch` may go."""
     import torch
-    host = torch.cat((scores, (raw * model.config.value_scale).reshape(-1))).cpu().numpy().astype(np.float64)
+    # float(): a pass under automatic mixed precision may give 16-bit outputs, which numpy may not read.
+    host = torch.cat((scores, (raw * model.config.value_scale).reshape(-1))).float().cpu().numpy().astype(np.float64)
     if not np.isfinite(host).all():
         raise ValueError("Neural evaluation returned a nonfinite logit or value")
     split = int(sum(lengths))

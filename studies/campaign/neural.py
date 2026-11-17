@@ -157,8 +157,9 @@ def _conditional_log_softmax(scores: Tensor, owners: Tensor, count: int) -> Tens
     maximum = scores.new_full((count,), -torch.inf)
     maximum.scatter_reduce_(0, owners, scores, reduce="amax", include_self=True)
     shifted = scores - maximum.index_select(0, owners)
-    totals = scores.new_zeros((count,))
-    totals.index_add_(0, owners, shifted.exp())
+    exponentials = shifted.exp()  # 32-bit even under automatic mixed precision
+    totals = exponentials.new_zeros((count,))
+    totals.index_add_(0, owners, exponentials)
     return shifted - totals.log().index_select(0, owners)
 
 
@@ -347,7 +348,9 @@ def _forward(networks: Any, batch: ZoneBatch, *, non_blocking: bool = False) -> 
     for layer in range(model.config.message_layers):
         sent = F.gelu(_by_network(h, node_sizes, [m.messages[layer] for m in models], _linear).index_select(0, sources)
                       + networks.border_terms(layer, batch, t))
-        received = h.new_zeros((nodes, dim)).index_add_(0, targets, sent) / degree
+        # Zeros of the messages' own type, so that a pass under automatic mixed
+        # precision, whose messages are half-precision, can add them up.
+        received = sent.new_zeros((nodes, dim)).index_add_(0, targets, sent) / degree
         h = h + _by_network(torch.cat((h, received, u.repeat_interleave(zones, 0)), dim=1), node_sizes,
                             [m.zone_updates[layer] for m in models], _apply_block)
         u = u + _by_network(torch.cat((u, h.view(positions, zones, dim).mean(1)), dim=1), sizes,
