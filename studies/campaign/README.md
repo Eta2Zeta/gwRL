@@ -182,6 +182,22 @@ matched pairs of runs of four network updates, it played 6.5% and 12.5% more
 decisions per wall-clock hour in steady play than alternating training
 iterations ([record](../../docs/archive/records/self_play_never_stops_2026_11_17.md)).
 
+`--networks one` trains one network for all three alliances instead of a
+network for each (`--networks three`, the default). The input tells it which
+alliance is choosing; its policy learns from every decision, the inference
+server evaluates every state with it in a forward pass of one network, and
+checkpoints and model exports hold it once
+([one training step](../../docs/design/README.md#84-one-training-step-and-one-network-update)).
+In self-play that never stops, each finished game is first scored by the
+networks then serving, before its training samples join the replay buffer:
+each network update's entry in `manifest.json` holds, under `fresh_games`, for
+each alliance the training samples, the value loss summed over them, and the
+policy's cross-entropy and KL divergence against the search's visit shares
+(`fresh_game_losses` in `learning.py`), and each game's own sums under
+`fresh_losses`. Divided by the training samples, these are the losses of
+[the loss](../../docs/design/README.md#81-the-loss) on games the networks have
+not trained on.
+
 `--sample-fraction F` keeps that share of a worker game's decisions as training
 samples, from its own random stream, so the games play the same.
 `--no-new-batch-after EPOCH` finishes the running training iteration and ends

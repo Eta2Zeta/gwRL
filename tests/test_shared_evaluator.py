@@ -161,10 +161,21 @@ class SharedEvaluatorTests(unittest.TestCase):
             self.assertMatches(priors[0], values[0], self.reference.evaluate_batch([(env, ())])[0])
 
     def test_server_answers_decisions_and_chance_cutoffs_through_pipes(self):
+        # Three decisions take one position each in a pass; the chance cutoff one per network.
+        self.assertServesFourRequests(self.models, self.reference, positions=6)
+
+    def test_one_network_for_all_three_alliances_is_one_network_in_a_pass(self):
+        one = self.models[PLAYERS[1]]
+        models = {player: one for player in PLAYERS}
+        # The chance cutoff, too, takes one position: the one network rates it once.
+        server = self.assertServesFourRequests(models, NeuralEvaluator(models, version="test"), positions=4)
+        self.assertEqual(len(server.stack.models), 1)
+
+    def assertServesFourRequests(self, models, reference, *, positions):
         memories = [shared_memory.SharedMemory(create=True, size=BUFFER_BYTES) for _ in range(2)]
         pipes = [Pipe() for _ in memories]
         try:
-            server = SharedEvaluatorServer(self.models, torch.device("cpu"), [parent for parent, _ in pipes],
+            server = SharedEvaluatorServer(models, torch.device("cpu"), [parent for parent, _ in pipes],
                                            [memory.name for memory in memories])
             serving = threading.Thread(target=server.serve, args=(lambda: True,), daemon=True)
             serving.start()
@@ -188,15 +199,15 @@ class SharedEvaluatorTests(unittest.TestCase):
             self.assertFalse(serving.is_alive(), "The server did not stop after every client closed")
             self.assertEqual(len(results), 4)
             for evaluation, env, menu in results.values():
-                self.assertMatches(evaluation.priors, evaluation.values, self.reference.evaluate_batch([(env, menu)])[0])
+                self.assertMatches(evaluation.priors, evaluation.values, reference.evaluate_batch([(env, menu)])[0])
             stats = server.stats
             self.assertEqual(stats.requests, 4)
             self.assertEqual(sum(size * count for size, count in stats.requests_per_round.items()), 4)
-            # Three decisions take one position each in a pass; the chance cutoff one per network.
-            self.assertEqual(sum(size * count for size, count in stats.positions_per_pass.items()), 6)
+            self.assertEqual(sum(size * count for size, count in stats.positions_per_pass.items()), positions)
             self.assertEqual(stats.passes, stats.rounds)
             self.assertEqual(stats.passes, sum(stats.positions_per_pass.values()))
             server.close()
+            return server
         finally:
             for memory in memories:
                 memory.close()

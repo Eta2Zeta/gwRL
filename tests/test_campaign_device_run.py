@@ -42,7 +42,7 @@ class DeviceRunTests(unittest.TestCase):
     def test_long_gpu_runner_rejects_unsupported_runtime_before_allocating_models(self):
         with patch("studies.campaign.run.resolve_neural_device", return_value=torch.device("mps")), \
              patch("studies.campaign.device_runtime.torch.__version__", "2.12.0"), \
-             patch("studies.campaign.run.CampaignPolicyValueNet", side_effect=AssertionError("No model allocation")):
+             patch("studies.campaign.run.alliance_networks", side_effect=AssertionError("No model allocation")):
             with self.assertRaisesRegex(ValueError, "2.13"):
                 _learner(RunConfig(neural_device="mps"), None)
 

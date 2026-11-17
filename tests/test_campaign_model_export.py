@@ -152,7 +152,7 @@ class CampaignModelExportTests(unittest.TestCase):
         expected = save_model_export(self.path, self.learner, self.runner)
         previous = self.path.read_bytes()
         self.runner["training_environment_seeds"].append(333)
-        with patch("studies.campaign.model_export.CampaignPolicyValueNet", side_effect=AssertionError("No model constructor")), \
+        with patch("studies.campaign.model_export.alliance_networks", side_effect=AssertionError("No model constructor")), \
              patch("torch.optim.Adam", side_effect=AssertionError("No optimizer")):
             self.assertEqual(validate_model_export(self.path, self.learner, self.runner), expected)
         self.assertEqual(self.path.read_bytes(), previous)
@@ -196,7 +196,7 @@ class CampaignModelExportTests(unittest.TestCase):
             compatibility=self.learner.compatibility)
         expected = save_model_export(self.path, learner, self.runner)
         previous = self.path.read_bytes()
-        with patch("studies.campaign.model_export.CampaignPolicyValueNet", side_effect=AssertionError("No model constructor")):
+        with patch("studies.campaign.model_export.alliance_networks", side_effect=AssertionError("No model constructor")):
             self.assertEqual(validate_model_export(self.path, learner, self.runner), expected)
         self.assertEqual(self.path.read_bytes(), previous)
 

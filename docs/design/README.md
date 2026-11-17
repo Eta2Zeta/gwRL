@@ -1324,14 +1324,15 @@ On decision 612's training sample, for the Comintern's network:
 | **Policy loss, the sum** | | | **1.903** |
 
 The cross-entropy is lowest when the probabilities equal the visit shares, here
-1.221, the visit shares' own entropy; the gap of 0.682 is what training can
-remove on this training sample. Most of the loss comes from the attack on Hopeh,
+1.221, the visit shares' own entropy; the gap of 0.682, the *Kullback–Leibler
+divergence* (KL divergence) of the probabilities from the visit shares, is what
+training can remove on this training sample. Most of the loss comes from the attack on Hopeh,
 to which the search gave 0.56 and the network 0.10.
 
 In a training step the two losses are averaged over the training samples of the
 training step's minibatch: the value loss over all of them, the policy loss over those
-where the network's own alliance chose (section 8.4). The training step lowers
-their sum.
+where the network's own alliance chose, or over all of them for one network serving
+all three alliances (section 8.4). The training step lowers their sum.
 
 ### 8.2 The gradient
 
@@ -1473,6 +1474,17 @@ minute: on 5 November the 32 games took 851 seconds and the 700 training steps
 seconds, also 64×2.
 
 ![Where a training step's minibatch of 32 training samples comes from. 1: self-play plays 24 games at a time, in 6 game processes of 4 games each, and a game that ends is replaced at once; at each decision a random draw keeps it as a training sample with chance 5%, and when a game ends its final scores are added to its training samples; on 5 November 32 games kept 1,611 training samples from 33,062 decisions. 2: when a game ends, its training samples join the replay buffer in the main training process, the latest 8,000 training samples, about five network updates' worth of games, drawn as five bars from the oldest games, whose training samples leave first, to the newest; purple dots spread over all five bars mark one training step's minibatch of 32, drawn at random. 3: one training step, 525 per network update, each with a new minibatch: draw 32 different training samples at random from the whole replay buffer; each of the three networks reads all 32 at once; it compares its values with the final scores on all 32, and its action probabilities with the visit shares on its own alliance's training samples; each network takes one Adam step. 4: after the last training step every game takes up the new networks at once. With 64×2 networks on the CPU, 24 games finish about every 6 minutes, and a network update's 525 training steps take about 40 seconds beside the games, which go on.](figures/training_update.svg)
+
+**One network for all three alliances.** With `--networks one` training keeps
+a single network instead of three, which serves every alliance; the default is
+`--networks three`. Its input tells it which alliance is choosing, in the global
+feature `deciding_player` (`src/zone_encoding.cpp`). In a training step it reads
+the minibatch once and gives its values and its action probabilities for every
+decision, so its policy loss averages over all 32 training samples, and it takes
+one Adam step. The inference server evaluates every state with it, a chance
+state once, in one forward pass of one network (section 9.2). Whether it learns
+as well as three networks is being measured
+([open question](#one-network-per-alliance-or-one-shared-network)).
 
 In the training command the minibatch size, 32, is `--batch-size` and the number
 of training steps per network update is `--epochs`. The second name misleads: a
@@ -2698,11 +2710,12 @@ it:** held-out value error on fixed data first, which is cheap, then games.
 
 #### One network per alliance, or one shared network?
 
-**Now.** Each alliance has its own network. All three value heads learn from every
-kept decision, but each policy only from its own alliance's decisions
-(`CampaignLearner.update` in `studies/campaign/learning.py`). A search rates each
-new state with the network of the alliance that decides there, so one search
-compares values that different networks gave.
+**Now.** Each alliance has its own network, by default. All three value heads
+learn from every kept decision, but each policy only from its own alliance's
+decisions (`CampaignLearner.update` in `studies/campaign/learning.py`). A search
+rates each new state with the network of the alliance that decides there, so one
+search compares values that different networks gave. `--networks one` trains one
+network for all three alliances instead (section 8.4).
 
 **Alternative.** One network told which alliance is choosing: the input already
 names it, in the global feature `deciding_player` (`src/zone_encoding.cpp`). Its
@@ -2731,9 +2744,11 @@ stopped at states rated by another alliance's network than the choosing one's,
 and such a rating set the bottom of the scale in [section
 4.6](#46-a-real-search-decision-612)'s example. Whether the networks agree better
 after more training, and how much the disagreement changes searches, is not
-measured. **Would settle it:** those two measurements first, then an equal-compute
-comparison; [Q-009](../questions.md#q-009-one-network-for-the-three-alliances)
-asks whether to make it. The
+measured. **Would settle it:** an equal-compute comparison, which the owner chose
+to make ([Q-009](../questions.md#answered)): matched runs of the Mac profile, one
+with three networks and one with one network, compared on how well the networks
+predict each game before they train on it and in held-out evaluation games
+(section 10); one network is kept if it learns at least as well. The
 [plan](../plans/japan_china_full_rules_plan.md#2-training-approach) lists sharing
 as optional future work.
 
@@ -2977,6 +2992,9 @@ the dated records use instead.
   loss, a cross-entropy. Training lowers it.
 - **Cross-entropy:** the policy loss, lowest when the action probabilities equal
   the visit shares.
+- **Kullback–Leibler divergence (KL divergence):** the cross-entropy less the
+  visit shares' own entropy: zero only when the action probabilities equal the
+  visit shares.
 - **Gradient:** for one parameter, how fast the loss would change if that number
   were raised a little.
 - **Learning rate:** how far Adam moves a parameter in one Adam step while its

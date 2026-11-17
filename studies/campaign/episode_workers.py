@@ -54,15 +54,12 @@ def _play_game(settings: Mapping[str, Any], evaluator: Any, task: Mapping[str, A
 
 
 def _play(task: Mapping[str, Any]) -> dict[str, Any]:
-    from .neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
+    from .neural import CampaignModelConfig, NeuralEvaluator, alliance_networks, load_alliance_weights
     settings = _WORKER["settings"]
     if _WORKER["version"] != task["batch_version"]:
-        model_config = CampaignModelConfig(**settings["model_config"])
-        models = {}
-        for player, weights in task["weights"].items():
-            model = CampaignPolicyValueNet(model_config)
-            model.load_state_dict(weights)
-            models[player] = model.eval()
+        models = alliance_networks(CampaignModelConfig(**settings["model_config"]),
+                                   settings["learning_config"].get("networks", "three"))
+        load_alliance_weights(models, task["weights"])
         _WORKER.update(version=task["batch_version"],
                        evaluator=NeuralEvaluator(models, version=task["batch_version"]))
     return _play_game(settings, _WORKER["evaluator"], task)
@@ -136,24 +133,24 @@ class SharedEpisodeWorkers:
     def __init__(self, processes: int, games_per_process: int, *, device: Any, runtime_policy: Any = None,
                  calendar_rounds: int | None, model_config: Mapping[str, Any], learning_config: Mapping[str, Any],
                  rules_version: str):
-        from studies.shared.multiplayer_mcts import PLAYERS
-        from .neural import CampaignModelConfig, CampaignPolicyValueNet
+        from .neural import CampaignModelConfig, alliance_networks
         if type(processes) is not int or processes <= 0 or type(games_per_process) is not int or games_per_process <= 0:
             raise ValueError("Shared episode workers need positive process and game counts")
         self.processes, self.games_per_process = processes, games_per_process
         self.device, self.runtime_policy = device, runtime_policy
         self.settings = {"calendar_rounds": calendar_rounds, "model_config": dict(model_config),
                          "learning_config": dict(learning_config), "rules_version": rules_version}
-        config = CampaignModelConfig(**model_config)
-        self.models = {player: CampaignPolicyValueNet(config, device=device).eval() for player in PLAYERS}
+        # The networks the inference server evaluates: one for each alliance, or one for all three.
+        self.models = alliance_networks(CampaignModelConfig(**model_config),
+                                        learning_config.get("networks", "three"), device=device)
         self.serving = None
 
     def play(self, games: Sequence[tuple[int, int]], *, weights: Mapping[str, Any], batch_version: str,
              max_transitions: int, stop: Callable[[], bool] = lambda: False) -> list[dict[str, Any]] | None:
         """Play (root, seed) games; results return in root order, or None if stopped."""
+        from .neural import load_alliance_weights
         from .shared_evaluator import play_shared_games
-        for player, model in self.models.items():
-            model.load_state_dict(weights[player])
+        load_alliance_weights(self.models, weights)
         stopped = False
 
         def keep_playing(_server: Any, _records: Any) -> bool:
@@ -187,9 +184,9 @@ class SharedEpisodeWorkers:
         answered. Returns every record that arrived, games stopped by a stop
         included as failures.
         """
+        from .neural import load_alliance_weights
         from .shared_evaluator import play_shared_games
-        for player, model in self.models.items():
-            model.load_state_dict(weights[player])
+        load_alliance_weights(self.models, weights)
 
         def keep(server: Any, records: list[dict[str, Any]]) -> bool:
             if server.network_version is None:  # Before the first inference batch.

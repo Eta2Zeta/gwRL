@@ -23,7 +23,7 @@ from studies.shared.file_replace import replace_file
 from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import compatibility, make_env, task_manifest
 from .learning import _model_digest
-from .neural import CampaignModelConfig, CampaignPolicyValueNet, resolve_neural_device
+from .neural import CampaignModelConfig, alliance_networks, alliance_weights, resolve_neural_device
 
 MODEL_EXPORT_SCHEMA = "campaign-evaluation-models-v1"
 _KEYS = {"schema", "config", "task", "training_environment_seeds", "model_config",
@@ -77,9 +77,8 @@ def save_model_export(path: str | Path, learner, runner: dict) -> dict:
         "compatibility": copy.deepcopy(learner.compatibility),
         "generation": learner.generation, "model_versions": versions,
         "runtime_source_sha256": dict(runner["runtime_source_sha256"]),
-        "models": {player: {name: tensor.detach().cpu().clone()
-                             for name, tensor in learner.models[player].state_dict().items()}
-                   for player in PLAYERS}}
+        # One network serving all three alliances is one dictionary, saved once.
+        "models": alliance_weights(learner.models, clone=True)}
     path.parent.mkdir(parents=True, exist_ok=True)
     descriptor, temporary = tempfile.mkstemp(prefix=".models-", suffix=".pt", dir=path.parent)
     try:
@@ -164,6 +163,8 @@ def load_initial_weights(path: str | Path, learner) -> dict[str, Any]:
         raise ValueError("Unsupported campaign model export")
     if value["model_config"] != learner.model_config:
         raise ValueError("Initial models have a different network size")
+    if value["config"].get("networks", "three") != learner.config.networks:
+        raise ValueError("Initial models have a different number of networks")
     for player in PLAYERS:
         learner.models[player].load_state_dict(value["models"][player])
     return {"path": str(path), "generation": value["generation"], "model_versions": value["model_versions"]}
@@ -228,8 +229,7 @@ def load_evaluation_models(path: str | Path, *, device: str | torch.device | Non
     # Constructors initialize tensors randomly before replacing every tensor.
     # fork_rng prevents those unused initializations from advancing training RNG.
     with torch.random.fork_rng(devices=[]):
-        models = {player: CampaignPolicyValueNet(CampaignModelConfig(**value["model_config"])).eval()
-                  for player in PLAYERS}
+        models = alliance_networks(CampaignModelConfig(**value["model_config"]), config.networks)
         for player, model in models.items():
             model.load_state_dict(value["models"][player], strict=True)
             if any(tensor.is_floating_point() and not torch.isfinite(tensor).all()
@@ -240,7 +240,8 @@ def load_evaluation_models(path: str | Path, *, device: str | torch.device | Non
                 raise ValueError("Exported model version does not match weights")
         # Weight-only evaluation can explicitly choose a different device.
         # This is not an optimizer/RNG migration or an exact training resume.
-        models = {player: model.to(target) for player, model in models.items()}
+        for model in {id(model): model for model in models.values()}.values():
+            model.to(target)  # In place: one network serving all three alliances stays one.
     return {"config": value["config"], "task": value["task"],
         "training_environment_seeds": value["training_environment_seeds"],
         "model_versions": value["model_versions"], "models": models,

@@ -218,6 +218,46 @@ def _border_indices(spec_sources: Tensor, spec_targets: Tensor, in_degree: Tenso
     return spec_sources.repeat(positions) + shift, spec_targets.repeat(positions) + shift, in_degree.repeat(positions, 1)
 
 
+def distinct_networks(models: Mapping[str, Any]) -> list[Any]:
+    """Each network of an alliance-to-network mapping once, in alliance order.
+
+    Three separate networks, or one network that serves all three alliances."""
+    found: dict[int, Any] = {}
+    for player in PLAYERS:
+        found.setdefault(id(models[player]), models[player])
+    return list(found.values())
+
+
+def alliance_networks(config: "CampaignModelConfig", networks: str = "three", *,
+                      device: str | torch.device = "cpu") -> dict[str, "CampaignPolicyValueNet"]:
+    """A fresh network for each alliance, or, with networks "one", one network for all three."""
+    if networks == "one":
+        model = CampaignPolicyValueNet(config, device=device).eval()
+        return {player: model for player in PLAYERS}
+    if networks != "three":
+        raise ValueError("networks must be three or one")
+    return {player: CampaignPolicyValueNet(config, device=device).eval() for player in PLAYERS}
+
+
+def alliance_weights(models: Mapping[str, nn.Module], *, clone: bool = False) -> dict[str, dict[str, Tensor]]:
+    """Each alliance's network's weights on the CPU: one dictionary for each distinct
+    network, so that one network serving all three alliances is copied once."""
+    made: dict[int, dict[str, Tensor]] = {}
+    for model in distinct_networks(models):
+        made[id(model)] = {name: tensor.detach().cpu().clone() if clone else tensor.detach().cpu()
+                           for name, tensor in model.state_dict().items()}
+    return {player: made[id(models[player])] for player in PLAYERS}
+
+
+def load_alliance_weights(models: Mapping[str, nn.Module], weights: Mapping[str, Mapping[str, Tensor]]) -> None:
+    """Load each alliance's weights into its network, each distinct network once."""
+    loaded: set[int] = set()
+    for player in PLAYERS:
+        if id(models[player]) not in loaded:
+            models[player].load_state_dict(weights[player])
+            loaded.add(id(models[player]))
+
+
 class _OneNetwork:
     """A pass's view of one network: its own tables and fixed terms, worked out for
     this pass, so that training reaches every parameter."""
@@ -504,7 +544,8 @@ class NeuralEvaluator:
     """Route each entitled actor to its model, retaining raw vector returns.
 
     A chance cutoff has no entitled actor: it deterministically averages the
-    three models' raw value vectors and emits no policy. This is a bootstrap
+    networks' raw value vectors, of the three alliances' networks or of the one
+    network serving all three, and emits no policy. This is a bootstrap
     convention, not a chance action or a peek at the execution random stream.
     """
     def __init__(self, models: Mapping[str, CampaignPolicyValueNet], version: str, *, runtime_policy: Any = None) -> None:
@@ -526,7 +567,11 @@ class NeuralEvaluator:
 
     def evaluate_batch(self, requests: Sequence[tuple[Any, Sequence[Any]]]) -> list[Evaluation]:
         results: list[Evaluation | None] = [None] * len(requests)
-        groups: dict[str, list[tuple[int, Any]]] = {player: [] for player in PLAYERS}
+        # Each alliance's network, or one network that serves all three alliances.
+        networks = distinct_networks(self.models)
+        network_of = {player: next(index for index, model in enumerate(networks) if model is self.models[player])
+                      for player in PLAYERS}
+        groups: list[list[tuple[int, Any]]] = [[] for _ in networks]
         chance_values: dict[int, list[tuple[float, float, float]]] = {}
         for row, (env, actions) in enumerate(requests):
             if env.is_terminal():
@@ -540,36 +585,35 @@ class NeuralEvaluator:
                     raise ValueError("An ownerless nonterminal evaluation must be a chance cutoff")
                 item = make_zone_input(env, ())
                 chance_values[row] = []
-                for player in PLAYERS:
-                    groups[player].append((row, item))
+                for group in groups:  # Every network rates a chance cutoff, once.
+                    group.append((row, item))
             elif actor in PLAYERS:
-                groups[actor].append((row, make_zone_input(env, actions)))
+                groups[network_of[actor]].append((row, make_zone_input(env, actions)))
             else:
                 raise ValueError(f"Unknown campaign decision player: {actor}")
-        for player in PLAYERS:
-            if not groups[player]:
+        for model, group in zip(networks, groups, strict=True):
+            if not group:
                 continue
-            model = self.models[player]
             training = model.training
             model.eval()
             completed_mps_forward = False
             try:
                 with torch.inference_mode():
-                    batch = [item for _, item in groups[player]]
+                    batch = [item for _, item in group]
                     logits, values = model.forward_batch(batch)
                     if values.shape != (len(batch), 3) or len(logits) != len(batch):
                         raise ValueError("Neural model returned an invalid batch shape")
                     counts = [item.action_count for item in batch]
                     if values.device.type != "cpu":
                         host_priors, host_values = _gpu_evaluation_outputs(logits, values, counts, model.config.value_scale)
-                        for index, (row, _) in enumerate(groups[player]):
+                        for index, (row, _) in enumerate(group):
                             if row in chance_values:
                                 chance_values[row].append(host_values[index])
                             else:
                                 results[row] = Evaluation(host_priors[index], host_values[index])
                         completed_mps_forward = values.device.type == "mps"
                         continue  # The finally still restores model.train(training).
-                    for index, (row, _) in enumerate(groups[player]):
+                    for index, (row, _) in enumerate(group):
                         scores = logits[index]
                         if scores.shape != (counts[index],) or not torch.isfinite(scores).all():
                             raise ValueError("Neural policy must contain one finite logit per legal action")
@@ -583,7 +627,8 @@ class NeuralEvaluator:
                 if completed_mps_forward and self.runtime_policy is not None:
                     self.runtime_policy.completed(1)
         for row, predictions in chance_values.items():
-            results[row] = Evaluation([], vector([sum(value[i] for value in predictions) / len(PLAYERS) for i in range(3)]))
+            results[row] = Evaluation([], vector([sum(value[i] for value in predictions) / len(predictions)
+                                                  for i in range(3)]))
         if any(result is None for result in results):
             raise RuntimeError("A neural batch request was not evaluated")
         return [result for result in results if result is not None]

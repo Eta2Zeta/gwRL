@@ -27,6 +27,7 @@ from studies.shared.file_replace import replace_file
 from studies.shared.multiplayer_mcts import (
     PLAYERS, MctsConfig, VectorMCTS, action_key, probabilities, vector,
 )
+from .neural import alliance_weights, distinct_networks
 
 CHECKPOINT_SCHEMA = "campaign-learning-checkpoint-v1"
 TARGET_SCHEMA = "campaign-raw-vector-target-v1"
@@ -174,6 +175,60 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
             "network_versions": network_versions}
 
 
+def fresh_game_losses(models: Mapping[str, nn.Module], records: Any, value_scale: float) -> dict[str, dict[str, float]]:
+    """How well the networks predict a finished game's kept decisions, by alliance.
+
+    Each kept decision is rated by the network of the alliance deciding there,
+    the network a search asks. Sums, so that games and network updates add up:
+    `value_squared_error`, the mean over the three values of the squared
+    difference between the network's values and the game's final scores, both
+    divided by value_scale, as the training loss measures it;
+    `policy_cross_entropy` of the network's action probabilities against the
+    search's visit shares, the training target; and `policy_kl`, that
+    cross-entropy less the visit shares' own entropy, which is zero only when
+    the two agree. Called before the game's samples train the networks, it
+    measures them on a game they have not learned from.
+    """
+    totals: dict[str, dict[str, float]] = {}
+    with torch.inference_mode():
+        for model in distinct_networks(models):
+            owned = [record for record in records if models[record["owner"]] is model]
+            if not owned:
+                continue
+            training = model.training
+            model.eval()
+            try:
+                logits, predicted = model.forward_batch([record["input"] for record in owned])
+            finally:
+                model.train(training)
+            target = torch.as_tensor([record["values"] for record in owned], dtype=predicted.dtype,
+                                     device=predicted.device) / value_scale
+            errors = ((predicted - target) ** 2).mean(1).double().cpu().tolist()
+            for record, error, scores in zip(owned, errors, logits, strict=True):
+                shares = torch.as_tensor(record["policy"], dtype=torch.float64)
+                logs = torch.log_softmax(scores.double().cpu(), 0)
+                cross_entropy = float(-(shares * logs).sum())
+                entropy = float(-(shares[shares > 0] * shares[shares > 0].log()).sum())
+                total = totals.setdefault(record["owner"], {"samples": 0, "value_squared_error": 0.0,
+                                                            "policy_cross_entropy": 0.0, "policy_kl": 0.0})
+                total["samples"] += 1
+                total["value_squared_error"] += error
+                total["policy_cross_entropy"] += cross_entropy
+                total["policy_kl"] += cross_entropy - entropy
+    return totals
+
+
+def add_fresh_losses(parts: Any) -> dict[str, dict[str, float]]:
+    """fresh_game_losses of several games, added up by alliance."""
+    totals: dict[str, dict[str, float]] = {}
+    for part in parts:
+        for owner, values in part.items():
+            total = totals.setdefault(owner, dict.fromkeys(values, 0))
+            for name, value in values.items():
+                total[name] += value
+    return totals
+
+
 def validate_sample(sample: Any, *, labeled: bool, spec: Any) -> None:
     """Check one replay row against the zone layout `spec` its networks read.
 
@@ -231,6 +286,10 @@ class LearningConfig:
     # Share of a worker game's decisions kept as samples: a whole game holds over a
     # thousand close, strongly correlated positions.
     sample_fraction: float = 1.0
+    # "three": a network for each alliance, whose policy learns from that
+    # alliance's decisions. "one": one network for all three alliances, which the
+    # input tells who is choosing, and whose policy learns from every decision.
+    networks: str = "three"
 
     def __post_init__(self) -> None:
         for name in ("simulations", "max_depth", "batch_size", "epochs", "replay_capacity"):
@@ -248,6 +307,8 @@ class LearningConfig:
             raise ValueError("Sample fraction must be above zero and at most one")
         if self.mode != "multiplayer":
             raise ValueError("Learning updates all three policies in multiplayer mode")
+        if self.networks not in ("three", "one"):
+            raise ValueError("networks must be three or one")
 
 
 class ReplayTraceCapture:
@@ -322,7 +383,10 @@ class CampaignLearner:
         if self.model_config.get("value_scale") != self.config.value_scale:
             raise ValueError("Model and learner must use the same positive value scale")
         self.models = dict(models)
-        if len({id(model) for model in self.models.values()}) != 3:
+        if self.config.networks == "one":
+            if len({id(model) for model in self.models.values()}) != 1:
+                raise ValueError("One network must serve all three alliances")
+        elif len({id(model) for model in self.models.values()}) != 3:
             raise ValueError("Actor policies must be separate model instances")
         if any(asdict(getattr(model, "config", None)) != self.model_config for model in self.models.values()):
             raise ValueError("Every actor model configuration must match the learner model configuration")
@@ -335,10 +399,10 @@ class CampaignLearner:
             raise ValueError("The models read another zone layout than the environment writes")
         from .device_runtime import runtime_policy_for_device
         self._mps_actor_count = sum(next(model.parameters()).device.type == "mps"
-                                    for model in self.models.values())
+                                    for model in distinct_networks(self.models))
         self._device_runtime = (runtime_policy if runtime_policy is not None else
                                 runtime_policy_for_device("mps") if self._mps_actor_count else None)
-        self.optimizers = {player: self._optimizer(self.models[player]) for player in PLAYERS}
+        self.optimizers = self._optimizers(self.models)
         self.policy_random = random.Random(self.config.seed)
         self.search_random = random.Random(self.config.seed ^ 0x9E3779B97F4A7C15)
         self.replay_random = random.Random(self.config.seed ^ 0xD1B54A32D192ED03)
@@ -363,6 +427,14 @@ class CampaignLearner:
 
     def _optimizer(self, model: nn.Module) -> torch.optim.Optimizer:
         return torch.optim.Adam(model.parameters(), lr=self.config.learning_rate)
+
+    def _optimizers(self, models: Mapping[str, nn.Module]) -> dict[str, torch.optim.Optimizer]:
+        """One optimizer for each network, under the name of every alliance it serves."""
+        made: dict[int, torch.optim.Optimizer] = {}
+        for player in PLAYERS:
+            if id(models[player]) not in made:
+                made[id(models[player])] = self._optimizer(models[player])
+        return {player: made[id(models[player])] for player in PLAYERS}
 
     def _new_env(self, factory: Callable[..., Any]) -> Any:
         """Seed-aware factories need no hidden external episode/seed counter.
@@ -395,7 +467,8 @@ class CampaignLearner:
             self.replay_capture.after(env, replay, event)
 
     def model_versions(self) -> dict[str, str]:
-        return {player: f"{player}:generation-{self.generation}:{_model_digest(self.models[player])}"
+        digests = {id(model): _model_digest(model) for model in distinct_networks(self.models)}
+        return {player: f"{player}:generation-{self.generation}:{digests[id(self.models[player])]}"
                 for player in PLAYERS}
 
     def _evaluator(self):
@@ -421,7 +494,10 @@ class CampaignLearner:
                              "model_config": self.model_config, "compatibility": self.compatibility})
 
     def _freeze_policies(self) -> None:
-        self.frozen_models = {player: copy.deepcopy(self.models[player]).eval() for player in PLAYERS}
+        # One copy of each network: a network serving all three alliances stays one.
+        self.frozen_models = copy.deepcopy(self.models)
+        for model in self.frozen_models.values():
+            model.eval()
         self.frozen_versions = self.model_versions()
         self.batch_version = self.network_version()
         self.pending, self.batch_records = [], []
@@ -646,8 +722,7 @@ class CampaignLearner:
             raise ValueError("An in-process rollout batch is active")
         before = self.environment_random.getstate()
         seeds = [self.environment_random.getrandbits(63) for _ in range(count)]
-        weights = {player: {name: tensor.detach().cpu() for name, tensor in model.state_dict().items()}
-                   for player, model in self.frozen_models.items()}
+        weights = alliance_weights(self.frozen_models)
         results = workers.play(list(enumerate(seeds)), weights=weights, batch_version=self.batch_version,
                                max_transitions=max_transitions, stop=stop)
         failed = [result for result in results or [] if "failure" in result]
@@ -708,23 +783,27 @@ class CampaignLearner:
         if not self.replay:
             return {"updated": False, "samples": 0, "losses": {}}
         from .neural import _conditional_log_softmax
-        losses: dict[str, list[dict[str, float]]] = {player: [] for player in PLAYERS}
+        # Each network with the alliances whose decisions train its policy: each
+        # alliance's own network, or one network for all three.
+        trained = ([("all", self.models[PLAYERS[0]], self.optimizers[PLAYERS[0]], PLAYERS)]
+                   if self.config.networks == "one" else
+                   [(player, self.models[player], self.optimizers[player], (player,)) for player in PLAYERS])
+        losses: dict[str, list[dict[str, float]]] = {name: [] for name, _, _, _ in trained}
         for _ in range(self.config.epochs):
             samples = self.replay_random.sample(self.replay, min(self.config.batch_size, len(self.replay)))
-            for player in PLAYERS:
-                model, optimizer = self.models[player], self.optimizers[player]
+            for name, model, optimizer, owners in trained:
                 model.train()
                 optimizer.zero_grad(set_to_none=True)
-                # Every position trains the value head, while only its owner
-                # has a policy target. Values do not read the options, so the
-                # other actors' rows are passed without them.
-                inputs = [sample["input"] if sample["owner"] == player
+                # Every position trains the value head, while only the network
+                # its owner uses has a policy target. Values do not read the
+                # options, so the other actors' rows are passed without them.
+                inputs = [sample["input"] if sample["owner"] in owners
                           else sample["input"].without_actions() for sample in samples]
                 logits, predicted = model.forward_batch(inputs)
                 target = torch.as_tensor([sample["values"] for sample in samples], dtype=predicted.dtype,
                                          device=predicted.device) / self.config.value_scale
                 value_loss = torch.mean((predicted - target) ** 2)
-                owned = [index for index, sample in enumerate(samples) if sample["owner"] == player]
+                owned = [index for index, sample in enumerate(samples) if sample["owner"] in owners]
                 if owned:
                     # Each owned position's cross-entropy against its own menu,
                     # as one log-softmax per menu over all of them at once
@@ -748,12 +827,12 @@ class CampaignLearner:
                 if not math.isfinite(total):
                     raise ValueError("Nonfinite learning loss")
                 loss.backward()
-                losses[player].append({"policy": policy_value, "value": value_value,
-                                       "total": total, "policy_samples": len(owned)})
-            # No actor changes until gradients for all three have been formed.
-            for player in PLAYERS:
-                self.optimizers[player].step()
-                self.models[player].eval()
+                losses[name].append({"policy": policy_value, "value": value_value,
+                                     "total": total, "policy_samples": len(owned)})
+            # No network changes until the gradients of all of them have been formed.
+            for _, model, optimizer, _ in trained:
+                optimizer.step()
+                model.eval()
             if self._device_runtime is not None and self._mps_actor_count:
                 # All actor gradients and updates have completed; no pending
                 # autograd work is discarded by compilation-cache housekeeping.
@@ -848,19 +927,22 @@ class CampaignLearner:
             raise ValueError("Replay exceeds configured capacity")
         if value["counters"]["updates"] != value["generation"]:
             raise ValueError("Update counter and model generation disagree")
-        models, optimizers = {}, {}
         if (set(value["models"]) != set(PLAYERS) or set(value["optimizers"]) != set(PLAYERS)
                 or set(value["model_versions"]) != set(PLAYERS)):
             raise ValueError("Checkpoint must contain all actor states")
+        if self.config.networks == "one" and len({value["model_versions"][player].rsplit(":", 1)[-1]
+                                                  for player in PLAYERS}) != 1:
+            raise ValueError("One network's checkpoint names different weights for the alliances")
+        # Copies that keep one network shared by the three alliances, as the live ones.
+        models = copy.deepcopy(self.models)
+        optimizers = self._optimizers(models)
         for player in PLAYERS:
-            models[player] = copy.deepcopy(self.models[player])
             models[player].load_state_dict(value["models"][player], strict=True)
             if value["model_versions"].get(player) != f"{player}:generation-{value['generation']}:{_model_digest(models[player])}":
                 raise ValueError("Model version does not match weights")
             for tensor in models[player].state_dict().values():
                 if tensor.is_floating_point() and not torch.isfinite(tensor).all():
                     raise ValueError("Checkpoint contains nonfinite model weights")
-            optimizers[player] = self._optimizer(models[player])
             expected_groups = [{key: item for key, item in group.items() if key != "params"}
                                for group in optimizers[player].param_groups]
             optimizers[player].load_state_dict(value["optimizers"][player])
@@ -878,8 +960,12 @@ class CampaignLearner:
         if value["frozen_models"] is not None:
             if set(value["frozen_models"]) != set(PLAYERS) or set(value["frozen_versions"] or {}) != set(PLAYERS):
                 raise ValueError("Frozen rollout must contain all actor policies")
-            frozen = {p: copy.deepcopy(models[p]).eval() for p in PLAYERS}
+            if self.config.networks == "one" and len({value["frozen_versions"][player].rsplit(":", 1)[-1]
+                                                      for player in PLAYERS}) != 1:
+                raise ValueError("One network's frozen rollout names different weights for the alliances")
+            frozen = copy.deepcopy(models)
             for player in PLAYERS:
+                frozen[player].eval()
                 frozen[player].load_state_dict(value["frozen_models"][player], strict=True)
                 if any(tensor.is_floating_point() and not torch.isfinite(tensor).all()
                        for tensor in frozen[player].state_dict().values()):

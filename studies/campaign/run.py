@@ -30,9 +30,10 @@ from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import ROOT, compatibility, make_env, task_manifest
 from .device_runtime import runtime_policy_for_device
 from .episode_workers import EpisodeWorkers, SharedEpisodeWorkers
-from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter
+from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter, add_fresh_losses, fresh_game_losses
 from .model_export import load_evaluation_models, load_initial_weights, save_model_export, validate_model_export
-from .neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator, resolve_neural_device
+from .neural import (CampaignModelConfig, NeuralEvaluator, alliance_networks, alliance_weights,
+                     resolve_neural_device)
 
 RUN_SCHEMA = "campaign-foreground-run-v1"
 
@@ -71,6 +72,9 @@ class RunConfig:
     # games, and the inference server takes up the new networks between two
     # inference batches (design document, section 9.1).
     continuous: bool = False
+    # "three": a network for each alliance; "one": one network for all three
+    # alliances, told by its input which alliance chooses (docs/questions.md, Q-009).
+    networks: str = "three"
 
     def __post_init__(self):
         if not isinstance(self.neural_device, str) or self.neural_device not in {"cpu", "mps", "cuda"} and not (
@@ -112,6 +116,8 @@ class RunConfig:
             raise ValueError("Self-play that never stops needs games per process, which share one inference server")
         if self.continuous and self.neural_device != "cpu":
             raise ValueError("Self-play that never stops runs its networks on the CPU for now")
+        if self.networks not in ("three", "one"):
+            raise ValueError("networks must be three or one")
         if self.cpu_budget is not None:
             if type(self.cpu_budget) is not int or self.cpu_budget <= 0 or self.cpu_budget > (os.cpu_count() or 1):
                 raise ValueError("CPU budget must fit available logical cores")
@@ -174,11 +180,11 @@ def _learner(config: RunConfig, template):
     torch.manual_seed(config.seed)
     model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers,
         value_scale=config.value_scale)
-    models = {player: CampaignPolicyValueNet(model_config, device=device).eval() for player in PLAYERS}
+    models = alliance_networks(model_config, config.networks, device=device)
     learning = LearningConfig(simulations=config.simulations, max_depth=config.max_depth,
         batch_size=config.batch_size, epochs=config.epochs, learning_rate=config.learning_rate,
         replay_capacity=config.replay_capacity, value_scale=config.value_scale, seed=config.seed,
-        sample_fraction=config.sample_fraction)
+        sample_fraction=config.sample_fraction, networks=config.networks)
     return CampaignLearner(models, model_config, learning, compatibility=compatibility(template),
                            runtime_policy=runtime_policy)
 
@@ -426,8 +432,7 @@ def train(args) -> int:
                    "weights": None, "version": None}
 
         def live_weights():
-            return {player: {name: tensor.detach().cpu().clone()
-                             for name, tensor in learner.models[player].state_dict().items()} for player in PLAYERS}
+            return alliance_weights(learner.models, clone=True)
 
         def feed():
             if (not state["feeding"] or stopped or runner["batch_index"] >= config.batches
@@ -484,6 +489,7 @@ def train(args) -> int:
                             "rollout_versions": sorted({version for result in episodes
                                                         for _, version in result["network_versions"]})},
                 "update": trainer["result"], "update_seconds": trainer["seconds"], "serving": serving,
+                "fresh_games": add_fresh_losses(result["fresh_losses"] for result in episodes),
                 "elapsed_seconds": time.perf_counter() - started, "counters": learner.counters.copy(),
                 "evaluator": workers.report(server),
                 "episodes": [{"root": result["root"], "seed": result["seed"], "terminal": result["terminal"],
@@ -494,7 +500,8 @@ def train(args) -> int:
                                                             for event in result["events"])),
                               "clock": result["clock"], "wealth": result["wealth"],
                               "observed_terminal_returns": result["returns"], "worker_seconds": result["seconds"],
-                              "network_versions": result["network_versions"]} for result in episodes]})
+                              "network_versions": result["network_versions"],
+                              "fresh_losses": result["fresh_losses"]} for result in episodes]})
             runner["batch_index"] += 1
             runner["total_waves"] += 1  # A network update counts as one wave, as a worker batch does.
             learner.counters["batches"] += 1
@@ -517,6 +524,9 @@ def train(args) -> int:
                 elif not result["terminal"]:
                     state["exhausted"] = True  # The transition guard ended it, as in a batch.
                 else:
+                    # How well the networks now serving predict this game, before it trains them.
+                    result["fresh_losses"] = fresh_game_losses(server.models, result["records"],
+                                                               learner.config.value_scale)
                     learner.accept_episode(result)
                     state["finished"].append(result)
             if trainer["thread"] is not None and not trainer["thread"].is_alive():
@@ -769,6 +779,11 @@ def main(argv=None) -> int:
         if field.name == "complete_episodes":
             training.add_argument("--complete-episodes", action=argparse.BooleanOptionalAction, default=None,
                                   help="Freeze each batch until all games finish; a guard saves without updating")
+            continue
+        if field.name == "networks":
+            training.add_argument("--networks", choices=("three", "one"), default=None,
+                                  help="A network for each alliance (three, the default) or one network "
+                                       "for all three alliances")
             continue
         if field.name == "continuous":
             training.add_argument("--continuous", action=argparse.BooleanOptionalAction, default=None,

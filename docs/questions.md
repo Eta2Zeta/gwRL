@@ -38,7 +38,6 @@ Other open things stay in the pages that own them, and
 | [Q-004](#q-004-features-whose-value-never-changes) | Should the input drop features whose value never changes? | The network's input | Yes, in the same change as Q-003 |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
-| [Q-009](#q-009-one-network-for-the-three-alliances) | Should one network, told which alliance is choosing, be built and compared with the three networks of today? | The networks | Yes: compare in matched runs, adopt it if it learns as well |
 
 Q-001 to Q-004 were raised on 14 November 2026, while the global features
 about nations were being pruned (commit `bce7a4c`). Their numbers are in the
@@ -47,10 +46,7 @@ Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
 Q-006 was raised on 15 November 2026, while the printed sources of Q-001 were
-being looked up; its numbers are in the first record. Q-009 was raised on 17
-November 2026, while measuring what a forward pass of the three networks costs;
-its numbers are in the
-[record of what evaluating three networks costs](archive/records/network_split_2026_11_17.md).
+being looked up; its numbers are in the first record.
 
 ## Q-001: Mongolia at war with the CCP
 
@@ -487,80 +483,6 @@ the game's developers.
 **If answered.** A ruling becomes the next rule clarification, with
 `mayDeclareWar`, its test and the politics page changed in the same commit.
 
-## Q-009: One network for the three alliances
-
-**The question.** Should training get a mode with one network for all three
-alliances, told which alliance is choosing, and should that mode be compared
-with today's three networks in matched runs and replace them if it learns at
-least as well?
-
-**What the program does now.** Each alliance has its own network:
-`CampaignLearner` in `studies/campaign/learning.py` trains three, and all three
-value heads learn from every kept decision, but each policy only from its own
-alliance's decisions. The inference server evaluates each state with the
-network of the alliance that decides there, in one forward pass that calls each
-linear layer once per network, on that network's states (`NetworkStack` and
-`_by_network` in `studies/campaign/neural.py`). The input already names the
-choosing alliance, in the global feature `deciding_player`
-(`src/zone_encoding.cpp`), so one network could tell the alliances apart.
-
-**A real case** (17 November 2026, the 853 inference batches saved from one
-training iteration of the Mac profile, eleven-round games;
-[record](archive/records/network_split_2026_11_17.md)). The Axis decided at 66%
-of the states, the Allies at 21% and the Comintern at 13%, and in half the
-inference batches one network had at least 73% of the states. Replayed through
-the inference server's code with the 64×2 network on one core, an inference
-batch took 1,278 µs with the three networks and 1,081 µs when one network
-evaluated all its states, 15% less. On the Mac's GPU one network took 34% to
-38% less time as saved and 15% to 18% less in inference batches of 119 states,
-at 64×2, 256×8 and 512×16 alike.
-
-**Why it matters.**
-
-- **Speed.** On one core the inference server sets the pace of self-play in the
-  Mac profile ([section 9.2](design/README.md#92-running-training-on-the-mac)),
-  so a cheaper inference batch should mean more decisions an hour; how many more
-  is not measured. On the GPU, where the larger networks the owner wants must
-  run, the gain is 15% to 38%. With three networks no cheaper forward pass has
-  been found: one grouped call per layer gained nothing on one core and is
-  slower on the GPU, and padding the three into one product doubles the
-  arithmetic, since the Axis has two thirds of the states. Compiling the forward
-  pass, which would fuse the operations that take more than half of the GPU's
-  time, needs fixed array sizes: one network has them for each inference batch
-  size, three networks only for each mix of alliances as well
-  ([section 9.3](design/README.md#93-what-a-larger-network-and-a-longer-search-cost)).
-- **Searches.** A search compares values that different networks gave. On 9
-  November, at states that all three networks rated, their values for one
-  alliance differed by 2.5 to 17 points, while the best and worst actions in a
-  search lay a median 1.45 points apart
-  ([record](archive/records/depth_limit_2026_11_09.md#positions-rated-by-another-alliances-network)).
-  One network would rate every state one way.
-- **Learning.** One network's policy would learn from every kept decision, not
-  from one alliance's: the Comintern's policy now learns from 13% of the
-  states. The catch is that one network must hold three different strategies,
-  which only training can show that it does
-  ([open question](design/README.md#one-network-per-alliance-or-one-shared-network)).
-
-**The choices.**
-
-| Choice | What it changes |
-| --- | --- |
-| A. Keep three networks | Nothing. The inference server keeps the cost of three networks, and work on the GPU goes on with them. |
-| B. Compare, then decide | Build a mode with one network: one policy and one value head trained on every kept decision, and one network in the inference server. Train it and the three networks from scratch in matched runs of the Mac profile with equal compute, a night each for example, and compare held-out value error, how closely the policies match the search's visit shares on held-out training samples, and held-out evaluation games ([section 10](design/README.md#10-measuring-strength)). Keep one network if it learns at least as well. |
-| C. Switch now | Build the mode and train with it from the next run, without the comparison. |
-
-**Recommendation: B.** The speed is measured, on both devices, and mixed values
-in a search are a known flaw, but whether one network learns three strategies as
-well as three networks do is not known. No run has yet shown strength that a
-worse network would visibly lose, so the comparison rests mostly on held-out
-value error and on how closely the policies match the visit shares, which can
-be measured now.
-
-**If answered.** B or C changes the network's description and the training
-loop in the [design document](design/README.md) (sections 6, 8 and 9) and the
-[campaign learning guide](../studies/campaign/README.md), and the open question
-there becomes the answered state, with the comparison as a dated record.
-
 ## Open elsewhere
 
 These are open too, and stay in the pages that own them:
@@ -592,3 +514,8 @@ the page that now states it.
 - **Q-008**, when self-play takes up new networks. Answered on 17 November 2026:
   every game at once, between two inference batches. Stated in
   [the training loop](design/README.md#91-the-training-loop).
+- **Q-009**, one network for the three alliances. Answered on 17 November 2026:
+  build it as a mode and compare it with three networks in matched runs, then
+  keep it if it learns at least as well. Stated in
+  [the open question](design/README.md#one-network-per-alliance-or-one-shared-network)
+  and [one training step](design/README.md#84-one-training-step-and-one-network-update).

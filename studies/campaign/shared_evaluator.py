@@ -4,8 +4,9 @@ Game processes keep the rules, the search and the network's input
 preparation. For each position a search asks about, a game thread writes the
 decision's zone input, a few integer arrays, into its own shared-memory buffer
 and sends a short header through its own pipe. The serving process merges
-every waiting position into one pass of the three alliance networks, each
-network reading its own alliance's positions, evaluates it on its device and
+every waiting position into one pass of the networks, each alliance's network
+reading its own alliance's positions, or one network reading every position
+when it serves all three alliances, evaluates it on its device and
 replies with the priors and values. A thread waits for its reply before
 preparing its next position, so its buffer is never overwritten while the
 server reads it. When the server stops, it closes the pipes still open, and a
@@ -174,7 +175,7 @@ class ServerStats:
     rounds: int = 0                  # Serving rounds: the waiting requests answered together.
     requests_per_round: dict[int, int] = field(default_factory=dict)
     passes: int = 0                  # Network passes: one per round, for every alliance's positions.
-    # Positions per pass; a chance position counts once for each of the three networks.
+    # Positions per pass; a chance position counts once for each network.
     positions_per_pass: dict[int, int] = field(default_factory=dict)
     receive_seconds: float = 0.0     # Reading requests from the ready pipes.
     forward_seconds: float = 0.0     # Answering: reading, laying out, the pass and host outputs.
@@ -204,17 +205,21 @@ class SharedEvaluatorServer:
 
     def take_up(self, weights: dict[str, Any], version: str) -> None:
         """Answer every later request with these weights: between two inference batches."""
-        for player, model in self.models.items():
-            model.load_state_dict(weights[player])
+        from .neural import load_alliance_weights
+        load_alliance_weights(self.models, weights)  # One network serving all three alliances loads once.
         self._stack = None  # The stack copied the old tables; the next batch builds a new one.
         self.network_version = version
 
     @property
     def stack(self) -> Any:
-        """The three networks for one pass, which reads their weights once, at the first request."""
+        """The networks for one pass, which reads their weights once, at the first request:
+        the three alliances' networks, or one network that serves all three."""
         if self._stack is None:
-            from .neural import NetworkStack
-            self._stack = NetworkStack([self.models[player] for player in PLAYERS])
+            from .neural import NetworkStack, distinct_networks
+            networks = distinct_networks(self.models)
+            self._network_of = {player: next(index for index, network in enumerate(networks)
+                                             if network is self.models[player]) for player in PLAYERS}
+            self._stack = NetworkStack(networks)
         return self._stack
 
     def serve(self, keep_running: Callable[[], bool]) -> None:
@@ -247,21 +252,23 @@ class SharedEvaluatorServer:
     def answer(self, requests: Sequence[tuple[Connection, tuple]]) -> None:
         import torch
         started = time.perf_counter()
-        rows: dict[str, list[int]] = {player: [] for player in PLAYERS}
+        stack = self.stack
+        rows: list[list[int]] = [[] for _ in stack.models]
         items = []
         for row, (connection, (actor, count, layout, header)) in enumerate(requests):
             readers = PLAYERS if actor is None else (actor,)
             if any(self.models[player].layout_version != layout for player in readers):
                 raise ValueError("A game sent a zone input of another layout")
             items.append(read_arrays(self.memories[connection].buf, header))
-            for player in readers:
-                rows[player].append(row)
-        # One pass for every alliance's positions, grouped by alliance network.
-        order = [row for player in PLAYERS for row in rows[player]]
+            # A chance position is rated by every network, once by each.
+            for network in sorted({self._network_of[player] for player in readers}):
+                rows[network].append(row)
+        # One pass for every alliance's positions, grouped by network.
+        order = [row for network_rows in rows for row in network_rows]
         with torch.inference_mode():
-            outputs = forward_prepared(self.stack, [items[row] for row in order], self.device,
-                                       [len(rows[player]) for player in PLAYERS])
-            row_priors, row_values = collect(self.stack, *outputs)
+            outputs = forward_prepared(stack, [items[row] for row in order], self.device,
+                                       [len(network_rows) for network_rows in rows])
+            row_priors, row_values = collect(stack, *outputs)
         priors: list[list[float]] = [[] for _ in requests]
         chance: dict[int, list[list[float]]] = {}
         values: list[list[float] | None] = [None] * len(requests)
@@ -271,7 +278,7 @@ class SharedEvaluatorServer:
             else:
                 priors[row], values[row] = prior, value
         for row, found in chance.items():
-            values[row] = [sum(value[i] for value in found) / len(PLAYERS) for i in range(3)]
+            values[row] = [sum(value[i] for value in found) / len(found) for i in range(3)]
         sending = time.perf_counter()
         version = self.network_version
         for (connection, _), row_priors, value in zip(requests, priors, values, strict=True):
