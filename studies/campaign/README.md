@@ -135,6 +135,9 @@ layout was chosen by the load it puts on the Mac: on 15 November 2026 these six
 processes kept about 9 cores busy, the allowance, and played about 192,000
 decisions an hour while playing; seven, which also fit the count, kept about 10
 busy ([record](../../docs/archive/records/nine_core_layouts_2026_11_15.md)).
+Since the engine work of 16 November the six keep about 7 cores busy and play
+about 301,000 decisions an hour while playing, the coordinator setting the pace
+([record](../../docs/archive/records/engine_speed_in_training_2026_11_16.md)).
 Evaluating on the GPU instead played half as many games an hour on 2 November
 2026, with the eight game processes of the 12-core allowance then (58.7
 against 124): the zone network is so cheap per position that the GPU's cost per

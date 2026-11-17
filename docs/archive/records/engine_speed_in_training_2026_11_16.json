@@ -1,0 +1,200 @@
+{
+ "date": "2026-11-16",
+ "question": "How much faster does training play with the engine work of 16 November (names held as numbers, slot maps, the binary planning key), and what limits it now?",
+ "code": {
+  "before": "9519ea7",
+  "after": "c90f85b",
+  "training_code": "the same in both (studies/, tools/supervise_campaign_training.py, tools/log_process_load.py unchanged between them)"
+ },
+ "machine": "Apple M4 Max: 10 performance and 4 efficiency cores, 36 GB",
+ "command": "tools/supervise_campaign_training.py --profile mac --seconds 1800 --max-restarts 0 -- --calendar-rounds 11 --complete-episodes --batches 1 --simulations 64 --max-depth 16 --hidden-dim 64 --message-layers 2 --batch-size 32 --epochs 50 --replay-capacity 8000 --sample-fraction 0.05 --transitions-per-batch 20000 --seed 20261104",
+ "layout": "the Mac profile: 6 game processes of 4 games, one coordinator evaluating on the CPU",
+ "order": [
+  "before1",
+  "after1",
+  "before2",
+  "after2"
+ ],
+ "batches": {
+  "before1": {
+   "games": 24,
+   "decisions": 25730,
+   "playing_s": 403.2,
+   "decisions_per_hour": 229711,
+   "games_per_hour": 214.3,
+   "positions_per_round": 4.81,
+   "coordinator_busy": 0.913,
+   "batch_cores": 8.6,
+   "other_cores_median": 2.31,
+   "game_cpu_ms_per_decision": 117.3,
+   "game_pcore_ms_per_decision": 100.9,
+   "coordinator_cpu_ms_per_decision": 13.7,
+   "game_minstr_per_decision": 1085,
+   "coordinator_minstr_per_decision": 183,
+   "game_pcore_share": 0.764,
+   "peak_memory_gb": 4.46,
+   "failed_games": 0,
+   "evaluations_per_decision": 51.47,
+   "coordinator_us_per_evaluation": 261.5,
+   "coordinator_us_per_round": 1257.3,
+   "coordinator": {
+    "evaluations": 1324421,
+    "serving_rounds": 275427,
+    "forward_seconds": 346.30069567169994,
+    "idle_seconds": 33.205470306798816
+   },
+   "coordinator_minstr_per_round": 17.1
+  },
+  "after1": {
+   "games": 24,
+   "decisions": 25187,
+   "playing_s": 296.3,
+   "decisions_per_hour": 305994,
+   "games_per_hour": 291.6,
+   "positions_per_round": 8.25,
+   "coordinator_busy": 0.962,
+   "batch_cores": 6.8,
+   "other_cores_median": 2.94,
+   "game_cpu_ms_per_decision": 65.0,
+   "game_pcore_ms_per_decision": 60.6,
+   "coordinator_cpu_ms_per_decision": 11.3,
+   "game_minstr_per_decision": 647,
+   "coordinator_minstr_per_decision": 161,
+   "game_pcore_share": 0.898,
+   "peak_memory_gb": 4.25,
+   "failed_games": 0,
+   "evaluations_per_decision": 51.27,
+   "coordinator_us_per_evaluation": 207.2,
+   "coordinator_us_per_round": 1709.5,
+   "coordinator": {
+    "evaluations": 1291399,
+    "serving_rounds": 156503,
+    "forward_seconds": 267.5372209371999,
+    "idle_seconds": 10.675086942268535
+   },
+   "coordinator_minstr_per_round": 25.91
+  },
+  "before2": {
+   "games": 24,
+   "decisions": 25887,
+   "playing_s": 375.5,
+   "decisions_per_hour": 248201,
+   "games_per_hour": 230.1,
+   "positions_per_round": 5.47,
+   "coordinator_busy": 0.915,
+   "batch_cores": 8.76,
+   "other_cores_median": 3.03,
+   "game_cpu_ms_per_decision": 110.2,
+   "game_pcore_ms_per_decision": 95.9,
+   "coordinator_cpu_ms_per_decision": 12.8,
+   "game_minstr_per_decision": 1052,
+   "coordinator_minstr_per_decision": 177,
+   "game_pcore_share": 0.786,
+   "peak_memory_gb": 4.94,
+   "failed_games": 0,
+   "evaluations_per_decision": 51.58,
+   "coordinator_us_per_evaluation": 242.0,
+   "coordinator_us_per_round": 1323.3,
+   "coordinator": {
+    "evaluations": 1335250,
+    "serving_rounds": 244233,
+    "forward_seconds": 323.18399380357005,
+    "idle_seconds": 30.07693798560649
+   },
+   "coordinator_minstr_per_round": 18.76
+  },
+  "after2": {
+   "games": 24,
+   "decisions": 25030,
+   "playing_s": 303.8,
+   "decisions_per_hour": 296642,
+   "games_per_hour": 284.4,
+   "positions_per_round": 7.62,
+   "coordinator_busy": 0.951,
+   "batch_cores": 6.81,
+   "other_cores_median": 2.07,
+   "game_cpu_ms_per_decision": 65.5,
+   "game_pcore_ms_per_decision": 60.5,
+   "coordinator_cpu_ms_per_decision": 11.5,
+   "game_minstr_per_decision": 657,
+   "coordinator_minstr_per_decision": 164,
+   "game_pcore_share": 0.883,
+   "peak_memory_gb": 4.75,
+   "failed_games": 0,
+   "evaluations_per_decision": 51.53,
+   "coordinator_us_per_evaluation": 210.6,
+   "coordinator_us_per_round": 1604.8,
+   "coordinator": {
+    "evaluations": 1289817,
+    "serving_rounds": 169302,
+    "forward_seconds": 271.6995129773859,
+    "idle_seconds": 13.91568507347256
+   },
+   "coordinator_minstr_per_round": 24.25
+  }
+ },
+ "averages": {
+  "decisions_per_hour": {
+   "before": 238956.0,
+   "after": 301318.0,
+   "change_percent": 26.1
+  },
+  "games_per_hour": {
+   "before": 222.2,
+   "after": 288.0,
+   "change_percent": 29.6
+  },
+  "game_cpu_ms_per_decision": {
+   "before": 113.8,
+   "after": 65.2,
+   "change_percent": -42.7
+  },
+  "game_minstr_per_decision": {
+   "before": 1068.5,
+   "after": 652.0,
+   "change_percent": -39.0
+  },
+  "coordinator_minstr_per_decision": {
+   "before": 180.0,
+   "after": 162.5,
+   "change_percent": -9.7
+  },
+  "coordinator_busy": {
+   "before": 0.914,
+   "after": 0.956,
+   "change_percent": 4.6
+  },
+  "batch_cores": {
+   "before": 8.68,
+   "after": 6.8,
+   "change_percent": -21.7
+  },
+  "positions_per_round": {
+   "before": 5.14,
+   "after": 7.94,
+   "change_percent": 54.5
+  },
+  "coordinator_us_per_evaluation": {
+   "before": 251.8,
+   "after": 208.9,
+   "change_percent": -17.0
+  }
+ },
+ "notes": [
+  "Decisions per hour count the time playing (manifest timings collection).",
+  "Load: tools/log_process_load.py, half-minute windows; other work is every process outside the batch.",
+  "Busy time is forward_seconds of studies/campaign/shared_evaluator.py: answering a round (reading the requests' arrays, laying them out, the pass and the outputs), without receiving the requests or sending the replies; coordinator_busy is forward_seconds over forward_seconds plus idle_seconds."
+ ],
+ "coordinator_fit": {
+  "method": "least squares of each batch's busy time per round, and of the coordinator process's instructions per round, against its mean positions per round, over the four batches",
+  "busy_ms_per_round": 0.616,
+  "busy_ms_per_position": 0.1312,
+  "minstr_per_round": 4.79,
+  "minstr_per_position": 2.56,
+  "busy_ms_per_position_at_8_25": 0.2059,
+  "busy_ms_per_position_at_24": 0.1568,
+  "positions_per_second_gain_rounds_of_24_over_8_25": 1.313,
+  "caveat": "the before and after batches differ in more than their rounds (about 2 more cores busy around the coordinator before), and rounds of 24 lie beyond the measured 4.8 to 8.3",
+  "earlier_fit": "self_play_limits_2026_11_16: 0.26 ms a round plus 0.23 ms a position, on a profiled batch with rounds of 4.44, counting receiving and replying, with the other steps' total divided by the requests; it gives 2.16 ms for a round of 8.25 positions"
+ }
+}

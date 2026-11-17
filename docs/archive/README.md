@@ -64,6 +64,7 @@ the first learning stage.
 | 16 Nov | [Facility types and technologies held as numbers](records/facility_type_numbers_2026_11_16.md) | Identical play again; after marks, listing the moves takes a further 14.0% fewer instructions and a searched game 4.0% fewer, 21.4% fewer than before any of the five changes; the build menu's factory capacity check, which copied every mark by name, fell from 5.0% to 0.4% of a searched game's engine samples. |
 | 16 Nov | [Units and facilities in slot maps](records/slot_maps_2026_11_16.md) | Identical play again, also in a build that throws when a map changes while iterated; listing the moves takes a further 5.6% fewer instructions and a searched game 3.2% fewer, 23.9% fewer than before the names work. A first version that searched names in name order made listing the moves 6.7% dearer. |
 | 16 Nov | [A planning key from a binary writing of the position](records/planning_key_2026_11_16.md) | Identical play with positions compared by canonical key; playing a move takes 31% fewer instructions and rolling dice 39% fewer, a searched game 5.5% fewer and 27.8% fewer than before the names work; the key was 15.6% of the engine's samples. |
+| 16 Nov | [The faster engine in training batches](records/engine_speed_in_training_2026_11_16.md) | Two matched pairs against the engine before the names work: decisions per hour while playing up 26% (239,000 to 301,000), game processes' CPU per decision down 43%; the coordinator, busy 96%, now limits and the training keeps only about 7 cores busy. |
 
 ### The engine
 

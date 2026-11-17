@@ -384,7 +384,10 @@ day ([record](archive/records/nine_core_layouts_2026_11_15.md)). On 16 November,
 with less other work on the Mac, about 2 cores instead of 3, the same six
 processes kept 9.1 to 10.4 cores busy on average in four batches
 ([record](archive/records/move_checks_2026_11_16.md#training-batches)). The
-layout's load grows into whatever cores are free. A command line that adds
+layout's load grows into whatever cores are free. It also shrinks when the
+engine gets faster: after the engine work later that day the same six
+processes kept about 6.8 cores busy, the coordinator setting the pace
+([record](archive/records/engine_speed_in_training_2026_11_16.md)). A count sees neither. A command line that adds
 `--episode-workers 7` overrides the profile, and the supervisor would accept it.
 
 **Why it matters.** The allowance is there to keep one performance core free

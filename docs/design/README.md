@@ -1480,7 +1480,9 @@ and one for itself, but a game process keeps 1.2 to 1.5 cores busy, because its
 game threads can compute at once (below). So the layout was chosen by the load it
 puts on the Mac: 6 processes kept about 9 cores busy, and 7, which also fit the
 count, about 10
-([record](../archive/records/nine_core_layouts_2026_11_15.md)). How to start,
+([record](../archive/records/nine_core_layouts_2026_11_15.md)). Since the engine
+work of 16 November the 6 keep only about 7 busy, because the coordinator now
+sets the pace ([record](../archive/records/engine_speed_in_training_2026_11_16.md)). How to start,
 stop and resume a run is in the
 [campaign learning guide](../../studies/campaign/README.md).
 
@@ -1500,10 +1502,12 @@ whatever its size
 Most of that fixed cost is Python's and PyTorch's own work for each of the pass's
 hundreds of operations. Of the arithmetic, the GELU curve (section 6.2) takes the
 most, mostly in the border messages (section 6.6). With one pass per round, the
-positions now cost most of a round. In a profiled batch with 24 games in flight, a
-round held 4.4 positions on average and cost about 0.26 ms plus 0.23 ms for each
-position, and the coordinator was busy 90% of the time
-([record](../archive/records/self_play_limits_2026_11_16.md#the-coordinator)).
+positions cost most of a round. In training batches with 24 games in flight, a
+round held about 8 positions and took the coordinator about 0.62 ms plus 0.13 ms
+for each position, from reading the requests' arrays to the outputs, about
+0.21 ms a position in all, and the coordinator was busy about 96% of the time
+([record](../archive/records/engine_speed_in_training_2026_11_16.md#what-limits-training-now)).
+So the more positions wait for a round, the less each costs.
 
 **What the cores and the GPU do.** In the Mac profile the GPU does nothing, and
 all the cores work at the same time. A game thread works in the engine and the
@@ -1513,8 +1517,9 @@ coordinator a request and waits for the reply. The engine releases Python's lock
 while it works, so the four game threads of a process can compute at once, and a
 thread that waits leaves its core to the others. That is why each process plays
 four games: in a 15 November batch a game thread computed about a third of the
-time, yet the 24 game threads and the coordinator kept about 9 cores busy. The
-coordinator, on a core of its own, answers round after round.
+time, yet the 24 game threads and the coordinator kept about 9 cores busy, and
+since the engine work of 16 November about 7. The coordinator, on a core of its
+own, answers round after round.
 
 The M4 Max has 10 performance cores and 4 efficiency cores. An efficiency core
 runs at 2.6 GHz instead of 3.8 and, in the game processes, does about 42% of a
@@ -1541,9 +1546,11 @@ night of 2 November, a network with five times the parameters played about as
 many decisions per hour as the small one on the CPU (table below): the engine
 and each pass's fixed costs set the pace, not the GPU's arithmetic.
 
-**The game processes** do about 90% of the CPU work, about 133 ms per decision.
-In a profiled batch on 16 November the engine and its encoding of positions for
-the network took 80% of the game threads' CPU time. Listing a position's legal
+**The game processes** do most of the CPU work: about 65 ms per decision since
+the engine work of 16 November, against 110 to 117 ms just before it
+([record](../archive/records/engine_speed_in_training_2026_11_16.md)). A profiled batch before that work showed where their
+time went: the engine and its encoding of positions for the network took 80% of
+the game threads' CPU time. Listing a position's legal
 moves took 37%, about 1.0 ms a call. Playing a move took 22% (0.6 ms), encoding a
 position 10% (0.26 ms), copying the game for the search 5% and rolling dice 4%.
 The search's and the adapter's Python and the requests to the coordinator took
@@ -1586,24 +1593,24 @@ play these make playing a move take 29% fewer instructions, and in training
 batches the game processes ran 10.6% fewer instructions per decision
 ([record](../archive/records/move_checks_2026_11_16.md)).
 
-**What limits self-play** depends on the Mac's other work. Inferred from batches
-on 16 November: when other work took about 4 cores, the training kept the 9 left
-to it busy and spent about 148 ms of CPU per decision. At that load that makes
-about 222,500 decisions an hour, close to the 213,600 the batch played. Less CPU
-per decision then buys more decisions an hour, and 90% of that CPU is the game
-processes'
-([record](../archive/records/self_play_limits_2026_11_16.md#what-limits-self-play)).
-When other work took about 2 cores, the training got about 10, and the
-coordinator, busy about 90% of the time, set the pace. The game processes then
-used 6% less CPU per decision without playing more decisions an hour
-([record](../archive/records/move_checks_2026_11_16.md#training-batches)). Busy
-all the time, at 0.26 ms a round plus 0.23 ms a position, the coordinator would
-answer about 240,000 decisions an hour with rounds of 4.4 positions, and about
-301,000 with rounds of any size. A cheaper engine leaves more positions waiting
-for each round, so rounds grow, but a faster engine alone can add at most about
-12% to 40%. Beyond that, the coordinator's cost per position, mostly the
-network's arithmetic, has to fall too
-([record](../archive/records/self_play_limits_2026_11_16.md#the-coordinator)).
+**What limits self-play** is the coordinator. In two matched pairs of
+Mac-profile batches after the engine work of 16 November, it was busy about 96%
+of the time with rounds of about 8 positions, the training kept only about 7 of
+its 9 cores busy, and it played about 301,000 decisions an hour while playing
+([record](../archive/records/engine_speed_in_training_2026_11_16.md)). Less
+engine work per decision now buys decisions per hour only by filling the
+coordinator's rounds: the game threads ask sooner, more positions wait for each
+round, and each costs less. That is how the engine work of 16 November raised
+it, with rounds of about 5 positions before and 8 after; the rest of its saving
+left cores idle. By the coordinator's cost above, rounds of all 24 game threads
+would answer about 31% more positions a second than rounds of 8 (inferred);
+larger rounds need more games in flight. Otherwise the coordinator's own cost
+has to fall, each round's fixed part and the network's arithmetic, or part of
+its work move elsewhere
+([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). Before
+that work, which of the coordinator and the cores set the pace depended on the
+Mac's other work
+([record](../archive/records/move_checks_2026_11_16.md#training-batches)).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept sample was drawn 8 to 12 times
@@ -1661,6 +1668,15 @@ Against the 252,200 of 8 processes the change costs about a quarter of the
 decisions an hour, on slightly different code and not in matched batches
 ([record](../archive/records/nine_core_layouts_2026_11_15.md)).
 
+On 16 November the engine came to hold its names as numbers, to keep units and
+facilities in slot maps and to digest a binary writing of the position for its
+planning key ([names held as numbers](../engine/names.md),
+[planning key](../archive/records/planning_key_2026_11_16.md)). In two matched pairs
+of Mac-profile batches against the engine before that work, decisions per hour
+while playing rose 26%, from about 239,000 to 301,000, and games per hour from
+222 to 288; the game processes used 43% less CPU per decision
+([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
+
 **Failures.** A game that fails costs only that game. Its seed is recorded, and a
 rules dead end (a decision with no legal move) saves its position in the run's
 `failed-positions/` folder. Two random-play checks run before long runs: the
@@ -1705,10 +1721,13 @@ evaluations per decision in self-play.
 
 **The search.** A simulation costs the game process about the same CPU whatever
 the network and however many simulations a search runs: 1.23 ms of a core at 64
-simulations, 1.26 ms at 256 and 1.29 ms at 1,024, measured alone on the Mac. In
-the 14 November training batches the same work cost about twice as much, about
-2.4 ms per evaluation (120 ms per decision, about 50 evaluations). There every
-core is busy and each process runs four games; the gap has not been broken down.
+simulations, 1.26 ms at 256 and 1.29 ms at 1,024, measured alone on the Mac with
+the engine of 14 November. In the 14 November training batches the same work
+cost about twice as much, about 2.4 ms per evaluation (120 ms per decision, about
+50 evaluations), with every core busy and four games to a process; the gap has
+not been broken down. With the engine of 16 November it costs about 1.3 ms per
+evaluation in training (65 ms per decision, about 51 evaluations)
+([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
 A search keeps a copy of the game at each node of its tree
 ([section 4.7](#47-more-detail-on-the-search)), about 160 to 230 KB each, so a
 tree holds about 11 MB at 64 simulations, 56 MB at 256 and 250 MB at 1,024 until
@@ -1719,15 +1738,15 @@ moment, holds one tree.
 is asked about. A search asks about roughly one position per simulation
 (section 4.2), and decisions with a single legal move are not searched, so a
 decision uses about 50 evaluations at 64 simulations, 197 at 256 and 612 at 800.
-Each evaluation needs engine work from a core for games, about 2.4 ms in training,
+Each evaluation needs engine work from a core for games, about 1.3 ms in training,
 and a share of a network pass. So the 7 cores for games that the 9-core allowance
-leaves can feed the network about 2,900 evaluations a second, whatever its size,
+leaves can feed the network about 5,400 evaluations a second, whatever its size,
 and the network can answer as many positions a second as the table above gives
 for its size and device. Self-play runs at the lower of the two rates:
 
 $$\text{decisions per hour} = \frac{3600}{\text{evaluations per decision}} \times \min\left(\frac{\text{cores for games}}{\text{core seconds per evaluation}}, \text{positions the network evaluates per second}\right)$$
 
-![A line chart on a logarithmic scale of evaluations per second for networks of 64×2, 128×4, 256×8, 384×12 and 512×16 on the Mac. A flat line at about 2,900 a second is what the engine work of the 7 cores for games can feed, the same for every network. The network on the GPU, in passes of 64 positions, answers 9,840 a second at 64×2 falling to 1,640 at 512×16, and crosses the flat line just before 384×12. The network on one CPU core, in passes of 16, answers 5,850 at 64×2 falling to 125 at 512×16, below the flat line from 128×4 on. Self-play gets the lower rate: the cores' up to 256×8, the GPU's beyond.](figures/evaluation_supply.svg)
+![A line chart on a logarithmic scale of evaluations per second for networks of 64×2, 128×4, 256×8, 384×12 and 512×16 on the Mac. A flat line at about 5,400 a second is what the engine work of the 7 cores for games can feed, the same for every network. The network on the GPU, in passes of 64 positions, answers 9,840 a second at 64×2 falling to 1,640 at 512×16, and crosses the flat line between 128×4 and 256×8. The network on one CPU core, in passes of 16, answers 5,850 at 64×2, just above the flat line, falling to 125 at 512×16. Self-play gets the lower rate: the cores' up to 128×4, the GPU's from 256×8 on.](figures/evaluation_supply.svg)
 
 **How decisions per hour changes with the network and the search.** The
 network's size changes only the second rate, and the search's budget divides
@@ -1737,21 +1756,22 @@ of 16 positions, and the GPU, in passes of 64, and 30 GB, decisions per hour are
 
 | Network | 64 simulations | 256 simulations | 800 simulations | Limited by |
 | --- | ---: | ---: | ---: | --- |
-| 64×2 | 210,000 | 51,000 | 16,000 | the cores |
-| 128×4 | 210,000 | 51,000 | 16,000 | the cores |
-| 256×8 | 210,000 | 51,000 | 16,000 | the cores |
-| 384×12 | 188,000 | 48,000 | 14,500 | the GPU, the cores nearly |
+| 64×2 | 386,000 | 94,000 | 29,000 | the cores |
+| 128×4 | 386,000 | 94,000 | 29,000 | the cores |
+| 256×8 | 324,000 | 82,000 | 25,000 | the GPU |
+| 384×12 | 188,000 | 48,000 | 14,500 | the GPU |
 | 512×16 | 118,000 | 30,000 | 9,200 | the GPU |
 
 Down a column, decisions per hour stays the same while the cores limit. Up to
-256×8, a network with about 50 times the arithmetic of 64×2, the engine sets the
-pace and the larger network costs nothing. The night of 2 November agrees: a
-256×8 network on the GPU played about as many decisions an hour as the 64×2
-network on the CPU (section 9.2). Beyond 256×8 the GPU limits, and decisions per
-hour falls, but much less than the arithmetic grows: 512×16 has about 390 times
-the arithmetic of 64×2 and plays a little more than half as many decisions an
-hour, because the GPU's rate falls only six times over that range; a pass of a
-small network costs it mostly fixed overhead. With the network on one CPU core, as
+128×4, a network with about 7 times the arithmetic of 64×2, the engine sets the
+pace and the larger network costs nothing. From 256×8 on the GPU limits, and
+decisions per hour falls, but much less than the arithmetic grows: 512×16 has
+about 390 times the arithmetic of 64×2 and plays about a third as many decisions
+an hour, because the GPU's rate falls only six times over that range; a pass of
+a small network costs it mostly fixed overhead. Before the engine work of 16
+November, with the cores' rate about half as high, the engine set the pace up to
+256×8: on the night of 2 November a 256×8 network on the GPU played about as
+many decisions an hour as the 64×2 network on the CPU (section 9.2). With the network on one CPU core, as
 in today's profile, the coordinator already limits at 64×2 (section 9.2), and the
 network's arithmetic alone would limit from 128×4 on, so every larger network
 needs the GPU.
@@ -1760,7 +1780,7 @@ Along a row, decisions per hour falls in proportion to the simulations, whatever
 limits: four times the simulations, about a quarter of the decisions. So which
 part limits depends on the network, not on the search. A game has about 1,000
 decisions (the 14 November batches averaged about 940), so 100,000 games take
-about 20 days at 210,000 decisions an hour, 81 days at 51,000 and 453 days at
+about 11 days at 386,000 decisions an hour, 44 days at 94,000 and 453 days at
 9,200.
 
 A pass's speed depends on its positions, and so on the games in flight: a pass of
@@ -1770,11 +1790,18 @@ while the other half work in the engine, and each holds its tree in memory. At
 processes' other memory, so passes hold about 57 positions.
 
 The table is worked out from the measurements above, not measured in training
-runs. For today's setup it gives 210,000 decisions an hour where a 15 November
-batch measured about 192,000, so read every rate as an upper bound, about a tenth
-too high, and every number of days as a lower bound
+runs, by the method of the 14 November study with the engine's cost of 16
+November: 0.065 s of CPU per decision at 64 simulations, scaled to larger
+searches as the study scaled 0.120
 ([record](../archive/records/network_and_search_cost_2026_11_14.md#which-part-limits-worked-out);
-[with 7 cores](../archive/records/nine_core_layouts_2026_11_15.md)).
+[engine cost](../archive/records/engine_speed_in_training_2026_11_16.md)). Today's setup, the 64×2 network on one CPU
+core, is not in the table: there the coordinator limits, at about 301,000
+decisions an hour measured, where the cores could feed about 386,000. With the
+engine of 14 November the table gave 210,000 for the cores where a 15 November
+batch measured about 192,000
+([record](../archive/records/nine_core_layouts_2026_11_15.md)), so read every
+rate as an upper bound, about a tenth too high, and every number of days as a
+lower bound.
 
 **Comparing setups.** Decisions per hour is the speed of one setup, a network and
 a search. It compares two versions of the code on the same setup, as the matched
@@ -1786,33 +1813,34 @@ change of the code at a size not yet trained, measure the rate it changes and
 work out the rest with the formula. A change to the engine or the search changes
 the cores' rate, which is the same for every network. It raises decisions per hour
 wherever the cores limit, but only until the cores' line in the figure reaches the
-network's line above it. With the GPU in passes of 64, a cheaper engine can pay up
-to about 3.4 times at 64×2, about 1.5 times at 256×8 and not at all from 384×12
-on, where the GPU already limits; larger passes would raise the 256×8 figure to at
-most about 2.2 times, with four times the games in flight. With the network on one
-core, as today, the coordinator is already busy about 90% of the time (section
-9.2), so a cheaper engine alone would gain at most about 12% to 40% at 64×2. A
-change to the
-network's passes changes the network's rate and matters only where the network
-limits.
+network's line above it. With the GPU in passes of 64, a cheaper engine can now
+pay up to about 1.8 times at 64×2, about 1.5 times at 128×4 and not at all from
+256×8 on, where the GPU already limits; passes of 256 would let it pay about 1.2
+times at 256×8, with four times the games in flight. With the network on one
+core, as today, the coordinator is busy about 96% of the time and the cores are
+not (section 9.2), so at 64×2 a cheaper engine gains only as far as it fills the
+coordinator's rounds. A change to
+the network's passes changes the network's rate and matters only where the
+network limits.
 
 Three things follow, inferred:
 
 - **The engine is the main cost of a simulation.** An evaluation takes about
-  2.4 ms of a core in the engine and 0.15 to 0.22 ms of the GPU at 256×8. Keeping
-  the Mac's GPU busy, in passes of 64, takes about 24 cores for games at 64×2,
-  11 at 256×8, 6 at 384×12 and 4 at 512×16: the 7 of the allowance keep it busy
-  only from 384×12 on, and even all 10 performance cores would just keep it busy
-  at 256×8.
+  1.3 ms of a core in the engine and 0.15 to 0.22 ms of the GPU at 256×8. Keeping
+  the Mac's GPU busy, in passes of 64, takes about 13 cores for games at 64×2,
+  10 at 128×4, 6 at 256×8, 3 at 384×12 and 2 at 512×16: the 7 of the allowance
+  keep it busy from 256×8 on, and all 10 performance cores would nearly keep it
+  busy at 128×4.
 - **Memory grows with the search.** A tree holds about 0.24 MB per simulation, so
   at 800 simulations each game in flight holds about 190 MB, and memory, not the
   GPU, sets how many games can fill a pass.
 - **What each part of a computer buys.** More cores, like a cheaper engine, raise
   the cores' line in the figure, and with it decisions per hour wherever the cores
   limit. A faster GPU raises its line and moves the crossing to larger networks,
-  but helps only with enough cores to feed it, about one core for every 400
-  evaluations a second at today's engine cost: a GPU ten times as fast as the
-  Mac's would need about ten times the cores, unless the engine gets cheaper.
+  but helps only with enough cores to feed it, about one core for every 750
+  evaluations a second at the engine's cost of 16 November: a GPU ten times as
+  fast as the Mac's would need about ten times the cores, unless the engine gets
+  cheaper.
   Memory must hold a tree for every game in flight.
 
 ### 9.4 How the Campaign Observatory shows a game
@@ -1950,24 +1978,18 @@ measured and what would settle it.
   pair a nation, or the game as a whole, with a mark that only units or
   territories carry
   ([what is still asked](network_input.md#what-the-position-asks-about-a-nation)).
-- **Self-play on the Mac is close to two limits.** The coordinator is busy about
-  90% of the time, and the training's cores are busy too. Which one sets the pace
-  depends on the Mac's other work: with about 4 cores of it the cores did, with
-  about 2 the coordinator did
-  ([record](../archive/records/move_checks_2026_11_16.md#training-batches)). The
-  game processes do 90% of the CPU work, so less engine work per move frees the
-  most, but a faster engine alone can add at most about 12% to 40% before the
-  coordinator is busy all the time. Within the engine, listing a position's
-  legal moves costs the most, about 1.0 ms a call, and 59% of the engine's time
-  goes to comparing names, allocating memory, looking up maps and copying memory.
-  Checking a naval route copies the whole position, and the copy works out its
-  carriers' reach and supply again with no cache
-  ([record](../archive/records/naval_route_checks_2026_11_16.md)). Every move
-  and every dice roll works out the position's planning key, a digest of a
-  compact binary writing of the whole position, about 21 to 33 µs a position
-  where the digest of its canonical text took 60 to 80 µs
-  ([record](../archive/records/planning_key_2026_11_16.md)). When the Mac's
-  other work needs more than one core, part of the training runs on the
+- **The coordinator limits self-play on the Mac.** Since the engine work of 16
+  November it is busy about 96% of the time while the training keeps about 7 of
+  its 9 cores busy ([record](../archive/records/engine_speed_in_training_2026_11_16.md)), so in the Mac
+  profile a faster engine plays more decisions an hour only as far as it fills
+  the coordinator's rounds. A round costs the coordinator about 0.62 ms besides
+  0.13 ms a position (section 9.2); a seventh game process, now that cores are
+  idle, would fill its rounds further, which is untested. Within the engine,
+  listing a position's legal moves now costs the most per call, and checking a
+  naval route copies the whole position and works out its carriers' reach and
+  supply again with no cache
+  ([record](../archive/records/naval_route_checks_2026_11_16.md)). When the
+  Mac's other work needs more than one core, part of the training runs on the
   efficiency cores
   ([record](../archive/records/self_play_limits_2026_11_16.md)).
 
