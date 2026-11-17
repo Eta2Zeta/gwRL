@@ -5,8 +5,16 @@ learns to play the 1936–1941 Japan–China campaign. It builds the system up f
 its bricks. Each section defines its parts, with a picture or a real example,
 before any later section uses them, and the last sections put the whole training
 loop together. One real decision, called decision 612 and introduced in
-[section 2](#23-legal-moves-and-the-running-example), is the example throughout.
+[section 2](#23-legal-actions-and-the-running-example), is the example throughout.
 A section's last part, headed "More detail", can be skipped on a first reading.
+
+**Words.** The document uses the standard terms of reinforcement learning and
+machine learning, such as *state*, *action*, *feature*, *embedding*, *forward
+pass* and *training step*, and each word means one thing only. A word that has
+more than one meaning in common use always carries the word that says which one:
+a *training step* or an *Adam step*, never a bare step; a *game round*, never a
+bare round. Every term is defined where it is first used and listed in the
+[glossary](#12-glossary).
 
 The document is revised whenever a question digs into part of the design (see
 `AGENTS.md`). The measurements behind its numbers are in the dated
@@ -20,38 +28,38 @@ numbers.
 1. [In brief](#1-in-brief)
 2. [The game, as the learner sees it](#2-the-game-as-the-learner-sees-it)
 3. [What a network gives at a decision](#3-what-a-network-gives-at-a-decision)
-4. [Choosing a move: search](#4-choosing-a-move-search)
+4. [Choosing an action: search](#4-choosing-an-action-search)
    - [4.1 Why search](#41-why-search) · [4.2 One simulation](#42-one-simulation) ·
-     [4.3 The search score](#43-the-search-score-of-a-move) ·
+     [4.3 The PUCT score](#43-the-puct-score-of-an-action) ·
      [4.4 A toy search](#44-a-toy-search) ·
-     [4.5 After the simulations](#45-after-the-simulations-visits-and-shares) ·
+     [4.5 After the simulations](#45-after-the-simulations-visit-counts-and-visit-shares) ·
      [4.6 A real search](#46-a-real-search-decision-612) ·
      [4.7 More detail](#47-more-detail-on-the-search)
 5. [How a decision becomes numbers](#5-how-a-decision-becomes-numbers)
-   - [5.1 Questions and answers](#51-questions-and-answers) ·
-     [5.2 Three parts](#52-three-parts-the-board-the-position-and-the-moves) ·
-     [5.3 Grids of answers](#53-the-input-as-grids-of-answers) ·
-     [5.4 A move's answers](#54-a-moves-answers-and-the-zones-it-is-linked-to) ·
-     [5.5 Facts that never change](#55-facts-that-never-change) ·
+   - [5.1 Features and feature values](#51-features-and-feature-values) ·
+     [5.2 Three parts](#52-three-parts-zone-features-global-features-and-action-features) ·
+     [5.3 Feature matrices](#53-the-input-as-feature-matrices) ·
+     [5.4 An action's features](#54-an-actions-features-and-its-zones) ·
+     [5.5 Static features](#55-static-features) ·
      [5.6 More detail](#56-more-detail-how-the-encoder-builds-the-input)
 6. [Inside a network, brick by brick](#6-inside-a-network-brick-by-brick)
-   - [6.1 Vectors](#61-vectors) · [6.2 Learned layers](#62-learned-layers) ·
-     [6.3 The first layer](#63-the-first-layer-rows-and-tables) ·
+   - [6.1 Vectors](#61-vectors) · [6.2 Linear layers](#62-linear-layers) ·
+     [6.3 The embedding layer](#63-the-embedding-layer-embeddings-and-embedding-tables) ·
      [6.4 A zone's vector](#64-a-zones-vector) ·
-     [6.5 Position and move vectors](#65-the-position-vector-and-the-move-vectors) ·
-     [6.6 Messages](#66-messages-along-the-borders) ·
+     [6.5 Global and action vectors](#65-the-global-vector-and-the-action-vectors) ·
+     [6.6 Message-passing layers](#66-message-passing-layers-messages-along-the-borders) ·
      [6.7 The values](#67-the-values) ·
-     [6.8 The move probabilities](#68-the-move-probabilities) ·
+     [6.8 The action probabilities](#68-the-action-probabilities) ·
      [6.9 The whole network](#69-the-whole-network) ·
      [6.10 More detail](#610-more-detail-how-other-game-networks-read-their-input)
 7. [Self-play and training samples](#7-self-play-and-training-samples)
 8. [Training the networks](#8-training-the-networks)
    - [8.1 The loss](#81-the-loss) · [8.2 The gradient](#82-the-gradient) ·
      [8.3 Adam](#83-adam) ·
-     [8.4 Steps and updates](#84-one-training-step-and-one-update) ·
-     [8.5 Which numbers a step moves](#85-which-numbers-a-step-moves) ·
-     [8.6 Why a few random samples](#86-why-a-few-random-samples-per-step) ·
-     [8.7 How often a sample is drawn](#87-how-often-a-sample-is-drawn)
+     [8.4 Training steps and network updates](#84-one-training-step-and-one-network-update) ·
+     [8.5 Which numbers a training step moves](#85-which-numbers-a-training-step-moves) ·
+     [8.6 Why small random minibatches](#86-why-small-random-minibatches) ·
+     [8.7 How often a training sample is drawn](#87-how-often-a-training-sample-is-drawn)
 9. [The whole loop, and running it](#9-the-whole-loop-and-running-it)
 10. [Measuring strength](#10-measuring-strength)
 11. [Known gaps and open questions](#11-known-gaps-and-open-questions)
@@ -63,18 +71,19 @@ Three agents, one per alliance (Axis, Allies and Comintern), learn the campaign
 by playing it against each other many thousands of times, in the manner of
 AlphaZero:
 
-- **They look ahead before they move.** At every decision the agent whose turn
+- **They look ahead before they act.** At every decision the agent whose turn
   it is plays possible continuations on copies of the game, a *search*
   (section 4), guided by its own neural network (sections 3, 5 and 6).
-- **They keep some of their decisions** as training *samples*: each with what the
-  search preferred there and how the game ended (section 7).
-- **They learn from them.** Play comes in *batches* of games. After each batch,
-  an *update* adjusts each network to propose what the search preferred and to
-  predict how games end (section 8). Better networks make the next searches
+- **They keep some of their decisions** as *training samples*: each with what
+  the search preferred there and how the game ended (section 7).
+- **They learn from them.** Training comes in *training iterations*. In each, the
+  agents play a set of self-play games with their networks held fixed, and then a
+  *network update* adjusts each network to propose what the search preferred and
+  to predict how games end (section 8). Better networks make the next searches
   better, and the loop repeats (section 9).
 
-Whether that works for this game on this hardware is unproven: no run has yet
-shown robust playing strength ([section 10](#10-measuring-strength)).
+Whether that works for this game on this hardware is unproven: no training run
+has yet shown robust playing strength ([section 10](#10-measuring-strength)).
 
 ## 2. The game, as the learner sees it
 
@@ -87,33 +96,34 @@ Each alliance plays for its nations: the Axis for Japan, the Allies for the KMT,
 and the Comintern for the CCP and Mongolia. The eight Chinese warlords start
 under nobody's control; some rules can later hand one to an alliance.
 
-### 2.2 Positions: decisions, chance events and the end
+### 2.2 States: decisions, chance events and the end
 
-A *position* is everything about the game at one moment. A game is a chain of
-positions, and each position is one of three kinds:
+A *state* is everything about the game at one moment: in a board game's words,
+its position. A game is a chain of states, and each state is one of three kinds:
 
-- **a decision:** one alliance chooses one move from a list of *legal moves*, the
-  moves the rules allow there;
+- **a decision:** one alliance chooses one *action* from a list of *legal
+  actions*, the actions the rules allow there;
 - **a chance event:** the engine rolls dice;
-- **the end** of the game, after the eleventh round (1941).
+- **the end** of the game, the *terminal state*, after the eleventh game round
+  (1941).
 
 Reactions are decisions too: the defender picks casualties, an attacker chooses
 whether to retreat, and so on. A full eleven-round game holds well over a
 thousand decisions.
 
-![A row of five positions joined by arrows: a decision, where one alliance chooses one legal move; a move leads to the next decision, often by the same alliance; a move leads to a chance event, where the engine rolls dice, say for a battle; the dice lead to further decisions, over a thousand of them; the chain ends after round 11 with the final scores. Below: one real game, played on 5 November with the networks after one update (seed 1105), had 1,349 decisions and 183 chance events; its 612th decision is the running example, in round 5 the Comintern choosing the CCP's Combat Movement from 5 legal moves; it ended Axis +49.0, Allies −63.8, Comintern −106.2.](figures/game_positions.svg)
+![A row of five states joined by arrows: a decision, where one alliance chooses one legal action; an action leads to the next decision, often by the same alliance; an action leads to a chance event, where the engine rolls dice, say for a battle; the dice lead to further decisions, over a thousand of them; the chain ends after game round 11 with the final scores. Below: one real game, played on 5 November with the networks after one network update (seed 1105), had 1,349 decisions and 183 chance events; its 612th decision is the running example, in game round 5 the Comintern choosing the CCP's Combat Movement from 5 legal actions; it ended Axis +49.0, Allies −63.8, Comintern −106.2.](figures/game_states.svg)
 
-### 2.3 Legal moves, and the running example
+### 2.3 Legal actions, and the running example
 
-**A legal move is a small record:** a kind plus labelled details. The running
-example of this document is decision 612 of a game the networks played on
-5 November, after their first update
-([record](../archive/records/training_sample_2026_11_05.md)). In round 5, during the CCP's
-Combat Movement, the Comintern chooses for the CCP. The CCP's mountain infantry in
-Shensi has one movement point left and may attack one of four neighbouring zones
-the KMT holds, Hopeh, Suiyuan, Szechwan or Tsinghai, or the CCP may end its Combat
-Movement. So the decision has 5 legal moves. The attack on Hopeh, as the engine
-writes it:
+**A legal action is a small data structure:** a kind plus labelled details. The
+running example of this document is decision 612 of a game the networks played
+on 5 November, after their first network update
+([record](../archive/records/training_sample_2026_11_05.md)). In game round 5,
+during the CCP's Combat Movement, the Comintern chooses for the CCP. The CCP's
+mountain infantry in Shensi has one movement point left and may attack one of
+four neighbouring zones the KMT holds, Hopeh, Suiyuan, Szechwan or Tsinghai, or
+the CCP may end its Combat Movement. So the decision has 5 legal actions. The
+attack on Hopeh, as the engine writes it:
 
 | Detail | Value |
 | --- | --- |
@@ -123,46 +133,49 @@ writes it:
 | `combat` | `true` |
 | `mode` | `ordinary` |
 
-The other three attacks differ only in the path's second zone. The fifth move,
+The other three attacks differ only in the path's second zone. The fifth action,
 ending the phase, has the kind `end_phase` and no details. Long orders, such as a
-fleet's, are built one step at a time with bounded choices: see
+fleet's, are built one part at a time, each part a decision of its own with a
+bounded list of legal actions: see
 [the rules engine, section 3](../engine/README.md#3-positions-and-moves).
 
 ### 2.4 The final score
 
 Only the end of the game is scored; there is no reward along the way. Each
-alliance's wealth is its income plus a tenth of the value of its units, its
-infrastructure, its treasury and its paid construction. Its score is its own
-wealth minus the other two alliances' wealth combined
-(`src/campaign_objective.cpp`). The three scores form one list,
+alliance's wealth is its income plus a tenth of what its units, its
+infrastructure, its treasury and its paid construction are worth. Its *final
+score* is its own wealth minus the other two alliances' wealth combined
+(`src/campaign_objective.cpp`). The three final scores form one list,
 `[Axis, Allies, Comintern]`. The game of decision 612 ended Axis +49.0, Allies
 −63.8 and Comintern −106.2.
 
 ### 2.5 What the learner asks of the engine
 
-The legal moves, play a move, roll the dice, is the game over, the final scores,
-a copy of the game for search, and the position's *planning key*, a digest that
-identifies a position exactly.
+The legal actions, apply an action, roll the dice, is the game over, the final
+scores, a copy of the game for search, and the state's *planning key*, a digest
+that identifies a state exactly.
 
 ## 3. What a network gives at a decision
 
 In reinforcement-learning terms an agent needs a *policy*, how likely it is to
-choose each legal move, and a *value function*, how good a position is for it.
+choose each legal action, and a *value function*, how good a state is for it.
 Here one neural network per alliance gives both, for any decision its alliance
 faces (`CampaignPolicyValueNet` in `studies/campaign/neural.py`). Given a
 decision, it returns:
 
 - **three values:** its estimates of the three alliances' final scores. Inside,
-  the network works in hundreds of points: it outputs 0.251 for a score of +25.1.
-- **a probability for every legal move,** adding up to 1: its first guess at
-  which move to play. The search (section 4) calls these the moves' *priors*.
+  the network works in hundreds of points: it outputs 0.251 for a final score of
+  +25.1.
+- **a probability for every legal action,** adding up to 1: its first guess at
+  which action to play. The search (section 4) uses these probabilities as the
+  actions' *priors*.
 
 This is what the Comintern's network gave at decision 612:
 
-![Left: decision 612, what the network is given: the position (the board, round 5, Combat Movement, the CCP's turn) and the 5 legal moves: 1 to 4, the mountain infantry in Shensi attacking Hopeh, Suiyuan, Szechwan or Tsinghai, and 5, ending Combat Movement. Middle: the Comintern's network, 4.1 million learned numbers. Right, what it gives: values, its estimate of each alliance's final score: Axis +25.1, Allies −42.4, Comintern −102.4; and move probabilities, its first guess, which the search calls priors: 0.10, 0.10, 0.09, 0.18 and 0.53 for moves 1 to 5.](figures/network_outputs.svg)
+![Left: decision 612, what the network is given: the state (the board, game round 5, Combat Movement, the CCP's turn) and the 5 legal actions: 1 to 4, the mountain infantry in Shensi attacking Hopeh, Suiyuan, Szechwan or Tsinghai, and 5, ending Combat Movement. Middle: the Comintern's network, 4.1 million parameters. Right, what it gives: values, its estimate of each alliance's final score: Axis +25.1, Allies −42.4, Comintern −102.4; and action probabilities, its first guess, which the search uses as priors: 0.10, 0.10, 0.09, 0.18 and 0.53 for actions 1 to 5.](figures/network_outputs.svg)
 
 The network gives values for all three alliances, not only its own, because a
-search (section 4) needs to know how each position it reaches looks to whichever
+search (section 4) needs to know how each state it reaches looks to whichever
 alliance chooses there.
 
 Until section 6 the network is a closed box: what goes in and what comes out is
@@ -177,86 +190,91 @@ ahead, preferred the attack ([section 4.6](#46-a-real-search-decision-612)), and
 the game ended with the Comintern at −106.2 where the network had predicted
 −102.4.
 
-## 4. Choosing a move: search
+## 4. Choosing an action: search
 
 ### 4.1 Why search
 
-The network answers in one look. A search looks ahead: it plays moves on copies
-of the game, asks the network about the positions it reaches, and combines the
-answers. Where looking ahead finds something the one look missed, the search
-chooses better than the network alone. The search is Monte Carlo tree search in
-AlphaZero's style (`studies/shared/multiplayer_mcts.py`, class `VectorMCTS`),
-made of many *simulations*: 64 per decision in current runs.
+The network answers in one look. A search looks ahead: it plays actions on copies
+of the game, asks the network about the states it reaches, and combines the
+network's outputs. Where looking ahead finds something the one look missed, the
+search chooses better than the network alone. The search is Monte Carlo tree
+search in AlphaZero's style (`studies/shared/multiplayer_mcts.py`, class
+`VectorMCTS`), made of many *simulations*: 64 per decision in current runs.
 
 ### 4.2 One simulation
 
-**Every simulation starts from the same place: the current position.** It plays
-on its own copy of the game, so the real game does not change. It does not play
-to the end of the game: it walks forward only until it reaches a position that no
-earlier simulation has asked the network about, asks about that one, and stops.
-So the first simulations look one move ahead, and later ones look further along
-the continuations that earlier ones found promising.
+**Every simulation starts from the same place: the current state,** the *root* of
+the search. It plays on its own copy of the game, so the real game does not
+change. It does not play to the end of the game: it walks forward only until it
+reaches a state that no earlier simulation has asked the network about, asks
+about that one, and stops. So the first simulations look one action ahead, and
+later ones look further along the continuations that earlier ones found
+promising.
 
-**What the simulations find is kept in a tree,** which the next simulation reads.
-For every position the search has met, the tree holds the moves tried there,
-each with its *visit count*, how many simulations played it, and the total of the
-values those simulations found.
+**What the simulations find is kept in a tree,** the *search tree*, which the
+next simulation reads. Each state the search has met is a *node* of the tree. For
+every node, the tree holds the actions tried there, each with its *visit count*,
+how many simulations played it, and the total of the values those simulations
+found.
 
-**One simulation, step by step:**
+**One simulation, in order:**
 
-1. Copy the game at the current position (`clone_for_search`).
+1. Copy the game at the current state (`clone_for_search`).
 2. At a decision the search has already asked the network about, give every
-   legal move a search score (section 4.3) and play the move with the highest
+   legal action a PUCT score (section 4.3) and play the action with the highest
    score on the copy; a tie is broken at random.
 3. At a chance event, roll the dice on the copy.
 4. At a decision no simulation has asked the network about yet, ask the deciding
-   alliance's network for the position's values for all three alliances and a
-   prior for each legal move, and stop.
-5. Stop also at the end of the game, using the true scores; on returning to a
-   position already on this simulation's path; or after 16 steps, the depth
-   limit. The last two use an estimate of the position reached
+   alliance's network for the state's values for all three alliances and a
+   prior for each legal action, and stop.
+5. Stop also at the end of the game, using the true final scores; on returning to
+   a state already on this simulation's path; or after 16 actions and dice
+   rolls, the depth limit. The last two use an estimate of the state reached
    ([section 4.7](#47-more-detail-on-the-search)).
-6. Add the three values found to every position and move on the path, with one
+6. Add the three values found to every state and action on the path, with one
    more visit each.
 
-### 4.3 The search score of a move
+### 4.3 The PUCT score of an action
 
-In item 2 above, the search gives each legal move a *search score*, the sum of
-two terms:
+In item 2 above, the search gives each legal action a *PUCT score*, the selection
+rule of AlphaZero ("predictor plus upper confidence bound applied to trees"). It
+is the sum of two terms:
 
 $$
-\text{search score} = \underbrace{\frac{\bar v - v_{\min}}{v_{\max} - v_{\min}}}_{\text{first term}} + \underbrace{c_{\text{puct}} \times P \times \frac{\sqrt{N + 1}}{n + 1}}_{\text{second term}}
+\text{PUCT score} = \underbrace{\frac{\bar v - v_{\min}}{v_{\max} - v_{\min}}}_{\text{value term}} + \underbrace{c_{\text{puct}} \times P \times \frac{\sqrt{N + 1}}{n + 1}}_{\text{exploration term}}
 $$
 
-- **The first term, what earlier simulations found.** $\bar v$ is the move's
+- **The value term, what earlier simulations found.** $\bar v$ is the action's
   average result so far for the alliance that is choosing. A simulation's result
-  is the network's value of the position where it stopped, or the true final
+  is the network's value of the state where it stopped, or the true final
   scores at the end of the game. $v_{\min}$ and $v_{\max}$ are the lowest and
-  highest averages, for that alliance, that any move anywhere in this search's
-  tree has had so far; the range only widens. So the first term places the
-  move's average on a scale from 0, the worst seen, to 1, the best. Until the
+  highest averages, for that alliance, that any action anywhere in this search's
+  tree has had so far; the range only widens. So the value term places the
+  action's average on a scale from 0, the worst seen, to 1, the best. Until the
   search has seen two different averages the scale has no width, and every
-  tried move's first term is 0.5. A move no simulation has tried yet gets 1, as
-  good as the best, so untried moves usually come first.
-- **The second term, what the network expected.** $P$ is the move's prior, $n$
-  how many simulations have played this move here, $N$ how many have played any
-  move here, and $c_{\text{puct}}$ is 1.5. It is large for a move the network
-  likes that has been tried little, and it shrinks each time the move is tried.
+  tried action's value term is 0.5. An action no simulation has tried yet gets 1,
+  as good as the best, so untried actions usually come first.
+- **The exploration term, what the network expected.** $P$ is the action's prior,
+  $n$ how many simulations have played this action here, $N$ how many have
+  played any action here, and $c_{\text{puct}}$ is 1.5. It is large for an
+  action the network likes that has been tried little, and it shrinks each time
+  the action is tried.
 
-Each alliance judges moves by its own value: this is Max-N search, not a search
-for an equilibrium. Values are rescaled per alliance before they enter the score.
+Each alliance judges actions by its own value: this is Max-N search, not a search
+for an equilibrium. Values are rescaled per alliance before they enter the
+PUCT score.
 
 ### 4.4 A toy search
 
-The current position R has three legal moves, A, B and C. Before the first
+The current state R has three legal actions, A, B and C. Before the first
 simulation the search asks the network about R, which gives priors for A, B and
 C: say 0.40, 0.36 and 0.24.
 
-![The tree after four simulations. Simulations 1, 2 and 3 each try one untried move from R and add RA, RB and RC at depth 1, asking the network about each. Simulation 4 plays A again, then x, the move with the highest prior at RA, and adds RAx at depth 2.](figures/search_tree.svg)
+![The search tree after four simulations. Simulations 1, 2 and 3 each try one untried action from R and add the nodes RA, RB and RC at depth 1, asking the network about each. Simulation 4 plays A again, then x, the action with the highest prior at RA, and adds RAx at depth 2.](figures/search_tree.svg)
 
-Simulations 1 to 3 each try a move nobody has tried, and simulation 4 goes one
-move deeper. Before each simulation the search scores the three moves, first term
-plus second term:
+Simulations 1 to 3 each try an action nobody has tried, and simulation 4 goes one
+action deeper. Before each simulation the search scores the three actions, value
+term plus exploration term:
 
 | Before simulation | A | B | C | Plays |
 | ---: | ---: | ---: | ---: | --- |
@@ -265,48 +283,50 @@ plus second term:
 | 3 | 1 + 0.52 = 1.52 | 0 + 0.47 = 0.47 | 1 + 0.62 = 1.62 | C |
 | 4 | 1 + 0.60 = 1.60 | 0 + 0.54 = 0.54 | 0.5 + 0.36 = 0.86 | A |
 
-- **Before simulation 1** nothing has been tried, so every first term is 1 and the
-  priors decide.
-- **Before simulation 2** A has the only result seen, so its first term is 0.5.
+- **Before simulation 1** nothing has been tried, so every value term is 1 and
+  the priors decide.
+- **Before simulation 2** A has the only result seen, so its value term is 0.5.
 - **Before simulation 3** say A's simulation ended better than B's: A's average
-  rescales to 1 and B's to 0. C, untried, still gets 1, and its larger second
-  term wins.
+  rescales to 1 and B's to 0. C, untried, still gets 1, and its larger
+  exploration term wins.
 - **Before simulation 4** say C's result lay halfway between A's and B's, so it
-  rescales to 0.5. Each move has one visit of three, so its second term is
+  rescales to 0.5. Each action has one visit of three, so its exploration term is
   $1.5 \times P \times \sqrt{3 + 1} \div (1 + 1)$, 0.60 for A.
 
-So simulation 4 plays A. At RA no move has been tried, so every first term is 1
-and the move with the highest prior, x, wins. RAx is new, so the simulation stops
-there.
+So simulation 4 plays A. At RA no action has been tried, so every value term is 1
+and the action with the highest prior, x, wins. RAx is new, so the simulation
+stops there.
 
-So a simulation chooses its path one step at a time, by these scores, at every
-position it passes. It does not look for the deepest branch: it goes deep only
-where the scores keep sending it. Each simulation adds one new position to the
-tree, so the continuations the scores keep choosing are explored deeper and
-deeper.
+So a simulation chooses its path one action at a time, by these scores, at every
+state it passes. It does not look for the deepest branch: it goes deep only
+where the scores keep sending it. Each simulation adds one new node to the tree,
+so the continuations the scores keep choosing are explored deeper and deeper.
 
-### 4.5 After the simulations: visits and shares
+### 4.5 After the simulations: visit counts and visit shares
 
-**Visits and shares.** After all 64 simulations, the number of times each first
-move was tried, its visit count, shows the search's preference. A move's *share*
-is its visit count divided by the number of simulations. The move actually played
-is drawn at random in proportion to the visit counts (temperature 1), and the
-shares become part of a training sample (section 7).
+**Visit counts and visit shares.** After all 64 simulations, the number of times
+each action at the root was tried, its visit count, shows the search's
+preference. An action's *visit share* is its visit count divided by the number of
+simulations; AlphaZero names the visit shares the *search probabilities*. The
+action actually played is drawn at random in proportion to the visit counts
+(temperature 1), and the visit shares become part of a training sample
+(section 7).
 
-**How the shares come to differ from the priors.** A move whose simulations keep
-scoring better than the others' is chosen again and again, until its second term
-has shrunk enough for the others to catch up. Moves whose results are about the
-same share the remaining simulations roughly in proportion to their priors, since
-only the second term tells them apart. So the shares end up far from the
-network's priors mainly where the search found a move better than the rest: that
-move gains, and every other move gives up simulations in proportion to its prior.
+**How the visit shares come to differ from the priors.** An action whose
+simulations keep scoring better than the others' is chosen again and again,
+until its exploration term has shrunk enough for the others to catch up. Actions
+whose results are about the same share the remaining simulations roughly in
+proportion to their priors, since only the exploration term tells them apart.
+So the visit shares end up far from the network's priors mainly where the search
+found an action better than the rest: that action gains, and every other action
+gives up simulations in proportion to its prior.
 
 **Exploration noise.** During training, random noise (Dirichlet, alpha 0.3,
-mixed in at 25%) is added to the network's priors at the position being decided,
-the root of the search tree, so the search sometimes tries moves the network
-dislikes. Held-out evaluation, which measures strength (section 10), turns it off.
+mixed in at 25%) is added to the network's priors at the root, so the search
+sometimes tries actions the network dislikes. Held-out evaluation, which
+measures playing strength (section 10), turns it off.
 
-**A decision with only one legal move** is played at once, with no search and
+**A decision with only one legal action** is played at once, with no search and
 without asking the network.
 
 ### 4.6 A real search: decision 612
@@ -315,27 +335,28 @@ At decision 612 the noise changed the five priors of [section
 3](#3-what-a-network-gives-at-a-decision): it lowered the attack on Hopeh from
 0.10 to 0.085 and ending the phase from 0.53 to 0.40, and raised the attacks on
 Szechwan and Tsinghai to 0.177 and 0.268. The simulations ran one after another,
-numbered 1 to 64 in the order they ran. Each began by scoring the five moves and
-playing the move with the highest score. The figure shows the move each began with
+numbered 1 to 64 in the order they ran. Each began by scoring the five actions
+and playing the action with the highest PUCT score. The figure shows the action
+each began with
 ([trace](../archive/records/training_sample_2026_11_05.md#how-the-64-simulations-were-spent)).
 
-![The 64 simulations of the search at decision 612, numbered in the order they ran, in two rows of 32, each marked with the move it began with. Simulations 1 to 14 tried every move; the two that began with the attack on Hopeh, 6 and 11, stopped before its battle. Simulation 15 was the first to play through the battle, in which the CCP takes Hopeh, at a position rated −101.42. From 15 to 51 the attack on Hopeh was chosen 32 times out of 37; simulation 33's scores are in the table below. Simulation 53 stopped at the depth limit at a position rated −106.02, and simulations 54 to 64 all began with the other moves.](figures/sample_simulations.svg)
+![The 64 simulations of the search at decision 612, numbered in the order they ran, in two rows of 32, each marked with the action it began with. Simulations 1 to 14 tried every action; the two that began with the attack on Hopeh, 6 and 11, stopped before its battle. Simulation 15 was the first to play through the battle, in which the CCP takes Hopeh, at a state rated −101.42. From 15 to 51 the attack on Hopeh was chosen 32 times out of 37; simulation 33's PUCT scores are in the table below. Simulation 53 stopped at the depth limit at a state rated −106.02, and simulations 54 to 64 all began with the other actions.](figures/simulations_at_decision_612.svg)
 
-**Simulations 1 to 14** tried every move. The attack's two, simulations 6 and 11,
-stopped before its battle, with Hopeh still the KMT's, and scored like every
-other move: about −102.2 for the Comintern.
+**Simulations 1 to 14** tried every action. The attack's two, simulations 6 and
+11, stopped before its battle, with Hopeh still the KMT's, and scored like every
+other action: about −102.2 for the Comintern.
 
 **Simulation 15** was the first to play on through the end of Combat Movement and
-the battle, which the CCP won. The network rated the position it reached, with
-the CCP holding Hopeh, −101.42: better than any result before it.
+the battle, which the CCP won. The network rated the state it reached, with the
+CCP holding Hopeh, −101.42: better than any result before it.
 
 **Simulations 15 to 51** began with the attack 32 times out of 37. From 15 on,
-all 34 of its simulations stopped at positions where the CCP held Hopeh, and the
+all 34 of its simulations stopped at states where the CCP held Hopeh, and the
 network rated 24 of them between −101.43 and −101.16; no simulation of another
-move did better than −102.16. The table gives the five scores just before
+action did better than −102.16. The table gives the five PUCT scores just before
 simulation 33, after 32 simulations:
 
-| Move | Simulations so far ($n$) | Average result for the Comintern ($\bar v$) | First term | Prior after noise ($P$) | Second term | Score |
+| Action | Simulations so far ($n$) | Average result for the Comintern ($\bar v$) | Value term | Prior after noise ($P$) | Exploration term | PUCT score |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Shensi → Hopeh | 18 | −101.50 | 0.77 | 0.085 | 0.04 | **0.81** |
 | Shensi → Suiyuan | 1 | −102.40 | 0.16 | 0.072 | 0.31 | 0.47 |
@@ -343,59 +364,59 @@ simulation 33, after 32 simulations:
 | Shensi → Tsinghai | 7 | −102.26 | 0.25 | 0.268 | 0.29 | 0.54 |
 | End Combat Movement | 5 | −102.39 | 0.17 | 0.399 | 0.57 | 0.74 |
 
-**The first term** places a move's average on a scale that runs from the worst
-average the search had met so far, which counts as 0, to the best, which counts
-as 1. Before simulation 33 these were −102.63, the result of the Szechwan
+**The value term** places an action's average on a scale that runs from the
+worst average the search had met so far, which counts as 0, to the best, which
+counts as 1. Before simulation 33 these were −102.63, the result of the Szechwan
 attack's one simulation, and −101.16, the result of simulation 20, deep in the
-attack's continuation. (A move that only one simulation has tried has that simulation's
-result as its average.) The attack's average sat 77% of the way up:
+attack's continuation. (An action that only one simulation has tried has that
+simulation's result as its average.) The attack's average sat 77% of the way up:
 
 $$
 \frac{-101.50 - (-102.63)}{-101.16 - (-102.63)} = \frac{1.13}{1.47} \approx 0.77
 $$
 
-The other moves' averages lay 0 to 0.37 points above the worst, 0 to 25% of the
-way up. The attack's lead over the next best move, Tsinghai, was 0.76 points:
+The other actions' averages lay 0 to 0.37 points above the worst, 0 to 25% of the
+way up. The attack's lead over the next best action, Tsinghai, was 0.76 points:
 small next to final scores in the tens or hundreds, but the results this search
 had seen spanned only 1.47 points, so on its scale the lead was large.
 
-**The second term** was small for the attack, because it had already been tried
-18 times:
+**The exploration term** was small for the attack, because it had already been
+tried 18 times:
 
 $$
 1.5 \times 0.085 \times \frac{\sqrt{32 + 1}}{18 + 1} \approx 0.04
 $$
 
 Szechwan's was 0.76: it had been tried once, and the noise had raised its prior
-to 0.177. The attack's score, 0.81, still beat Szechwan's 0.76, so simulation 33
-began with the attack. Five of simulations 15 to 51, numbers 16, 32, 38, 42 and
-51, began with another move, whose second term outweighed the attack's lead at
-that moment.
+to 0.177. The attack's PUCT score, 0.81, still beat Szechwan's 0.76, so
+simulation 33 began with the attack. Five of simulations 15 to 51, numbers 16,
+32, 38, 42 and 51, began with another action, whose exploration term outweighed
+the attack's lead at that moment.
 
-**Simulation 53**, one of the attack's, went 16 steps deep, to the depth limit,
-and reached a new position where Japan decides. So the Axis network rated it, the
-only one of the search's 64 stops rated by that network alone, and it put the
-Comintern at −106.02, far below anything before. Five of the attack's simulations
-reached the depth limit: 44, 49, 50, 52 and 53. The low value says more about
-the network than the position: simulations 49 and 50 stopped at chance events,
-which all three networks rate together
+**Simulation 53**, one of the attack's, played 16 actions and dice rolls, to the
+depth limit, and reached a new state where Japan decides. So the Axis network
+rated it, the only one of the search's 64 stops rated by that network alone, and
+it put the Comintern at −106.02, far below anything before. Five of the attack's
+simulations reached the depth limit: 44, 49, 50, 52 and 53. The low value says
+more about the network than the state: simulations 49 and 50 stopped at chance
+events, which all three networks rate together
 ([section 4.7](#47-more-detail-on-the-search)), and there the Axis network gave
 the Comintern about 5 points less than the Comintern's own network did
 ([record](../archive/records/depth_limit_2026_11_09.md#simulation-53-at-decision-612)).
 The bottom of the scale, at −102.64 since simulation 38 tried Szechwan again,
-moved to −106.02, so all five first terms
-crowded between 0.70 and 0.90, and the second terms decided: 0.025 for the
-attack after 36 simulations, 0.37 to 0.65 for the others. Simulations 54 to 64
-all began with the other moves. So the attack ended with 36 of the 64, although
-the exploration noise had lowered its prior from 0.10 to 0.085.
+moved to −106.02, so all five value terms crowded between 0.70 and 0.90, and the
+exploration terms decided: 0.025 for the attack after 36 simulations, 0.37 to
+0.65 for the others. Simulations 54 to 64 all began with the other actions. So
+the attack ended with 36 of the 64, although the exploration noise had lowered
+its prior from 0.10 to 0.085.
 
-**The other moves shared what was left, by prior.** Their simulations scored
-about the same, −102.3 to −102.5 on average, so only the second term of the
-score told them apart. That term grows with the prior, so the remaining 28
-simulations went to them roughly in proportion to their priors after the
-noise, which left each with about half that prior:
+**The other actions shared what was left, by prior.** Their simulations scored
+about the same, −102.3 to −102.5 on average, so only the exploration term told
+them apart. That term grows with the prior, so the remaining 28 simulations went
+to them roughly in proportion to their priors after the noise, which left each
+with a visit share of about half that prior:
 
-| Move | Network's probability | Prior after noise | Visits if the 28 went exactly by that prior | Visits | Share |
+| Action | Network's probability | Prior after noise | Visits if the 28 went exactly by that prior | Visits | Visit share |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Shensi → Suiyuan | 0.10 | 0.07 | 2.2 | 2 | 0.03 |
 | Shensi → Szechwan | 0.09 | 0.18 | 5.4 | 5 | 0.08 |
@@ -409,32 +430,33 @@ back near the network's numbers; Suiyuan's fell to a third, but only from 0.10
 to 0.03. Their agreement is a coincidence of small numbers, not the search
 confirming the network: it found no difference among them.
 
-The attack on Hopeh ended with a share of 0.56. The move played was drawn from
-the shares, and it was the attack.
+The attack on Hopeh ended with a visit share of 0.56. The action played was drawn
+from the visit shares, and it was the attack.
 
 ### 4.7 More detail on the search
 
-**Depth** is how many steps a simulation took from the current position before it
-stopped, counting moves and dice rolls. The *depth limit* is the most steps a
-simulation may take: 16 in current runs (`--max-depth 16` in the training command,
+**Simulation depth** is how many actions and dice rolls a simulation played from
+the root before it stopped. The *depth limit* is the greatest simulation depth
+allowed: 16 in current runs (`--max-depth 16` in the training command,
 `MctsConfig.max_depth` in the code; held-out evaluation, section 10, takes its
-own, 4 unless set). After its 16th step a simulation stops wherever it is, even at
-a position the tree already holds, and uses an estimate of that position:
+own, 4 unless set). After its 16th action or dice roll a simulation stops wherever
+it is, even at a state the tree already holds, and uses an estimate of that
+state:
 
-| What the 16th step reached | What the simulation uses |
+| What the 16th action or dice roll reached | What the simulation uses |
 | --- | --- |
-| A decision no simulation has asked the network about | The deciding alliance's network's value, as at any new position, so the limit changes nothing |
+| A decision no simulation has asked the network about | The deciding alliance's network's value, as at any new state, so the limit changes nothing |
 | A decision asked about before | The value its network gave it then; nothing new joins the tree |
 | A chance event | The average of the three networks' values, since no alliance decides there |
 
 **Why there is a limit.** It is as old as the search (commit `6480d5b`, 23
 October). That first version had nothing else to end a simulation caught in a
-loop: some sequences of moves could bring the game back to exactly a position
-already on the simulation's path, and on such a loop every position is already in
-the tree, so the rule to stop at a new position never fires. Two hours later the
+loop: some sequences of actions could bring the game back to exactly a state
+already on the simulation's path, and on such a loop every state is already in
+the tree, so the rule to stop at a new state never fires. Two hours later the
 search began to stop at such a repetition (item 5 of the list in section 4.2,
 commit `47eb3d6`). Since then a simulation ends without the limit too: it never
-repeats a position, it stops at the first decision no simulation has asked the
+repeats a state, it stops at the first decision no simulation has asked the
 network about, and each simulation adds at most one such decision to the tree, so
 no walk can outrun what earlier simulations added. What the limit does now is cap
 how far ahead a search can look along one continuation. Like the other learning
@@ -442,90 +464,90 @@ settings, 16 is the value of the 2 November speed test (section 9.2), not a tune
 one.
 
 **How much it matters** ([record](../archive/records/depth_limit_2026_11_09.md)). A
-replay of the game of decision 612, with the networks after one update, ran
-68,800 simulations in 1,075 searches: 41% stopped after one step, 90% within five
-and 18 at the limit, in 10 searches, all at decisions with two to five legal
-moves, where the simulations crowd into few continuations; none returned to a
-position
-already on its path. Nine of the 18 had reached a new position and would have
-stopped there anyway; eight stopped at a chance event and one at a known
-decision. Searched again without the limit, those ten positions' deepest
-simulations took 16 to 19 steps; at five of them 1 to 6 of the 64 visits moved to
-other moves, and the most-visited move stayed the same at all ten. So in this
-game the limit hardly mattered. At the eight chance events, though, the three
-networks' values for the same position differed by 2.5 to 17 points, more than a
-search's moves usually differ;
+replay of the game of decision 612, with the networks after one network update,
+ran 68,800 simulations in 1,075 searches: 41% stopped at depth 1, 90% within
+depth 5 and 18 at the limit, in 10 searches, all at decisions with two to five
+legal actions, where the simulations crowd into few continuations; none returned
+to a state already on its path. Nine of the 18 had reached a new state and would
+have stopped there anyway; eight stopped at a chance event and one at a known
+decision. Searched again without the limit, those ten states' deepest
+simulations reached depths of 16 to 19; at five of them 1 to 6 of the 64 visits
+moved to other actions, and the most-visited action stayed the same at all ten.
+So in this game the limit hardly mattered. At the eight chance events, though,
+the three networks' values for the same state differed by 2.5 to 17 points, more
+than a search's actions usually differ;
 [section 11](#one-network-per-alliance-or-one-shared-network) takes that up.
 Better-trained networks may crowd the simulations into fewer continuations and
-meet the
-limit more often; that has not been measured.
+meet the limit more often; that has not been measured.
 
-**What the search remembers.** The tree holds, for every position the search has
-met, identified by its planning key, the moves tried there with their visit
-counts, value totals and priors (`Node` and `Edge`), and a saved copy of the game
-at that position (`Node.game`). A simulation walks the tree on these saved
-positions. Following a move already played from a position needs only the tree:
-the engine rolls no dice inside a move, so a move from a position always reaches
-the same position. The simulation copies a saved position only to play a move no
-simulation has played from there yet, or to roll dice. In the toy example,
-simulation 4 follows A to RA in the tree alone, copies the saved RA and plays only
-x.
+**What the search remembers.** The tree holds, for every node, identified by its
+state's planning key, the actions tried there with their visit counts, value
+totals and priors (`Node` and `Edge`), and a saved copy of the game at that state
+(`Node.game`). A simulation walks the tree on these saved states. Following an
+action already played from a state needs only the tree: the engine rolls no dice
+inside an action, so an action from a state always reaches the same state. The
+simulation copies a saved state only to play an action no simulation has played
+from there yet, or to roll dice. In the toy example, simulation 4 follows A to
+RA in the tree alone, copies the saved RA and plays only x.
 
 **The dice.** Each simulation rolls its own dice, from a stream seeded per
-simulation, so one move can lead to different outcomes in different simulations,
-and the tree keeps a branch per outcome; the real game's dice are untouched.
-Each copy a simulation makes continues that simulation's stream where its last
-copy left it (`clone_for_search_continuing`), so the dice come out exactly as if
-the simulation had played its whole path on one copy.
+simulation, so one action can lead to different outcomes in different
+simulations, and the tree keeps a branch per outcome; the real game's dice are
+untouched. Each copy a simulation makes continues that simulation's stream where
+its last copy left it (`clone_for_search_continuing`), so the dice come out
+exactly as if the simulation had played its whole path on one copy.
 
 **A search at a larger decision**
-([measurements](../archive/records/search_replays_2026_11_04.md)). At a round-5 Japanese
-Combat Movement decision with 24 legal moves, the network was asked 65 times: once
-for the current position and once per simulation. 24 simulations, all among the
-first 31, each tried a different one of the 24 moves and stopped after one step.
-The other 40 went deeper, 37 of them through two moves, which ended with 27 and 12
-of the 64 visits: 21 stopped after two steps and the rest after three to nine. The
-deepest, nine steps, chose to end Combat Movement and followed positions earlier
-simulations had evaluated: the start of a battle, a retreat, a retreating unit and
-the next battle, with four dice rolls on the way. The 64 simulations together
-played 57 moves and 38 dice rolls, and the tree kept 77 positions. At a decision
-with 104 legal moves, 55 of the 64 simulations stopped after one step.
+([measurements](../archive/records/search_replays_2026_11_04.md)). At a game-round-5
+Japanese Combat Movement decision with 24 legal actions, the network was asked 65
+times: once for the root and once per simulation. 24 simulations, all among the
+first 31, each tried a different one of the 24 actions and stopped at depth 1.
+The other 40 went deeper, 37 of them through two actions, which ended with 27 and
+12 of the 64 visits: 21 stopped at depth 2 and the rest at depths of three to
+nine. The deepest, at depth nine, chose to end Combat Movement and followed
+states earlier simulations had evaluated: the start of a battle, a retreat, a
+retreating unit and the next battle, with four dice rolls on the way. The 64
+simulations together played 57 actions and 38 dice rolls, and the tree kept 77
+nodes. At a decision with 104 legal actions, 55 of the 64 simulations stopped at
+depth 1.
 
-**What the copies cost and save.** Every position the search reaches still comes
+**What the copies cost and save.** Every state the search reaches still comes
 from the real rules, played by the engine. A saved copy takes about 144 KB, so
 that tree held about 11 MB; each tree is dropped after its decision. Until
-4 November the tree kept no positions, and every simulation copied the current
-position and played its whole path again: 123 moves instead of 57 in the example,
-and about half of the time the game threads (section 9.2) spent not waiting for
-the network
-([measurements](../archive/records/search_replays_2026_11_04.md)). Saving copies gave
-identical search results on 151 real positions and played 59% fewer moves. In a
-matched training batch it raised games per hour while playing from 152 to 184,
-for 0.5 GB more peak memory ([record](../archive/records/search_copies_2026_11_04.md)).
+4 November the tree kept no states, and every simulation copied the root and
+played its whole path again: 123 actions instead of 57 in the example, and about
+half of the time the game threads (section 9.2) spent not waiting for the network
+([measurements](../archive/records/search_replays_2026_11_04.md)). Saving copies
+gave identical search results on 151 real states and played 59% fewer actions.
+In a matched training iteration it raised games per hour while playing from 152
+to 184, for 0.5 GB more peak memory
+([record](../archive/records/search_copies_2026_11_04.md)).
 
 ## 5. How a decision becomes numbers
 
 A network computes with numbers, so every decision it is asked about is first
 turned into numbers: the network's *input*. The engine's encoder
 (`src/zone_encoding.cpp`) builds it once per decision. Search copies of the same
-position share it, and a training sample stores it (section 7).
+state share it, and a training sample stores it (section 7).
 
-### 5.1 Questions and answers
+### 5.1 Features and feature values
 
-**A question** is a numbered slot with one fixed meaning, such as "how many CCP
-mountain infantry are in this zone?". Its name, here
+**A feature** is a numbered input slot with one fixed meaning, such as "how many
+CCP mountain infantry are in this zone?". Its name, here
 `units:ccp:mountain_infantry`, is a readable label for that meaning; the network
-only sees the number. A name is built as `family:part:part`. The *family* says
-what kind of fact it is, `units` being how many units of a nation and type are
-somewhere, and the parts say which nation, which unit type, which zone and so on.
+only sees the number. A name is built as `family:part:part`. The *feature
+family* says what kind of fact it is, `units` being how many units of a nation
+and type are somewhere, and the parts say which nation, which unit type, which
+zone and so on. The code names a feature a *column* (`zone_columns`), from the
+feature matrices of section 5.3.
 
-**An answer** is a whole number: a count ("how many?"), 1 for "yes", or a value
-such as the round. Almost every answer is 0, so only the non-zero answers are
-stored.
+**A feature value** is a whole number: a count ("how many?"), 1 for "yes", or a
+number such as the game round. Almost every feature value is 0, so only the
+non-zero feature values are stored.
 
-These are all the non-zero answers of the zone Shensi at decision 612:
+These are all the non-zero feature values of the zone Shensi at decision 612:
 
-| Question | Answer | Meaning |
+| Feature | Feature value | Meaning |
 | --- | ---: | --- |
 | `possessor:ccp` | 1 | the CCP holds Shensi |
 | `turn_start_possessor:ccp` | 1 | and held it when the turn began |
@@ -537,49 +559,53 @@ These are all the non-zero answers of the zone Shensi at decision 612:
 | `unit_stat:comintern:mountain_infantry:move_1` | 1 | ... with 1 movement point left |
 | `rail_to:land_china_hopeh` | 1 | a railroad runs from here to Hopeh |
 
-Shensi's other 42,523 zone questions have the answer 0. Hopeh, next door, has 28
-non-zero answers: the KMT holds it and is building a fortification and a major
-shipyard there, and none of its answers says a unit is there.
+Shensi's other 42,523 zone features have the value 0. Hopeh, next door, has 28
+non-zero feature values: the KMT holds it and is building a fortification and a
+major shipyard there, and none of its features says a unit is there.
 
-### 5.2 Three parts: the board, the position and the moves
+### 5.2 Three parts: zone features, global features and action features
 
 The input for one decision has three parts:
 
-1. **The board:** each of the 37 zones (31 land, 6 sea) answers the same list of
-   42,532 zone questions, such as `units:ccp:mountain_infantry`.
-2. **The position as a whole:** one list of 4,076 position questions, such as the
-   round, the phase, whose turn it is, treasuries and wars.
-3. **Each legal move:** every move on the menu answers the same list of 12,627
-   move questions about itself, such as which kind of move it is, which unit it
-   moves and which zones it names.
+1. **The zones:** each of the 37 zones of the board (31 land, 6 sea) gives values
+   to the same list of 42,532 *zone features*, such as
+   `units:ccp:mountain_infantry`.
+2. **The state as a whole:** one list of 4,076 *global features*, such as the
+   game round, the phase, whose turn it is, treasuries and wars.
+3. **Each legal action:** every legal action gives values to the same list of
+   12,627 *action features* about itself, such as which kind of action it is,
+   which unit it moves and which zones it names.
 
-At decision 612 the board has 840 non-zero answers, from 2 in Szechwan to 86 in
-sea zone P14, the position 176, and the moves 80: 19 for each attack and 4 for
-ending the phase.
+At decision 612 the zones have 840 non-zero feature values, from 2 in Szechwan to
+86 in sea zone P14, the global features 176, and the legal actions 80: 19 for
+each attack and 4 for ending the phase.
 
-### 5.3 The input as grids of answers
+### 5.3 The input as feature matrices
 
-Picture each part as a grid of answers: the board as one line per zone and one
-column per zone question, the position as one line, and the moves as one line per
-legal move. That is why questions are also called *columns*. Almost every cell
-is 0, and only the non-zero cells are stored.
+Picture each part as a *feature matrix*: the zones' as one row per zone and one
+column per zone feature, the global features' as a single row, and the actions'
+as one row per legal action. One row of a feature matrix, all the feature values
+of one zone, of the state as a whole or of one legal action, is a *feature
+vector*. Almost every entry is 0, and only the non-zero entries are stored.
 
-![Two grids of real answers from decision 612. The board: one line per zone, one column per zone question; shown are Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and 8 of the 42,532 columns. Shensi answers 1 to possessor:ccp, units:ccp:militia, units:ccp:mountain_infantry and rail_to:land_china_hopeh; Hopeh 1 to possessor:kmt and project:kmt:fortification; Suiyuan 1 to possessor:kmt and 3 to units:kmt:militia; Szechwan 1 to possessor:kmt; Tsinghai 1 to possessor:kmt, 1 to units:kmt:militia and 2 to units:kmt:infantry; every other cell shown is 0. In all, Shensi has 9 non-zero answers, Hopeh 28, Suiyuan 12, Szechwan 2 and Tsinghai 13, and the 37 zones 840. The position: one line of 4,076 questions, with round 5, completed_rounds 4, rounds_left 7, phase:combat_movement 1, turn_nation:ccp 1, turn_nation:japan 0 and phase:noncombat_movement 0; 176 non-zero answers in all.](figures/answer_grid.svg)
+![Two feature matrices of real feature values from decision 612. The zone features: one row per zone, one column per zone feature; shown are Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and 8 of the 42,532 columns. Shensi has the value 1 for possessor:ccp, units:ccp:militia, units:ccp:mountain_infantry and rail_to:land_china_hopeh; Hopeh 1 for possessor:kmt and project:kmt:fortification; Suiyuan 1 for possessor:kmt and 3 for units:kmt:militia; Szechwan 1 for possessor:kmt; Tsinghai 1 for possessor:kmt, 1 for units:kmt:militia and 2 for units:kmt:infantry; every other entry shown is 0. In all, Shensi has 9 non-zero feature values, Hopeh 28, Suiyuan 12, Szechwan 2 and Tsinghai 13, and the 37 zones 840. The global features: one row of 4,076 features, with round 5, completed_rounds 4, rounds_left 7, phase:combat_movement 1, turn_nation:ccp 1, turn_nation:japan 0 and phase:noncombat_movement 0; 176 non-zero feature values in all.](figures/feature_matrices.svg)
 
-A line of a grid holds one zone's, the position's or one move's answers. In the
-usual picture of a neural network, the lines are its input layer, which the
-network's first layer reads ([section 6.3](#63-the-first-layer-rows-and-tables)).
-A line is not what section 6 calls a row: a row holds learned numbers.
+A feature vector holds one zone's, the state's global or one legal action's
+feature values. In the usual picture of a neural network, the feature vectors
+are its input layer, which the network's embedding layer reads
+([section 6.3](#63-the-embedding-layer-embeddings-and-embedding-tables)).
+A feature vector is input; it is not what section 6 names an embedding, which
+holds learned numbers.
 
-### 5.4 A move's answers, and the zones it is linked to
+### 5.4 An action's features, and its zones
 
-![A grid of real answers from decision 612's five legal moves, one line per move, with 10 of the 12,627 move columns. Each of the four attacks answers 1 to kind:movement_route, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path:land_china_shensi, the path column of its own destination and true:combat, and has 19 non-zero answers in all; ending the phase answers 1 to kind:end_phase and has 4. On the right, the links: each attack starts from Shensi and acts on its destination; ending the phase links to no zone. In all 80 non-zero answers.](figures/move_answers.svg)
+![A feature matrix of real feature values from decision 612's five legal actions, one row per action, with 10 of the 12,627 action-feature columns. Each of the four attacks has the value 1 for kind:movement_route, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path:land_china_shensi, the path column of its own destination and true:combat, and has 19 non-zero feature values in all; ending the phase has the value 1 for kind:end_phase and has 4. On the right, the action's zones: each attack has Shensi as its source zone and its destination as its target zone; ending the phase names no zone. In all 80 non-zero feature values.](figures/action_features.svg)
 
-These are all 19 answers of the attack on Hopeh:
+These are all 19 feature values of the attack on Hopeh:
 
-| Question | Answer | Meaning |
+| Feature | Feature value | Meaning |
 | --- | ---: | --- |
-| `schedule:play`, `player:comintern`, `nation:ccp` | 1 each | an ordinary move in play, the Comintern choosing for the CCP |
+| `schedule:play`, `player:comintern`, `nation:ccp` | 1 each | an ordinary action in play, the Comintern choosing for the CCP |
 | `kind:movement_route` | 1 | a movement |
 | `parameter:combat`, `parameter:mode`, `parameter:path`, `parameter:unit` | 1 each | it has these four details |
 | `unit:0_source:ccp:mountain_infantry` | 1 | the unit that acts is a CCP mountain infantry |
@@ -593,94 +619,100 @@ These are all 19 answers of the attack on Hopeh:
 | `value:mode:ordinary` | 1 | ordinary movement |
 | `true:combat` | 1 | it starts a combat |
 
-Ending the phase has only the four answers every move has: `schedule:play`,
-`player:comintern`, `nation:ccp` and `kind:end_phase`.
+Ending the phase has only the four feature values every action has:
+`schedule:play`, `player:comintern`, `nation:ccp` and `kind:end_phase`.
 
-**Zones in a move's questions.** A board answer belongs to its zone's line, so a
-zone question never names its zone. A move involves several zones, so a move's
-answer about a zone names it inside the question, as in
+**Zones in an action's features.** A zone feature belongs to its zone's feature
+vector, so a zone feature never names its zone. An action involves several
+zones, so an action feature about a zone names it inside the feature, as in
 `zone:1_path:land_china_hopeh`. The parts `0_source` and `1_path` are *roles*:
-they say whether a detail names what acts, the route, or what the move acts on
+they say whether a detail names what acts, the route, or what the action acts on
 ([details](network_input.md#roles)).
 
-**Links.** Each move is also linked to three places on the board: the zone it
-starts from, the zone it acts on and its path's zones. The attack on Hopeh starts
-from Shensi, acts on Hopeh and travels through Shensi and Hopeh; ending the phase
-names no zone. Through the links the network reads those zones' descriptions
-together with the move's own answers
-([section 6.8](#68-the-move-probabilities)).
+**An action's zones.** Each action also names up to three places on the board:
+its *source zone*, the zone it starts from; its *target zone*, the zone it acts
+on; and its *path zones* (`action_source`, `action_target` and `path_zone` in the
+code). The attack on Hopeh has Shensi as its source zone, Hopeh as its target
+zone and Shensi and Hopeh as its path zones; ending the phase names no zone.
+Through its zones the network reads those zones' descriptions together with the
+action's own feature values
+([section 6.8](#68-the-action-probabilities)).
 
-### 5.5 Facts that never change
+### 5.5 Static features
 
-Some facts never change during a game, so they come with the layout once, not
-with each decision:
+Some facts never change during a game, so they come with the input layout once,
+not with each decision. They are the *static features*:
 
-- **39 facts per zone,** such as terrain, production value, capitals, victory
-  cities, original owners and home countries. Shensi's: it is land, worth 2 IPP,
-  mountainous, originally the CCP's, and part of the CCP's and the KMT's home
-  countries; its other 33 facts are 0.
-- **22 facts per border.** The map has 80 borders, each counted in both
+- **39 static features per zone,** such as terrain, production value, capitals,
+  victory cities, original owners and home countries. Shensi's: it is land, worth
+  2 IPP, mountainous, originally the CCP's, and part of the CCP's and the KMT's
+  home countries; its other 33 static features are 0.
+- **22 static features per border.** The map has 80 borders, each counted in both
   directions: 160 *directed borders*. The border from Shensi to Hopeh is land to
   land, crosses a river, carries a railway connection and is passable.
 
 The *layout version*, now `campaign-zone-v1-9e192fe5c085f13e`, is a hash of every
-question name and every fixed fact. A network refuses inputs of another layout,
-and a run cannot resume across a layout change.
+feature name and every static feature. A network refuses inputs of another
+layout, and a training run cannot resume across a layout change.
 
 ### 5.6 More detail: how the encoder builds the input
 
 The encoder reads the engine's memory directly; no text is written or parsed.
 The engine holds zones, nations, unit types, facility types and technologies
-as numbers, and each one's number is its column in the encoder's list of its
-kind ([names held as numbers](../engine/names.md)). Marks are numbered too, but the encoder asks
-about them through its own lists of their names. Everything else it identifies
-by name (battle notes, a move's details), so the encoder translates those
-names into question numbers through fixed lists. Encoding costs about 0.17 ms per decision, about 4% of a
-game process's work.
+as numbers, and each one's number is its index in the encoder's list of its
+kind ([names held as numbers](../engine/names.md)). Marks are numbered too, but
+the encoder asks about them through its own lists of their names. Everything
+else it identifies by name (battle notes, an action's details), so the encoder
+translates those names into feature numbers through fixed lists. Encoding costs
+about 0.17 ms per decision, about 4% of a game process's work.
 
-[The network's input](network_input.md) explains the families, the roles, how
-each kind of detail becomes answers, how the lists of names are kept complete,
-which questions were removed as impossible, and why the engine works with names.
+[The network's input](network_input.md) explains the feature families, the roles,
+how each kind of detail becomes feature values, how the lists of names are kept
+complete, which features were removed as impossible, and why the engine works
+with names.
 
 ## 6. Inside a network, brick by brick
 
 This section opens the box of [section 3](#3-what-a-network-gives-at-a-decision).
 It builds a network from small parts and shows each on decision 612, with the
-Comintern's network after its first update, the network that faced that decision.
-A network's size is written width × message layers, both explained below: 64×2
-here and in the Mac profile's measurements (section 9.2), 256×8 in the night run
-of 2 November.
+Comintern's network after its first network update, the network that faced that
+decision. A network's size is written width × number of message-passing layers,
+both explained below: 64×2 here and in the Mac profile's measurements
+(section 9.2), 256×8 in the night run of 2 November.
 Which plays better, and how big a network this game needs, is
 [open](#how-big-should-the-network-and-the-search-be).
 
-In the usual picture of a neural network, the lines of answers of section 5 are
-its *input layer*, and learned layers follow. Section 6.2 defines a learned
-layer, and section 6.3 shows the first one, the layer that reads the answers.
-Nothing else stands between the answers and the network. The first layer turns
-each line into a vector of its own, and section 6.3 ends with a plan of how the
-later layers combine those vectors; section 6.9 draws the whole network.
+In the usual picture of a neural network, the feature vectors of section 5 are
+its *input layer*, and linear layers follow. Section 6.2 defines a linear layer,
+and section 6.3 shows the first one, the *embedding layer*, which reads the
+feature values. Nothing else stands between the feature values and the network.
+The embedding layer turns each feature vector into a vector of its own, and
+section 6.3 ends with a plan of how the later layers combine those vectors;
+section 6.9 draws the whole network.
 
 ### 6.1 Vectors
 
-A *vector* is a list of numbers. Inside the network, every zone, the position as a
-whole and every legal move is described by a vector of 64 numbers, the network's
-*width*. At decision 612, Shensi's vector begins −0.294, 1.957, −1.422, −0.203,
-and goes on to 64 numbers ([section 6.4](#64-a-zones-vector) derives them).
+A *vector* is a list of numbers. Inside the network, every zone, the state as a
+whole and every legal action is described by a vector of 64 numbers, the
+network's *width*. At decision 612, Shensi's vector begins −0.294, 1.957,
+−1.422, −0.203, and goes on to 64 numbers ([section 6.4](#64-a-zones-vector)
+derives them).
 
-A vector is the network's own description of its zone, position or move: no
-number in it has a meaning chosen by hand. The network computes every vector from
-the answers of section 5 and its learned numbers, and training (section 8) adjusts
-the learned numbers until the vectors are useful for predicting values and good
-moves.
+A vector is the network's own description of its zone, of the state or of its
+action: no number in it has a meaning chosen by hand. The network computes every
+vector from the feature values of section 5 and its parameters, and training
+(section 8) adjusts the parameters until the vectors are useful for predicting
+values and good actions.
 
-### 6.2 Learned layers
+### 6.2 Linear layers
 
-A *learned layer* turns a vector of $n$ numbers into a vector of $m$ numbers: it
+A *linear layer* turns a vector of $n$ numbers into a vector of $m$ numbers: it
 multiplies it by a learned matrix of $m \times n$ numbers, its *weights*, adds a
-learned vector of $m$ numbers, its *bias*, and most layers then bend each result
-with a fixed curve, GELU. A toy layer with 3 inputs, 1, 2 and 3, and 2 outputs,
-$y_1$ and $y_2$, whose weights are 0.5, 0.2 and 0.1, with bias 0.1, for the first
-output, and 0.1, 0.3 and −0.4, with bias 0, for the second:
+learned vector of $m$ numbers, its *bias*, and most linear layers are then
+followed by a fixed *activation function*, GELU, which bends each result. A toy
+layer with 3 inputs, 1, 2 and 3, and 2 outputs, $y_1$ and $y_2$, whose weights
+are 0.5, 0.2 and 0.1, with bias 0.1, for the first output, and 0.1, 0.3 and
+−0.4, with bias 0, for the second:
 
 $$
 y_1 = \operatorname{GELU}(0.5 \times 1 + 0.2 \times 2 + 0.1 \times 3 + 0.1) = \operatorname{GELU}(1.3) \approx 1.17
@@ -692,28 +724,32 @@ $$
 
 The figure draws this layer the usual way, as Sutton and Barto do in
 *Reinforcement Learning: An Introduction* (2nd edition, section 9.7): each input
-and each output is a *unit*, every input unit has a *link* to every output unit,
-and every link carries one weight.
+and each output is a *neuron* (the book names it a unit), every input neuron has a
+*connection* to every output neuron, and every connection carries one weight.
 
-![The toy layer drawn as units and links. Left: three input units hold 1, 2 and 3, and two output units are y1 and y2. Every input is linked to every output, and each link carries one learned weight: from input 1, 0.5 to y1 and 0.1 to y2; from input 2, 0.2 and 0.3; from input 3, 0.1 and −0.4. With the biases 0.1 and 0, y1 adds up to 1.3, which GELU turns into 1.17, and y2 to −0.5, which becomes −0.15. Right: the same layer read input by input. The weights that leave one input are its row: input 1's row is (0.5, 0.1), input 2's (0.2, 0.3) and input 3's (0.1, −0.4). 1 × (0.5, 0.1) + 2 × (0.2, 0.3) + 3 × (0.1, −0.4) + (0.1, 0) = (1.3, −0.5) before the curve. An input of 0 adds nothing, so its row can be skipped.](figures/learned_layer.svg)
+![The toy layer drawn as neurons and connections. Left: three input neurons hold 1, 2 and 3, and two output neurons are y1 and y2. Every input is connected to every output, and each connection carries one learned weight: from input 1, 0.5 to y1 and 0.1 to y2; from input 2, 0.2 and 0.3; from input 3, 0.1 and −0.4. With the biases 0.1 and 0, y1 adds up to 1.3, which GELU turns into 1.17, and y2 to −0.5, which becomes −0.15. Right: the same layer read input by input. The weights that leave one input are its embedding: input 1's embedding is (0.5, 0.1), input 2's (0.2, 0.3) and input 3's (0.1, −0.4). 1 × (0.5, 0.1) + 2 × (0.2, 0.3) + 3 × (0.1, −0.4) + (0.1, 0) = (1.3, −0.5) before the activation function. An input of 0 adds nothing, so its embedding can be skipped.](figures/linear_layer.svg)
 
-**A row: the weights that leave one input.** Read by input instead of by output,
-the layer is a sum of rows. The weights on the links that leave one input, one
-for each output, are that input's *row*: input 1's row is (0.5, 0.1). Before the
-curve, the outputs are each input times its row, added up, plus the bias:
+**An embedding: the weights that leave one input.** Read by input instead of by
+output, the layer is a sum of vectors, one per input. The weights on the
+connections that leave one input neuron, one for each output, form that input's
+*embedding*: input 1's embedding is (0.5, 0.1). (The name is the usual one where
+the inputs are features that are mostly 0, as in section 6.3.) Before the
+activation function, the outputs are each input times its embedding, added up,
+plus the bias:
 
 $$
 (1.3, -0.5) = 1 \times (0.5, 0.1) + 2 \times (0.2, 0.3) + 3 \times (0.1, -0.4) + (0.1, 0)
 $$
 
-An input of 0 adds nothing, so a layer can skip the rows of its zero inputs. The
-network's first layer, in section 6.3, has almost only such inputs.
+An input of 0 adds nothing, so a layer can skip the embeddings of its zero
+inputs. The network's embedding layer, in section 6.3, has almost only such
+inputs.
 
-**The curve.** GELU multiplies a number by the chance that a standard normal
-variable falls below it, $\operatorname{GELU}(x) = x \Phi(x)$: large positive
-numbers pass almost unchanged and negative ones are squashed toward 0. Without
-such curves any stack of layers would amount to a single multiplication and could
-only add effects up.
+**The activation function.** GELU multiplies a number by the chance that a
+standard normal variable falls below it, $\operatorname{GELU}(x) = x \Phi(x)$:
+large positive numbers pass almost unchanged and negative ones are squashed
+toward 0. Without such functions any stack of linear layers would amount to a
+single multiplication and could only add effects up.
 
 A layer's weights and biases are parameters, adjusted by training (section 8).
 When a layer reads several vectors, they are first joined end to end into one:
@@ -723,76 +759,82 @@ three vectors of 64 numbers make one of 192.
 spread (standard deviation) of 1, then multiplies each by a learned number and
 adds another. It keeps vectors on a common scale, whatever went into them.
 
-### 6.3 The first layer: rows and tables
+### 6.3 The embedding layer: embeddings and embedding tables
 
-**The input layer.** A zone's line of answers (section 5.3) is the input layer for
-that zone: one input unit for each of the 42,532 zone questions. An input unit
-holds its answer after a fixed scaling, explained below, which turns an answer of
-1 into 0.69 and leaves 0 at 0. The first learned layer links every input unit to
-each of 64 output units, the 64 places of a vector; as the code computes it, it
-has no bias and no curve. Its 64 outputs are the first part of the zone's vector,
-to which section 6.4 adds two more.
+**The input layer.** A zone's feature vector (section 5.3) is the input layer for
+that zone: one input neuron for each of the 42,532 zone features. An input
+neuron holds its feature value after a fixed scaling, explained below, which
+turns a feature value of 1 into 0.69 and leaves 0 at 0. The *embedding layer*,
+the network's first linear layer, connects every input neuron to each of 64
+output neurons, the 64 places of a vector; as the code computes it, it has no
+bias and no activation function. Its 64 outputs are the first part of the zone's
+vector, to which section 6.4 adds two more.
 
-![Decision 612, the Comintern's network after one update. Left, the input layer: Shensi's line of answers, one input unit per zone question, 42,532 in all, each holding its answer after a fixed scaling, 0.69 for an answer of 1 and 0 for an answer of 0. Shown are rows 0 possessor:ccp (0.69), 1 possessor:dadao (0), 14 turn_start_possessor:ccp (0.69), 186 units:ccp:militia (0.69), 188 units:ccp:mountain_infantry (0.69), 304 units:kmt:fighter (0), 9,841 and 9,842, the Comintern militia's count and moves left (0.69 each), 9,989 and 9,991, the Comintern mountain infantry's count and moves left (0.69 each), 29,244 rail_to:land_china_hopeh (0.69) and the last, 42,531 battle_order (0). Right, the first layer: 64 output units, of which outputs 1 to 4 and 64 are shown, with −0.001, 0.137, −0.118, −0.104 and −0.073. Every input unit has a link to every output unit. The links that leave units:ccp:mountain_infantry carry its row, row 188 of the zone table, beginning 0.019, 0.001, −0.030, 0.021. Each output adds up input times weight over its 42,532 links; the inputs of 0 add nothing, so the output is 0.69 times row 0 plus 0.69 times row 14 and so on to row 29,244, and only 9 rows are fetched. In all 42,532 × 64 = 2,722,048 links, whose weights make up the zone table.](figures/first_layer.svg)
+![Decision 612, the Comintern's network after one network update. Left, the input layer: Shensi's feature vector, one input neuron per zone feature, 42,532 in all, each holding its feature value after a fixed scaling, 0.69 for a feature value of 1 and 0 for a feature value of 0. Shown are features 0 possessor:ccp (0.69), 1 possessor:dadao (0), 14 turn_start_possessor:ccp (0.69), 186 units:ccp:militia (0.69), 188 units:ccp:mountain_infantry (0.69), 304 units:kmt:fighter (0), 9,841 and 9,842, the Comintern militia's count and movement points left (0.69 each), 9,989 and 9,991, the Comintern mountain infantry's count and movement points left (0.69 each), 29,244 rail_to:land_china_hopeh (0.69) and the last, 42,531 battle_order (0). Right, the embedding layer: 64 output neurons, of which outputs 1 to 4 and 64 are shown, with −0.001, 0.137, −0.118, −0.104 and −0.073. Every input neuron has a connection to every output neuron. The connections that leave units:ccp:mountain_infantry carry its embedding, row 188 of the zone embedding table, beginning 0.019, 0.001, −0.030, 0.021. Each output adds up input times weight over its 42,532 connections; the inputs of 0 add nothing, so the output is 0.69 times embedding 0 plus 0.69 times embedding 14 and so on to embedding 29,244, and only 9 embeddings are fetched. In all 42,532 × 64 = 2,722,048 connections, whose weights make up the zone embedding table.](figures/embedding_layer.svg)
 
-**Rows and tables.** As in the toy layer, the 64 weights on the links that leave
-one input unit are that question's *row*. The first layer's weights, stored one
-row per question in question order, are a *table*. Each part of the input has its
-own first layer and so its own table:
+**Embeddings and embedding tables.** As in the toy layer, the 64 weights on the
+connections that leave one input neuron are that feature's *embedding*. The
+embedding layer's weights, stored as a matrix with one row per feature, in
+feature order, are an *embedding table*: row $q$ of the table is the embedding of
+feature $q$. Each part of the input has its own embedding layer and so its own
+embedding table:
 
-| Table | Rows | One row for each |
+| Embedding table | Embeddings | One embedding for each |
 | --- | ---: | --- |
-| Zone table | 42,532 | zone question |
-| Position table | 4,076 | position question |
-| Move table | 12,627 | move question |
+| Zone embedding table | 42,532 | zone feature |
+| Global embedding table | 4,076 | global feature |
+| Action embedding table | 12,627 | action feature |
 
-A question's number is its row's number: `units:ccp:mountain_infantry` is
-question 188 of the zone questions, and its row is row 188 of the zone table. In
-machine-learning terms a table is an *embedding table* and a row an *embedding*.
+A feature's number is its embedding's row number: `units:ccp:mountain_infantry`
+is zone feature 188, and its embedding is row 188 of the zone embedding table.
 
-**One vector per line.** A first layer reads one line at a time and gives each
-line its own 64 outputs, its own vector. At decision 612 the input has 43 lines,
-37 for the zones, one for the position and 5 for the legal moves, so the first
-layers give 43 vectors of 64 numbers: one for each zone, one for the position
-and one for each move, not one vector for the whole decision. All 37 zone lines
-go through the zone table, with the same weights for every zone, and all 5 move
-lines through the move table. In the units-and-links picture, the Shensi figure
-above is drawn once for every zone, each time with the same links. No first
-layer adds one line's answers to another's (`_bag` in
-`studies/campaign/neural.py` makes one sum per line): the vectors meet only in
-the layers after it, as the plan at the end of this section shows.
+**One vector per feature vector.** An embedding layer reads one feature vector at
+a time and gives each its own 64 outputs, its own vector. At decision 612 the
+input has 43 feature vectors, 37 for the zones, one for the global features and
+5 for the legal actions, so the embedding layers give 43 vectors of 64 numbers:
+one for each zone, one for the state as a whole and one for each legal action,
+not one vector for the whole decision. All 37 zone feature vectors go through the
+zone embedding table, with the same weights for every zone, and all 5 action
+feature vectors through the action embedding table. In the neurons-and-connections
+picture, the Shensi figure above is drawn once for every zone, each time with the
+same connections. No embedding layer adds one feature vector's values to
+another's (`_bag` in `studies/campaign/neural.py` makes one sum per feature
+vector): the vectors meet only in the layers after it, as the plan at the end of
+this section shows.
 
-![Decision 612 of the 5 November sample game. Left, the input layer: 43 lines of answers, each drawn as a bar with a tick for every non-zero answer at its column. The board has 37 zone lines of 42,532 inputs each, 840 non-zero answers in all: shown are Shensi with 9, Hopeh 28, Suiyuan 12, Szechwan 2, Tsinghai 13, 31 more zones, and sea zone P14 with 86. The position has 1 line of 4,076 inputs with 176 non-zero answers. The moves have 5 lines of 12,627 inputs each, 80 non-zero answers in all: the attacks on Hopeh, Suiyuan, Szechwan and Tsinghai with 19 each, and ending the phase with 4. Middle, the first layers: every zone line goes through the zone table, 42,532 rows of 64, the same weights for all 37 zones; the position line through the position table, 4,076 rows of 64; every move line through the move table, 12,627 rows of 64, the same weights for all 5 moves. Each line goes through on its own. Right, the outputs: one vector of 64 numbers per line, 43 in all: 37 zone vectors, 1 position vector and 5 move vectors. No first layer adds one line to another; the vectors meet only in the layers after it.](figures/first_layers.svg)
+![Decision 612 of the game of 5 November. Left, the input layer: 43 feature vectors, each drawn as a bar with a tick for every non-zero feature value at its column. The zones have 37 feature vectors of 42,532 inputs each, 840 non-zero feature values in all: shown are Shensi with 9, Hopeh 28, Suiyuan 12, Szechwan 2, Tsinghai 13, 31 more zones, and sea zone P14 with 86. The global features are 1 feature vector of 4,076 inputs with 176 non-zero feature values. The legal actions have 5 feature vectors of 12,627 inputs each, 80 non-zero feature values in all: the attacks on Hopeh, Suiyuan, Szechwan and Tsinghai with 19 each, and ending the phase with 4. Middle, the embedding layers: every zone feature vector goes through the zone embedding table, 42,532 embeddings of 64, the same weights for all 37 zones; the global feature vector through the global embedding table, 4,076 embeddings of 64; every action feature vector through the action embedding table, 12,627 embeddings of 64, the same weights for all 5 legal actions. Each feature vector goes through on its own. Right, the outputs: one vector of 64 numbers per feature vector, 43 in all: 37 zone vectors, 1 global vector and 5 action vectors. No embedding layer adds one feature vector to another; the vectors meet only in the layers after it.](figures/embedding_layers.svg)
 
-**Skipping the zeros: a column lookup.** Each output adds up all 42,532 inputs,
-each times its weight, so the 64 outputs together are the sum of every input
-times its row. An input of 0 adds nothing, and 42,523 of Shensi's 42,532 inputs
-are 0. So the network fetches only the rows of the 9 non-zero inputs, multiplies
-each by its input and adds them up. With $x_q$ for the input of question $q$ and
-$r_q$ for its row,
+**Skipping the zeros: an embedding lookup.** Each output adds up all 42,532
+inputs, each times its weight, so the 64 outputs together are the sum of every
+input times its embedding. An input of 0 adds nothing, and 42,523 of Shensi's
+42,532 inputs are 0. So the network fetches only the embeddings of the 9 non-zero
+inputs, multiplies each by its input and adds them up. With $x_q$ for the input of
+feature $q$ and $e_q$ for its embedding,
 
 $$
-\text{output of the first layer} = \sum_{q} x_q r_q
+\text{output of the embedding layer} = \sum_{q} x_q e_q
 $$
 
-where only the questions with $x_q \neq 0$ count. Multiplying Shensi's whole line
-of 42,532 inputs by the zone table, as a matrix multiplication, gives the same 64
-numbers (checked: equal to within $3 \times 10^{-8}$, float rounding), but it
-would multiply 42,523 zeros. Fetching only the rows of the answered columns is a
-*column lookup*. The network's numbers live in PyTorch, a library that keeps them
-in arrays and does their arithmetic, and the network's code works by *calls* to
-it, each applying one function to whole arrays at once
-([section 9.2](#92-running-training-on-the-mac) lists the calls of a message
-layer and what they cost). One call, `embedding_bag`, does the column lookup for
-every zone at once: it fetches each answered row, multiplies it by its input and
-adds it to its zone's sum, without first copying the fetched rows into a
-temporary array (`_bag` in `studies/campaign/neural.py`, since 12 November;
-[record](../archive/records/coordinator_lookups_2026_11_12.md)). The table view
-of the same layer, with real rows:
+where only the features with $x_q \neq 0$ count. Multiplying Shensi's whole
+feature vector of 42,532 inputs by the zone embedding table, as a matrix
+multiplication, gives the same 64 numbers (checked: equal to within
+$3 \times 10^{-8}$, float rounding), but it would multiply 42,523 zeros. Fetching
+only the embeddings of the non-zero features is an *embedding lookup*. The
+network's numbers live in PyTorch, a library that keeps them in arrays and does
+their arithmetic, and the network's code works by *PyTorch calls*, each applying
+one function to whole arrays at once
+([section 9.2](#92-running-training-on-the-mac) lists the PyTorch calls of a
+message-passing layer and what they cost). One PyTorch call, `embedding_bag`,
+does the embedding lookup for every zone at once: it fetches each embedding of a
+non-zero feature, multiplies it by its input and adds it to its zone's sum,
+without first copying the fetched embeddings into a temporary array (`_bag` in
+`studies/campaign/neural.py`, since 12 November;
+[record](../archive/records/coordinator_lookups_2026_11_12.md)). The embedding
+table's view of the same layer, with real embeddings:
 
-![Top: one row, the 64 learned numbers the Comintern's network keeps for the zone question units:ccp:mountain_infantry, row 188 of its zone table after one update, drawn as 64 coloured cells, blue for negative and red for positive numbers up to ±0.15; its first numbers are 0.019, 0.001, −0.030, 0.021, −0.007, 0.018, −0.015 and −0.028. Left: the zone table, one row per zone question, 42,532 rows of 64 numbers; shown with their row numbers are rows 0 to 3 (possessor:ccp, possessor:dadao, possessor:japan, possessor:kmt), 14 (turn_start_possessor:ccp), 186 and 188 (units:ccp:militia and units:ccp:mountain_infantry), 304 (units:kmt:fighter, still all zeros because no kept sample had a KMT fighter), 9,841, 9,842, 9,989 and 9,991 (Comintern militia and mountain infantry counts and movement points left), 29,244 (rail_to:land_china_hopeh) and the last, 42,531 (battle_order). The 9 rows Shensi's answers pick are highlighted. A fresh network's rows are all zeros; after one update 1,840 have moved. Right: Shensi's 9 answers, each 1, enter as ln 2 ≈ 0.69 each, so Shensi's vector starts as 0.69 times row 0 plus 0.69 times row 14 and so on to row 29,244; the sum's first numbers are −0.001, 0.137, −0.118 and −0.104. The network fetches only these 9 rows: Shensi's other 42,523 answers are 0.](figures/rows_and_tables.svg)
+![Top: one embedding, the 64 learned numbers the Comintern's network keeps for the zone feature units:ccp:mountain_infantry, row 188 of its zone embedding table after one network update, drawn as 64 coloured cells, blue for negative and red for positive numbers up to ±0.15; its first numbers are 0.019, 0.001, −0.030, 0.021, −0.007, 0.018, −0.015 and −0.028. Left: the zone embedding table, one row per zone feature, 42,532 embeddings of 64 numbers; shown with their row numbers are rows 0 to 3 (possessor:ccp, possessor:dadao, possessor:japan, possessor:kmt), 14 (turn_start_possessor:ccp), 186 and 188 (units:ccp:militia and units:ccp:mountain_infantry), 304 (units:kmt:fighter, still all zeros because no kept training sample had a KMT fighter), 9,841, 9,842, 9,989 and 9,991 (Comintern militia and mountain infantry counts and movement points left), 29,244 (rail_to:land_china_hopeh) and the last, 42,531 (battle_order). The 9 embeddings Shensi's feature values pick are highlighted. A fresh network's embeddings are all zeros; after one network update 1,840 have moved. Right: Shensi's 9 feature values, each 1, enter as ln 2 ≈ 0.69 each, so Shensi's vector starts as 0.69 times embedding 0 plus 0.69 times embedding 14 and so on to embedding 29,244; the sum's first numbers are −0.001, 0.137, −0.118 and −0.104. The network fetches only these 9 embeddings: Shensi's other 42,523 feature values are 0.](figures/embedding_table.svg)
 
-**The scaling of an answer.** An input unit holds not its answer $a$ but a fixed
+**Feature scaling.** An input neuron holds not its feature value $a$ but a fixed
 formula of it, written by hand, not learned (`_signed_log` in
 `studies/campaign/features.py`):
 
@@ -800,12 +842,12 @@ $$
 x = \operatorname{sign}(a) \ln(1 + |a|)
 $$
 
-where $\ln$ is the natural logarithm. Answers are counts and yes-or-no flags, so
-in practice $a \ge 0$ and the input is $\ln(1 + a)$; no answer was negative in 60
-decisions sampled from a game, and the sign only keeps the formula defined for
-negative numbers:
+where $\ln$ is the natural logarithm. Feature values are counts and yes-or-no
+flags, so in practice $a \ge 0$ and the input is $\ln(1 + a)$; no feature value
+was negative in 60 decisions drawn at random from a game, and the sign only keeps
+the formula defined for negative numbers:
 
-| Answer $a$ | Input $x$ | Compared with an answer of 1 |
+| Feature value $a$ | Input $x$ | Compared with a feature value of 1 |
 | ---: | ---: | ---: |
 | 1 | $\ln 2 \approx 0.69$ | 1 |
 | 2 | $\ln 3 \approx 1.10$ | 1.58 |
@@ -813,20 +855,20 @@ negative numbers:
 | 10 | $\ln 11 \approx 2.40$ | 3.46 |
 | 100 | $\ln 101 \approx 4.62$ | 6.66 |
 
-Larger counts matter more but not in proportion: ten militia add their row 3.46
-times as strongly as one, not ten times, so a big stack does not drown out
-everything else in its zone. That an answer of 1 counts 0.69 rather than 1 makes
-no difference, because the row it multiplies is learned and training can make it
-as large as it needs; the formula fixes only how counts compare with one another.
-Scaling inputs to comparable sizes before a network is common practice; this
-curve was chosen, not compared with others
+Larger counts matter more but not in proportion: ten militia add their embedding
+3.46 times as strongly as one, not ten times, so a big stack does not drown out
+everything else in its zone. That a feature value of 1 counts 0.69 rather than 1
+makes no difference, because the embedding it multiplies is learned and training
+can make it as large as it needs; the formula fixes only how counts compare with
+one another. Scaling inputs to comparable sizes before a network is common
+practice; this formula was chosen, not compared with others
 ([open question](#how-should-a-count-count)).
 
-**Shensi's sum, in numbers.** Each of Shensi's answers is 1, so each input is
-0.69. The first 4 of the 64 numbers of each row, from the Comintern's network
-after one update:
+**Shensi's sum, in numbers.** Each of Shensi's feature values is 1, so each input
+is 0.69. The first 4 of the 64 numbers of each embedding, from the Comintern's
+network after one network update:
 
-| Question | Its row's first 4 numbers | × 0.69 |
+| Feature | Its embedding's first 4 numbers | × 0.69 |
 | --- | --- | --- |
 | `possessor:ccp` | −0.006, −0.002, −0.028, −0.010 | −0.004, −0.002, −0.020, −0.007 |
 | `turn_start_possessor:ccp` | −0.006, −0.003, −0.027, −0.009 | −0.004, −0.002, −0.019, −0.007 |
@@ -839,53 +881,56 @@ after one update:
 | `rail_to:land_china_hopeh` | 0.008, −0.017, 0.025, 0.005 | 0.006, −0.012, 0.018, 0.003 |
 | **Sum** | | **−0.001, 0.137, −0.118, −0.104** |
 
-Two pairs of rows are identical, the militia's count and moves left, and the
-mountain infantry's `units` and `count` questions: in every sample so far these
-questions were answered together, so training moved them alike
-([section 8.5](#85-which-numbers-a-step-moves)).
+Two pairs of embeddings are identical, the militia's count and movement points left, and
+the mountain infantry's `units` and `count` features: in every training sample so
+far these features had non-zero values together, so training moved them alike
+([section 8.5](#85-which-numbers-a-training-step-moves)).
 
-**A row belongs to a question, not to a zone.** `units:ccp:mountain_infantry` has
-one row, the network's own description, in 64 numbers, of "a CCP mountain
-infantry is here", added in whichever zone that is true. No number in a row has a
-meaning chosen by hand. Nor is a row computed from the answer: it stays the same
-from position to position until training changes it, and the answer only sets how
-strongly it is added.
+**An embedding belongs to a feature, not to a zone.** `units:ccp:mountain_infantry`
+has one embedding, the network's own description, in 64 numbers, of "a CCP
+mountain infantry is here", added in whichever zone that is true. No number in an
+embedding has a meaning chosen by hand. Nor is an embedding computed from the
+feature value: it stays the same from state to state until training changes it,
+and the feature value only sets how strongly it is added.
 
-**Each of a row's numbers is one parameter,** so the zone table alone holds
-42,532 × 64 = 2,722,048 parameters, and the three tables 3.79 million of the
-network's 3.92 million.
+**Each of an embedding's numbers is one parameter,** so the zone embedding table
+alone holds 42,532 × 64 = 2,722,048 parameters, and the three embedding tables
+3.79 million of the network's 3.92 million.
 
-**Rows start at zero** (since 3 November 2026), and training moves a row only when
-it trains on samples that answer the row's question
-([section 8.5](#85-which-numbers-a-step-moves)). After the first update of the
-5 November run, 1,840 of the zone table's 42,532 rows had moved; the row of
-`units:kmt:fighter` was still all zeros, because no kept sample had a KMT fighter.
-Starting at zero means a question training has never reached adds nothing,
-instead of a random row added at full strength. In a test on a fixed set of
-saved samples it gave a slightly lower value error on samples held out of
+**Embeddings start at zero** (since 3 November 2026), and training moves an
+embedding only when it trains on training samples in which the embedding's
+feature has a non-zero value
+([section 8.5](#85-which-numbers-a-training-step-moves)). After the first network
+update of the 5 November run, 1,840 of the zone embedding table's 42,532
+embeddings had moved; the embedding of `units:kmt:fighter` was still all zeros,
+because no kept training sample had a KMT fighter. Starting at zero means a
+feature that training has never reached adds nothing, instead of a random
+embedding added at full strength. In a test on a fixed set of saved training
+samples it gave a slightly lower value error on training samples held out of
 training (0.0076 against 0.0081) and the same policy loss
 ([section 8.1](#81-the-loss)): no harm shown, not a strength gain.
 
-Computing a first layer by adding up the rows of its non-zero inputs is common
-wherever inputs are mostly 0; chess programs compute theirs the same way
+Computing an embedding layer by adding up the embeddings of its non-zero inputs
+is common wherever inputs are mostly 0; chess programs compute their first layer
+the same way
 ([section 6.10](#610-more-detail-how-other-game-networks-read-their-input)).
 
 **What the 43 vectors become.** Each of the 43 vectors so far describes one zone,
-the position or one move, from that line's answers alone. The layers after the
-first bring them together, in this order (`_forward` in
-`studies/campaign/neural.py`):
+the state as a whole or one legal action, from that feature vector alone. The
+layers after the embedding layer bring them together, in this order (`_forward`
+in `studies/campaign/neural.py`):
 
-| Step | What it reads | What it gives at decision 612 | Section |
+| Part of the network | What it reads | What it gives at decision 612 | Section |
 | --- | --- | --- | --- |
-| Zone vectors | each zone's first-layer vector, its identity vector and its fixed facts | 37 zone vectors, one per zone | [6.4](#64-a-zones-vector) |
-| Position and move vectors | the position's and each move's first-layer vector | 1 position vector and 5 move vectors | [6.5](#65-the-position-vector-and-the-move-vectors) |
-| Two message layers | each zone's vector, its neighbours' vectors along the borders and the position vector; for the position vector, itself and the average zone vector | 37 zone vectors and 1 position vector, each now informed by the others | [6.6](#66-messages-along-the-borders) |
-| Summary and values | the position vector, and the average and the largest of the 37 zone vectors | 1 summary vector, then 3 values | [6.7](#67-the-values) |
-| Move probabilities | each move vector, the vectors of the zones the move is linked to, and the summary | 5 logits, then 5 probabilities | [6.8](#68-the-move-probabilities) |
+| Zone vectors | each zone's embedding-layer output, its identity embedding and its static features | 37 zone vectors, one per zone | [6.4](#64-a-zones-vector) |
+| Global and action vectors | the global features' and each legal action's embedding-layer output | 1 global vector and 5 action vectors | [6.5](#65-the-global-vector-and-the-action-vectors) |
+| Two message-passing layers | each zone's vector, its neighbours' vectors along the borders and the global vector; for the global vector, itself and the average zone vector | 37 zone vectors and 1 global vector, each now informed by the others | [6.6](#66-message-passing-layers-messages-along-the-borders) |
+| Summary and values | the global vector, and the average and the largest of the 37 zone vectors | 1 summary vector, then 3 values | [6.7](#67-the-values) |
+| Action probabilities | each action vector, the vectors of the action's zones, and the summary | 5 logits, then 5 probabilities | [6.8](#68-the-action-probabilities) |
 
-The move vectors take no part in the message layers or the values: a move meets
-the board only in the last step, through the zones it is linked to, so the values
-do not depend on which moves are legal. Section 6.9 draws the whole plan in one
+The action vectors take no part in the message-passing layers or the values: an
+action meets the board only in the last part, through its zones, so the values do
+not depend on which actions are legal. Section 6.9 draws the whole plan in one
 figure.
 
 ### 6.4 A zone's vector
@@ -893,85 +938,91 @@ figure.
 A zone's vector, before the borders come in, adds three things and normalizes
 the result:
 
-1. **the first layer's output:** the rows of the zone's non-zero answers, each
-   times its input (section 6.3);
-2. **the zone's identity vector:** 64 learned numbers for each of the 37 zones,
-   so the network can tell zones apart. Unlike the tables' rows, these start
-   random;
-3. **its 39 fixed facts** (section 5.5), turned into 64 numbers by a learned
-   layer without a curve.
+1. **the embedding layer's output:** the embeddings of the zone's non-zero
+   feature values, each times its input (section 6.3);
+2. **the zone's identity embedding:** 64 learned numbers for each of the 37
+   zones, so the network can tell zones apart. Unlike the embedding tables'
+   embeddings, these start random;
+3. **its 39 static features** (section 5.5), turned into 64 numbers by a linear
+   layer without an activation function.
 
 Then layer normalization rescales the sum. For Shensi at decision 612, the first 4
 of the 64 numbers:
 
 | Part | First 4 numbers |
 | --- | --- |
-| 1. The first layer: 9 rows, each times 0.69 | −0.001, 0.137, −0.118, −0.104 |
-| 2. Shensi's identity vector | 0.204, 1.874, −1.609, 0.437 |
-| 3. Its fixed facts, through a learned layer | −0.449, −0.205, 0.425, −0.504 |
+| 1. The embedding layer: 9 embeddings, each times 0.69 | −0.001, 0.137, −0.118, −0.104 |
+| 2. Shensi's identity embedding | 0.204, 1.874, −1.609, 0.437 |
+| 3. Its static features, through a linear layer | −0.449, −0.205, 0.425, −0.504 |
 | Total | −0.246, 1.807, −1.302, −0.171 |
 | After layer normalization: Shensi's vector | −0.294, 1.957, −1.422, −0.203 |
 
-**Still one layer, in the usual picture.** The identity vector is the row of one
-more kind of input: 37 input units that say which zone this is, 1 for Shensi and
-0 for the other 36. The facts' layer adds 39 input units, one per fact, and a
-bias. So everything before the layer normalization is one learned layer with
-42,532 + 37 + 39 = 42,608 inputs, which the code computes in three pieces.
+**Still one layer, in the usual picture.** The identity embedding is the
+embedding of one more kind of input: 37 input neurons that say which zone this
+is, 1 for Shensi and 0 for the other 36. The static features' layer adds 39 input
+neurons, one per static feature, and a bias. So everything before the layer
+normalization is one linear layer with 42,532 + 37 + 39 = 42,608 inputs, which
+the code computes in three pieces.
 
-After one update the answers are still a small part of it: measured over all 64
-numbers, the first layer's output is about a sixth the size of Shensi's identity
-vector (1.3 against 8.0, root of the sum of squares) and smaller than its facts'
-part (2.1). So this early network's description of Shensi still says mostly
-"this is Shensi", whatever stands there. Inferred: that is part of why young
-networks rate different positions much alike.
+After one network update the feature values are still a small part of it:
+measured over all 64 numbers, the embedding layer's output is about a sixth the
+size of Shensi's identity embedding (1.3 against 8.0, root of the sum of squares)
+and smaller than its static features' part (2.1). So this early network's
+description of Shensi still says mostly "this is Shensi", whatever stands there.
+Inferred: that is part of why young networks rate different states much alike.
 
-**One table serves every zone.** `units:ccp:mountain_infantry` has one row, added
-wherever CCP mountain infantry stand, so what the network learns about mountain
-infantry in Shensi applies in Hopeh too. It does not carry across combinations:
-KMT infantry has a separate row
-([open question](#one-row-per-combination-or-rows-built-from-parts)).
+**One embedding table serves every zone.** `units:ccp:mountain_infantry` has one
+embedding, added wherever CCP mountain infantry stand, so what the network learns
+about mountain infantry in Shensi applies in Hopeh too. It does not carry across
+combinations: KMT infantry has a separate embedding
+([open question](#one-embedding-per-combination-or-embeddings-built-from-parts)).
 
 Layer normalization also keeps a busy zone from dominating: sea zone P14, with 86
-answers at decision 612, does not get a vector many times larger than Szechwan,
-with 2.
+non-zero feature values at decision 612, does not get a vector many times larger
+than Szechwan, with 2.
 
-### 6.5 The position vector and the move vectors
+### 6.5 The global vector and the action vectors
 
-**The position vector** is built the same way from the position's answers and the
-position table: its first layer adds up the rows of its 176 non-zero answers at
-decision 612, each times its input, then layer normalization. It has no identity
-vector and no fixed facts.
+**The global vector** is built the same way from the global feature values and
+the global embedding table: its embedding layer adds up the embeddings of its 176
+non-zero feature values at decision 612, each times its input, then layer
+normalization. It has no identity embedding and no static features.
 
-**A move vector** is built the same way from the move's own answers and the move
-table: 19 rows for each attack at decision 612 and 4 for ending the phase, then
-layer normalization.
+**An action vector** is built the same way from the action's own feature values
+and the action embedding table: 19 embeddings for each attack at decision 612 and
+4 for ending the phase, then layer normalization.
 
-One pass of the coordinator (section 9.2) does these lookups for every zone of
-every position, every position and every move at once: about 6,000 rows for a
-pass of four positions ([record](../archive/records/coordinator_lookups_2026_11_04.md)).
+The forward pass of each inference batch (section 9.2) does these embedding
+lookups for every zone of every state, every state's global features and every
+legal action at once: about 6,000 embeddings for an inference batch of four
+states ([record](../archive/records/coordinator_lookups_2026_11_04.md)).
 
-### 6.6 Messages along the borders
+### 6.6 Message-passing layers: messages along the borders
 
-A zone vector so far describes only its own zone. *Message layers* let each zone
-hear from its neighbours along the 160 directed borders. In each message layer:
+A zone vector so far describes only its own zone. *Message-passing layers* let
+each zone hear from its neighbours along the 160 directed borders, as in a graph
+neural network whose nodes are the zones and whose edges are the borders. In each
+message-passing layer:
 
 1. every zone sends a message along each border leaving it: its own vector
-   through a learned layer, plus the border's 22 fixed facts, such as a river, a
-   railway or a narrow crossing, through another, the sum bent by the curve;
+   through a linear layer, plus the border's 22 static features, such as a river,
+   a railway or a narrow crossing, through another, the sum passed through the
+   activation function;
 2. every zone averages the messages it receives;
-3. every zone adds a correction to its vector, computed by a learned layer (with
-   its curve and a layer normalization) from its old vector, that average and the
-   position vector; then the position vector adds a correction computed the same
-   way from itself and the average zone vector.
+3. every zone adds a *zone correction* to its vector, computed by a linear layer
+   (with its activation function and a layer normalization) from its old vector,
+   that average and the global vector; then the global vector adds a *global
+   correction* computed the same way from itself and the average zone vector.
 
-With $h_z$ for zone $z$'s vector, $u$ for the position vector and $f_{s \to t}$ for
-the facts of the border from $s$ to $t$, the message along that border is
+With $h_z$ for zone $z$'s vector, $u$ for the global vector and $f_{s \to t}$ for
+the static features of the border from $s$ to $t$, the message along that border
+is
 
 $$
 \text{message}_{s \to t} = \operatorname{GELU}\big(\text{layer}_1(h_s) + \text{layer}_2(f_{s \to t})\big)
 $$
 
-and then every zone $t$, and after them the position vector, change by
+and then every zone $t$, and after them the global vector, change by
 
 $$
 h_t \leftarrow h_t + \text{layer}_3\big(h_t,\ \text{average of the messages into } t,\ u\big)
@@ -983,38 +1034,40 @@ $$
 
 Every zone sends at the same time, so information spreads one border per layer:
 
-![Two panels of a schematic map around Shensi. Message layer 1: every zone hears from its neighbours at the same time: arrows run into Shensi from its four neighbours, Hopeh, Suiyuan, Szechwan and Tsinghai, and into those four from the 12 zones beyond them. After it, Shensi's vector reflects its 4 neighbours. Message layer 2: Shensi hears its neighbours again, and their vectors now carry what they heard from the zones beyond, so after it Shensi's vector also reflects those 12 zones. Every zone sends along all its borders at once, so 2 layers reach zones up to 2 borders away.](figures/message_layers.svg)
+![Two panels of a schematic map around Shensi. Message-passing layer 1: every zone hears from its neighbours at the same time: arrows run into Shensi from its four neighbours, Hopeh, Suiyuan, Szechwan and Tsinghai, and into those four from the 12 zones beyond them. After it, Shensi's vector reflects its 4 neighbours. Message-passing layer 2: Shensi hears its neighbours again, and their vectors now carry what they heard from the zones beyond, so after it Shensi's vector also reflects those 12 zones. Every zone sends along all its borders at once, so 2 layers reach zones up to 2 borders away.](figures/message_layers.svg)
 
-After the first layer Shensi's vector reflects what its four neighbours hold;
-after the second, also the 12 zones two borders away, such as Beiping beyond
-Hopeh. In general, after $k$ message layers a zone's vector reflects zones up to
-$k$ borders away, and through the position vector, from the second message layer
-on, the average of all zones. Each message layer has its own learned layers; a
-64×2 network has 2 message layers.
+After the first message-passing layer Shensi's vector reflects what its four
+neighbours hold; after the second, also the 12 zones two borders away, such as
+Beiping beyond Hopeh. In general, after $k$ message-passing layers a zone's
+vector reflects zones up to $k$ borders away, and through the global vector, from
+the second message-passing layer on, the average of all zones. Each
+message-passing layer has its own linear layers; a 64×2 network has 2
+message-passing layers, its *network depth*.
 
 ### 6.7 The values
 
-A learned layer (with its curve and a layer normalization) combines the position
-vector with the average and the largest value, number by number, of the 37 zone
-vectors after the message layers into one *summary vector* of the position. Two
-more learned layers, the *value head*, turn the summary into three numbers: the
-predicted final scores of the Axis, the Allies and the Comintern, in hundreds of
-points. At decision 612 they were 0.251, −0.424 and −1.024: +25.1, −42.4 and
-−102.4 (section 3).
+A linear layer (with its activation function and a layer normalization) combines
+the global vector with the average and the largest value, number by number, of
+the 37 zone vectors after the message-passing layers into one *summary vector* of
+the state. Two more linear layers, the *value head*, turn the summary vector into
+three numbers: the predicted final scores of the Axis, the Allies and the
+Comintern, in hundreds of points. At decision 612 they were 0.251, −0.424 and
+−1.024: +25.1, −42.4 and −102.4 (section 3).
 
-### 6.8 The move probabilities
+### 6.8 The action probabilities
 
-**A logit for each move.** Each move vector is joined with three zone vectors,
-taken after the message layers, through the move's links (section 5.4): the zone
-it starts from, the zone it acts on and the average of its path zones. A move that
-names no zone, such as ending the phase, gets a learned "no zone" vector for the
-first two and zeros for the path. A learned layer turns these 4 × 64 numbers into
-one combined vector of the move, and two more, the *policy head*, turn that,
-together with the summary, into one number, the move's *logit*: a raw preference,
-which a softmax turns into a probability. So the attack on Hopeh reads its own 19
-answers ("a CCP mountain infantry with 1 movement point left, in Shensi, attacking
-along Shensi–Hopeh") together with Shensi's vector as its start, Hopeh's as the
-zone it acts on, and the average of both as its path.
+**A logit for each action.** Each action vector is joined with three zone
+vectors, taken after the message-passing layers, through the action's zones
+(section 5.4): its source zone, its target zone and the average of its path
+zones. An action that names no zone, such as ending the phase, gets a learned "no
+zone" vector for the first two and zeros for the path. A linear layer turns these
+4 × 64 numbers into one combined vector of the action, and two more, the *policy
+head*, turn that, together with the summary vector, into one number, the action's
+*logit*: a raw preference, which a softmax turns into a probability. So the
+attack on Hopeh reads its own 19 feature values ("a CCP mountain infantry with 1
+movement point left, in Shensi, attacking along Shensi–Hopeh") together with
+Shensi's vector as its source zone, Hopeh's as its target zone, and the average
+of both as its path.
 
 **From logits to probabilities: softmax.** A list of logits becomes probabilities
 that add up to 1 by a *softmax*: each logit $s_i$ becomes
@@ -1026,88 +1079,90 @@ $$
 so a higher logit means a higher probability, and only differences between
 logits matter.
 
-**Probabilities in stages.** The softmax is not taken over all moves at once. The
-moves are grouped four times over: by kind, then within a kind by what acts, then
-by how it travels, then by what it acts on. At each of these four stages a small
-learned head gives every group a logit, from the summary and the average combined
-vector of the group's moves, and a softmax over the groups under one parent turns
-those logits into probabilities that add up to 1. Last, a softmax over the moves'
-own logits, among the moves of one final group, picks the exact move. A move's
-probability is the product of the probabilities along its branch of the tree:
+**A hierarchical softmax.** The softmax is not taken over all legal actions at
+once. The legal actions are grouped four times over, in four *levels*: by kind,
+then within a kind by what acts, then by how it travels, then by what it acts on.
+At each level a small learned head gives every group a logit, from the summary
+vector and the average combined vector of the group's actions, and a softmax over
+the groups under one parent turns those logits into probabilities that add up to
+1. Last, a softmax over the actions' own logits, among the actions of one final
+group, picks the exact action. An action's probability is the product of the
+probabilities along its branch of the tree of groups (`_readout` in
+`studies/campaign/neural.py`):
 
-![A tree from decision 612 through the stages kind, what acts, how it travels, what it acts on and the move. Kind: a movement with probability 0.469, or ending the phase with 0.531. Under a movement, what acts: the mountain infantry, probability 1, the only unit that can move. How it travels: to Hopeh 0.219, to Suiyuan 0.204, to Szechwan 0.184, to Tsinghai 0.394. What it acts on: no split, probability 1. The moves' probabilities, the products along their paths: 0.102, 0.096, 0.086 and 0.185 for the four attacks, and 0.531 for ending the phase, whose later stages have one branch each.](figures/policy_stages.svg)
+![A tree of groups from decision 612 through the levels kind, what acts, how it travels, what it acts on and the action. Kind: a movement with probability 0.469, or ending the phase with 0.531. Under a movement, what acts: the mountain infantry, probability 1, the only unit that can move. How it travels: to Hopeh 0.219, to Suiyuan 0.204, to Szechwan 0.184, to Tsinghai 0.394. What it acts on: no split, probability 1. The actions' probabilities, the products along their paths: 0.102, 0.096, 0.086 and 0.185 for the four attacks, and 0.531 for ending the phase, whose later levels have one branch each.](figures/hierarchical_softmax.svg)
 
 These four attacks name their destination only as the last zone of their path,
 not in a detail of their own, so "what it acts on" does not split them, and
-their destinations separate them at "how it travels". The link to the zone a move
-acts on (section 5.4) does use the path's last zone, so the network still reads
-Hopeh's vector as the zone the attack acts on
-([details](network_input.md#roles)).
+their destinations separate them at "how it travels". The action's target zone
+(section 5.4) does use the path's last zone, so the network still reads Hopeh's
+vector as the zone the attack acts on ([details](network_input.md#roles)).
 
-At a larger decision the stages split more: at the CCP's first Combat Movement
-decision of one game, with 13 legal moves, three units could each move to four
+At a larger decision the levels split more: at the CCP's first Combat Movement
+decision of one game, with 13 legal actions, three units could each move to four
 zones, so "what acts" had three branches under "a movement"
-([the input page](network_input.md#2-three-parts) describes that decision). Every
-listed move gets a probability; none is padded, merged or dropped. Which details
-count as "what acts" and so on comes from the roles explained in
+([the input page](network_input.md#2-three-parts) describes that decision).
+Every legal action gets a probability; none is padded, merged or dropped. Which
+details count as "what acts" and so on comes from the roles explained in
 [The network's input](network_input.md#roles).
 
 ### 6.9 The whole network
 
 All the bricks together, for decision 612:
 
-![For decision 612 at width 64: the board's 37 lines, one per zone, with 840 answers in all, go through the zone table of 42,532 rows, the first layer, each on its own, to 37 zone vectors; the position's line, with 176 answers, through the position table of 4,076 rows to one position vector; the 5 move lines, with 80 answers in all, through the move table of 12,627 rows to 5 move vectors, one per move. Two message layers update every zone vector from its neighbours along the 160 directed borders and from the position vector, and the position vector from the average zone. A learned layer turns the position vector and the zones' mean and maximum into a summary vector, and the value head turns that into three values, one per alliance. Each move vector is joined with the vectors of the zones it starts from, acts on and passes through; with the summary, the policy head turns it into the move's logit, giving 5 logits and 5 probabilities, built in stages.](figures/network_structure.svg)
+![For decision 612 at width 64: the 37 zone feature vectors, one per zone, with 840 non-zero feature values in all, go through the zone embedding table of 42,532 embeddings, the embedding layer, each on its own, to 37 zone vectors; the global feature vector, with 176 non-zero feature values, through the global embedding table of 4,076 embeddings to one global vector; the 5 action feature vectors, with 80 non-zero feature values in all, through the action embedding table of 12,627 embeddings to 5 action vectors, one per legal action. Two message-passing layers update every zone vector from its neighbours along the 160 directed borders and from the global vector, and the global vector from the average zone. A linear layer turns the global vector and the zones' mean and maximum into a summary vector, and the value head turns that into three values, one per alliance. Each action vector is joined with the vectors of its source zone, its target zone and its path zones; with the summary vector, the policy head turns it into the action's logit, giving 5 logits and 5 probabilities, built by a hierarchical softmax.](figures/network_structure.svg)
 
 **Its size.** A 64×2 network has 3,924,424 parameters. Most, 3.79 million or 97%,
-are the rows of the three first layers; the other layers hold the rest. At 256×8
-there are 19.58 million, 77% of them rows, since wider layers weigh more. A decision reads only the rows of its
-answers: at decision 612, 1,096 row lookups (840 + 176 + 80) of 581 different
-rows, out of 59,235.
+are the embeddings of the three embedding tables; the other layers hold the rest.
+At 256×8 there are 19.58 million, 77% of them embeddings, since wider layers
+weigh more. A decision reads only the embeddings of its non-zero features: at
+decision 612, 1,096 embedding lookups (840 + 176 + 80) of 581 different
+embeddings, out of 59,235.
 
-**A fresh network gives every position the same values.** Its rows are all zero,
-so every answer adds nothing: each zone's vector is only its identity vector and
-its fixed facts, the same in every position, and so are the position vector, the
-summary and the values. On 5 November a fresh 64×2 network gave the same three
-values at four different positions of a game
+**A fresh network gives every state the same values.** Its embeddings are all
+zero, so every feature value adds nothing: each zone's vector is only its identity
+embedding and its static features, the same in every state, and so are the global
+vector, the summary vector and the values. On 5 November a fresh 64×2 network
+gave the same three values at four different states of a game
 ([record](../archive/records/training_sample_2026_11_05.md#a-fresh-network-gives-every-position-the-same-values)).
-Its move probabilities still differ between moves, because a move's combined
-vector also carries the vectors of the zones it is linked to.
+Its action probabilities still differ between actions, because an action's
+combined vector also carries the vectors of its zones.
 
 Measurements of this network are in the
 [zone network record](../archive/records/zone_network_2026_11_02.md).
 
 ### 6.10 More detail: how other game networks read their input
 
-Reading a decision through a first layer of rows is the usual way to read sparse
+Reading a decision through an embedding layer is the usual way to read sparse
 inputs. The shape of the network after it follows published networks for games
 played on maps rather than AlphaZero's grids:
 
-| Network | Its input | Its first learned layer | Its move output |
+| Network | Its input | Its first linear layer | Its action output |
 | --- | --- | --- | --- |
 | AlphaGo Zero, for Go | 17 grids of 19 × 19 numbers, each 0 or 1 | a convolution: at every point, the same learned numbers for the facts at and around that point | a fixed list of 362: one per point and one for passing |
 | Stockfish's NNUE, for chess | for each side's view, 40,960 numbers, at most 30 of them 1 (HalfKP) | adds up the weights that leave its non-zero inputs | none: it gives a value only |
 | DipNet, for Diplomacy | the features of each of the board's 81 locations | a graph convolution along the map's adjacency | one order per location in turn, invalid orders masked |
-| This network | 42,532 answers per zone, 4,076 for the position and 12,627 per move, almost all 0 | adds up the rows of its non-zero inputs, with one table for every zone | one logit per listed move, from the move's own vector |
+| This network | 42,532 zone features per zone, 4,076 global features and 12,627 action features per legal action, almost all 0 | adds up the embeddings of its non-zero inputs, with one embedding table for every zone | one logit per legal action, from the action's own vector |
 
-**The first layer is the usual one.** Adding up the weights of the few non-zero
-inputs, instead of multiplying them all, is how a layer is computed wherever
-inputs are mostly 0. Sutton and Barto describe it for linear value functions over
-binary features, such as tile coding (section 9.5.4). Stockfish's NNUE computes
-its first layer this way and, after a move, adds and subtracts only the rows of
-the inputs that changed
+**The embedding layer is the usual first layer.** Adding up the weights of the
+few non-zero inputs, instead of multiplying them all, is how a layer is computed
+wherever inputs are mostly 0. Sutton and Barto describe it for linear value
+functions over binary features, such as tile coding (section 9.5.4). Stockfish's
+NNUE computes its first layer this way and, after a move, adds and subtracts
+only the weights of the inputs that changed
 ([nnue-pytorch documentation](https://github.com/official-stockfish/nnue-pytorch/blob/master/docs/nnue.md)).
 AlphaGo Zero's first convolution does the same on a grid: its inputs are 0 or 1,
 so at each point it adds up learned numbers for the facts at and around that
-point, with the same numbers at every point, as one table serves every zone here
-(Sutton and Barto, section 16.6.2, describe its input).
+point, with the same numbers at every point, as one embedding table serves every
+zone here (Sutton and Barto, section 16.6.2, describe its input).
 
 **Why not a grid.** The 37 zones are not a grid: each has its own neighbours,
 along 160 directed borders, so messages travel along borders (section 6.6)
-rather than across a grid. A zone can answer any of 42,532 questions, where a
-point of a Go board answers 17. And the legal moves are no fixed list: decision
-612 has 5, others over a hundred (section 4.7), and their kinds change with the
-phase. So the network gives every listed move a logit from its own vector
-(section 6.8) instead of keeping one output for each possible move.
+rather than across a grid. A zone can have values for any of 42,532 features,
+where a point of a Go board has 17. And the legal actions are no fixed list:
+decision 612 has 5, others over a hundred (section 4.7), and their kinds change
+with the phase. So the network gives every legal action a logit from its own
+vector (section 6.8) instead of keeping one output for each possible action.
 
 **Networks for games on maps.** Networks for games on an irregular map, with many
 kinds of unit and a changing list of orders, are built like this one: a vector
@@ -1116,107 +1171,118 @@ or by attention, and a score for each order from vectors of its own. DipNet, a
 network for the board game Diplomacy, is a published example
 ([Paquette et al. 2019](https://arxiv.org/abs/1909.02128)): its 16
 graph-convolution layers mix the locations' vectors along the map, and it writes
-the orders one location at a time. Layers like the message layers of section 6.6
-make a *graph neural network*, in which the position vector plays the part of a
-vector shared by the whole graph
+the orders one location at a time. Layers like the message-passing layers of
+section 6.6 make a *graph neural network*, in which the global vector plays the
+part of a vector shared by the whole graph
 ([Battaglia et al. 2018](https://arxiv.org/abs/1806.01261)).
 
 **This project's own choices.** Three choices are this project's own and have not
-been compared with alternatives: one row per named combination of facts, such as
-one for CCP mountain infantry and another for KMT infantry
-([open question](#one-row-per-combination-or-rows-built-from-parts)); the
-logarithm that scales an answer ([open question](#how-should-a-count-count)); and
-the grouping of moves into the stages of section 6.8.
+been compared with alternatives: one embedding per named combination of facts,
+such as one for CCP mountain infantry and another for KMT infantry
+([open question](#one-embedding-per-combination-or-embeddings-built-from-parts));
+the logarithm that scales a feature value
+([open question](#how-should-a-count-count)); and the grouping of legal actions
+into the levels of section 6.8.
 
 ## 7. Self-play and training samples
 
-### 7.1 A batch of games
+### 7.1 A training iteration's games
 
-Training alternates between playing and learning. A *batch* of games is played
-with all three networks frozen: 24 games at once, 6 game processes of 4 games
-each ([section 9.2](#92-running-training-on-the-mac)), and it ends when the last
-of them ends. At every decision the
-alliance to move searches (section 4) and plays the move drawn from the shares.
+Training alternates between playing and learning, in *training iterations*. Each
+training iteration first plays a set of self-play games with all three networks
+held fixed: 24 games at once, 6 game processes of 4 games each
+([section 9.2](#92-running-training-on-the-mac)), until the last of them ends.
+At every decision the alliance
+to act searches (section 4) and plays the action drawn from the visit shares.
+Then a network update trains the networks (section 8.4), and the next training
+iteration plays with them. The code and the dated records name a training
+iteration's games a *batch* (as in the flag `--transitions-per-batch`); this
+document keeps "batch" for the inference batches of section 9.2.
+
 The settings in sections 7 and 8 are those of the Mac training command in the
 [campaign learning guide](../../studies/campaign/README.md#training-on-the-mac),
 which names them the speed test's settings, not tuned values. The worked
-examples come from the 5 November run, when a batch was 32 games, in 8 game
-processes, and an update 700 training steps. Today an update is 525 steps,
-which draws each kept sample as often from batches of 24 games (section 8.7).
+examples come from the 5 November run, when a training iteration played 32
+games, in 8 game processes, and a network update was 700 training steps. Today a
+network update is 525 training steps, which draws each kept training sample as
+often from training iterations of 24 games (section 8.7).
 
 **Which decisions are kept.** A random 5% of each game's decisions, because a
-game's thousand-odd positions are close to one another. A decision with only one
-legal move, played without a search, can be kept too: its share is 1, so it
-teaches only the values. Every game is played to its end. A guard,
-`--transitions-per-batch`, stops a game that runs far too long, 20,000 positions
-in the Mac command against about 1,500 in a normal game; then the batch is
-discarded without samples and the run stops, to be resumed with a higher guard
-(`--extend-episode-budget`), which replays the batch exactly.
+game's thousand-odd states are close to one another. A decision with only one
+legal action, played without a search, can be kept too: its visit share is 1, so
+it teaches only the values. Every game is played to its end. A guard,
+`--transitions-per-batch`, stops a game that runs far too long, 20,000 states in
+the Mac command against about 1,500 in a normal game; then the training
+iteration's games are discarded without training samples and the run stops, to
+be resumed with a higher guard (`--extend-episode-budget`), which replays the
+training iteration exactly.
 
-### 7.2 What a sample stores
+### 7.2 What a training sample stores
 
-A *sample* is one decision of a self-play game, saved so that training can show
-it to the networks again and compare their answers with better ones. It stores
-four things (`_decide` and `play_episode` in `studies/campaign/learning.py`):
+A *training sample* is one decision of a self-play game, saved so that training
+can show it to the networks again and compare their outputs with better ones. It
+stores four things (`_decide` and `play_episode` in `studies/campaign/learning.py`):
 
 | Part | What it stores | What training does with it |
 | --- | --- | --- |
-| 1. What the network read | The decision's input (section 5): the non-zero answers about the board, about the position as a whole and about each legal move, and each move's links. It is not a copy of the game. | Shows the decision to the networks again. |
-| 2. Who chose | The alliance to move. | Only that alliance's network learns move probabilities from the sample; all three learn values from it. |
-| 3. How the search split its simulations | Each legal move's share (section 4.5). | The *policy target*: the move probabilities the network should give. |
-| 4. How the game ended | The three alliances' final scores, written into every sample of the game when it ends. | The *value target*: the values the network should predict, the scores divided by 100. |
+| 1. What the network read | The decision's input (section 5): the non-zero zone, global and action feature values, and each legal action's zones. It is not a copy of the game. | Shows the decision to the networks again. |
+| 2. Who chose | The alliance to act. | Only that alliance's network learns action probabilities from the training sample; all three learn values from it. |
+| 3. How the search split its simulations | Each legal action's visit share (section 4.5). | The *policy target*: the action probabilities the network should give. |
+| 4. How the game ended | The three alliances' final scores, written into every training sample of the game when it ends. | The *value target*: the values the network should predict, the final scores divided by 100. |
 
-**Decision 612, as a sample.** The game of decision 612 was played for this
-example and kept every decision
-([record](../archive/records/training_sample_2026_11_05.md)); this is its sample:
+**Decision 612, as a training sample.** The game of decision 612 was played for
+this example and kept every decision
+([record](../archive/records/training_sample_2026_11_05.md)); this is its training
+sample:
 
-![One real sample, from round 5 of a self-play game: the Comintern chooses the CCP's Combat Movement. 1, what the network read: 840 answers about the board from all 37 zones, 176 about the position as a whole, 80 about the five legal moves, and each move's zones, 12 KB in all; in Hopeh, for example, possessor:kmt = 1 and project:kmt:major_shipyard = 1. 2, who chose: the Comintern, for the CCP. 3, how the search split its 64 simulations, stored as shares: the mountain infantry in Shensi attacking Hopeh 36 visits, share 0.56, the network's own probability 0.10, the move played; attacking Suiyuan 2, 0.03, 0.10; attacking Szechwan 5, 0.08, 0.09; attacking Tsinghai 9, 0.14, 0.18; ending Combat Movement 12, 0.19, 0.53. 4, how the game ended, stored as the value target: Axis +49.0, the network predicted +25.1; Allies −63.8, predicted −42.4; Comintern −106.2, predicted −102.4.](figures/training_sample.svg)
+![One real training sample, from game round 5 of a self-play game: the Comintern chooses the CCP's Combat Movement. 1, what the network read: 840 non-zero zone feature values from all 37 zones, 176 global feature values, 80 action feature values for the five legal actions, and each action's zones, 12 KB in all; in Hopeh, for example, possessor:kmt = 1 and project:kmt:major_shipyard = 1. 2, who chose: the Comintern, for the CCP. 3, how the search split its 64 simulations, stored as visit shares: the mountain infantry in Shensi attacking Hopeh 36 visits, visit share 0.56, the network's own probability 0.10, the action played; attacking Suiyuan 2, 0.03, 0.10; attacking Szechwan 5, 0.08, 0.09; attacking Tsinghai 9, 0.14, 0.18; ending Combat Movement 12, 0.19, 0.53. 4, how the game ended, stored as the value target: Axis +49.0, the network predicted +25.1; Allies −63.8, predicted −42.4; Comintern −106.2, predicted −102.4.](figures/training_sample.svg)
 
 Part 1 is the input of section 5, 12 KB in all. Part 3 is the search of
-[section 4.6](#46-a-real-search-decision-612): its shares differ most from the
-network's probabilities for the attack on Hopeh and for ending Combat Movement,
-both because the search found the attack better than the rest. Part 4 is the
-game's end: Axis +49.0, Allies −63.8 and Comintern −106.2, which every sample of
-the game stores. The record counts 191 position answers, not 176: when it was
-made, twelve more said that a nation's income had been worked out and three that
-Japan, the KMT and the CCP keep a treasury. Both are true of every position and
-are no longer asked.
+[section 4.6](#46-a-real-search-decision-612): its visit shares differ most from
+the network's probabilities for the attack on Hopeh and for ending Combat
+Movement, both because the search found the attack better than the rest. Part 4
+is the game's end: Axis +49.0, Allies −63.8 and Comintern −106.2, which every
+training sample of the game stores. The record counts 191 non-zero global feature
+values, not 176: when it was made, twelve more said that a nation's income had
+been worked out and three that Japan, the KMT and the CCP keep a treasury. Both
+are true of every state, and those features have since been removed.
 
 ### 7.3 Why these targets
 
-**The shares.** The network answers in one look. The search also asks it about
-every position its 64 simulations reach, and returns most often to the moves
-whose continuations score best for the alliance choosing (section 4). At decision
-612, the one look did not see that the attack would take Hopeh; the simulations
-that played through the battle did. Where the search finds a difference, its
-split is therefore a better judgment than the network's first guess. Training
-moves the network's probabilities toward the split, so the network's next first
-guesses come closer to what a search would conclude, and the next batch's
-searches start from them.
+**The visit shares.** The network answers in one look. The search also asks it
+about every state its 64 simulations reach, and returns most often to the
+actions whose continuations score best for the alliance choosing (section 4). At
+decision 612, the one look did not see that the attack would take Hopeh; the
+simulations that played through the battle did. Where the search finds a
+difference, its split is therefore a better judgment than the network's first
+guess. Training moves the network's probabilities toward the split, so the
+network's next first guesses come closer to what a search would conclude, and
+the next training iteration's searches start from them.
 
 **The final scores** are what really happened after the decision, so they teach
-the network to predict how a position will end.
+the network to predict how a state will end.
 
-**In a run's first batch** the shares carry little. A fresh network gives every
-position the same values ([section 6.9](#69-the-whole-network)), so a
-first-batch search splits its simulations by the network's arbitrary first
-guesses, the exploration noise and the rare game ends it reaches; only the final
-scores carry information. From the second batch on, the values differ between
-positions.
+**In a run's first training iteration** the visit shares carry little. A fresh
+network gives every state the same values ([section 6.9](#69-the-whole-network)),
+so a search in the first training iteration splits its simulations by the
+network's arbitrary first guesses, the exploration noise and the rare game ends
+it reaches; only the final scores carry information. From the second training
+iteration on, the values differ between states.
 
 ## 8. Training the networks
 
-Training changes a network's parameters so that, on the saved samples, its move
-probabilities come closer to the shares and its values closer to the final
-scores. This section builds that from its parts: a number that measures how far
-off the network is, the *loss*; the direction that lowers it, the *gradient*; the
-rule that takes a step, *Adam*; and the schedule of steps, the *update*.
+Training changes a network's parameters so that, on the saved training samples,
+its action probabilities come closer to the visit shares and its values closer
+to the final scores. This section builds that from its parts: a number that
+measures how far off the network is, the *loss*; the direction that lowers it,
+the *gradient*; the rule that changes the parameters once, an *Adam step*; and
+the schedule of those changes, the *training steps* of a *network update*.
 
 ### 8.1 The loss
 
-The loss has two parts. On one sample, with the network's values $v_k$, the final
-scores divided by 100 as $z_k$, the shares $\pi_m$ and the network's
-probabilities $p_m$:
+The loss has two parts. On one training sample, with the network's values $v_k$,
+the final scores divided by 100 as $z_k$, the visit shares $\pi_m$ and the
+network's probabilities $p_m$:
 
 - **the value loss** is the average squared error of the three values:
 
@@ -1224,14 +1290,14 @@ $$
 L_{\text{value}} = \frac{1}{3} \sum_{k=1}^{3} \left( v_k - z_k \right)^2
 $$
 
-- **the policy loss** is the *cross-entropy* between the shares and the
+- **the policy loss** is the *cross-entropy* between the visit shares and the
   probabilities:
 
 $$
 L_{\text{policy}} = -\sum_{m} \pi_m \ln p_m
 $$
 
-On decision 612's sample, for the Comintern's network:
+On decision 612's training sample, for the Comintern's network:
 
 | Alliance | Value $v_k$ | Target $z_k$ | Error | Squared |
 | --- | ---: | ---: | ---: | ---: |
@@ -1240,7 +1306,7 @@ On decision 612's sample, for the Comintern's network:
 | Comintern | −1.024 | −1.062 | 0.038 | 0.001 |
 | **Value loss, the average** | | | | **0.035** |
 
-| Move | Share $\pi_m$ | Probability $p_m$ | Share × (−ln probability) |
+| Action | Visit share $\pi_m$ | Probability $p_m$ | Visit share × (−ln probability) |
 | --- | ---: | ---: | ---: |
 | Shensi → Hopeh | 0.5625 | 0.102 | 1.282 |
 | Shensi → Suiyuan | 0.0313 | 0.096 | 0.073 |
@@ -1249,52 +1315,55 @@ On decision 612's sample, for the Comintern's network:
 | End Combat Movement | 0.1875 | 0.531 | 0.119 |
 | **Policy loss, the sum** | | | **1.903** |
 
-The cross-entropy is lowest when the probabilities equal the shares, here 1.221,
-the shares' own entropy; the gap of 0.682 is what training can remove on this
-sample. Most of the loss comes from the attack on Hopeh, to which the search gave
-0.56 and the network 0.10.
+The cross-entropy is lowest when the probabilities equal the visit shares, here
+1.221, the visit shares' own entropy; the gap of 0.682 is what training can
+remove on this training sample. Most of the loss comes from the attack on Hopeh,
+to which the search gave 0.56 and the network 0.10.
 
-In a training step the two losses are averaged over the step's samples: the
-value loss over all of them, the policy loss over those where the network's own
-alliance chose (section 8.4). The step lowers their sum.
+In a training step the two losses are averaged over the training samples of the
+training step's minibatch: the value loss over all of them, the policy loss over those
+where the network's own alliance chose (section 8.4). The training step lowers
+their sum.
 
 ### 8.2 The gradient
 
-A step nudges each of the network's 3.92 million parameters the way that lowers
-the loss. For that, training first works out every parameter's *gradient*
-(`loss.backward()`): how fast the loss on the step's samples would change if that
-one number were raised a little. A positive gradient means that raising the
-number would raise the loss, so it should go down; a negative one, that it should
-go up. The larger the gradient, the more the loss responds to that number.
+A training step nudges each of the network's 3.92 million parameters the way that
+lowers the loss. For that, training first works out every parameter's *gradient*
+(`loss.backward()`): how fast the loss on the training step's minibatch would
+change if that one number were raised a little. A positive gradient means that
+raising the number would raise the loss, so it should go down; a negative one,
+that it should go up. The larger the gradient, the more the loss responds to that
+number.
 
 **An example.** The value head's last layer adds a learned bias to every
-Comintern value the network predicts. In the first step of the 5 November update,
-the fresh network predicted the Comintern's final scores 109 points too high on
-average on the step's samples, so raising that bias would have raised the loss
-further: its gradient was positive, 0.728, and the step lowered it
+Comintern value the network predicts. In the first training step of the
+5 November network update, the fresh network predicted the Comintern's final
+scores 109 points too high on average on that training step's minibatch, so
+raising that bias would have raised the loss further: its gradient was positive,
+0.728, and the training step lowered it
 ([record](../archive/records/adam_steps_2026_11_09.md)).
 
 ### 8.3 Adam
 
 The plainest rule, gradient descent, moves every parameter against its
-gradient by a fixed multiple of it, the *learning rate*. Its steps then follow
-the gradients' sizes, which differ enormously: in the first step of the
-5 November update, the Comintern network's nonzero gradients ranged from
-$4 \times 10^{-17}$ to 171. And a gradient from 32 random samples is noisy: it
-points a little differently in every step. Training uses Adam instead
-(`torch.optim.Adam` in `CampaignLearner._optimizer`), a standard rule built for
-both problems (Kingma and Ba, *Adam: A Method for Stochastic Optimization*,
-2015). For every parameter it keeps two running averages, both starting at
-zero:
+gradient by a fixed multiple of it, the *learning rate*. Its changes then follow
+the gradients' sizes, which differ enormously: in the first training step of the
+5 November network update, the Comintern network's nonzero gradients ranged from
+$4 \times 10^{-17}$ to 171. And a gradient from 32 random training samples is
+noisy: it points a little differently in every training step. Training uses Adam
+instead (`torch.optim.Adam` in `CampaignLearner._optimizer`), a standard
+optimizer built for both problems (Kingma and Ba, *Adam: A Method for Stochastic
+Optimization*, 2015). For every parameter it keeps two running averages, both
+starting at zero:
 
-- $m$, the average of the parameter's recent gradients: each step keeps 90% of
-  it and adds 10% of the new gradient $g$, so it mostly reflects the last ten or
-  so steps;
-- $v$, the average of its recent squared gradients: each step keeps 99.9% of it
-  and adds 0.1% of the new gradient squared, so its square root is the
-  gradient's typical size over roughly the last thousand steps.
+- $m$, the average of the parameter's recent gradients: each Adam step keeps 90%
+  of it and adds 10% of the new gradient $g$, so it mostly reflects the last ten
+  or so training steps;
+- $v$, the average of its recent squared gradients: each Adam step keeps 99.9% of
+  it and adds 0.1% of the new gradient squared, so its square root is the
+  gradient's typical size over roughly the last thousand training steps.
 
-At step number $t$, counted over the whole run, Adam moves the parameter by
+At Adam step number $t$, counted over the whole run, Adam moves the parameter by
 
 $$
 \Delta = -\eta \times \frac{\hat m}{\sqrt{\hat v} + \epsilon},
@@ -1306,30 +1375,32 @@ $$
 
 where $\eta$ is the learning rate, 0.001. The divisions by $1 - 0.9^{t}$ and
 $1 - 0.999^{t}$ correct the averages for having started at zero, which would
-otherwise make them too small in the first steps, and $\epsilon = 10^{-8}$ only
-keeps the division safe. Apart from the learning rate, these are PyTorch's
+otherwise make them too small in the first Adam steps, and $\epsilon = 10^{-8}$
+only keeps the division safe. Apart from the learning rate, these are PyTorch's
 defaults.
 
 The fraction cancels the gradient's size and keeps how steadily it points one
-way. A parameter whose gradients keep their sign moves about 0.001 per step,
+way. A parameter whose gradients keep their sign moves about 0.001 per Adam step,
 whether they are large or small; one whose gradients keep changing sign has a
 small average beside its typical size and moves much less. In the very first
-step the corrected averages are the gradient and its size, so every parameter
-moves by exactly the learning rate, unless its gradient is so small that
-$\epsilon$ counts. **An Adam step** is this rule applied once to every parameter
-of one network, by `optimizer.step()`. Each of the three networks has its own
-Adam, whose averages carry over from one update to the next and are saved in
-checkpoints, the full saves from which a run can resume.
+Adam step the corrected averages are the gradient and its size, so every
+parameter moves by exactly the learning rate, unless its gradient is so small
+that $\epsilon$ counts. **An Adam step**, the optimizer step, is this rule applied
+once to every parameter of one network, by `optimizer.step()`. Each of the three
+networks has its own Adam, whose averages carry over from one network update to
+the next and are saved in checkpoints, the full saves from which a run can
+resume.
 
-**A real update, run again** ([record](../archive/records/adam_steps_2026_11_09.md)).
-Re-running the 5 November update from that run's fresh networks and its 1,611
-samples gave exactly the networks that update had produced. In the first step,
-211,741 of the Comintern network's 221,675 numbers with a nonzero gradient moved
-by 0.001, to within 0.00001; the rest had gradients below about $10^{-6}$, where
-$\epsilon$ shrinks the step. The bias of section 8.2 shows how the steps change
-after that:
+**A real network update, run again**
+([record](../archive/records/adam_steps_2026_11_09.md)). Re-running the
+5 November network update from that run's fresh networks and its 1,611 training
+samples gave exactly the networks that network update had produced. In the first
+Adam step, 211,741 of the Comintern network's 221,675 parameters with a nonzero
+gradient moved by 0.001, to within 0.00001; the rest had gradients below about
+$10^{-6}$, where $\epsilon$ shrinks the change. The bias of section 8.2 shows how
+the Adam steps change after that:
 
-| Step | Gradient | Average gradient ($\hat m$) | Typical size ($\sqrt{\hat v}$) | Change |
+| Adam step | Gradient | Average gradient ($\hat m$) | Typical size ($\sqrt{\hat v}$) | Change |
 | ---: | ---: | ---: | ---: | ---: |
 | 1 | 0.728 | 0.728 | 0.728 | −0.001000 |
 | 2 | 0.322 | 0.514 | 0.563 | −0.000914 |
@@ -1340,393 +1411,423 @@ after that:
 | 50 | −0.00006 | 0.003 | 0.115 | −0.000026 |
 | 700 | −0.016 | −0.0013 | 0.030 | +0.000044 |
 
-From step 4 on, the gradients pointed now one way, now the other (356 of the
+From Adam step 4 on, the gradients pointed now one way, now the other (356 of the
 700 were negative), so their average shrank, while the typical size still
-remembered the large first gradients: at step 700 the first step's gradient
-still made up 60% of the average squared gradient. The steps shrank
-accordingly. The average still leaned the first way, so the bias kept falling
-until step 39; over all 700 steps it moved by 0.78 points of predicted score.
-The network's other numbers did most of the correcting: in the first step each
-of them with a gradient also moved by 0.001, the way that lowered the loss. The
-network's value loss was 0.62 on the first step's samples and 0.0065 on the
-fourth step's, after three steps: an error of about 79 points per value, then 8
-(root mean square). These are samples it is trained on, so this measures fit,
-not foresight.
+remembered the large first gradients: at Adam step 700 the first gradient still
+made up 60% of the average squared gradient. The changes shrank accordingly. The
+average still leaned the first way, so the bias kept falling until Adam step 39;
+over all 700 Adam steps it moved by 0.78 points of predicted final score. The
+network's other parameters did most of the correcting: in the first Adam step
+each of them with a gradient also moved by 0.001, the way that lowered the loss.
+The network's value loss was 0.62 on the first training step's minibatch and
+0.0065 on the fourth training step's, after three Adam steps: an error of about
+79 points per value, then 8 (root mean square). These are training samples it is
+trained on, so this measures fit, not foresight.
 
-### 8.4 One training step, and one update
+### 8.4 One training step, and one network update
 
-**Where samples wait: the replay buffer.** A sample is made in a game process at
-the moment of its decision, and its final scores are added when its game ends.
-The game processes hand their samples to the main training process, which adds
-them to its *replay buffer* once all the games of the batch have ended. The buffer
-is a list of the latest samples, at most 8,000, from which the oldest leave
-first. On 5 November one batch kept 1,611 samples from 33,062 decisions, so a
-full buffer holds about the last five batches
+**Where training samples wait: the replay buffer.** A training sample is made in
+a game process at the moment of its decision, and its final scores are added when
+its game ends. The game processes hand their training samples to the main
+training process, which adds them to its *replay buffer* once all the games of
+the training iteration have ended. The replay buffer is a list of the latest
+training samples, at most 8,000, from which the oldest leave first. On 5 November
+one training iteration kept 1,611 training samples from 33,062 decisions, so a
+full replay buffer holds about the last five training iterations' training
+samples
 ([record](../archive/records/training_sample_2026_11_05.md#the-update-after-the-batch)).
 
-**An update** follows each batch. It runs in the main training process, on the
-CPU, while the game processes wait, and it is many *training steps* in a row, 700
-in the 5 November run and 525 today. Each step does four things
-(`CampaignLearner.update` in `studies/campaign/learning.py`):
+**A network update** follows each training iteration's games. It runs in the main
+training process, on the CPU, while the game processes wait, and it is many
+*training steps* one after another, 700 in the 5 November run and 525 today. Each training
+step does four things (`CampaignLearner.update` in `studies/campaign/learning.py`):
 
-1. **Draw.** It picks 32 different samples at random from the whole buffer, so
-   one step mixes decisions of many games and of all three alliances. Nothing is
-   played: a step only reads stored decisions.
+1. **Draw a minibatch.** It picks 32 different training samples at random from
+   the whole replay buffer, the training step's *minibatch*, so one training step
+   mixes decisions of many games and of all three alliances. Nothing is played: a
+   training step only reads stored decisions.
 2. **Read.** Each of the three networks reads the 32 decisions at once. It
-   gives its three values for every decision, and its move probabilities for
+   gives its three values for every decision, and its action probabilities for
    those where its alliance was choosing.
 3. **Compare.** It computes each network's losses (section 8.1), averaged over
-   the samples they use. On 5 November a step held 16 of the Axis's decisions on
-   average, and 8 each of the Allies' and the Comintern's.
-4. **Step.** Each network takes one Adam step (section 8.3) to lower the sum of
-   its two losses; all three step together.
+   the training samples they use. On 5 November a minibatch held 16 of the Axis's
+   decisions on average, and 8 each of the Allies' and the Comintern's.
+4. **Adam step.** Each network takes one Adam step (section 8.3) to lower the sum
+   of its two losses; all three take theirs together.
 
-The next step draws a new 32. After the last, the networks are saved as a *model
-export*, and the next batch of games plays with them. Playing takes minutes and
-the steps under a minute: on 5 November the 32 games took 851 seconds and the
-700 steps 49, and on 15 November a batch of today's 24 games played in 499
+The next training step draws a new minibatch of 32. After the last, the networks
+are saved as a *model export*, and the next training iteration's games play with
+them. The networks after $k$ network updates are *generation* $k$; a fresh
+network is generation 0. Playing takes minutes and the training steps under a
+minute: on 5 November the 32 games took 851 seconds and the 700 training steps
+49, and on 15 November a training iteration of today's 24 games played in 499
 seconds, also 64×2.
 
-![Where a training step's 32 samples come from. 1: a batch of 24 games plays at once, 6 game processes of 4 games each, with the networks frozen; at each decision a random draw keeps it as a sample with chance 5%, and when a game ends its final scores are added to its samples; on 5 November one batch of 32 games kept 1,611 samples from 33,062 decisions. 2: when all of the batch's games have ended, their samples join the replay buffer in the main training process, the latest 8,000 samples, about five batches, drawn as five bars from the oldest batch, whose samples leave first, to the newest; purple dots spread over all five bars mark one step's 32 samples, drawn at random. 3: one training step, 525 per update, each with a new draw: draw 32 different samples at random from the whole buffer; each of the three networks reads all 32 at once; it compares its values with the final scores on all 32, and its move probabilities with the shares on its own alliance's samples; each network takes one Adam step. 4: after the last step the networks are saved for the next batch. With 64×2 networks on the CPU, a batch's 24 games take about 8 minutes to play and its 525 steps under a minute; no game plays during the steps.](figures/training_update.svg)
+![Where a training step's minibatch of 32 training samples comes from. 1: a training iteration plays 24 games at once, 6 game processes of 4 games each, with the networks held fixed; at each decision a random draw keeps it as a training sample with chance 5%, and when a game ends its final scores are added to its training samples; on 5 November one training iteration of 32 games kept 1,611 training samples from 33,062 decisions. 2: when all of the training iteration's games have ended, their training samples join the replay buffer in the main training process, the latest 8,000 training samples, about five training iterations' worth, drawn as five bars from the oldest training iteration, whose training samples leave first, to the newest; purple dots spread over all five bars mark one training step's minibatch of 32, drawn at random. 3: one training step, 525 per network update, each with a new minibatch: draw 32 different training samples at random from the whole replay buffer; each of the three networks reads all 32 at once; it compares its values with the final scores on all 32, and its action probabilities with the visit shares on its own alliance's training samples; each network takes one Adam step. 4: after the last training step the networks are saved for the next training iteration. With 64×2 networks on the CPU, a training iteration's 24 games take about 8 minutes to play and its 525 training steps under a minute; no game plays during the training steps.](figures/training_update.svg)
 
-In the training command the 32 is `--batch-size` and the number of steps is
-`--epochs`. Both names mislead here: a step's 32 samples are not the batch of
-games, and a step does not go through the whole buffer, as an epoch would.
+In the training command the minibatch size, 32, is `--batch-size` and the number
+of training steps per network update is `--epochs`. The second name misleads: a
+training step does not go through the whole replay buffer, as an epoch would.
 
-### 8.5 Which numbers a step moves
+### 8.5 Which numbers a training step moves
 
-Every sample passes through the learned layers, so nearly all of their numbers
-change in every step. A row is different: like any weight whose input is 0, its
-gradient is zero unless its question is answered in one of the step's samples,
-because an unanswered question's row was never added in. So a step changes the rows of the questions
-those samples answer, and Adam's average $m$, which loses a tenth each step
-without a new gradient, keeps moving a recently answered row for a few dozen
-steps more. A row whose question has never appeared in a trained sample stays at
-zero. Checked with a test loss on two real decisions: the first step gave a
-gradient to exactly the 150 rows its decision answers and changed only those;
-the second step also moved the 59 rows that only the first decision answered.
+Every training sample passes through the linear layers, so nearly all of their
+parameters change in every training step. An embedding is different: like any
+weight whose input is 0, its gradient is zero unless its feature has a non-zero
+value in one of the minibatch's training samples, because the embedding of a
+feature with value 0 was never added in. So a training step changes the
+embeddings of the features those training samples have, and Adam's average $m$,
+which loses a tenth each Adam step without a new gradient, keeps moving a
+recently used embedding for a few dozen training steps more. An embedding whose
+feature has never had a non-zero value in a trained training sample stays at
+zero. Checked with a test loss on two real decisions: the first training step
+gave a gradient to exactly the 150 embeddings its decision uses and changed only
+those; the second training step also moved the 59 embeddings that only the first
+decision used.
 
-**After the first update of the 5 November run:**
+**After the first network update of the 5 November run:**
 
-| Table | Rows moved, Axis network | Allies | Comintern | Rows in the table |
+| Embedding table | Embeddings moved, Axis network | Allies | Comintern | Embeddings in the embedding table |
 | --- | ---: | ---: | ---: | ---: |
-| Zone table | 1,840 | 1,840 | 1,840 | 42,532 |
-| Position table | 670 | 670 | 670 | 4,076 |
-| Move table | 948 | 430 | 242 | 12,627 |
+| Zone embedding table | 1,840 | 1,840 | 1,840 | 42,532 |
+| Global embedding table | 670 | 670 | 670 | 4,076 |
+| Action embedding table | 948 | 430 | 242 | 12,627 |
 
-The tables of that run had 2,812 more rows than today's. Of the rows removed
-since, only fifteen had moved: twelve said that a nation's income had been
-worked out and three that Japan, the KMT or the CCP keeps a treasury, each true
-of every position. They are among the 670. No other removed row had moved: each
-asked about something that cannot happen
-([list](network_input.md#8-questions-removed-as-impossible)).
+The embedding tables of that run had 2,812 more embeddings than today's. Of the
+embeddings removed since, only fifteen had moved: twelve said that a nation's
+income had been worked out and three that Japan, the KMT or the CCP keeps a
+treasury, each true of every state. They are among the 670. No other removed
+embedding had moved: each feature asked about something that cannot happen
+([list](network_input.md#8-features-removed-as-impossible)).
 
-The three networks moved the same zone and position rows, because every network
-learns values from every sample. Move rows feed only the move probabilities,
-which each network learns from its own alliance's decisions alone, so each moved
-the rows of the move questions its own decisions answered.
+The three networks moved the same zone and global embeddings, because every
+network learns values from every training sample. Action embeddings feed only the
+action probabilities, which each network learns from its own alliance's decisions
+alone, so each moved the embeddings of the action features its own decisions
+used.
 
-**Questions always answered together get identical rows.** Of the Comintern
-network's 1,840 moved zone rows, only 1,480 were different from one another. Two
-questions answered together, with the same answers, in every sample get the same
-gradient in every step and stay identical, such as `units:ccp:mountain_infantry`
-and `unit_stat:comintern:mountain_infantry:count` in section 6.3. The network
-cannot tell them apart until some sample answers one without the other.
+**Features that always have non-zero values together get identical embeddings.**
+Of the Comintern network's 1,840 moved zone embeddings, only 1,480 were different
+from one another. Two features with the same values in every training sample get
+the same gradient in every training step and stay identical, such as
+`units:ccp:mountain_infantry` and `unit_stat:comintern:mountain_infantry:count` in
+section 6.3. The network cannot tell them apart until some training sample has
+one without the other.
 
-### 8.6 Why a few random samples per step
+### 8.6 Why small random minibatches
 
-One sample's gradient points the way that one decision would move the
-parameters. The average over 32 different decisions comes nearer to the way the
-game's decisions in general would: the random error of an average of $n$
-independent samples shrinks like $1/\sqrt{n}$. And one step on 32 decisions costs
-far less than 32 steps on one: in a separate timing on a busy machine it took
-78 ms, and a step on a single sample 21 ms (the update's own steps took 70 ms
-each)
+One training sample's gradient points the way that one decision would move the
+parameters. The average over a minibatch of 32 different decisions comes nearer
+to the way the game's decisions in general would: the random error of an average
+of $n$ independent training samples shrinks like $1/\sqrt{n}$. And one training
+step on 32 decisions costs far less than 32 training steps on one: in a separate
+timing on a busy machine it took 78 ms, and a training step on a single training
+sample 21 ms (the network update's own training steps took 70 ms each)
 ([record](../archive/records/training_sample_2026_11_05.md#the-update-after-the-batch)).
-Averaging all 8,000 in every step would read 250 times as many decisions per step
-but shrink that error only about 16 times, $\sqrt{250}$. So for the same time,
-many cheap steps with a little noise make more progress than a few exact ones;
-that is the usual reasoning behind small batches, not something measured here.
-Drawing at random keeps a step from being 32 neighbouring positions of one game,
-which would push the networks 32 times in nearly the same direction; keeping only
-5% of decisions serves the same purpose. Both choices are standard. DQN, which
-learned Atari games, took mini-batches of 32 experiences drawn at random from a
-replay memory; AlphaGo trained its value network on one position from each
-self-play game; AlphaGo Zero took batches of 2,048 positions drawn at random from
-its latest 500,000 games (Sutton and Barto, *Reinforcement Learning: An
-Introduction*, 2nd edition, sections 16.5, 16.6.1 and 16.6.2). Whether 32 samples
-a step and these numbers of steps suit this game has not been tested.
+Averaging all 8,000 in every training step would read 250 times as many
+decisions per training step but shrink that error only about 16 times,
+$\sqrt{250}$. So for the same time, many cheap training steps with a little noise
+make more progress than a few exact ones; that is the usual reasoning behind
+small minibatches, not something measured here. Drawing at random keeps a
+minibatch from being 32 neighbouring states of one game, which would push the
+networks 32 times in nearly the same direction; keeping only 5% of decisions
+serves the same purpose. Both choices are standard. DQN, which learned Atari
+games, took minibatches of 32 experiences drawn at random from a replay memory;
+AlphaGo trained its value network on one state from each self-play game;
+AlphaGo Zero took minibatches of 2,048 states drawn at random from its latest
+500,000 games (Sutton and Barto, *Reinforcement Learning: An Introduction*, 2nd
+edition, sections 16.5, 16.6.1 and 16.6.2). Whether minibatches of 32 and these
+numbers of training steps suit this game has not been tested.
 
-### 8.7 How often a sample is drawn
+### 8.7 How often a training sample is drawn
 
-Each update draws 700 × 32 = 22,400 times. Once the buffer is full, a sample is
-drawn 2.8 times per update and stays about five updates, until newer samples push
-it out:
+Each network update draws 700 × 32 = 22,400 times. Once the replay buffer is
+full, a training sample is drawn 2.8 times per network update and stays about
+five network updates, until newer training samples push it out:
 
 $$
-\text{draws per sample} \approx \underbrace{\frac{700 \times 32}{8{,}000}}_{\text{per update}} \times \underbrace{\frac{8{,}000}{1{,}611}}_{\text{updates in the buffer}} = \frac{22{,}400}{1{,}611} \approx 14
+\text{draws per training sample} \approx \underbrace{\frac{700 \times 32}{8{,}000}}_{\text{per network update}} \times \underbrace{\frac{8{,}000}{1{,}611}}_{\text{network updates in the buffer}} = \frac{22{,}400}{1{,}611} \approx 14
 $$
 
-The buffer's size cancels: it sets how old a sample may be, about five batches,
-not how often a sample is drawn. Longer games keep more samples per batch, and
-each is then drawn less often: 8 times on 31 October, when a batch of longer games
-kept about 2,750 samples
+The replay buffer's size cancels: it sets how old a training sample may be, about
+five training iterations, not how often a training sample is drawn. Longer games
+keep more training samples per training iteration, and each is then drawn less
+often: 8 times on 31 October, when a training iteration of longer games kept
+about 2,750 training samples
 ([record](../archive/records/training_sample_2026_11_05.md#draws-per-kept-sample-in-recorded-runs)).
-A run's first samples are drawn more often, because the buffer is not yet full: in
-the first update of the 5 November run, its 1,611 samples shared all 22,400 draws,
-14 each in that one update.
+A run's first training samples are drawn more often, because the replay buffer is
+not yet full: in the first network update of the 5 November run, its 1,611
+training samples shared all 22,400 draws, 14 each in that one network update.
 
-Today's 525 steps keep this for batches of 24 games: they draw 525 × 32 = 16,800
-times, 700 for each game of a batch as before. A batch of 24 games kept 1,354
-samples on 15 November, so each would be drawn about 12 times; those games were
-longer than on 5 November.
+Today's 525 training steps keep this for training iterations of 24 games: they
+draw 525 × 32 = 16,800 times, 700 for each game of a training iteration as
+before. A training iteration of 24 games kept 1,354 training samples on
+15 November, so each would be drawn about 12 times; those games were longer than
+on 5 November.
 
 ## 9. The whole loop, and running it
 
 ### 9.1 The training loop
 
-With all the bricks in place, training repeats one loop:
+With all the bricks in place, training repeats one loop, one training iteration
+per turn of the loop:
 
-1. **Play a batch of games** (section 7.1). At every decision, the alliance to move
-   runs a search (section 4), guided by its own network (sections 3, 5 and 6),
-   and picks a move. The networks do not change during the batch.
+1. **Play a training iteration's games** (section 7.1). At every decision, the
+   alliance to act runs a search (section 4), guided by its own network
+   (sections 3, 5 and 6), and picks an action. The networks do not change during
+   the games.
 2. **Keep some decisions as training samples** (section 7.2): what the network
    read, how the search split its simulations and, added when the game ends, the
    final scores.
-3. **Train the three networks** on those samples and recent older ones from the
-   replay buffer (section 8), so that their move probabilities come closer to the
-   search's shares and their values closer to the final scores.
-4. **Save the networks** and play the next batch with them.
+3. **Train the three networks** in a network update on those training samples and
+   recent older ones from the replay buffer (section 8), so that their action
+   probabilities come closer to the search's visit shares and their values closer
+   to the final scores.
+4. **Save the networks** and play the next training iteration's games with them.
 
-![The training loop. 1: play a batch of games with the networks frozen; at every decision the alliance to move searches, asking its network many times, and a random 5% of decisions are kept as samples. When a game ends, its scores are added to its samples. 2: the samples join a replay buffer of recent samples; a sample records what the network read, how many simulations began with each move and, once the game ends, the final scores. 3: training steps update the three networks, one per alliance: each network's move probabilities shift toward the search's shares and its predicted scores toward the final ones. 4: the saved networks play the next batch.](figures/training_loop.svg)
+![The training loop. 1: a training iteration plays its games with the networks held fixed; at every decision the alliance to act searches, asking its network many times, and a random 5% of decisions are kept as training samples. When a game ends, its final scores are added to its training samples. 2: the training samples join a replay buffer of recent training samples; a training sample records what the network read, how many simulations began with each action and, once the game ends, the final scores. 3: the training steps of a network update train the three networks, one per alliance: each network's action probabilities shift toward the search's visit shares and its predicted final scores toward the real ones. 4: the saved networks play the next training iteration's games.](figures/training_loop.svg)
 
 The idea comes from AlphaZero. The search chooses better than the bare network,
 the network learns to imitate the search and to predict outcomes, and a better
 network makes the next searches better. Whether that works for this game on this
-hardware is unproven: no run has yet shown robust playing strength.
+hardware is unproven: no training run has yet shown robust playing strength.
 
 ### 9.2 Running training on the Mac
 
 **Layout.** The Mac profile (`studies/campaign/profiles/mac.json`) runs 6 game
-processes of 4 games each. One coordinating process evaluates all their positions
-together, on the CPU: for this small network the GPU's cost per pass outweighs its
-speed. Training stays within the owner's allowance of 9 cores, the Mac's 10
-performance cores less one for everything else, and 30 GB of memory.
-`tools/supervise_campaign_training.py` handles the time budget, restarts and
-memory stops. It counts one core for each game process, one for the coordinator
-and one for itself, but a game process keeps 1.2 to 1.5 cores busy, because its
-game threads can compute at once (below). So the layout was chosen by the load it
-puts on the Mac: 6 processes kept about 9 cores busy, and 7, which also fit the
-count, about 10
+processes of 4 games each. One *inference server*, a process of its own, runs the
+networks for all their states together, on the CPU: for this small network the
+GPU's cost per forward pass outweighs its speed. Training stays within the
+owner's allowance of 9 cores, the Mac's 10 performance cores less one for
+everything else, and 30 GB of memory. `tools/supervise_campaign_training.py`
+handles the time budget, restarts and memory stops. It counts one core for each
+game process, one for the inference server and one for itself, but a game process
+keeps 1.2 to 1.5 cores busy, because its game threads can compute at once
+(below). So the layout was chosen by the load it puts on the Mac: 6 processes
+kept about 9 cores busy, and 7, which also fit the count, about 10
 ([record](../archive/records/nine_core_layouts_2026_11_15.md)). Since the engine
-work of 16 November the 6 keep only about 7 busy, because the coordinator now
-sets the pace ([record](../archive/records/engine_speed_in_training_2026_11_16.md)). How to start,
-stop and resume a run is in the
+work of 16 November the 6 keep only about 7 busy, because the inference server
+now sets the pace ([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
+How to start, stop and resume a training run is in the
 [campaign learning guide](../../studies/campaign/README.md).
 
-**The coordinator.** Game threads do not run the network themselves. When a game
-thread's search needs the network's answer for a position, the thread writes the
-position's input, a few arrays of whole numbers, into its own block of *shared
-memory*, memory that its game process and the coordinator can both read. Then it
-sends a short note of where those arrays lie through its own *pipe*, a channel
-the operating system keeps between two processes, and waits. The coordinator
-works in *rounds*, which have nothing to do with the game's rounds. In each
-round it reads the notes of every waiting request, lays their positions out,
-evaluates them all in one pass of the three alliance networks, and sends each
-position's priors and values back through the pipe its request came by, as
-lists of numbers (`SharedEvaluatorServer` in
-`studies/campaign/shared_evaluator.py`). *Laying the positions out* joins the
-arrays of all the round's positions end to end, one array of each kind for the
-whole pass, and shifts each position's indices to point into the joined arrays
-(`pack_zone_arrays` in `studies/campaign/features.py`). The pass puts each
-network's positions together, the Axis's first, then the Allies' and the
-Comintern's. If decision 612 came seventh in a round of 8 positions, after
-three of the Axis and three of the Allies, its 37 zone vectors would be numbers
-222 to 258 of the pass's 296 zone vectors, counting from 0, and every index in
-its arrays that names one of its zones would grow by 222 (figure below). In the
-pass each network's learned layers read only its own alliance's positions, so every output is that
-network's own, up to floating-point rounding; a chance position, which all
-three networks rate, appears once for each (`NetworkStack` in
-`studies/campaign/neural.py`). The pass gives every legal move of every position
-the logarithm of its probability (section 6.8). The coordinator turns each
-position's logarithms into its priors on the CPU, one position at a time, after
-copying them back from the GPU's memory when the pass ran there (`collect` in
-`studies/campaign/shared_evaluator.py`).
+**The inference server.** Game threads do not run the network themselves; the
+inference server, which the tools and the dated records name the *coordinator*,
+does it for all of them (`SharedEvaluatorServer` in
+`studies/campaign/shared_evaluator.py`). A *network evaluation* is a network's
+output for one state, its priors and values. When a game thread's search needs a
+network evaluation, the thread writes the state's input, a few arrays of whole
+numbers, into its own block of *shared memory*, memory that its game process and
+the inference server can both read. Then it sends a short note of where those
+arrays lie, its *inference request*, through its own *pipe*, a channel the
+operating system keeps between two processes, and waits.
 
-**What a pass looks like.** A pass takes the positions of one round, laid out.
-Each position keeps its own vectors through the whole network of section 6: its
-37 zone vectors, its position vector and a move vector for each of its legal
-moves. But the vectors of all the pass's positions lie in the same arrays: in a
-round of 8 positions, the pass's zone vectors are one array of 8 × 37 = 296
-vectors of 64 numbers each. Every step of section 6, the first layer, the
-message layers, the summary and the heads, works on such whole arrays, so on
-all the pass's positions at once. The figure shows a pass over a round of 8
-positions, three of the Axis, three of the Allies and two of the Comintern,
-decision 612 among them; the calls of a pass of that mix were counted in the
-record cited below:
+The inference server works in *inference batches*. Each time it is free, it takes
+every inference request waiting at that moment as one inference batch: it reads
+their notes, collates their states, evaluates them all in one forward pass of the
+three alliance networks, and sends each state's priors and values back through
+the pipe its inference request came by, as lists of numbers. The number of states
+in an inference batch is its *inference batch size*. *Collating* the inference
+batch joins the arrays of all its states end to end, one array of each kind for
+the whole forward pass, and shifts each state's indices to point into the joined
+arrays (`pack_zone_arrays` in `studies/campaign/features.py`). The forward pass
+puts each network's states together, the Axis's first, then the Allies' and the
+Comintern's. If decision 612 came seventh in an inference batch of 8 states,
+after three of the Axis and three of the Allies, its 37 zone vectors would be
+numbers 222 to 258 of the forward pass's 296 zone vectors, counting from 0, and
+every index in its arrays that names one of its zones would grow by 222 (figure
+below). In the forward pass each network's linear layers read only its own
+alliance's states, so every output is that network's own, up to floating-point
+rounding; a chance state, which all three networks rate, appears once for each
+(`NetworkStack` in `studies/campaign/neural.py`). The forward pass gives every
+legal action of every state the logarithm of its probability (section 6.8). The
+inference server turns each state's logarithms into its priors on the CPU, one
+state at a time, after copying them back from the GPU's memory when the forward
+pass ran there (`collect` in `studies/campaign/shared_evaluator.py`).
 
-![A pass over a round of 8 positions: 3 of the Axis, 3 of the Allies and 2 of the Comintern, decision 612 among them. Part 1: each position brings 37 zone vectors, a position vector and a move vector for each of its legal moves; laid out, the pass's zone vectors are one array of 296 vectors of 64 numbers, each network's positions together: the Axis's zone vectors 0 to 110, the Allies' 111 to 221, the Comintern's 222 to 295, decision 612's 222 to 258. Part 2: the pass is a list of calls: the first layer, message layer 1, message layer 2, then the summary, the heads and the outputs. Message layer 1 is 42 calls: those that apply a network's learned layers are made once per network, on its own positions, between a split and a join (every zone's message 5 calls, the border terms 2, the zone update 11, the position update 11); the others once for all 8 positions (every border's message 3, each zone's average 3, a zone's inputs side by side 2, adding the zone update 1, the average zone beside the position vector 3, adding the position update 1). Message layer 2 is the same 42; the first layer, summary, heads and outputs are 174; 258 in all. If all 8 positions were one alliance's, each learned layer would be one call and the pass 146 calls, for 1 position as for 8. Part 3: one call, the Comintern network's linear for every zone's message, multiplies its 74 zone vectors by its 64 × 64 message weights: 74 × 64 output numbers of 64 multiply-adds each, 303,104 multiply-adds or 606,208 operations, half of them for decision 612. One output number, the first of Shensi's message at decision 612, is −0.294 × w1 + 1.957 × w2 − 1.422 × w3 − 0.203 × w4 and so on to w64, plus a bias: 64 multiply-adds, each two operations. A call's time is one start, the same for 1 position or 8, then its operations, which grow with the positions.](figures/pass_of_a_round.svg)
+**What a forward pass looks like.** A *forward pass* runs the networks over the
+states of one inference batch, collated. Each state keeps its own vectors through
+the whole network of section 6: its 37 zone vectors, its global vector and an
+action vector for each of its legal actions. But the vectors of all the inference
+batch's states lie in the same arrays: in an inference batch of 8 states, the
+forward pass's zone vectors are one array of 8 × 37 = 296 vectors of 64 numbers
+each. Every layer of section 6, the embedding layer, the message-passing layers,
+the summary and the heads, works on such whole arrays, so on all the inference
+batch's states at once. The figure shows the forward pass of an inference batch
+of 8 states, three of the Axis, three of the Allies and two of the Comintern,
+decision 612 among them; the PyTorch calls of a forward pass of that mix were
+counted in the record cited below:
 
-**What a pass is made of: calls.** A pass is a list of calls to PyTorch (section
-6.3), each applying one function to whole arrays, for all the pass's positions
-at once. When a pass's positions all belong to one alliance, a message layer
-(section 6.6) is the 20 calls below, however many positions the pass holds. For
-decision 612's zones, as for any position's:
+![The forward pass of an inference batch of 8 states: 3 of the Axis, 3 of the Allies and 2 of the Comintern, decision 612 among them. Part 1: each state brings 37 zone vectors, a global vector and an action vector for each of its legal actions; collated, the forward pass's zone vectors are one array of 296 vectors of 64 numbers, each network's states together: the Axis's zone vectors 0 to 110, the Allies' 111 to 221, the Comintern's 222 to 295, decision 612's 222 to 258. Part 2: the forward pass is a list of PyTorch calls: the embedding layer, message-passing layer 1, message-passing layer 2, then the summary, the heads and the outputs. Message-passing layer 1 is 42 PyTorch calls: those that apply a network's linear layers are made once per network, on its own states, between a split and a join (every zone's message 5 calls, the border terms 2, the zone correction 11, the global correction 11); the others once for all 8 states (every border's message 3, each zone's average 3, a zone's inputs side by side 2, adding the zone correction 1, the average zone beside the global vector 3, adding the global correction 1). Message-passing layer 2 is the same 42; the embedding layer, summary, heads and outputs are 174; 258 in all. If all 8 states were one alliance's, each linear layer would be one PyTorch call and the forward pass 146 PyTorch calls, for 1 state as for 8. Part 3: one PyTorch call, the Comintern network's linear for every zone's message, multiplies its 74 zone vectors by its 64 × 64 message weights: 74 × 64 output numbers of 64 multiply-adds each, 303,104 multiply-adds or 606,208 FLOPs, half of them for decision 612. One output number, the first of Shensi's message at decision 612, is −0.294 × w1 + 1.957 × w2 − 1.422 × w3 − 0.203 × w4 and so on to w64, plus a bias: 64 multiply-adds, each two FLOPs. A PyTorch call's time is its call overhead, the same for 1 state or 8, then its FLOPs, which grow with the states.](figures/inference_batch_forward_pass.svg)
 
-| Calls | What they do |
+**What a forward pass is made of: PyTorch calls.** A forward pass is a list of
+PyTorch calls (section 6.3), each applying one function to whole arrays, for all
+the inference batch's states at once. PyTorch's documentation names such a
+function an *operator*. When an inference batch's states all belong to one
+alliance, a message-passing layer (section 6.6) is the 20 PyTorch calls below,
+however many states the inference batch holds. For decision 612's zones, as for
+any state's:
+
+| PyTorch calls | What they do |
 | --- | --- |
 | `linear` | every zone's message: the 37 zone vectors times the layer's message weights |
-| `index_select`, `add`, `gelu` | each of the 160 directed borders takes its source zone's message, adds the border's own term and passes the sum through the GELU curve |
+| `index_select`, `add`, `gelu` | each of the 160 directed borders takes its source zone's message, adds the border's own term and passes the sum through the GELU activation function |
 | `new_zeros`, `index_add_`, `div` | each zone adds up the messages arriving at it and divides by their number |
-| `repeat_interleave`, `cat` | each zone's vector, the messages it received and the position vector, side by side |
-| `linear`, `gelu`, `layer_norm`, `add` | the zone update, added to each zone's vector |
-| `view`, `mean`, `cat` | the average zone vector beside the position vector |
-| `linear`, `gelu`, `layer_norm`, `add` | the position update, added to the position vector |
+| `repeat_interleave`, `cat` | each zone's vector, the messages it received and the global vector, side by side |
+| `linear`, `gelu`, `layer_norm`, `add` | the zone correction, added to each zone's vector |
+| `view`, `mean`, `cat` | the average zone vector beside the global vector |
+| `linear`, `gelu`, `layer_norm`, `add` | the global correction, added to the global vector |
 
-**What a call computes: operations.** An *operation* is one multiplication or
-one addition of two numbers. Each output number of a learned layer is a sum of
-products, one for each input: the input times its weight, added to the sum. A
-*multiply-add* like that is two operations. The toy layer of section 6.2, with 3
-inputs and 2 outputs, does 6 multiply-adds, 12 operations. In the messages'
-`linear` call at decision 612, the first number of Shensi's message adds up
-Shensi's 64 numbers, −0.294, 1.957, −1.422, −0.203 and so on (section 6.4), each
-times its weight: 64 multiply-adds. Shensi's whole message is 64 such numbers,
-4,096 multiply-adds, and the call does the same for all 37 zones: 151,552
-multiply-adds, 303,104 operations, for one position. Only the three `linear`
-calls of a message layer do much arithmetic: at 64×2 about 614,000 multiply-adds
-for one position. Each other call goes over at most about ten thousand numbers
-for each position, adding, dividing or bending each by the GELU curve, or does
-no arithmetic at all: `view`, for one, only reads the same numbers as an array
-of another shape. Counting only the multiply-adds of its learned layers, a whole
-pass of the 64×2 network does about 3.4 million operations for each position
-with 14 legal moves (section 9.3).
+**What a PyTorch call computes: FLOPs.** A *floating-point operation*, or *FLOP*,
+is one multiplication or one addition of two numbers. Each output number of a
+linear layer is a sum of products, one for each input: the input times its
+weight, added to the sum. A *multiply-add* like that is two FLOPs. The toy layer
+of section 6.2, with 3 inputs and 2 outputs, does 6 multiply-adds, 12 FLOPs. In
+the messages' `linear` PyTorch call at decision 612, the first number of Shensi's
+message adds up Shensi's 64 numbers, −0.294, 1.957, −1.422, −0.203 and so on
+(section 6.4), each times its weight: 64 multiply-adds. Shensi's whole message is
+64 such numbers, 4,096 multiply-adds, and the PyTorch call does the same for all
+37 zones: 151,552 multiply-adds, 303,104 FLOPs, for one state. Only the three
+`linear` PyTorch calls of a message-passing layer do much arithmetic: at 64×2
+about 614,000 multiply-adds for one state. Each other PyTorch call goes over at
+most about ten thousand numbers for each state, adding, dividing or passing each
+through the GELU activation function, or does no arithmetic at all: `view`, for
+one, only reads the same numbers as an array of another shape. Counting only the
+multiply-adds of its linear layers, a whole forward pass of the 64×2 network does
+about 3.4 million FLOPs for each state with 14 legal actions (section 9.3).
 
-**How the positions enter.** How many calls a pass makes does not depend on how
-many positions it holds; how many operations its calls do grows in proportion
-to them. A pass of the 64×2 network on one CPU core is 146 calls when its
-positions belong to one alliance, for 1 position as for 8: 40 for the two
-message layers and 106 for the rest, the first layer's column lookups, the
-summary, the value and policy heads and the outputs. With positions of all three
-alliances it is 258, as in the figure: each network's learned layers, with their
-curves and layer normalizations, are called on that network's own positions,
-between a split of the pass's vectors by network and a join, which adds 22 calls
-to each message layer and 68 elsewhere. On the GPU 25 more calls carry the
-positions' arrays over, and at 512×16 a pass is 426 to 871 calls
+**How the states enter.** How many PyTorch calls a forward pass makes does not
+depend on how many states the inference batch holds; how many FLOPs those calls
+do grows in proportion to them. A forward pass of the 64×2 network on one CPU
+core is 146 PyTorch calls when its states belong to one alliance, for 1 state as
+for 8: 40 for the two message-passing layers and 106 for the rest, the embedding
+layer's embedding lookups, the summary, the value and policy heads and the
+outputs. With states of all three alliances it is 258, as in the figure: each
+network's linear layers, with their activation functions and layer
+normalizations, are called on that network's own states, between a split of the
+forward pass's vectors by network and a join, which adds 22 PyTorch calls to each
+message-passing layer and 68 elsewhere. On the GPU 25 more PyTorch calls carry
+the states' arrays over, and at 512×16 a forward pass is 426 to 871 PyTorch calls
 ([record](../archive/records/pass_calls_2026_11_17.md#how-many-calls-a-pass-makes)).
-The operations, by contrast, follow the positions: in the figure's pass, the
-Comintern network's `linear` call for the messages multiplies the zone vectors
-of its two positions, 74 of them, in one call, twice decision 612's
-303,104 operations.
+The FLOPs, by contrast, follow the states: in the figure's forward pass, the
+Comintern network's `linear` PyTorch call for the messages multiplies the zone
+vectors of its two states, 74 of them, in one PyTorch call, twice decision 612's
+303,104 FLOPs.
 
-A call costs a start, whatever the size of its arrays: Python's and PyTorch's own
-work to check the arrays, choose a routine and make room for the result, and on
-the GPU, handing the call over. Then it costs its operations, which grow with
-the positions. A pass of the 64×2 network over one position takes one core
-0.45 ms, 3.1 µs a call, of which at most about 2.1 µs is the start, since the
-same core does a position's 3.4 million operations in about 0.14 ms in large
-passes. A pass of 8 positions makes the same 146 starts as a pass of one when
-its positions belong to one alliance, and 258 when they belong to three, so its
-time per position is much lower: on one core a pass of 8 took 1.67 ms, about
-0.21 ms a position
+A PyTorch call costs a fixed *call overhead*, whatever the size of its arrays:
+Python's and PyTorch's own work to check the arrays, choose a routine and make
+room for the result, and on the GPU, handing the PyTorch call over. Then it costs
+its FLOPs, which grow with the states. A forward pass of the 64×2 network over
+one state takes one core 0.45 ms, 3.1 µs a PyTorch call, of which at most about
+2.1 µs is the call overhead, since the same core does a state's 3.4 million FLOPs
+in about 0.14 ms in large inference batches. An inference batch of 8 states pays
+the same 146 call overheads as an inference batch of one when its states belong
+to one alliance, and 258 when they belong to three, so its time per state is much
+lower: on one core a forward pass of 8 states took 1.67 ms, about 0.21 ms a state
 ([record](../archive/records/pass_calls_2026_11_17.md#what-the-calls-cost)). A
-call is not a training step either: a training step (section 8.4) reads 32
-samples and changes the network's weights once, and each of its parts is itself
-many calls.
+PyTorch call is not a training step either: a training step (section 8.4) reads a
+minibatch of 32 training samples and changes the network's weights once, and each
+of its parts is itself many PyTorch calls.
 
-**What a pass costs.** A pass costs much more than its share of arithmetic. In a
-profiled training batch of 17 November, a pass of the 64×2 network on one core
-took 0.40 ms for one position, 0.82 ms for four and 1.41 ms for eight: about
-0.27 ms plus 0.14 ms a position
+**What a forward pass costs.** A forward pass costs much more than its
+arithmetic alone. In a training iteration timed with the profiler on 17 November,
+a forward pass of the 64×2 network on one core took 0.40 ms for one state,
+0.82 ms for four and 1.41 ms for eight: about 0.27 ms plus 0.14 ms a state
 ([record](../archive/records/coordinator_rounds_2026_11_17.md#the-training-batch)).
-Native samples of the coordinator in that batch put about 43% of its busy time
-in arithmetic, the GELU curve (section 6.2) alone 14%, mostly in the border
-messages (section 6.6). About 31% went to Python's and PyTorch's own work around
-the calls, where their starts lie, and 12% to allocating and copying memory.
-Most of a pass's fixed cost is probably those starts, which by the bound above
-take at most about 0.31 ms of a one-position pass (inferred).
+Native samples of the inference server in that training iteration put about 43%
+of its busy time in arithmetic, the GELU activation function (section 6.2) alone
+14%, mostly in the border messages (section 6.6). About 31% went to Python's and
+PyTorch's own work around the PyTorch calls, where their call overheads lie, and
+12% to allocating and copying memory. Most of a forward pass's fixed cost is
+probably those call overheads, which by the bound above take at most about
+0.31 ms of a one-state forward pass (inferred).
 
-**What a round costs.** A round is its pass and the round trip around it. In
-the same batch the coordinator spent two thirds of its time in passes, 13% laying
-the positions out, 6% reading the requests from the pipes and shared memory,
-turning the outputs into priors and sending the replies, and 9% waiting for
-requests ([record](../archive/records/coordinator_rounds_2026_11_17.md#the-training-batch)).
-In training batches of the Mac profile, whose 6 game processes of 4 games keep
-24 *games in flight*, that is, being played at the moment, a round held about 8
-positions and took the coordinator about 0.62 ms plus 0.13 ms for each
-position, from reading the requests' arrays to the outputs, about 0.21 ms a
-position in all, and the coordinator was busy about 96% of the time
+**What an inference batch costs.** An inference batch costs its forward pass and
+the *request handling* around it, the inference server's work outside the forward
+pass. In the same training iteration the inference server spent two thirds of its
+time in forward passes, 13% collating, 6% reading the inference requests from the
+pipes and shared memory, turning the outputs into priors and sending the replies,
+and 9% waiting for inference requests
+([record](../archive/records/coordinator_rounds_2026_11_17.md#the-training-batch)).
+In training iterations of the Mac profile, whose 6 game processes of 4 games keep
+24 *concurrent games*, games being played at the same moment, an inference batch
+held about 8 states and took the inference server about 0.62 ms plus 0.13 ms for
+each state, from reading the inference requests' arrays to the outputs, about
+0.21 ms a state in all, and the inference server was busy about 96% of the time
 ([record](../archive/records/engine_speed_in_training_2026_11_16.md#what-limits-training-now)).
-So the more positions wait for a round, the less each costs. While all 24 games
-play, a round holds about 10, fewer as the batch's games end, and one when its
-last game plays alone
-([record](../archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail);
-below).
+So the more states wait for an inference batch, the less each costs. While all 24
+games play, an inference batch holds about 10 states, fewer as the training
+iteration's games end, and one when its last game plays alone
+([record](../archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail); below).
 
 **What the cores and the GPU do.** In the Mac profile the GPU does nothing, and
 all the cores work at the same time. A game thread works in the engine and the
-search, listing moves, playing them on copies of the game and building the
-network's input, until a position needs the network. Then it sends the
-coordinator a request and waits for the reply. The engine releases Python's lock
-while it works, so the four game threads of a process can compute at once, and a
-thread that waits leaves its core to the others. That is why each process plays
-four games: in a 15 November batch a game thread computed about a third of the
-time, yet the 24 game threads and the coordinator kept about 9 cores busy, and
-since the engine work of 16 November about 7. The coordinator, on a core of its
-own, answers round after round.
+search, listing legal actions, applying them on copies of the game and building
+the network's input, until a state needs a network evaluation. Then it sends the
+inference server an inference request and waits for the reply. The engine
+releases Python's lock while it works, so the four game threads of a process can
+compute at once, and a thread that waits leaves its core to the others. That is
+why each process plays four games: in a 15 November training iteration a game
+thread computed about a third of the time, yet the 24 game threads and the
+inference server kept about 9 cores busy, and since the engine work of
+16 November about 7. The inference server, on a core of its own, answers
+inference batch after inference batch.
 
 The M4 Max has 10 performance cores and 4 efficiency cores. An efficiency core
 runs at 2.6 GHz instead of 3.8 and, in the game processes, does about 42% of a
 performance core's work in a second. The allowance leaves one performance core for
 the Mac's other work. When that work needs more, the training no longer fits on
-the performance cores. In two profiled batches on 16 November other work kept
-about 4 cores busy. macOS then ran 27% to 29% of the game processes' CPU time on
-the efficiency cores. The game processes waited for a free core half to three
-quarters as long as they computed, and the coordinator a tenth to a fifth as long
+the performance cores. In two training iterations timed with the profiler on
+16 November other work kept about 4 cores busy. macOS then ran 27% to 29% of the
+game processes' CPU time on the efficiency cores. The game processes waited for a
+free core half to three quarters as long as they computed, and the inference
+server a tenth to a fifth as long
 ([record](../archive/records/self_play_limits_2026_11_16.md#the-two-batches)).
 
-![A schematic timeline. The four game threads of one game process take turns: each works in the engine, listing moves, playing a move on a copy of the game and building the network's input, then sends a request and waits until the coordinator answers it in its next round, then works again. While one thread waits, others work. Five more game processes do the same. The coordinator, on one core, runs round after round: one network pass on the CPU for all waiting requests. The GPU is idle.](figures/self_play_timeline.svg)
+![A schematic timeline. The four game threads of one game process take turns: each works in the engine, listing legal actions, applying an action on a copy of the game and building the network's input, then sends an inference request and waits until the inference server answers it in its next inference batch, then works again. While one thread waits, others work. Five more game processes do the same. The inference server, on one core, runs inference batch after inference batch: one forward pass on the CPU for all waiting inference requests. The GPU is idle.](figures/self_play_timeline.svg)
 
-**Why the network runs on the CPU.** A pass on the Mac's GPU has a larger fixed
-cost than a pass on one CPU core. A pass of the 64×2 network over one position
-takes 2.1 ms on the GPU and 0.46 ms on one core, and over 16 positions 4.7 ms
-and 2.7 ms
+**Why the network runs on the CPU.** A forward pass on the Mac's GPU has a larger
+fixed cost than a forward pass on one CPU core. A forward pass of the 64×2 network
+over one state takes 2.1 ms on the GPU and 0.46 ms on one core, and over 16 states
+4.7 ms and 2.7 ms
 ([record](../archive/records/network_and_search_cost_2026_11_14.md#the-network)).
-A round holds about 8 positions (above), so one core answers it sooner. The GPU is
-faster only for larger networks and many positions per pass
+An inference batch holds about 8 states (above), so one core answers it sooner.
+The GPU is faster only for larger networks and larger inference batches
 ([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). The GPU has
-never limited self-play. When the coordinator ran its passes there, up to the
-night of 2 November, a network with five times the parameters played about as
-many decisions per hour as the small one on the CPU (table below): the engine
-and each pass's fixed costs set the pace, not the GPU's arithmetic.
+never limited self-play. When the inference server ran its forward passes there,
+up to the night of 2 November, a network with five times the parameters played
+about as many decisions per hour as the small one on the CPU (table below): the
+engine and each forward pass's fixed costs set the pace, not the GPU's arithmetic.
 
 **The Windows PC.** The owner's second machine is a PC with an 8-core Intel
 i7-9700K, 16 GB of memory and an NVIDIA RTX 3060 Ti GPU. Its profile
 (`studies/campaign/profiles/windows.json`; [training on
 Windows](../../studies/campaign/README.md#training-on-windows)) runs 6 game
-processes of 4 games, as the Mac's does, but the coordinator's passes run on the
-GPU, through *CUDA*, NVIDIA's software for computing on its GPUs. There too the
-coordinator probably set the pace. On the night of 14 November, in three-round
-games with the 64×2 network, a pass held about 10 positions and took 7.6 ms, laying them out
-included, and the coordinator waited for requests only 5.6% of the time
+processes of 4 games, as the Mac's does, but the inference server's forward passes
+run on the GPU, through *CUDA*, NVIDIA's software for computing on its GPUs. There
+too the inference server probably set the pace. On the night of 14 November, in
+three-round games with the 64×2 network, an inference batch held about 10 states
+and its forward pass took 7.6 ms, collating included, and the inference server
+waited for inference requests only 5.6% of the time
 ([record](../archive/records/three_round_training_2026_11_14.md#training)).
 
 **The game processes** do most of the CPU work: about 65 ms per decision since
 the engine work of 16 November, against 110 to 117 ms just before it
-([record](../archive/records/engine_speed_in_training_2026_11_16.md)). A profiled batch before that work showed where their
-time went: the engine and its encoding of positions for the network took 80% of
-the game threads' CPU time. Listing a position's legal
-moves took 37%, about 1.0 ms each time. Playing a move took 22% (0.6 ms), encoding a
-position 10% (0.26 ms), copying the game for the search 5% and rolling dice 4%.
-The search's and the adapter's Python and the requests to the coordinator took
-the rest
+([record](../archive/records/engine_speed_in_training_2026_11_16.md)). A training
+iteration timed with the profiler before that work showed where their time went:
+the engine and its encoding of states for the network took 80% of the game
+threads' CPU time. Listing a state's legal actions took 37%, about 1.0 ms each
+time. Applying an action took 22% (0.6 ms), encoding a state 10% (0.26 ms),
+copying the game for the search 5% and rolling dice 4%. The search's and the
+adapter's Python and the inference requests took the rest
 ([record](../archive/records/self_play_limits_2026_11_16.md#a-game-threads-time)).
 Inside the engine a few rule checks take the most. Enumerating and checking the
 routes a naval force could sail takes about a quarter of the engine's time.
-Finding landing plans for aircraft in flight takes a seventh. The economy's
-options, movement allowances and Supply Paths take about a tenth each. By kind
-of work, 59% of the engine's time went to comparing names, allocating memory,
+Finding landing plans for aircraft in flight takes a seventh. The economy's legal
+actions, movement allowances and Supply Paths take about a tenth each. By kind of
+work, 59% of the engine's time went to comparing names, allocating memory,
 looking up maps and copying memory, and 41% to the rules' own logic, while the
-position kept its zones, units, facilities and nations in maps keyed by name
+state kept its zones, units, facilities and nations in maps keyed by name
 ([record](../archive/records/self_play_limits_2026_11_16.md#inside-the-engine)).
 The engine now holds zones, nations, unit types, facility types, technologies
 and the bases of marks as numbers, and keeps units and facilities in slot maps
@@ -1739,59 +1840,60 @@ of a searched game with play unchanged
 [facility types](../archive/records/facility_type_numbers_2026_11_16.md),
 [slot maps](../archive/records/slot_maps_2026_11_16.md)); the rules still refer
 to units and facilities by name ([names held as numbers](../engine/names.md)).
-While the engine lists a position's legal moves, it keeps a cache of facts about
-that position, such as whether a zone is in supply for a nation, so that each is
-worked out once (`PositionScope` in `include/game/position_facts.hpp`). Playing a
-move opens the same cache for the checks it makes while the position is still
+While the engine lists a state's legal actions, it keeps a cache of facts about
+that state, such as whether a zone is in supply for a nation, so that each is
+worked out once (`PositionScope` in `include/game/position_facts.hpp`). Applying
+an action opens the same cache for the checks it makes while the state is still
 unchanged, such as whether a fleet's chosen route is legal, and closes it before
-the move changes anything. The supply search also works out only once per search
-which naval facilities it may use. Since these two changes, playing a move takes
-about 0.6 ms in random play instead of 1.1 ms
-([record](../archive/records/supply_cache_2026_11_14.md)). A move is also checked
-only once. The engine looks the chosen move up in the position's menu, and the
-economy, which used to list all its options again to check an economy move, skips
-that check for a move the engine has found (`MenuCheckedAction` in
-`include/game/campaign.hpp`). The check of the whole position after every step
-reads the map's index and builds an error message only when it fails. In random
-play these make playing a move take 29% fewer instructions, and in training
-batches the game processes ran 10.6% fewer instructions per decision
-([record](../archive/records/move_checks_2026_11_16.md)).
+the action changes anything. The supply search also works out only once per
+search which naval facilities it may use. Since these two changes, applying an
+action takes about 0.6 ms in random play instead of 1.1 ms
+([record](../archive/records/supply_cache_2026_11_14.md)). An action is also
+checked only once. The engine looks the chosen action up in the state's list of
+legal actions, and the economy, which used to list all its legal actions again to
+check an economy action, skips that check for an action the engine has found
+(`MenuCheckedAction` in `include/game/campaign.hpp`). The check of the whole state
+after every action reads the map's index and builds an error message only when it
+fails. In random play these make applying an action take 29% fewer instructions,
+and in training iterations the game processes ran 10.6% fewer instructions per
+decision ([record](../archive/records/move_checks_2026_11_16.md)).
 
-**What limits self-play** is the coordinator. In two matched pairs of
-Mac-profile batches after the engine work of 16 November, it was busy about 96%
-of the time with rounds of about 8 positions, the training kept only about 7 of
-its 9 cores busy, and it played about 301,000 decisions an hour while playing
-([record](../archive/records/engine_speed_in_training_2026_11_16.md)). Less
-engine work per decision now buys decisions per hour only by filling the
-coordinator's rounds: the game threads ask sooner, more positions wait for each
-round, and each costs less. That is how the engine work of 16 November raised
-it, with rounds of about 5 positions before and 8 after; the rest of its saving
-left cores idle. By the coordinator's cost above, rounds of all 24 game threads
-would answer about 31% more positions a second than rounds of 8 (inferred);
-larger rounds need more games in flight. Otherwise the coordinator's own cost
-has to fall, each round's fixed part and the network's arithmetic, or part of
-its work move elsewhere
-([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). Before
-that work, which of the coordinator and the cores set the pace depended on the
+**What limits self-play** is the inference server. In two matched pairs of
+Mac-profile training iterations after the engine work of 16 November, it was busy
+about 96% of the time with inference batches of about 8 states, the training kept
+only about 7 of its 9 cores busy, and it played about 301,000 decisions an hour
+while playing ([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
+Less engine work per decision now buys decisions per hour only by filling the
+inference server's inference batches: the game threads ask sooner, more states
+wait for each inference batch, and each costs less. That is how the engine work of
+16 November raised it, with inference batches of about 5 states before and 8
+after; the rest of its saving left cores idle. By the inference server's cost
+above, inference batches of all 24 game threads would answer about 31% more
+states a second than inference batches of 8 (inferred); larger inference batches
+need more concurrent games. Otherwise the inference server's own cost has to fall,
+each inference batch's fixed part and the network's arithmetic, or part of its
+work move elsewhere
+([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). Before that
+work, which of the inference server and the cores set the pace depended on the
 Mac's other work
 ([record](../archive/records/move_checks_2026_11_16.md#training-batches)).
 
-A batch also pays for its end. Its 24 games start together and the batch ends
-with the last of them, so as games end fewer remain in flight, and the longest
-plays alone. In a profiled batch of 17 November, 23 games ended between 231 and
-299 seconds and the longest, 1,445 decisions, played alone until 332 seconds: for the
-last tenth of the playing time the coordinator's rounds held one position each
-and the other game threads waited. That cost the batch about 9% of its decisions
-an hour (worked out from each game's decisions and time;
+A training iteration also pays for its end. Its 24 games start together and its
+self-play ends with the last of them, so as games end fewer remain concurrent, and
+the longest plays alone. In a training iteration timed with the profiler on
+17 November, 23 games ended between 231 and 299 seconds and the longest, 1,445
+decisions, played alone until 332 seconds: for the last tenth of the playing time
+the inference server's inference batches held one state each and the other game
+threads waited. That cost the training iteration about 9% of its decisions an hour
+(worked out from each game's decisions and time;
 [record](../archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail)).
-Whether to play more games than game threads in a batch is waiting for the
-owner's decision
-([Q-007](../questions.md#q-007-a-batchs-last-game-played-alone)).
+Whether to play more games than game threads in a training iteration is waiting
+for the owner's decision ([Q-007](../questions.md#q-007-a-training-iterations-last-game-played-alone)).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
-under which each kept sample was drawn 8 to 12 times
-([section 8.7](#87-how-often-a-sample-is-drawn)). Decisions per hour is the speed
-of one setup, a network and a search;
+under which each kept training sample was drawn 8 to 12 times
+([section 8.7](#87-how-often-a-training-sample-is-drawn)). Decisions per hour is
+the speed of one setup, a network and a search;
 [section 9.3](#93-what-a-larger-network-and-a-longer-search-cost) shows how it
 changes with the network's size and the search's budget. Measured on the Mac:
 
@@ -1799,66 +1901,68 @@ changes with the network's size and the search's budget. Measured on the Mac:
 | --- | --- | ---: |
 | 31 October: graph input, network on the GPU | older graph network | about 54,000 |
 | 2 November, best: zone input, network on the CPU | 64×2 | about 144,000 |
-| Night of 2 November, batches 1–2: batched on the GPU | 256×8 | about 151,000 |
+| Night of 2 November, training iterations 1–2: inference batches on the GPU | 256×8 | about 151,000 |
 
 Graph input was the network input until 2 November, replaced then by the zone
 input of section 5.
 
 On 2 November the Mac profile played 124 eleven-round games per hour with learning
-(64×2, CPU evaluation). The night run's network had about five times the
-parameters at no cost in throughput. In its 467 games it did not make the agents
-stronger, but so few games cannot show whether a larger network helps
+(64×2, network evaluations on the CPU). The night run's network had about five
+times the parameters at no cost in throughput. In its 467 games it did not make
+the agents stronger, but so few games cannot show whether a larger network helps
 ([open question](#how-big-should-the-network-and-the-search-be)).
 
-On 4 November the search began keeping a copy of the game at each tree position
-([section 4.7](#47-more-detail-on-the-search)). In a matched batch of the Mac
-profile, with little training, that raised decisions per hour while playing by
-15.5%, from about 162,000 to 188,000. Games per hour rose more, from 152 to 184,
-because that batch's games were shorter
+On 4 November the search began keeping a copy of the game at each tree node
+([section 4.7](#47-more-detail-on-the-search)). In a matched training iteration of
+the Mac profile, with little training, that raised decisions per hour while
+playing by 15.5%, from about 162,000 to 188,000. Games per hour rose more, from
+152 to 184, because that training iteration's games were shorter
 ([record](../archive/records/search_copies_2026_11_04.md)).
 
-On 12 November the fused column lookup cut the coordinator's time per evaluation
-by 18%. In two matched pairs of Mac-profile batches, decisions per hour while
-playing rose by 17.6%, from about 192,700 to 226,600, and games per hour from 182
-to 211 ([record](../archive/records/coordinator_lookups_2026_11_12.md)).
+On 12 November the fused embedding lookup cut the inference server's time per
+network evaluation by 18%. In two matched pairs of Mac-profile training
+iterations, decisions per hour while playing rose by 17.6%, from about 192,700 to
+226,600, and games per hour from 182 to 211
+([record](../archive/records/coordinator_lookups_2026_11_12.md)).
 
-On 14 November playing a move began to use the position's cache (above). In
-matched Mac-profile batches the game processes used 16% less CPU per decision,
-but decisions per hour while playing rose only about 3%, from about 246,200 to
-254,200, a smaller difference than between runs of the same code: the
-coordinator limited the layout
+On 14 November applying an action began to use the state's cache (above). In
+matched Mac-profile training iterations the game processes used 16% less CPU per
+decision, but decisions per hour while playing rose only about 3%, from about
+246,200 to 254,200, a smaller difference than between runs of the same code: the
+inference server limited the layout
 ([record](../archive/records/supply_cache_2026_11_14.md#training-batches)).
 
-The same day the coordinator began answering each round in one pass of the three
-networks instead of one pass per alliance (above), which made a round about a
-third cheaper. In matched Mac-profile batches, on a Mac whose other work used
-about 2.3 cores, decisions per hour while playing rose by 13%, from about 222,500
-to 252,200, and the training used 9.9 cores instead of 8.9
+The same day the inference server began answering each inference batch in one
+forward pass of the three networks instead of one forward pass per alliance
+(above), which made an inference batch about a third cheaper. In matched
+Mac-profile training iterations, on a Mac whose other work used about 2.3 cores,
+decisions per hour while playing rose by 13%, from about 222,500 to 252,200, and
+the training used 9.9 cores instead of 8.9
 ([record](../archive/records/coordinator_one_pass_2026_11_14.md#matched-training-batches)).
 
 On 15 November the owner lowered the allowance from 12 cores to 9, and the
 profile went from 8 game processes to 6, which keep about 9 cores busy. In one
-batch each, 7 processes played about 229,000 decisions an hour while playing,
-6 about 192,000 and 5 about 201,000; one batch each cannot separate 6 from 5.
-Against the 252,200 of 8 processes the change costs about a quarter of the
-decisions an hour, on slightly different code and not in matched batches
-([record](../archive/records/nine_core_layouts_2026_11_15.md)).
+training iteration each, 7 processes played about 229,000 decisions an hour while
+playing, 6 about 192,000 and 5 about 201,000; one training iteration each cannot
+separate 6 from 5. Against the 252,200 of 8 processes the change costs about a
+quarter of the decisions an hour, on slightly different code and not in matched
+training iterations ([record](../archive/records/nine_core_layouts_2026_11_15.md)).
 
 On 16 November the engine came to hold its names as numbers, to keep units and
-facilities in slot maps and to digest a binary writing of the position for its
+facilities in slot maps and to digest a binary writing of the state for its
 planning key ([names held as numbers](../engine/names.md),
-[planning key](../archive/records/planning_key_2026_11_16.md)). In two matched pairs
-of Mac-profile batches against the engine before that work, decisions per hour
-while playing rose 26%, from about 239,000 to 301,000, and games per hour from
-222 to 288; the game processes used 43% less CPU per decision
+[planning key](../archive/records/planning_key_2026_11_16.md)). In two matched
+pairs of Mac-profile training iterations against the engine before that work,
+decisions per hour while playing rose 26%, from about 239,000 to 301,000, and
+games per hour from 222 to 288; the game processes used 43% less CPU per decision
 ([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
 
 **Failures.** A game that fails costs only that game. Its seed is recorded, and a
-rules dead end (a decision with no legal move) saves its position in the run's
-`failed-positions/` folder. Two random-play checks run before long runs: the
-fuzzer (`tools/fuzz_campaign_dead_ends.py`) looks for dead ends and for moves
-that leave the game unchanged, and `tools/check_zone_names.py` for names the
-network's input does not list.
+rules dead end (a decision with no legal action) saves its state in the training
+run's `failed-positions/` folder. Two random-play checks run before long training
+runs: the fuzzer (`tools/fuzz_campaign_dead_ends.py`) looks for dead ends and for
+actions that leave the game unchanged, and `tools/check_zone_names.py` for names
+the network's input does not list.
 
 ### 9.3 What a larger network and a longer search cost
 
@@ -1867,104 +1971,111 @@ less than published game-playing systems used
 ([open question](#how-big-should-the-network-and-the-search-be)). A larger
 system costs in three places: the network's arithmetic, on the CPU or the GPU;
 the engine's work for each simulation, on the CPU; and the search trees, in
-memory. Each was measured on 14 November, on positions from two scripted
+memory. Each was measured on 14 November, on states from two scripted
 eleven-round games
 ([record](../archive/records/network_and_search_cost_2026_11_14.md)).
 
-**The network.** Most of a pass's arithmetic is the message layers' learned
-layers, applied to each of the 37 zones (section 6.6), so it grows with the
-width squared times the number of layers. It is counted below in operations
-(section 9.2), two for each multiply-add of the learned layers, for a position
-with 14 legal moves
-([record](../archive/records/network_and_search_cost_2026_11_14.md#the-network)). Most of the parameters, by contrast,
-are rows of the first layer's tables, of which a decision reads only a few
-hundred (section 6.9), so the parameter count says little about the cost.
+**The network.** Most of a forward pass's arithmetic is the message-passing
+layers' linear layers, applied to each of the 37 zones (section 6.6), so it grows
+with the width squared times the number of message-passing layers. It is counted
+below in FLOPs (section 9.2), two for each multiply-add of the linear layers, for
+a state with 14 legal actions
+([record](../archive/records/network_and_search_cost_2026_11_14.md#the-network)).
+Most of the parameters, by contrast, are embeddings of the embedding tables, of
+which a decision reads only a few hundred (section 6.9), so the parameter count
+says little about the cost.
 
-A pass costs two parts (section 9.2): the starts of its calls, which hardly
-depend on how many positions it holds, and the arithmetic, which grows with
-them. On one CPU core the first part is small and the arithmetic slow. On the
-GPU the first part is larger, since the coordinator's core hands every call to
-the GPU and the pass ends only when the GPU has finished and its outputs are
-copied back, and the arithmetic is fast. So a pass of the 64×2
-network over 64 positions takes one core 10.3 ms, 22 times its 0.46 ms over one
-position, but the GPU 6.5 ms, about three times its 2.1 ms over one. The GPU
-pays only with many positions in a pass. Positions evaluated per second through
-the coordinator's own code, which lays the positions out, runs the pass and
-copies the outputs back
+A forward pass costs two parts (section 9.2): the call overheads of its PyTorch
+calls, which hardly depend on the inference batch size, and the arithmetic, which
+grows with it. On one CPU core the first part is small and the arithmetic slow.
+On the GPU the first part is larger, since the inference server's core hands
+every PyTorch call to the GPU and the forward pass ends only when the GPU has
+finished and its outputs are copied back, and the arithmetic is fast. So a forward
+pass of the 64×2 network over an inference batch of 64 states takes one core
+10.3 ms, 22 times its 0.46 ms for one state, but the GPU 6.5 ms, about three times
+its 2.1 ms for one. The GPU pays only with large inference batches. States
+evaluated per second through the inference server's own code, which collates the
+inference batch, runs the forward pass and copies the outputs back
 ([record](../archive/records/network_and_search_cost_2026_11_14.md#the-network)):
 
-![Three line charts side by side, for networks of 64×2, 256×8 and 512×16, of positions evaluated per second against positions in a pass of 1, 4, 16, 64 and 256, on logarithmic scales. On the GPU the rate rises with the pass: at 64×2 from 485 to 20,916, at 256×8 from 217 to 6,552, at 512×16 from 178 to 1,903. On one CPU core it rises at most 40% beyond 16 positions: at 64×2 from 2,198 to about 6,000, at 256×8 from 360 to 658, at 512×16 from 87 to 166. One core is faster in small passes up to 256×8, the GPU in large ones, and at 512×16 in every pass. A shaded band from 8 to 24 positions marks today's layout.](figures/pass_size_rates.svg)
+![Three line charts side by side, for networks of 64×2, 256×8 and 512×16, of states evaluated per second against the inference batch size, 1, 4, 16, 64 and 256 states, on logarithmic scales. On the GPU the rate rises with the inference batch size: at 64×2 from 485 to 20,916, at 256×8 from 217 to 6,552, at 512×16 from 178 to 1,903. On one CPU core it rises at most 40% beyond 16 states: at 64×2 from 2,198 to about 6,000, at 256×8 from 360 to 658, at 512×16 from 87 to 166. One core is faster in small inference batches up to 256×8, the GPU in large ones, and at 512×16 in every inference batch size. A shaded band from 8 to 24 states marks today's layout.](figures/inference_batch_rates.svg)
 
-Beyond 16 positions a pass one core gains at most 40%: its arithmetic is
-already most of the cost. The GPU's rate keeps rising until its arithmetic
-fills it, the sooner the larger the network: from 64 to 256 positions a pass it
-doubles at 64×2 but rises only 16% at 512×16, where the GPU then does about 2.5
-trillion operations a second, against about 0.2 trillion for one core. In passes
-of one position one core is faster up to 256×8; in passes of 64 the GPU is 7 to
-9 times as fast as one core for the three larger networks. On the GPU the
-coordinator's core takes about 5.6 µs to make each call of a pass, and its own
-work, laying the positions out and making the calls, is about two thirds of
-every 64×2 pass, 40% to 60% of a 256×8 pass of 8 to 64 positions, and only a
-tenth of a 512×16 pass of 256, where the GPU's arithmetic takes the rest
+Beyond 16 states an inference batch on one core gains at most 40%: its arithmetic
+is already most of the cost. The GPU's rate keeps rising until its arithmetic
+fills it, the sooner the larger the network: from inference batches of 64 states
+to 256 it doubles at 64×2 but rises only 16% at 512×16, where the GPU then does
+about 2.5 trillion FLOPs a second, against about 0.2 trillion for one core. In
+inference batches of one state one core is faster up to 256×8; in inference
+batches of 64 the GPU is 7 to 9 times as fast as one core for the three larger
+networks. On the GPU the inference server's core takes about 5.6 µs to make each
+PyTorch call of a forward pass, and its own work, collating the inference batch
+and making the PyTorch calls, is about two thirds of every 64×2 forward pass,
+40% to 60% of a 256×8 forward pass of 8 to 64 states, and only a tenth of a
+512×16 forward pass of 256, where the GPU's arithmetic takes the rest
 ([record](../archive/records/pass_calls_2026_11_17.md#what-the-calls-cost)).
-Real rounds saved from a training batch, replayed through the coordinator's
-code, divide the same way. In the rounds as saved, 7.4 positions on average, making
-the calls took 1.6 ms of a 2.75 ms round at 64×2 and 5.4 ms of 11.7 ms at
-512×16, and the GPU was slower than one core at 64×2 but 1.7 and 3.7 times as
-fast at 256×8 and 512×16. Merged 16 at a time, 119 positions a round, a 512×16
-round waited 84% of its time for the GPU's arithmetic, a 64×2 round only 30%
+Real inference batches saved from a training iteration, replayed through the
+inference server's code, divide the same way. In the inference batches as saved,
+7.4 states on average, making the PyTorch calls took 1.6 ms of a 2.75 ms
+inference batch at 64×2 and 5.4 ms of 11.7 ms at 512×16, and the GPU was slower
+than one core at 64×2 but 1.7 and 3.7 times as fast at 256×8 and 512×16. Merged
+16 at a time, 119 states an inference batch, a 512×16 inference batch waited 84%
+of its time for the GPU's arithmetic, a 64×2 inference batch only 30%
 ([record](../archive/records/coordinator_rounds_2026_11_17.md#replayed-rounds-on-the-gpu)).
-Two of the coordinator's levers (below), half precision and compiling, were
-tried on those rounds and did not pay as they stand; whether fewer calls would
-let the GPU do more is open. The rates used below:
+Two of the inference server's levers (below), half precision and compiling, were
+tried on those inference batches and did not pay as they stand; whether fewer
+PyTorch calls would let the GPU do more is open. The rates used below, in states
+evaluated per second:
 
-| Network | Arithmetic per position | One CPU core, 16 per pass | GPU, 64 per pass | GPU, 256 per pass |
+| Network | Arithmetic per state | One CPU core, inference batches of 16 | GPU, inference batches of 64 | GPU, inference batches of 256 |
 | --- | ---: | ---: | ---: | ---: |
-| 64×2 | 3.4 million operations | 5,850 | 9,840 | 20,900 |
+| 64×2 | 3.4 million FLOPs | 5,850 | 9,840 | 20,900 |
 | 128×4 | 23 million | 2,210 | 7,970 | 13,500 |
 | 256×8 | 173 million | 577 | 4,500 | 6,550 |
 | 384×12 | 565 million | 267 | 2,620 | 3,350 |
 | 512×16 | 1,320 million | 125 | 1,640 | 1,900 |
 
-Four threads on one pass are at most about twice as fast as one core, and
-slower than one core on passes of a few positions. Training adds little: with 5%
-of decisions kept and each drawn about ten times, the networks train on about
-half a sample per decision, against 50 or more evaluations per decision in
-self-play.
+Four threads on one forward pass are at most about twice as fast as one core, and
+slower than one core on inference batches of a few states. Training adds little:
+with 5% of decisions kept and each drawn about ten times, the networks train on
+about half a training sample per decision, against 50 or more network evaluations
+per decision in self-play.
 
 **The search.** A simulation costs the game process about the same CPU whatever
 the network and however many simulations a search runs: 1.23 ms of a core at 64
 simulations, 1.26 ms at 256 and 1.29 ms at 1,024, measured alone on the Mac with
-the engine of 14 November. In the 14 November training batches the same work
-cost about twice as much, about 2.4 ms per evaluation (120 ms per decision, about
-50 evaluations), with every core busy and four games to a process; the gap has
-not been broken down. With the engine of 16 November it costs about 1.3 ms per
-evaluation in training (65 ms per decision, about 51 evaluations)
+the engine of 14 November. In the 14 November training iterations the same work
+cost about twice as much, about 2.4 ms per network evaluation (120 ms per
+decision, about 50 network evaluations), with every core busy and four games to a
+process; the gap has not been broken down. With the engine of 16 November it
+costs about 1.3 ms per network evaluation in training (65 ms per decision, about
+51 network evaluations)
 ([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
 A search keeps a copy of the game at each node of its tree
 ([section 4.7](#47-more-detail-on-the-search)), about 160 to 230 KB each, so a
-tree holds about 11 MB at 64 simulations, 56 MB at 256 and 250 MB at 1,024 until
-its move is chosen. Each game in flight (section 9.2) holds one tree.
+search tree holds about 11 MB at 64 simulations, 56 MB at 256 and 250 MB at 1,024
+until its action is chosen. Each concurrent game (section 9.2) holds one search
+tree.
 
-**Which part limits.** Count both parts in evaluations, the positions the network
-is asked about. A search asks about roughly one position per simulation
-(section 4.2), and decisions with a single legal move are not searched, so a
-decision uses about 50 evaluations at 64 simulations, 197 at 256 and 612 at 800.
-Each evaluation needs engine work from a core for games, about 1.3 ms in training,
-and a share of a network pass. So the 7 cores for games that the 9-core allowance
-leaves can feed the network about 5,400 evaluations a second, whatever its size,
-and the network can answer as many positions a second as the table above gives
-for its size and device. Self-play runs at the lower of the two rates:
+**Which part limits.** Count both parts in network evaluations. A search asks for
+roughly one network evaluation per simulation (section 4.2), and decisions with a
+single legal action are not searched, so a decision uses about 50 network
+evaluations at 64 simulations, 197 at 256 and 612 at 800. Each network evaluation
+needs engine work from a core for games, about 1.3 ms in training, and part of
+a forward pass. So the 7 cores for games that the 9-core allowance leaves can
+feed the network about 5,400 network evaluations a second, whatever its size, and
+the network can evaluate as many states a second as the table above gives for its
+size and device. Self-play runs at the lower of the two rates:
 
-$$\text{decisions per hour} = \frac{3600}{\text{evaluations per decision}} \times \min\left(\frac{\text{cores for games}}{\text{core seconds per evaluation}}, \text{positions the network evaluates per second}\right)$$
+$$\text{decisions per hour} = \frac{3600}{\text{network evaluations per decision}} \times \min\left(\frac{\text{cores for games}}{\text{core seconds per network evaluation}}, \text{states the network evaluates per second}\right)$$
 
-![A line chart on a logarithmic scale of evaluations per second for networks of 64×2, 128×4, 256×8, 384×12 and 512×16 on the Mac. A flat line at about 5,400 a second is what the engine work of the 7 cores for games can feed, the same for every network. The network on the GPU, in passes of 64 positions, answers 9,840 a second at 64×2 falling to 1,640 at 512×16, and crosses the flat line between 128×4 and 256×8. The network on one CPU core, in passes of 16, answers 5,850 at 64×2, just above the flat line, falling to 125 at 512×16. Self-play gets the lower rate: the cores' up to 128×4, the GPU's from 256×8 on.](figures/evaluation_supply.svg)
+![A line chart on a logarithmic scale of network evaluations per second for networks of 64×2, 128×4, 256×8, 384×12 and 512×16 on the Mac. A flat line at about 5,400 a second is what the engine work of the 7 cores for games can feed, the same for every network. The network on the GPU, in inference batches of 64 states, evaluates 9,840 states a second at 64×2 falling to 1,640 at 512×16, and crosses the flat line between 128×4 and 256×8. The network on one CPU core, in inference batches of 16, evaluates 5,850 at 64×2, just above the flat line, falling to 125 at 512×16. Self-play gets the lower rate: the cores' up to 128×4, the GPU's from 256×8 on.](figures/evaluation_supply.svg)
 
 **How decisions per hour changes with the network and the search.** The
 network's size changes only the second rate, and the search's budget divides
-both. Worked out for the Mac, with 7 cores for games, one for the coordinator and
-one for the supervisor, the network on whichever is faster of one core, in passes
-of 16 positions, and the GPU, in passes of 64, and 30 GB, decisions per hour are:
+both. Worked out for the Mac, with 7 cores for games, one for the inference server
+and one for the supervisor, the network on whichever is faster of one core, in
+inference batches of 16 states, and the GPU, in inference batches of 64, and
+30 GB, decisions per hour are:
 
 | Network | 64 simulations | 256 simulations | 800 simulations | Limited by |
 | --- | ---: | ---: | ---: | --- |
@@ -1974,185 +2085,188 @@ of 16 positions, and the GPU, in passes of 64, and 30 GB, decisions per hour are
 | 384×12 | 188,000 | 48,000 | 14,500 | the GPU |
 | 512×16 | 118,000 | 30,000 | 9,200 | the GPU |
 
-Down a column, decisions per hour stays the same while the cores limit. Up to
+Down a column of the table, decisions per hour stays the same while the cores limit. Up to
 128×4, a network with about 7 times the arithmetic of 64×2, the engine sets the
 pace and the larger network costs nothing. From 256×8 on the GPU limits, and
 decisions per hour falls, but much less than the arithmetic grows: 512×16 has
 about 390 times the arithmetic of 64×2 and plays about a third as many decisions
-an hour, because the GPU's rate falls only six times over that range; a pass of
-a small network costs it mostly fixed overhead. Before the engine work of 16
-November, with the cores' rate about half as high, the engine set the pace up to
-256×8: on the night of 2 November a 256×8 network on the GPU played about as
-many decisions an hour as the 64×2 network on the CPU (section 9.2). With the network on one CPU core, as
-in today's profile, the coordinator already limits at 64×2 (section 9.2), and the
-network's arithmetic alone would limit from 128×4 on, so every larger network
-needs the GPU.
+an hour, because the GPU's rate falls only six times over that range; a forward
+pass of a small network costs it mostly fixed overhead. Before the engine work of
+16 November, with the cores' rate about half as high, the engine set the pace up
+to 256×8: on the night of 2 November a 256×8 network on the GPU played about as
+many decisions an hour as the 64×2 network on the CPU (section 9.2). With the
+network on one CPU core, as in today's profile, the inference server already
+limits at 64×2 (section 9.2), and the network's arithmetic alone would limit from
+128×4 on, so every larger network needs the GPU.
 
-Along a row, decisions per hour falls in proportion to the simulations, whatever
+Along a row of the table, decisions per hour falls in proportion to the simulations, whatever
 limits: four times the simulations, about a quarter of the decisions. So which
 part limits depends on the network, not on the search. A game has about 1,000
-decisions (the 14 November batches averaged about 940), so 100,000 games take
-about 11 days at 386,000 decisions an hour, 44 days at 94,000 and 453 days at
-9,200.
+decisions (the 14 November training iterations averaged about 940), so 100,000
+games take about 11 days at 386,000 decisions an hour, 44 days at 94,000 and 453
+days at 9,200.
 
 The table is worked out from the measurements above, not measured in training
 runs, by the method of the 14 November study with the engine's cost of 16
 November: 0.065 s of CPU per decision at 64 simulations, scaled to larger
 searches as the study scaled 0.120
 ([record](../archive/records/network_and_search_cost_2026_11_14.md#which-part-limits-worked-out);
-[engine cost](../archive/records/engine_speed_in_training_2026_11_16.md)). Today's setup, the 64×2 network on one CPU
-core, is not in the table: there the coordinator limits, at about 301,000
-decisions an hour measured, where the cores could feed about 386,000. With the
-engine of 14 November the table gave 210,000 for the cores where a 15 November
-batch measured about 192,000
+[engine cost](../archive/records/engine_speed_in_training_2026_11_16.md)). Today's
+setup, the 64×2 network on one CPU core, is not in the table: there the inference
+server limits, at about 301,000 decisions an hour measured, where the cores could
+feed about 386,000. With the engine of 14 November the table gave 210,000 for the
+cores where a 15 November training iteration measured about 192,000
 ([record](../archive/records/nine_core_layouts_2026_11_15.md)), so read every
 rate as an upper bound, about a tenth too high, and every number of days as a
 lower bound.
 
-**Where a pass's positions come from.** A round's pass holds the positions
-waiting when it starts, and a game asks about one position at a time: its
-search plays one simulation after another, and a simulation that reaches a new
-position waits for its evaluation before the next begins (`_expand` in
-`studies/shared/multiplayer_mcts.py`). So a pass holds at most one position for
-each game in flight. A pass of 64 positions needs about 128 games in flight,
-half of them waiting in the pass while the other half work in the engine, and
-each holds its tree in memory. At 800 simulations 30 GB holds the trees of only
-about 115 games beside the processes' other memory, so passes hold about 57
-positions. Today's layout has 24 games in flight, and its rounds on the CPU
-hold about 10 positions while all 24 play, about 8 over a whole batch, and one
-at its end (section 9.2). It could never fill a pass of 64, and in
-passes of 4 and of 16 positions the GPU gives 11% and 35% of its rate in passes
-of 64 at 64×2, and 25% and 56% at 512×16. So moving the network to the GPU
-means more games in flight as well. A search could instead ask about several
-positions at once: choose a few new positions before asking, steering each
-later choice away from the paths already chosen, and wait for all of them
-together. That would fill passes with fewer games and less memory, but it
-changes which positions a search explores, so it is a change of the search, to
-be checked like one; it has not been tried.
+**Where an inference batch's states come from.** An inference batch holds the
+inference requests waiting when it starts, and a game asks for one network
+evaluation at a time: its search plays one simulation after another, and a
+simulation that reaches a new state waits for its network evaluation before the
+next begins (`_expand` in `studies/shared/multiplayer_mcts.py`). So an inference
+batch holds at most one state for each concurrent game. An inference batch of 64
+states needs about 128 concurrent games, half of them waiting in the inference
+batch while the other half work in the engine, and each holds its search tree in
+memory. At 800 simulations 30 GB holds the search trees of only about 115 games
+beside the processes' other memory, so inference batches hold about 57 states.
+Today's layout has 24 concurrent games, and its inference batches on the CPU hold
+about 10 states while all 24 play, about 8 over a whole training iteration, and
+one at its end (section 9.2). It could never fill an inference batch of 64, and in
+inference batches of 4 and of 16 states the GPU gives 11% and 35% of its rate in
+inference batches of 64 at 64×2, and 25% and 56% at 512×16. So moving the network
+to the GPU means more concurrent games as well. A search could instead ask for
+several network evaluations at once: choose a few new states before asking,
+steering each later choice away from the paths already chosen, and wait for all
+of them together. That would fill inference batches with fewer games and less
+memory, but it changes which states a search explores, so it is a change of the
+search, to be checked like one; it has not been tried.
 
 **Comparing setups.** Decisions per hour is the speed of one setup, a network and
 a search. It compares two versions of the code on the same setup, as the matched
-batches of section 9.2 do, but not two setups: a larger network or a longer search
-plays fewer decisions an hour, and whether its better searches teach more per
-hour is unmeasured
+training iterations of section 9.2 do, but not two setups: a larger network or a
+longer search plays fewer decisions an hour, and whether its better searches
+teach more per hour is unmeasured
 ([open question](#how-big-should-the-network-and-the-search-be)). To judge a
 change of the code at a size not yet trained, measure the rate it changes and
 work out the rest with the formula. A change to the engine or the search changes
 the cores' rate, which is the same for every network. It raises decisions per hour
 wherever the cores limit, but only until the cores' line in the figure reaches the
-network's line above it. With the GPU in passes of 64, a cheaper engine can now
-pay up to about 1.8 times at 64×2, about 1.5 times at 128×4 and not at all from
-256×8 on, where the GPU already limits; passes of 256 would let it pay about 1.2
-times at 256×8, with four times the games in flight. With the network on one
-core, as today, the coordinator is busy about 96% of the time and the cores are
-not (section 9.2), so at 64×2 a cheaper engine gains only as far as it fills the
-coordinator's rounds. A change to the coordinator changes the network's rate,
-and matters only where the network or the coordinator limits.
+network's line above it. With the GPU in inference batches of 64, a cheaper engine
+can now pay up to about 1.8 times at 64×2, about 1.5 times at 128×4 and not at all
+from 256×8 on, where the GPU already limits; inference batches of 256 would let it
+pay about 1.2 times at 256×8, with four times the concurrent games. With the
+network on one core, as today, the inference server is busy about 96% of the time
+and the cores are not (section 9.2), so at 64×2 a cheaper engine gains only as far
+as it fills the inference server's inference batches. A change to the inference
+server changes the network's rate, and matters only where the network or the
+inference server limits.
 
-**The coordinator's levers.** The coordinator has three levers, which weigh
-differently on the two devices. More positions per pass gain little on one core
-beyond about 16, and much on the GPU: at least up to 256 positions for the small
-networks, and up to about 64 for 512×16. Fewer calls, or cheaper starts, gain on
-both, most on the GPU in small passes of small networks, where the starts are
-most of a pass's time. Cheaper arithmetic gains on one core in any pass, but on
-the GPU only in large passes of large networks, where the arithmetic fills it.
-From 256×8 on the network needs the GPU, so there the coordinator's speed is the
-GPU's, and these levers are what would raise it. The levers take the forms
-below, beside two changes around the pass: a leaner round trip and a second
-coordinator. None of them is built. Two were tried on real rounds saved from a
-training batch and did not pay as they stand; which of the others pay, and how
-much, is open:
+**The inference server's levers.** The inference server has three levers, which
+weigh differently on the two devices. Larger inference batches gain little on one
+core beyond about 16 states, and much on the GPU: at least up to 256 states for
+the small networks, and up to about 64 for 512×16. Fewer PyTorch calls, or
+smaller call overheads, gain on both, most on the GPU in small inference batches
+of small networks, where the call overheads are most of a forward pass's time.
+Cheaper arithmetic gains on one core in any inference batch, but on the GPU only
+in large inference batches of large networks, where the arithmetic fills it. From
+256×8 on the network needs the GPU, so there the inference server's speed is the
+GPU's, and these levers are what would raise it. The levers take the forms below,
+beside two changes around the forward pass: leaner request handling and a second
+inference server. None of them is built. Two were tried on real inference batches
+saved from a training iteration and did not pay as they stand; which of the
+others pay, and how much, is open:
 
-- **Fewer calls.** In a pass with positions of all three alliances, 43% to 50%
-  of the calls are ones that positions of one alliance would not need: the pass
-  splits its vectors by network, calls each network's learned layer on that
-  network's part and joins the results (`_by_network` in
+- **Fewer PyTorch calls.** In a forward pass with states of all three alliances,
+  43% to 50% of the PyTorch calls are ones that states of one alliance would not
+  need: the forward pass splits its vectors by network, calls each network's
+  linear layer on that network's part and joins the results (`_by_network` in
   `studies/campaign/neural.py`;
   [record](../archive/records/pass_calls_2026_11_17.md#how-many-calls-a-pass-makes)).
-  A *grouped matrix product*, one call that multiplies each network's positions
-  by that network's own weights, would call each learned layer once for all
-  three networks, as for positions of one alliance. PyTorch offers one only as a
+  A *grouped matrix product*, one PyTorch call that multiplies each network's
+  states by that network's own weights, would call each linear layer once for all
+  three networks, as for states of one alliance. PyTorch offers one only as a
   private function, `torch._grouped_mm`, which gave the same products on the CPU
   ([record](../archive/records/coordinator_one_pass_2026_11_14.md#other-ways-considered)).
-- **Cheaper starts: compiling.** PyTorch's compiler, `torch.compile`, reads a
-  pass's calls once, ahead of the passes it serves, and writes routines that
-  each do the work of several calls, such as a learned layer's matrix product,
-  its GELU curve and the addition after it. A compiled pass makes fewer starts
-  and moves its numbers through memory fewer times. Its routines work best for
-  arrays of fixed sizes, and a pass's arrays change size with its positions, so
-  passes would be padded with empty positions up to a few fixed sizes, each
-  compiled once, at the cost of the empty positions' arithmetic. Compiled as it
-  is written, the pass was never faster on the saved rounds: 5% to 7% slower on
-  the GPU and 12% to 21% slower on one core. PyTorch compiled it again for each
-  new mix of positions, up to its limit of 8, and rounds merged into larger
-  passes made it write GPU code that did not build
-  ([record](../archive/records/coordinator_rounds_2026_11_17.md#compiling)).
-  On an NVIDIA
-  GPU, such as the Windows PC's (section 9.2), a *CUDA graph* goes further:
-  PyTorch records a pass's calls on the GPU once, and each later pass of the
-  same size replays the record from a single start.
+- **Smaller call overheads: compiling.** PyTorch's compiler, `torch.compile`,
+  reads a forward pass's PyTorch calls once, ahead of the forward passes it
+  serves, and writes routines that each do the work of several PyTorch calls,
+  such as a linear layer's matrix product, its GELU activation function and the
+  addition after it. A compiled forward pass pays fewer call overheads and moves
+  its numbers through memory fewer times. Its routines work best for arrays of
+  fixed sizes, and a forward pass's arrays change size with the inference batch
+  size, so inference batches would be padded with empty states up to a few fixed
+  sizes, each compiled once, at the cost of the empty states' arithmetic.
+  Compiled as it is written, the forward pass was never faster on the saved
+  inference batches: 5% to 7% slower on the GPU and 12% to 21% slower on one
+  core. PyTorch compiled it again for each new mix of states, up to its limit of
+  8, and inference batches merged into larger ones made it write GPU code that
+  did not build ([record](../archive/records/coordinator_rounds_2026_11_17.md#compiling)). On an NVIDIA GPU, such as the Windows PC's (section 9.2), a *CUDA graph* goes further:
+  PyTorch records a forward pass's PyTorch calls on the GPU once, and each later
+  forward pass of the same inference batch size replays the record with a single
+  call overhead.
 - **Cheaper arithmetic: half precision.** The networks compute with numbers of
   32 bits, which keep about 7 significant digits; that is the float rounding of
-  section 6.3. *Half-precision* numbers take 16 bits and keep about 3. A pass in
-  half precision moves half as many bytes, and many GPUs compute with such
+  section 6.3. *Half-precision* numbers take 16 bits and keep about 3. A forward
+  pass in half precision moves half as many bytes, and many GPUs compute with such
   numbers faster, but its outputs differ from the 32-bit ones by much more than
   rounding, so it would be checked like a change of the network. Under PyTorch's
   automatic mixed precision, which does the matrix products in 16 bits and keeps
-  sums and normalizations in 32, the saved rounds ran 5% to 23% slower on the
-  GPU, since the conversions add calls, while priors moved by at most 0.00023
-  and values by at most 0.10; on one core bfloat16, another 16-bit format, made
-  them 92% slower
-  ([record](../archive/records/coordinator_rounds_2026_11_17.md#half-precision)).
-- **A leaner round trip.** Outside the pass, the coordinator reads the requests'
-  notes from the pipes, lays the positions out in Python, turns the outputs into
-  priors one position at a time and sends the replies through the pipes as lists
-  (section 9.2). In a profiled batch of 17 November laying the positions out
-  took 13% of the coordinator's time, and the rest of the round trip 6%
+  sums and normalizations in 32, the saved inference batches ran 5% to 23% slower
+  on the GPU, since the conversions add PyTorch calls, while priors moved by at
+  most 0.00023 and values by at most 0.10; on one core bfloat16, another 16-bit
+  format, made them 92% slower ([record](../archive/records/coordinator_rounds_2026_11_17.md#half-precision)).
+- **Leaner request handling.** Outside the forward pass, the inference server
+  reads the inference requests' notes from the pipes, collates the inference batch
+  in Python, turns the outputs into priors one state at a time and sends the
+  replies through the pipes as lists: its request handling (section 9.2). In a
+  training iteration timed with the profiler on 17 November collating took 13%
+  of the inference server's time, and the rest of the request handling 6%
   ([record](../archive/records/coordinator_rounds_2026_11_17.md#the-training-batch)).
-  Writing the replies into shared memory, turning all the positions' outputs
-  into priors at once, and laying the positions out in the engine's C++ with
-  fewer copies would shorten that part of a round.
-- **More positions per pass.** More games in flight fill larger passes, each
-  game with its search tree in memory, and so would a search that asks about
-  several positions at once (both above, where a pass's positions come from). On
-  the GPU the coordinator's core could also lay out the next pass while the GPU
-  computes the current one; now it waits for each pass's outputs before its next
-  round. A batch's end empties its passes too, since its last games play alone
-  ([Q-007](../questions.md#q-007-a-batchs-last-game-played-alone)).
-- **A second coordinator**, serving half the game processes, would add capacity
-  without making a round cheaper: each coordinator would find about half as many
-  positions waiting, and smaller passes cost more per position. It was not built
-  on 14 November, when the cores were nearly all busy
+  Writing the replies into shared memory, turning all the states' outputs into
+  priors at once, and collating in the engine's C++ with fewer copies would
+  shorten that part of an inference batch.
+- **Larger inference batches.** More concurrent games fill larger inference
+  batches, each game with its search tree in memory, and so would a search that
+  asks for several network evaluations at once (both above, where an inference
+  batch's states come from). On the GPU the inference server's core could also
+  collate the next inference batch while the GPU computes the current one; now it
+  waits for each forward pass's outputs before its next inference batch. A
+  training iteration's end empties its inference batches too, since its last games
+  play alone ([Q-007](../questions.md#q-007-a-training-iterations-last-game-played-alone)).
+- **A second inference server**, serving half the game processes, would add
+  capacity without making an inference batch cheaper: each inference server would
+  find about half as many states waiting, and smaller inference batches cost more
+  per state. It was not built on 14 November, when the cores were nearly all busy
   ([record](../archive/records/coordinator_one_pass_2026_11_14.md#other-ways-considered));
   since the engine work of 16 November about 2 of the 9 are idle (section 9.2).
 
-Each form can be checked on real rounds saved from a training batch
-(`tools/profile_coordinator.py --save-every`) and replayed through the
-coordinator's code on one core or on the GPU, with a network of any size, as
-saved or merged into larger passes: the replay times each step of a round and
-compares two versions' replies (`tools/replay_coordinator_rounds.py`).
-`tools/benchmark_network_sizes.py` times passes of sampled positions, as for
-the rates above.
+Each form can be checked on real inference batches saved from a training
+iteration (`tools/profile_coordinator.py --save-every`) and replayed through the
+inference server's code on one core or on the GPU, with a network of any size, as
+saved or merged into larger inference batches: the replay times each part of an
+inference batch's handling and compares two versions' replies
+(`tools/replay_coordinator_rounds.py`). `tools/benchmark_network_sizes.py` times
+forward passes of sampled states, as for the rates above.
 
 Three things follow, inferred:
 
-- **The engine is the main cost of a simulation.** An evaluation takes about
-  1.3 ms of a core in the engine and 0.15 to 0.22 ms of the GPU at 256×8. Keeping
-  the Mac's GPU busy, in passes of 64, takes about 13 cores for games at 64×2,
-  10 at 128×4, 6 at 256×8, 3 at 384×12 and 2 at 512×16: the 7 of the allowance
-  keep it busy from 256×8 on, and all 10 performance cores would nearly keep it
-  busy at 128×4.
-- **Memory grows with the search.** A tree holds about 0.24 MB per simulation, so
-  at 800 simulations each game in flight holds about 190 MB, and memory, not the
-  GPU, sets how many games can fill a pass.
+- **The engine is the main cost of a simulation.** A network evaluation takes
+  about 1.3 ms of a core in the engine and 0.15 to 0.22 ms of the GPU at 256×8.
+  Keeping the Mac's GPU busy, in inference batches of 64, takes about 13 cores for
+  games at 64×2, 10 at 128×4, 6 at 256×8, 3 at 384×12 and 2 at 512×16: the 7 of
+  the allowance keep it busy from 256×8 on, and all 10 performance cores would
+  nearly keep it busy at 128×4.
+- **Memory grows with the search.** A search tree holds about 0.24 MB per
+  simulation, so at 800 simulations each concurrent game holds about 190 MB, and
+  memory, not the GPU, sets how many games can fill an inference batch.
 - **What each part of a computer buys.** More cores, like a cheaper engine, raise
   the cores' line in the figure, and with it decisions per hour wherever the cores
   limit. A faster GPU raises its line and moves the crossing to larger networks,
   but helps only with enough cores to feed it, about one core for every 750
-  evaluations a second at the engine's cost of 16 November: a GPU ten times as
-  fast as the Mac's would need about ten times the cores, unless the engine gets
-  cheaper.
-  Memory must hold a tree for every game in flight.
+  network evaluations a second at the engine's cost of 16 November: a GPU ten
+  times as fast as the Mac's would need about ten times the cores, unless the
+  engine gets cheaper. Memory must hold a search tree for every concurrent game.
 
 ### 9.4 How the Campaign Observatory shows a game
 
@@ -2161,16 +2275,17 @@ lets you stop a recorded game at any event and inspect both the board and the
 decision facing the player there. Python prepares the recording.
 The browser draws it with HTML, CSS, JavaScript and SVG.
 
-**From play to replay.** On a fresh run whose games are played inside the training
-process (without `--episode-workers`), `--record-replay` writes a `replay.jsonl`
-trace. It records the actual moves, resolved dice and search statistics for the
-choices at each recorded decision. To turn the trace into a viewable game, Python
-starts a separate copy of the C++ engine from the recorded seed. It plays each
-move or dice event in order and checks the resulting position against the trace.
-The exported JSON contains the scenario map, the factions (nations and alliances),
-one initial position and a list of events. Each event carries just the changes
-needed to advance the board, alongside its move and search details or its dice
-record. [Recorder](../../studies/campaign/learning.py) · [Replay
+**From play to replay.** On a fresh training run whose games are played inside
+the training process (without `--episode-workers`), `--record-replay` writes a
+`replay.jsonl` trace. It records the actual actions, resolved dice and search
+statistics for the legal actions at each recorded decision. To turn the trace
+into a viewable game, Python starts a separate copy of the C++ engine from the
+recorded seed. It applies each action or dice event in order and checks the
+resulting state against the trace. The exported JSON contains the scenario map,
+the factions (nations and alliances), one initial state and a list of events.
+Each event carries just the changes needed to advance the board, alongside its
+action and search details or its dice record.
+[Recorder](../../studies/campaign/learning.py) · [Replay
 builder](../../studies/campaign/replay.py)
 
 **From replay to screen.** A local Python server serves the selected recording and
@@ -2182,10 +2297,10 @@ package the recording, board image, styles and scripts into one HTML file. [Serv
 and HTML export](../../studies/campaign/viewer.py) · [Launch
 commands](../../web/campaign_viewer/README.md)
 
-**How the browser draws a position.** The HTML defines the map, inspector,
+**How the browser draws a state.** The HTML defines the map, inspector,
 timeline and analysis panels. The stylesheet arranges them. When you move the
-timeline, `model.js` applies recorded changes from the current position or a
-cached earlier one. In `app.js`, `seek()` compares the selected position with its
+timeline, `model.js` applies recorded changes from the current state or a
+cached earlier one. In `app.js`, `seek()` compares the selected state with its
 predecessor and redraws the panels. The SVG uses the pixel coordinates of the
 China campaign board image. Each of the 31 land pins marks its printed territory
 roundel, and each of the six sea pins sits inside its zone. Scenario connections
@@ -2200,46 +2315,47 @@ controls](../../web/campaign_viewer/app.js)
 
 For example, at event 12 of the viewer's test game (seed 1951), its event journal
 records Ma Clique joining KMT after the CCP attack, and the map's card for
-Tsinghai now shows KMT possession. Stepping back one event restores Ma Clique. The
+Tsinghai now shows KMT possession. Going back one event restores Ma Clique. The
 search panel looks forward from whichever board you select. If the next event is a
-decision with saved search data, it shows the legal choices, the network's initial
-preferences, the simulation visits and the move actually played. If the next event
-is a dice roll, the combat and dice panel shows the outcome once you step forward.
-[Replay example and checks](../../tools/verify_campaign_replay_viewer.mjs)
+decision with saved search data, it shows the legal actions, the network's
+priors, the simulations' visit counts and the action actually played. If the next
+event is a dice roll, the combat and dice panel shows the outcome once you go
+forward. [Replay example and checks](../../tools/verify_campaign_replay_viewer.mjs)
 
 ## 10. Measuring strength
 
 **Held-out evaluation** (`studies/campaign/evaluation.py`) fixes the networks
 being tested, turns exploration noise off and plays them against simple scripted
 opponents (`balanced` and `cautious`), one side at a time, on seeds that training
-never used.
+never used. It measures playing strength; it is not a network evaluation
+(section 9.2).
 
-**Repeated-state guard.** Evaluation stops a game after 20 visits to the same full
-position and reports it as unfinished, with no final score.
+**Repeated-state guard.** Held-out evaluation stops a game after 20 visits to the
+same full state and reports it as unfinished, with no final score.
 
-**Evaluation loops, night of 2 November.** In 3 of 26 games the trained networks
-repeated one combat-phase move 20 times and were stopped; the untrained networks
-never did in 39 games. The move was a patrol plane declaring an attack it had
-already declared, which changed nothing: an engine loophole. A search values a
-move that changes nothing exactly as the current position, so a network that
-preferred the position to the likely battle chose it every time once the noise
-was off. The engine stopped offering the duplicate (commit `68ebd15`), and the
-fuzzer now flags any move that leaves the game unchanged (`b26511f`). The lesson
-is general: search will find and use any move that does nothing, so the engine
-must not offer one.
+**Held-out evaluation loops, night of 2 November.** In 3 of 26 games the trained
+networks repeated one combat-phase action 20 times and were stopped; the
+untrained networks never did in 39 games. The action was a patrol plane declaring
+an attack it had already declared, which changed nothing: an engine loophole. A
+search values an action that changes nothing exactly as the current state, so a
+network that preferred the state to the likely battle chose it every time once
+the noise was off. The engine stopped offering the duplicate (commit `68ebd15`),
+and the fuzzer now flags any action that leaves the game unchanged (`b26511f`).
+The lesson is general: search will find and use any action that does nothing, so
+the engine must not offer one.
 
-**Generation 0 is nearly passive with the noise off.** A fresh network gives every
-position the same values (section 6.9), so its search has little to go on. On
-14 November, the untrained networks playing one alliance against the scripted
-opponents ended almost every phase at once. The Axis made 23 decisions a game,
-against 338 for the scripted Axis. In self-play, with noise and the move drawn
-from the shares, the same networks made 208 Axis decisions a game
+**Generation 0 is nearly passive with the noise off.** A fresh network, generation
+0, gives every state the same values (section 6.9), so its search has little to go
+on. On 14 November, the untrained networks playing one alliance against the
+scripted opponents ended almost every phase at once. The Axis made 23 decisions a
+game, against 338 for the scripted Axis. In self-play, with noise and the action
+drawn from the visit shares, the same networks made 208 Axis decisions a game
 ([record](../archive/records/three_round_training_2026_11_14.md)). So comparing a
 trained network with generation 0 compares it with a player that does almost
-nothing. Over three rounds, that is the best Axis player measured (see
+nothing. Over three game rounds, that is the best Axis player measured (see
 [the objective](#is-the-final-wealth-gap-the-right-goal)).
 
-Small samples do not establish strength. The scripted opponents are simple
+A few games do not establish strength. The scripted opponents are simple
 controls, not expert play.
 
 ## 11. Known gaps and open questions
@@ -2253,56 +2369,57 @@ measured and what would settle it.
 
 - **Some details are summarized, not named.** Tests check the names the
   engine's source writes, and in 480 random games no name falls into an "other"
-  question. But a mark's argument other than a place or a nation, such as which
-  railroad was damaged this turn, is counted for the whole position, and a
-  battle note's numbers are added into one answer. Four marks a nation can
-  carry are known to be on no list, because the engine puts their names
-  together in a variable. See
+  feature. But a mark's argument other than a place or a nation, such as which
+  railroad was damaged this turn, is counted for the whole state, and a battle
+  note's numbers are added into one feature value. Four marks a nation can carry
+  are known to be on no list, because the engine puts their names together in a
+  variable. See
   [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
 - **Heap corruption.** On the night of 2 November a game process crashed twice
-  early in batch 3: the engine freed memory and kept using it. About 4.5 hours of
-  replays in builds with memory checks did not reproduce it. Two crashes close
-  together and none under changed timing suggest a race between game threads in
-  one process, but that is unproven. A ThreadSanitizer run is the suggested next
-  step.
-- **No run has yet made the agents stronger.** The most games a run has played
-  is 792 three-round games, on the PC on the night of 14 November
+  early in training iteration 3: the engine freed memory and kept using it. About
+  4.5 hours of replays in builds with memory checks did not reproduce it. Two
+  crashes close together and none under changed timing suggest a race between
+  game threads in one process, but that is unproven. A ThreadSanitizer run is the
+  suggested next check.
+- **No training run has yet made the agents stronger.** The most games a training
+  run has played is 792 three-round games, on the PC on the night of 14 November
   ([record](../archive/records/three_round_training_2026_11_14.md)). Earlier runs
   played at most about 500. Both are far fewer than published systems needed
   ([how big](#how-big-should-the-network-and-the-search-be)). In that run:
-  - The value heads learned each alliance's average score.
+  - The value heads learned each alliance's average final score.
   - On 24 held-out seeds, no trained network beat the scripted policy in its seat
     by a clear margin.
   - Training made the Axis more active, away from the passive play that scores
-    best over three rounds.
-  - Its settings could not test the main question. Within three rounds a
+    best over three game rounds.
+  - Its settings could not test the main question. Within three game rounds a
     passive Axis wins whatever is learned, and a 64×2 network relates each zone
     to about a third of the map
     ([how big](#how-big-should-the-network-and-the-search-be)).
 
   Two design questions below may also be part of the reason: the
   [objective](#is-the-final-wealth-gap-the-right-goal) and
-  [flat search targets](#are-64-simulations-enough-on-large-menus).
+  [flat search targets](#are-64-simulations-enough-when-there-are-many-legal-actions).
 - **Input pruning left out two rules** it could not prove for the whole game:
   warlords never owning ships or planes, and per-flag unit-class rules. Nor
-  does each kind of thing have its own list of marks yet, so some questions
+  does each kind of thing have its own list of marks yet, so some global features
   pair a nation, or the game as a whole, with a mark that only units or
   territories carry
-  ([what is still asked](network_input.md#what-the-position-asks-about-a-nation)).
-- **The coordinator limits self-play on the Mac.** Since the engine work of 16
-  November it is busy about 96% of the time while the training keeps about 7 of
-  its 9 cores busy ([record](../archive/records/engine_speed_in_training_2026_11_16.md)), so in the Mac
-  profile a faster engine plays more decisions an hour only as far as it fills
-  the coordinator's rounds. A round costs the coordinator about 0.62 ms besides
-  0.13 ms a position (section 9.2); a seventh game process, now that cores are
-  idle, would fill its rounds further, which is untested. The coordinator's own
-  levers, none of them built, are listed in section 9.3, with the first
-  measurements of two of them. Each batch also ends with its longest game
-  playing alone, which cost a profiled batch about 9% of its decisions an hour
-  ([Q-007](../questions.md#q-007-a-batchs-last-game-played-alone)). Within the engine,
-  listing a position's legal moves now costs the most each time, and checking a
-  naval route copies the whole position and works out its carriers' reach and
-  supply again with no cache
+  ([what is still asked](network_input.md#what-the-global-features-ask-about-a-nation)).
+- **The inference server limits self-play on the Mac.** Since the engine work of
+  16 November it is busy about 96% of the time while the training keeps about 7
+  of its 9 cores busy
+  ([record](../archive/records/engine_speed_in_training_2026_11_16.md)), so in the
+  Mac profile a faster engine plays more decisions an hour only as far as it fills
+  the inference server's inference batches. An inference batch costs the
+  inference server about 0.62 ms besides 0.13 ms a state (section 9.2); a seventh
+  game process, now that cores are idle, would fill its inference batches further,
+  which is untested. The inference server's own levers, none of them built, are
+  listed in section 9.3, with the first measurements of two of them. Each
+  training iteration also ends with its longest game playing alone, which cost a
+  training iteration timed with the profiler about 9% of its decisions an hour
+  ([Q-007](../questions.md#q-007-a-training-iterations-last-game-played-alone)). Within the engine, listing a state's legal actions now
+  costs the most each time, and checking a naval route copies the whole state and
+  works out its carriers' reach and supply again with no cache
   ([record](../archive/records/naval_route_checks_2026_11_16.md)). When the
   Mac's other work needs more than one core, part of the training runs on the
   efficiency cores
@@ -2310,54 +2427,57 @@ measured and what would settle it.
 
 ### Open design questions
 
-#### One row per combination, or rows built from parts?
+#### One embedding per combination, or embeddings built from parts?
 
-**Now.** Every question names a full combination and has its own row (section 6.3).
-`unit_stat:axis:infantry:move_1`, an Axis infantry with one move left, and
-`unit_stat:allies:infantry:move_1`, the same for the Allies, share nothing. What
-training learns about one does not carry over to the other, and a combination
-that training rarely meets keeps a row near zero.
+**Now.** Every feature names a full combination and has its own embedding
+(section 6.3). `unit_stat:axis:infantry:move_1`, an Axis infantry with one
+movement point left, and `unit_stat:allies:infantry:move_1`, the same for the
+Allies, share nothing. What training learns about one does not carry over to the
+other, and a combination that training rarely meets keeps an embedding near zero.
 
-**Alternative.** Build each row from its parts: one row for the alliance, one for
-the unit type, one for the property. Every part is trained wherever it appears,
-and the tables shrink about tenfold: unit statistics would need 5 + 45 + 74 = 124
-part rows instead of their 13,321 combination rows, and the three tables about
-6,400 instead of 59,235.
+**Alternative.** Build each embedding from its parts: one embedding for the
+alliance, one for the unit type, one for the property. Every part is trained
+wherever it appears, and the embedding tables shrink about tenfold: unit
+statistics would need 5 + 45 + 74 = 124 part embeddings instead of their 13,321
+combination embeddings, and the three embedding tables about 6,400 embeddings
+instead of 59,235.
 
 **The catch.** Added parts lose which part went with which. With Axis infantry
-with one move left and Axis tanks with two in one zone, a sum of parts cannot
-tell whether the infantry or the tanks have the one move, and the layers after
-the lookup would have to learn what the current rows give directly. Combining
-each answer's parts through a small learned layer, or keeping a combination row
-alongside the parts, keeps that distinction at some cost per answer.
+with one movement point left and Axis tanks with two in one zone, a sum of parts
+cannot tell whether the infantry or the tanks have the one movement point, and
+the layers after the embedding lookup would have to learn what the current
+embeddings give directly. Combining each feature's parts through a small learned
+layer, or keeping a combination embedding alongside the parts, keeps that
+distinction at some cost per feature.
 
 **Measured:** nothing yet. **Would settle it:** both versions trained with equal
-compute, compared on held-out value error and in evaluation games.
+compute, compared on held-out value error and in held-out evaluation games.
 
 #### How big should the network and the search be?
 
 **Now.** The Mac profile runs a 64×2 network (section 6) with 64 simulations per
-decision (section 4), and no training run has played more than about 500 games:
-the night run of 2 November played 467, with a 256×8 network. After $k$ message
-layers a zone's vector reflects zones up to $k$ borders away (section 6.6). The
-map is 7 borders across, from Tokyo to Sinkiang, and two zones are on average
-3.2 borders apart. So a 64×2 network relates each zone to about a third of the
-others, and to the average of all zones through the position vector; 7 message
-layers would relate every zone to every other. Inferred, not measured: in China
-many threats are three or more borders away.
+decision (section 4), and no training run has played more than about 500
+eleven-round games: the night run of 2 November played 467, with a 256×8 network.
+After $k$ message-passing layers a zone's vector reflects zones up to $k$ borders
+away (section 6.6). The map is 7 borders across, from Tokyo to Sinkiang, and two
+zones are on average 3.2 borders apart. So a 64×2 network relates each zone to
+about a third of the others, and to the average of all zones through the global
+vector; 7 message-passing layers would relate every zone to every other.
+Inferred, not measured: in China many threats are three or more borders away.
 
 **How big published networks are.** AlphaZero's networks, and most that
-followed them, are stacks of *residual blocks*. A block is two convolutions
-(section 6.10), each a learned layer applied at every point of the board to the
-vectors at and around that point, and the block adds their result to its input.
-A message layer here is two learned layers as well (section 6.6), and where a
-convolution carries information one point further, a message layer carries it
-one border further. So blocks there compare with message layers here, and
-widths with widths. Parameters compare too, since both kinds of network apply
-the same learned numbers at every point or zone, but arithmetic grows also with
-the number of points: 361 in Go, 64 in chess, 37 zones here.
+followed them, are stacks of *residual blocks*. A residual block is two
+convolutions (section 6.10), each a linear layer applied at every point of the
+board to the vectors at and around that point, and the residual block adds their
+result to its input. A message-passing layer here is two linear layers as well
+(section 6.6), and where a convolution carries information one point further, a
+message-passing layer carries it one border further. So residual blocks there
+compare with message-passing layers here, and widths with widths. Parameters
+compare too, since both kinds of network apply the same learned numbers at every
+point or zone, but arithmetic grows also with the number of points: 361 in Go, 64
+in chess, 37 zones here.
 
-| Network | Game | Blocks or layers | Width | Parameters | Operations per evaluation | Reach |
+| Network | Game | Residual blocks or message-passing layers | Width | Parameters | FLOPs per network evaluation | Receptive field |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
 | [AlphaGo Zero](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf), first run | Go, 361 points | 20 | 256 | 23 million | 16 billion | 2.2 |
 | AlphaGo Zero, second run | Go | 40 | 256 | 46 million | 33 billion | 4.4 |
@@ -2370,31 +2490,31 @@ the number of points: 361 in Go, 64 in chess, 37 zones here.
 | This project, 256×8 | this game | 8 | 256 | 4.4 million | 173 million | 1.1 |
 | This project, 512×16 | this game | 16 | 512 | 30 million | 1.3 billion | 2.3 |
 
-The published networks' parameters and operations are worked out here from
-their published sizes, counting the convolutions' parameters and two operations
-per multiply-add of each convolution at every point, as section 9.3 counts this
+The published networks' parameters and FLOPs are worked out here from their
+published sizes, counting the convolutions' parameters and two FLOPs per
+multiply-add of each convolution at every point, as section 9.3 counts this
 network's; their output layers add little. DORA's parameters are as published;
-TD-Gammon's are estimated from its 198 board inputs and a few features (Sutton
-and Barto, section 16.1). This project's counts are for one of its three
-networks and leave out the first layer's tables (section 6.3), which have no
+TD-Gammon's are estimated from its 198 board inputs and a few more input features
+(Sutton and Barto, section 16.1). This project's counts are for one of its three
+networks and leave out the embedding tables (section 6.3), which have no
 counterpart in those networks: 3.8 million parameters at 64×2, 15.2 million at
-256×8 and 30.3 million at 512×16. *Reach* is how many points or borders the
-layers carry information, divided by the largest distance on the board: 18 king
-steps in Go, 7 in chess, 6 in Connect Four and 7 borders here. KataGo's
-networks, like this one through its position vector, also hand every point a
-summary of the whole board.
+256×8 and 30.3 million at 512×16. The *receptive field* here is how many points
+or borders the layers carry information, divided by the largest distance on the
+board: 18 king steps in Go, 7 in chess, 6 in Connect Four and 7 borders here.
+KataGo's networks, like this one through its global vector, also hand every point
+a summary of the whole board.
 
 Against these, the 64×2 network is small in every measure: a quarter of the
 usual width of 256; an eighth of the parameters of KataGo's first network and
 about a 170th of AlphaZero's; about a 220th of the arithmetic of KataGo's first
-network and a 900th of AlphaZero's; and a reach of a third of the map. A 256×8
-network is about as large as the smallest published ones: more parameters than
-KataGo's first two networks or AlphaZero.jl's, less arithmetic than KataGo's,
-since it has 37 zones to their 361 points, and a reach of the whole map. A
-512×16 network has a little more than AlphaZero's parameters, under half its
-arithmetic and the reach of KataGo's final network.
+network and a 900th of AlphaZero's; and a receptive field of a third of the map.
+A 256×8 network is about as large as the smallest published ones: more parameters
+than KataGo's first two networks or AlphaZero.jl's, less arithmetic than
+KataGo's, since it has 37 zones to their 361 points, and a receptive field of the
+whole map. A 512×16 network has a little more than AlphaZero's parameters, under
+half its arithmetic and the receptive field of KataGo's final network.
 
-**What those sizes were enough for.** TD-Gammon 2.1's 80 units played
+**What those sizes were enough for.** TD-Gammon 2.1's 80 hidden neurons played
 backgammon at a strong master level after 1.5 million games. KataGo's first
 network reached strong amateur strength after 0.4 million games, its second
 strong professional strength after 1.0 million and its third superhuman strength
@@ -2425,17 +2545,17 @@ trend carries over.
 **Their searches and games.** The same systems searched more and played many
 more games:
 
-| System | Simulations per move | Self-play games | Hardware and time |
+| System | Simulations per decision | Self-play games | Hardware and time |
 | --- | --- | ---: | --- |
 | AlphaGo Zero, first run | 1,600 | 4.9 million | 3 days |
 | AlphaGo Zero, second run | 1,600 | 29 million | about 40 days |
 | AlphaZero, chess | 800 | 44 million | 9 hours, 5,000 TPUs playing |
-| KataGo, 2019 run | 600 to 1,000 on a quarter of the moves, 100 to 200 on the rest | 4.2 million | 19 days, at most 28 GPUs |
+| KataGo, 2019 run | 600 to 1,000 on a quarter of the decisions, 100 to 200 on the rest | 4.2 million | 19 days, at most 28 GPUs |
 | [Gumbel MuZero](https://openreview.net/forum?id=bERaNdoegnO), 9×9 Go | from 2 to 200; it learned even with 2 | not stated | not stated |
-| DORA, two-player Diplomacy | an equilibrium search each turn | not stated | 192 GPUs, about a week per stage |
+| DORA, two-player Diplomacy | an equilibrium search each turn | not stated | 192 GPUs, about a week per training stage |
 | AlphaZero.jl, Connect Four | 600 | 75,000 | one GPU, about a day |
 | TD-Gammon 2.1 | none; a 2-ply lookahead in play | 1.5 million | not stated |
-| This project | 64 | at most about 500 per run | the Mac |
+| This project | 64 | at most about 500 per training run | the Mac |
 
 A game here has about 1,000 decisions, many more than a game of chess or Go has
 moves, so it holds more decisions to learn from, but its final score comes much
@@ -2446,7 +2566,7 @@ with two kinds of unit and grew weaker on larger maps
 
 **What it would cost here.** On the Mac, at least about 51 days per 100,000 games
 at 256×8 with 256 simulations and at least about 450 days at 512×16 with 800
-simulations, both limited by its GPU in passes of 64 positions
+simulations, both limited by its GPU in inference batches of 64 states
 ([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost), whose rates
 are upper bounds). Three months of eight-hour nights, about 720 hours, would
 play at most about 59,000 games at the first size and 6,600 at the second.
@@ -2454,19 +2574,20 @@ AlphaGo Zero's first run played 4.9 million games, 49 times as many as 100,000,
 and KataGo's 2019 run 4.2 million.
 
 **Unmeasured:** whether a larger network or a longer search learns faster here
-for the same compute, whether depth or width matters more, and how many games
-this game needs. In Hex, the strength a fixed amount of compute buys falls
+for the same compute, whether network depth or width matters more, and how many
+games this game needs. In Hex, the strength a fixed amount of compute buys falls
 predictably as the board grows, and compute spent in training can stand in for
 search at play time ([Jones 2021](https://arxiv.org/abs/2104.03113)). Gumbel
 search learned with a few simulations where plain search failed, so the search
 budget and the search method are one question.
 
-**Would settle it:** a ladder of runs at growing sizes, each given the same
-compute and compared in held-out evaluation (section 10), with the search's
-targets checked as in [the question on 64 simulations](#are-64-simulations-enough-on-large-menus),
-then repeated with more compute; or one long run that grows its network, as
-KataGo's did. Inferred from the published networks, not measured: a first ladder
-would run from 64×2 through 256×8, the smallest of the measured sizes whose
+**Would settle it:** a ladder of training runs at growing sizes, each given the
+same compute and compared in held-out evaluation (section 10), with the search's
+targets checked as in
+[the question on 64 simulations](#are-64-simulations-enough-when-there-are-many-legal-actions),
+then repeated with more compute; or one long training run that grows its network,
+as KataGo's did. Inferred from the published networks, not measured: a first
+ladder would run from 64×2 through 256×8, the smallest of the measured sizes whose
 layers reach across the map, to 512×16, a little more than AlphaZero's
 parameters. The size that does best for a budget is the target for that budget,
 and section 9.3's costs at that size say which part of a computer limits it, and
@@ -2474,11 +2595,12 @@ so what hardware it needs.
 
 #### How should a count count?
 
-**Now.** An answer $a$ adds its row times $\operatorname{sign}(a)\ln(1 + |a|)$
-([section 6.3](#63-the-first-layer-rows-and-tables)): 1 counts
-0.69, 2 counts 1.10 and 10 counts 2.40. The curve was chosen, not compared.
+**Now.** A feature value $a$ adds its feature's embedding times
+$\operatorname{sign}(a)\ln(1 + |a|)$
+([section 6.3](#63-the-embedding-layer-embeddings-and-embedding-tables)): 1 counts
+0.69, 2 counts 1.10 and 10 counts 2.40. The formula was chosen, not compared.
 
-**Alternatives:** counts in proportion, or separate questions for count ranges
+**Alternatives:** counts in proportion, or separate features for count ranges
 (1, 2 to 3, 4 to 7, more), so each range learns its own effect. **Would settle
 it:** held-out value error on fixed data first, which is cheap, then games.
 
@@ -2487,22 +2609,22 @@ it:** held-out value error on fixed data first, which is cheap, then games.
 **Now.** Each alliance has its own network. All three value heads learn from every
 kept decision, but each policy only from its own alliance's decisions
 (`CampaignLearner.update` in `studies/campaign/learning.py`). A search rates each
-new position with the network of the alliance that decides there, so one search
+new state with the network of the alliance that decides there, so one search
 compares values that different networks gave.
 
 **Alternative.** One network told which alliance is choosing. Its policy would
 learn from all three alliances' decisions. Speed is not a reason for it: the
-coordinator already evaluates the three networks in one pass
+inference server already evaluates the three networks in one forward pass
 ([section 9.2](#92-running-training-on-the-mac)). **The catch:** one network must
 hold three different strategies.
 
-**Measured** on 9 November, with networks after one update
+**Measured** on 9 November, with networks after one network update
 ([record](../archive/records/depth_limit_2026_11_09.md#positions-rated-by-another-alliances-network)):
-at eight positions that all three networks rated, their values for one alliance
-differed by 2.5 to 17 points, while the best and worst moves' average results in a
-search lay a median 1.45 points apart. In one game 9.3% of the simulations stopped
-at positions rated by another alliance's network than the choosing one's, and such
-a rating set the bottom of the scale in [section
+at eight states that all three networks rated, their values for one alliance
+differed by 2.5 to 17 points, while the best and worst actions' average results in
+a search lay a median 1.45 points apart. In one game 9.3% of the simulations
+stopped at states rated by another alliance's network than the choosing one's,
+and such a rating set the bottom of the scale in [section
 4.6](#46-a-real-search-decision-612)'s example. Whether the networks agree better
 after more training, and how much the disagreement changes searches, is not
 measured. **Would settle it:** those two measurements first, then an equal-compute
@@ -2513,7 +2635,7 @@ as optional future work.
 #### Is the final wealth gap the right goal?
 
 **Now.** Each alliance maximizes its wealth minus the other two alliances'
-combined wealth after the July 1941 round, the approved objective
+combined wealth after the July 1941 game round, the approved objective
 ([plan](../plans/japan_china_full_rules_plan.md#wealth-definition-and-approved-accounting-decisions)).
 
 **Measured.** In the [decision
@@ -2532,24 +2654,25 @@ moved and fought far more and scored 12.9 ± 2.2 below the untrained network
 **Would settle it:** the owner's decision on the objective. A changed objective
 can be checked first with the same scripted comparison.
 
-#### Are 64 simulations enough on large menus?
+#### Are 64 simulations enough when there are many legal actions?
 
-**Now.** A search runs 64 simulations, and the share of visits each first move
-received becomes the policy target (section 4.5).
+**Now.** A search runs 64 simulations, and the visit share each action at the
+root received becomes the policy target (section 4.5).
 
-**Measured** on 31 October: at Japan's opening, with 308 options, the search tried
-63 of them, almost all once, and in an eleven-round game 60% of Japan's Combat
-Movement decisions had at least 64 options
+**Measured** on 31 October: at Japan's opening, with 308 legal actions, the
+search tried 63 of them, almost all once, and in an eleven-round game 60% of
+Japan's Combat Movement decisions had at least 64 legal actions
 ([decision review](../archive/records/decision_review_2026_10_31.md#training-findings)).
-Such targets say little more than which moves were tried. Since then Combat
-Movement menus have shrunk to about a third
-([record](../archive/records/combat_movement_combats_only_2026_11_01.md)); the spread of
-targets has not been measured again.
+Such targets say little more than which actions were tried. Since then Combat
+Movement decisions have shrunk to about a third as many legal actions
+([record](../archive/records/combat_movement_combats_only_2026_11_01.md)); the
+spread of policy targets has not been measured again.
 
-**Alternatives:** more simulations where menus are large, fewer options per
-decision, or Gumbel root search, which the review suggests because it was
-designed for fewer simulations than options. **Would settle it:** measuring the
-targets on current menus, then comparing learning at equal compute.
+**Alternatives:** more simulations where there are many legal actions, fewer legal
+actions per decision, or Gumbel root search, which the review suggests because it
+was designed for fewer simulations than legal actions. **Would settle it:**
+measuring the policy targets on today's decisions, then comparing learning at
+equal compute.
 
 #### Search-guided self-play or direct policy learning, and which opponents?
 
@@ -2558,246 +2681,320 @@ their latest networks.
 
 **Open.** The [plan](../plans/japan_china_full_rules_plan.md#2-training-approach)
 keeps masked PPO, a policy trained without a search at every decision, as a
-competing method, and older networks as extra opponents for when evaluation shows
-overfitting to the current ones. Neither has been tried. **Would settle it:** the
-equal-compute comparison the plan describes.
+competing method, and older networks as extra opponents for when held-out
+evaluation shows overfitting to the current ones. Neither has been tried.
+**Would settle it:** the equal-compute comparison the plan describes.
 
-#### Should the engine leave out choices that are never better?
+#### Should the engine leave out actions that are never better?
 
-**Now.** Since 5 November the engine leaves out two moves that do what another
-move on the same menu does, at greater cost, on the user's decision: a
-strategic rail move to a zone the unit also reaches by an ordinary move, which
+**Now.** Since 5 November the engine leaves out two actions that do what another
+legal action of the same decision does, at greater cost, on the user's decision:
+a strategic rail move to a zone the unit also reaches by an ordinary move, which
 spends rail capacity and ends the unit's movement, and the printed price once
 Improved Construction offers the discount (RB 8.2.1 offers the discount or the
-condensed stages). In random games they were 3.0% of options and, in 1 game of
-240, 1,930 options. The engine still offers copies of one move for each of
-several identical units, and lets a player skip the free recruitment roll.
+condensed stages). In random games they were 3.0% of legal actions and, in 1 game
+of 240, 1,930 legal actions. The engine still offers copies of one action for each
+of several identical units, and lets a player skip the free recruitment roll.
 
 **Alternative.** Leave those out too:
 
-| Choice | Why it is never better | In random games |
+| Action | Why it is never better | In random games |
 | --- | --- | ---: |
-| The same move for another of several identical units | the positions differ only in the units' names | 10.2% of options |
+| The same action for another of several identical units | the states differ only in the units' names | 10.2% of legal actions |
 | Ending the Place Units Phase without the recruitment roll | the roll is free and every result helps (RB 12.7) | skipped 472 times in 48 games |
 
-**The catch.** A move may go only if it is never better in any position, and some
+**The catch.** An action may go only if it is never better in any state, and some
 that look so are not. Cargo kept aboard a landed air transport cannot be
 carpet-bombed, since carpet bombing attacks only land units, so taking every unit
 off its transport before the Place Units Phase would change the game. The user
 kept that choice and instead barred upgrades that would leave a transport with
 cargo it may not carry
 ([RCL-021](../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport)).
-Merging identical units touches the menu, the network input and the search, so it
-needs its own check.
+Merging identical units touches the list of legal actions, the network input and
+the search, so it needs its own check.
 
-**Measured:** the shares above
-([record](../archive/records/never_better_choices_2026_11_05.md)). Fewer options would
-also help the 64 simulations of the question above. **Would settle it:** the
-user's decision on the two left, then learning compared at equal compute.
+**Measured:** the percentages above
+([record](../archive/records/never_better_choices_2026_11_05.md)). Fewer legal
+actions would also help the 64 simulations of the question above. **Would settle
+it:** the user's decision on the two left, then learning compared at equal
+compute.
 
 ## 12. Glossary
 
-Terms in the order the document introduces them.
+Terms in the order the document introduces them. Each means one thing only; the
+last two lists give the words that need a qualifier and the names the code and
+the dated records use instead.
 
 **The game (section 2)**
 
 - **Alliance (player):** Axis, Allies or Comintern; each chooses for its nations.
-- **Position (state):** everything about the game at one moment.
-- **Decision:** a position where one alliance must choose a move.
-- **Legal move (option, action):** one choice the rules allow at a decision.
-- **Chance event:** a position where the engine rolls dice.
+- **State:** everything about the game at one moment, its position in a board
+  game's words.
+- **Decision:** a state where one alliance must choose an action.
+- **Action:** one choice at a decision. A **legal action** is an action the rules
+  allow there.
+- **Chance event:** a state where the engine rolls dice.
+- **Terminal state:** the end of the game, after the eleventh game round.
+- **Game round:** one of the game's eleven rounds, the last in July 1941.
 - **Final score:** an alliance's wealth minus the other two alliances' combined
   wealth at the end of the game.
-- **Planning key:** a digest that identifies a position exactly.
-- **Decision 612:** the running example: round 5 of a game played on 5 November,
-  the Comintern choosing the CCP's Combat Movement from 5 legal moves.
+- **Planning key:** a digest that identifies a state exactly.
+- **Decision 612:** the running example: game round 5 of a game played on
+  5 November, the Comintern choosing the CCP's Combat Movement from 5 legal
+  actions.
 
 **What a network gives (section 3)**
 
 - **Network:** one per alliance; it turns a decision into three values and a
-  probability for every legal move.
+  probability for every legal action.
+- **Policy:** how likely an agent is to choose each legal action.
 - **Value:** a network's estimate of an alliance's final score, in hundreds of
   points.
-- **Prior:** a network's probability for a move, as the search uses it.
+- **Prior:** a network's probability for an action, as the search uses it.
 - **Parameters:** all the numbers training adjusts: the weights and biases of
-  the learned layers, the rows among them, and the identity vectors.
+  the linear layers, the embeddings among them, and the identity embeddings.
 
 **Search (section 4)**
 
-- **Search (MCTS):** the simulations that pick a move at a decision.
-- **Simulation:** one imagined walk forward from the current position, on a copy
-  of the game.
-- **Search tree:** what a search remembers between simulations: for each position
-  it has met, its planning key, the statistics of the moves tried there and a
-  saved copy of the game at that position.
-- **Visit count:** how many simulations played a move.
-- **Search score:** a move's first term, its average result rescaled between
-  the worst and best averages seen, plus its second term, a bonus from its prior
-  that shrinks each time the move is tried.
-- **Share:** a move's visit count divided by the number of simulations.
-- **Exploration noise:** random noise mixed into the priors at the position
-  being decided, during training.
-- **Depth:** how many steps, moves and dice rolls, a simulation took from the
-  current position before it stopped.
-- **Depth limit:** the most steps a simulation may take, 16 in current runs; a
-  simulation that reaches it stops and uses an estimate of the position there.
+- **Search (MCTS):** the simulations that pick an action at a decision.
+- **Simulation:** one imagined walk forward from the root, on a copy of the game.
+- **Root:** the current state, where every simulation of a search starts.
+- **Search tree:** what a search remembers between simulations.
+- **Node:** a state the search tree holds, with its planning key, the statistics
+  of the actions tried there and a saved copy of the game at that state.
+- **Visit count:** how many simulations played an action.
+- **PUCT score:** an action's value term, its average result rescaled between the
+  worst and best averages seen, plus its exploration term, a bonus from its prior
+  that shrinks each time the action is tried.
+- **Visit share:** an action's visit count divided by the number of simulations;
+  AlphaZero's search probability.
+- **Exploration noise:** random noise mixed into the priors at the root, during
+  training.
+- **Simulation depth:** how many actions and dice rolls a simulation played from
+  the root before it stopped.
+- **Depth limit:** the greatest simulation depth allowed, 16 in current runs; a
+  simulation that reaches it stops and uses an estimate of the state there.
 
 **The input (section 5)**
 
-- **Input:** a decision turned into numbers: the non-zero answers about the board,
-  the position as a whole and each legal move, and each move's links.
-- **Question (column):** one numbered input slot with a fixed meaning.
-- **Answer:** the whole number a decision gives to a question; only non-zero
-  answers are stored.
-- **Family:** a group of questions with one name pattern, such as `units`.
-- **Grid of answers:** a part of the input pictured with one line per zone, for
-  the position or per move, and one column per question.
-- **Role:** the part of a move question's name, such as `0_source`, that says how
-  the move relates to the unit or zone a detail names.
-- **Links:** the zones a move starts from, acts on and passes through.
-- **Fixed facts:** 39 per zone and 22 per directed border, the same in every
-  position.
-- **Layout version:** an identifier of the full set of questions and fixed facts;
-  a network refuses inputs of another layout.
+- **Input:** a decision turned into numbers: the non-zero zone, global and action
+  feature values, and each legal action's zones.
+- **Feature:** one numbered input slot with a fixed meaning. The code names it a
+  column.
+- **Feature value:** the whole number a decision gives a feature; only non-zero
+  feature values are stored.
+- **Feature family:** a group of features with one name pattern, such as `units`.
+- **Zone features, global features, action features:** the three lists of
+  features: 42,532 that every zone has, 4,076 about the state as a whole and
+  12,627 that every legal action has.
+- **Feature matrix:** one part of the input pictured as a matrix with one row per
+  zone or per legal action, or a single row for the global features, and one
+  column per feature.
+- **Feature vector:** one row of a feature matrix: all the feature values of one
+  zone, of the state as a whole or of one legal action.
+- **Role:** the part of an action feature's name, such as `0_source`, that says
+  how the action relates to the unit or zone a detail names.
+- **An action's zones:** its source zone, the zone it starts from; its target
+  zone, the zone it acts on; and its path zones.
+- **Static features:** 39 per zone and 22 per directed border, the same in every
+  state.
+- **Layout version:** an identifier of the full set of features and static
+  features; a network refuses inputs of another layout.
 
 **The network (section 6)**
 
-- **Input layer:** the lines of answers as the network's input, one input unit
-  per question.
-- **Vector:** a list of numbers. The vectors that describe a zone, the position
-  or a move inside a network have as many numbers as the width.
-- **Width:** how many numbers each vector and row has: 64 in a 64×2 network.
-- **Learned layer:** a multiplication by a learned matrix, the layer's weights,
-  plus a learned bias, usually followed by the GELU curve.
-- **Unit and link:** in the usual drawing of a layer, each input and output is a
-  unit, and each weight a link from an input unit to an output unit.
-- **Row:** the weights on the links that leave one input unit, one per output; in
-  machine-learning terms, an embedding.
-- **GELU:** the fixed curve $x \Phi(x)$ that bends a layer's results.
+- **Vector:** a list of numbers. The vectors that describe a zone, the state as a
+  whole or a legal action inside a network have as many numbers as the width.
+- **Width:** how many numbers each of those vectors and each embedding has: 64 in
+  a 64×2 network.
+- **Linear layer:** a multiplication by a learned matrix, the layer's weights,
+  plus a learned bias, usually followed by the GELU activation function.
+- **Neuron and connection:** in the usual drawing of a layer, each input and
+  output is a neuron, and each weight a connection from an input neuron to an
+  output neuron.
+- **Activation function:** a fixed function applied to each number a linear layer
+  gives; here GELU, $x \Phi(x)$.
 - **Layer normalization:** rescaling a vector to an average of 0 and a spread of
   1, then a learned scale and shift for each number.
-- **First layer:** the learned layer that reads one line of answers, without bias
-  or curve; the zones, the position and the moves each have their own.
-- **Table:** a first layer's weights, one row per question: the zone table, the
-  position table and the move table; embedding tables.
-- **Input of a question:** its answer $a$ after a fixed scaling,
-  $\operatorname{sign}(a)\ln(1 + |a|)$.
-- **Column lookup:** computing a first layer by fetching only the rows of its
-  non-zero inputs, each times its input, and adding them up.
-- **Identity vector:** a zone's own learned numbers, as many as the width, which
-  let the network tell zones apart.
-- **Zone vector, position vector, move vector:** the vectors that describe a zone,
-  the position as a whole and a legal move.
-- **Message layer:** one layer in which every zone hears from its neighbours
-  along the borders; a 64×2 network has 2.
-- **Summary vector:** one vector of the position, from the position vector and
-  the zone vectors' average and maximum.
-- **Value head:** the learned layers that turn the summary into three values.
-- **Policy head:** the learned layers that turn a move's combined vector and the
-  summary into the move's logit.
-- **Logit:** a move's or a group's raw preference, which a softmax turns into a
-  probability.
-- **Softmax:** turning scores into probabilities that add up to 1.
-- **Stage:** one level of the grouping by which move probabilities are built:
-  kind, what acts, how it travels, what it acts on, and the move.
+- **Input layer:** the feature vectors as the network's input, one input neuron
+  per feature.
+- **Embedding:** the weights on the connections that leave one input neuron, one
+  per output; for a feature, the learned vector added in wherever the feature has
+  a non-zero value.
+- **Embedding table:** an embedding layer's weights, a matrix with one row per
+  feature: the zone, global and action embedding tables.
+- **Embedding layer:** the network's first linear layer, which reads one feature
+  vector, without bias or activation function; the zones, the global features and
+  the legal actions each have their own.
+- **Feature scaling:** the fixed formula $\operatorname{sign}(a)\ln(1 + |a|)$
+  that turns a feature value $a$ into its input neuron's value.
+- **Embedding lookup:** computing an embedding layer by fetching only the
+  embeddings of its non-zero inputs, each times its input, and adding them up.
+- **Identity embedding:** a zone's own learned numbers, as many as the width,
+  which let the network tell zones apart.
+- **Zone vector, global vector, action vector:** the vectors that describe a
+  zone, the state as a whole and a legal action.
+- **Message-passing layer:** one layer in which every zone hears from its
+  neighbours along the borders; a 64×2 network has 2.
+- **Network depth:** the number of message-passing layers.
+- **Summary vector:** one vector of the state, from the global vector and the
+  zone vectors' average and maximum.
+- **Value head:** the linear layers that turn the summary vector into three
+  values.
+- **Policy head:** the linear layers that turn an action's combined vector and the
+  summary vector into the action's logit.
+- **Logit:** an action's or a group's raw preference, which a softmax turns into
+  a probability.
+- **Softmax:** turning logits into probabilities that add up to 1.
+- **Hierarchical softmax, level:** the softmaxes by which action probabilities are
+  built, one level after another: kind, what acts, how it travels, what it acts
+  on, and the action.
 
-**Samples and training (sections 7 and 8)**
+**Training samples and training (sections 7 and 8)**
 
-- **Batch:** the games played between two updates, all at once: 24 in the Mac
-  profile, one per game thread.
-- **Sample:** one saved decision: what the network read, who chose, how the
-  search split its simulations among the moves and the final scores.
-- **Policy target:** a sample's shares, the move probabilities a network is
-  trained toward.
-- **Value target:** a sample's final scores, divided by 100, the values a network
-  is trained toward.
-- **Loss:** a number that measures how far a network's answers are from the
-  samples' targets: the value loss, a squared error, plus the policy loss, a
-  cross-entropy. Training lowers it.
-- **Cross-entropy:** the policy loss, lowest when the move probabilities equal
-  the shares.
+- **Training iteration:** one turn of the training loop: self-play games with the
+  networks held fixed, all at once (24 in the Mac profile, one per game thread),
+  then a network update. The code and the dated records call
+  a training iteration's games a batch.
+- **Training sample:** one saved decision: what the network read, who chose, how
+  the search split its simulations among the legal actions and the final scores.
+- **Policy target:** a training sample's visit shares, the action probabilities a
+  network is trained toward.
+- **Value target:** a training sample's final scores, divided by 100, the values
+  a network is trained toward.
+- **Loss:** a number that measures how far a network's outputs are from the
+  training samples' targets: the value loss, a squared error, plus the policy
+  loss, a cross-entropy. Training lowers it.
+- **Cross-entropy:** the policy loss, lowest when the action probabilities equal
+  the visit shares.
 - **Gradient:** for one parameter, how fast the loss would change if that number
   were raised a little.
-- **Learning rate:** how far Adam moves a parameter in one step while its
+- **Learning rate:** how far Adam moves a parameter in one Adam step while its
   gradients keep their sign: 0.001.
-- **Adam step:** one change of every parameter of a network: against the
-  average of its recent gradients, divided by their typical size, times the
-  learning rate.
-- **Replay buffer:** the latest samples, at most 8,000, that training draws from.
-- **Training step:** one draw of 32 samples from the replay buffer, read by the
-  three networks, and one Adam step for each. The training command names the 32
-  `--batch-size` and the steps per update `--epochs`.
-- **Update:** the training steps after a batch, 525 in the Mac training command.
-- **Model export:** the saved networks after an update.
-- **Checkpoint:** a full save of a run, for resuming it.
+- **Adam step:** one change of every parameter of a network by the Adam
+  optimizer: against the average of its recent gradients, divided by their
+  typical size, times the learning rate.
+- **Replay buffer:** the latest training samples, at most 8,000, that training
+  draws from.
+- **Minibatch:** the 32 training samples one training step draws at random from
+  the replay buffer; the training command's `--batch-size`.
+- **Training step:** one minibatch, read by the three networks, and one Adam step
+  for each. The training command names the number of training steps per network
+  update `--epochs`.
+- **Network update:** the training steps after a training iteration's games, 525
+  in the Mac training command.
+- **Generation:** the networks after a given number of network updates; a fresh
+  network is generation 0.
+- **Model export:** the saved networks after a network update.
+- **Checkpoint:** a full save of a training run, for resuming it.
 
 **Running it (section 9)**
 
 - **Game process:** an operating-system process that plays several games, one
   per game thread; the Mac profile runs 6 of 4.
 - **Game thread:** a thread that plays one game, searching at every decision.
-- **Coordinator:** the process that evaluates every game's positions with the
-  three networks and sends each game thread its priors and values.
-- **Request:** a position a game thread sends the coordinator to be evaluated.
-- **Shared memory:** memory that two processes can both read; a game thread
-  writes each request's arrays into its own block of it.
-- **Pipe:** a channel the operating system keeps between two processes; each
-  game thread sends its requests' notes and receives its replies through its
-  own.
-- **Evaluation:** the network's answer for one position, its priors and values;
+- **Concurrent games:** the games being played at the same moment, each holding
+  its search tree in memory.
+- **Inference server:** the process that runs the three networks for every game's
+  states and sends each game thread its priors and values; the tools and the
+  dated records name it the coordinator.
+- **Network evaluation:** a network's output for one state, its priors and values;
   a search asks for about one per simulation.
-- **Round:** one turn of the coordinator, not of the game: it reads every
-  waiting request, lays the positions out, evaluates them in one pass and
-  replies.
-- **Laying the positions out:** joining the arrays of a round's positions end to
-  end for one pass, each network's positions together, with each position's
-  indices shifted to point into the joined arrays.
-- **Pass:** one run of the networks over all the positions of a round at once.
-  Each position keeps its own vectors, but every call works on the arrays that
-  hold them all.
-- **Call:** one instruction to PyTorch, the library that does the network's
-  arithmetic, to apply one function, such as a matrix product or the GELU
-  curve, to whole arrays at once. A pass is a list of 146 to 871 calls, however
-  many positions it holds; a call is not a training step.
-- **Start of a call:** what a call costs whatever the size of its arrays: Python's
-  and PyTorch's work to check them, choose a routine and make room for the
-  result, and on the GPU, handing the call over.
-- **Operation:** one multiplication or one addition of two numbers.
+- **Inference request:** a game thread's request for one state's network
+  evaluation.
+- **Shared memory:** memory that two processes can both read; a game thread
+  writes each inference request's arrays into its own block of it.
+- **Pipe:** a channel the operating system keeps between two processes; each
+  game thread sends its inference requests' notes and receives its replies
+  through its own.
+- **Inference batch:** the states the inference server evaluates together: every
+  inference request waiting when it starts, answered in one forward pass. Its
+  number of states is the *inference batch size*.
+- **Collating:** joining the arrays of an inference batch's states end to end for
+  one forward pass, each network's states together, with each state's indices
+  shifted to point into the joined arrays.
+- **Forward pass:** one run of the networks over all the states of an inference
+  batch at once. Each state keeps its own vectors, but every PyTorch call works on
+  the arrays that hold them all.
+- **PyTorch call:** one instruction to PyTorch, the library that does the
+  network's arithmetic, to apply one function, such as a matrix product or GELU,
+  to whole arrays at once. A forward pass is a list of 146 to 871 PyTorch calls,
+  however many states it holds; a PyTorch call is not a training step.
+- **Call overhead:** what a PyTorch call costs whatever the size of its arrays:
+  Python's and PyTorch's work to check them, choose a routine and make room for
+  the result, and on the GPU, handing the PyTorch call over.
+- **FLOP (floating-point operation):** one multiplication or one addition of two
+  numbers.
 - **Multiply-add:** one input times its weight, added to an output's sum: two
-  operations. A learned layer is made of them; the learned layers of a 64×2
-  pass do about 3.4 million operations for each position with 14 legal moves.
-- **Games in flight:** the games being played at the moment, each holding its
-  search tree in memory.
-- **Decisions per hour:** decisions searched per hour across all games in
-  flight, the measure of self-play speed for one network and search. It falls in
+  FLOPs. A linear layer is made of them; the linear layers of a 64×2 forward pass
+  do about 3.4 million FLOPs for each state with 14 legal actions.
+- **Request handling:** the inference server's work for an inference batch outside
+  the forward pass: reading the inference requests' notes from the pipes and
+  their arrays from shared memory, collating, turning the outputs into priors and
+  sending the replies through the pipes.
+- **Decisions per hour:** decisions searched per hour across all concurrent games,
+  the measure of self-play speed for one network and search. It falls in
   proportion to the search's simulations, and with the network's size only where
   the network, not the cores, limits (section 9.3).
 - **Windows PC:** the owner's second training machine, with an NVIDIA GPU on
-  which its coordinator runs the passes (section 9.2).
+  which its inference server runs the forward passes (section 9.2).
 - **CUDA:** NVIDIA's software for computing on its GPUs.
 
-**The coordinator's levers (section 9.3; none of them built)**
+**The inference server's levers (section 9.3; none of them built)**
 
-- **Grouped matrix product:** one call that multiplies each network's positions
-  by that network's own weights.
-- **Compiling a pass:** having PyTorch's compiler, `torch.compile`, turn a pass's
-  calls, once and ahead of time, into fewer routines that each do the work of
-  several calls.
-- **CUDA graph:** a pass's calls recorded once on an NVIDIA GPU and replayed
-  from a single start.
+- **Grouped matrix product:** one PyTorch call that multiplies each network's
+  states by that network's own weights.
+- **Compiling a forward pass:** having PyTorch's compiler, `torch.compile`, turn
+  a forward pass's PyTorch calls, once and ahead of time, into fewer routines that
+  each do the work of several PyTorch calls.
+- **CUDA graph:** a forward pass's PyTorch calls recorded once on an NVIDIA GPU and
+  replayed with a single call overhead.
 - **Half precision:** numbers of 16 bits, with about 3 significant digits,
   instead of the 32 bits, with about 7, that the networks compute with.
-- **Round trip:** the coordinator's work in a round outside the pass: reading
-  the requests' notes from the pipes and their arrays from shared memory, laying
-  the positions out, turning the outputs into priors and sending the replies
-  through the pipes.
-- **Second coordinator:** a second coordinating process serving half the game
+- **Second inference server:** a second inference server serving half the game
   processes.
 
-**Size (section 11)**
+**Measuring strength and size (sections 10 and 11)**
 
+- **Held-out evaluation:** games of fixed networks, without exploration noise,
+  against scripted opponents on seeds training never used; it measures playing
+  strength.
 - **Residual block:** two convolutions whose result is added to their input;
-  AlphaZero's networks are stacks of them, as this one is a stack of message
-  layers.
-- **Reach:** how many points or borders a network's layers carry information,
-  divided by the largest distance on its board: 0.3 for a 64×2 network here.
+  AlphaZero's networks are stacks of them, as this one is a stack of
+  message-passing layers.
+- **Receptive field:** how many points or borders a network's layers carry
+  information, divided by the largest distance on its board: 0.3 for a 64×2
+  network here.
+
+**Words that always carry a qualifier**
+
+| Word | Its meanings here, each always written in full |
+| --- | --- |
+| step | a *training step* (section 8.4); an *Adam step* (section 8.3). A simulation's actions and dice rolls are counted as its *simulation depth*. |
+| batch | a *minibatch* of training samples (section 8.4); an *inference batch* of states (section 9.2) |
+| round | a *game round*, one of the game's eleven |
+| evaluation | a *network evaluation* (section 9.2); *held-out evaluation*, which measures strength (section 10) |
+| update | a *network update* (section 8.4); a message-passing layer changes a zone vector or the global vector by a *correction* (section 6.6) |
+| depth | *simulation depth* (section 4.7); *network depth* (section 6.6) |
+| score | the *final score* (section 2.4); the *PUCT score* (section 4.3) |
+| value | a network's *value* (section 3); a *feature value* (section 5.1) |
+| unit | a game unit, such as mountain infantry; the network's units are called *neurons* (section 6.2) |
+| move | a unit's movement in the game, as in Combat Movement or an ordinary move; a choice at a decision is an *action* |
+| row | a row of a named matrix or table: a feature matrix's row is a *feature vector*, an embedding table's row an *embedding* |
+
+**Names in the code and the dated records**
+
+| Name there | This document's term |
+| --- | --- |
+| coordinator (`tools/profile_coordinator.py`, the dated records), `SharedEvaluatorServer` | inference server |
+| round (`tools/replay_coordinator_rounds.py`, the dated records) | inference batch |
+| pass, network pass | forward pass |
+| batch, training batch (supervisor, `--transitions-per-batch`, the dated records) | a training iteration's games |
+| position (`batch.positions`, `PositionScope`, `failed-positions/`, the dated records) | state |
+| column (`zone_columns`, `global_columns`, `action_columns`) | feature |
+| question, answer (the dated records) | feature, feature value |
+| row (the dated records) | embedding |
+| option (`option_table`, `option_encoder`) | legal action |
+| `--batch-size` | minibatch size |
+| `--epochs` | training steps per network update |
+| `--max-depth` | depth limit |

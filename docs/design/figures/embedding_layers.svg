@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="636" viewBox="0 0 960 636" role="img" aria-labelledby="title desc">
-  <title id="title">Decision 612's first layers: 43 lines in, 43 vectors out</title>
-  <desc id="desc">Decision 612 of the 5 November sample game. Left, the input layer: 43 lines of answers, each drawn as a bar with a tick for every non-zero answer at its column. The board has 37 zone lines of 42,532 inputs each, 840 non-zero answers in all: shown are Shensi with 9, Hopeh 28, Suiyuan 12, Szechwan 2, Tsinghai 13, 31 more zones, and sea zone P14 with 86. The position has 1 line of 4,076 inputs with 176 non-zero answers. The moves have 5 lines of 12,627 inputs each, 80 non-zero answers in all: the attacks on Hopeh, Suiyuan, Szechwan and Tsinghai with 19 each, and ending the phase with 4. Middle, the first layers: every zone line goes through the zone table, 42,532 rows of 64, the same weights for all 37 zones; the position line through the position table, 4,076 rows of 64; every move line through the move table, 12,627 rows of 64, the same weights for all 5 moves. Each line goes through on its own. Right, the outputs: one vector of 64 numbers per line, 43 in all: 37 zone vectors, 1 position vector and 5 move vectors. No first layer adds one line to another; the vectors meet only in the layers after it.</desc>
+  <title id="title">Decision 612's embedding layers: 43 feature vectors in, 43 vectors out</title>
+  <desc id="desc">Decision 612 of the game of 5 November. Left, the input layer: 43 feature vectors, each drawn as a bar with a tick for every non-zero feature value at its column. The zones have 37 feature vectors of 42,532 inputs each, 840 non-zero feature values in all: shown are Shensi with 9, Hopeh 28, Suiyuan 12, Szechwan 2, Tsinghai 13, 31 more zones, and sea zone P14 with 86. The global features are 1 feature vector of 4,076 inputs with 176 non-zero feature values. The legal actions have 5 feature vectors of 12,627 inputs each, 80 non-zero feature values in all: the attacks on Hopeh, Suiyuan, Szechwan and Tsinghai with 19 each, and ending the phase with 4. Middle, the embedding layers: every zone feature vector goes through the zone embedding table, 42,532 embeddings of 64, the same weights for all 37 zones; the global feature vector through the global embedding table, 4,076 embeddings of 64; every action feature vector through the action embedding table, 12,627 embeddings of 64, the same weights for all 5 legal actions. Each feature vector goes through on its own. Right, the outputs: one vector of 64 numbers per feature vector, 43 in all: 37 zone vectors, 1 global vector and 5 action vectors. No embedding layer adds one feature vector to another; the vectors meet only in the layers after it.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -22,19 +22,19 @@
     </style>
   </defs>
   <rect x="0.5" y="0.5" width="959" height="635" rx="10" fill="#ffffff" stroke="#d0d7de"/>
-  <text class="title" x="24" y="36">Decision 612's first layers: 43 lines in, 43 vectors out</text>
-  <text class="sub" x="24" y="56">Each line goes through its part's first layer on its own; all the lines of one part share that layer's table. Ticks mark a line's non-zero answers at their columns.</text>
-  <text class="cap" x="24" y="92">LINES OF ANSWERS: THE INPUT LAYER</text>
-  <text class="cap" x="404" y="92">FIRST LAYERS</text>
-  <text class="cap" x="604" y="92">ONE VECTOR OF 64 NUMBERS PER LINE</text>
-  <text class="group" x="24" y="122">Board: 37 zone lines of 42,532 inputs each, 840 non-zero answers in all</text>
+  <text class="title" x="24" y="36">Decision 612's embedding layers: 43 feature vectors in, 43 vectors out</text>
+  <text class="sub" x="24" y="56">Each feature vector goes through its part's embedding layer on its own; those of one part share one embedding table. Ticks mark non-zero feature values.</text>
+  <text class="cap" x="24" y="92">FEATURE VECTORS: THE INPUT LAYER</text>
+  <text class="cap" x="404" y="92">EMBEDDING LAYERS</text>
+  <text class="cap" x="604" y="92">ONE VECTOR OF 64 NUMBERS PER FEATURE VECTOR</text>
+  <text class="group" x="24" y="122">Zone features: 37 feature vectors of 42,532 inputs each, 840 non-zero feature values in all</text>
   <rect x="404" y="134" width="164" height="184" rx="8" fill="#fff8c5" stroke="#d4a72c"/>
-  <text class="boxhead" x="486.0" y="203" text-anchor="middle">Zone table</text>
-  <text class="boxtext" x="486.0" y="221" text-anchor="middle">42,532 rows of 64</text>
+  <text class="boxhead" x="486.0" y="203" text-anchor="middle">Zone embedding table</text>
+  <text class="boxtext" x="486.0" y="221" text-anchor="middle">42,532 embeddings of 64</text>
   <text class="boxtext" x="486.0" y="239" text-anchor="middle">the same weights</text>
   <text class="boxtext" x="486.0" y="257" text-anchor="middle">for all 37 zones</text>
   <text class="body" x="24" y="152">Shensi</text>
-  <text class="label" x="214" y="152" text-anchor="end">9 answers</text>
+  <text class="label" x="214" y="152" text-anchor="end">9 non-zero</text>
   <rect x="222" y="142" width="150" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
   <rect x="223.0" y="143" width="1.2" height="10" fill="#24292f"/>
   <rect x="223.0" y="143" width="1.2" height="10" fill="#24292f"/>
@@ -50,7 +50,7 @@
   <rect x="604" y="142" width="192" height="12" fill="url(#cells)" stroke="#54aeff"/>
   <text class="label" x="806" y="152">Shensi's vector</text>
   <text class="body" x="24" y="178">Hopeh</text>
-  <text class="label" x="214" y="178" text-anchor="end">28 answers</text>
+  <text class="label" x="214" y="178" text-anchor="end">28 non-zero</text>
   <rect x="222" y="168" width="150" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
   <rect x="223.0" y="169" width="1.2" height="10" fill="#24292f"/>
   <rect x="223.1" y="169" width="1.2" height="10" fill="#24292f"/>
@@ -85,7 +85,7 @@
   <rect x="604" y="168" width="192" height="12" fill="url(#cells)" stroke="#54aeff"/>
   <text class="label" x="806" y="178">Hopeh's vector</text>
   <text class="body" x="24" y="204">Suiyuan</text>
-  <text class="label" x="214" y="204" text-anchor="end">12 answers</text>
+  <text class="label" x="214" y="204" text-anchor="end">12 non-zero</text>
   <rect x="222" y="194" width="150" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
   <rect x="223.0" y="195" width="1.2" height="10" fill="#24292f"/>
   <rect x="223.1" y="195" width="1.2" height="10" fill="#24292f"/>
@@ -104,7 +104,7 @@
   <rect x="604" y="194" width="192" height="12" fill="url(#cells)" stroke="#54aeff"/>
   <text class="label" x="806" y="204">Suiyuan's vector</text>
   <text class="body" x="24" y="230">Szechwan</text>
-  <text class="label" x="214" y="230" text-anchor="end">2 answers</text>
+  <text class="label" x="214" y="230" text-anchor="end">2 non-zero</text>
   <rect x="222" y="220" width="150" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
   <rect x="223.0" y="221" width="1.2" height="10" fill="#24292f"/>
   <rect x="223.1" y="221" width="1.2" height="10" fill="#24292f"/>
@@ -113,7 +113,7 @@
   <rect x="604" y="220" width="192" height="12" fill="url(#cells)" stroke="#54aeff"/>
   <text class="label" x="806" y="230">Szechwan's vector</text>
   <text class="body" x="24" y="256">Tsinghai</text>
-  <text class="label" x="214" y="256" text-anchor="end">13 answers</text>
+  <text class="label" x="214" y="256" text-anchor="end">13 non-zero</text>
   <rect x="222" y="246" width="150" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
   <rect x="223.0" y="247" width="1.2" height="10" fill="#24292f"/>
   <rect x="223.1" y="247" width="1.2" height="10" fill="#24292f"/>
@@ -137,7 +137,7 @@
   <text class="label" x="700.0" y="282" text-anchor="middle">⋮</text>
   <text class="label" x="806" y="282">one vector each</text>
   <text class="body" x="24" y="308">Sea zone P14</text>
-  <text class="label" x="214" y="308" text-anchor="end">86 answers</text>
+  <text class="label" x="214" y="308" text-anchor="end">86 non-zero</text>
   <rect x="222" y="298" width="150" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
   <rect x="223.9" y="299" width="1.2" height="10" fill="#24292f"/>
   <rect x="223.9" y="299" width="1.2" height="10" fill="#24292f"/>
@@ -229,12 +229,12 @@
   <line x1="572" y1="304" x2="600" y2="304" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="604" y="298" width="192" height="12" fill="url(#cells)" stroke="#54aeff"/>
   <text class="label" x="806" y="308">P14's vector</text>
-  <text class="group" x="24" y="348">Position: 1 line of 4,076 inputs, 176 non-zero answers</text>
+  <text class="group" x="24" y="348">Global features: 1 feature vector of 4,076 inputs, 176 non-zero feature values</text>
   <rect x="404" y="350" width="164" height="40" rx="8" fill="#fff8c5" stroke="#d4a72c"/>
-  <text class="boxhead" x="486.0" y="365" text-anchor="middle">Position table</text>
-  <text class="boxtext" x="486.0" y="383" text-anchor="middle">4,076 rows of 64</text>
-  <text class="body" x="24" y="374">The position</text>
-  <text class="label" x="214" y="374" text-anchor="end">176 answers</text>
+  <text class="boxhead" x="486.0" y="365" text-anchor="middle">Global embedding table</text>
+  <text class="boxtext" x="486.0" y="383" text-anchor="middle">4,076 embeddings of 64</text>
+  <text class="body" x="24" y="374">The state</text>
+  <text class="label" x="214" y="374" text-anchor="end">176 non-zero</text>
   <rect x="222" y="364" width="150" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
   <rect x="223.0" y="365" width="1.2" height="10" fill="#24292f"/>
   <rect x="223.0" y="365" width="1.2" height="10" fill="#24292f"/>
@@ -415,15 +415,15 @@
   <line x1="376" y1="370" x2="400" y2="370" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="572" y1="370" x2="600" y2="370" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="604" y="364" width="192" height="12" fill="url(#cells)" stroke="#54aeff"/>
-  <text class="label" x="806" y="374">the position vector</text>
-  <text class="group" x="24" y="422">Moves: 5 lines of 12,627 inputs each, 80 non-zero answers in all</text>
+  <text class="label" x="806" y="374">the global vector</text>
+  <text class="group" x="24" y="422">Action features: 5 feature vectors of 12,627 inputs each, 80 non-zero feature values in all</text>
   <rect x="404" y="434" width="164" height="132" rx="8" fill="#fff8c5" stroke="#d4a72c"/>
-  <text class="boxhead" x="486.0" y="477" text-anchor="middle">Move table</text>
-  <text class="boxtext" x="486.0" y="495" text-anchor="middle">12,627 rows of 64</text>
+  <text class="boxhead" x="486.0" y="477" text-anchor="middle">Action embedding table</text>
+  <text class="boxtext" x="486.0" y="495" text-anchor="middle">12,627 embeddings of 64</text>
   <text class="boxtext" x="486.0" y="513" text-anchor="middle">the same weights</text>
-  <text class="boxtext" x="486.0" y="531" text-anchor="middle">for all 5 moves</text>
+  <text class="boxtext" x="486.0" y="531" text-anchor="middle">for all 5 actions</text>
   <text class="body" x="24" y="452">Attack Hopeh</text>
-  <text class="label" x="214" y="452" text-anchor="end">19 answers</text>
+  <text class="label" x="214" y="452" text-anchor="end">19 non-zero</text>
   <rect x="222" y="442" width="150" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
   <rect x="223.0" y="443" width="1.2" height="10" fill="#24292f"/>
   <rect x="223.1" y="443" width="1.2" height="10" fill="#24292f"/>
@@ -447,9 +447,9 @@
   <line x1="376" y1="448" x2="400" y2="448" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="572" y1="448" x2="600" y2="448" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="604" y="442" width="192" height="12" fill="url(#cells)" stroke="#54aeff"/>
-  <text class="label" x="806" y="452">a move vector</text>
+  <text class="label" x="806" y="452">an action vector</text>
   <text class="body" x="24" y="478">Attack Suiyuan</text>
-  <text class="label" x="214" y="478" text-anchor="end">19 answers</text>
+  <text class="label" x="214" y="478" text-anchor="end">19 non-zero</text>
   <rect x="222" y="468" width="150" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
   <rect x="223.0" y="469" width="1.2" height="10" fill="#24292f"/>
   <rect x="223.1" y="469" width="1.2" height="10" fill="#24292f"/>
@@ -473,9 +473,9 @@
   <line x1="376" y1="474" x2="400" y2="474" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="572" y1="474" x2="600" y2="474" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="604" y="468" width="192" height="12" fill="url(#cells)" stroke="#54aeff"/>
-  <text class="label" x="806" y="478">a move vector</text>
+  <text class="label" x="806" y="478">an action vector</text>
   <text class="body" x="24" y="504">Attack Szechwan</text>
-  <text class="label" x="214" y="504" text-anchor="end">19 answers</text>
+  <text class="label" x="214" y="504" text-anchor="end">19 non-zero</text>
   <rect x="222" y="494" width="150" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
   <rect x="223.0" y="495" width="1.2" height="10" fill="#24292f"/>
   <rect x="223.1" y="495" width="1.2" height="10" fill="#24292f"/>
@@ -499,9 +499,9 @@
   <line x1="376" y1="500" x2="400" y2="500" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="572" y1="500" x2="600" y2="500" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="604" y="494" width="192" height="12" fill="url(#cells)" stroke="#54aeff"/>
-  <text class="label" x="806" y="504">a move vector</text>
+  <text class="label" x="806" y="504">an action vector</text>
   <text class="body" x="24" y="530">Attack Tsinghai</text>
-  <text class="label" x="214" y="530" text-anchor="end">19 answers</text>
+  <text class="label" x="214" y="530" text-anchor="end">19 non-zero</text>
   <rect x="222" y="520" width="150" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
   <rect x="223.0" y="521" width="1.2" height="10" fill="#24292f"/>
   <rect x="223.1" y="521" width="1.2" height="10" fill="#24292f"/>
@@ -525,9 +525,9 @@
   <line x1="376" y1="526" x2="400" y2="526" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="572" y1="526" x2="600" y2="526" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="604" y="520" width="192" height="12" fill="url(#cells)" stroke="#54aeff"/>
-  <text class="label" x="806" y="530">a move vector</text>
+  <text class="label" x="806" y="530">an action vector</text>
   <text class="body" x="24" y="556">End the phase</text>
-  <text class="label" x="214" y="556" text-anchor="end">4 answers</text>
+  <text class="label" x="214" y="556" text-anchor="end">4 non-zero</text>
   <rect x="222" y="546" width="150" height="12" rx="2" fill="#f6f8fa" stroke="#d0d7de"/>
   <rect x="223.0" y="547" width="1.2" height="10" fill="#24292f"/>
   <rect x="223.1" y="547" width="1.2" height="10" fill="#24292f"/>
@@ -536,7 +536,7 @@
   <line x1="376" y1="552" x2="400" y2="552" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="572" y1="552" x2="600" y2="552" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="604" y="546" width="192" height="12" fill="url(#cells)" stroke="#54aeff"/>
-  <text class="label" x="806" y="556">a move vector</text>
-  <text class="label" x="24" y="596">43 lines in, 43 vectors out: 37 zone vectors, 1 position vector and 5 move vectors. No first layer adds one line to another;</text>
+  <text class="label" x="806" y="556">an action vector</text>
+  <text class="label" x="24" y="596">43 feature vectors in, 43 vectors out: 37 zone vectors, 1 global vector and 5 action vectors. No embedding layer adds one feature vector to another;</text>
   <text class="label" x="24" y="614">the vectors meet only in the layers after it (sections 6.4 to 6.8).</text>
 </svg>

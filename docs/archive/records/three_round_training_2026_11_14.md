@@ -64,7 +64,7 @@ took 8.0 hours of play and 19 minutes of updates. While playing, the run made
   675 × 32 = 21,600 times. Longer games kept about 2,950 samples per batch, so
   once the buffer was full each sample was drawn about 7 times during its stay,
   not the 12 intended
-  ([how the count works](../../design/README.md#87-how-often-a-sample-is-drawn)).
+  ([how the count works](../../design/README.md#87-how-often-a-training-sample-is-drawn)).
 - **The value loss** fell from about 0.017 to 0.001 within the first update.
   After that, each update began at 0.0017 to 0.0027 in batches 1 to 3, and at
   about 0.0045 in the last batches. Each update lowered it by about half: by

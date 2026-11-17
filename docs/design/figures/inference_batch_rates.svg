@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-labelledby="title desc">
-  <title id="title">Positions the network evaluates per second, by the positions in a pass, on the GPU and on one CPU core</title>
-  <desc id="desc">Three line charts side by side, for networks of 64×2, 256×8 and 512×16, on logarithmic scales, from the 14 November measurements through the coordinator's own code. Each shows positions evaluated per second against positions in a pass of 1, 4, 16, 64 and 256. On the GPU the rate rises with the pass: at 64×2 485, 1,085, 3,422, 9,835, 20,916; at 256×8 216, 637, 1,940, 4,503, 6,552; at 512×16 178, 405, 920, 1,641, 1,903. On one CPU core it rises at most 40% beyond 16 positions: at 64×2 2,198, 4,154, 5,850, 6,243, 6,082; at 256×8 360, 505, 577, 600, 658; at 512×16 87, 117, 125, 175, 166. One core is faster in small passes up to 256×8; the GPU is faster in large ones, and at 512×16 in every pass. A shaded band from 8 to 24 positions marks today's layout: rounds of about 8 positions, and never more than its 24 games in flight.</desc>
+  <title id="title">The GPU needs large inference batches; one CPU core does not</title>
+  <desc id="desc">Three line charts side by side, for networks of 64×2, 256×8 and 512×16, of states evaluated per second against the inference batch size, 1, 4, 16, 64 and 256 states, on logarithmic scales. On the GPU the rate rises with the inference batch size: at 64×2 from 485 to 20,916, at 256×8 from 217 to 6,552, at 512×16 from 178 to 1,903. On one CPU core it rises at most 40% beyond 16 states: at 64×2 from 2,198 to about 6,000, at 256×8 from 360 to 658, at 512×16 from 87 to 166. One core is faster in small inference batches up to 256×8, the GPU in large ones, and at 512×16 in every inference batch size. A shaded band from 8 to 24 states marks today's layout.</desc>
   <defs>
     <style>
       text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
@@ -14,8 +14,8 @@
     </style>
   </defs>
   <rect x="0.5" y="0.5" width="959" height="519" rx="10" fill="#ffffff" stroke="#d0d7de"/>
-  <text class="title" x="24" y="36">The GPU needs many positions in a pass; one CPU core does not</text>
-  <text class="sub" x="24" y="58">Positions evaluated per second, by the positions in a pass, through the coordinator's own code; 14 November measurements, logarithmic scales.</text>
+  <text class="title" x="24" y="36">The GPU needs large inference batches; one CPU core does not</text>
+  <text class="sub" x="24" y="58">States evaluated per second, by inference batch size, through the inference server's own code; 14 November measurements, logarithmic scales.</text>
   <line x1="24" y1="84" x2="46" y2="84" stroke="#eb6834" stroke-width="2" stroke-linecap="round"/>
   <circle cx="35" cy="84" r="4" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
   <text class="label" x="56" y="88">the network on the GPU</text>
@@ -23,10 +23,10 @@
   <circle cx="261" cy="84" r="4" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/>
   <text class="label" x="282" y="88">the network on one CPU core</text>
   <rect x="500" y="77" width="22" height="14" fill="#1f2328" fill-opacity="0.07"/>
-  <text class="label" x="532" y="88">today's layout: rounds of about 8 positions, at most its 24 games in flight</text>
-  <text class="label" x="24" y="128">positions evaluated per second</text>
+  <text class="label" x="532" y="88">today's layout: inference batches of about 8 states, at most 24 states</text>
+  <text class="label" x="24" y="128">states evaluated per second</text>
   <text class="body" x="195.0" y="160" text-anchor="middle">64×2</text>
-  <text class="small" x="195.0" y="176" text-anchor="middle">3.4 million operations a position</text>
+  <text class="small" x="195.0" y="176" text-anchor="middle">3.4 million FLOPs a state</text>
   <rect x="170.0" y="190.0" width="39.6" height="260.0" fill="#1f2328" fill-opacity="0.07"/>
   <line x1="80" y1="428.6" x2="310" y2="428.6" stroke="#d0d7de" stroke-width="1"/>
   <text class="tick" x="70" y="432.6" text-anchor="end">100</text>
@@ -64,7 +64,7 @@
   <circle cx="295.0" cy="205.1" r="4" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
   <text class="end" x="304.0" y="209.1">20,916</text>
   <text class="body" x="495.0" y="160" text-anchor="middle">256×8</text>
-  <text class="small" x="495.0" y="176" text-anchor="middle">173 million operations a position</text>
+  <text class="small" x="495.0" y="176" text-anchor="middle">173 million FLOPs a state</text>
   <rect x="470.0" y="190.0" width="39.6" height="260.0" fill="#1f2328" fill-opacity="0.07"/>
   <line x1="380" y1="428.6" x2="610" y2="428.6" stroke="#d0d7de" stroke-width="1"/>
   <line x1="380" y1="399.6" x2="610" y2="399.6" stroke="#eaeef2" stroke-width="1"/>
@@ -94,7 +94,7 @@
   <circle cx="595.0" cy="253.6" r="4" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
   <text class="end" x="604.0" y="257.6">6,552</text>
   <text class="body" x="795.0" y="160" text-anchor="middle">512×16</text>
-  <text class="small" x="795.0" y="176" text-anchor="middle">1.3 billion operations a position</text>
+  <text class="small" x="795.0" y="176" text-anchor="middle">1.3 billion FLOPs a state</text>
   <rect x="770.0" y="190.0" width="39.6" height="260.0" fill="#1f2328" fill-opacity="0.07"/>
   <line x1="680" y1="428.6" x2="910" y2="428.6" stroke="#d0d7de" stroke-width="1"/>
   <line x1="680" y1="399.6" x2="910" y2="399.6" stroke="#eaeef2" stroke-width="1"/>
@@ -123,5 +123,5 @@
   <circle cx="845.0" cy="311.6" r="4" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
   <circle cx="895.0" cy="305.4" r="4" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
   <text class="end" x="904.0" y="309.4">1,903</text>
-  <text class="label" x="495" y="500" text-anchor="middle">positions in a pass</text>
+  <text class="label" x="495" y="500" text-anchor="middle">inference batch size (states)</text>
 </svg>

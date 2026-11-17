@@ -76,7 +76,7 @@ matrix products) took about two fifths.
   makes one pass. Its statistics count passes (`network_passes` in a run's
   manifest), one per round.
 - **The policy readout** (`_readout` in `neural.py`). The probability of a move
-  is built in stages ([section 6.8](../../design/README.md#68-the-move-probabilities)).
+  is built in stages ([section 6.8](../../design/README.md#68-the-action-probabilities)).
   Each stage used to take its own softmax, ten operations each, five times in
   all. Now the groups of all four levels and the moves are scored together and
   one softmax pass normalizes each among those sharing its parent.
@@ -129,7 +129,7 @@ of three passes over all rounds after one warm-up pass:
 After the change, a round took 233 µs to lay its positions out, 1,279 µs for
 the pass and 34 µs for turning outputs into priors and values. In the pass, the
 GELU curve now takes about 30% of the operators' time, mostly in the border
-messages ([section 6.6](../../design/README.md#66-messages-along-the-borders)): it
+messages ([section 6.6](../../design/README.md#66-message-passing-layers-messages-along-the-borders)): it
 belongs to the network's design. Running each round's positions through one
 network in one pass with the old code, an upper bound for merging the passes
 without separate layers per network, took 1,638 µs per round; the stacked pass

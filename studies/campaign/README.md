@@ -3,9 +3,10 @@
 This study uses the approved 1936 China campaign and the shared C++ engine.
 Three separate policy/value networks guide vector MCTS. Each reads the engine's
 fixed [zone encoding](../../docs/design/README.md#5-how-a-decision-becomes-numbers) of a
-decision: the 37 map zones answer fixed questions, and messages pass along the
-map's borders ([network](../../docs/design/README.md#6-inside-a-network-brick-by-brick)). A rollout
-batch freezes all three policies; training then updates all three together.
+decision: each of the 37 map zones has values for fixed features, and messages
+travel along the map's borders ([network](../../docs/design/README.md#6-inside-a-network-brick-by-brick)). A training
+iteration (a *batch* in the code and its flags) holds all three networks fixed
+while its games play; a network update then trains all three together.
 Each policy learns choices made by its actual alliance, including reactions and
 controlled minors. Every value target retains `[Axis, Allies, Comintern]`.
 A decision with one legal action is played without a search or a network
@@ -26,9 +27,9 @@ Rebuild the extension after C++ changes:
 
 ## Training runs and resume
 
-The defaults are a small operational smoke: one batch, two independent games,
+The defaults are a small operational smoke: one training iteration, two independent games,
 six real transitions per game, two simulations per search, and a small CPU model.
-The one-round curriculum keeps the complete approved starting position and
+The one-round curriculum keeps the complete approved starting state and
 rules, while ending after four national turns. A transition limit is separate:
 unfinished games produce explicitly marked bootstrap targets. Neither is a full
 July 1941 campaign result.
@@ -37,18 +38,19 @@ July 1941 campaign result.
 ./.venv/bin/python -m studies.campaign.run train
 ```
 
-Add `--complete-episodes` to freeze a batch until each game reaches its true
-endpoint. Each new batch creates fresh games, and every row receives an observed
-terminal target. A transition guard saves frozen pending work without
+Add `--complete-episodes` to hold a training iteration's networks fixed until
+each game reaches its true end. Each new training iteration creates fresh games,
+and every training sample receives an observed terminal target. A transition guard saves frozen pending work without
 bootstrapping or updating and exits with code 2; increase only that guard when
 resuming, with `--extend-episode-budget N`. `--calendar-rounds N` shortens the
 game to N rounds and `--full-campaign` plays all eleven. Small model exports live
 in `models/generation-000000.pt` and later generation files, starting before any
-action or update. `--max-episodes 10` with at least three batches of four games
-finishes exactly ten games, in batches of four, four and two.
+action or network update. `--max-episodes 10` with at least three training
+iterations of four games finishes exactly ten games, in training iterations of
+four, four and two.
 
 The final line prints the new run directory. `progress.jsonl` is flushed after
-each completed search wave and update, with counters and each game's calendar
+each completed search wave and network update, with counters and each game's calendar
 clock. In another terminal, use the actual printed path:
 
 ```sh
@@ -66,7 +68,7 @@ Press Ctrl-C in the training terminal to finish the current search wave, save
 `--stop-after-waves 2` provides the same safe boundary for a bounded resume check.
 An interrupted run exits with code 130; a completed run exits with code 0.
 Full recovery checkpoints default to every 1,800 wall-clock seconds and orderly
-shutdown. Learning updates publish small model exports, without forcing full
+shutdown. Network updates publish small model exports, without forcing full
 recovery writes. An explicit `--checkpoint-every-waves N` overrides the timer for
 controlled comparisons and recovery tests. A crash can resume the latest
 completed recovery checkpoint. The manifest and checkpoint are
@@ -77,12 +79,12 @@ unique ignored `runs/` directories.
 Checkpoint bytes are flushed before replacement, and `checkpoint.pt.previous`
 keeps the preceding complete snapshot. If the newest file is damaged, explicitly
 resume that backup; the first recovery save preserves it instead of backing up
-the damaged file. Abrupt interruption can lose games and learning updates since
+the damaged file. Abrupt interruption can lose games and network updates since
 the latest recovery point. Saving models separately does not preserve Adam,
 replay or in-progress games; that is the tradeoff for infrequent recovery saves.
 
 Checkpoints contain the live and frozen models, optimizer moments, replay,
-pending samples, all active game states, declaration scheduling, all random
+pending training samples, all active game states, declaration scheduling, all random
 generators, counters, configuration, scenario/rule/schema fingerprints and
 runtime source hashes. Resume rejects configuration, source or schema changes;
 a changed implementation needs an explicit migration or a new run. Only load
@@ -92,18 +94,18 @@ software versions are part of exact continuation compatibility.
 ## Game processes and the GPU
 
 `--episode-workers P` plays each complete game in one of P processes, each with
-its own interpreter lock; the main process keeps learning updates, model exports
+its own interpreter lock; the main process keeps network updates, model exports
 and checkpoints. `--games-per-process N` with `--episode-workers P` plays N games
-in each of P processes for one batch and evaluates all their positions together
-in the main process on `--neural-device` (`mps` for the Apple GPU, `cuda` for an
-NVIDIA GPU). A position's
-batch changes its outputs in the last digits, so unlike one-position evaluation
-a game need not repeat exactly from its seed. In either mode a game that fails
+in each of P processes for one training iteration, and an inference server in the
+main process evaluates all their states together on `--neural-device` (`mps` for
+the Apple GPU, `cuda` for an NVIDIA GPU). The inference batch a state lands in
+changes its outputs in the last digits, so unlike one-state evaluation a game
+need not repeat exactly from its seed. In either mode a game that fails
 costs only that game, recorded with its seed in `failed_games`.
 
 `--cpu-budget N` checks the run's busy cores against the allowance: one per game
-process plus the coordinator, or tensor threads plus parallel search workers
-plus one coordinator without worker processes. It counts and does not measure:
+process plus the inference server, or tensor threads plus parallel search
+workers plus one inference server without worker processes. It counts and does not measure:
 a game process of four games keeps more than one core busy
 ([Training on the Mac](#training-on-the-mac)).
 
@@ -127,21 +129,21 @@ Mac has ten performance cores, and one stays free for everything else.
 `--profile mac` gives the supervisor the setup measured on this Mac, kept in
 [profiles/mac.json](profiles/mac.json): PyTorch 2.14 from `tmp/gpu-mps-env`
 (built from `requirements-gpu-mps.txt`), six game processes of four games
-each, whose positions one coordinating process evaluates on the CPU, the 30 GB
+each, whose states one inference server evaluates on the CPU, the 30 GB
 memory limit, the faster memory allocator and keeping the Mac awake. The
-supervisor counts one core per game process, one for the coordinator and one
+supervisor counts one core per game process, one for the inference server and one
 for itself, but a process of four games keeps 1.2 to 1.5 cores busy. So the
 layout was chosen by the load it puts on the Mac: on 15 November 2026 these six
 processes kept about 9 cores busy, the allowance, and played about 192,000
 decisions an hour while playing; seven, which also fit the count, kept about 10
 busy ([record](../../docs/archive/records/nine_core_layouts_2026_11_15.md)).
 Since the engine work of 16 November the six keep about 7 cores busy and play
-about 301,000 decisions an hour while playing, the coordinator setting the pace
+about 301,000 decisions an hour while playing, the inference server setting the pace
 ([record](../../docs/archive/records/engine_speed_in_training_2026_11_16.md)).
 Evaluating on the GPU instead played half as many games an hour on 2 November
 2026, with the eight game processes of the 12-core allowance then (58.7
-against 124): the zone network is so cheap per position that the GPU's cost per
-call outweighs its speed. Flags after `--` win over the profile, and the
+against 124): the zone network is so cheap per state that the GPU's cost per
+forward pass outweighs its speed. Flags after `--` win over the profile, and the
 learning settings stay there:
 
 ```sh
@@ -153,16 +155,18 @@ learning settings stay there:
   --transitions-per-batch 20000
 ```
 
-These learning settings are the speed test's, not tuned values. A batch is the
-24 games the profile plays at once; with 525 steps an update draws each kept
-sample as often as the 700 steps did with the 32 games of the eight game
-processes before 15 November 2026. Repeat the same command to resume. Another
+These learning settings are the speed test's, not tuned values. A training
+iteration plays the 24 games the profile plays at once (`--batches` counts
+training iterations); with 525 training steps a network update draws each kept
+training sample as often as the 700 training steps did with the 32 games of the
+eight game processes before 15 November 2026. `--batch-size` is the minibatch
+size and `--epochs` the number of training steps per network update. Repeat the same command to resume. Another
 machine gets its own file beside `mac.json`.
 
 `--sample-fraction F` keeps that share of a worker game's decisions as training
 samples, from its own random stream, so the games play the same.
-`--no-new-batch-after EPOCH` finishes the running batch and ends the run as
-completed. `--initial-models EXPORT` starts a fresh run from an export's weights
+`--no-new-batch-after EPOCH` finishes the running training iteration and ends
+the run as completed. `--initial-models EXPORT` starts a fresh run from an export's weights
 and nothing else of that run, even if the sources have changed since, so a run
 stopped by a bug continues from its latest networks after the fix.
 `tools/record_campaign_games.py` plays recorded games from a model export, each in
@@ -172,7 +176,7 @@ its own process, for the Campaign Observatory.
 
 `--profile windows` gives the supervisor the setup in
 [profiles/windows.json](profiles/windows.json): an 8-core PC with an NVIDIA GPU,
-six game processes of four games each, whose positions the coordinating process
+six game processes of four games each, whose states the inference server
 evaluates with CUDA, 7 cores for training and one for the supervisor, a 12 GB
 memory limit and keeping the PC awake. Its software: Visual Studio 2022 Build
 Tools with the C++ workload, and a Python 3.13 environment at `~/.venvs/gwrl`
@@ -181,7 +185,7 @@ built from `requirements-gpu-cuda.txt`, PyTorch 2.14 for CUDA 12.6. Build the ex
 `.gitattributes` keeps every text file's line endings LF, which the engine's
 data fingerprints need. That checkout syncs through OneDrive, so the environment
 and the run directories live outside it. Use the Mac's command with
-`--profile windows`: both machines play 24 games a batch.
+`--profile windows`: both machines play 24 games a training iteration.
 
 The supervisor holds the trainer and every process it starts in a Windows job
 object. A safe stop is a Ctrl+Break to the trainer's console process group,
@@ -191,8 +195,9 @@ window; Ctrl+Break or Ctrl+C there stops the supervisor and saves the run.
 On the night of 14 November 2026 this PC trained on three-round games and made
 48,551 decisions an hour while playing
 ([record](../../docs/archive/records/three_round_training_2026_11_14.md)). Its
-coordinator, on the GPU, answered about ten positions per pass and waited for
-requests only 5.6% of the time, so the coordinator probably set the pace. The
+inference server, on the GPU, evaluated inference batches of about ten states
+and waited for inference requests only 5.6% of the time, so the inference
+server probably set the pace. The
 profile lists the earlier measurements.
 
 ## The network's input and the order interface
@@ -231,7 +236,7 @@ simple controls, with no claim of expert play. Each side is evaluated separately
 Seeds must differ from the base run seed and every logged training episode seed.
 Evaluation accepts small model exports directly, without constructing a learner
 or restoring its optimizer, replay and active games. Profiling retained
-positions uses a full recovery checkpoint.
+states uses a full recovery checkpoint.
 
 ```sh
 ./.venv/bin/python -m studies.campaign.run evaluate \
@@ -253,7 +258,7 @@ states. Truncated games report their snapshot wealth and calendar, but contribut
 no observed terminal returns, terminal wealth intervals or value-calibration
 errors. Reports include all wealth components, territorial control, removed-unit
 casualties, decisions by actor, throughput, inference batches and approximate
-uncertainty for completed games. Very small samples do not establish strength.
+uncertainty for completed games. A few games do not establish strength.
 For baseline-versus-baseline controls add `--target-script balanced` or `cautious`.
 
 Profiling measures cloning, rule transitions, legal actions, observation/context,

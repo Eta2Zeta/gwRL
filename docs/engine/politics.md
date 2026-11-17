@@ -232,10 +232,10 @@ or the repair of a facility.
 Whatever happens in a game, the rules above leave each nation only a few
 possible answers to some questions. The functions declared at the top of
 `include/game/politics.hpp` state them, and the reason for each is beside its
-definition in `src/politics.cpp`. The network's input asks only the questions
+definition in `src/politics.cpp`. The network's input has only the features
 they allow
-([the network's input](../design/network_input.md#what-the-position-asks-about-a-nation)),
-so a rule change that allows a new answer must change its function too.
+([the network's input](../design/network_input.md#what-the-global-features-ask-about-a-nation)),
+so a rule change that allows a new value must change its function too.
 
 | Function | What it states |
 | --- | --- |

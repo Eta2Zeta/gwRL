@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="920" height="250" viewBox="0 0 920 250" role="img" aria-labelledby="title desc">
-  <title id="title">Two toy moves as lines of the same questions</title>
-  <desc id="desc">A toy game with two unit types and three zones. The infantry moving a to b to c answers unit:0_source:infantry 1, unit_zone:0_source:a 1, zone:1_path a, b and c 1 each and list_length:path 3; it starts from a and acts on c. The tank moving b to c answers unit:0_source:tank 1, unit_zone:0_source:b 1, zone:1_path b and c 1 each and list_length:path 2; it starts from b and acts on c. All other answers are zero.</desc>
+  <title id="title">Two toy actions as feature vectors of the same features</title>
+  <desc id="desc">A toy game with two unit types and three zones. The infantry moving a to b to c has the feature values unit:0_source:infantry 1, unit_zone:0_source:a 1, zone:1_path a, b and c 1 each and list_length:path 3; its source zone is a and its target zone c. The tank moving b to c has the feature values unit:0_source:tank 1, unit_zone:0_source:b 1, zone:1_path b and c 1 each and list_length:path 2; its source zone is b and its target zone c. All other feature values are zero.</desc>
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
     .q { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; fill: #1f2328; }
@@ -23,7 +23,7 @@
   <line x1="486" y1="44" x2="630" y2="44" stroke="#bc4c00" stroke-width="2"/>
   <text class="q" x="676" y="36" text-anchor="middle">list_length:path</text>
   <line x1="654" y1="44" x2="698" y2="44" stroke="#8250df" stroke-width="2"/>
-  <text class="head" x="824" y="36" text-anchor="middle">LINKS</text>
+  <text class="head" x="824" y="36" text-anchor="middle">ACTION'S ZONES</text>
   <line x1="748" y1="44" x2="898" y2="44" stroke="#8c959f" stroke-width="2"/>
 
   <!-- Sub headers -->
@@ -35,8 +35,8 @@
   <text class="sub" x="508" y="66" text-anchor="middle">a</text>
   <text class="sub" x="558" y="66" text-anchor="middle">b</text>
   <text class="sub" x="608" y="66" text-anchor="middle">c</text>
-  <text class="head" x="784" y="66" text-anchor="middle">starts from</text>
-  <text class="head" x="864" y="66" text-anchor="middle">acts on</text>
+  <text class="head" x="784" y="66" text-anchor="middle">source zone</text>
+  <text class="head" x="864" y="66" text-anchor="middle">target zone</text>
 
   <!-- Row 1: infantry a→b→c -->
   <text class="row" x="24" y="104">infantry a→b→c</text>
@@ -67,6 +67,6 @@
   <rect x="834" y="130" width="60" height="32" rx="16" fill="#f6f8fa" stroke="#8c959f"/><text class="link" x="864" y="151" text-anchor="middle">c</text>
 
   <!-- Notes -->
-  <text class="note" x="24" y="196">Each colour is one family of questions; grey cells are zero and are not stored. The path's zones are a set: the line alone</text>
-  <text class="note" x="24" y="214">cannot say a came before b. Where the move starts comes from unit_zone, and where it ends from the link to the zone it acts on.</text>
+  <text class="note" x="24" y="196">Each colour is one feature family; grey cells are zero and are not stored. The path's zones are a set: the feature vector alone</text>
+  <text class="note" x="24" y="214">cannot say a came before b. Where the action starts comes from unit_zone, and where it ends from its target zone.</text>
 </svg>

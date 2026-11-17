@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="578" viewBox="0 0 960 578" role="img" aria-labelledby="title desc">
   <title id="title">One real training sample</title>
-  <desc id="desc">One sample, from round 5 of a self-play game: the Comintern chooses the CCP&#x27;s Combat Movement. Part 1, what the network read, stored as the decision&#x27;s input: 840 answers about the board, from all 37 zones; 176 about the position as a whole; 80 about the five legal moves; and the zones each move names; 12 KB in all. In Shensi, one of its 9 answers is units:ccp:mountain_infantry = 1; in Hopeh, two of its 28 answers are possessor:kmt = 1 and project:kmt:major_shipyard = 1. Part 2, who chose: the Comintern, for the CCP; in parts 3 and 4, the network is the Comintern&#x27;s. Part 3, how the search split its 64 simulations, stored as each move&#x27;s share, the policy target. The CCP mountain infantry in Shensi attacking Hopeh: 36 visits, share 0.56, the network&#x27;s own probability 0.10; this move was played. Attacking Suiyuan: 2 visits, share 0.03, network 0.10. Attacking Szechwan: 5 visits, share 0.08, network 0.09. Attacking Tsinghai: 9 visits, share 0.14, network 0.18. Ending Combat Movement: 12 visits, share 0.19, network 0.53. The move played was drawn at random in proportion to the shares; training moves the network&#x27;s probabilities toward them. Part 4, how the game ended, stored when it ends as the value target: Axis +49.0, the network predicted +25.1; Allies −63.8, the network predicted −42.4; Comintern −106.2, the network predicted −102.4.</desc>
+  <desc id="desc">One real training sample, from game round 5 of a self-play game: the Comintern chooses the CCP's Combat Movement. 1, what the network read: 840 non-zero zone feature values from all 37 zones, 176 global feature values, 80 action feature values for the five legal actions, and each action's zones, 12 KB in all; in Hopeh, for example, possessor:kmt = 1 and project:kmt:major_shipyard = 1. 2, who chose: the Comintern, for the CCP. 3, how the search split its 64 simulations, stored as visit shares: the mountain infantry in Shensi attacking Hopeh 36 visits, visit share 0.56, the network's own probability 0.10, the action played; attacking Suiyuan 2, 0.03, 0.10; attacking Szechwan 5, 0.08, 0.09; attacking Tsinghai 9, 0.14, 0.18; ending Combat Movement 12, 0.19, 0.53. 4, how the game ended, stored as the value target: Axis +49.0, the network predicted +25.1; Allies −63.8, predicted −42.4; Comintern −106.2, predicted −102.4.</desc>
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
     .heading { font-size: 16px; font-weight: 600; }
@@ -20,14 +20,15 @@
     .step { font-size: 12px; font-weight: 700; fill: #ffffff; }
   </style>
   <rect x="0.5" y="0.5" width="959" height="577" rx="10" fill="#ffffff" stroke="#d0d7de"/>
-  <text class="heading" x="24" y="36">One real sample</text>
-  <text class="subheading" x="24" y="58">Round 5, the CCP&#x27;s Combat Movement, in a game the networks played after one training batch (5 November 2026)</text>
+  <text class="heading" x="24" y="36">One real training sample</text>
+  <text class="subheading" x="24" y="58">Game round 5, the CCP&#x27;s Combat Movement, in a game the networks played after one network update (5 November 2026)</text>
   <rect x="348" y="80" width="588" height="364" rx="10" fill="#ffffff" stroke="#d0d7de"/>
   <circle cx="372" cy="106" r="11" fill="#57606a"/>
   <text class="step" x="372" y="110.5" text-anchor="middle">3</text>
   <text class="title" x="392" y="111" text-anchor="start">How the search split its 64 simulations</text>
-  <text class="sub" x="392" y="130" text-anchor="start">stored: each move&#x27;s share, the policy target</text>
+  <text class="sub" x="392" y="130" text-anchor="start">stored: each action&#x27;s visit share, the policy target</text>
   <text class="head" x="808" y="152" text-anchor="end">visits</text>
+  <text class="head" x="864" y="137" text-anchor="end">visit</text>
   <text class="head" x="864" y="152" text-anchor="end">share</text>
   <text class="head" x="920" y="152" text-anchor="end">network</text>
   <line x1="610.00" y1="162" x2="610.00" y2="338" stroke="#eaeef2" stroke-width="1"/>
@@ -40,7 +41,7 @@
   <text class="tick" x="780.00" y="353" text-anchor="middle">0.6</text>
   <line x1="610" y1="162" x2="610" y2="338" stroke="#8c959f" stroke-width="1"/>
   <text class="move" x="368" y="177" text-anchor="start" font-weight="600">Mountain infantry: Shensi → Hopeh</text>
-  <text class="played" x="368" y="191" text-anchor="start">the move played</text>
+  <text class="played" x="368" y="191" text-anchor="start">the action played</text>
   <path d="M 610 167 H 765.38 Q 769.38 167 769.38 171.00 V 174.00 Q 769.38 178 765.38 178 H 610 Z" fill="#0969da"/>
   <path d="M 610 180 H 635.53 Q 639.03 180 639.03 183.50 V 183.50 Q 639.03 187 635.53 187 H 610 Z" fill="#bc4c00"/>
   <text class="num" x="808" y="177" text-anchor="end">36</text>
@@ -71,23 +72,23 @@
   <text class="num" x="864" y="321" text-anchor="end" font-weight="600">0.19</text>
   <text class="num" x="920" y="321" text-anchor="end">0.53</text>
   <rect x="368" y="359" width="12" height="10" rx="2" fill="#0969da"/>
-  <text class="legend" x="385" y="368" text-anchor="start">the search's share (stored)</text>
+  <text class="legend" x="385" y="368" text-anchor="start">the search's visit share (stored)</text>
   <rect x="564" y="361" width="12" height="6" rx="2" fill="#bc4c00"/>
   <text class="legend" x="581" y="368" text-anchor="start">the network's own probability (not stored)</text>
-  <text class="note" x="368" y="390" text-anchor="start">The move played was drawn at random in proportion to the shares.</text>
-  <text class="note" x="368" y="406" text-anchor="start">Training moves the network&#x27;s probabilities toward the shares.</text>
+  <text class="note" x="368" y="390" text-anchor="start">The action played was drawn at random in proportion to the visit shares.</text>
+  <text class="note" x="368" y="406" text-anchor="start">Training moves the network&#x27;s probabilities toward the visit shares.</text>
   <rect x="24" y="80" width="300" height="264" rx="10" fill="#ffffff" stroke="#d0d7de"/>
   <circle cx="48" cy="106" r="11" fill="#57606a"/>
   <text class="step" x="48" y="110.5" text-anchor="middle">1</text>
   <text class="title" x="68" y="111" text-anchor="start">What the network read</text>
   <text class="sub" x="68" y="130" text-anchor="start">stored: the decision&#x27;s input</text>
-  <text class="body" x="44" y="160" text-anchor="start">840 answers about the board (37 zones)</text>
-  <text class="body" x="44" y="179" text-anchor="start">176 about the position as a whole</text>
-  <text class="body" x="44" y="198" text-anchor="start">80 about the five legal moves</text>
-  <text class="body" x="44" y="217" text-anchor="start">and each move&#x27;s zones: 12 KB in all</text>
-  <text class="note" x="44" y="244" text-anchor="start">In Shensi, one of its 9 answers:</text>
+  <text class="body" x="44" y="160" text-anchor="start">840 non-zero zone feature values (37 zones)</text>
+  <text class="body" x="44" y="179" text-anchor="start">176 global feature values</text>
+  <text class="body" x="44" y="198" text-anchor="start">80 action feature values (5 legal actions)</text>
+  <text class="body" x="44" y="217" text-anchor="start">and each action&#x27;s zones: 12 KB in all</text>
+  <text class="note" x="44" y="244" text-anchor="start">In Shensi, one of its 9 feature values:</text>
   <text class="mono" x="52" y="263" text-anchor="start">units:ccp:mountain_infantry = 1</text>
-  <text class="note" x="44" y="290" text-anchor="start">In Hopeh, two of its 28 answers:</text>
+  <text class="note" x="44" y="290" text-anchor="start">In Hopeh, two of its 28 feature values:</text>
   <text class="mono" x="52" y="309" text-anchor="start">possessor:kmt = 1</text>
   <text class="mono" x="52" y="328" text-anchor="start">project:kmt:major_shipyard = 1</text>
   <rect x="24" y="358" width="300" height="86" rx="10" fill="#ffffff" stroke="#d0d7de"/>
@@ -101,7 +102,7 @@
   <text class="step" x="48" y="488.5" text-anchor="middle">4</text>
   <text class="title" x="68" y="489" text-anchor="start">How the game ended</text>
   <text class="sub" x="68" y="508" text-anchor="start">stored when it ends: the value target</text>
-  <text class="note" x="44" y="536" text-anchor="start">Every sample of the game stores these scores.</text>
+  <text class="note" x="44" y="536" text-anchor="start">Every training sample of the game stores these final scores.</text>
   <text class="title" x="368" y="488" text-anchor="start">Axis</text>
   <text class="score" x="368" y="514" text-anchor="start">+49.0</text>
   <text class="note" x="368" y="536" text-anchor="start">the network predicted +25.1</text>

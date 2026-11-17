@@ -18,7 +18,7 @@ exact values.
 - **The lookup** (`_bag` in `studies/campaign/neural.py`). A zone's, position's or
   move's vector starts as the sum of the rows of its answers, each multiplied by
   its answer's weight
-  ([section 6.3](../../design/README.md#63-the-first-layer-rows-and-tables)).
+  ([section 6.3](../../design/README.md#63-the-embedding-layer-embeddings-and-embedding-tables)).
   The old lookup copied every answer's row into one temporary array, multiplied
   each row by its weight and added the products into their sums: three
   operations, each over all the answers of a network call. Now

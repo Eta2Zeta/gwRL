@@ -35,22 +35,22 @@ Other open things stay in the pages that own them, and
 | [Q-001](#q-001-mongolia-at-war-with-the-ccp) | May Mongolia attack land that was Chinese at the start, which now puts it at war with the CCP? | A printed rule | No: rule 4.5 does not allow the attack |
 | [Q-002](#q-002-chinese-land-that-japan-holds) | Is an attack on Chinese land that Japan now holds an attack on China? | A printed rule | Yes, as now; it cannot arise if Q-001 is answered as recommended |
 | [Q-003](#q-003-one-list-of-marks-for-each-kind-of-thing) | Should the network's input ask about a mark only where the engine can put it, and learn the four marks it does not know? | The network's input | Yes, before the next long run |
-| [Q-004](#q-004-questions-whose-answer-never-changes) | Should the input stop asking questions whose answer never changes? | The network's input | Yes, in the same change as Q-003 |
+| [Q-004](#q-004-features-whose-value-never-changes) | Should the input drop features whose value never changes? | The network's input | Yes, in the same change as Q-003 |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
-| [Q-007](#q-007-a-batchs-last-game-played-alone) | Should a batch play more games than it has game threads, so that its longest game does not end it alone? | Running training | Yes: 48 games on 24 threads, measured in matched batches first |
+| [Q-007](#q-007-a-training-iterations-last-game-played-alone) | Should a training iteration play more games than it has game threads, so that its longest game does not end it alone? | Running training | Yes: 48 games on 24 threads, measured in matched training iterations first |
 
-Q-001 to Q-004 were raised on 14 November 2026, while the position questions
+Q-001 to Q-004 were raised on 14 November 2026, while the global features
 about nations were being pruned (commit `bce7a4c`). Their numbers are in the
-[record of the questions random games answer](archive/records/answer_census_2026_11_15.md).
+[record of which features random games give values to](archive/records/answer_census_2026_11_15.md).
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
 Q-006 was raised on 15 November 2026, while the printed sources of Q-001 were
 being looked up; its numbers are in the first record.
-Q-007 was raised on 17 November 2026, in the measurements of the coordinator's
-rounds; its numbers are in the
-[record of where a coordinator round's time goes](archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail).
+Q-007 was raised on 17 November 2026, in the measurements of the inference
+server's inference batches; its numbers are in the
+[record of where an inference batch's time goes](archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail).
 
 ## Q-001: Mongolia at war with the CCP
 
@@ -76,25 +76,25 @@ attack at all?
 **A real case** (random game, seed 7155;
 [record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
 
-1. Round 1: the CCP attacks the Ma Clique in Tsinghai and Mengjiang in
+1. Game round 1: the CCP attacks the Ma Clique in Tsinghai and Mengjiang in
    Suiyuan, so both join the KMT with their land at the end of that Combat
    Phase (rulebook 4.9, page 30: a warlord attacked by the CCP aligns with the
    KMT). Japan then attacks Nanking, and at the end of Japan's Combat Phase the
    six other warlords join the KMT too (rulebook 4.9, page 30: an attack by a
    foreign nation on Chinese land makes every warlord align with the CCP or
-   the KMT). Later in the round the KMT destroys the CCP's last units.
-2. Round 2: the KMT attacks Mongolia. The declaration-of-war table lets the
+   the KMT). Later in that game round the KMT destroys the CCP's last units.
+2. Game round 2: the KMT attacks Mongolia. The declaration-of-war table lets the
    KMT attack Chinese warlords or Mongolia, by a combat move, once the CCP has
    been eliminated (rulebook 5.1, page 35, the KMT's rows; the same rows are on
    the KMT's national reference sheet, page 2; [Q-006](#q-006-the-kmt-after-the-ccp-comes-back)
    is about their exact words). The KMT and Mongolia are now at war.
-3. Round 3: a Mongolian cavalry moves into Tsinghai, which the KMT holds, as an
+3. Game round 3: a Mongolian cavalry moves into Tsinghai, which the KMT holds, as an
    attack. The engine records Mongolia as invading China. No warlord is left
    to join a side, and Mongolia was already at war with the KMT, so the attack
    changes one thing: from that move on Mongolia and the CCP are at war.
 
 **How often.** In 480 random games Mongolia was recorded as the invader in 70,
-from round 3 on, and in all 70 it came to be at war with the CCP. In 69 of them
+from game round 3 on, and in all 70 it came to be at war with the CCP. In 69 of them
 no warlord was left to join a side; the new enemies were the CCP alone in 46
 games and the CCP and the KMT in 23. Three times Mongolia then attacked land
 the CCP held ([record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
@@ -128,7 +128,7 @@ the zone only.
 **Why it matters.** Two nations of one alliance, moved by one player, become
 enemies (rulebook glossary, page 6: nations at war with each other are
 enemies), so their units may attack each other, and the Comintern's network is
-trained on such positions. Random play reaches this in one game in seven.
+trained on such states. Random play reaches this in one game in seven.
 
 **The choices.**
 
@@ -161,13 +161,13 @@ zone that Dadao holds: an attack there is an attack on Dadao only.
 **A real case** (random game, seed 7024;
 [record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
 
-1. Round 1: the CCP attacks Mengjiang in Suiyuan, so Mengjiang joins the KMT
+1. Game round 1: the CCP attacks Mengjiang in Suiyuan, so Mengjiang joins the KMT
    with its land (rulebook 4.9, page 30).
-2. Round 2: Japan takes Suiyuan from the KMT. A Japanese infantry also attacks
+2. Game round 2: Japan takes Suiyuan from the KMT. A Japanese infantry also attacks
    Kerulen, which puts Japan and Mongolia at war: an Axis major power may
    declare war on any nation outside the Axis, and on a minor power it does so
    by a land unit's combat move against it (rulebook 5.1, page 35).
-3. Round 3: a Mongolian cavalry moves into Suiyuan, now Japan's, as an attack.
+3. Game round 3: a Mongolian cavalry moves into Suiyuan, now Japan's, as an attack.
    The engine treats that as Mongolia invading China: Mongolia is now also at
    war with the KMT and the CCP, neither of which had any part in the fight.
 
@@ -244,10 +244,10 @@ engine can put that mark, and should it learn the four marks it does not know?
 happened to them: on a unit that has moved, on a nation that has finished its
 research this turn, on a city that is damaged, on a facility built this turn.
 The code calls a mark a flag; the engine's mark table, `GWRL_MARKS` in
-`include/game/marks.hpp`, lists every mark a position may hold
-([names held as numbers](engine/names.md#what-a-mark-is)). The network's input asks one question for each
+`include/game/marks.hpp`, lists every mark a state may hold
+([names held as numbers](engine/names.md#what-a-mark-is)). The network's input has one feature for each
 pairing of a thing and a mark
-([the network's input](design/network_input.md#3-questions-and-answers)). But
+([the network's input](design/network_input.md#3-features-and-feature-values)). But
 it keeps only two lists of marks, `kActorFlags` and `kRecordFlags` in
 `src/zone_encoding.cpp`: one of 119 for units and nations together, and one of
 108 for territories, facilities, construction projects, battles and the game
@@ -255,10 +255,10 @@ as a whole. So it asks about every pairing, including those that cannot
 happen. `nation_flag:japan:air_battle` asks whether Japan, the nation, carries
 the mark of a unit that is in an air battle. Only a unit ever gets that mark.
 
-Of the layout's 59,235 questions, 8,902 are about marks: 5,660 of the 42,532 a
-zone answers, 1,890 of the position's 4,076 and 1,352 of a move's 12,627. In
-480 random games, 290 of them were ever answered; of the 1,560 that ask a
-nation about a mark, 88 were
+Of the layout's 59,235 features, 8,902 are about marks: 5,660 of the 42,532
+zone features, 1,890 of the 4,076 global features and 1,352 of the 12,627
+action features. In 480 random games, 290 of them ever had a non-zero value; of
+the 1,560 that ask a nation about a mark, 88 did
 ([record](archive/records/answer_census_2026_11_15.md#which-questions-were-answered)). The engine's code puts 43
 of the 119 marks on a nation and 11 of the 108 on the game as a whole; the
 record [lists them](archive/records/answer_census_2026_11_15.md#the-marks-the-engine-puts-on-a-nation) with the
@@ -272,21 +272,21 @@ page 46). The engine notes on the nation that holds the factory or the city
 how much has been taken off this turn, in four marks: `bombing_reduction` and
 `bombing_reduction_turn` (`applyFacilityBombDamage` in `src/air.cpp`), and
 `city_bombing_reduction` and `city_bombing_reduction_turn`
-(`applyCityBombDamage`, the same file). The input has no question for any of
+(`applyCityBombDamage`, the same file). The input has no feature for any of
 them. Put on Japan by hand, the first pair arrives as
 `nation_flag:japan:other = 3` and the second as `nation_flag:japan:other = 5`,
 which says only that Japan carries some unlisted mark, and the name check
 reports them ([record](archive/records/answer_census_2026_11_15.md#four-marks-without-a-question)). No random
 game has reached this: it needs a nation that has completed Improved
 Construction to be bombed. The engine's mark table lists them, and the test
-that checks every mark in it has a question (`test_marks` in
+that checks every mark in it has a feature (`test_marks` in
 `tests/test_campaign_zone_encoding.py`) names these four as the ones this
 question leaves open.
 
 **Why it matters.** Play is not affected: the rules are applied. For learning,
-the questions that can never be answered cost no time, because an unanswered
-question is never read, but their rows never train and they make the layout
-harder to read. The four missing marks mean the network cannot see how much of
+the features that can never have a non-zero value cost no time, because a
+feature whose value is 0 is never read, but their embeddings never train and
+they make the layout harder to read. The four missing marks mean the network cannot see how much of
 a factory's or a city's protection is already used up, which matters to a
 player choosing what to bomb next. That is rare.
 
@@ -294,25 +294,25 @@ player choosing what to bomb next. That is rare.
 
 | Choice | What it changes |
 | --- | --- |
-| A. Give each kind of thing its own list, and add the four marks | One layout change, so networks trained before it no longer load; those so far are experiments. Work of about the size of the pruning of 14 November (commit `bce7a4c`): each mark of the engine's table is given the kinds of thing it can be on, and a test keeps the lists in step with the table. Most of the 8,902 questions go. |
-| B. Only add the four marks | A small layout change. The questions that cannot be answered stay. |
+| A. Give each kind of thing its own list, and add the four marks | One layout change, so networks trained before it no longer load; those so far are experiments. Work of about the size of the pruning of 14 November (commit `bce7a4c`): each mark of the engine's table is given the kinds of thing it can be on, and a test keeps the lists in step with the table. Most of the 8,902 features go. |
+| B. Only add the four marks | A small layout change. The features that can never have a non-zero value stay. |
 | C. Leave it | Nothing changes. The name check reports the four marks if a game ever reaches them. |
 
 **Recommendation: A, before the next long training run.** After a long run a
 layout change costs the networks it trained.
 
 **If answered.** The lists and the reason for each belong in
-[the network's input, section 8](design/network_input.md#8-questions-removed-as-impossible),
+[the network's input, section 8](design/network_input.md#8-features-removed-as-impossible),
 which now describes the gap.
 
-## Q-004: Questions whose answer never changes
+## Q-004: Features whose value never changes
 
-**The question.** Should the input stop asking questions that every position
-answers alike, and questions that always repeat another question?
+**The question.** Should the input drop features that have the same value in
+every state, and features that always repeat another feature?
 
-**What happens now.** The engine leaves 37 position questions only one answer:
+**What happens now.** The engine leaves 37 global features only one possible value:
 
-| Questions | How many | Always | Where that is settled |
+| Features | How many | Always | Where that is settled |
 | --- | ---: | --- | --- |
 | `nation_present` for every nation but Dadao | 12 | 1 | `loadScenario` in `src/campaign_setup.cpp` creates these twelve nations, and no code removes a nation |
 | `alliance` and `player` of Japan, the KMT, the CCP and Mongolia | 8 | 1 | `alliancePossible` in `src/politics.cpp`: each keeps its alliance and its player for good |
@@ -322,27 +322,28 @@ answers alike, and questions that always repeat another question?
 | `state_flag:__campaign_started` | 1 | 1 | `Engine::start` in `src/campaign_runtime.cpp` sets it once |
 
 The reasons for the middle three rows are in
-[what the position asks about a nation](design/network_input.md#what-the-position-asks-about-a-nation).
+[what the global features ask about a nation](design/network_input.md#what-the-global-features-ask-about-a-nation).
 
-And every `player` question always has the answer of the `alliance` question
+And every `player` feature always has the value of the `alliance` feature
 for the same nation: a nation's player is the agent that decides for it, and in
 this campaign each alliance is one agent
 ([approved scenario decisions](plans/japan_china_full_rules_plan.md#approved-scenario-decisions);
-the rule `alliancePossible` covers both). In 710,254 encoded positions none of
+the rule `alliancePossible` covers both). In 710,254 encoded states none of
 these ever differed ([record](archive/records/answer_census_2026_11_15.md#which-questions-were-answered)). At
 decision 612, the example of the
-[design document](design/README.md#52-three-parts-the-board-the-position-and-the-moves),
-45 of the position's 176 answers are of these kinds; its answers are listed in
-the [record of that sample](archive/records/training_sample_2026_11_05.md).
+[design document](design/README.md#52-three-parts-zone-features-global-features-and-action-features),
+45 of its 176 non-zero global feature values are of these kinds; its feature
+values are listed in the [record of that training sample](archive/records/training_sample_2026_11_05.md).
 
-Sixteen questions of this kind were removed on 14 November 2026: thirteen that
+Sixteen features of this kind were removed on 14 November 2026: thirteen that
 said a nation's income had been worked out (commit `c998709`), and three that
 said Japan, the KMT and the CCP keep a treasury (commit `bce7a4c`).
 
-**Why it matters.** Little. A question answered alike everywhere cannot tell
-two positions apart, so the network learns nothing from it: its row is a
-constant added to every position. Unlike a question that is never answered, it
-is read at every evaluation: 45 of the 1,096 rows that decision 612 looks up
+**Why it matters.** Little. A feature with the same value everywhere cannot
+tell two states apart, so the network learns nothing from it: its embedding is a
+constant added to every state. Unlike a feature whose value is always 0, it is
+read at every network evaluation: 45 of the 1,096 embeddings that decision 612
+looks up
 ([its size](design/README.md#69-the-whole-network)). Whether that shows in
 speed has not been measured.
 
@@ -350,16 +351,16 @@ speed has not been measured.
 
 | Choice | What it changes |
 | --- | --- |
-| A. Remove the 37 fixed questions and the `player` family | 71 questions go, and the position part has 4,005. A layout change. The encoder reports any position that breaks one of these rules, as it does for a missing treasury. |
-| B. Remove only the 37 fixed questions | The position part has 4,039. `player` stays, in case an alliance is ever given more than one player. |
+| A. Remove the 37 fixed features and the `player` family | 71 features go, leaving 4,005 global features. A layout change. The encoder reports any state that breaks one of these rules, as it does for a missing treasury. |
+| B. Remove only the 37 fixed features | 4,039 global features remain. `player` stays, in case an alliance is ever given more than one player. |
 | C. Keep them | Nothing changes. |
 
 **Recommendation: A, in the same layout change as Q-003.** Nothing the network
-can learn is lost either way, so this is tidiness. Keeping the questions as a
+can learn is lost either way, so this is tidiness. Keeping the features as a
 plain record of who is who costs almost nothing, so C is a fair choice too.
 
-**If answered.** The removed questions join the list in
-[the network's input, section 8](design/network_input.md#8-questions-removed-as-impossible).
+**If answered.** The removed features join the list in
+[the network's input, section 8](design/network_input.md#8-features-removed-as-impossible).
 
 ## Q-005: The supervisor's count of cores
 
@@ -369,7 +370,7 @@ counting one core for each game process?
 
 **What the supervisor does now.** Before it starts a run,
 `tools/supervise_campaign_training.py` checks that the run fits the allowance by
-counting: one core for each game process, one for the coordinator and one for
+counting: one core for each game process, one for the inference server and one for
 itself (`validate_training_arguments`, and `busy_cores` in
 `studies/campaign/run.py`). While the run plays it measures only memory: every
 second it reads the process table and stops the run if the memory used comes
@@ -378,7 +379,7 @@ threads, and the engine releases Python's lock while it works, so the four
 threads compute at the same time. A process keeps 1.2 to 1.5 cores busy, not
 one ([running training on the Mac](design/README.md#92-running-training-on-the-mac)).
 
-**A real case** (15 November 2026, one training batch each, eleven-round games,
+**A real case** (15 November 2026, one training iteration each, eleven-round games,
 64 simulations, the 64×2 network on the CPU). Seven game processes of four
 games count 7 + 1 + 1 = 9 cores, which the supervisor accepts. Measured every
 five seconds, they kept 9.9 cores busy in a typical half minute and up to 11.1,
@@ -386,11 +387,11 @@ all ten of the Mac's performance cores. The Mac profile now runs six processes,
 chosen by hand from these measurements, which kept about 8.9 cores busy that
 day ([record](archive/records/nine_core_layouts_2026_11_15.md)). On 16 November,
 with less other work on the Mac, about 2 cores instead of 3, the same six
-processes kept 9.1 to 10.4 cores busy on average in four batches
+processes kept 9.1 to 10.4 cores busy on average in four training iterations
 ([record](archive/records/move_checks_2026_11_16.md#training-batches)). The
 layout's load grows into whatever cores are free. It also shrinks when the
 engine gets faster: after the engine work later that day the same six
-processes kept about 6.8 cores busy, the coordinator setting the pace
+processes kept about 6.8 cores busy, the inference server setting the pace
 ([record](archive/records/engine_speed_in_training_2026_11_16.md)). A count sees neither. A command line that adds
 `--episode-workers 7` overrides the profile, and the supervisor would accept it.
 
@@ -411,7 +412,7 @@ GPU, game threads wait more and use less than they count.
 
 **Recommendation: A.** It holds training to what the allowance means, whatever
 the layout, and the supervisor already samples every process once a second.
-Stopping only a run that stays over keeps a brief peak from costing a batch.
+Stopping only a run that stays over keeps a brief peak from costing a training iteration.
 
 **If answered.** What the supervisor measures and when it stops a run belong in
 the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
@@ -448,11 +449,11 @@ elimination).
 **A real case** (random game, seed 9105;
 [record](archive/records/answer_census_2026_11_15.md#the-kmt-and-mongolia-after-the-ccp-comes-back)).
 
-1. Round 2, the CCP's Combat Phase: the CCP loses its last two units in
+1. Game round 2, the CCP's Combat Phase: the CCP loses its last two units in
    battles on its own turn. It has no units.
 2. Three decisions later, in its Place Units Phase, the CCP places an infantry
    it had bought. It has one unit again.
-3. Later in round 2, the KMT's Combat Movement: KMT units in Tsinghai stand
+3. Later in game round 2, the KMT's Combat Movement: KMT units in Tsinghai stand
    next to Mongolian land. The engine offers the KMT seven combat moves, none
    into Mongolia, because the CCP has a unit.
 
@@ -486,34 +487,37 @@ the game's developers.
 **If answered.** A ruling becomes the next rule clarification, with
 `mayDeclareWar`, its test and the politics page changed in the same commit.
 
-## Q-007: A batch's last game, played alone
+## Q-007: A training iteration's last game, played alone
 
-**The question.** Should a batch keep its game threads busy to its end, by
-playing more games than it has game threads, instead of ending with its longest
-game playing alone?
+**The question.** Should a training iteration keep its game threads busy to the
+end of its self-play, by playing more games than it has game threads, instead of
+ending with its longest game playing alone?
 
-**What the program does now.** A batch plays as many games as it has game
-threads, 24 in the Mac profile, all started together, and the networks are
-updated only when the last of them has ended (`count = config.parallel_envs` in
-the batch loop of `studies/campaign/run.py`;
-[a batch of games](design/README.md#71-a-batch-of-games)). Games differ in
-length, so near the end of a batch fewer and fewer games are in flight, and its
-longest game ends it alone.
+**What the program does now.** A training iteration plays as many games as it has
+game threads, 24 in the Mac profile, all started together, and its network update
+starts only when the last of them has ended (`count = config.parallel_envs` in
+the batch loop of `studies/campaign/run.py`, the code's name for the loop over
+training iterations;
+[a training iteration's games](design/README.md#71-a-training-iterations-games)).
+Games differ in length, so near the end of a training iteration fewer and fewer
+games are concurrent, and its longest game ends it alone.
 
-**A real case** (17 November 2026, one profiled batch of the Mac profile,
-eleven-round games, 64 simulations, the 64×2 network on one core). The 24 games
-took 834 to 1,445 decisions. 23 of them ended between 231 and 299 seconds; the
-longest played alone until 332 seconds. For that last tenth of the playing time
-the coordinator's rounds held one position each, while the other 23 game threads
-waited; on average 20.1 of the 24 games were in flight. The longest game made
-about 348 of its decisions alone. Without them the batch would have played about
-294,000 decisions an hour instead of 268,000, so its tail cost about 9%
+**A real case** (17 November 2026, one training iteration of the Mac profile,
+timed with the profiler, eleven-round games, 64 simulations, the 64×2 network on
+one core). The 24 games took 834 to 1,445 decisions. 23 of them ended between 231
+and 299 seconds; the longest played alone until 332 seconds. For that last tenth
+of the playing time the inference server's inference batches held one state
+each, while the other 23 game threads waited; on average 20.1 of the 24 games
+were concurrent. The longest game made about 348 of its decisions alone. Without
+them the training iteration would have played about 294,000 decisions an hour
+instead of 268,000, so its tail cost about 9%
 ([record](archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail)).
 
 **Why it matters.** Decisions per hour counts the whole playing time, so every
-batch pays for its tail, however fast the engine and the coordinator get. A
-larger network on the GPU pays more: the GPU uses a pass of one position worst,
-and filling passes of 64 positions takes about 128 games in flight
+training iteration pays for its tail, however fast the engine and the inference
+server get. A larger network on the GPU pays more: the GPU uses an inference
+batch of one state worst, and filling inference batches of 64 states takes about
+128 concurrent games
 ([section 9.3 of the design document](design/README.md#93-what-a-larger-network-and-a-longer-search-cost)),
 whose tail would leave more threads waiting.
 
@@ -521,19 +525,19 @@ whose tail would leave more threads waiting.
 
 | Choice | What it changes |
 | --- | --- |
-| A. More games than game threads | A batch plays, say, 48 games on its 24 threads, and a thread that finishes a game starts the next. Threads fall idle only once the batch's last games are under way, so the tail stays about as long but is about half as large a share of a batch twice as long. Each update then has twice the samples, and needs twice the training steps to draw each sample as often ([section 8.7](design/README.md#87-how-often-a-sample-is-drawn)); the networks change every 48 games instead of every 24. Needs a setting for the games per batch. |
-| B. Play on through updates | Game threads never stop: a finished game is replaced at once, and new networks are swapped in when an update is ready, as AlphaZero's players do. No tail, but a game may be played by two versions of the networks, and training runs beside play instead of between batches: a change to the training loop ([section 9.1](design/README.md#91-the-training-loop)). |
-| C. Leave it | Every batch keeps a tail, about a tenth of its playing time in this case, and decisions per hour stays comparable with earlier batches. |
+| A. More games than game threads | A training iteration plays, say, 48 games on its 24 threads, and a thread that finishes a game starts the next. Threads fall idle only once the training iteration's last games are under way, so the tail stays about as long but is about half as large a part of a training iteration twice as long. Each network update then has twice the training samples, and needs twice the training steps to draw each training sample as often ([section 8.7](design/README.md#87-how-often-a-training-sample-is-drawn)); the networks change every 48 games instead of every 24. Needs a setting for the games per training iteration. |
+| B. Play on through network updates | Game threads never stop: a finished game is replaced at once, and new networks are swapped in when a network update is ready, as AlphaZero's players do. No tail, but a game may be played by two versions of the networks, and training runs beside play instead of between training iterations: a change to the training loop ([section 9.1](design/README.md#91-the-training-loop)). |
+| C. Leave it | Every training iteration keeps a tail, about a tenth of its playing time in this case, and decisions per hour stays comparable with earlier training iterations. |
 
-**Recommendation: A**, measured in matched batches before it replaces the
-profile's setting. It keeps the training loop as it is and needs only a
-setting, and its cost, fewer updates per game, can be offset by more training
-steps per update. B removes the tail entirely and suits larger runs, but it
-changes what a batch is.
+**Recommendation: A**, measured in matched training iterations before it replaces
+the profile's setting. It keeps the training loop as it is and needs only a
+setting, and its cost, fewer network updates per game, can be offset by more
+training steps per network update. B removes the tail entirely and suits larger
+runs, but it changes what a training iteration is.
 
-**If answered.** The number of games per batch belongs in
-[a batch of games](design/README.md#71-a-batch-of-games), in the
-[campaign learning guide](../studies/campaign/README.md) and in the Mac
+**If answered.** The number of games per training iteration belongs in
+[a training iteration's games](design/README.md#71-a-training-iterations-games),
+in the [campaign learning guide](../studies/campaign/README.md) and in the Mac
 profile.
 
 ## Open elsewhere

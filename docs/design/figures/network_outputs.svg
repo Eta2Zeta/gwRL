@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="334" viewBox="0 0 960 334" role="img" aria-labelledby="title desc">
   <title id="title">What a network gives at a decision</title>
-  <desc id="desc">Left: decision 612, what the network is given: the position (the board, round 5, Combat Movement, the CCP's turn) and the 5 legal moves: 1 to 4, the mountain infantry in Shensi attacking Hopeh, Suiyuan, Szechwan or Tsinghai, and 5, ending Combat Movement. Middle: the Comintern's network, 4.1 million learned numbers. Right, what it gives: values, its estimate of each alliance's final score: Axis +25.1, Allies −42.4, Comintern −102.4; and move probabilities, its first guess, which the search calls priors: 0.10, 0.10, 0.09, 0.18 and 0.53 for moves 1 to 5.</desc>
+  <desc id="desc">Left: decision 612, what the network is given: the state (the board, game round 5, Combat Movement, the CCP's turn) and the 5 legal actions: 1 to 4, the mountain infantry in Shensi attacking Hopeh, Suiyuan, Szechwan or Tsinghai, and 5, ending Combat Movement. Middle: the Comintern's network, 4.1 million parameters. Right, what it gives: values, its estimate of each alliance's final score: Axis +25.1, Allies −42.4, Comintern −102.4; and action probabilities, its first guess, which the search uses as priors: 0.10, 0.10, 0.09, 0.18 and 0.53 for actions 1 to 5.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -23,9 +23,9 @@
   <rect x="24" y="24" width="318" height="286" rx="8" fill="#ddf4ff" stroke="#54aeff"/>
   <text class="title" x="40" y="52">Decision 612</text>
   <text class="sub" x="40" y="74">what the network is given</text>
-  <text class="body" x="40" y="100">the position: the board, round 5,</text>
+  <text class="body" x="40" y="100">the state: the board, game round 5,</text>
   <text class="body" x="40" y="118">Combat Movement, the CCP's turn, …</text>
-  <text class="body bold" x="40" y="146">and the 5 legal moves:</text>
+  <text class="body bold" x="40" y="146">and the 5 legal actions:</text>
   <text class="num" x="40" y="172">1</text>
   <text class="body" x="58" y="172">mountain infantry Shensi → Hopeh</text>
   <text class="num" x="40" y="194">2</text>
@@ -36,13 +36,13 @@
   <text class="body" x="58" y="238">mountain infantry Shensi → Tsinghai</text>
   <text class="num" x="40" y="260">5</text>
   <text class="body" x="58" y="260">end Combat Movement</text>
-  <text class="label" x="40" y="290">moves 1 to 4 attack a KMT zone</text>
+  <text class="label" x="40" y="290">actions 1 to 4 attack a KMT zone</text>
   <line x1="346" y1="167" x2="388" y2="167" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
   <rect x="392" y="112" width="168" height="110" rx="8" fill="#fbefff" stroke="#c297ff"/>
   <text class="head" x="476" y="146" text-anchor="middle">The Comintern's</text>
   <text class="head" x="476" y="166" text-anchor="middle">network</text>
-  <text class="label" x="476" y="192" text-anchor="middle">4.1 million learned</text>
-  <text class="label" x="476" y="208" text-anchor="middle">numbers inside</text>
+  <text class="label" x="476" y="192" text-anchor="middle">4.1 million</text>
+  <text class="label" x="476" y="208" text-anchor="middle">parameters inside</text>
   <line x1="564" y1="167" x2="606" y2="167" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
   <rect x="610" y="24" width="326" height="286" rx="8" fill="#dafbe1" stroke="#4ac26b"/>
   <text class="title" x="626" y="52">What it gives</text>
@@ -54,8 +54,8 @@
   <text class="body bold" x="800" y="139" text-anchor="end">−42.4</text>
   <text class="body" x="640" y="158">Comintern</text>
   <text class="body bold" x="800" y="158" text-anchor="end">−102.4</text>
-  <text class="body bold" x="626" y="192">Move probabilities: its first guess,</text>
-  <text class="sub" x="626" y="210">which the search calls priors</text>
+  <text class="body bold" x="626" y="192">Action probabilities: its first guess,</text>
+  <text class="sub" x="626" y="210">which the search uses as priors</text>
   <text class="small" x="640" y="234" text-anchor="middle">1</text>
   <rect x="652" y="225" width="34.2" height="11" rx="2" fill="#2a78d6"/>
   <text class="small" x="692.1570686887874" y="234.5">0.10</text>

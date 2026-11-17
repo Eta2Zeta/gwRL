@@ -98,6 +98,17 @@
   when a thing was built, not what it is. `tests/test_documentation.py` checks
   the file names and the pages, every relative link, and every document the
   data or the code cites.
+- One word means one thing, in every page and in chat. Use the standard term
+  of machine learning or reinforcement learning where one exists (state,
+  action, feature, embedding, forward pass, inference batch, minibatch,
+  training step) and define it where it is first used; the design document's
+  glossary lists every term, with the names the code and the dated records use
+  instead. A word with more than one meaning in common use (step, batch, round,
+  update, evaluation, depth, score, value, unit, move) always carries the word
+  that says which: a training step or an Adam step, never a bare step; a game
+  round, never the inference server's inference batch. A plain word may explain
+  a term where it is introduced (a state is the game's position at one moment),
+  but it is not used for that thing afterwards.
 - `docs/design/README.md` is the central design document of the learning
   system: the game interface, search, the network's input, the network,
   training, runs, evaluation and their data structures. It builds the design up

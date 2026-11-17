@@ -33,7 +33,7 @@ Road, need nations or routes this campaign leaves out.
 
 **The stored income.** The state also stores each nation's income as the
 position stands, part by part (`income_components`), because the network reads
-it as [part of the position](../design/network_input.md#5-the-position-part).
+it as [global features](../design/network_input.md#5-the-global-features).
 Land changes hands in battles, political events and surrenders, which are not
 economy moves. So the module brings the stored income up to date when any move
 or dice roll ends, not only one of its own (`EconomyRules::settle`). The parts

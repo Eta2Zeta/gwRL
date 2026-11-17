@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="670" viewBox="0 0 960 670" role="img" aria-labelledby="title desc">
-  <title id="title">The first layer at Shensi</title>
-  <desc id="desc">Decision 612, the Comintern's network after one update. Left, the input layer: Shensi's line of answers, one input unit per zone question, 42,532 in all, each holding its answer after a fixed scaling: an answer of 1 gives 0.69 and an answer of 0 gives 0. Shown are rows 0 possessor:ccp (0.69), 1 possessor:dadao (0), 14 turn_start_possessor:ccp (0.69), 186 units:ccp:militia (0.69), 188 units:ccp:mountain_infantry (0.69), 304 units:kmt:fighter (0), 9,841 and 9,842 the Comintern militia's count and moves left (0.69 each), 9,989 and 9,991 the Comintern mountain infantry's count and moves left (0.69 each), 29,244 rail_to:land_china_hopeh (0.69) and the last, 42,531 battle_order (0). Right, the first layer: 64 output units, of which outputs 1 to 4 and 64 are shown, with the values −0.001, 0.137, −0.118, −0.104 and −0.073: Shensi's first 64 numbers. Every input unit is linked to every output unit. The links that leave units:ccp:mountain_infantry are drawn in orange: their 64 weights are its row, row 188 of the zone table, beginning 0.019, 0.001, −0.030, 0.021. The links of the 9 non-zero inputs are drawn in blue and those of inputs that are 0 here in grey. Each output adds up input times weight over its 42,532 links; the inputs of 0 add nothing, so the output is 0.69 times row 0 plus 0.69 times row 14 and so on to row 29,244, and only 9 rows are fetched. In all 42,532 × 64 = 2,722,048 links, whose weights make up the zone table.</desc>
+  <title id="title">The embedding layer at Shensi</title>
+  <desc id="desc">Decision 612, the Comintern's network after one network update. Left, the input layer: Shensi's feature vector, one input neuron per zone feature, 42,532 in all, each holding its feature value after a fixed scaling, 0.69 for a feature value of 1 and 0 for a feature value of 0. Shown are features 0 possessor:ccp (0.69), 1 possessor:dadao (0), 14 turn_start_possessor:ccp (0.69), 186 units:ccp:militia (0.69), 188 units:ccp:mountain_infantry (0.69), 304 units:kmt:fighter (0), 9,841 and 9,842, the Comintern militia's count and movement points left (0.69 each), 9,989 and 9,991, the Comintern mountain infantry's count and movement points left (0.69 each), 29,244 rail_to:land_china_hopeh (0.69) and the last, 42,531 battle_order (0). Right, the embedding layer: 64 output neurons, of which outputs 1 to 4 and 64 are shown, with −0.001, 0.137, −0.118, −0.104 and −0.073. Every input neuron has a connection to every output neuron. The connections that leave units:ccp:mountain_infantry carry its embedding, row 188 of the zone embedding table, beginning 0.019, 0.001, −0.030, 0.021. Each output adds up input times weight over its 42,532 connections; the inputs of 0 add nothing, so the output is 0.69 times embedding 0 plus 0.69 times embedding 14 and so on to embedding 29,244, and only 9 embeddings are fetched. In all 42,532 × 64 = 2,722,048 connections, whose weights make up the zone embedding table.</desc>
   <defs>
     <style>
       text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
@@ -21,11 +21,11 @@
     </style>
   </defs>
   <rect x="0.5" y="0.5" width="959" height="669" rx="10" fill="#ffffff" stroke="#d0d7de"/>
-  <text class="title" x="24" y="36">The first layer at Shensi: 42,532 input units, 64 output units</text>
-  <text class="sub" x="24" y="56">Decision 612, the Comintern's network after one update. An input is an answer after a fixed scaling: an answer of 1 gives 0.69, an answer of 0 gives 0.</text>
-  <text class="head" x="24" y="92">Input layer: Shensi's line of answers</text>
-  <text class="small" x="60" y="112" text-anchor="end">row</text>
-  <text class="small" x="70" y="112">question</text>
+  <text class="title" x="24" y="36">The embedding layer at Shensi: 42,532 input neurons, 64 output neurons</text>
+  <text class="sub" x="24" y="56">Decision 612, the Comintern's network after one network update. An input is a feature value after feature scaling: a value of 1 gives 0.69, a value of 0 gives 0.</text>
+  <text class="head" x="24" y="92">Input layer: Shensi's feature vector</text>
+  <text class="small" x="60" y="112" text-anchor="end">feature</text>
+  <text class="small" x="70" y="112">name</text>
   <text class="small" x="416" y="112" text-anchor="end">input</text>
   <text class="label" x="436" y="184" text-anchor="middle">⋮</text>
   <text class="label" x="436" y="224" text-anchor="middle">⋮</text>
@@ -144,7 +144,7 @@
   <text class="mono" x="70" y="546">battle_order</text>
   <text class="zero" x="416" y="546" text-anchor="end">0</text>
   <circle cx="436" cy="542" r="8" fill="#ffffff" stroke="#afb8c1" stroke-width="1.5"/>
-  <text class="head" x="748" y="92">First layer: 64 outputs</text>
+  <text class="head" x="748" y="92">Embedding layer: 64 outputs</text>
   <circle cx="760" cy="164.0" r="9" fill="#ddf4ff" stroke="#54aeff" stroke-width="1.5"/>
   <text class="body" x="778" y="168.0">output 1: −0.001</text>
   <circle cx="760" cy="235.6" r="9" fill="#ddf4ff" stroke="#54aeff" stroke-width="1.5"/>
@@ -158,10 +158,10 @@
   <text class="label" x="760" y="454.4" text-anchor="middle">⋮</text>
   <text class="label" x="748" y="556">Shensi's first 64 numbers</text>
   <line x1="24.0" y1="586.0" x2="52.0" y2="586.0" stroke="#bc4c00" stroke-width="2.2"/>
-  <text class="label" x="60" y="590">The links that leave units:ccp:mountain_infantry. Their 64 weights are its row, row 188 of the zone table: 0.019, 0.001, −0.030, 0.021, …</text>
+  <text class="label" x="60" y="590">The connections that leave units:ccp:mountain_infantry. Their 64 weights are its embedding, row 188 of the zone embedding table: 0.019, 0.001, −0.030, 0.021, …</text>
   <line x1="24.0" y1="606.0" x2="52.0" y2="606.0" stroke="#0969da" stroke-width="1.2" stroke-opacity="0.55"/>
-  <text class="label" x="60" y="610">The links of the 9 non-zero inputs, each 0.69, the orange ones included. Each output adds up input × weight over its 42,532 links;</text>
-  <text class="label" x="60" y="628">the inputs of 0 add nothing, so the output is 0.69 × row 0 + 0.69 × row 14 + … + 0.69 × row 29,244, and only 9 rows are fetched.</text>
+  <text class="label" x="60" y="610">The connections of the 9 non-zero inputs, each 0.69, the orange ones included. Each output adds up input × weight over its 42,532 connections;</text>
+  <text class="label" x="60" y="628">the inputs of 0 add nothing, so the output is 0.69 × embedding 0 + 0.69 × embedding 14 + … + 0.69 × embedding 29,244: only 9 embeddings are fetched.</text>
   <line x1="24.0" y1="644.0" x2="52.0" y2="644.0" stroke="#afb8c1" stroke-width="1" stroke-dasharray="3 3"/>
-  <text class="label" x="60" y="648">Links of inputs that are 0 here: 42,523 of the 42,532. In all 42,532 × 64 = 2,722,048 links, whose weights make up the zone table.</text>
+  <text class="label" x="60" y="648">Connections of inputs that are 0 here: 42,523 of the 42,532. In all 42,532 × 64 = 2,722,048 connections, whose weights make up the zone embedding table.</text>
 </svg>

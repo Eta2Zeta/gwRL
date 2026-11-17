@@ -1,6 +1,6 @@
 # One real training sample — 5 November 2026
 
-The [design document](../../design/README.md#72-what-a-sample-stores) explains what
+The [design document](../../design/README.md#72-what-a-training-sample-stores) explains what
 a training sample stores by showing one real sample. This record says how that
 sample was made and gives its exact values; the
 [evidence file](training_sample_2026_11_05.json) holds them in full, with every
@@ -111,7 +111,7 @@ than the Comintern's own network did. The outlier therefore comes from which
 network rated the position; the depth limit did not cause it.
 
 **Which move each simulation began with**, as the design document's
-[figure](../../design/figures/sample_simulations.svg) draws it from this trace:
+[figure](../../design/figures/simulations_at_decision_612.svg) draws it from this trace:
 
 | Move | Simulations | Count |
 | --- | --- | ---: |

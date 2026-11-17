@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="364" viewBox="0 0 960 364" role="img" aria-labelledby="title desc">
-  <title id="title">The move each of the 64 simulations began with</title>
-  <desc id="desc">The 64 simulations of the search at decision 612, numbered in the order they ran, in two rows of 32, each marked with the move it began with. Simulations 1 to 14 tried every move; both attacks on Hopeh among them stopped before its battle. Simulation 15 was the first to play through the battle, in which the CCP takes Hopeh, at a position rated −101.42. From 15 to 51 the attack on Hopeh was chosen 32 times out of 37. Simulation 53 stopped at the depth limit at a position rated −106.02, and simulations 54 to 64 all began with the other moves. Simulations beginning with the attack on Hopeh: 6, 11, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35, 36, 37, 39, 40, 41, 43, 44, 45, 46, 47, 48, 49, 50, 52, 53.</desc>
+  <title id="title">The action each of the 64 simulations began with</title>
+  <desc id="desc">The 64 simulations of the search at decision 612, numbered in the order they ran, in two rows of 32, each marked with the action it began with. Simulations 1 to 14 tried every action; both attacks on Hopeh among them stopped before its battle. Simulation 15 was the first to play through the battle, in which the CCP takes Hopeh, at a state rated −101.42. From 15 to 51 the attack on Hopeh was chosen 32 times out of 37. Simulation 53 stopped at the depth limit at a state rated −106.02, and simulations 54 to 64 all began with the other actions. Simulations beginning with the attack on Hopeh: 6, 11, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35, 36, 37, 39, 40, 41, 43, 44, 45, 46, 47, 48, 49, 50, 52, 53.</desc>
   <defs>
     <style>
       text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
@@ -12,7 +12,7 @@
     </style>
   </defs>
   <rect x="0.5" y="0.5" width="959" height="363" rx="10" fill="#ffffff" stroke="#d0d7de"/>
-  <text class="title" x="40" y="36">The move each simulation began with, in the order the 64 ran</text>
+  <text class="title" x="40" y="36">The action each simulation began with, in the order the 64 ran</text>
   <rect x="40" y="88" width="25" height="30" rx="4" fill="#e8ebef"/>
   <text class="cell" x="52.5" y="107.5" text-anchor="middle">E</text>
   <text class="num" x="52.5" y="132" text-anchor="middle">1</text>
@@ -206,19 +206,19 @@
   <text class="cell" x="889.5" y="247.5" text-anchor="middle">T</text>
   <text class="num" x="889.5" y="272" text-anchor="middle">64</text>
   <path d="M 40 84 L 40 78 L 416 78 L 416 84" fill="none" stroke="#57606a" stroke-width="1.5"/>
-  <text class="label" x="40" y="71">1–14: every move tried</text>
+  <text class="label" x="40" y="71">1–14: every action tried</text>
   <path d="M 418 84 L 418 78 L 902 78" fill="none" stroke="#57606a" stroke-width="1.5"/>
   <text class="label" x="418" y="71">15–51: the attack on Hopeh 32 times out of 37 →</text>
   <path d="M 40 218 L 551 218 L 551 224" fill="none" stroke="#57606a" stroke-width="1.5"/>
   <text class="label" x="40" y="211">… 15–51 continued</text>
   <path d="M 607 224 L 607 218 L 902 218 L 902 224" fill="none" stroke="#57606a" stroke-width="1.5"/>
-  <text class="label" x="607" y="211">54–64: only the other moves</text>
+  <text class="label" x="607" y="211">54–64: only the other actions</text>
   <line x1="187.5" y1="138" x2="187.5" y2="152" stroke="#57606a" stroke-width="1.5"/>
   <text class="note" x="183.5" y="166">6 and 11: stop before the battle</text>
   <line x1="430.5" y1="138" x2="430.5" y2="152" stroke="#57606a" stroke-width="1.5"/>
   <text class="note" x="426.5" y="166">15: the first to play through the battle; the CCP takes Hopeh, rated −101.42</text>
   <line x1="52.5" y1="278" x2="52.5" y2="292" stroke="#57606a" stroke-width="1.5"/>
-  <text class="note" x="48.5" y="306">33: the scores in the table below</text>
+  <text class="note" x="48.5" y="306">33: the PUCT scores in the table below</text>
   <line x1="592.5" y1="278" x2="592.5" y2="292" stroke="#57606a" stroke-width="1.5"/>
   <text class="note" x="588.5" y="306">53: stops at the depth limit, rated −106.02</text>
   <rect x="40" y="325" width="25" height="20" rx="4" fill="#2a78d6"/>

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="528" viewBox="0 0 960 528" role="img" aria-labelledby="title desc">
-  <title id="title">What the cores can feed and what the network can answer, by network size, on the Mac</title>
-  <desc id="desc">A line chart of evaluations per second on a logarithmic scale, worked out from the network's 14 November measurements and the engine's cost in the 16 November training batches, for networks of 64×2, 128×4, 256×8, 384×12 and 512×16. A flat line at about 5,400 a second shows the evaluations the engine work of the 7 cores for games of the 9-core allowance can feed, the same for every network. The network on the GPU, in passes of 64 positions, answers 9,840, 7,970, 4,500, 2,620 and 1,640 a second; on one CPU core, in passes of 16, 5,850, 2,210, 577, 267 and 125. Self-play gets the lower of the cores' rate and the faster network's: the cores' rate up to 128×4, the GPU line crossing it between 128×4 and 256×8, and the GPU's rate from 256×8 on.</desc>
+  <title id="title">What the cores can feed and what the network can evaluate, by network size, on the Mac</title>
+  <desc id="desc">A line chart on a logarithmic scale of network evaluations per second for networks of 64×2, 128×4, 256×8, 384×12 and 512×16 on the Mac. A flat line at about 5,400 a second is what the engine work of the 7 cores for games can feed, the same for every network. The network on the GPU, in inference batches of 64 states, evaluates 9,840 states a second at 64×2 falling to 1,640 at 512×16, and crosses the flat line between 128×4 and 256×8. The network on one CPU core, in inference batches of 16, evaluates 5,850 at 64×2, just above the flat line, falling to 125 at 512×16. Self-play gets the lower rate: the cores' up to 128×4, the GPU's from 256×8 on.</desc>
   <defs>
     <style>
       text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
@@ -14,20 +14,20 @@
     </style>
   </defs>
   <rect x="0.5" y="0.5" width="959" height="527" rx="10" fill="#ffffff" stroke="#d0d7de"/>
-  <text class="title" x="24" y="36">What the cores can feed and what the network can answer, on the Mac</text>
-  <text class="sub" x="24" y="58">Evaluations per second by network size, worked out from the 14 and 16 November measurements; logarithmic scale. Self-play gets the lower rate.</text>
+  <text class="title" x="24" y="36">What the cores can feed and what the network can evaluate, on the Mac</text>
+  <text class="sub" x="24" y="58">Network evaluations per second by network size, worked out from the 14 and 16 November measurements; logarithmic scale. Self-play gets the lower rate.</text>
   <line x1="24" y1="82" x2="46" y2="82" stroke="#2a78d6" stroke-width="2" stroke-linecap="round"/>
   <circle cx="35" cy="82" r="4" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
-  <text class="label" x="56" y="86">the 7 cores for games: evaluations their engine work can feed</text>
+  <text class="label" x="56" y="86">the 7 cores for games: network evaluations their engine work can feed</text>
   <line x1="500" y1="82" x2="522" y2="82" stroke="#eb6834" stroke-width="2" stroke-linecap="round"/>
   <circle cx="511" cy="82" r="4" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
-  <text class="label" x="532" y="86">the network on the GPU, passes of 64 positions</text>
+  <text class="label" x="532" y="86">the network on the GPU, inference batches of 64 states</text>
   <line x1="24" y1="104" x2="46" y2="104" stroke="#1baf7a" stroke-width="2" stroke-linecap="round"/>
   <circle cx="35" cy="104" r="4" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/>
-  <text class="label" x="56" y="108">the network on one CPU core, passes of 16 positions</text>
+  <text class="label" x="56" y="108">the network on one CPU core, inference batches of 16 states</text>
   <line x1="502" y1="104" x2="520" y2="104" stroke="#1f2328" stroke-opacity="0.13" stroke-width="12" stroke-linecap="round"/>
   <text class="label" x="532" y="108">what self-play gets: the lower of the two rates</text>
-  <text class="label" x="24" y="136">evaluations per second</text>
+  <text class="label" x="24" y="136">network evaluations per second</text>
   <line x1="96" y1="450.0" x2="720" y2="450.0" stroke="#d0d7de" stroke-width="1"/>
   <text class="tick" x="88" y="454.0" text-anchor="end">100</text>
   <line x1="96" y1="410.8" x2="720" y2="410.8" stroke="#eaeef2" stroke-width="1"/>
@@ -54,7 +54,7 @@
   <text class="small" x="555" y="489" text-anchor="middle">565 million</text>
   <text class="body" x="690" y="472" text-anchor="middle">512×16</text>
   <text class="small" x="690" y="489" text-anchor="middle">1.3 billion</text>
-  <text class="label" x="408.0" y="514" text-anchor="middle">network (width × message layers), with its arithmetic per position in operations</text>
+  <text class="label" x="408.0" y="514" text-anchor="middle">network (width × message-passing layers), with its arithmetic per state in FLOPs</text>
   <path d="M 150.0 224.5 L 285.0 224.5 L 378.6 224.5 L 420.0 234.4 L 555.0 265.2 L 690.0 291.6" fill="none" stroke="#1f2328" stroke-opacity="0.13" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
   <polyline points="150.0,219.6 285.0,274.6 420.0,350.8 555.0,394.4 690.0,437.4" fill="none" stroke="#1baf7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   <circle cx="150.0" cy="219.6" r="4" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/>

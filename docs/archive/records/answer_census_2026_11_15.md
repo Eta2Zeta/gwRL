@@ -65,7 +65,7 @@ of the 710,254 positions, always with the same answer:
 | Questions | How many | Can the rules give another answer? |
 | --- | ---: | --- |
 | `nation_present` for every nation but Dadao | 12 | No: these nations are in the game from the start and never leave it |
-| `alliance` and `player` of Japan, the KMT, the CCP and Mongolia | 8 | No ([what the position asks about a nation](../../design/network_input.md#what-the-position-asks-about-a-nation)) |
+| `alliance` and `player` of Japan, the KMT, the CCP and Mongolia | 8 | No ([what the position asks about a nation](../../design/network_input.md#what-the-global-features-ask-about-a-nation)) |
 | `power_status` of Japan, Mongolia and the eight warlords | 10 | No |
 | `controller` of Japan, the KMT, the CCP and Mongolia | 4 | No |
 | `at_war` between the KMT and the CCP, both ways | 2 | Not in the engine: they start at war and it never ends that war; under the Truce it treats them as friends while the war stays recorded |

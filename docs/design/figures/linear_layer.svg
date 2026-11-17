@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="384" viewBox="0 0 960 384" role="img" aria-labelledby="title desc">
-  <title id="title">A learned layer: units and links</title>
-  <desc id="desc">Left: the toy layer drawn as units and links. Three input units hold the inputs 1, 2 and 3; two output units are y1 and y2. Each input is linked to each output, and each link carries one learned weight: from input 1, 0.5 to y1 and 0.1 to y2; from input 2, 0.2 and 0.3; from input 3, 0.1 and −0.4. y1 has the bias 0.1 and y2 the bias 0. So y1 adds 1 × 0.5 + 2 × 0.2 + 3 × 0.1 + 0.1 = 1.3, which the GELU curve turns into 1.17, and y2 adds 1 × 0.1 + 2 × 0.3 + 3 × (−0.4) + 0 = −0.5, which becomes −0.15. Right: the same layer read input by input. The weights on the links that leave one input, one per output, are that input's row: input 1's row is (0.5, 0.1), input 2's (0.2, 0.3) and input 3's (0.1, −0.4); the biases are (0.1, 0). 1 × (0.5, 0.1) + 2 × (0.2, 0.3) + 3 × (0.1, −0.4) + (0.1, 0) = (1.3, −0.5) before the curve. An input of 0 adds nothing, so its row can be skipped.</desc>
+  <title id="title">A linear layer: neurons and connections</title>
+  <desc id="desc">The toy layer drawn as neurons and connections. Left: three input neurons hold 1, 2 and 3, and two output neurons are y1 and y2. Every input is connected to every output, and each connection carries one learned weight: from input 1, 0.5 to y1 and 0.1 to y2; from input 2, 0.2 and 0.3; from input 3, 0.1 and −0.4. With the biases 0.1 and 0, y1 adds up to 1.3, which GELU turns into 1.17, and y2 to −0.5, which becomes −0.15. Right: the same layer read input by input. The weights that leave one input are its embedding: input 1's embedding is (0.5, 0.1), input 2's (0.2, 0.3) and input 3's (0.1, −0.4). 1 × (0.5, 0.1) + 2 × (0.2, 0.3) + 3 × (0.1, −0.4) + (0.1, 0) = (1.3, −0.5) before the activation function. An input of 0 adds nothing, so its embedding can be skipped.</desc>
   <defs>
     <style>
       text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
@@ -21,7 +21,7 @@
     </style>
   </defs>
   <rect x="0.5" y="0.5" width="959" height="383" rx="10" fill="#ffffff" stroke="#d0d7de"/>
-  <text class="title" x="24" y="36">A learned layer: units and links</text>
+  <text class="title" x="24" y="36">A linear layer: neurons and connections</text>
   <text class="sub" x="24" y="56">The toy layer of section 6.2: 3 inputs, 2 outputs, 6 weights and 2 biases</text>
   <text class="head" x="40" y="88">Inputs</text>
   <text class="head" x="380" y="88">Outputs</text>
@@ -56,11 +56,11 @@
   <text class="body" x="432" y="260">−0.5 → GELU → −0.15</text>
   <line x1="592" y1="76" x2="592" y2="316" stroke="#d0d7de"/>
   <text class="head" x="616" y="88">The same layer, input by input</text>
-  <text class="label" x="616" y="116">input 1's row</text>
+  <text class="label" x="616" y="116">input 1's embedding</text>
   <text class="body" x="728" y="116">(<tspan class="c1">0.5</tspan>, <tspan class="c2">0.1</tspan>)</text>
-  <text class="label" x="616" y="136">input 2's row</text>
+  <text class="label" x="616" y="136">input 2's embedding</text>
   <text class="body" x="728" y="136">(<tspan class="c1">0.2</tspan>, <tspan class="c2">0.3</tspan>)</text>
-  <text class="label" x="616" y="156">input 3's row</text>
+  <text class="label" x="616" y="156">input 3's embedding</text>
   <text class="body" x="728" y="156">(<tspan class="c1">0.1</tspan>, <tspan class="c2">−0.4</tspan>)</text>
   <text class="label" x="616" y="176">the bias</text>
   <text class="body" x="728" y="176">(<tspan class="c1">0.1</tspan>, <tspan class="c2">0</tspan>)</text>
@@ -69,8 +69,8 @@
   <text class="mono" x="728" y="242">+ 3 × (0.1, −0.4)</text>
   <text class="mono" x="728" y="260">+ (0.1, 0)</text>
   <text class="body" x="728" y="280">= (<tspan class="c1">1.3</tspan>, <tspan class="c2">−0.5</tspan>)</text>
-  <text class="label" x="616" y="280">before the curve</text>
-  <text class="label" x="616" y="304">An input of 0 adds nothing: its row can be skipped.</text>
-  <text class="label" x="24" y="346">Every link carries one learned weight. The weights on the links that leave one input, one per output,</text>
-  <text class="label" x="24" y="364">are that input's row: input 1's row is (0.5, 0.1). Each output adds up its inputs times their weights, plus its bias.</text>
+  <text class="label" x="616" y="280">before GELU</text>
+  <text class="label" x="616" y="304">An input of 0 adds nothing: its embedding can be skipped.</text>
+  <text class="label" x="24" y="346">Every connection carries one learned weight. The weights on the connections that leave one input, one per output,</text>
+  <text class="label" x="24" y="364">are that input's embedding: input 1's embedding is (0.5, 0.1). Each output adds up its inputs times their weights, plus its bias.</text>
 </svg>

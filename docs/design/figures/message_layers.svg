@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="536" viewBox="0 0 960 536" role="img" aria-labelledby="title desc">
   <title id="title">Messages along the borders, around Shensi</title>
-  <desc id="desc">Two panels of a schematic map around Shensi. Message layer 1: every zone hears from its neighbours at the same time: arrows run into Shensi from its four neighbours, Hopeh, Suiyuan, Szechwan and Tsinghai, and into those four from the 12 zones beyond them: Beiping, Shantung and sea zone P14 into Hopeh; Beiping, Rehe, Central Mongolia and Kerulen into Suiyuan; Hunan, Kweichow, Shantung and Sikang into Szechwan; Sikang, Sinkiang, Central Mongolia, Ulyassutai and Tibet into Tsinghai. After it, Shensi's vector reflects its 4 neighbours. Message layer 2: Shensi hears its neighbours again, and their vectors now carry what they heard from the zones beyond, so after it Shensi's vector also reflects those 12 zones. Every zone sends along all its borders at once, so 2 layers reach zones up to 2 borders away.</desc>
+  <desc id="desc">Two panels of a schematic map around Shensi. Message-passing layer 1: every zone hears from its neighbours at the same time: arrows run into Shensi from its four neighbours, Hopeh, Suiyuan, Szechwan and Tsinghai, and into those four from the 12 zones beyond them. After it, Shensi's vector reflects its 4 neighbours. Message-passing layer 2: Shensi hears its neighbours again, and their vectors now carry what they heard from the zones beyond, so after it Shensi's vector also reflects those 12 zones. Every zone sends along all its borders at once, so 2 layers reach zones up to 2 borders away.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -21,7 +21,7 @@
   </defs>
   <rect x="0.5" y="0.5" width="959" height="535" rx="10" fill="#ffffff" stroke="#d0d7de"/>
   <rect x="24" y="24" width="442" height="452" rx="10" fill="#ffffff" stroke="#d0d7de"/>
-  <text class="title" x="40" y="50">Message layer 1</text>
+  <text class="title" x="40" y="50">Message-passing layer 1</text>
   <text class="sub" x="40" y="70">every zone hears from its neighbours at the same time</text>
   <line x1="373.0" y1="180.0" x2="358.0" y2="241.0" stroke="#8250df" stroke-width="1.6" marker-end="url(#arrow)" opacity="0.8"/>
   <line x1="401.8" y1="276.0" x2="394.3" y2="273.0" stroke="#8250df" stroke-width="1.6" marker-end="url(#arrow)" opacity="0.8"/>
@@ -80,7 +80,7 @@
   <text class="label" x="40" y="446">After it, Shensi's vector reflects its 4 neighbours (blue).</text>
   <text class="small" x="40" y="462">Schematic: zones sit near their real neighbours.</text>
   <rect x="494" y="24" width="442" height="452" rx="10" fill="#ffffff" stroke="#d0d7de"/>
-  <text class="title" x="510" y="50">Message layer 2</text>
+  <text class="title" x="510" y="50">Message-passing layer 2</text>
   <text class="sub" x="510" y="70">Shensi hears its neighbours again, now carrying the zones beyond</text>
   <line x1="846" y1="168" x2="824" y2="257" stroke="#c297ff" stroke-width="1.4" stroke-dasharray="4 3"/>
   <line x1="902" y1="288" x2="824" y2="257" stroke="#c297ff" stroke-width="1.4" stroke-dasharray="4 3"/>
