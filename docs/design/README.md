@@ -1538,7 +1538,7 @@ cost than a pass on one CPU core. A pass of the 64×2 network over one position
 takes 2.1 ms on the GPU and 0.46 ms on one core, and over 16 positions 4.7 ms
 and 2.7 ms
 ([record](../archive/records/network_and_search_cost_2026_11_14.md#the-network)).
-A round holds four to five positions, so one core answers it sooner. The GPU is
+A round holds about 8 positions (above), so one core answers it sooner. The GPU is
 faster only for larger networks and many positions per pass
 ([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). The GPU has
 never limited self-play. When the coordinator ran its passes there, up to the
@@ -1700,7 +1700,31 @@ layers, applied to each of the 37 zones (section 6.6), so it grows with the
 width squared times the number of layers. Most of the parameters, by contrast,
 are rows of the first layer's tables, of which a decision reads only a few
 hundred (section 6.9), so the parameter count says little about the cost.
-Positions evaluated per second, through the coordinator's own code:
+
+A pass costs two parts: starting each of its hundreds of operations, which
+hardly depends on how many positions it holds, and the arithmetic, which grows
+with them. On one CPU core the first part is small and the arithmetic slow. On
+the GPU the first part is larger, since the coordinator's core hands every
+operation to the GPU and the pass ends only when the GPU has finished and its
+outputs are copied back, and the arithmetic is fast. So a pass of the 64×2
+network over 64 positions takes one core 10.3 ms, 22 times its 0.46 ms over one
+position, but the GPU 6.5 ms, about three times its 2.1 ms over one. The GPU
+pays only with many positions in a pass. Positions evaluated per second through
+the coordinator's own code, which lays the positions out, runs the pass and
+copies the outputs back
+([record](../archive/records/network_and_search_cost_2026_11_14.md#the-network)):
+
+![Three line charts side by side, for networks of 64×2, 256×8 and 512×16, of positions evaluated per second against positions in a pass of 1, 4, 16, 64 and 256, on logarithmic scales. On the GPU the rate rises with the pass: at 64×2 from 485 to 20,916, at 256×8 from 217 to 6,552, at 512×16 from 178 to 1,903. On one CPU core it rises at most 40% beyond 16 positions: at 64×2 from 2,198 to about 6,000, at 256×8 from 360 to 658, at 512×16 from 87 to 166. One core is faster in small passes up to 256×8, the GPU in large ones, and at 512×16 in every pass. A shaded band from 8 to 24 positions marks today's layout.](figures/pass_size_rates.svg)
+
+Beyond 16 positions a pass one core gains at most 40%: its arithmetic is
+already most of the cost. The GPU's rate keeps rising until its arithmetic
+fills it, the sooner the larger the network: from 64 to 256 positions a pass it
+doubles at 64×2 but rises only 16% at 512×16, where the GPU then does about 2.5
+trillion operations a second, against about 0.2 trillion for one core. In passes
+of one position one core is faster up to 256×8; in passes of 64 the GPU is 7 to
+9 times as fast as one core for the three larger networks. Whether other code,
+such as half-precision numbers or fewer and larger operations, would let the
+GPU do more is unmeasured. The rates used below:
 
 | Network | Arithmetic per position | One CPU core, 16 per pass | GPU, 64 per pass | GPU, 256 per pass |
 | --- | ---: | ---: | ---: | ---: |
@@ -1710,14 +1734,11 @@ Positions evaluated per second, through the coordinator's own code:
 | 384×12 | 565 million | 267 | 2,620 | 3,350 |
 | 512×16 | 1,320 million | 125 | 1,640 | 1,900 |
 
-One core slows down nearly as fast as the arithmetic grows. Four threads on one
-pass are at most about twice as fast as one core, and slower than one core on
-passes of a few positions. The GPU is 7 to 15 times as fast as one core for the
-three larger networks, but only with many positions in a pass: a pass over a
-single position costs it 2 to 6 ms, and up to 256×8 one core is faster.
-Training adds little: with 5% of decisions kept and each drawn about ten times,
-the networks train on about half a sample per decision, against 50 or more
-evaluations per decision in self-play.
+Four threads on one pass are at most about twice as fast as one core, and
+slower than one core on passes of a few positions. Training adds little: with 5%
+of decisions kept and each drawn about ten times, the networks train on about
+half a sample per decision, against 50 or more evaluations per decision in
+self-play.
 
 **The search.** A simulation costs the game process about the same CPU whatever
 the network and however many simulations a search runs: 1.23 ms of a core at 64
@@ -1783,12 +1804,6 @@ decisions (the 14 November batches averaged about 940), so 100,000 games take
 about 11 days at 386,000 decisions an hour, 44 days at 94,000 and 453 days at
 9,200.
 
-A pass's speed depends on its positions, and so on the games in flight: a pass of
-64 positions needs about 128 games in flight, half of them waiting in the pass
-while the other half work in the engine, and each holds its tree in memory. At
-800 simulations 30 GB holds the trees of only about 115 games beside the
-processes' other memory, so passes hold about 57 positions.
-
 The table is worked out from the measurements above, not measured in training
 runs, by the method of the 14 November study with the engine's cost of 16
 November: 0.065 s of CPU per decision at 64 simulations, scaled to larger
@@ -1802,6 +1817,26 @@ batch measured about 192,000
 ([record](../archive/records/nine_core_layouts_2026_11_15.md)), so read every
 rate as an upper bound, about a tenth too high, and every number of days as a
 lower bound.
+
+**Where a pass's positions come from.** A round's pass holds the positions
+waiting when it starts, and a game asks about one position at a time: its
+search plays one simulation after another, and a simulation that reaches a new
+position waits for its evaluation before the next begins (`_expand` in
+`studies/shared/multiplayer_mcts.py`). So a pass holds at most one position for
+each game in flight. A pass of 64 positions needs about 128 games in flight,
+half of them waiting in the pass while the other half work in the engine, and
+each holds its tree in memory. At 800 simulations 30 GB holds the trees of only
+about 115 games beside the processes' other memory, so passes hold about 57
+positions. Today's layout has 24 games in flight, and its rounds on the CPU
+hold about 8 positions (section 9.2). It could never fill a pass of 64, and in
+passes of 4 and of 16 positions the GPU gives 11% and 35% of its rate in passes
+of 64 at 64×2, and 25% and 56% at 512×16. So moving the network to the GPU
+means more games in flight as well. A search could instead ask about several
+positions at once: choose a few new positions before asking, steering each
+later choice away from the paths already chosen, and wait for all of them
+together. That would fill passes with fewer games and less memory, but it
+changes which positions a search explores, so it is a change of the search, to
+be checked like one; it has not been tried.
 
 **Comparing setups.** Decisions per hour is the speed of one setup, a network and
 a search. It compares two versions of the code on the same setup, as the matched
@@ -1819,9 +1854,16 @@ pay up to about 1.8 times at 64×2, about 1.5 times at 128×4 and not at all fro
 times at 256×8, with four times the games in flight. With the network on one
 core, as today, the coordinator is busy about 96% of the time and the cores are
 not (section 9.2), so at 64×2 a cheaper engine gains only as far as it fills the
-coordinator's rounds. A change to
-the network's passes changes the network's rate and matters only where the
-network limits.
+coordinator's rounds. A change to the coordinator changes the network's rate,
+and matters only where the network or the coordinator limits. Its three levers
+weigh differently on the two devices. More positions per pass gain little on
+one core beyond about 16, and much on the GPU: at least up to 256 positions for
+the small networks, and up to about 64 for 512×16. A smaller cost of starting a
+pass's operations gains on both, most on the GPU in small passes of small
+networks, where it is most of a pass's time. Cheaper arithmetic gains on one
+core in any pass, but on the GPU only in large passes of large networks, where
+the arithmetic fills it. From 256×8 on the network needs the GPU, so there the
+coordinator's speed is the GPU's, and these levers are what would raise it.
 
 Three things follow, inferred:
 
@@ -2129,12 +2171,14 @@ AlphaZero-style agent for a hex-and-counter wargame was trained on a 5×5 map
 with two kinds of unit and grew weaker on larger maps
 ([arXiv 2502.13918](https://arxiv.org/abs/2502.13918)).
 
-**What it would cost here.** On the Mac, at least about 57 days per 100,000 games
-at 256×8 with 256 simulations, limited by its cores, and at least about 450 days
-at 512×16 with 800 simulations, limited by its GPU
+**What it would cost here.** On the Mac, at least about 51 days per 100,000 games
+at 256×8 with 256 simulations and at least about 450 days at 512×16 with 800
+simulations, both limited by its GPU in passes of 64 positions
 ([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost), whose rates
-are upper bounds). AlphaGo Zero's first run played 4.9 million games, 49 times as
-many, and KataGo's 2019 run 4.2 million.
+are upper bounds). Three months of eight-hour nights, about 720 hours, would
+play at most about 59,000 games at the first size and 6,600 at the second.
+AlphaGo Zero's first run played 4.9 million games, 49 times as many as 100,000,
+and KataGo's 2019 run 4.2 million.
 
 **Unmeasured:** whether a larger network or a longer search learns faster here
 for the same compute, whether depth or width matters more, and how many games
