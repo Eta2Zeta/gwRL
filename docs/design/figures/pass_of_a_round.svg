@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="700" viewBox="0 0 960 700" role="img" aria-labelledby="title desc">
+  <title id="title">A pass over a round of 8 positions: its calls and their operations</title>
+  <desc id="desc">One pass of the 64×2 network on one core, over a round of 8 positions: 3 of the Axis, 3 of the Allies and 2 of the Comintern, decision 612 among them. Part 1: each position brings 37 zone vectors, a position vector and a move vector for each of its legal moves. Laid out, the pass's zone vectors are one array of 8 × 37 = 296 vectors of 64 numbers, each network's positions together: the Axis's zone vectors 0 to 110, the Allies' 111 to 221, the Comintern's 222 to 295, decision 612's 222 to 258. Part 2: the pass is a list of calls, in order: the first layer, message layer 1, message layer 2, then the summary, the heads and the outputs. Message layer 1 is 42 calls. Calls that apply a network's learned layers are made once per network, on its own positions, between a split by network and a join: every zone's message, 5 calls; the border terms, 2; the zone update, 11; the position update, 11. The other calls are made once for all 8 positions: every border's message, 3; each zone's average of what arrives, 3; a zone's inputs side by side, 2; adding the zone update, 1; the average zone beside the position vector, 3; adding the position update, 1. Message layer 2 is the same 42 calls, and the first layer, summary, heads and outputs 174, so 258 calls in all. If all 8 positions were one alliance's, every learned layer would be one call and the pass 146 calls, for 1 position as for 8. Part 3: one call, the Comintern network's linear for every zone's message, multiplies its 74 zone vectors, 2 positions × 37, by its 64 × 64 message weights, giving 74 messages of 64 numbers, each number 64 multiply-adds: 303,104 multiply-adds, or 606,208 operations, half of them for decision 612. One output number, the first of Shensi's message at decision 612, is −0.294 × w1 + 1.957 × w2 − 1.422 × w3 − 0.203 × w4 and so on to Shensi's 64th number times w64, plus a bias: 64 multiply-adds, each two operations, a multiplication and an addition. A call's time is one start, the same for 1 position or 8, then its operations, which grow with the positions.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8c959f"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+      .title { font-size: 15px; font-weight: 600; }
+      .head { font-size: 14px; font-weight: 600; }
+      .sub { font-size: 12px; fill: #57606a; font-style: italic; }
+      .body { font-size: 13px; }
+      .bold { font-size: 13px; font-weight: 600; }
+      .label { font-size: 12px; fill: #57606a; }
+      .small { font-size: 11px; }
+      .code { font-family: SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 11px; }
+      .row { font-size: 11.5px; }
+      .count { font-size: 11.5px; fill: #57606a; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="699" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="title" x="24" y="36">A pass over a round of 8 positions: its calls and their operations</text>
+  <text class="sub" x="24" y="58">The 64×2 network on one core. The round holds 3 positions of the Axis, 3 of the Allies and 2 of the Comintern, decision 612 among them.</text>
+
+  <!-- Part 1: the round's positions, laid out -->
+  <text class="head" x="24" y="92">1. A round's 8 positions</text>
+  <text class="label" x="250" y="100" text-anchor="middle">laid out</text>
+  <g>
+    <rect x="24" y="108" width="190" height="30" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+    <text class="body" x="34" y="128">Axis position</text>
+    <rect x="24" y="144" width="190" height="30" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+    <text class="body" x="34" y="164">Axis position</text>
+    <rect x="24" y="180" width="190" height="30" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+    <text class="body" x="34" y="200">Axis position</text>
+    <rect x="24" y="216" width="190" height="30" rx="4" fill="#dafbe1" stroke="#4ac26b"/>
+    <text class="body" x="34" y="236">Allies position</text>
+    <rect x="24" y="252" width="190" height="30" rx="4" fill="#dafbe1" stroke="#4ac26b"/>
+    <text class="body" x="34" y="272">Allies position</text>
+    <rect x="24" y="288" width="190" height="30" rx="4" fill="#dafbe1" stroke="#4ac26b"/>
+    <text class="body" x="34" y="308">Allies position</text>
+    <rect x="24" y="324" width="190" height="30" rx="4" fill="#fff1e5" stroke="#fb8f44" stroke-width="2"/>
+    <text class="bold" x="34" y="344">Comintern: decision 612</text>
+    <rect x="24" y="360" width="190" height="30" rx="4" fill="#fff1e5" stroke="#fb8f44"/>
+    <text class="body" x="34" y="380">Comintern position</text>
+  </g>
+  <g stroke="#8c959f" stroke-width="1" marker-end="url(#arrow)">
+    <line x1="218" y1="123" x2="286" y2="123"/>
+    <line x1="218" y1="159" x2="286" y2="159"/>
+    <line x1="218" y1="195" x2="286" y2="195"/>
+    <line x1="218" y1="231" x2="286" y2="231"/>
+    <line x1="218" y1="267" x2="286" y2="267"/>
+    <line x1="218" y1="303" x2="286" y2="303"/>
+    <line x1="218" y1="339" x2="286" y2="339"/>
+    <line x1="218" y1="375" x2="286" y2="375"/>
+  </g>
+  <g>
+    <rect x="290" y="105" width="162" height="36" fill="#ddf4ff" stroke="#54aeff"/>
+    <text class="small" x="371" y="127" text-anchor="middle">zone vectors 0–36</text>
+    <rect x="290" y="141" width="162" height="36" fill="#ddf4ff" stroke="#54aeff"/>
+    <text class="small" x="371" y="163" text-anchor="middle">zone vectors 37–73</text>
+    <rect x="290" y="177" width="162" height="36" fill="#ddf4ff" stroke="#54aeff"/>
+    <text class="small" x="371" y="199" text-anchor="middle">zone vectors 74–110</text>
+    <rect x="290" y="213" width="162" height="36" fill="#dafbe1" stroke="#4ac26b"/>
+    <text class="small" x="371" y="235" text-anchor="middle">zone vectors 111–147</text>
+    <rect x="290" y="249" width="162" height="36" fill="#dafbe1" stroke="#4ac26b"/>
+    <text class="small" x="371" y="271" text-anchor="middle">zone vectors 148–184</text>
+    <rect x="290" y="285" width="162" height="36" fill="#dafbe1" stroke="#4ac26b"/>
+    <text class="small" x="371" y="307" text-anchor="middle">zone vectors 185–221</text>
+    <rect x="290" y="321" width="162" height="36" fill="#fff1e5" stroke="#fb8f44" stroke-width="2"/>
+    <text class="small" x="371" y="343" text-anchor="middle" font-weight="600">222–258: decision 612</text>
+    <rect x="290" y="357" width="162" height="36" fill="#fff1e5" stroke="#fb8f44"/>
+    <text class="small" x="371" y="379" text-anchor="middle">zone vectors 259–295</text>
+    <rect x="290" y="105" width="162" height="288" fill="none" stroke="#57606a" stroke-width="1.5"/>
+  </g>
+  <text class="label" x="24" y="418">Each position brings 37 zone vectors, a position vector and a move vector for each</text>
+  <text class="label" x="24" y="436">legal move. Laid out, the pass's zone vectors are one array, 8 × 37 = 296 vectors</text>
+  <text class="label" x="24" y="454">of 64 numbers, with each network's positions together.</text>
+
+  <!-- Part 2: the pass as a list of calls -->
+  <text class="head" x="476" y="92">2. The pass: a list of calls, in order</text>
+  <rect x="476" y="102" width="7" height="10" fill="#ddf4ff" stroke="#54aeff"/>
+  <rect x="484" y="102" width="7" height="10" fill="#dafbe1" stroke="#4ac26b"/>
+  <rect x="492" y="102" width="7" height="10" fill="#fff1e5" stroke="#fb8f44"/>
+  <text class="label" x="506" y="111">one call per network, on its own positions</text>
+  <rect x="762" y="102" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
+  <text class="label" x="792" y="111">one call for all 8</text>
+
+  <rect x="476" y="122" width="460" height="26" rx="4" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text class="body" x="488" y="140">First layer: column lookups, identity vectors, fixed facts</text>
+
+  <rect x="476" y="154" width="460" height="208" rx="4" fill="#ffffff" stroke="#57606a"/>
+  <text class="bold" x="488" y="173">Message layer 1: 42 calls</text>
+  <text class="count" x="924" y="173" text-anchor="end">calls</text>
+  <g>
+    <!-- k0: per network -->
+    <rect x="488" y="181" width="7" height="10" fill="#ddf4ff" stroke="#54aeff"/><rect x="496" y="181" width="7" height="10" fill="#dafbe1" stroke="#4ac26b"/><rect x="504" y="181" width="7" height="10" fill="#fff1e5" stroke="#fb8f44"/>
+    <text class="row" x="522" y="190"><tspan class="code">split, linear ×3, cat</tspan>: every zone's message</text>
+    <text class="count" x="924" y="190" text-anchor="end">5</text>
+    <!-- k1: per network -->
+    <rect x="488" y="198" width="7" height="10" fill="#ddf4ff" stroke="#54aeff"/><rect x="496" y="198" width="7" height="10" fill="#dafbe1" stroke="#4ac26b"/><rect x="504" y="198" width="7" height="10" fill="#fff1e5" stroke="#fb8f44"/>
+    <text class="row" x="522" y="207"><tspan class="code">index_select, view</tspan>: each position's border terms</text>
+    <text class="count" x="924" y="207" text-anchor="end">2</text>
+    <!-- k2: all -->
+    <rect x="488" y="215" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
+    <text class="row" x="522" y="224"><tspan class="code">index_select, add, gelu</tspan>: every border's message</text>
+    <text class="count" x="924" y="224" text-anchor="end">3</text>
+    <!-- k3: all -->
+    <rect x="488" y="232" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
+    <text class="row" x="522" y="241"><tspan class="code">new_zeros, index_add_, div</tspan>: each zone's average</text>
+    <text class="count" x="924" y="241" text-anchor="end">3</text>
+    <!-- k4: all -->
+    <rect x="488" y="249" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
+    <text class="row" x="522" y="258"><tspan class="code">repeat_interleave, cat</tspan>: a zone's inputs side by side</text>
+    <text class="count" x="924" y="258" text-anchor="end">2</text>
+    <!-- k5: per network -->
+    <rect x="488" y="266" width="7" height="10" fill="#ddf4ff" stroke="#54aeff"/><rect x="496" y="266" width="7" height="10" fill="#dafbe1" stroke="#4ac26b"/><rect x="504" y="266" width="7" height="10" fill="#fff1e5" stroke="#fb8f44"/>
+    <text class="row" x="522" y="275"><tspan class="code">split, (linear, gelu, layer_norm) ×3, cat</tspan>: zone update</text>
+    <text class="count" x="924" y="275" text-anchor="end">11</text>
+    <!-- k6: all -->
+    <rect x="488" y="283" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
+    <text class="row" x="522" y="292"><tspan class="code">add</tspan>: the update added to every zone vector</text>
+    <text class="count" x="924" y="292" text-anchor="end">1</text>
+    <!-- k7: all -->
+    <rect x="488" y="300" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
+    <text class="row" x="522" y="309"><tspan class="code">view, mean, cat</tspan>: the average zone beside the position vector</text>
+    <text class="count" x="924" y="309" text-anchor="end">3</text>
+    <!-- k8: per network -->
+    <rect x="488" y="317" width="7" height="10" fill="#ddf4ff" stroke="#54aeff"/><rect x="496" y="317" width="7" height="10" fill="#dafbe1" stroke="#4ac26b"/><rect x="504" y="317" width="7" height="10" fill="#fff1e5" stroke="#fb8f44"/>
+    <text class="row" x="522" y="326"><tspan class="code">split, (linear, gelu, layer_norm) ×3, cat</tspan>: position update</text>
+    <text class="count" x="924" y="326" text-anchor="end">11</text>
+    <!-- k9: all -->
+    <rect x="488" y="334" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
+    <text class="row" x="522" y="343"><tspan class="code">add</tspan>: the update added to every position vector</text>
+    <text class="count" x="924" y="343" text-anchor="end">1</text>
+  </g>
+
+  <rect x="476" y="368" width="460" height="26" rx="4" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text class="body" x="488" y="386">Message layer 2: the same 42 calls</text>
+  <rect x="476" y="400" width="460" height="26" rx="4" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text class="body" x="488" y="418">Summary, value head, policy head, outputs</text>
+  <text class="count" x="924" y="418" text-anchor="end">174 with the first layer</text>
+  <text class="label" x="476" y="446">258 calls for these 8 positions. If all were one alliance's, each learned</text>
+  <text class="label" x="476" y="464">layer would be one call and the pass 146 calls, for 1 position as for 8.</text>
+
+  <!-- Part 3: inside one call -->
+  <line x1="24" y1="480" x2="936" y2="480" stroke="#d0d7de"/>
+  <text class="head" x="24" y="506">3. Inside one call: operations</text>
+  <rect x="24" y="526" width="56" height="104" fill="#fff1e5" stroke="#fb8f44"/>
+  <text class="small" x="52" y="582" text-anchor="middle">74 × 64</text>
+  <text class="body" x="96" y="582" text-anchor="middle">×</text>
+  <rect x="112" y="550" width="56" height="56" fill="#f6f8fa" stroke="#57606a"/>
+  <text class="small" x="140" y="582" text-anchor="middle">64 × 64</text>
+  <text class="body" x="184" y="582" text-anchor="middle">=</text>
+  <rect x="200" y="526" width="56" height="104" fill="#fff1e5" stroke="#fb8f44"/>
+  <text class="small" x="228" y="582" text-anchor="middle">74 × 64</text>
+  <text class="small" x="52" y="648" text-anchor="middle" fill="#57606a">74 zone</text>
+  <text class="small" x="52" y="662" text-anchor="middle" fill="#57606a">vectors</text>
+  <text class="small" x="140" y="648" text-anchor="middle" fill="#57606a">message</text>
+  <text class="small" x="140" y="662" text-anchor="middle" fill="#57606a">weights</text>
+  <text class="small" x="228" y="648" text-anchor="middle" fill="#57606a">74</text>
+  <text class="small" x="228" y="662" text-anchor="middle" fill="#57606a">messages</text>
+
+  <text class="body" x="290" y="532">One call, the Comintern network's <tspan class="code" font-size="12px">linear</tspan> for every zone's message: its 74 zone</text>
+  <text class="body" x="290" y="550">vectors, 2 positions × 37, times its 64 × 64 message weights. Each of the 74 × 64</text>
+  <text class="body" x="290" y="568">output numbers is 64 multiply-adds: 303,104 multiply-adds, or 606,208 operations,</text>
+  <text class="body" x="290" y="586">in one call. Decision 612's 37 zones are half of them.</text>
+  <text class="body" x="290" y="614">One output number, the first of Shensi's message at decision 612:</text>
+  <text class="body" x="290" y="636" xml:space="preserve">−0.294 × w<tspan dy="3" font-size="9">1</tspan><tspan dy="-3"> + 1.957 × w</tspan><tspan dy="3" font-size="9">2</tspan><tspan dy="-3"> − 1.422 × w</tspan><tspan dy="3" font-size="9">3</tspan><tspan dy="-3"> − 0.203 × w</tspan><tspan dy="3" font-size="9">4</tspan><tspan dy="-3"> + … + (Shensi's 64th number) × w</tspan><tspan dy="3" font-size="9">64</tspan><tspan dy="-3"> + bias</tspan></text>
+  <text class="body" x="290" y="658">64 multiply-adds, each two operations: a multiplication and an addition.</text>
+  <text class="label" x="290" y="684">A call's time: one start, the same for 1 position or 8, then its operations, which grow with the positions.</text>
+</svg>

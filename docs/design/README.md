@@ -1523,21 +1523,54 @@ sets the pace ([record](../archive/records/engine_speed_in_training_2026_11_16.m
 stop and resume a run is in the
 [campaign learning guide](../../studies/campaign/README.md).
 
-**The coordinator.** Game threads do not run the network themselves. A game thread
-that needs an evaluation writes the position's input into shared memory and waits.
-Over and over, the coordinator reads every waiting request, evaluates all of them
-in one pass of the three alliance networks, and sends back each position's priors
-and values (`studies/campaign/shared_evaluator.py`). In that pass each network's
-learned layers read only its own alliance's positions, so every output is that
-network's own, up to floating-point rounding; a chance position, which all three
-networks rate, appears once for each (`NetworkStack` in
-`studies/campaign/neural.py`).
+**The coordinator.** Game threads do not run the network themselves. When a game
+thread's search needs the network's answer for a position, the thread writes the
+position's input, a few arrays of whole numbers, into its own block of *shared
+memory*, memory that its game process and the coordinator can both read. Then it
+sends a short note of where those arrays lie through its own *pipe*, a channel
+the operating system keeps between two processes, and waits. The coordinator
+works in *rounds*, which have nothing to do with the game's rounds. In each
+round it reads the notes of every waiting request, lays their positions out,
+evaluates them all in one pass of the three alliance networks, and sends each
+position's priors and values back through the pipe its request came by, as
+lists of numbers (`SharedEvaluatorServer` in
+`studies/campaign/shared_evaluator.py`). *Laying the positions out* joins the
+arrays of all the round's positions end to end, one array of each kind for the
+whole pass, and shifts each position's indices to point into the joined arrays
+(`pack_zone_arrays` in `studies/campaign/features.py`). The pass puts each
+network's positions together, the Axis's first, then the Allies' and the
+Comintern's. If decision 612 came seventh in a round of 8 positions, after
+three of the Axis and three of the Allies, its 37 zone vectors would be numbers
+222 to 258 of the pass's 296 zone vectors, counting from 0, and every index in
+its arrays that names one of its zones would grow by 222 (figure below). In the
+pass each network's learned layers read only its own alliance's positions, so every output is that
+network's own, up to floating-point rounding; a chance position, which all
+three networks rate, appears once for each (`NetworkStack` in
+`studies/campaign/neural.py`). The pass gives every legal move of every position
+the logarithm of its probability (section 6.8). The coordinator turns each
+position's logarithms into its priors on the CPU, one position at a time, after
+copying them back from the GPU's memory when the pass ran there (`collect` in
+`studies/campaign/shared_evaluator.py`).
 
-**What a pass is made of.** A pass is a list of calls to PyTorch (section 6.3),
-each applying one function to whole arrays, for all the pass's positions at
-once. A message layer (section 6.6), for example, is 20 calls for each network
-whose positions are in the pass, however many there are. For decision 612, as
-for any position:
+**What a pass looks like.** A pass takes the positions of one round, laid out.
+Each position keeps its own vectors through the whole network of section 6: its
+37 zone vectors, its position vector and a move vector for each of its legal
+moves. But the vectors of all the pass's positions lie in the same arrays: in a
+round of 8 positions, the pass's zone vectors are one array of 8 × 37 = 296
+vectors of 64 numbers each. Every step of section 6, the first layer, the
+message layers, the summary and the heads, works on such whole arrays, so on
+all the pass's positions at once. The figure shows a pass over a round of 8
+positions, three of the Axis, three of the Allies and two of the Comintern,
+decision 612 among them; the calls of a pass of that mix were counted in the
+record cited below:
+
+![A pass over a round of 8 positions: 3 of the Axis, 3 of the Allies and 2 of the Comintern, decision 612 among them. Part 1: each position brings 37 zone vectors, a position vector and a move vector for each of its legal moves; laid out, the pass's zone vectors are one array of 296 vectors of 64 numbers, each network's positions together: the Axis's zone vectors 0 to 110, the Allies' 111 to 221, the Comintern's 222 to 295, decision 612's 222 to 258. Part 2: the pass is a list of calls: the first layer, message layer 1, message layer 2, then the summary, the heads and the outputs. Message layer 1 is 42 calls: those that apply a network's learned layers are made once per network, on its own positions, between a split and a join (every zone's message 5 calls, the border terms 2, the zone update 11, the position update 11); the others once for all 8 positions (every border's message 3, each zone's average 3, a zone's inputs side by side 2, adding the zone update 1, the average zone beside the position vector 3, adding the position update 1). Message layer 2 is the same 42; the first layer, summary, heads and outputs are 174; 258 in all. If all 8 positions were one alliance's, each learned layer would be one call and the pass 146 calls, for 1 position as for 8. Part 3: one call, the Comintern network's linear for every zone's message, multiplies its 74 zone vectors by its 64 × 64 message weights: 74 × 64 output numbers of 64 multiply-adds each, 303,104 multiply-adds or 606,208 operations, half of them for decision 612. One output number, the first of Shensi's message at decision 612, is −0.294 × w1 + 1.957 × w2 − 1.422 × w3 − 0.203 × w4 and so on to w64, plus a bias: 64 multiply-adds, each two operations. A call's time is one start, the same for 1 position or 8, then its operations, which grow with the positions.](figures/pass_of_a_round.svg)
+
+**What a pass is made of: calls.** A pass is a list of calls to PyTorch (section
+6.3), each applying one function to whole arrays, for all the pass's positions
+at once. When a pass's positions all belong to one alliance, a message layer
+(section 6.6) is the 20 calls below, however many positions the pass holds. For
+decision 612's zones, as for any position's:
 
 | Calls | What they do |
 | --- | --- |
@@ -1549,24 +1582,51 @@ for any position:
 | `view`, `mean`, `cat` | the average zone vector beside the position vector |
 | `linear`, `gelu`, `layer_norm`, `add` | the position update, added to the position vector |
 
-Only the three `linear` calls do much arithmetic: at 64×2 about 614,000
-multiply-adds for one position, 151,552 of them for the messages; each other
-call does at most about ten thousand simple operations, or none. A whole pass of
-the 64×2 network on one CPU core is 146 calls when its positions belong to one
-alliance, 40 for the two message layers and 106 for the rest: the first layer's
-column lookups, the summary, the value and policy heads and the outputs. With
-positions of all three alliances it is 258, because each network's learned
-layers are called on its own positions, one network after another. On the GPU
-25 more calls carry the positions' arrays over, and at 512×16 a pass is 426 to
-871 calls
+**What a call computes: operations.** An *operation* is one multiplication or
+one addition of two numbers. Each output number of a learned layer is a sum of
+products, one for each input: the input times its weight, added to the sum. A
+*multiply-add* like that is two operations. The toy layer of section 6.2, with 3
+inputs and 2 outputs, does 6 multiply-adds, 12 operations. In the messages'
+`linear` call at decision 612, the first number of Shensi's message adds up
+Shensi's 64 numbers, −0.294, 1.957, −1.422, −0.203 and so on (section 6.4), each
+times its weight: 64 multiply-adds. Shensi's whole message is 64 such numbers,
+4,096 multiply-adds, and the call does the same for all 37 zones: 151,552
+multiply-adds, 303,104 operations, for one position. Only the three `linear`
+calls of a message layer do much arithmetic: at 64×2 about 614,000 multiply-adds
+for one position. Each other call goes over at most about ten thousand numbers
+for each position, adding, dividing or bending each by the GELU curve, or does
+no arithmetic at all: `view`, for one, only reads the same numbers as an array
+of another shape. Counting only the multiply-adds of its learned layers, a whole
+pass of the 64×2 network does about 3.4 million operations for each position
+with 14 legal moves (section 9.3).
+
+**How the positions enter.** How many calls a pass makes does not depend on how
+many positions it holds; how many operations its calls do grows in proportion
+to them. A pass of the 64×2 network on one CPU core is 146 calls when its
+positions belong to one alliance, for 1 position as for 8: 40 for the two
+message layers and 106 for the rest, the first layer's column lookups, the
+summary, the value and policy heads and the outputs. With positions of all three
+alliances it is 258, as in the figure: each network's learned layers, with their
+curves and layer normalizations, are called on that network's own positions,
+between a split of the pass's vectors by network and a join, which adds 22 calls
+to each message layer and 68 elsewhere. On the GPU 25 more calls carry the
+positions' arrays over, and at 512×16 a pass is 426 to 871 calls
 ([record](../archive/records/pass_calls_2026_11_17.md#how-many-calls-a-pass-makes)).
+The operations, by contrast, follow the positions: in the figure's pass, the
+Comintern network's `linear` call for the messages multiplies the zone vectors
+of its two positions, 74 of them, in one call, twice decision 612's
+303,104 operations.
 
 A call costs a start, whatever the size of its arrays: Python's and PyTorch's own
 work to check the arrays, choose a routine and make room for the result, and on
-the GPU, handing the call over. Then it costs its arithmetic, which grows with
+the GPU, handing the call over. Then it costs its operations, which grow with
 the positions. A pass of the 64×2 network over one position takes one core
 0.45 ms, 3.1 µs a call, of which at most about 2.1 µs is the start, since the
-same core does a position's arithmetic in about 0.14 ms in large passes
+same core does a position's 3.4 million operations in about 0.14 ms in large
+passes. A pass of 8 positions makes the same 146 starts as a pass of one when
+its positions belong to one alliance, and 258 when they belong to three, so its
+time per position is much lower: on one core a pass of 8 took 1.67 ms, about
+0.21 ms a position
 ([record](../archive/records/pass_calls_2026_11_17.md#what-the-calls-cost)). A
 call is not a training step either: a training step (section 8.4) reads 32
 samples and changes the network's weights once, and each of its parts is itself
@@ -1577,11 +1637,14 @@ than its share of arithmetic: in a profiled training batch, a pass of one
 network took 0.57 ms for one position and 1.02 ms for four, about 0.4 ms
 whatever its size
 ([record](../archive/records/coordinator_one_pass_2026_11_14.md#where-the-coordinators-time-went)).
-Most of that fixed cost is the starts of the pass's calls. Of the arithmetic,
+Most of that fixed cost is probably the starts of the pass's calls, which by the
+bound above take at most about 0.31 ms of a one-position pass of the 64×2
+network (inferred). Of the arithmetic,
 the GELU curve (section 6.2) takes the most, mostly in the border messages
 (section 6.6). With one pass per round, the
-positions cost most of a round. In training batches with 24 games in flight, a
-round held about 8 positions and took the coordinator about 0.62 ms plus 0.13 ms
+positions cost most of a round. In training batches of the Mac profile, whose 6
+game processes of 4 games keep 24 *games in flight*, that is, being played at
+the moment, a round held about 8 positions and took the coordinator about 0.62 ms plus 0.13 ms
 for each position, from reading the requests' arrays to the outputs, about
 0.21 ms a position in all, and the coordinator was busy about 96% of the time
 ([record](../archive/records/engine_speed_in_training_2026_11_16.md#what-limits-training-now)).
@@ -1623,6 +1686,17 @@ never limited self-play. When the coordinator ran its passes there, up to the
 night of 2 November, a network with five times the parameters played about as
 many decisions per hour as the small one on the CPU (table below): the engine
 and each pass's fixed costs set the pace, not the GPU's arithmetic.
+
+**The Windows PC.** The owner's second machine is a PC with an 8-core Intel
+i7-9700K, 16 GB of memory and an NVIDIA RTX 3060 Ti GPU. Its profile
+(`studies/campaign/profiles/windows.json`; [training on
+Windows](../../studies/campaign/README.md#training-on-windows)) runs 6 game
+processes of 4 games, as the Mac's does, but the coordinator's passes run on the
+GPU, through *CUDA*, NVIDIA's software for computing on its GPUs. There too the
+coordinator probably set the pace. On the night of 14 November, in three-round
+games with the 64×2 network, a pass held about 10 positions and took 7.6 ms, laying them out
+included, and the coordinator waited for requests only 5.6% of the time
+([record](../archive/records/three_round_training_2026_11_14.md#training)).
 
 **The game processes** do most of the CPU work: about 65 ms per decision since
 the engine work of 16 November, against 110 to 117 ms just before it
@@ -1775,8 +1849,9 @@ eleven-round games
 
 **The network.** Most of a pass's arithmetic is the message layers' learned
 layers, applied to each of the 37 zones (section 6.6), so it grows with the
-width squared times the number of layers. It is counted below in operations on
-numbers, two for each multiply-add of the learned layers
+width squared times the number of layers. It is counted below in operations
+(section 9.2), two for each multiply-add of the learned layers, for a position
+with 14 legal moves
 ([record](../archive/records/network_and_search_cost_2026_11_14.md#the-network)). Most of the parameters, by contrast,
 are rows of the first layer's tables, of which a decision reads only a few
 hundred (section 6.9), so the parameter count says little about the cost.
@@ -1808,8 +1883,8 @@ work, laying the positions out and making the calls, is about two thirds of
 every 64×2 pass, 40% to 60% of a 256×8 pass of 8 to 64 positions, and only a
 tenth of a 512×16 pass of 256, where the GPU's arithmetic takes the rest
 ([record](../archive/records/pass_calls_2026_11_17.md#what-the-calls-cost)).
-Whether other code, such as half-precision numbers or fewer calls, would let the
-GPU do more is unmeasured. The rates used below:
+Whether fewer calls or cheaper arithmetic would let the GPU do more is open (the
+coordinator's levers, below). The rates used below:
 
 | Network | Arithmetic per position | One CPU core, 16 per pass | GPU, 64 per pass | GPU, 256 per pass |
 | --- | ---: | ---: | ---: | ---: |
@@ -1837,8 +1912,7 @@ evaluation in training (65 ms per decision, about 51 evaluations)
 A search keeps a copy of the game at each node of its tree
 ([section 4.7](#47-more-detail-on-the-search)), about 160 to 230 KB each, so a
 tree holds about 11 MB at 64 simulations, 56 MB at 256 and 250 MB at 1,024 until
-its move is chosen. Each game in flight, that is each game being played at the
-moment, holds one tree.
+its move is chosen. Each game in flight (section 9.2) holds one tree.
 
 **Which part limits.** Count both parts in evaluations, the positions the network
 is asked about. A search asks about roughly one position per simulation
@@ -1940,15 +2014,77 @@ times at 256×8, with four times the games in flight. With the network on one
 core, as today, the coordinator is busy about 96% of the time and the cores are
 not (section 9.2), so at 64×2 a cheaper engine gains only as far as it fills the
 coordinator's rounds. A change to the coordinator changes the network's rate,
-and matters only where the network or the coordinator limits. Its three levers
-weigh differently on the two devices. More positions per pass gain little on
-one core beyond about 16, and much on the GPU: at least up to 256 positions for
-the small networks, and up to about 64 for 512×16. Fewer calls, or cheaper starts,
-gain on both, most on the GPU in small passes of small networks, where the
-starts are most of a pass's time. Cheaper arithmetic gains on one
-core in any pass, but on the GPU only in large passes of large networks, where
-the arithmetic fills it. From 256×8 on the network needs the GPU, so there the
-coordinator's speed is the GPU's, and these levers are what would raise it.
+and matters only where the network or the coordinator limits.
+
+**The coordinator's levers.** The coordinator has three levers, which weigh
+differently on the two devices. More positions per pass gain little on one core
+beyond about 16, and much on the GPU: at least up to 256 positions for the small
+networks, and up to about 64 for 512×16. Fewer calls, or cheaper starts, gain on
+both, most on the GPU in small passes of small networks, where the starts are
+most of a pass's time. Cheaper arithmetic gains on one core in any pass, but on
+the GPU only in large passes of large networks, where the arithmetic fills it.
+From 256×8 on the network needs the GPU, so there the coordinator's speed is the
+GPU's, and these levers are what would raise it. The levers take the forms
+below, beside two changes around the pass: a leaner round trip and a second
+coordinator. None of them is built, and which of them pay, and how much, is
+open:
+
+- **Fewer calls.** In a pass with positions of all three alliances, 43% to 50%
+  of the calls are ones that positions of one alliance would not need: the pass
+  splits its vectors by network, calls each network's learned layer on that
+  network's part and joins the results (`_by_network` in
+  `studies/campaign/neural.py`;
+  [record](../archive/records/pass_calls_2026_11_17.md#how-many-calls-a-pass-makes)).
+  A *grouped matrix product*, one call that multiplies each network's positions
+  by that network's own weights, would call each learned layer once for all
+  three networks, as for positions of one alliance. PyTorch offers one only as a
+  private function, `torch._grouped_mm`, which gave the same products on the CPU
+  ([record](../archive/records/coordinator_one_pass_2026_11_14.md#other-ways-considered)).
+- **Cheaper starts: compiling.** PyTorch's compiler, `torch.compile`, reads a
+  pass's calls once, ahead of the passes it serves, and writes routines that
+  each do the work of several calls, such as a learned layer's matrix product,
+  its GELU curve and the addition after it. A compiled pass makes fewer starts
+  and moves its numbers through memory fewer times. Its routines work best for
+  arrays of fixed sizes, and a pass's arrays change size with its positions, so
+  passes would be padded with empty positions up to a few fixed sizes, each
+  compiled once, at the cost of the empty positions' arithmetic. On an NVIDIA
+  GPU, such as the Windows PC's (section 9.2), a *CUDA graph* goes further:
+  PyTorch records a pass's calls on the GPU once, and each later pass of the
+  same size replays the record from a single start.
+- **Cheaper arithmetic: half precision.** The networks compute with numbers of
+  32 bits, which keep about 7 significant digits; that is the float rounding of
+  section 6.3. *Half-precision* numbers take 16 bits and keep about 3. A pass in
+  half precision moves half as many bytes, and many GPUs compute with such
+  numbers faster, but its outputs differ from the 32-bit ones by much more than
+  rounding, so it would be checked like a change of the network.
+- **A leaner round trip.** Outside the pass, the coordinator reads the requests'
+  notes from the pipes, lays the positions out in Python, turns the outputs into
+  priors one position at a time and sends the replies through the pipes as lists
+  (section 9.2). On 14 November laying the positions out took 233 µs of a
+  1,603 µs round
+  ([record](../archive/records/coordinator_one_pass_2026_11_14.md#time-per-round-replayed)).
+  Writing the replies into shared memory, turning all the positions' outputs
+  into priors at once, and laying the positions out in the engine's C++ with
+  fewer copies would shorten that part of a round.
+- **More positions per pass.** More games in flight fill larger passes, each
+  game with its search tree in memory, and so would a search that asks about
+  several positions at once (both above, where a pass's positions come from). On
+  the GPU the coordinator's core could also lay out the next pass while the GPU
+  computes the current one; now it waits for each pass's outputs before its next
+  round.
+- **A second coordinator**, serving half the game processes, would add capacity
+  without making a round cheaper: each coordinator would find about half as many
+  positions waiting, and smaller passes cost more per position. It was not built
+  on 14 November, when the cores were nearly all busy
+  ([record](../archive/records/coordinator_one_pass_2026_11_14.md#other-ways-considered));
+  since the engine work of 16 November about 2 of the 9 are idle (section 9.2).
+
+Each form can be checked on one core on real rounds saved from a training batch
+(`tools/profile_coordinator.py --save-every`) and replayed through the
+coordinator's code, which times the rounds and compares two versions' replies
+(`tools/replay_coordinator_rounds.py`). On the GPU, passes are timed through the
+coordinator's code by `tools/benchmark_network_sizes.py`, which measured the
+rates above.
 
 Three things follow, inferred:
 
@@ -2111,8 +2247,9 @@ measured and what would settle it.
   profile a faster engine plays more decisions an hour only as far as it fills
   the coordinator's rounds. A round costs the coordinator about 0.62 ms besides
   0.13 ms a position (section 9.2); a seventh game process, now that cores are
-  idle, would fill its rounds further, which is untested. Within the engine,
-  listing a position's legal moves now costs the most per call, and checking a
+  idle, would fill its rounds further, which is untested. The coordinator's own
+  levers, none of them built, are listed in section 9.3. Within the engine,
+  listing a position's legal moves now costs the most each time, and checking a
   naval route copies the whole position and works out its carriers' reach and
   supply again with no cache
   ([record](../archive/records/naval_route_checks_2026_11_16.md)). When the
@@ -2500,7 +2637,7 @@ Terms in the order the document introduces them.
   let the network tell zones apart.
 - **Zone vector, position vector, move vector:** the vectors that describe a zone,
   the position as a whole and a legal move.
-- **Message layer:** one round in which every zone hears from its neighbours
+- **Message layer:** one layer in which every zone hears from its neighbours
   along the borders; a 64×2 network has 2.
 - **Summary vector:** one vector of the position, from the position vector and
   the zone vectors' average and maximum.
@@ -2536,7 +2673,7 @@ Terms in the order the document introduces them.
   learning rate.
 - **Replay buffer:** the latest samples, at most 8,000, that training draws from.
 - **Training step:** one draw of 32 samples from the replay buffer, read by the
-  three networks, and one Adam step for each. The training command calls the 32
+  three networks, and one Adam step for each. The training command names the 32
   `--batch-size` and the steps per update `--epochs`.
 - **Update:** the 700 training steps after a batch.
 - **Model export:** the saved networks after an update.
@@ -2550,21 +2687,60 @@ Terms in the order the document introduces them.
 - **Coordinator:** the process that evaluates every game's positions with the
   three networks and sends each game thread its priors and values.
 - **Request:** a position a game thread sends the coordinator to be evaluated.
+- **Shared memory:** memory that two processes can both read; a game thread
+  writes each request's arrays into its own block of it.
+- **Pipe:** a channel the operating system keeps between two processes; each
+  game thread sends its requests' notes and receives its replies through its
+  own.
 - **Evaluation:** the network's answer for one position, its priors and values;
   a search asks for about one per simulation.
-- **Round:** one turn of the coordinator: it reads every waiting request,
-  evaluates them in one pass and replies.
-- **Pass:** one run of the networks over several positions at once.
+- **Round:** one turn of the coordinator, not of the game: it reads every
+  waiting request, lays the positions out, evaluates them in one pass and
+  replies.
+- **Laying the positions out:** joining the arrays of a round's positions end to
+  end for one pass, each network's positions together, with each position's
+  indices shifted to point into the joined arrays.
+- **Pass:** one run of the networks over all the positions of a round at once.
+  Each position keeps its own vectors, but every call works on the arrays that
+  hold them all.
 - **Call:** one instruction to PyTorch, the library that does the network's
   arithmetic, to apply one function, such as a matrix product or the GELU
-  curve, to whole arrays at once. A pass is a list of 146 to 871 calls; a call
-  is not a training step.
+  curve, to whole arrays at once. A pass is a list of 146 to 871 calls, however
+  many positions it holds; a call is not a training step.
+- **Start of a call:** what a call costs whatever the size of its arrays: Python's
+  and PyTorch's work to check them, choose a routine and make room for the
+  result, and on the GPU, handing the call over.
+- **Operation:** one multiplication or one addition of two numbers.
+- **Multiply-add:** one input times its weight, added to an output's sum: two
+  operations. A learned layer is made of them; the learned layers of a 64×2
+  pass do about 3.4 million operations for each position with 14 legal moves.
 - **Games in flight:** the games being played at the moment, each holding its
   search tree in memory.
 - **Decisions per hour:** decisions searched per hour across all games in
   flight, the measure of self-play speed for one network and search. It falls in
   proportion to the search's simulations, and with the network's size only where
   the network, not the cores, limits (section 9.3).
+- **Windows PC:** the owner's second training machine, with an NVIDIA GPU on
+  which its coordinator runs the passes (section 9.2).
+- **CUDA:** NVIDIA's software for computing on its GPUs.
+
+**The coordinator's levers (section 9.3; none of them built)**
+
+- **Grouped matrix product:** one call that multiplies each network's positions
+  by that network's own weights.
+- **Compiling a pass:** having PyTorch's compiler, `torch.compile`, turn a pass's
+  calls, once and ahead of time, into fewer routines that each do the work of
+  several calls.
+- **CUDA graph:** a pass's calls recorded once on an NVIDIA GPU and replayed
+  from a single start.
+- **Half precision:** numbers of 16 bits, with about 3 significant digits,
+  instead of the 32 bits, with about 7, that the networks compute with.
+- **Round trip:** the coordinator's work in a round outside the pass: reading
+  the requests' notes from the pipes and their arrays from shared memory, laying
+  the positions out, turning the outputs into priors and sending the replies
+  through the pipes.
+- **Second coordinator:** a second coordinating process serving half the game
+  processes.
 
 **Size (section 11)**
 

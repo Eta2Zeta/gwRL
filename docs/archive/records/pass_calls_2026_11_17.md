@@ -48,6 +48,12 @@ unset, one CPU thread, the Mac's load average 1.7 to 2.8 before the runs.
 - With positions of all three alliances each network's learned layers are
   called on its own positions, with a split before and a join after: 22 calls
   more per message layer and 68 more elsewhere, 43% to 50% of the pass's calls.
+  A message layer is then 42 calls at every size: 9 `linear`, 7 `gelu`,
+  6 `layer_norm`, 5 `cat`, 3 `split_with_sizes` (the splits), 3 `add`,
+  2 `index_select`, 2 `view`, and one each of `div`, `index_add_`, `mean`,
+  `new_zeros` and `repeat_interleave`. The tool counted these after the first
+  runs, for the 8 positions of all three alliances, and its other counts came
+  out the same as before (`message_layer_three_alliances` in the evidence file).
 - On the GPU a pass makes 25 calls more: the positions' arrays travel to the GPU
   in two copies and are then cut into views (`batch_tensors` in
   `studies/campaign/neural.py`).

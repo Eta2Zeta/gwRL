@@ -16,7 +16,8 @@ time, on a GPU they are only handed to it, which computes until the outputs are
 copied back. It counts the PyTorch calls of one pass, as PyTorch's dispatcher
 sees them, for one position, for 8 positions of one alliance and for 8 of all
 three, separating calls that only give another view of an array, and the calls
-one more message layer adds for one position. It also times training steps of
+one more message layer adds, for one position and for the 8 of all three
+alliances. It also times training steps of
 one network (forward, backward, Adam) with a stand-in loss, the squared
 outputs, on --train-rows decisions.
 
@@ -173,6 +174,11 @@ for size in args.sizes:
     added.subtract(count_calls(stack, by_owner[first][:1], [1 if c else 0 for c in one_count]).names)
     calls["one_message_layer"] = {"calls": sum(added.values()),
                                   "by_operator": {name: n for name, n in sorted(added.items()) if n}}
+    # The same for 8 positions of all three alliances (3, 3, 2).
+    added = count_calls(deeper, mixed, [3, 3, 2]).names
+    added.subtract(count_calls(stack, mixed, [3, 3, 2]).names)
+    calls["one_message_layer_three_alliances"] = {"calls": sum(added.values()),
+                                                  "by_operator": {name: n for name, n in sorted(added.items()) if n}}
     del deeper
     print(size, "calls", calls, flush=True)
     cells = {}

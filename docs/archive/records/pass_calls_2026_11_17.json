@@ -497,5 +497,64 @@
     "256": 0.1
    }
   }
+ },
+ "message_layer_three_alliances": {
+  "note": "Calls one more message layer adds to a pass of 8 positions of all three alliances (3, 3, 2), counted on one CPU core by tools/benchmark_network_sizes.py after this record's first runs (key one_message_layer_three_alliances); the same at every size. The run reproduced the record's other call counts exactly.",
+  "sizes": {
+   "64x2": {
+    "calls": 42,
+    "by_operator": {
+     "add": 3,
+     "cat": 5,
+     "div": 1,
+     "gelu": 7,
+     "index_add_": 1,
+     "index_select": 2,
+     "layer_norm": 6,
+     "linear": 9,
+     "mean": 1,
+     "new_zeros": 1,
+     "repeat_interleave": 1,
+     "split_with_sizes": 3,
+     "view": 2
+    }
+   },
+   "256x8": {
+    "calls": 42,
+    "by_operator": {
+     "add": 3,
+     "cat": 5,
+     "div": 1,
+     "gelu": 7,
+     "index_add_": 1,
+     "index_select": 2,
+     "layer_norm": 6,
+     "linear": 9,
+     "mean": 1,
+     "new_zeros": 1,
+     "repeat_interleave": 1,
+     "split_with_sizes": 3,
+     "view": 2
+    }
+   },
+   "512x16": {
+    "calls": 42,
+    "by_operator": {
+     "add": 3,
+     "cat": 5,
+     "div": 1,
+     "gelu": 7,
+     "index_add_": 1,
+     "index_select": 2,
+     "layer_norm": 6,
+     "linear": 9,
+     "mean": 1,
+     "new_zeros": 1,
+     "repeat_interleave": 1,
+     "split_with_sizes": 3,
+     "view": 2
+    }
+   }
+  }
  }
 }
