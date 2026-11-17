@@ -38,7 +38,7 @@ Other open things stay in the pages that own them, and
 | [Q-004](#q-004-features-whose-value-never-changes) | Should the input drop features whose value never changes? | The network's input | Yes, in the same change as Q-003 |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
-| [Q-007](#q-007-a-training-iterations-last-game-played-alone) | Should a training iteration play more games than it has game threads, so that its longest game does not end it alone? | Running training | Yes: 48 games on 24 threads, measured in matched training iterations first |
+| [Q-007](#q-007-self-play-stopping-at-each-training-iterations-end) | Should self-play go on through network updates, instead of standing still while a training iteration's last games finish and while the networks update? | Running training | Yes: a trainer beside self-play, networks swapped between games, as AlphaZero did |
 
 Q-001 to Q-004 were raised on 14 November 2026, while the global features
 about nations were being pruned (commit `bce7a4c`). Their numbers are in the
@@ -487,57 +487,80 @@ the game's developers.
 **If answered.** A ruling becomes the next rule clarification, with
 `mayDeclareWar`, its test and the politics page changed in the same commit.
 
-## Q-007: A training iteration's last game, played alone
+## Q-007: Self-play stopping at each training iteration's end
 
-**The question.** Should a training iteration keep its game threads busy to the
-end of its self-play, by playing more games than it has game threads, instead of
-ending with its longest game playing alone?
+**The question.** At the end of each training iteration self-play stands still
+twice: while the training iteration's last games finish one by one, and during
+the network update that follows. Should self-play go on through network updates,
+with the networks updated beside it (choice B below), or should each training
+iteration only play more games than it has game threads (choice A)?
 
-**What the program does now.** A training iteration plays as many games as it has
-game threads, 24 in the Mac profile, all started together, and its network update
-starts only when the last of them has ended (`count = config.parallel_envs` in
-the batch loop of `studies/campaign/run.py`, the code's name for the loop over
-training iterations;
+**What the program does now.** A training iteration plays as many games as it
+has game threads, 24 in the Mac profile, all started together with the networks
+fixed (`count = config.parallel_envs` in the loop over training iterations in
+`studies/campaign/run.py`, which the code calls batches;
 [a training iteration's games](design/README.md#71-a-training-iterations-games)).
-Games differ in length, so near the end of a training iteration fewer and fewer
-games are concurrent, and its longest game ends it alone.
+The network update starts when the last game has ended, and the next training
+iteration's games start when the network update is done, so no game plays
+during it
+([one training step, and one network update](design/README.md#84-one-training-step-and-one-network-update)).
+An interrupted training iteration is discarded and played again exactly, game
+for game (the comment in the same loop).
 
 **A real case** (17 November 2026, one training iteration of the Mac profile,
-timed with the profiler, eleven-round games, 64 simulations, the 64×2 network on
-one core). The 24 games took 834 to 1,445 decisions. 23 of them ended between 231
-and 299 seconds; the longest played alone until 332 seconds. For that last tenth
-of the playing time the inference server's inference batches held one state
-each, while the other 23 game threads waited; on average 20.1 of the 24 games
-were concurrent. The longest game made about 348 of its decisions alone. Without
-them the training iteration would have played about 294,000 decisions an hour
-instead of 268,000, so its tail cost about 9%
-([record](archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail)).
+timed with the profiler, eleven-round games, 64 simulations, the 64×2 network
+on one core).
 
-**Why it matters.** Decisions per hour counts the whole playing time, so every
-training iteration pays for its tail, however fast the engine and the inference
-server get. A larger network on the GPU pays more: the GPU uses an inference
-batch of one state worst, and filling inference batches of 64 states takes about
-128 concurrent games
+- **The tail.** The 24 games took 834 to 1,445 decisions. 23 of them ended
+  between 231 and 299 seconds; the longest played alone until 332 seconds. For
+  that last tenth of the playing time the inference batches held one state each
+  while the other 23 game threads waited, and on average 20.1 of the 24 games
+  were concurrent. The longest game made about 348 of its decisions alone.
+  Without them the training iteration would have played about 294,000 decisions
+  an hour instead of 268,000, so the tail cost about 9%
+  ([record](archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail)).
+- **The network update's pause.** That profile ran 50 training steps; the Mac
+  training command runs 525. A training step took 65 ms on 2 November and 70 ms
+  on 5 November ([record](archive/records/training_sample_2026_11_05.md#the-update-after-the-batch)),
+  so 525 take about 35 seconds: about a tenth of a training iteration's
+  wall-clock time beside its 300 or so seconds of self-play (worked out; not
+  measured with today's code).
+
+**Why it matters.** Together the two stops cost about a fifth of the wall-clock
+time (worked out), however fast the engine and the inference server get. Both
+grow with a larger network on the GPU: filling inference batches of 64 states
+takes about 128 concurrent games
 ([section 9.3 of the design document](design/README.md#93-what-a-larger-network-and-a-longer-search-cost)),
-whose tail would leave more threads waiting.
+whose tail leaves more game threads waiting, and a larger network takes longer
+to update.
 
 **The choices.**
 
-| Choice | What it changes |
-| --- | --- |
-| A. More games than game threads | A training iteration plays, say, 48 games on its 24 threads, and a thread that finishes a game starts the next. Threads fall idle only once the training iteration's last games are under way, so the tail stays about as long but is about half as large a part of a training iteration twice as long. Each network update then has twice the training samples, and needs twice the training steps to draw each training sample as often ([section 8.7](design/README.md#87-how-often-a-training-sample-is-drawn)); the networks change every 48 games instead of every 24. Needs a setting for the games per training iteration. |
-| B. Play on through network updates | Game threads never stop: a finished game is replaced at once, and new networks are swapped in when a network update is ready, as AlphaZero's players do. No tail, but a game may be played by two versions of the networks, and training runs beside play instead of between training iterations: a change to the training loop ([section 9.1](design/README.md#91-the-training-loop)). |
-| C. Leave it | Every training iteration keeps a tail, about a tenth of its playing time in this case, and decisions per hour stays comparable with earlier training iterations. |
+| | A. More games than game threads | B. Self-play never stops | C. Leave it |
+| --- | --- | --- | --- |
+| How it works | A training iteration plays, say, 48 games on its 24 game threads, and a game thread that finishes a game starts the next one. | Game threads play one game after another. A trainer runs network updates beside them, and each new game starts with the newest networks. | As now. |
+| The tail | Still about as long, but half as large a share of a training iteration twice as long: about 4% to 5% instead of 9%. | Gone. | About 9%. |
+| The network update's pause | The same for each game: a network update with twice the training samples needs twice the training steps to draw each as often ([section 8.7](design/README.md#87-how-often-a-training-sample-is-drawn)). | Gone: network updates run on cores self-play leaves idle, about 2 of the 9 today. | About a tenth of the wall-clock time. |
+| Which networks play | The same networks for 48 games instead of 24. | Each new game, the newest networks. Training samples come from games of slightly older networks, as the replay buffer's already do. | Unchanged. |
+| Exact replay | An interrupted training iteration is still played again exactly. | A single game still replays exactly if its networks' version is recorded; a whole run no longer does, since which version a game gets depends on timing. | Unchanged. |
+| Work | A setting for the games per training iteration, and a queue of games for the game threads: small. | A trainer beside self-play; swapping networks between games; checkpoints that save the replay buffer and the trainer; and pacing training steps to the incoming training samples, so each is drawn as often as now: a few days. | None. |
 
-**Recommendation: A**, measured in matched training iterations before it replaces
-the profile's setting. It keeps the training loop as it is and needs only a
-setting, and its cost, fewer network updates per game, can be offset by more
-training steps per network update. B removes the tail entirely and suits larger
-runs, but it changes what a training iteration is.
+**Recommendation: B.** It removes both stops, about a fifth of the wall-clock
+time today, and long runs on the GPU need it most, since more concurrent games
+make the tail worse. It is how AlphaZero trained: one network updated
+continually rather than in iterations, self-play games always generated with
+its latest parameters, and 5,000 TPUs playing while 16 others trained
+([AlphaZero preprint](https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/alphazero-shedding-new-light-on-chess-shogi-and-go/alphazero_preprint.pdf),
+pages 3 and 4). Swapping networks only between games keeps every game played by
+one version, so each game can still be replayed. The price is a few days of work
+and exact replay of a whole run. A is small, but it recovers only about half of
+the tail and none of the pause, and the networks change half as often; it is
+worth doing only as a stopgap while B waits.
 
-**If answered.** The number of games per training iteration belongs in
-[a training iteration's games](design/README.md#71-a-training-iterations-games),
-in the [campaign learning guide](../studies/campaign/README.md) and in the Mac
+**If answered.** B belongs in [the training loop](design/README.md#91-the-training-loop)
+and [a training iteration's games](design/README.md#71-a-training-iterations-games),
+and changes how the [campaign learning guide](../studies/campaign/README.md)
+describes a run. A belongs in section 7.1 too, in the guide and in the Mac
 profile.
 
 ## Open elsewhere

@@ -1887,8 +1887,12 @@ the inference server's inference batches held one state each and the other game
 threads waited. That cost the training iteration about 9% of its decisions an hour
 (worked out from each game's decisions and time;
 [record](../archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail)).
-Whether to play more games than game threads in a training iteration is waiting
-for the owner's decision ([Q-007](../questions.md#q-007-a-training-iterations-last-game-played-alone)).
+Self-play also stands still during the network update that follows, about 35
+seconds for 525 training steps at the speed measured on 5 November (worked out;
+[record](../archive/records/training_sample_2026_11_05.md#the-update-after-the-batch)).
+Whether self-play should go on through network updates instead, as AlphaZero's
+did, is waiting for the owner's decision
+([Q-007](../questions.md#q-007-self-play-stopping-at-each-training-iterations-end)).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept training sample was drawn 8 to 12 times
@@ -2233,7 +2237,7 @@ others pay, and how much, is open:
   collate the next inference batch while the GPU computes the current one; now it
   waits for each forward pass's outputs before its next inference batch. A
   training iteration's end empties its inference batches too, since its last games
-  play alone ([Q-007](../questions.md#q-007-a-training-iterations-last-game-played-alone)).
+  play alone ([Q-007](../questions.md#q-007-self-play-stopping-at-each-training-iterations-end)).
 - **A second inference server**, serving half the game processes, would add
   capacity without making an inference batch cheaper: each inference server would
   find about half as many states waiting, and smaller inference batches cost more
@@ -2417,7 +2421,7 @@ measured and what would settle it.
   listed in section 9.3, with the first measurements of two of them. Each
   training iteration also ends with its longest game playing alone, which cost a
   training iteration timed with the profiler about 9% of its decisions an hour
-  ([Q-007](../questions.md#q-007-a-training-iterations-last-game-played-alone)). Within the engine, listing a state's legal actions now
+  ([Q-007](../questions.md#q-007-self-play-stopping-at-each-training-iterations-end)). Within the engine, listing a state's legal actions now
   costs the most each time, and checking a naval route copies the whole state and
   works out its carriers' reach and supply again with no cache
   ([record](../archive/records/naval_route_checks_2026_11_16.md)). When the
