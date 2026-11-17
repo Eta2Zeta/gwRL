@@ -811,18 +811,18 @@ need its own encoder code, kept in step with its rule by hand.
 
 - **Speed: little.** Encoding is about 4% of a game process's work (section 1),
   and the name lookups are only part of encoding.
-- **Correctness: the real cost.** The engine and the encoder agree only through
-  names. A rule can write a name the encoder's lists lack, and the name falls
-  into an "other" feature and is only counted. That is how the missing names of
-  [section 7](#keeping-the-lists-complete) arose; since 4 November tests check
-  the names the engine's source writes.
+- **Correctness: the real cost.** For everything still named, the engine and
+  the encoder agree only through names. A rule can write a name the encoder's
+  lists lack, and the name falls into an "other" feature and is only counted.
+  That is how the missing names of [section 7](#keeping-the-lists-complete)
+  arose; since 4 November tests check the names the engine's source writes.
 
 **The alternatives:**
 
 | Option | What it means | Assessment |
 | --- | --- | --- |
 | The engine writes the network's numbers itself | every rules module also fills input features as it plays | Spreads learning code through the rules: every rule change becomes an input change, and the rules get harder to check against the rulebook. Not recommended. |
-| The engine stores numbers instead of names | unit types, nations, zones and marks become numbered constants | A rewrite of every rules module, with risk to rule correctness, for at most the few percent of speed above. The measurements do not justify it. |
+| The engine holds numbers instead of names | inside the engine, zones, nations, unit types and classes, facility types, technologies and the bases of marks become numbers; saved games, actions, battle notes and the scenario's files keep names, which the engine converts where they enter and leave ([where names become numbers](../engine/names.md#4-where-names-become-numbers)) | Done on 16 November, for the engine's own speed rather than the encoder's: before it, comparing names, allocating memory, looking up maps and copying memory took 59% of the engine's time, and a searched game now runs 23.9% fewer instructions, with play unchanged ([why numbers](../engine/names.md#1-why-numbers)). For zones, nations, unit types, facility types and technologies the encoder translates nothing: each one's number is its index in the encoder's list (section 1). Units, facilities, railroads, battles, an action's details and a battle's notes are still names ([what is still a name](../engine/names.md#what-is-still-a-name)), so the encoder still translates those, and the check in the next row still guards them. |
 | Keep the names, but check them | a test scans the engine's source for the names it writes and compares them with the encoder's lists, and full random games fail on any unknown name | Closes the missing-names gap without touching the rules. Built on 4 November for the usual ways the engine writes names ([section 7](#keeping-the-lists-complete)). |
 
 A stricter form of the last option is one register of names, each declared once
