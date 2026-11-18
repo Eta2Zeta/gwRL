@@ -2279,20 +2279,33 @@ inference requests waiting when it starts, and a game asks for one network
 evaluation at a time: its search plays one simulation after another, and a
 simulation that reaches a new state waits for its network evaluation before the
 next begins (`_expand` in `studies/shared/multiplayer_mcts.py`). So an inference
-batch holds at most one state for each concurrent game. An inference batch of 64
-states needs about 128 concurrent games, half of them waiting in the inference
-batch while the other half work in the engine, and each holds its search tree in
-memory. At 800 simulations 30 GB holds the search trees of only about 115 games
-beside the processes' other memory, so inference batches hold about 57 states.
-Today's layout has 24 concurrent games, and its inference batches on the CPU hold
-about 10 states while all 24 play, about 8 over a whole training iteration, and
-one at its end (section 9.2). It could never fill an inference batch of 64, and in
-inference batches of 4 and of 16 states the GPU gives 11% and 35% of its rate in
-inference batches of 64 at 64×2, and 25% and 56% at 512×16. So moving the network
-to the GPU means more concurrent games as well. In training at 256×8 on the Mac's
-GPU, inference batches held about 0.4 states for each concurrent game: 25.5
-states on average with 63 concurrent games, and 48 with 126
-([record](../archive/records/concurrent_games_gpu_2026_11_18.md)). A search could instead ask for
+batch holds at most one state for each concurrent game, and in steady play at
+most about half. The inference server starts the next inference batch as soon as
+it has sent its replies, with the inference requests already waiting (`serve` in
+`studies/campaign/shared_evaluator.py`). The game threads it has just answered
+are back in the engine then, so they can join only the inference batch after
+that: the concurrent games take turns in two groups. A game thread that takes
+longer in the engine than an inference batch takes misses its turn and waits for
+the next one. On the Mac's GPU at 256×8, an inference batch of 60 states takes
+the inference server about 14 ms, while a game thread's engine work for a
+network evaluation takes about 1.6 ms of a CPU core, so the game threads come
+back in time: half of all states were answered in inference batches of at least
+31 states with 63 concurrent games, and of at least 60 with 126
+([record](../archive/records/concurrent_games_gpu_2026_11_18.md#results)). The
+averages over a whole training iteration, 25.5 and 48 states, are lower, because
+fewer games are left at its end. So an inference batch of 64 states needs about
+128 concurrent games, each holding its search tree in memory. At 800 simulations
+30 GB holds the search trees of only about 115 games beside the processes' other
+memory, so inference batches hold about 57 states. The Mac profile has 24
+concurrent games, and its inference batches on one CPU core hold about 10 states
+(section 9.2). There an inference batch takes about 1.5 ms and a game thread's
+engine work for a network evaluation about 1.1 ms of a CPU core, not much less
+(both worked out from the
+[record](../archive/records/one_network_comparison_2026_11_17.md#speed)), so some
+game threads miss their turn. That layout could never fill an inference batch of
+64, and in inference batches of 4 and of 16 states the GPU gives 11% and 35% of
+its rate in inference batches of 64 at 64×2, and 25% and 56% at 512×16. So moving
+the network to the GPU means more concurrent games as well. A search could instead ask for
 several network evaluations at once: choose a few new states before asking,
 steering each later choice away from the paths already chosen, and wait for all
 of them together. That would fill inference batches with fewer games and less
@@ -2306,18 +2319,60 @@ longer search plays fewer decisions an hour, and whether its better searches
 teach more per hour is unmeasured
 ([open question](#how-big-should-the-network-and-the-search-be)). To judge a
 change of the code at a size not yet trained, measure the rate it changes and
-work out the rest with the formula. A change to the engine or the search changes
-the cores' rate, which is the same for every network. It raises decisions per hour
-wherever the cores limit, but only until the cores' line in the figure reaches the
-network's line above it. With the GPU in inference batches of 64, a cheaper engine
-can now pay up to about 1.8 times at 64×2, about 1.5 times at 128×4 and not at all
-from 256×8 on, where the GPU already limits; inference batches of 256 would let it
-pay about 1.2 times at 256×8, with four times the concurrent games. With the
-network on one core, as today, the inference server is busy about 96% of the time
-and the cores are not (section 9.2), so at 64×2 a cheaper engine gains only as far
-as it fills the inference server's inference batches. A change to the inference
-server changes the network's rate, and matters only where the network or the
-inference server limits.
+work out the rest with the formula.
+
+**Which changes pay now.** A change to the engine or the search changes the CPU
+cores' rate, the network evaluations a second that the game processes can feed,
+which is the same for every network. A change to the inference server changes
+the network's rate. Each change pays only while its own part limits, and only
+until the other part limits instead. Where the CPU cores limit, a cheaper engine
+pays directly, until the CPU cores' line in the figure reaches the network's line
+above it: with the GPU in inference batches of 64, up to about 1.8 times at 64×2
+and 1.5 times at 128×4 (worked out). In the setups trained so far the inference
+server limits instead, with the CPU cores about a fifth behind:
+
+| Setup | What limits | The CPU cores could feed | What pays |
+| --- | --- | --- | --- |
+| 64×2 on one CPU core, 24 concurrent games (the Mac profile) | the inference server, busy 98% | about a fifth more | a cheaper inference server; a cheaper engine little |
+| 256×8 on the GPU, 126 concurrent games | the inference server, busy 98% | about a fifth more | a cheaper inference server; self-play that never stops, about a tenth; a cheaper engine little by itself |
+| 512×16 on the GPU, not trained yet | the GPU's forward pass, about 2,000 states a second as written and 2,700 compiled, in inference batches of about 60 | about twice as much | a cheaper forward pass on the GPU; the engine not at all |
+
+The CPU cores' rates are inferred: the 9 CPU cores of the allowance, less the
+inference server's process, divided by the game processes' CPU time per network
+evaluation, against the network evaluations a second measured in training or,
+at 512×16, in replayed forward passes
+([64×2](../archive/records/one_network_comparison_2026_11_17.md#speed),
+[256×8](../archive/records/concurrent_games_gpu_2026_11_18.md#what-limits-next),
+[512×16](../archive/records/compiled_forward_2026_11_18.md#speed)).
+
+A cheaper inference server pays until the CPU cores limit, about a fifth. At
+256×8 it has room in its own work: in training an inference batch of about 60
+states took it about 14.0 ms, while the forward pass alone, replayed from saved
+inference batches, takes 9.4 ms as written and 7.4 ms with the compiled layers,
+and reading the inference requests, replying and the GPU cache clears took about
+1 ms more; the remaining 3.6 ms are not broken down
+([record](../archive/records/concurrent_games_gpu_2026_11_18.md#the-inference-servers-time-by-inference-batch-size)).
+Self-play that never stops does not make the inference server cheaper but keeps
+its inference batches full: in a training iteration, fewer games are left to fill
+them as games end, which cost the 126-game run 9.7% of its decisions an hour
+(section 9.2).
+
+A cheaper engine pays little by itself while the inference server limits. Its
+game threads would come back from the engine sooner, but at 256×8 on the GPU they
+already come back in time for their turn, every second inference batch (above,
+where an inference batch's states come from), so the inference batches would not
+grow. At 64×2 on one CPU core they come back late more often, and the inference
+batches hold about 10 states of a possible 12; but there an inference batch's
+cost is mostly the network's arithmetic, about 0.14 ms a state beside 0.27 ms for
+the whole inference batch (section 9.2), so inference batches of 12 states would
+cost only about 3% less a state (inferred). The engine work of 16 November raised
+decisions per hour by 26% when inference batches held about 5 states of a
+possible 12, far below the most they can hold (section 9.2). A cheaper engine
+still pays in two ways. The CPU cores it frees can run more concurrent games,
+which fill larger inference batches on the GPU. And once the inference server is
+about a fifth cheaper, the CPU cores limit, and from there each cheaper
+simulation pays in full. On a faster GPU the engine's cost sets how many CPU
+cores keep it busy (below).
 
 **The inference server's levers.** The inference server has three levers, which
 weigh differently on the two devices. Larger inference batches gain little on one
