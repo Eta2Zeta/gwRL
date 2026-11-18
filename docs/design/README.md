@@ -779,34 +779,39 @@ output neurons, the 64 places of a vector; as the code computes it, it has no
 bias and no activation function. Its 64 outputs are the first part of the zone's
 vector, to which section 6.4 adds two more.
 
-![Decision 612, the Comintern's network after one network update. Left, the input layer: Shensi's feature vector, one input neuron per zone feature, 42,532 in all, each holding its feature value after a fixed scaling, 0.69 for a feature value of 1 and 0 for a feature value of 0. Shown are features 0 possessor:ccp (0.69), 1 possessor:dadao (0), 14 turn_start_possessor:ccp (0.69), 186 units:ccp:militia (0.69), 188 units:ccp:mountain_infantry (0.69), 304 units:kmt:fighter (0), 9,841 and 9,842, the Comintern militia's count and movement points left (0.69 each), 9,989 and 9,991, the Comintern mountain infantry's count and movement points left (0.69 each), 29,244 rail_to:land_china_hopeh (0.69) and the last, 42,531 battle_order (0). Right, the embedding layer: 64 output neurons, of which outputs 1 to 4 and 64 are shown, with −0.001, 0.137, −0.118, −0.104 and −0.073. Every input neuron has a connection to every output neuron. The connections that leave units:ccp:mountain_infantry carry its embedding, row 188 of the zone embedding table, beginning 0.019, 0.001, −0.030, 0.021. Each output adds up input times weight over its 42,532 connections; the inputs of 0 add nothing, so the output is 0.69 times embedding 0 plus 0.69 times embedding 14 and so on to embedding 29,244, and only 9 embeddings are fetched. In all 42,532 × 64 = 2,722,048 connections, whose weights make up the zone embedding table.](figures/embedding_layer.svg)
+![Decision 612, the Comintern's network after one network update. Left, the input layer: Shensi's feature vector, one input neuron per zone feature, 42,532 in all, each holding its feature value after a fixed scaling, 0.69 for a feature value of 1 and 0 for a feature value of 0. Shown are features 0 possessor:ccp (0.69), 1 possessor:dadao (0), 14 turn_start_possessor:ccp (0.69), 186 units:ccp:militia (0.69), 188 units:ccp:mountain_infantry (0.69), 304 units:kmt:fighter (0), 9,841 and 9,842, the Comintern militia's count and movement points left (0.69 each), 9,989 and 9,991, the Comintern mountain infantry's count and movement points left (0.69 each), 29,244 rail_to:land_china_hopeh (0.69) and the last, 42,531 battle_order (0). Right, the embedding layer: 64 output neurons, of which outputs 1 to 4 and 64 are shown, with −0.001, 0.137, −0.118, −0.104 and −0.073. Every input neuron has a connection to every output neuron. The connections that leave units:ccp:mountain_infantry carry its embedding, row 188 of the zone embedding table, beginning 0.019, 0.001, −0.030, 0.021. Each output adds up input times weight over its 42,532 connections; the inputs of 0 add nothing, so the output is 0.69 times embedding 0 plus 0.69 times embedding 14 and so on to embedding 29,244, and only 9 embeddings are fetched. In all 42,532 × 64 = 2,722,048 connections, whose weights make up the zone embedding table. The network has one zone embedding table: every zone's embedding layer, not only Shensi's, has these same weights.](figures/embedding_layer.svg)
 
 **Embeddings and embedding tables.** As in the toy layer, the 64 weights on the
 connections that leave one input neuron are that feature's *embedding*. The
 embedding layer's weights, stored as a matrix with one row per feature, in
 feature order, are an *embedding table*: row $q$ of the table is the embedding of
-feature $q$. Each part of the input has its own embedding layer and so its own
-embedding table:
+feature $q$. A network has three embedding tables, one for each of the three
+parts of the input of section 5.2, and not one for each zone or for each legal
+action. The zone embedding table is the one table that every zone's feature
+vector goes through: at decision 612, Shensi's feature vector, Hopeh's and those
+of the other 35 zones all take their embeddings from this same table of 42,532
+embeddings.
 
-| Embedding table | Embeddings | One embedding for each |
-| --- | ---: | --- |
-| Zone embedding table | 42,532 | zone feature |
-| Global embedding table | 4,076 | global feature |
-| Action embedding table | 12,627 | action feature |
+| Embedding table | Embeddings: one for each | The feature vectors that go through it at decision 612 |
+| --- | --- | --- |
+| Zone embedding table | 42,532: one for each zone feature | all 37 zones' feature vectors |
+| Global embedding table | 4,076: one for each global feature | the one global feature vector |
+| Action embedding table | 12,627: one for each action feature | all 5 legal actions' feature vectors |
 
 A feature's number is its embedding's row number: `units:ccp:mountain_infantry`
-is zone feature 188, and its embedding is row 188 of the zone embedding table.
+is zone feature 188, and its embedding is row 188 of the zone embedding table, in
+whichever zone's feature vector the feature has a non-zero value.
 
-**One vector per feature vector.** An embedding layer reads one feature vector at
-a time and gives each its own 64 outputs, its own vector. At decision 612 the
-input has 43 feature vectors, 37 for the zones, one for the global features and
-5 for the legal actions, so the embedding layers give 43 vectors of 64 numbers:
-one for each zone, one for the state as a whole and one for each legal action,
-not one vector for the whole decision. All 37 zone feature vectors go through the
-zone embedding table, with the same weights for every zone, and all 5 action
-feature vectors through the action embedding table. In the neurons-and-connections
-picture, the Shensi figure above is drawn once for every zone, each time with the
-same connections. No embedding layer adds one feature vector's values to
+**One vector per feature vector.** Sharing one embedding table does not merge
+the feature vectors that go through it: an embedding layer reads one feature
+vector at a time and gives each its own 64 outputs, its own vector. At decision
+612 the input has 43 feature vectors, 37 for the zones, one for the global
+features and 5 for the legal actions, so the embedding layers give 43 vectors of
+64 numbers: one for each zone, one for the state as a whole and one for each
+legal action, not one vector for the whole decision. In the
+neurons-and-connections picture, the Shensi figure above is drawn once for every
+zone, each time with the same connections, whose weights are the zone embedding
+table. No embedding layer adds one feature vector's values to
 another's (`_bag` in `studies/campaign/neural.py` makes one sum per feature
 vector): the vectors meet only in the layers after it, as the plan at the end of
 this section shows.
@@ -841,7 +846,7 @@ without first copying the fetched embeddings into a temporary array (`_bag` in
 [record](../archive/records/coordinator_lookups_2026_11_12.md)). The embedding
 table's view of the same layer, with real embeddings:
 
-![Top: one embedding, the 64 learned numbers the Comintern's network keeps for the zone feature units:ccp:mountain_infantry, row 188 of its zone embedding table after one network update, drawn as 64 coloured cells, blue for negative and red for positive numbers up to ±0.15; its first numbers are 0.019, 0.001, −0.030, 0.021, −0.007, 0.018, −0.015 and −0.028. Left: the zone embedding table, one row per zone feature, 42,532 embeddings of 64 numbers; shown with their row numbers are rows 0 to 3 (possessor:ccp, possessor:dadao, possessor:japan, possessor:kmt), 14 (turn_start_possessor:ccp), 186 and 188 (units:ccp:militia and units:ccp:mountain_infantry), 304 (units:kmt:fighter, still all zeros because no kept training sample had a KMT fighter), 9,841, 9,842, 9,989 and 9,991 (Comintern militia and mountain infantry counts and movement points left), 29,244 (rail_to:land_china_hopeh) and the last, 42,531 (battle_order). The 9 embeddings Shensi's feature values pick are highlighted. A fresh network's embeddings are all zeros; after one network update 1,840 have moved. Right: Shensi's 9 feature values, each 1, enter as ln 2 ≈ 0.69 each, so Shensi's vector starts as 0.69 times embedding 0 plus 0.69 times embedding 14 and so on to embedding 29,244; the sum's first numbers are −0.001, 0.137, −0.118 and −0.104. The network fetches only these 9 embeddings: Shensi's other 42,523 feature values are 0.](figures/embedding_table.svg)
+![Top: one embedding, the 64 learned numbers the Comintern's network keeps for the zone feature units:ccp:mountain_infantry, row 188 of its zone embedding table after one network update, drawn as 64 coloured cells, blue for negative and red for positive numbers up to ±0.15; its first numbers are 0.019, 0.001, −0.030, 0.021, −0.007, 0.018, −0.015 and −0.028. Left: the zone embedding table, the network's one table for all 37 zones, one row per zone feature, 42,532 embeddings of 64 numbers; shown with their row numbers are rows 0 to 3 (possessor:ccp, possessor:dadao, possessor:japan, possessor:kmt), 14 (turn_start_possessor:ccp), 186 and 188 (units:ccp:militia and units:ccp:mountain_infantry), 304 (units:kmt:fighter, still all zeros because no kept training sample had a KMT fighter), 9,841, 9,842, 9,989 and 9,991 (Comintern militia and mountain infantry counts and movement points left), 29,244 (rail_to:land_china_hopeh) and the last, 42,531 (battle_order). The 9 embeddings Shensi's feature values pick are highlighted. A fresh network's embeddings are all zeros; after one network update 1,840 have moved. Right: Shensi's 9 feature values, each 1, enter as ln 2 ≈ 0.69 each, so Shensi's vector starts as 0.69 times embedding 0 plus 0.69 times embedding 14 and so on to embedding 29,244; the sum's first numbers are −0.001, 0.137, −0.118 and −0.104. The network fetches only these 9 embeddings: Shensi's other 42,523 feature values are 0.](figures/embedding_table.svg)
 
 **Feature scaling.** An input neuron holds not its feature value $a$ but a fixed
 formula of it, written by hand, not learned (`_signed_log` in
@@ -896,15 +901,25 @@ far these features had non-zero values together, so training moved them alike
 ([section 8.5](#85-which-numbers-a-training-step-moves)).
 
 **An embedding belongs to a feature, not to a zone.** `units:ccp:mountain_infantry`
-has one embedding, the network's own description, in 64 numbers, of "a CCP
-mountain infantry is here", added in whichever zone that is true. No number in an
-embedding has a meaning chosen by hand. Nor is an embedding computed from the
-feature value: it stays the same from state to state until training changes it,
-and the feature value only sets how strongly it is added.
+has one embedding, row 188 of the zone embedding table: the network's own
+description, in 64 numbers, of "a CCP mountain infantry is here", added in
+whichever zone that is true, so what the network learns about mountain infantry
+in Shensi applies in Hopeh too. It does not carry across combinations: KMT
+infantry has a separate embedding
+([open question](#one-embedding-per-combination-or-embeddings-built-from-parts)).
+No number in an embedding has a meaning chosen by hand. Nor is an embedding
+computed from the feature value: it stays the same from state to state until
+training changes it, and the feature value only sets how strongly it is added.
 
-**Each of an embedding's numbers is one parameter,** so the zone embedding table
-alone holds 42,532 × 64 = 2,722,048 parameters, and the three embedding tables
-3.79 million of the network's 3.92 million.
+**The embedding tables' parameters.** Each of an embedding's 64 numbers is one
+parameter. The zone embedding table is one table for all 37 zones, so its 42,532
+embeddings hold 42,532 × 64 = 2,722,048 parameters in the whole network, not
+2,722,048 for each zone. The global embedding table holds 4,076 × 64 = 260,864
+parameters, and the action embedding table, which all legal actions share in the
+same way, holds 12,627 × 64 = 808,128. The three embedding tables together hold
+3,791,040 parameters, 97% of a 64×2 network's 3,924,424; the identity embeddings
+and the layers of sections 6.4 to 6.8 hold the other 133,384 (counted from
+`CampaignPolicyValueNet` in `studies/campaign/neural.py`).
 
 **Embeddings start at zero** (since 3 November 2026), and training moves an
 embedding only when it trains on training samples in which the embedding's
@@ -950,8 +965,11 @@ the result:
 1. **the embedding layer's output:** the embeddings of the zone's non-zero
    feature values, each times its input (section 6.3);
 2. **the zone's identity embedding:** 64 learned numbers for each of the 37
-   zones, so the network can tell zones apart. Unlike the embedding tables'
-   embeddings, these start random;
+   zones, so the network can tell zones apart. These 37 × 64 = 2,368 numbers are
+   the only parameters of the network that each belong to one zone: the zone
+   embedding table, the static features' linear layer and all the later layers
+   use the same parameters for every zone. Unlike the embedding tables'
+   embeddings, the identity embeddings start random;
 3. **its 39 static features** (section 5.5), turned into 64 numbers by a linear
    layer without an activation function.
 
@@ -979,12 +997,6 @@ size of Shensi's identity embedding (1.3 against 8.0, root of the sum of squares
 and smaller than its static features' part (2.1). So this early network's
 description of Shensi still says mostly "this is Shensi", whatever stands there.
 Inferred: that is part of why young networks rate different states much alike.
-
-**One embedding table serves every zone.** `units:ccp:mountain_infantry` has one
-embedding, added wherever CCP mountain infantry stand, so what the network learns
-about mountain infantry in Shensi applies in Hopeh too. It does not carry across
-combinations: KMT infantry has a separate embedding
-([open question](#one-embedding-per-combination-or-embeddings-built-from-parts)).
 
 Layer normalization also keeps a busy zone from dominating: sea zone P14, with 86
 non-zero feature values at decision 612, does not get a vector many times larger
@@ -1151,7 +1163,7 @@ played on maps rather than AlphaZero's grids:
 | AlphaGo Zero, for Go | 17 grids of 19 × 19 numbers, each 0 or 1 | a convolution: at every point, the same learned numbers for the facts at and around that point | a fixed list of 362: one per point and one for passing |
 | Stockfish's NNUE, for chess | for each side's view, 40,960 numbers, at most 30 of them 1 (HalfKP) | adds up the weights that leave its non-zero inputs | none: it gives a value only |
 | DipNet, for Diplomacy | the features of each of the board's 81 locations | a graph convolution along the map's adjacency | one order per location in turn, invalid orders masked |
-| This network | 42,532 zone features per zone, 4,076 global features and 12,627 action features per legal action, almost all 0 | adds up the embeddings of its non-zero inputs, with one embedding table for every zone | one logit per legal action, from the action's own vector |
+| This network | 42,532 zone features per zone, 4,076 global features and 12,627 action features per legal action, almost all 0 | adds up the embeddings of its non-zero inputs, with one zone embedding table that all zones share | one logit per legal action, from the action's own vector |
 
 **The embedding layer is the usual first layer.** Adding up the weights of the
 few non-zero inputs, instead of multiplying them all, is how a layer is computed
@@ -3203,10 +3215,13 @@ the dated records use instead.
   per output; for a feature, the learned vector added in wherever the feature has
   a non-zero value.
 - **Embedding table:** an embedding layer's weights, a matrix with one row per
-  feature: the zone, global and action embedding tables.
+  feature. A network has three, the zone, global and action embedding tables:
+  every zone's feature vector goes through the one zone embedding table, and
+  every legal action's through the one action embedding table.
 - **Embedding layer:** the network's first linear layer, which reads one feature
-  vector, without bias or activation function; the zones, the global features and
-  the legal actions each have their own.
+  vector, without bias or activation function. A network has three: one for the
+  zones, which reads every zone's feature vector, one for the global features and
+  one for the legal actions, which reads every legal action's feature vector.
 - **Feature scaling:** the fixed formula $\operatorname{sign}(a)\ln(1 + |a|)$
   that turns a feature value $a$ into its input neuron's value.
 - **Embedding lookup:** computing an embedding layer by fetching only the
