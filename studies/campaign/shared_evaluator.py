@@ -181,6 +181,9 @@ class ServerStats:
     forward_seconds: float = 0.0     # Answering: reading, laying out, the pass and host outputs.
     reply_seconds: float = 0.0       # Sending priors and values back.
     idle_seconds: float = 0.0
+    # Seconds of the inference batches of each size, by their number of requests:
+    # reading the requests, answering them and replying, as in serve().
+    seconds_per_round: dict[int, float] = field(default_factory=dict)
 
 
 class SharedEvaluatorServer:
@@ -250,6 +253,8 @@ class SharedEvaluatorServer:
             self.stats.receive_seconds += time.perf_counter() - received
             if requests:
                 self.answer(requests)
+                spent = self.stats.seconds_per_round
+                spent[len(requests)] = spent.get(len(requests), 0.0) + time.perf_counter() - received
 
     def answer(self, requests: Sequence[tuple[Connection, tuple]]) -> None:
         import torch

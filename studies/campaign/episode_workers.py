@@ -206,7 +206,10 @@ class SharedEpisodeWorkers:
         """The evaluator traffic of the last batch, or of a server still serving."""
         stats = self.serving if server is None else server.stats
         return {"evaluations": stats.requests, "serving_rounds": stats.rounds, "network_passes": stats.passes,
-                "forward_seconds": stats.forward_seconds, "idle_seconds": stats.idle_seconds}
+                "forward_seconds": stats.forward_seconds, "idle_seconds": stats.idle_seconds,
+                # Requests in an inference batch: [inference batches, their seconds in serve()].
+                "inference_batches": {str(size): [stats.requests_per_round[size], stats.seconds_per_round.get(size, 0.0)]
+                                      for size in sorted(stats.requests_per_round)}}
 
     def terminate(self) -> None:
         """Nothing outlives a batch."""

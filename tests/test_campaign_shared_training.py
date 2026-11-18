@@ -147,6 +147,14 @@ class SharedEpisodeWorkerTests(unittest.TestCase):
         self.assertEqual({len(result["records"]) > 0 for result in collection["results"]}, {True})
         report = workers.report()
         self.assertEqual(report["evaluations"], workers.serving.requests)
+        sizes = report["inference_batches"]
+        self.assertEqual(sum(count for count, _ in sizes.values()), report["serving_rounds"])
+        self.assertEqual(sum(int(size) * count for size, (count, _) in sizes.items()), report["evaluations"])
+        self.assertTrue(all(seconds > 0 for _, seconds in sizes.values()))
+        # The same span as reading, answering and replying, up to the clock reads between them.
+        self.assertLessEqual(sum(seconds for _, seconds in sizes.values()),
+                             sum(getattr(workers.serving, part) for part in ("receive_seconds", "forward_seconds",
+                                                                             "reply_seconds")) + 1e-4 * report["serving_rounds"])
         if sys.platform != "win32":  # Windows has no shared-memory manager process.
             started = subprocess.run(["pgrep", "-P", "1", "torch_shm"], capture_output=True, text=True).stdout
             self.assertEqual(started, "")  # A manager would inherit the game pipes.
