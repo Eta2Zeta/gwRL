@@ -22,6 +22,10 @@ is enough, since its trainer and game processes are in its tree:
     .venv/bin/python tools/log_process_load.py record --pid PID --output LOAD.jsonl
     .venv/bin/python tools/log_process_load.py summarize LOAD.jsonl
 
+A log that covers several runs one after another, such as the matched runs of
+one night, is summarized one run at a time with `--from` and `--to`, local
+times such as "2026-11-17 21:00:14".
+
 macOS only: other systems have no proc_pid_rusage.
 """
 from __future__ import annotations
@@ -29,6 +33,7 @@ from __future__ import annotations
 import argparse
 import ctypes
 import ctypes.util
+import datetime
 import json
 import statistics
 import subprocess
@@ -118,20 +123,32 @@ def record(pid: int, output: Path, interval: float) -> None:
             time.sleep(max(0.0, interval - (time.time() - now)))
 
 
-def summarize(path: Path, window: float = 30.0) -> dict:
+def summarize(path: Path, window: float = 30.0, start_time: float | None = None, end_time: float | None = None) -> dict:
+    """The log's samples from start_time to end_time (epoch seconds; None: no limit)."""
     samples = []
-    for line in path.read_text().splitlines():
-        entry = json.loads(line)
-        family, rows = set(entry["family"]), {row[0]: row for row in entry["ps"]}
-        children = {}
-        for row in entry["ps"]:
-            if row[0] in family:
-                children.setdefault(row[1], []).append(row[0])
-        trainer = max((member for member in family if member in children),
-                      key=lambda member: len(children[member]), default=None)
-        games = [child for child in children.get(trainer, []) if "python" in rows[child][4].lower()]
-        samples.append({"t": entry["t"], "rows": rows, "family": family, "trainer": trainer, "games": games,
-                        "rusage": {int(key): value for key, value in entry["rusage"].items()}})
+    with path.open() as lines:
+        entries = (json.loads(line) for line in lines if line.strip())
+        for entry in entries:
+            if (start_time is not None and entry["t"] < start_time) or (end_time is not None and entry["t"] > end_time):
+                continue
+            samples.append(_sample(entry))
+    return _summarize(samples, window)
+
+
+def _sample(entry: dict) -> dict:
+    family, rows = set(entry["family"]), {row[0]: row for row in entry["ps"]}
+    children = {}
+    for row in entry["ps"]:
+        if row[0] in family:
+            children.setdefault(row[1], []).append(row[0])
+    trainer = max((member for member in family if member in children),
+                  key=lambda member: len(children[member]), default=None)
+    games = [child for child in children.get(trainer, []) if "python" in rows[child][4].lower()]
+    return {"t": entry["t"], "rows": rows, "family": family, "trainer": trainer, "games": games,
+            "rusage": {int(key): value for key, value in entry["rusage"].items()}}
+
+
+def _summarize(samples: list[dict], window: float) -> dict:
     playing = [sample for sample in samples if len(sample["games"]) >= 2]
     if not playing:
         return {"error": "no sample with two or more game processes"}
@@ -153,19 +170,23 @@ def summarize(path: Path, window: float = 30.0) -> dict:
             batch, other, elapsed, opened = 0.0, 0.0, 0.0, sample["t"]
         previous = sample
 
-    first, last = {}, {}
+    first, last, roles = {}, {}, {}
     for sample in samples:
         if start <= sample["t"] <= end:
             for pid, value in sample["rusage"].items():
                 first.setdefault(pid, (sample, value))
                 last[pid] = (sample, value)
+                # A process's role is the one it has in most samples: at the edges of a
+                # run the trainer may not have started its game processes yet.
+                seen = roles.setdefault(pid, {"coordinator": 0, "game processes": 0, "rest of the tree": 0})
+                seen["coordinator" if pid == sample["trainer"] else
+                     "game processes" if pid in sample["games"] else "rest of the tree"] += 1
     tick = tick_seconds()
     totals = {}
     for pid, (after, value) in last.items():
         before, earlier = first[pid]
         change = {name: value[name] - earlier[name] for name in value if name not in ("phys_footprint", "resident_size")}
-        role = ("coordinator" if pid in (before["trainer"], after["trainer"]) else
-                "game processes" if pid in before["games"] or pid in after["games"] else "rest of the tree")
+        role = max(roles[pid], key=roles[pid].get)
         if role == "game processes" and (change["user_time"] + change["system_time"]) * tick < 10:
             role = "rest of the tree"  # Such as multiprocessing's resource tracker.
         total = totals.setdefault(role, dict.fromkeys(change, 0) | {"processes": 0})
@@ -207,6 +228,10 @@ def summarize(path: Path, window: float = 30.0) -> dict:
             "windows": windows, "processes": processes}
 
 
+def _local_time(text: str) -> float:
+    return datetime.datetime.strptime(text, "%Y-%m-%d %H:%M:%S").timestamp()
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     commands = parser.add_subparsers(dest="command", required=True)
@@ -217,13 +242,15 @@ def main(argv=None) -> int:
     summary = commands.add_parser("summarize", help="Summarize a recorded log as JSON")
     summary.add_argument("log", type=Path)
     summary.add_argument("--window", type=float, default=30.0, help="Seconds per load window")
+    summary.add_argument("--from", dest="start", type=_local_time, help='First moment summarized, "YYYY-MM-DD HH:MM:SS"')
+    summary.add_argument("--to", dest="end", type=_local_time, help='Last moment summarized, "YYYY-MM-DD HH:MM:SS"')
     args = parser.parse_args(argv)
     if sys.platform != "darwin":
         parser.error("proc_pid_rusage exists on macOS only")
     if args.command == "record":
         record(args.pid, args.output, args.interval)
     else:
-        print(json.dumps(summarize(args.log, args.window), indent=1))
+        print(json.dumps(summarize(args.log, args.window, args.start, args.end), indent=1))
     return 0
 
 

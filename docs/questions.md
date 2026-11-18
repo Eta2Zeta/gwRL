@@ -38,6 +38,7 @@ Other open things stay in the pages that own them, and
 | [Q-004](#q-004-features-whose-value-never-changes) | Should the input drop features whose value never changes? | The network's input | Yes, in the same change as Q-003 |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
+| [Q-010](#q-010-one-network-for-the-three-alliances-by-default) | Should training keep one network for all three alliances by default, although its action probabilities fit its searches slightly less well? | Training | Yes: 22% faster, with values and held-out games alike |
 
 Q-001 to Q-004 were raised on 14 November 2026, while the global features
 about nations were being pruned (commit `bce7a4c`). Their numbers are in the
@@ -46,7 +47,10 @@ Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
 Q-006 was raised on 15 November 2026, while the printed sources of Q-001 were
-being looked up; its numbers are in the first record.
+being looked up; its numbers are in the first record. Q-010 was raised on 18
+November 2026, from the matched runs that the answer to Q-009 asked for; its
+numbers are in the
+[record of that comparison](archive/records/one_network_comparison_2026_11_17.md).
 
 ## Q-001: Mongolia at war with the CCP
 
@@ -482,6 +486,78 @@ the game's developers.
 
 **If answered.** A ruling becomes the next rule clarification, with
 `mayDeclareWar`, its test and the politics page changed in the same commit.
+
+## Q-010: One network for the three alliances by default?
+
+**The question.** Should training keep one network for all three alliances by
+default (`--networks one`)? In matched runs it was 22% faster and as good in its
+values and in held-out games, but its action probabilities fit its searches
+slightly less well.
+
+**What the program does now.** Training keeps a network for each alliance
+unless the training command adds `--networks one` (`RunConfig.networks` in
+`studies/campaign/run.py`, default `three`). The owner's answer to
+[Q-009](#answered) was to compare the two in matched runs and keep one network
+if it learns at least as well.
+
+**A real case** (the night of 17 November, one run of each, 3.7 hours of
+training each, fresh 64×2 networks, eleven-round games, the Mac profile;
+[record](archive/records/one_network_comparison_2026_11_17.md)):
+
+- **Speed.** One network played 395,060 decisions an hour, 21.6% more than
+  three networks while the Mac's other work was as light. The inference server
+  sets the pace of self-play on the Mac, and with one network its forward pass
+  took 20% less time per network evaluation and a network update 61% less time.
+- **Values.** On each game before training on it, the two runs' value heads
+  explained about the same share of the variance of the final scores after the
+  first hour: 15.4% with one network and 13.1% with three.
+- **Action probabilities.** The one network's action probabilities lay further
+  from its searches' visit shares: a KL divergence of 0.273 against 0.252 after
+  the first hour, at Axis decisions 0.318 against 0.289, at Comintern decisions
+  about equal. This is the one measure where one network learned less well. The
+  visit shares themselves were spread alike in both runs.
+- **Held-out games.** Against the scripted opponents on 16 seeds per alliance,
+  the two runs' last networks scored alike: one network minus three, Axis
+  +1.9 ± 3.5, Allies +14.2 ± 8.0, Comintern −1.1 ± 4.7 points. These games
+  cannot yet tell the better learner: in both runs the trained Axis scored about
+  33 points below the untrained one, which does almost nothing and scored best
+  (see [the objective](design/README.md#is-the-final-wealth-gap-the-right-goal)).
+
+**Why it matters.** The rule "at least as well" holds for the values and, as far
+as 16 seeds can tell, for the held-out games, but not for the action
+probabilities, which fit the searches 0.02 less well (8%). The cause is not
+measured; one candidate is that one 64×2 network holds three alliances'
+strategies in a third of the parameters of three networks. The speed is more
+training in the same night: on the Mac, 22% more games and network updates. On
+the Mac's GPU, where larger networks would run, one network's forward pass took
+15% to 38% less time on saved inference batches
+([record](archive/records/network_split_2026_11_17.md#inference-batches-on-the-gpu)),
+and a compiled forward pass of one network needs fixed sizes only for the whole
+inference batch
+([section 9.3](design/README.md#93-what-a-larger-network-and-a-longer-search-cost)).
+The GPU forward pass, the next piece of speed work, would be built for whichever
+setup is the default.
+
+**The choices.**
+
+| Choice | What it changes |
+| --- | --- |
+| A. One network by default | Self-play about 22% faster on the Mac at 64×2, and the GPU forward pass built for one network. Its action probabilities fit the searches 0.02 less well at this size. Every run records that fit by alliance (`fresh_games` in `manifest.json`), so a gap at larger sizes would show, and `--networks three` stays available. |
+| B. Three networks by default | No change; one network stays an option. The GPU forward pass is built for three networks, which needs a split by network or padding (section 9.3). |
+| C. Compare once more first | Matched runs with one network given more parameters, at about the forward-pass cost of three 64×2 networks, to see whether the gap comes from size. One more night, and the GPU work waits for it. |
+
+**Recommendation: A.** It departs from the rule as written, since one of the
+three measures is slightly worse. But that shortfall is small, measured at the
+smallest network size, and recorded by every run, while the speed is 22% more
+training every night. If larger networks still show the gap, three networks are
+one option away.
+
+**If answered.** The default and the reason for it belong in
+[one training step](design/README.md#84-one-training-step-and-one-network-update),
+in the
+[open question](design/README.md#one-network-per-alliance-or-one-shared-network)
+of the design document, and in the campaign guide's paragraph on `--networks`
+([campaign learning guide](../studies/campaign/README.md)).
 
 ## Open elsewhere
 

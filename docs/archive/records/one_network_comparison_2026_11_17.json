@@ -1,0 +1,4121 @@
+{
+ "record": "one_network_comparison_2026_11_17.md",
+ "commit": "9634d40",
+ "machine": "Apple M4 Max, PyTorch 2.14.0, MallocNanoZone unset",
+ "training_command": "python tools/supervise_campaign_training.py --profile mac --working-directory RUNTIME --control-dir CONTROL --run-dir RUN --seconds 13350 --max-restarts 0 -- --calendar-rounds 11 --complete-episodes --batches 1000 --simulations 64 --max-depth 16 --hidden-dim 64 --message-layers 2 --batch-size 32 --epochs 525 --replay-capacity 8000 --sample-fraction 0.05 --transitions-per-batch 20000 --seed 20261104 --networks three|one",
+ "supervisor_charged_seconds": {
+  "three": 13307.810335749993,
+  "one": 13312.284884166002
+ },
+ "driver_log": [
+  "== 2026-11-17 18:50:39 driver 18633: start 2026-11-17 21:00:00, 13350 s each, first block 6675 s, stop by 2026-11-18 05:10:00",
+  "== 2026-11-17 21:00:14 start three",
+  "== 2026-11-17 22:51:42 stop three after 6680 s",
+  "== 2026-11-17 22:51:51 end three, supervisor exit 0",
+  "== 2026-11-17 22:51:51 start one",
+  "== 2026-11-18 02:33:47 end one, supervisor exit 0",
+  "== 2026-11-18 02:33:47 start three",
+  "== 2026-11-18 04:24:05 end three, supervisor exit 0",
+  "== 2026-11-18 04:24:05 evaluate three: generation-000032.pt",
+  "== 2026-11-18 04:24:05 evaluate one: generation-000041.pt",
+  "== 2026-11-18 05:20:21 done"
+ ],
+ "evaluation_command": "python -m studies.campaign.run evaluate --checkpoint RUN/models/generation-NNNNNN.pt --target ALLIANCE --seeds SEEDS --simulations 64 --max-depth 16 --max-transitions 20000 [--target-script balanced]; seeds 3001 to 3016, the Axis's split over two processes",
+ "evaluation_groups": {
+  "final-three": "three networks, generation 32",
+  "final-one": "one network, generation 41",
+  "first-three": "three networks, generation 0",
+  "first-one": "one network, generation 0",
+  "script": "the balanced scripted policy in the target alliance's place"
+ },
+ "comparison": {
+  "runs": {
+   "three": {
+    "directory": "tmp/one-network-2026-11-17/three",
+    "networks": "three",
+    "status": "interrupted",
+    "active_seconds": 13293.302855250018,
+    "speed": [
+     {
+      "invocation": 1,
+      "seconds": 6693.466934417011,
+      "network_updates": 16,
+      "games": 395,
+      "decisions": 565637,
+      "decisions_per_hour": 304220.9993642641,
+      "games_per_hour": 212.44595871359954,
+      "decisions_per_game": 1431.9924050632912,
+      "network_update_seconds": 36.62792047912626,
+      "forward_microseconds_per_evaluation": 198.25818638575305,
+      "evaluations_per_inference_batch": 10.62640805729828,
+      "server_idle_share": 0.01623782886790671
+     },
+     {
+      "invocation": 2,
+      "seconds": 6599.835920833008,
+      "network_updates": 16,
+      "games": 403,
+      "decisions": 595648,
+      "decisions_per_hour": 324906.9864344976,
+      "games_per_hour": 219.82364673952154,
+      "decisions_per_game": 1478.0347394540943,
+      "network_update_seconds": 34.295122702998924,
+      "forward_microseconds_per_evaluation": 186.56036824668843,
+      "evaluations_per_inference_batch": 10.755474545221192,
+      "server_idle_share": 0.015145967506646258
+     }
+    ],
+    "updates": [
+     {
+      "network_update": 1,
+      "active_seconds": 325.8363559999998,
+      "fresh": {
+       "axis": {
+        "samples": 757,
+        "value_loss": 0.5291142654229974,
+        "score_variance": 0.014610198674109917,
+        "explained": -35.21540522652969,
+        "policy_cross_entropy": 2.429427506630691,
+        "policy_kl": 0.29137160914321425
+       },
+       "allies": {
+        "samples": 215,
+        "value_loss": 0.5128572867360226,
+        "score_variance": 0.01437036567513982,
+        "explained": -34.68853419111289,
+        "policy_cross_entropy": 2.286623757670214,
+        "policy_kl": 0.5083350905175237
+       },
+       "comintern": {
+        "samples": 253,
+        "value_loss": 0.7278830025035873,
+        "score_variance": 0.015043248105735216,
+        "explained": -47.38602656736632,
+        "policy_cross_entropy": 0.7481362557616255,
+        "policy_kl": 0.11966659759153622
+       },
+       "all": {
+        "samples": 1225,
+        "value_loss": 0.5673128287402951,
+        "score_variance": 0.014702852352853216,
+        "explained": -37.58522245380524,
+        "policy_cross_entropy": 2.0571258801030377,
+        "policy_kl": 0.2939885728761954
+       }
+      }
+     },
+     {
+      "network_update": 2,
+      "active_seconds": 720.6557983750099,
+      "fresh": {
+       "axis": {
+        "samples": 826,
+        "value_loss": 0.013509771474732929,
+        "score_variance": 0.009921167113211246,
+        "explained": -0.36171191560144345,
+        "policy_cross_entropy": 2.478665029096172,
+        "policy_kl": 0.3208067720119136
+       },
+       "allies": {
+        "samples": 415,
+        "value_loss": 0.015013295602465766,
+        "score_variance": 0.010833204583151818,
+        "explained": -0.38585914142293354,
+        "policy_cross_entropy": 2.788532724809465,
+        "policy_kl": 0.4110337877857948
+       },
+       "comintern": {
+        "samples": 286,
+        "value_loss": 0.01202407073598132,
+        "score_variance": 0.010734796025070511,
+        "explained": -0.12010239485685448,
+        "policy_cross_entropy": 0.7328788741018367,
+        "policy_kl": 0.1016833475273304
+       },
+       "all": {
+        "samples": 1527,
+        "value_loss": 0.013640126485686542,
+        "score_variance": 0.010395862313902104,
+        "explained": -0.3120726375382994,
+        "policy_cross_entropy": 2.2359016063015664,
+        "policy_kl": 0.30428739555059714
+       }
+      }
+     },
+     {
+      "network_update": 3,
+      "active_seconds": 1152.727384208003,
+      "fresh": {
+       "axis": {
+        "samples": 864,
+        "value_loss": 0.017050884879052073,
+        "score_variance": 0.007771596624317992,
+        "explained": -1.1940002425882983,
+        "policy_cross_entropy": 2.455448708055323,
+        "policy_kl": 0.309384883425517
+       },
+       "allies": {
+        "samples": 425,
+        "value_loss": 0.013189548910659677,
+        "score_variance": 0.007485070272664489,
+        "explained": -0.7621142394384686,
+        "policy_cross_entropy": 2.593209992300904,
+        "policy_kl": 0.29050360633074235
+       },
+       "comintern": {
+        "samples": 292,
+        "value_loss": 0.018974300049306555,
+        "score_variance": 0.008255208810283118,
+        "explained": -1.2984639741239712,
+        "policy_cross_entropy": 0.7053745051502069,
+        "policy_kl": 0.12659228379055001
+       },
+       "all": {
+        "samples": 1581,
+        "value_loss": 0.016368133103686823,
+        "score_variance": 0.007794953615721689,
+        "explained": -1.099837139591676,
+        "policy_cross_entropy": 2.169254450342533,
+        "policy_kl": 0.2705487152669532
+       }
+      }
+     },
+     {
+      "network_update": 4,
+      "active_seconds": 1594.8838108330092,
+      "fresh": {
+       "axis": {
+        "samples": 958,
+        "value_loss": 0.028866682212199877,
+        "score_variance": 0.01848994838433432,
+        "explained": -0.5612094534918921,
+        "policy_cross_entropy": 2.3987565150250902,
+        "policy_kl": 0.30704797929695865
+       },
+       "allies": {
+        "samples": 424,
+        "value_loss": 0.028344292895558027,
+        "score_variance": 0.017850502180491157,
+        "explained": -0.5878708962336954,
+        "policy_cross_entropy": 2.6969651556809584,
+        "policy_kl": 0.3453440110966439
+       },
+       "comintern": {
+        "samples": 258,
+        "value_loss": 0.025992486100602587,
+        "score_variance": 0.01615116699216773,
+        "explained": -0.6093255746292052,
+        "policy_cross_entropy": 0.7057622682814324,
+        "policy_kl": 0.10455674861025968
+       },
+       "all": {
+        "samples": 1640,
+        "value_loss": 0.028279465342048508,
+        "score_variance": 0.017997358815684816,
+        "explained": -0.5713119703654943,
+        "policy_cross_entropy": 2.209517458914252,
+        "policy_kl": 0.28509357683714054
+       }
+      }
+     },
+     {
+      "network_update": 5,
+      "active_seconds": 2002.4973819580046,
+      "fresh": {
+       "axis": {
+        "samples": 970,
+        "value_loss": 0.01570708257552058,
+        "score_variance": 0.011840168638891957,
+        "explained": -0.32659280915364586,
+        "policy_cross_entropy": 2.5449558038352023,
+        "policy_kl": 0.33117551563927766
+       },
+       "allies": {
+        "samples": 408,
+        "value_loss": 0.011741498767150915,
+        "score_variance": 0.010780780889561614,
+        "explained": -0.08911394150673324,
+        "policy_cross_entropy": 2.6446722039790815,
+        "policy_kl": 0.31822951093638296
+       },
+       "comintern": {
+        "samples": 284,
+        "value_loss": 0.015040719184494072,
+        "score_variance": 0.010944949918997545,
+        "explained": -0.3742154414418426,
+        "policy_cross_entropy": 0.8592724277106907,
+        "policy_kl": 0.13213223914027095
+       },
+       "all": {
+        "samples": 1662,
+        "value_loss": 0.014619714707369948,
+        "score_variance": 0.01148076778264342,
+        "explained": -0.2734091468579285,
+        "policy_cross_entropy": 2.2813879412836626,
+        "policy_kl": 0.29398522656316517
+       }
+      }
+     },
+     {
+      "network_update": 6,
+      "active_seconds": 2411.0141905830096,
+      "fresh": {
+       "axis": {
+        "samples": 1065,
+        "value_loss": 0.01786680399515115,
+        "score_variance": 0.018515516617367125,
+        "explained": 0.03503616105464202,
+        "policy_cross_entropy": 2.4531820661781985,
+        "policy_kl": 0.30745253532841516
+       },
+       "allies": {
+        "samples": 442,
+        "value_loss": 0.018362826364526845,
+        "score_variance": 0.018693216496727488,
+        "explained": 0.017674332946311377,
+        "policy_cross_entropy": 2.75602622435298,
+        "policy_kl": 0.34468639577080884
+       },
+       "comintern": {
+        "samples": 268,
+        "value_loss": 0.01896420473577333,
+        "score_variance": 0.018017452829137828,
+        "explained": -0.05254637909218851,
+        "policy_cross_entropy": 0.7438347816986226,
+        "policy_kl": 0.0982119471653808
+       },
+       "all": {
+        "samples": 1775,
+        "value_loss": 0.018156012606841743,
+        "score_variance": 0.018575122636090943,
+        "explained": 0.022562975085552384,
+        "policy_cross_entropy": 2.2705071623318474,
+        "policy_kl": 0.2851319092370601
+       }
+      }
+     },
+     {
+      "network_update": 7,
+      "active_seconds": 2853.2570336250064,
+      "fresh": {
+       "axis": {
+        "samples": 1112,
+        "value_loss": 0.013462128567773693,
+        "score_variance": 0.014084725945053481,
+        "explained": 0.0442037267681763,
+        "policy_cross_entropy": 2.4693512089430185,
+        "policy_kl": 0.2957030391316327
+       },
+       "allies": {
+        "samples": 451,
+        "value_loss": 0.015190654226051935,
+        "score_variance": 0.014107583181334768,
+        "explained": -0.07677226005302873,
+        "policy_cross_entropy": 2.555003415126291,
+        "policy_kl": 0.2862976439738137
+       },
+       "comintern": {
+        "samples": 303,
+        "value_loss": 0.014737505392770233,
+        "score_variance": 0.011848128244507594,
+        "explained": -0.243867815121098,
+        "policy_cross_entropy": 0.8936019644497398,
+        "policy_kl": 0.1232131726805995
+       },
+       "all": {
+        "samples": 1866,
+        "value_loss": 0.014086996868876286,
+        "score_variance": 0.013748278348242706,
+        "explained": -0.024637159072130155,
+        "policy_cross_entropy": 2.23418353686756,
+        "policy_kl": 0.2654210119339695
+       }
+      }
+     },
+     {
+      "network_update": 8,
+      "active_seconds": 3273.9637180420104,
+      "fresh": {
+       "axis": {
+        "samples": 982,
+        "value_loss": 0.02078977306160881,
+        "score_variance": 0.017120303314376945,
+        "explained": -0.21433438881602007,
+        "policy_cross_entropy": 2.458801408880312,
+        "policy_kl": 0.28007202877724013
+       },
+       "allies": {
+        "samples": 480,
+        "value_loss": 0.01854919878299673,
+        "score_variance": 0.015550874690393466,
+        "explained": -0.19280742416730257,
+        "policy_cross_entropy": 2.661101509702253,
+        "policy_kl": 0.2853207772065183
+       },
+       "comintern": {
+        "samples": 245,
+        "value_loss": 0.018788044382633918,
+        "score_variance": 0.017940928757462327,
+        "explained": -0.04721693266962235,
+        "policy_cross_entropy": 0.7261468732448741,
+        "policy_kl": 0.0933264336093621
+       },
+       "all": {
+        "samples": 1707,
+        "value_loss": 0.01987243317872501,
+        "score_variance": 0.01697371285585972,
+        "explained": -0.17077703313830872,
+        "policy_cross_entropy": 2.2670050920460114,
+        "policy_kl": 0.2547449804057834
+       }
+      }
+     },
+     {
+      "network_update": 9,
+      "active_seconds": 3713.288862125002,
+      "fresh": {
+       "axis": {
+        "samples": 1019,
+        "value_loss": 0.014044587045047147,
+        "score_variance": 0.02106963781831825,
+        "explained": 0.3334205757995242,
+        "policy_cross_entropy": 2.4094331127492548,
+        "policy_kl": 0.28549770021791937
+       },
+       "allies": {
+        "samples": 475,
+        "value_loss": 0.015501503947927727,
+        "score_variance": 0.018670418047645496,
+        "explained": 0.16972914541232764,
+        "policy_cross_entropy": 2.4977499787146056,
+        "policy_kl": 0.2831181754598458
+       },
+       "comintern": {
+        "samples": 257,
+        "value_loss": 0.013002186350112556,
+        "score_variance": 0.018536582698703518,
+        "explained": 0.2985661617649755,
+        "policy_cross_entropy": 0.7777649646541362,
+        "policy_kl": 0.11645658002086175
+       },
+       "all": {
+        "samples": 1751,
+        "value_loss": 0.014286813515789629,
+        "score_variance": 0.020146707028036545,
+        "explained": 0.29086110718204106,
+        "policy_cross_entropy": 2.193905869615672,
+        "policy_kl": 0.26004147968637814
+       }
+      }
+     },
+     {
+      "network_update": 10,
+      "active_seconds": 4131.879051833006,
+      "fresh": {
+       "axis": {
+        "samples": 1068,
+        "value_loss": 0.019095780124073515,
+        "score_variance": 0.018663132054325775,
+        "explained": -0.02318196476820522,
+        "policy_cross_entropy": 2.4476331098743156,
+        "policy_kl": 0.28516036415962676
+       },
+       "allies": {
+        "samples": 518,
+        "value_loss": 0.017310404776667926,
+        "score_variance": 0.014376555932380288,
+        "explained": -0.2040717441706421,
+        "policy_cross_entropy": 2.743931257569009,
+        "policy_kl": 0.29077934125811333
+       },
+       "comintern": {
+        "samples": 252,
+        "value_loss": 0.018276959772929476,
+        "score_variance": 0.01725484497564449,
+        "explained": -0.05923639411004378,
+        "policy_cross_entropy": 0.6578342703752472,
+        "policy_kl": 0.08070405126313665
+       },
+       "all": {
+        "samples": 1838,
+        "value_loss": 0.018480346414364923,
+        "score_variance": 0.01733903603538804,
+        "explained": -0.06582317359785916,
+        "policy_cross_entropy": 2.28574689276446,
+        "policy_kl": 0.25871185452257595
+       }
+      }
+     },
+     {
+      "network_update": 11,
+      "active_seconds": 4562.491934833,
+      "fresh": {
+       "axis": {
+        "samples": 996,
+        "value_loss": 0.02303693364924639,
+        "score_variance": 0.02102467993795805,
+        "explained": -0.09570912457294578,
+        "policy_cross_entropy": 2.3738671754413305,
+        "policy_kl": 0.27224440390345217
+       },
+       "allies": {
+        "samples": 475,
+        "value_loss": 0.02368304511703747,
+        "score_variance": 0.02082282007756224,
+        "explained": -0.1373601187937692,
+        "policy_cross_entropy": 2.532153378265993,
+        "policy_kl": 0.26283311544438887
+       },
+       "comintern": {
+        "samples": 274,
+        "value_loss": 0.018001496923789356,
+        "score_variance": 0.020112840832400836,
+        "explained": 0.10497492254849472,
+        "policy_cross_entropy": 0.7509195289160395,
+        "policy_kl": 0.09264493939809733
+       },
+       "all": {
+        "samples": 1745,
+        "value_loss": 0.022422144700493113,
+        "score_variance": 0.02091569064950179,
+        "explained": -0.07202506846347934,
+        "policy_cross_entropy": 2.162118345179889,
+        "policy_kl": 0.24148187364985776
+       }
+      }
+     },
+     {
+      "network_update": 12,
+      "active_seconds": 4951.632626250008,
+      "fresh": {
+       "axis": {
+        "samples": 1088,
+        "value_loss": 0.02419719255216451,
+        "score_variance": 0.029623937247130083,
+        "explained": 0.18318782711745396,
+        "policy_cross_entropy": 2.409778953712643,
+        "policy_kl": 0.286387020802743
+       },
+       "allies": {
+        "samples": 540,
+        "value_loss": 0.021278488974658775,
+        "score_variance": 0.027203613277320546,
+        "explained": 0.21780651865101697,
+        "policy_cross_entropy": 2.726102784429467,
+        "policy_kl": 0.2962920792995428
+       },
+       "comintern": {
+        "samples": 263,
+        "value_loss": 0.025485079595476065,
+        "score_variance": 0.02889959104994046,
+        "explained": 0.11815085717178098,
+        "policy_cross_entropy": 0.7349105888658646,
+        "policy_kl": 0.07941831361121267
+       },
+       "all": {
+        "samples": 1891,
+        "value_loss": 0.02354283737529399,
+        "score_variance": 0.028941105813271407,
+        "explained": 0.18652599084524113,
+        "policy_cross_entropy": 2.2671689529894183,
+        "policy_kl": 0.2604303637942287
+       }
+      }
+     },
+     {
+      "network_update": 13,
+      "active_seconds": 5320.323834082999,
+      "fresh": {
+       "axis": {
+        "samples": 1097,
+        "value_loss": 0.022816403040001217,
+        "score_variance": 0.023421247717664333,
+        "explained": 0.025824613827338583,
+        "policy_cross_entropy": 2.4642931009724918,
+        "policy_kl": 0.3060011842798114
+       },
+       "allies": {
+        "samples": 473,
+        "value_loss": 0.025539968095460896,
+        "score_variance": 0.02390047275945435,
+        "explained": -0.06859677431937028,
+        "policy_cross_entropy": 2.444888108103128,
+        "policy_kl": 0.2878796491840256
+       },
+       "comintern": {
+        "samples": 236,
+        "value_loss": 0.019014147815033862,
+        "score_variance": 0.019547239478598117,
+        "explained": 0.027271966670686543,
+        "policy_cross_entropy": 0.5767458329873538,
+        "policy_kl": 0.06705763663957863
+       },
+       "all": {
+        "samples": 1806,
+        "value_loss": 0.02303285599578202,
+        "score_variance": 0.02307588338009935,
+        "explained": 0.0018646039940743986,
+        "policy_cross_entropy": 2.2125546087954695,
+        "policy_kl": 0.2700309941671859
+       }
+      }
+     },
+     {
+      "network_update": 14,
+      "active_seconds": 5747.411078667006,
+      "fresh": {
+       "axis": {
+        "samples": 1126,
+        "value_loss": 0.01928704976279495,
+        "score_variance": 0.017569413791516792,
+        "explained": -0.09776285035232646,
+        "policy_cross_entropy": 2.4381701056842515,
+        "policy_kl": 0.29630742462829907
+       },
+       "allies": {
+        "samples": 460,
+        "value_loss": 0.019769400495051347,
+        "score_variance": 0.017710210653749087,
+        "explained": -0.11627133530827582,
+        "policy_cross_entropy": 2.599567899328804,
+        "policy_kl": 0.2896044502142961
+       },
+       "comintern": {
+        "samples": 292,
+        "value_loss": 0.017990879098798446,
+        "score_variance": 0.016526586241946667,
+        "explained": -0.08860225792639564,
+        "policy_cross_entropy": 0.6469900057125351,
+        "policy_kl": 0.08999469148769261
+       },
+       "all": {
+        "samples": 1878,
+        "value_loss": 0.019203662916655952,
+        "score_variance": 0.017501164662442503,
+        "explained": -0.09727914039155405,
+        "policy_cross_entropy": 2.199202265367293,
+        "policy_kl": 0.26258714437936476
+       }
+      }
+     },
+     {
+      "network_update": 15,
+      "active_seconds": 6160.3032727080135,
+      "fresh": {
+       "axis": {
+        "samples": 1076,
+        "value_loss": 0.017514134222485194,
+        "score_variance": 0.019886084122777783,
+        "explained": 0.11927687148701771,
+        "policy_cross_entropy": 2.4433933763340345,
+        "policy_kl": 0.2921701649169169
+       },
+       "allies": {
+        "samples": 474,
+        "value_loss": 0.013343301791082385,
+        "score_variance": 0.02106337010183559,
+        "explained": 0.36651629219012916,
+        "policy_cross_entropy": 2.462717238592319,
+        "policy_kl": 0.28584365428032904
+       },
+       "comintern": {
+        "samples": 301,
+        "value_loss": 0.015644304732166686,
+        "score_variance": 0.017985698458074465,
+        "explained": 0.1301808618311755,
+        "policy_cross_entropy": 0.775101535426842,
+        "policy_kl": 0.09151075531819003
+       },
+       "all": {
+        "samples": 1851,
+        "value_loss": 0.0161420146930034,
+        "score_variance": 0.01995852714478821,
+        "explained": 0.1912221490142081,
+        "policy_cross_entropy": 2.177052839649736,
+        "policy_kl": 0.2579198956943564
+       }
+      }
+     },
+     {
+      "network_update": 16,
+      "active_seconds": 6558.134476417006,
+      "fresh": {
+       "axis": {
+        "samples": 1149,
+        "value_loss": 0.02868656219086502,
+        "score_variance": 0.023603443669562418,
+        "explained": -0.21535495381368808,
+        "policy_cross_entropy": 2.357713039468884,
+        "policy_kl": 0.27058387535162665
+       },
+       "allies": {
+        "samples": 479,
+        "value_loss": 0.020305129812816732,
+        "score_variance": 0.02072002012427296,
+        "explained": 0.020023644232381455,
+        "policy_cross_entropy": 2.3484059535505337,
+        "policy_kl": 0.2867403002770043
+       },
+       "comintern": {
+        "samples": 285,
+        "value_loss": 0.025538315339712937,
+        "score_variance": 0.021123044793269655,
+        "explained": -0.20902623602114878,
+        "policy_cross_entropy": 0.7583623297681855,
+        "policy_kl": 0.09081478766241764
+       },
+       "all": {
+        "samples": 1913,
+        "value_loss": 0.026118890229723635,
+        "score_variance": 0.022550661104809435,
+        "explained": -0.15823168590623693,
+        "policy_cross_entropy": 2.1171102969599507,
+        "policy_kl": 0.24784719869079616
+       }
+      }
+     },
+     {
+      "network_update": 17,
+      "active_seconds": 7141.841738625022,
+      "fresh": {
+       "axis": {
+        "samples": 879,
+        "value_loss": 0.010633972411868003,
+        "score_variance": 0.010137334481775237,
+        "explained": -0.04899097795240115,
+        "policy_cross_entropy": 2.3523551746903264,
+        "policy_kl": 0.26567733210060596
+       },
+       "allies": {
+        "samples": 472,
+        "value_loss": 0.012438641476765658,
+        "score_variance": 0.009445833843543408,
+        "explained": -0.3168389030332086,
+        "policy_cross_entropy": 2.3719955900260126,
+        "policy_kl": 0.24612999277127193
+       },
+       "comintern": {
+        "samples": 291,
+        "value_loss": 0.011874415290802381,
+        "score_variance": 0.009944362765358566,
+        "explained": -0.19408508830422,
+        "policy_cross_entropy": 0.7285884215427684,
+        "policy_kl": 0.10223474533303069
+       },
+       "all": {
+        "samples": 1642,
+        "value_loss": 0.011372567220882375,
+        "score_variance": 0.00993430046441294,
+        "explained": -0.14477785945992405,
+        "policy_cross_entropy": 2.070232245867247,
+        "policy_kl": 0.23109259585650724
+       }
+      }
+     },
+     {
+      "network_update": 18,
+      "active_seconds": 7548.801375584022,
+      "fresh": {
+       "axis": {
+        "samples": 1021,
+        "value_loss": 0.019716168139672047,
+        "score_variance": 0.02271855756760664,
+        "explained": 0.13215581222531325,
+        "policy_cross_entropy": 2.5122867830377977,
+        "policy_kl": 0.29222596268972917
+       },
+       "allies": {
+        "samples": 455,
+        "value_loss": 0.019329961460083884,
+        "score_variance": 0.02120203282695334,
+        "explained": 0.08829678654631457,
+        "policy_cross_entropy": 2.740307175840851,
+        "policy_kl": 0.29337548359835386
+       },
+       "comintern": {
+        "samples": 277,
+        "value_loss": 0.01688059548390752,
+        "score_variance": 0.02318651526802114,
+        "explained": 0.27196496373953827,
+        "policy_cross_entropy": 0.6665147266963685,
+        "policy_kl": 0.0829883329911625
+       },
+       "all": {
+        "samples": 1753,
+        "value_loss": 0.019167863710202914,
+        "score_variance": 0.022526918432932346,
+        "explained": 0.14911292606354865,
+        "policy_cross_entropy": 2.2798112662772803,
+        "policy_kl": 0.25946167779921087
+       }
+      }
+     },
+     {
+      "network_update": 19,
+      "active_seconds": 7982.603373167018,
+      "fresh": {
+       "axis": {
+        "samples": 1126,
+        "value_loss": 0.02118149184258512,
+        "score_variance": 0.027270966222248727,
+        "explained": 0.2232951458351914,
+        "policy_cross_entropy": 2.4008220222905394,
+        "policy_kl": 0.29179703519413325
+       },
+       "allies": {
+        "samples": 464,
+        "value_loss": 0.016941216629847673,
+        "score_variance": 0.025350324523756528,
+        "explained": 0.33171598596414165,
+        "policy_cross_entropy": 2.489794932404422,
+        "policy_kl": 0.23551506247232035
+       },
+       "comintern": {
+        "samples": 276,
+        "value_loss": 0.024771520188854385,
+        "score_variance": 0.03094048368252461,
+        "explained": 0.199381611385555,
+        "policy_cross_entropy": 0.8190106895408908,
+        "policy_kl": 0.11760234528527294
+       },
+       "all": {
+        "samples": 1866,
+        "value_loss": 0.020658104985596986,
+        "score_variance": 0.027406858986251764,
+        "explained": 0.24624324896334115,
+        "policy_cross_entropy": 2.188980383734235,
+        "policy_kl": 0.2520368156026184
+       }
+      }
+     },
+     {
+      "network_update": 20,
+      "active_seconds": 8377.888161584022,
+      "fresh": {
+       "axis": {
+        "samples": 991,
+        "value_loss": 0.02099752726129283,
+        "score_variance": 0.024143691776272347,
+        "explained": 0.1303100016407378,
+        "policy_cross_entropy": 2.428512734858733,
+        "policy_kl": 0.3089103146609851
+       },
+       "allies": {
+        "samples": 504,
+        "value_loss": 0.015190000554505945,
+        "score_variance": 0.021106864417989358,
+        "explained": 0.280328889517122,
+        "policy_cross_entropy": 2.3148893710820224,
+        "policy_kl": 0.23919273110837566
+       },
+       "comintern": {
+        "samples": 280,
+        "value_loss": 0.016452432497083336,
+        "score_variance": 0.02351408167517004,
+        "explained": 0.30031575443337566,
+        "policy_cross_entropy": 0.795359847878037,
+        "policy_kl": 0.11880358908586415
+       },
+       "all": {
+        "samples": 1775,
+        "value_loss": 0.01863154416596931,
+        "score_variance": 0.02340002496626308,
+        "explained": 0.2037810133608281,
+        "policy_cross_entropy": 2.138625983479545,
+        "policy_kl": 0.25912578211363346
+       }
+      }
+     },
+     {
+      "network_update": 21,
+      "active_seconds": 8739.405936459021,
+      "fresh": {
+       "axis": {
+        "samples": 980,
+        "value_loss": 0.020543663265862606,
+        "score_variance": 0.02314761912328192,
+        "explained": 0.11249346395199022,
+        "policy_cross_entropy": 2.4521429054952333,
+        "policy_kl": 0.32175537686651173
+       },
+       "allies": {
+        "samples": 486,
+        "value_loss": 0.018921127893940768,
+        "score_variance": 0.023560672383670028,
+        "explained": 0.19691901887082564,
+        "policy_cross_entropy": 2.444504803065007,
+        "policy_kl": 0.25170498276514786
+       },
+       "comintern": {
+        "samples": 278,
+        "value_loss": 0.018490921636132973,
+        "score_variance": 0.020158098994185813,
+        "explained": 0.08270508833862278,
+        "policy_cross_entropy": 0.6174105471717918,
+        "policy_kl": 0.08307370654638253
+       },
+       "all": {
+        "samples": 1744,
+        "value_loss": 0.019764297231562807,
+        "score_variance": 0.022871746194795355,
+        "explained": 0.13586408911531522,
+        "policy_cross_entropy": 2.1575513267136928,
+        "policy_kl": 0.2641877186771432
+       }
+      }
+     },
+     {
+      "network_update": 22,
+      "active_seconds": 9181.81395845901,
+      "fresh": {
+       "axis": {
+        "samples": 976,
+        "value_loss": 0.02215296695713792,
+        "score_variance": 0.013451334853071983,
+        "explained": -0.6468972930280357,
+        "policy_cross_entropy": 2.3550560138706307,
+        "policy_kl": 0.2841600535164145
+       },
+       "allies": {
+        "samples": 530,
+        "value_loss": 0.016125275520346993,
+        "score_variance": 0.01404681023377237,
+        "explained": -0.14796706526136627,
+        "policy_cross_entropy": 2.3984000283293776,
+        "policy_kl": 0.2482691123568034
+       },
+       "comintern": {
+        "samples": 236,
+        "value_loss": 0.014062416571223983,
+        "score_variance": 0.010968554198985042,
+        "explained": -0.2820665619289391,
+        "policy_cross_entropy": 0.6064496077417738,
+        "policy_kl": 0.08234153091311339
+       },
+       "all": {
+        "samples": 1742,
+        "value_loss": 0.019222974791480697,
+        "score_variance": 0.013329667293335365,
+        "explained": -0.44211962447794173,
+        "policy_cross_entropy": 2.1313483306425747,
+        "policy_kl": 0.24589864700150468
+       }
+      }
+     },
+     {
+      "network_update": 23,
+      "active_seconds": 9561.432013625017,
+      "fresh": {
+       "axis": {
+        "samples": 972,
+        "value_loss": 0.022419363280703788,
+        "score_variance": 0.02312317769387844,
+        "explained": 0.030437616425054603,
+        "policy_cross_entropy": 2.447330364218328,
+        "policy_kl": 0.2832920740278685
+       },
+       "allies": {
+        "samples": 464,
+        "value_loss": 0.017946301130928863,
+        "score_variance": 0.026472801917670073,
+        "explained": 0.3220853165924208,
+        "policy_cross_entropy": 2.437228082540467,
+        "policy_kl": 0.2699765573208025
+       },
+       "comintern": {
+        "samples": 297,
+        "value_loss": 0.017253003791374916,
+        "score_variance": 0.022293502953213428,
+        "explained": 0.2260972253852087,
+        "policy_cross_entropy": 0.6533069733420754,
+        "policy_kl": 0.0895480659303796
+       },
+       "all": {
+        "samples": 1733,
+        "value_loss": 0.020336322538738273,
+        "score_variance": 0.02403106822975302,
+        "explained": 0.15374870795132856,
+        "policy_cross_entropy": 2.1371674064636985,
+        "policy_kl": 0.24652325108670697
+       }
+      }
+     },
+     {
+      "network_update": 24,
+      "active_seconds": 9922.61041379202,
+      "fresh": {
+       "axis": {
+        "samples": 960,
+        "value_loss": 0.022586138356700758,
+        "score_variance": 0.027721409751880744,
+        "explained": 0.18524567982447526,
+        "policy_cross_entropy": 2.5324329239421948,
+        "policy_kl": 0.280136636134684
+       },
+       "allies": {
+        "samples": 449,
+        "value_loss": 0.019234195154420576,
+        "score_variance": 0.023815443223661314,
+        "explained": 0.19236459410879825,
+        "policy_cross_entropy": 2.255586457191957,
+        "policy_kl": 0.24531809927920034
+       },
+       "comintern": {
+        "samples": 276,
+        "value_loss": 0.01859901433019094,
+        "score_variance": 0.02259440132500176,
+        "explained": 0.17683084129295956,
+        "policy_cross_entropy": 0.6522627708008629,
+        "policy_kl": 0.10858584347667169
+       },
+       "all": {
+        "samples": 1685,
+        "value_loss": 0.021039866113887397,
+        "score_variance": 0.025998938923121894,
+        "explained": 0.1907413538644147,
+        "policy_cross_entropy": 2.1506934427327793,
+        "policy_kl": 0.2427588665075484
+       }
+      }
+     },
+     {
+      "network_update": 25,
+      "active_seconds": 10276.545175959021,
+      "fresh": {
+       "axis": {
+        "samples": 971,
+        "value_loss": 0.026250133193556895,
+        "score_variance": 0.023670484340413522,
+        "explained": -0.10898166746588456,
+        "policy_cross_entropy": 2.4771199778165243,
+        "policy_kl": 0.29070338318860944
+       },
+       "allies": {
+        "samples": 440,
+        "value_loss": 0.020672241448912908,
+        "score_variance": 0.026453775742079733,
+        "explained": 0.21855232876909148,
+        "policy_cross_entropy": 2.39150677856968,
+        "policy_kl": 0.25182357235376873
+       },
+       "comintern": {
+        "samples": 261,
+        "value_loss": 0.01815332317095579,
+        "score_variance": 0.020795195695894043,
+        "explained": 0.1270424459366778,
+        "policy_cross_entropy": 0.6280440807804989,
+        "policy_kl": 0.08496672687140604
+       },
+       "all": {
+        "samples": 1672,
+        "value_loss": 0.023518351026366558,
+        "score_variance": 0.02400524630989449,
+        "explained": 0.020282869721159336,
+        "policy_cross_entropy": 2.1659485562884053,
+        "policy_kl": 0.2483562635318391
+       }
+      }
+     },
+     {
+      "network_update": 26,
+      "active_seconds": 10672.469093459018,
+      "fresh": {
+       "axis": {
+        "samples": 995,
+        "value_loss": 0.015517405470215713,
+        "score_variance": 0.017314875438499078,
+        "explained": 0.10381073630404214,
+        "policy_cross_entropy": 2.367668515672147,
+        "policy_kl": 0.27795818750644874
+       },
+       "allies": {
+        "samples": 432,
+        "value_loss": 0.015005067664670033,
+        "score_variance": 0.01775520032257362,
+        "explained": 0.1548916716195604,
+        "policy_cross_entropy": 2.2720733980710675,
+        "policy_kl": 0.23000990550510764
+       },
+       "comintern": {
+        "samples": 277,
+        "value_loss": 0.014339762850394951,
+        "score_variance": 0.018409378461859388,
+        "explained": 0.2210620863651579,
+        "policy_cross_entropy": 0.7986386035506804,
+        "policy_kl": 0.1081321848742827
+       },
+       "all": {
+        "samples": 1704,
+        "value_loss": 0.01519608097626848,
+        "score_variance": 0.017777295070697936,
+        "explained": 0.14519723524666217,
+        "policy_cross_entropy": 2.0883736938051793,
+        "policy_kl": 0.23819559328480008
+       }
+      }
+     },
+     {
+      "network_update": 27,
+      "active_seconds": 11027.956130334016,
+      "fresh": {
+       "axis": {
+        "samples": 1039,
+        "value_loss": 0.013674531787125363,
+        "score_variance": 0.014473966459815477,
+        "explained": 0.05523259121192581,
+        "policy_cross_entropy": 2.4428603570842777,
+        "policy_kl": 0.29072347660372966
+       },
+       "allies": {
+        "samples": 408,
+        "value_loss": 0.011828652834662766,
+        "score_variance": 0.014455548757288814,
+        "explained": 0.181722324536556,
+        "policy_cross_entropy": 2.2380848664076836,
+        "policy_kl": 0.2693938168528981
+       },
+       "comintern": {
+        "samples": 327,
+        "value_loss": 0.011754826832304043,
+        "score_variance": 0.013957725294354425,
+        "explained": 0.1578264663900072,
+        "policy_cross_entropy": 0.819054320772057,
+        "policy_kl": 0.1041197330549059
+       },
+       "all": {
+        "samples": 1774,
+        "value_loss": 0.012896142760726653,
+        "score_variance": 0.014462216799234304,
+        "explained": 0.10828727436796315,
+        "policy_cross_entropy": 2.0964494359624357,
+        "policy_kl": 0.2514213766494993
+       }
+      }
+     },
+     {
+      "network_update": 28,
+      "active_seconds": 11386.965014375019,
+      "fresh": {
+       "axis": {
+        "samples": 1109,
+        "value_loss": 0.024491840041471855,
+        "score_variance": 0.029229368986647353,
+        "explained": 0.16208112283709275,
+        "policy_cross_entropy": 2.3434164001150313,
+        "policy_kl": 0.2827488611440535
+       },
+       "allies": {
+        "samples": 405,
+        "value_loss": 0.023093642253149516,
+        "score_variance": 0.02949434613829204,
+        "explained": 0.21701460527828387,
+        "policy_cross_entropy": 2.3163695274312066,
+        "policy_kl": 0.23007193450891944
+       },
+       "comintern": {
+        "samples": 309,
+        "value_loss": 0.023251820063814866,
+        "score_variance": 0.029591960557597764,
+        "explained": 0.2142521270749349,
+        "policy_cross_entropy": 0.5943594336383496,
+        "policy_kl": 0.07974529593369976
+       },
+       "all": {
+        "samples": 1823,
+        "value_loss": 0.023971030234907643,
+        "score_variance": 0.029403233333403434,
+        "explained": 0.18474849472845412,
+        "policy_cross_entropy": 2.040941037482972,
+        "policy_kl": 0.23663681674623202
+       }
+      }
+     },
+     {
+      "network_update": 29,
+      "active_seconds": 11786.659256250015,
+      "fresh": {
+       "axis": {
+        "samples": 1128,
+        "value_loss": 0.030619366031481066,
+        "score_variance": 0.03944272453232147,
+        "explained": 0.2237005329996936,
+        "policy_cross_entropy": 2.4047095257625943,
+        "policy_kl": 0.2962015611753794
+       },
+       "allies": {
+        "samples": 467,
+        "value_loss": 0.027018213793570556,
+        "score_variance": 0.038632516883779895,
+        "explained": 0.3006354239137259,
+        "policy_cross_entropy": 2.437617131725166,
+        "policy_kl": 0.2691538045460852
+       },
+       "comintern": {
+        "samples": 319,
+        "value_loss": 0.028642574378758594,
+        "score_variance": 0.039807754169082527,
+        "explained": 0.28047751055987946,
+        "policy_cross_entropy": 0.6419279671014205,
+        "policy_kl": 0.09830853168469042
+       },
+       "all": {
+        "samples": 1914,
+        "value_loss": 0.029411249713653127,
+        "score_variance": 0.039450102718898185,
+        "explained": 0.2544696290596994,
+        "policy_cross_entropy": 2.118941780084228,
+        "policy_kl": 0.25661996308059876
+       }
+      }
+     },
+     {
+      "network_update": 30,
+      "active_seconds": 12247.232990000019,
+      "fresh": {
+       "axis": {
+        "samples": 1144,
+        "value_loss": 0.02520831041841063,
+        "score_variance": 0.019743709567348416,
+        "explained": -0.2767768049069874,
+        "policy_cross_entropy": 2.384973209443166,
+        "policy_kl": 0.28164905306502924
+       },
+       "allies": {
+        "samples": 486,
+        "value_loss": 0.02460776486320801,
+        "score_variance": 0.017398948484874204,
+        "explained": -0.41432483029654343,
+        "policy_cross_entropy": 2.333116817376853,
+        "policy_kl": 0.26143039584941336
+       },
+       "comintern": {
+        "samples": 284,
+        "value_loss": 0.019917737518586415,
+        "score_variance": 0.020347177180453545,
+        "explained": 0.021105613720200478,
+        "policy_cross_entropy": 0.5021840894839625,
+        "policy_kl": 0.07715347669029826
+       },
+       "all": {
+        "samples": 1914,
+        "value_loss": 0.024270803708181504,
+        "score_variance": 0.019298113917068604,
+        "explained": -0.25767750218920127,
+        "policy_cross_entropy": 2.0924369938670724,
+        "policy_kl": 0.2461720357728595
+       }
+      }
+     },
+     {
+      "network_update": 31,
+      "active_seconds": 12617.715934042018,
+      "fresh": {
+       "axis": {
+        "samples": 1051,
+        "value_loss": 0.02449921187510922,
+        "score_variance": 0.026748288728086902,
+        "explained": 0.08408301838823984,
+        "policy_cross_entropy": 2.420070830617947,
+        "policy_kl": 0.29234383121795665
+       },
+       "allies": {
+        "samples": 464,
+        "value_loss": 0.020324009281796014,
+        "score_variance": 0.02648875539102749,
+        "explained": 0.23273068206593261,
+        "policy_cross_entropy": 2.1396862109073314,
+        "policy_kl": 0.26498483503733633
+       },
+       "comintern": {
+        "samples": 290,
+        "value_loss": 0.022487878997745955,
+        "score_variance": 0.027732862116528003,
+        "explained": 0.18912520088058948,
+        "policy_cross_entropy": 0.7103110621996528,
+        "policy_kl": 0.11016687400159803
+       },
+       "all": {
+        "samples": 1805,
+        "value_loss": 0.023102768363899982,
+        "score_variance": 0.02689667421397941,
+        "explained": 0.1410548315340624,
+        "policy_cross_entropy": 2.0732958741708383,
+        "policy_kl": 0.25604139807637666
+       }
+      }
+     },
+     {
+      "network_update": 32,
+      "active_seconds": 13030.818465334014,
+      "fresh": {
+       "axis": {
+        "samples": 1036,
+        "value_loss": 0.01725699718230682,
+        "score_variance": 0.021583424451409604,
+        "explained": 0.20045138244131733,
+        "policy_cross_entropy": 2.438158860982031,
+        "policy_kl": 0.3041757015903929
+       },
+       "allies": {
+        "samples": 471,
+        "value_loss": 0.014943689881648963,
+        "score_variance": 0.02035204659192839,
+        "explained": 0.2657401891180997,
+        "policy_cross_entropy": 2.336116215167798,
+        "policy_kl": 0.2464428154560084
+       },
+       "comintern": {
+        "samples": 278,
+        "value_loss": 0.017122203261802863,
+        "score_variance": 0.019871530873143046,
+        "explained": 0.1383550985020474,
+        "policy_cross_entropy": 0.6318966630505899,
+        "policy_kl": 0.09138258087737253
+       },
+       "all": {
+        "samples": 1785,
+        "value_loss": 0.016625601973057548,
+        "score_variance": 0.021195022420994598,
+        "explained": 0.2155893189058785,
+        "policy_cross_entropy": 2.129921898963294,
+        "policy_kl": 0.25580109266741546
+       }
+      }
+     }
+    ],
+    "hours": [
+     {
+      "from_hours": 0.0,
+      "to_hours": 1.0,
+      "network_updates": 8,
+      "games": 192,
+      "losses": {
+       "axis": {
+        "samples": 7534,
+        "value_loss": 0.06951609725578471,
+        "score_variance": 0.015131519990754627,
+        "explained": -3.594125196824847,
+        "policy_cross_entropy": 2.4618632757860017,
+        "policy_kl": 0.30522231448339177
+       },
+       "allies": {
+        "samples": 3260,
+        "value_loss": 0.04993247669322742,
+        "score_variance": 0.014398006447394668,
+        "explained": -2.4680132194455817,
+        "policy_cross_entropy": 2.6445760051221323,
+        "policy_kl": 0.3368172385496857
+       },
+       "comintern": {
+        "samples": 2189,
+        "value_loss": 0.09970870124147532,
+        "score_variance": 0.014215855475308578,
+        "explained": -6.0139079153314885,
+        "policy_cross_entropy": 0.7670106539788117,
+        "policy_kl": 0.11299342161006723
+       },
+       "all": {
+        "samples": 12983,
+        "value_loss": 0.0696893243289373,
+        "score_variance": 0.014835232217902764,
+        "explained": -3.6975553402418653,
+        "policy_cross_entropy": 2.2219812075814156,
+        "policy_kl": 0.2807449522371015
+       }
+      }
+     },
+     {
+      "from_hours": 1.0,
+      "to_hours": 2.0,
+      "network_updates": 9,
+      "games": 216,
+      "losses": {
+       "axis": {
+        "samples": 9498,
+        "value_loss": 0.020201853135537625,
+        "score_variance": 0.021550606596224098,
+        "explained": 0.06258540587543315,
+        "policy_cross_entropy": 2.4120897595516366,
+        "policy_kl": 0.2849389065906755
+       },
+       "allies": {
+        "samples": 4366,
+        "value_loss": 0.01881953382265471,
+        "score_variance": 0.020293033368541085,
+        "explained": 0.07261110348197819,
+        "policy_cross_entropy": 2.5301616215616614,
+        "policy_kl": 0.28134339406440423
+       },
+       "comintern": {
+        "samples": 2451,
+        "value_loss": 0.018264311657489447,
+        "score_variance": 0.019503814160233484,
+        "explained": 0.06355180030741225,
+        "policy_cross_entropy": 0.7144775287290189,
+        "policy_kl": 0.09050175713844243
+       },
+       "all": {
+        "samples": 16315,
+        "value_loss": 0.01954085894106978,
+        "score_variance": 0.020957218028121043,
+        "explained": 0.06758335410505112,
+        "policy_cross_entropy": 2.188654526440363,
+        "policy_kl": 0.25476646031441896
+       }
+      }
+     },
+     {
+      "from_hours": 2.0,
+      "to_hours": 3.0,
+      "network_updates": 9,
+      "games": 216,
+      "losses": {
+       "axis": {
+        "samples": 8992,
+        "value_loss": 0.021235121714534514,
+        "score_variance": 0.02363610268839365,
+        "explained": 0.10158108574465285,
+        "policy_cross_entropy": 2.4408046744113845,
+        "policy_kl": 0.29235422833791
+       },
+       "allies": {
+        "samples": 4224,
+        "value_loss": 0.017659776103229774,
+        "score_variance": 0.022920234462937516,
+        "explained": 0.22951154222327041,
+        "policy_cross_entropy": 2.416056118865546,
+        "policy_kl": 0.2516128839637961
+       },
+       "comintern": {
+        "samples": 2458,
+        "value_loss": 0.017716173264586358,
+        "score_variance": 0.02250563644536117,
+        "explained": 0.21281171907324614,
+        "policy_cross_entropy": 0.6946027748762127,
+        "policy_kl": 0.09761290134304958
+       },
+       "all": {
+        "samples": 15674,
+        "value_loss": 0.019719756450267335,
+        "score_variance": 0.02333085728956183,
+        "explained": 0.15477788897667688,
+        "policy_cross_entropy": 2.1602954127243166,
+        "policy_kl": 0.25083543157960814
+       }
+      }
+     },
+     {
+      "from_hours": 3.0,
+      "to_hours": 4.0,
+      "network_updates": 6,
+      "games": 144,
+      "losses": {
+       "axis": {
+        "samples": 6507,
+        "value_loss": 0.022802084201106132,
+        "score_variance": 0.02617548902120978,
+        "explained": 0.12887647743162345,
+        "policy_cross_entropy": 2.4046917809064334,
+        "policy_kl": 0.2911220916505258
+       },
+       "allies": {
+        "samples": 2701,
+        "value_loss": 0.020446024907513707,
+        "score_variance": 0.02535400602123682,
+        "explained": 0.19357813158252501,
+        "policy_cross_entropy": 2.3016125127988927,
+        "policy_kl": 0.2572637317271512
+       },
+       "comintern": {
+        "samples": 1807,
+        "value_loss": 0.020533324223637118,
+        "score_variance": 0.026649196332857394,
+        "explained": 0.22949555524418008,
+        "policy_cross_entropy": 0.6533152247766876,
+        "policy_kl": 0.09369851083801961
+       },
+       "all": {
+        "samples": 11015,
+        "value_loss": 0.021852164506936396,
+        "score_variance": 0.026134834545544383,
+        "explained": 0.1638682667435567,
+        "policy_cross_entropy": 2.092103987889192,
+        "policy_kl": 0.25043250103035036
+       }
+      }
+     }
+    ],
+    "after_first_hour": {
+     "from_hours": 1.0,
+     "to_hours": 3.6925841264583386,
+     "network_updates": 24,
+     "games": 576,
+     "losses": {
+      "axis": {
+       "samples": 24997,
+       "value_loss": 0.02125041314697877,
+       "score_variance": 0.023615422994449003,
+       "explained": 0.10014683404257252,
+       "policy_cross_entropy": 2.420493402683791,
+       "policy_kl": 0.2892159221659677
+      },
+      "allies": {
+       "samples": 11291,
+       "value_loss": 0.018774749110348734,
+       "score_variance": 0.022575511514618035,
+       "explained": 0.16835775356887228,
+       "policy_cross_entropy": 2.432801530678957,
+       "policy_kl": 0.26446084666932057
+      },
+      "comintern": {
+       "samples": 6716,
+       "value_loss": 0.018674195745826707,
+       "score_variance": 0.022644808426599283,
+       "explained": 0.17534317826723467,
+       "policy_cross_entropy": 0.6907472684234706,
+       "policy_kl": 0.09396449186001181
+      },
+      "all": {
+       "samples": 43004,
+       "value_loss": 0.0201980785105792,
+       "score_variance": 0.023255559386488905,
+       "explained": 0.13147311681894225,
+       "policy_cross_entropy": 2.1535879063462726,
+       "policy_kl": 0.25222359207185024
+      }
+     }
+    }
+   },
+   "one": {
+    "directory": "tmp/one-network-2026-11-17/one",
+    "networks": "one",
+    "status": "interrupted",
+    "active_seconds": 13307.298527791005,
+    "speed": [
+     {
+      "invocation": 1,
+      "seconds": 13307.298527791005,
+      "network_updates": 41,
+      "games": 997,
+      "decisions": 1460330,
+      "decisions_per_hour": 395060.4992456487,
+      "games_per_hour": 269.7166515430839,
+      "decisions_per_game": 1464.7241725175527,
+      "network_update_seconds": 13.686511090341543,
+      "forward_microseconds_per_evaluation": 154.2478087047124,
+      "evaluations_per_inference_batch": 9.713818712551268,
+      "server_idle_share": 0.01869506216562863
+     }
+    ],
+    "updates": [
+     {
+      "network_update": 1,
+      "active_seconds": 262.3774300829973,
+      "fresh": {
+       "axis": {
+        "samples": 588,
+        "value_loss": 0.4995157754644245,
+        "score_variance": 0.012187765229958278,
+        "explained": -39.98501784696213,
+        "policy_cross_entropy": 2.375504703041757,
+        "policy_kl": 0.2574474798772932
+       },
+       "allies": {
+        "samples": 263,
+        "value_loss": 0.5038302709621169,
+        "score_variance": 0.011022100141200128,
+        "explained": -44.71091393724698,
+        "policy_cross_entropy": 2.6862186283406775,
+        "policy_kl": 0.4739170455390575
+       },
+       "comintern": {
+        "samples": 265,
+        "value_loss": 0.5012450109112937,
+        "score_variance": 0.013241261288715,
+        "explained": -36.85477833131235,
+        "policy_cross_entropy": 0.7645699278418532,
+        "policy_kl": 0.05569967769353853
+       },
+       "all": {
+        "samples": 1116,
+        "value_loss": 0.5009431587164974,
+        "score_variance": 0.012224461639752679,
+        "explained": -39.978750106056395,
+        "policy_cross_entropy": 2.0662036698210065,
+        "policy_kl": 0.2605553008363874
+       }
+      }
+     },
+     {
+      "network_update": 2,
+      "active_seconds": 570.0717067910009,
+      "fresh": {
+       "axis": {
+        "samples": 771,
+        "value_loss": 0.03228805931474142,
+        "score_variance": 0.027218458902846132,
+        "explained": -0.18625596805428168,
+        "policy_cross_entropy": 2.5146846537074454,
+        "policy_kl": 0.35427376025307067
+       },
+       "allies": {
+        "samples": 418,
+        "value_loss": 0.030129142161480663,
+        "score_variance": 0.024856607544851833,
+        "explained": -0.21211802966736104,
+        "policy_cross_entropy": 2.7579228596059795,
+        "policy_kl": 0.38055627524993024
+       },
+       "comintern": {
+        "samples": 295,
+        "value_loss": 0.029897785610943577,
+        "score_variance": 0.023818701154840517,
+        "explained": -0.255223171766763,
+        "policy_cross_entropy": 1.0291274543437674,
+        "policy_kl": 0.15048137864937092
+       },
+       "all": {
+        "samples": 1484,
+        "value_loss": 0.031204799130992524,
+        "score_variance": 0.0259476910928306,
+        "explained": -0.2026040783110168,
+        "policy_cross_entropy": 2.287888289996733,
+        "policy_kl": 0.32116549791856647
+       }
+      }
+     },
+     {
+      "network_update": 3,
+      "active_seconds": 882.5769990830013,
+      "fresh": {
+       "axis": {
+        "samples": 873,
+        "value_loss": 0.028863069741925484,
+        "score_variance": 0.011776450873802297,
+        "explained": -1.45091412100515,
+        "policy_cross_entropy": 2.471454350401817,
+        "policy_kl": 0.33631928769068026
+       },
+       "allies": {
+        "samples": 446,
+        "value_loss": 0.025043465151158892,
+        "score_variance": 0.01136771272630987,
+        "explained": -1.2030346608950926,
+        "policy_cross_entropy": 2.564362334900107,
+        "policy_kl": 0.3094034796526939
+       },
+       "comintern": {
+        "samples": 284,
+        "value_loss": 0.0318640685774727,
+        "score_variance": 0.012605275722409626,
+        "explained": -1.527835906105952,
+        "policy_cross_entropy": 0.8398256090683452,
+        "policy_kl": 0.11733407514355788
+       },
+       "all": {
+        "samples": 1603,
+        "value_loss": 0.028332027958902096,
+        "score_variance": 0.011829947339329244,
+        "explained": -1.3949411731285455,
+        "policy_cross_entropy": 2.2082318916042696,
+        "policy_kl": 0.2900334169805588
+       }
+      }
+     },
+     {
+      "network_update": 4,
+      "active_seconds": 1180.5354241660098,
+      "fresh": {
+       "axis": {
+        "samples": 816,
+        "value_loss": 0.03863044310226399,
+        "score_variance": 0.04032266298018383,
+        "explained": 0.041966967279702394,
+        "policy_cross_entropy": 2.4515531087960247,
+        "policy_kl": 0.3416966066828117
+       },
+       "allies": {
+        "samples": 491,
+        "value_loss": 0.03354919307633072,
+        "score_variance": 0.03541260439160812,
+        "explained": 0.05262000203856754,
+        "policy_cross_entropy": 2.6424765564417285,
+        "policy_kl": 0.3286158146605317
+       },
+       "comintern": {
+        "samples": 274,
+        "value_loss": 0.03244296371019656,
+        "score_variance": 0.03802903862752408,
+        "explained": 0.14688972214208218,
+        "policy_cross_entropy": 0.6895863374442824,
+        "policy_kl": 0.10969876509637977
+       },
+       "all": {
+        "samples": 1581,
+        "value_loss": 0.035980055299506424,
+        "score_variance": 0.03873511940776816,
+        "explained": 0.07112574197226351,
+        "policy_cross_entropy": 2.205483859867286,
+        "policy_kl": 0.2974271079619883
+       }
+      }
+     },
+     {
+      "network_update": 5,
+      "active_seconds": 1517.3698691660102,
+      "fresh": {
+       "axis": {
+        "samples": 982,
+        "value_loss": 0.026658072053295102,
+        "score_variance": 0.0248591885617974,
+        "explained": -0.072362920737572,
+        "policy_cross_entropy": 2.4183254524528617,
+        "policy_kl": 0.32613466492552634
+       },
+       "allies": {
+        "samples": 454,
+        "value_loss": 0.025555967519870132,
+        "score_variance": 0.023118654542426103,
+        "explained": -0.10542624671220402,
+        "policy_cross_entropy": 2.4474141483841394,
+        "policy_kl": 0.3101261977194072
+       },
+       "comintern": {
+        "samples": 312,
+        "value_loss": 0.026598704288540505,
+        "score_variance": 0.024475991908421008,
+        "explained": -0.086726306662537,
+        "policy_cross_entropy": 0.7164288613728633,
+        "policy_kl": 0.11655591568193725
+       },
+       "all": {
+        "samples": 1748,
+        "value_loss": 0.026361230977334935,
+        "score_variance": 0.02452543181615834,
+        "explained": -0.07485287822606645,
+        "policy_cross_entropy": 2.1221095093955618,
+        "policy_kl": 0.28456921076329644
+       }
+      }
+     },
+     {
+      "network_update": 6,
+      "active_seconds": 1814.290891458004,
+      "fresh": {
+       "axis": {
+        "samples": 890,
+        "value_loss": 0.03595166887397671,
+        "score_variance": 0.0262669651441317,
+        "explained": -0.36870280509009135,
+        "policy_cross_entropy": 2.5422651416372593,
+        "policy_kl": 0.33262146886197513
+       },
+       "allies": {
+        "samples": 499,
+        "value_loss": 0.04020083767371504,
+        "score_variance": 0.03076704649914387,
+        "explained": -0.30661997975118194,
+        "policy_cross_entropy": 2.466700542094428,
+        "policy_kl": 0.32038263707589804
+       },
+       "comintern": {
+        "samples": 308,
+        "value_loss": 0.03747072162117216,
+        "score_variance": 0.028938065838112054,
+        "explained": -0.29485922904434125,
+        "policy_cross_entropy": 0.8701064336234018,
+        "policy_kl": 0.15629024141232023
+       },
+       "all": {
+        "samples": 1697,
+        "value_loss": 0.03747683297368539,
+        "score_variance": 0.02813354844991438,
+        "explained": -0.332104730421926,
+        "policy_cross_entropy": 2.216554112031991,
+        "policy_kl": 0.29701911463937863
+       }
+      }
+     },
+     {
+      "network_update": 7,
+      "active_seconds": 2104.9961067080003,
+      "fresh": {
+       "axis": {
+        "samples": 951,
+        "value_loss": 0.03321510640925102,
+        "score_variance": 0.029598855560752518,
+        "explained": -0.12217536049919375,
+        "policy_cross_entropy": 2.4774007212822653,
+        "policy_kl": 0.3261407437073174
+       },
+       "allies": {
+        "samples": 470,
+        "value_loss": 0.026227252197388726,
+        "score_variance": 0.02790127077108798,
+        "explained": 0.059997932977085555,
+        "policy_cross_entropy": 2.426142398124232,
+        "policy_kl": 0.30760286539415393
+       },
+       "comintern": {
+        "samples": 325,
+        "value_loss": 0.030159575236388125,
+        "score_variance": 0.03084805104852065,
+        "explained": 0.022318292038924215,
+        "policy_cross_entropy": 0.8303661151364998,
+        "policy_kl": 0.12270487634804167
+       },
+       "all": {
+        "samples": 1746,
+        "value_loss": 0.030765313104121745,
+        "score_variance": 0.029446383319730984,
+        "explained": -0.04479089231671418,
+        "policy_cross_entropy": 2.15702405525612,
+        "policy_kl": 0.2832830921042524
+       }
+      }
+     },
+     {
+      "network_update": 8,
+      "active_seconds": 2407.137632500002,
+      "fresh": {
+       "axis": {
+        "samples": 943,
+        "value_loss": 0.02753484778529252,
+        "score_variance": 0.02940100499710052,
+        "explained": 0.06347256537632096,
+        "policy_cross_entropy": 2.4213425852555557,
+        "policy_kl": 0.3415980785489442
+       },
+       "allies": {
+        "samples": 489,
+        "value_loss": 0.02738921800411365,
+        "score_variance": 0.02811648279323023,
+        "explained": 0.025866136759171265,
+        "policy_cross_entropy": 2.3781201776075,
+        "policy_kl": 0.30377057063751034
+       },
+       "comintern": {
+        "samples": 272,
+        "value_loss": 0.02972434573519636,
+        "score_variance": 0.031493312635164444,
+        "explained": 0.0561696040191374,
+        "policy_cross_entropy": 0.6207350502716454,
+        "policy_kl": 0.09468623506964163
+       },
+       "all": {
+        "samples": 1704,
+        "value_loss": 0.027842553465678304,
+        "score_variance": 0.029497758316871226,
+        "explained": 0.05611290300138605,
+        "policy_cross_entropy": 2.1215180507159297,
+        "policy_kl": 0.2913294912278989
+       }
+      }
+     },
+     {
+      "network_update": 9,
+      "active_seconds": 2711.0014513330098,
+      "fresh": {
+       "axis": {
+        "samples": 880,
+        "value_loss": 0.02810324758953894,
+        "score_variance": 0.0325896741937845,
+        "explained": 0.13766405204201804,
+        "policy_cross_entropy": 2.3142715427010763,
+        "policy_kl": 0.31830150335821644
+       },
+       "allies": {
+        "samples": 487,
+        "value_loss": 0.021698248193849565,
+        "score_variance": 0.029495786748408553,
+        "explained": 0.26436109743638914,
+        "policy_cross_entropy": 2.133941572224646,
+        "policy_kl": 0.2608414120025664
+       },
+       "comintern": {
+        "samples": 297,
+        "value_loss": 0.025198402534748948,
+        "score_variance": 0.033410835780173564,
+        "explained": 0.2458014908533951,
+        "policy_cross_entropy": 0.7766771729352124,
+        "policy_kl": 0.11619607756480937
+       },
+       "all": {
+        "samples": 1664,
+        "value_loss": 0.02571023455650207,
+        "score_variance": 0.03196949997941431,
+        "explained": 0.19578865565437953,
+        "policy_cross_entropy": 1.987056264189969,
+        "policy_kl": 0.2654118543492961
+       }
+      }
+     },
+     {
+      "network_update": 10,
+      "active_seconds": 3023.0773129580048,
+      "fresh": {
+       "axis": {
+        "samples": 933,
+        "value_loss": 0.03042343720265055,
+        "score_variance": 0.031939022426858095,
+        "explained": 0.047452461254201106,
+        "policy_cross_entropy": 2.466761696513389,
+        "policy_kl": 0.32371783462086573
+       },
+       "allies": {
+        "samples": 490,
+        "value_loss": 0.02619714742305609,
+        "score_variance": 0.0332228813397196,
+        "explained": 0.21147274508860547,
+        "policy_cross_entropy": 2.2587017175417925,
+        "policy_kl": 0.2760259138883434
+       },
+       "comintern": {
+        "samples": 290,
+        "value_loss": 0.027714502086771595,
+        "score_variance": 0.030349195632183867,
+        "explained": 0.08681263178580934,
+        "policy_cross_entropy": 0.6780468116920143,
+        "policy_kl": 0.09467769750625579
+       },
+       "all": {
+        "samples": 1713,
+        "value_loss": 0.028755910538548868,
+        "score_variance": 0.032127100701831855,
+        "explained": 0.1049329098996713,
+        "policy_cross_entropy": 2.104428534636985,
+        "policy_kl": 0.2713006245086808
+       }
+      }
+     },
+     {
+      "network_update": 11,
+      "active_seconds": 3336.261845166009,
+      "fresh": {
+       "axis": {
+        "samples": 925,
+        "value_loss": 0.03469923616289511,
+        "score_variance": 0.030939786454735774,
+        "explained": -0.12150858615845084,
+        "policy_cross_entropy": 2.3161272020392127,
+        "policy_kl": 0.31139610651862776
+       },
+       "allies": {
+        "samples": 477,
+        "value_loss": 0.03888878398366525,
+        "score_variance": 0.033420169033397874,
+        "explained": -0.16363217507375283,
+        "policy_cross_entropy": 2.2053196823629677,
+        "policy_kl": 0.28387352358559503
+       },
+       "comintern": {
+        "samples": 293,
+        "value_loss": 0.03079559338819948,
+        "score_variance": 0.028171157380982737,
+        "explained": -0.093160389959285,
+        "policy_cross_entropy": 0.5954107139493814,
+        "policy_kl": 0.08621054581765206
+       },
+       "all": {
+        "samples": 1695,
+        "value_loss": 0.03520345266880752,
+        "score_variance": 0.03137386287136343,
+        "explained": -0.1220630629115027,
+        "policy_cross_entropy": 1.9874988139000447,
+        "policy_kl": 0.26472493168414823
+       }
+      }
+     },
+     {
+      "network_update": 12,
+      "active_seconds": 3637.072402165999,
+      "fresh": {
+       "axis": {
+        "samples": 968,
+        "value_loss": 0.024766276385017882,
+        "score_variance": 0.024642719825746423,
+        "explained": -0.005013917300734416,
+        "policy_cross_entropy": 2.4859196247967597,
+        "policy_kl": 0.3250176481952153
+       },
+       "allies": {
+        "samples": 537,
+        "value_loss": 0.023959548265375788,
+        "score_variance": 0.028269164225928123,
+        "explained": 0.15244935881760557,
+        "policy_cross_entropy": 2.462748348564441,
+        "policy_kl": 0.29514286326221906
+       },
+       "comintern": {
+        "samples": 252,
+        "value_loss": 0.022155288684506745,
+        "score_variance": 0.023716324772192765,
+        "explained": 0.06582116338347355,
+        "policy_cross_entropy": 0.6357837311957463,
+        "policy_kl": 0.08810683113214986
+       },
+       "all": {
+        "samples": 1757,
+        "value_loss": 0.024145228063574165,
+        "score_variance": 0.02580601709917772,
+        "explained": 0.06435665872888507,
+        "policy_cross_entropy": 2.2134795448171296,
+        "policy_kl": 0.2819076394252031
+       }
+      }
+     },
+     {
+      "network_update": 13,
+      "active_seconds": 3984.289376416011,
+      "fresh": {
+       "axis": {
+        "samples": 1042,
+        "value_loss": 0.021594533356644963,
+        "score_variance": 0.022693206395987736,
+        "explained": 0.04841418264882236,
+        "policy_cross_entropy": 2.399027597482071,
+        "policy_kl": 0.3130226266791326
+       },
+       "allies": {
+        "samples": 488,
+        "value_loss": 0.022844688802065395,
+        "score_variance": 0.024679017161885208,
+        "explained": 0.07432744779856093,
+        "policy_cross_entropy": 2.4395896811401583,
+        "policy_kl": 0.27791645103220114
+       },
+       "comintern": {
+        "samples": 271,
+        "value_loss": 0.02642221922517541,
+        "score_variance": 0.02599114011701002,
+        "explained": -0.016585617492141935,
+        "policy_cross_entropy": 0.6005012632261763,
+        "policy_kl": 0.09258402489882502
+       },
+       "all": {
+        "samples": 1801,
+        "value_loss": 0.02265970755305636,
+        "score_variance": 0.023854469538228434,
+        "explained": 0.05008545602983905,
+        "policy_cross_entropy": 2.1393905404258793,
+        "policy_kl": 0.270340408579096
+       }
+      }
+     },
+     {
+      "network_update": 14,
+      "active_seconds": 4316.254823958006,
+      "fresh": {
+       "axis": {
+        "samples": 1105,
+        "value_loss": 0.027332808376132764,
+        "score_variance": 0.03841223755997345,
+        "explained": 0.2884348813719131,
+        "policy_cross_entropy": 2.4228371742607253,
+        "policy_kl": 0.3163673345304607
+       },
+       "allies": {
+        "samples": 521,
+        "value_loss": 0.024123524329812625,
+        "score_variance": 0.03654010981637507,
+        "explained": 0.33980701067838837,
+        "policy_cross_entropy": 2.5171217169363493,
+        "policy_kl": 0.304004624429262
+       },
+       "comintern": {
+        "samples": 268,
+        "value_loss": 0.03054669261375727,
+        "score_variance": 0.03660262017338689,
+        "explained": 0.16545065710986384,
+        "policy_cross_entropy": 0.5617079714619534,
+        "policy_kl": 0.08040102623283363
+       },
+       "all": {
+        "samples": 1894,
+        "value_loss": 0.026904764018978896,
+        "score_variance": 0.03786408423885896,
+        "explained": 0.2894384068751038,
+        "policy_cross_entropy": 2.1854240910421017,
+        "policy_kl": 0.27957750211943183
+       }
+      }
+     },
+     {
+      "network_update": 15,
+      "active_seconds": 4663.488071041007,
+      "fresh": {
+       "axis": {
+        "samples": 1108,
+        "value_loss": 0.03003550931010557,
+        "score_variance": 0.032513318449782114,
+        "explained": 0.07620905086952601,
+        "policy_cross_entropy": 2.443514355035629,
+        "policy_kl": 0.3169154268406149
+       },
+       "allies": {
+        "samples": 497,
+        "value_loss": 0.0258014589806122,
+        "score_variance": 0.03190972307351821,
+        "explained": 0.1914232874673627,
+        "policy_cross_entropy": 2.4736899168039,
+        "policy_kl": 0.29205594407506297
+       },
+       "comintern": {
+        "samples": 263,
+        "value_loss": 0.027043563377993234,
+        "score_variance": 0.031017331280390432,
+        "explained": 0.12811443597371852,
+        "policy_cross_entropy": 0.5193136279424724,
+        "policy_kl": 0.06993040013542529
+       },
+       "all": {
+        "samples": 1868,
+        "value_loss": 0.02848775513778022,
+        "score_variance": 0.032268442708978,
+        "explained": 0.11716362036107453,
+        "policy_cross_entropy": 2.1806302345716735,
+        "policy_kl": 0.27552772611366405
+       }
+      }
+     },
+     {
+      "network_update": 16,
+      "active_seconds": 4986.02502500001,
+      "fresh": {
+       "axis": {
+        "samples": 1138,
+        "value_loss": 0.018231407625186758,
+        "score_variance": 0.02046412015061531,
+        "explained": 0.109103763513694,
+        "policy_cross_entropy": 2.4306231686347646,
+        "policy_kl": 0.3188282455928771
+       },
+       "allies": {
+        "samples": 525,
+        "value_loss": 0.01691505360724737,
+        "score_variance": 0.024123811937717288,
+        "explained": 0.29882335134602467,
+        "policy_cross_entropy": 2.437770674209362,
+        "policy_kl": 0.2995000633700684
+       },
+       "comintern": {
+        "samples": 299,
+        "value_loss": 0.020114194507460527,
+        "score_variance": 0.022894338452589934,
+        "explained": 0.1214336876728972,
+        "policy_cross_entropy": 0.6165271458194698,
+        "policy_kl": 0.09062372441910518
+       },
+       "all": {
+        "samples": 1962,
+        "value_loss": 0.018166100498979664,
+        "score_variance": 0.021899487482348188,
+        "explained": 0.17047828111857755,
+        "policy_cross_entropy": 2.1560756302070843,
+        "policy_kl": 0.2788789859099348
+       }
+      }
+     },
+     {
+      "network_update": 17,
+      "active_seconds": 5318.981847083007,
+      "fresh": {
+       "axis": {
+        "samples": 1046,
+        "value_loss": 0.024514076318228314,
+        "score_variance": 0.02805453186499422,
+        "explained": 0.12619905988107405,
+        "policy_cross_entropy": 2.386795187139342,
+        "policy_kl": 0.3163619751522361
+       },
+       "allies": {
+        "samples": 434,
+        "value_loss": 0.022821927443347885,
+        "score_variance": 0.03485331058562862,
+        "explained": 0.3452005832479439,
+        "policy_cross_entropy": 2.480215054538658,
+        "policy_kl": 0.29942543260925947
+       },
+       "comintern": {
+        "samples": 274,
+        "value_loss": 0.02317044180280437,
+        "score_variance": 0.029122691064165967,
+        "explained": 0.20438527635536896,
+        "policy_cross_entropy": 0.6734208150957064,
+        "policy_kl": 0.09675912885573767
+       },
+       "all": {
+        "samples": 1754,
+        "value_loss": 0.02388548540093968,
+        "score_variance": 0.030205773485223967,
+        "explained": 0.2092410607321823,
+        "policy_cross_entropy": 2.1422567860625734,
+        "policy_kl": 0.2778661716465961
+       }
+      }
+     },
+     {
+      "network_update": 18,
+      "active_seconds": 5646.516906500008,
+      "fresh": {
+       "axis": {
+        "samples": 994,
+        "value_loss": 0.03110724108803145,
+        "score_variance": 0.03294468844859912,
+        "explained": 0.05577370578065988,
+        "policy_cross_entropy": 2.410070250436971,
+        "policy_kl": 0.3150037463542624
+       },
+       "allies": {
+        "samples": 510,
+        "value_loss": 0.02740588202602036,
+        "score_variance": 0.03246120395232609,
+        "explained": 0.15573427078460156,
+        "policy_cross_entropy": 2.5617633480659023,
+        "policy_kl": 0.28865934473845484
+       },
+       "comintern": {
+        "samples": 308,
+        "value_loss": 0.028486586313724197,
+        "score_variance": 0.03476153042952721,
+        "explained": 0.18051403486173723,
+        "policy_cross_entropy": 0.7616147278160695,
+        "policy_kl": 0.10728784142288629
+       },
+       "all": {
+        "samples": 1812,
+        "value_loss": 0.029620014381567715,
+        "score_variance": 0.03329288110251807,
+        "explained": 0.11031988218864475,
+        "policy_cross_entropy": 2.172564278485271,
+        "policy_kl": 0.2722818128316765
+       }
+      }
+     },
+     {
+      "network_update": 19,
+      "active_seconds": 5966.228288416009,
+      "fresh": {
+       "axis": {
+        "samples": 984,
+        "value_loss": 0.018711756725122732,
+        "score_variance": 0.023525805436096874,
+        "explained": 0.2046284334047792,
+        "policy_cross_entropy": 2.4730724079831785,
+        "policy_kl": 0.3235156068216562
+       },
+       "allies": {
+        "samples": 516,
+        "value_loss": 0.01972731859724411,
+        "score_variance": 0.022348661329697744,
+        "explained": 0.11729305365464082,
+        "policy_cross_entropy": 2.409741155610011,
+        "policy_kl": 0.28022514680980365
+       },
+       "comintern": {
+        "samples": 294,
+        "value_loss": 0.020544263995479244,
+        "score_variance": 0.02759329064664413,
+        "explained": 0.2554616171530155,
+        "policy_cross_entropy": 0.7212810765265076,
+        "policy_kl": 0.10738985088534439
+       },
+       "all": {
+        "samples": 1794,
+        "value_loss": 0.019304168689169246,
+        "score_variance": 0.02413284690234623,
+        "explained": 0.2000873843320794,
+        "policy_cross_entropy": 2.1677738697040168,
+        "policy_kl": 0.2756455680193197
+       }
+      }
+     },
+     {
+      "network_update": 20,
+      "active_seconds": 6289.268052875006,
+      "fresh": {
+       "axis": {
+        "samples": 995,
+        "value_loss": 0.024497312201432277,
+        "score_variance": 0.015064083488800617,
+        "explained": -0.6262066138736411,
+        "policy_cross_entropy": 2.464839994160246,
+        "policy_kl": 0.32325701301066784
+       },
+       "allies": {
+        "samples": 495,
+        "value_loss": 0.02020251430157158,
+        "score_variance": 0.015540455101860431,
+        "explained": -0.29999502390074984,
+        "policy_cross_entropy": 2.3377139052672975,
+        "policy_kl": 0.289486749001924
+       },
+       "comintern": {
+        "samples": 277,
+        "value_loss": 0.022400421391811563,
+        "score_variance": 0.01593733421956921,
+        "explained": -0.40553125655772626,
+        "policy_cross_entropy": 0.6933586677307908,
+        "policy_kl": 0.09526872048436769
+       },
+       "all": {
+        "samples": 1767,
+        "value_loss": 0.02296547082356245,
+        "score_variance": 0.015406334398897853,
+        "explained": -0.4906511976791421,
+        "policy_cross_entropy": 2.151524916954266,
+        "policy_kl": 0.2780566521085098
+       }
+      }
+     },
+     {
+      "network_update": 21,
+      "active_seconds": 6604.859126875002,
+      "fresh": {
+       "axis": {
+        "samples": 1012,
+        "value_loss": 0.017341135605280077,
+        "score_variance": 0.018513158617993786,
+        "explained": 0.06330756608840193,
+        "policy_cross_entropy": 2.4719986631463584,
+        "policy_kl": 0.32497662455144666
+       },
+       "allies": {
+        "samples": 504,
+        "value_loss": 0.0168148772389118,
+        "score_variance": 0.017621983305513667,
+        "explained": 0.045801091319235154,
+        "policy_cross_entropy": 2.4270131495519585,
+        "policy_kl": 0.29724351195350013
+       },
+       "comintern": {
+        "samples": 269,
+        "value_loss": 0.015861037812307372,
+        "score_variance": 0.018755406632486232,
+        "explained": 0.15432183779825526,
+        "policy_cross_entropy": 0.7006534104446158,
+        "policy_kl": 0.08665247878320784
+       },
+       "all": {
+        "samples": 1785,
+        "value_loss": 0.016969493855723064,
+        "score_variance": 0.0185086856659528,
+        "explained": 0.08316051382627987,
+        "policy_cross_entropy": 2.1923546453153526,
+        "policy_kl": 0.28123058311670085
+       }
+      }
+     },
+     {
+      "network_update": 22,
+      "active_seconds": 6956.999640082999,
+      "fresh": {
+       "axis": {
+        "samples": 1078,
+        "value_loss": 0.021285816232871936,
+        "score_variance": 0.0199130339117769,
+        "explained": -0.06893888330512765,
+        "policy_cross_entropy": 2.368808642640468,
+        "policy_kl": 0.31213287669669976
+       },
+       "allies": {
+        "samples": 486,
+        "value_loss": 0.017325757567114086,
+        "score_variance": 0.019974247266394535,
+        "explained": 0.1325952194321922,
+        "policy_cross_entropy": 2.5862451872202357,
+        "policy_kl": 0.2823545874091484
+       },
+       "comintern": {
+        "samples": 304,
+        "value_loss": 0.018962231478805113,
+        "score_variance": 0.020472032519621364,
+        "explained": 0.07374944521845528,
+        "policy_cross_entropy": 0.6690053235177483,
+        "policy_kl": 0.09364472662208459
+       },
+       "all": {
+        "samples": 1868,
+        "value_loss": 0.019877380324523634,
+        "score_variance": 0.020049850957541065,
+        "explained": 0.008602090528386785,
+        "policy_cross_entropy": 2.1487518715764753,
+        "policy_kl": 0.26882846223394125
+       }
+      }
+     },
+     {
+      "network_update": 23,
+      "active_seconds": 7284.754948916001,
+      "fresh": {
+       "axis": {
+        "samples": 1046,
+        "value_loss": 0.019453026625001476,
+        "score_variance": 0.021248175496016947,
+        "explained": 0.08448484771560638,
+        "policy_cross_entropy": 2.3998596084237986,
+        "policy_kl": 0.3119328436712223
+       },
+       "allies": {
+        "samples": 554,
+        "value_loss": 0.01725261578271111,
+        "score_variance": 0.018832968885080414,
+        "explained": 0.08391417795105416,
+        "policy_cross_entropy": 2.6856365922625507,
+        "policy_kl": 0.3042924438205893
+       },
+       "comintern": {
+        "samples": 266,
+        "value_loss": 0.020763208686504987,
+        "score_variance": 0.023376244398590474,
+        "explained": 0.11178167320337595,
+        "policy_cross_entropy": 0.7384185428238008,
+        "policy_kl": 0.12108890827503854
+       },
+       "all": {
+        "samples": 1866,
+        "value_loss": 0.018986510452295723,
+        "score_variance": 0.020993590058193373,
+        "explained": 0.09560440116883806,
+        "policy_cross_entropy": 2.247864498883107,
+        "policy_kl": 0.2824594951542686
+       }
+      }
+     },
+     {
+      "network_update": 24,
+      "active_seconds": 7592.283704540998,
+      "fresh": {
+       "axis": {
+        "samples": 978,
+        "value_loss": 0.024389482635165882,
+        "score_variance": 0.02364640132331876,
+        "explained": -0.03142471032640115,
+        "policy_cross_entropy": 2.4022586605431244,
+        "policy_kl": 0.3085010476235014
+       },
+       "allies": {
+        "samples": 529,
+        "value_loss": 0.024025025150576026,
+        "score_variance": 0.022797344708840688,
+        "explained": -0.05385190500976411,
+        "policy_cross_entropy": 2.5120429436301572,
+        "policy_kl": 0.2824835901754733
+       },
+       "comintern": {
+        "samples": 276,
+        "value_loss": 0.02124033773936284,
+        "score_variance": 0.021785054444094287,
+        "explained": 0.02500414704628451,
+        "policy_cross_entropy": 0.6854536925405982,
+        "policy_kl": 0.11755003335320967
+       },
+       "all": {
+        "samples": 1783,
+        "value_loss": 0.023793878596697193,
+        "score_variance": 0.02320322621606355,
+        "explained": -0.02545561445350808,
+        "policy_cross_entropy": 2.1690773451109,
+        "policy_kl": 0.2712235855210857
+       }
+      }
+     },
+     {
+      "network_update": 25,
+      "active_seconds": 7932.467852041009,
+      "fresh": {
+       "axis": {
+        "samples": 996,
+        "value_loss": 0.02076303352670955,
+        "score_variance": 0.018918104217069086,
+        "explained": -0.09752189164788794,
+        "policy_cross_entropy": 2.4292065249928716,
+        "policy_kl": 0.30883456412084775
+       },
+       "allies": {
+        "samples": 531,
+        "value_loss": 0.019939940529847093,
+        "score_variance": 0.019683207410481105,
+        "explained": -0.013043256315496743,
+        "policy_cross_entropy": 2.3481900665413655,
+        "policy_kl": 0.25860768436868414
+       },
+       "comintern": {
+        "samples": 303,
+        "value_loss": 0.016467119179381342,
+        "score_variance": 0.017484747377708245,
+        "explained": 0.0582009094180167,
+        "policy_cross_entropy": 0.7861489402686431,
+        "policy_kl": 0.13469132657535657
+       },
+       "all": {
+        "samples": 1830,
+        "value_loss": 0.019812910888144297,
+        "score_variance": 0.018963981519404236,
+        "explained": -0.044765355200933055,
+        "policy_cross_entropy": 2.133651231217357,
+        "policy_kl": 0.26542698263195
+       }
+      }
+     },
+     {
+      "network_update": 26,
+      "active_seconds": 8277.950289166009,
+      "fresh": {
+       "axis": {
+        "samples": 994,
+        "value_loss": 0.03327784762932314,
+        "score_variance": 0.0309280988132012,
+        "explained": -0.07597456378789724,
+        "policy_cross_entropy": 2.5020416918368826,
+        "policy_kl": 0.33180715590937326
+       },
+       "allies": {
+        "samples": 532,
+        "value_loss": 0.03113608474290286,
+        "score_variance": 0.029423859332306127,
+        "explained": -0.05819173451243298,
+        "policy_cross_entropy": 2.5325551818959244,
+        "policy_kl": 0.2762510379826398
+       },
+       "comintern": {
+        "samples": 238,
+        "value_loss": 0.03198849973515823,
+        "score_variance": 0.02943067445213376,
+        "explained": -0.08691018234001158,
+        "policy_cross_entropy": 0.5846198269430283,
+        "policy_kl": 0.07717727909850301
+       },
+       "all": {
+        "samples": 1764,
+        "value_loss": 0.0324579595032535,
+        "score_variance": 0.030378114596562925,
+        "explained": -0.06846524000294263,
+        "policy_cross_entropy": 2.2525443975436135,
+        "policy_kl": 0.2806973115680982
+       }
+      }
+     },
+     {
+      "network_update": 27,
+      "active_seconds": 8622.932746291,
+      "fresh": {
+       "axis": {
+        "samples": 1071,
+        "value_loss": 0.02594901844649744,
+        "score_variance": 0.03340286182969913,
+        "explained": 0.22314984330397503,
+        "policy_cross_entropy": 2.337737146277848,
+        "policy_kl": 0.31006226104419476
+       },
+       "allies": {
+        "samples": 519,
+        "value_loss": 0.026699932015294938,
+        "score_variance": 0.03708931122421837,
+        "explained": 0.28011787941048194,
+        "policy_cross_entropy": 2.3932760431677944,
+        "policy_kl": 0.263722858494251
+       },
+       "comintern": {
+        "samples": 269,
+        "value_loss": 0.0267837927430058,
+        "score_variance": 0.033786920763026036,
+        "explained": 0.20727334311222445,
+        "policy_cross_entropy": 0.6381389527682403,
+        "policy_kl": 0.09259124576320896
+       },
+       "all": {
+        "samples": 1859,
+        "value_loss": 0.026279453318991605,
+        "score_variance": 0.03480991185113139,
+        "explained": 0.24505832041808318,
+        "policy_cross_entropy": 2.107308299280429,
+        "policy_kl": 0.265656745695079
+       }
+      }
+     },
+     {
+      "network_update": 28,
+      "active_seconds": 8959.841329333009,
+      "fresh": {
+       "axis": {
+        "samples": 1091,
+        "value_loss": 0.027280645961201225,
+        "score_variance": 0.029892275338344414,
+        "explained": 0.0873680356407367,
+        "policy_cross_entropy": 2.44771995034556,
+        "policy_kl": 0.3170565877374515
+       },
+       "allies": {
+        "samples": 539,
+        "value_loss": 0.027656816964152377,
+        "score_variance": 0.03054921396158393,
+        "explained": 0.09467991553133848,
+        "policy_cross_entropy": 2.38808651876774,
+        "policy_kl": 0.2666380216823167
+       },
+       "comintern": {
+        "samples": 278,
+        "value_loss": 0.028601152100491686,
+        "score_variance": 0.027527135349274548,
+        "explained": -0.039016655296296276,
+        "policy_cross_entropy": 0.6573222452286012,
+        "policy_kl": 0.09777665838296525
+       },
+       "all": {
+        "samples": 1908,
+        "value_loss": 0.027579313087675764,
+        "score_variance": 0.02992570220636727,
+        "explained": 0.07840715323940728,
+        "policy_cross_entropy": 2.170008744033736,
+        "policy_kl": 0.27086401569119106
+       }
+      }
+     },
+     {
+      "network_update": 29,
+      "active_seconds": 9295.378685916003,
+      "fresh": {
+       "axis": {
+        "samples": 1037,
+        "value_loss": 0.020405675902663057,
+        "score_variance": 0.019252492250876923,
+        "explained": -0.05989788941395924,
+        "policy_cross_entropy": 2.4616366000829677,
+        "policy_kl": 0.31994588220148423
+       },
+       "allies": {
+        "samples": 554,
+        "value_loss": 0.021569047082545565,
+        "score_variance": 0.01796073303010152,
+        "explained": -0.20090015515495074,
+        "policy_cross_entropy": 2.3881069687491516,
+        "policy_kl": 0.27240683667124505
+       },
+       "comintern": {
+        "samples": 280,
+        "value_loss": 0.01854840369433077,
+        "score_variance": 0.020075485871598575,
+        "explained": 0.07606700963727187,
+        "policy_cross_entropy": 0.7231111512121345,
+        "policy_kl": 0.08796436274176846
+       },
+       "all": {
+        "samples": 1871,
+        "value_loss": 0.020472202581082014,
+        "score_variance": 0.01902048533301935,
+        "explained": -0.0763238804186821,
+        "policy_cross_entropy": 2.179689758050489,
+        "policy_kl": 0.27115301385703044
+       }
+      }
+     },
+     {
+      "network_update": 30,
+      "active_seconds": 9640.530425958,
+      "fresh": {
+       "axis": {
+        "samples": 1037,
+        "value_loss": 0.015411565952154583,
+        "score_variance": 0.018230933989480416,
+        "explained": 0.15464748207374668,
+        "policy_cross_entropy": 2.4388740049617,
+        "policy_kl": 0.3290832662813896
+       },
+       "allies": {
+        "samples": 527,
+        "value_loss": 0.014652224949166777,
+        "score_variance": 0.02155669544772074,
+        "explained": 0.32029354941246324,
+        "policy_cross_entropy": 2.5097490775339617,
+        "policy_kl": 0.2759617714935527
+       },
+       "comintern": {
+        "samples": 279,
+        "value_loss": 0.01572634438395969,
+        "score_variance": 0.017116803389815836,
+        "explained": 0.08123356763468126,
+        "policy_cross_entropy": 0.6757878499793972,
+        "policy_kl": 0.107135761535443
+       },
+       "all": {
+        "samples": 1843,
+        "value_loss": 0.015242087099142675,
+        "score_variance": 0.01910738617894675,
+        "explained": 0.20229345048057956,
+        "policy_cross_entropy": 2.19223815363534,
+        "policy_kl": 0.28029412814937155
+       }
+      }
+     },
+     {
+      "network_update": 31,
+      "active_seconds": 9963.176766290999,
+      "fresh": {
+       "axis": {
+        "samples": 1031,
+        "value_loss": 0.02352061466832658,
+        "score_variance": 0.03321504105732297,
+        "explained": 0.2918685655774328,
+        "policy_cross_entropy": 2.4133571789230923,
+        "policy_kl": 0.31549444894392475
+       },
+       "allies": {
+        "samples": 475,
+        "value_loss": 0.021244638333813973,
+        "score_variance": 0.02863962149584499,
+        "explained": 0.25820813180453084,
+        "policy_cross_entropy": 2.5478622336764567,
+        "policy_kl": 0.25882860114343376
+       },
+       "comintern": {
+        "samples": 319,
+        "value_loss": 0.02464790937501162,
+        "score_variance": 0.030468506939462642,
+        "explained": 0.19103652095640478,
+        "policy_cross_entropy": 0.7182396381574088,
+        "policy_kl": 0.12172411286153564
+       },
+       "all": {
+        "samples": 1825,
+        "value_loss": 0.023125282203964412,
+        "score_variance": 0.03166900875901666,
+        "explained": 0.2697819379212403,
+        "policy_cross_entropy": 2.1520680860483496,
+        "policy_kl": 0.2668758106340533
+       }
+      }
+     },
+     {
+      "network_update": 32,
+      "active_seconds": 10254.220904833011,
+      "fresh": {
+       "axis": {
+        "samples": 1001,
+        "value_loss": 0.024453849729767385,
+        "score_variance": 0.019134666409181936,
+        "explained": -0.27798672873821273,
+        "policy_cross_entropy": 2.443363592976979,
+        "policy_kl": 0.30830815995927313
+       },
+       "allies": {
+        "samples": 481,
+        "value_loss": 0.018682234995060464,
+        "score_variance": 0.018716007362231956,
+        "explained": 0.0018044643025544316,
+        "policy_cross_entropy": 2.334051207114681,
+        "policy_kl": 0.2593423371468358
+       },
+       "comintern": {
+        "samples": 262,
+        "value_loss": 0.020329937226968135,
+        "score_variance": 0.01825103068003024,
+        "explained": -0.11390625457731418,
+        "policy_cross_entropy": 0.5613716869785674,
+        "policy_kl": 0.08176766108404383
+       },
+       "all": {
+        "samples": 1744,
+        "value_loss": 0.02224248977384569,
+        "score_variance": 0.018951704632023725,
+        "explained": -0.17364058831211127,
+        "policy_cross_entropy": 2.1304845006768938,
+        "policy_kl": 0.26077021759798164
+       }
+      }
+     },
+     {
+      "network_update": 33,
+      "active_seconds": 10592.979445875011,
+      "fresh": {
+       "axis": {
+        "samples": 935,
+        "value_loss": 0.03535199789453315,
+        "score_variance": 0.034492359726614914,
+        "explained": -0.0249225676274889,
+        "policy_cross_entropy": 2.446948017478045,
+        "policy_kl": 0.3211551409056078
+       },
+       "allies": {
+        "samples": 518,
+        "value_loss": 0.029993711081752316,
+        "score_variance": 0.03476761592328676,
+        "explained": 0.1373089501468222,
+        "policy_cross_entropy": 2.467702348399549,
+        "policy_kl": 0.2767573397150779
+       },
+       "comintern": {
+        "samples": 264,
+        "value_loss": 0.026140265089149278,
+        "score_variance": 0.030368948834940356,
+        "explained": 0.13924366525738474,
+        "policy_cross_entropy": 0.5674882867410513,
+        "policy_kl": 0.07272894191969782
+       },
+       "all": {
+        "samples": 1717,
+        "value_loss": 0.0323190974695816,
+        "score_variance": 0.03408484269595191,
+        "explained": 0.0518044117768518,
+        "policy_cross_entropy": 2.1642301226048772,
+        "policy_kl": 0.2695636571845975
+       }
+      }
+     },
+     {
+      "network_update": 34,
+      "active_seconds": 10933.099243165998,
+      "fresh": {
+       "axis": {
+        "samples": 1070,
+        "value_loss": 0.03907806365089774,
+        "score_variance": 0.05163847143855354,
+        "explained": 0.24323740493755464,
+        "policy_cross_entropy": 2.4252899664626253,
+        "policy_kl": 0.31711914676797437
+       },
+       "allies": {
+        "samples": 468,
+        "value_loss": 0.03106934612157454,
+        "score_variance": 0.05002200058288884,
+        "explained": 0.37888637480439924,
+        "policy_cross_entropy": 2.466794119063582,
+        "policy_kl": 0.2499840400711538
+       },
+       "comintern": {
+        "samples": 293,
+        "value_loss": 0.0356935936678982,
+        "score_variance": 0.04086921577032535,
+        "explained": 0.12663864487913934,
+        "policy_cross_entropy": 0.5501930396240317,
+        "policy_kl": 0.08116564613234459
+       },
+       "all": {
+        "samples": 1831,
+        "value_loss": 0.036489462062289264,
+        "score_variance": 0.049573901621477005,
+        "explained": 0.26393806279550813,
+        "policy_cross_entropy": 2.1358418746294956,
+        "policy_kl": 0.2622018307546748
+       }
+      }
+     },
+     {
+      "network_update": 35,
+      "active_seconds": 11224.329084124998,
+      "fresh": {
+       "axis": {
+        "samples": 1065,
+        "value_loss": 0.030747896312668714,
+        "score_variance": 0.031227661463407497,
+        "explained": 0.015363467139573372,
+        "policy_cross_entropy": 2.4993873349049673,
+        "policy_kl": 0.3392003800081634
+       },
+       "allies": {
+        "samples": 469,
+        "value_loss": 0.0248316429464009,
+        "score_variance": 0.030883887313357044,
+        "explained": 0.19596770010032372,
+        "policy_cross_entropy": 2.535022542859638,
+        "policy_kl": 0.28681698381828274
+       },
+       "comintern": {
+        "samples": 264,
+        "value_loss": 0.02787842582697384,
+        "score_variance": 0.02788657108490192,
+        "explained": 0.0002920853160212067,
+        "policy_cross_entropy": 0.6799376452418475,
+        "policy_kl": 0.1011717442046795
+       },
+       "all": {
+        "samples": 1798,
+        "value_loss": 0.028783345124124192,
+        "score_variance": 0.030762931595193114,
+        "explained": 0.06434973419042556,
+        "policy_cross_entropy": 2.2415331605221405,
+        "policy_kl": 0.290586713342327
+       }
+      }
+     },
+     {
+      "network_update": 36,
+      "active_seconds": 11520.24741908301,
+      "fresh": {
+       "axis": {
+        "samples": 931,
+        "value_loss": 0.023836162876168396,
+        "score_variance": 0.02391405214047851,
+        "explained": 0.00325705003286636,
+        "policy_cross_entropy": 2.468733624098906,
+        "policy_kl": 0.31021282612808315
+       },
+       "allies": {
+        "samples": 434,
+        "value_loss": 0.021681136828938432,
+        "score_variance": 0.02259956159081734,
+        "explained": 0.04063905214214791,
+        "policy_cross_entropy": 2.3422740828159543,
+        "policy_kl": 0.255311669901895
+       },
+       "comintern": {
+        "samples": 295,
+        "value_loss": 0.022741347707822077,
+        "score_variance": 0.022563037349420594,
+        "explained": -0.00790276396036993,
+        "policy_cross_entropy": 0.778579294599233,
+        "policy_kl": 0.1160309886051568
+       },
+       "all": {
+        "samples": 1660,
+        "value_loss": 0.02307817987667444,
+        "score_variance": 0.02350573041757409,
+        "explained": 0.01818920464517837,
+        "policy_cross_entropy": 2.135312558966855,
+        "policy_kl": 0.261350932229632
+       }
+      }
+     },
+     {
+      "network_update": 37,
+      "active_seconds": 11864.164167541006,
+      "fresh": {
+       "axis": {
+        "samples": 1052,
+        "value_loss": 0.02671248986903075,
+        "score_variance": 0.022712396182418017,
+        "explained": -0.17611940433256712,
+        "policy_cross_entropy": 2.4465099867474462,
+        "policy_kl": 0.3107407302195907
+       },
+       "allies": {
+        "samples": 479,
+        "value_loss": 0.024344765256772496,
+        "score_variance": 0.023268120789222257,
+        "explained": -0.046271225652607884,
+        "policy_cross_entropy": 2.43644529738983,
+        "policy_kl": 0.2677286566256681
+       },
+       "comintern": {
+        "samples": 283,
+        "value_loss": 0.028344591265281435,
+        "score_variance": 0.025012671802619516,
+        "explained": -0.13320925844927034,
+        "policy_cross_entropy": 0.6150031320069638,
+        "policy_kl": 0.09796343794460152
+       },
+       "all": {
+        "samples": 1814,
+        "value_loss": 0.02634189703874808,
+        "score_variance": 0.023381627776650107,
+        "explained": -0.12660663707315645,
+        "policy_cross_entropy": 2.1581211079746483,
+        "policy_kl": 0.26618794247686145
+       }
+      }
+     },
+     {
+      "network_update": 38,
+      "active_seconds": 12175.702761041,
+      "fresh": {
+       "axis": {
+        "samples": 1027,
+        "value_loss": 0.016820558780641356,
+        "score_variance": 0.017990346378390285,
+        "explained": 0.06502307254929007,
+        "policy_cross_entropy": 2.477785098047584,
+        "policy_kl": 0.319396581120144
+       },
+       "allies": {
+        "samples": 444,
+        "value_loss": 0.019588665893049462,
+        "score_variance": 0.017772100916795246,
+        "explained": -0.10221441937331677,
+        "policy_cross_entropy": 2.3270251643707156,
+        "policy_kl": 0.27002086589216584
+       },
+       "comintern": {
+        "samples": 277,
+        "value_loss": 0.014198912042113264,
+        "score_variance": 0.0175618757531919,
+        "explained": 0.19149228467052626,
+        "policy_cross_entropy": 0.6453860300995798,
+        "policy_kl": 0.09690498246931487
+       },
+       "all": {
+        "samples": 1748,
+        "value_loss": 0.01710822663609726,
+        "score_variance": 0.01792041310020653,
+        "explained": 0.0453218605825505,
+        "policy_cross_entropy": 2.149116933073827,
+        "policy_kl": 0.2715973875346166
+       }
+      }
+     },
+     {
+      "network_update": 39,
+      "active_seconds": 12499.269209000006,
+      "fresh": {
+       "axis": {
+        "samples": 994,
+        "value_loss": 0.016551290508712707,
+        "score_variance": 0.016309965000600474,
+        "explained": -0.014796200243430757,
+        "policy_cross_entropy": 2.493237395900618,
+        "policy_kl": 0.311477624515837
+       },
+       "allies": {
+        "samples": 518,
+        "value_loss": 0.015453528060665907,
+        "score_variance": 0.016111162854111793,
+        "explained": 0.04081858022296936,
+        "policy_cross_entropy": 2.594046940562315,
+        "policy_kl": 0.3016765032712521
+       },
+       "comintern": {
+        "samples": 238,
+        "value_loss": 0.015273262721166248,
+        "score_variance": 0.015141977785231742,
+        "explained": -0.008670263409219281,
+        "policy_cross_entropy": 0.5513959647634983,
+        "policy_kl": 0.09290702995582097
+       },
+       "all": {
+        "samples": 1750,
+        "value_loss": 0.016052541044984537,
+        "score_variance": 0.016182302670584865,
+        "explained": 0.00801873677942011,
+        "policy_cross_entropy": 2.2589865864858325,
+        "policy_kl": 0.27885089176727756
+       }
+      }
+     },
+     {
+      "network_update": 40,
+      "active_seconds": 12819.895144458002,
+      "fresh": {
+       "axis": {
+        "samples": 896,
+        "value_loss": 0.028985482248239287,
+        "score_variance": 0.03540255763213496,
+        "explained": 0.18126021996983854,
+        "policy_cross_entropy": 2.405693907493699,
+        "policy_kl": 0.31909392971878675
+       },
+       "allies": {
+        "samples": 498,
+        "value_loss": 0.028250005916912,
+        "score_variance": 0.03574509176330507,
+        "explained": 0.20968153882562757,
+        "policy_cross_entropy": 2.5438806944433616,
+        "policy_kl": 0.28187091782174956
+       },
+       "comintern": {
+        "samples": 294,
+        "value_loss": 0.025264897189006253,
+        "score_variance": 0.03190085430839001,
+        "explained": 0.20801816325146127,
+        "policy_cross_entropy": 0.6307113036560892,
+        "policy_kl": 0.09695632842987173
+       },
+       "all": {
+        "samples": 1688,
+        "value_loss": 0.028120482710078443,
+        "score_variance": 0.03513877380805301,
+        "explained": 0.1997306774650781,
+        "policy_cross_entropy": 2.1373124705106856,
+        "policy_kl": 0.26942241626874786
+       }
+      }
+     },
+     {
+      "network_update": 41,
+      "active_seconds": 13155.306286166,
+      "fresh": {
+       "axis": {
+        "samples": 948,
+        "value_loss": 0.026956410210108448,
+        "score_variance": 0.035730830799684865,
+        "explained": 0.2455700131566435,
+        "policy_cross_entropy": 2.424275023430768,
+        "policy_kl": 0.3130874685461834
+       },
+       "allies": {
+        "samples": 518,
+        "value_loss": 0.02431646967138178,
+        "score_variance": 0.035314303270175956,
+        "explained": 0.31142717200602943,
+        "policy_cross_entropy": 2.585231380454671,
+        "policy_kl": 0.2872345034773704
+       },
+       "comintern": {
+        "samples": 298,
+        "value_loss": 0.02319373151054978,
+        "score_variance": 0.03639306347311692,
+        "explained": 0.3626881252334613,
+        "policy_cross_entropy": 0.6658647531984356,
+        "policy_kl": 0.09150418019743045
+       },
+       "all": {
+        "samples": 1764,
+        "value_loss": 0.025545544307881182,
+        "score_variance": 0.03591945612199927,
+        "explained": 0.28881038117290614,
+        "policy_cross_entropy": 2.174484282166112,
+        "policy_kl": 0.26806272034120976
+       }
+      }
+     }
+    ],
+    "hours": [
+     {
+      "from_hours": 0.0,
+      "to_hours": 1.0,
+      "network_updates": 11,
+      "games": 264,
+      "losses": {
+       "axis": {
+        "samples": 9552,
+        "value_loss": 0.06032978738602852,
+        "score_variance": 0.02820642899845474,
+        "explained": -1.1388665466774834,
+        "policy_cross_entropy": 2.4341369990145356,
+        "policy_kl": 0.3261845688125702
+       },
+       "allies": {
+        "samples": 4984,
+        "value_loss": 0.0545906389250262,
+        "score_variance": 0.02787903434562054,
+        "explained": -0.9581251720650694,
+        "policy_cross_entropy": 2.4365122409195856,
+        "policy_kl": 0.3159174447427793
+       },
+       "comintern": {
+        "samples": 3215,
+        "value_loss": 0.06900760316926569,
+        "score_variance": 0.027511504635074024,
+        "explained": -1.5083180322056569,
+        "policy_cross_entropy": 0.7669207781281021,
+        "policy_kl": 0.11194270553825209
+       },
+       "all": {
+        "samples": 17751,
+        "value_loss": 0.06029008606291838,
+        "score_variance": 0.028074958528712262,
+        "explained": -1.1474683925627067,
+        "policy_cross_entropy": 2.1328434412152544,
+        "policy_kl": 0.2844990898654253
+       }
+      }
+     },
+     {
+      "from_hours": 1.0,
+      "to_hours": 2.0,
+      "network_updates": 11,
+      "games": 264,
+      "losses": {
+       "axis": {
+        "samples": 11470,
+        "value_loss": 0.023587580959625362,
+        "score_variance": 0.026051448781469273,
+        "explained": 0.09457699809756803,
+        "policy_cross_entropy": 2.4315876289817826,
+        "policy_kl": 0.31854450057554373
+       },
+       "allies": {
+        "samples": 5513,
+        "value_loss": 0.02162939300055949,
+        "score_variance": 0.02692630431357793,
+        "explained": 0.19671883862455664,
+        "policy_cross_entropy": 2.4664115334045853,
+        "policy_kl": 0.29149007292980517
+       },
+       "comintern": {
+        "samples": 3079,
+        "value_loss": 0.023207309719069077,
+        "score_variance": 0.026929607573408083,
+        "explained": 0.13822324904632577,
+        "policy_cross_entropy": 0.6526395558360211,
+        "policy_kl": 0.09211597205105262
+       },
+       "all": {
+        "samples": 20062,
+        "value_loss": 0.022991112742697693,
+        "score_variance": 0.02654494855321825,
+        "explained": 0.1338799283560751,
+        "policy_cross_entropy": 2.1681344871149246,
+        "policy_kl": 0.2763590505238111
+       }
+      }
+     },
+     {
+      "from_hours": 2.0,
+      "to_hours": 3.0,
+      "network_updates": 11,
+      "games": 264,
+      "losses": {
+       "axis": {
+        "samples": 11217,
+        "value_loss": 0.024466272661169585,
+        "score_variance": 0.0271302073916663,
+        "explained": 0.0981907249007985,
+        "policy_cross_entropy": 2.4288191416871494,
+        "policy_kl": 0.31653840290612095
+       },
+       "allies": {
+        "samples": 5759,
+        "value_loss": 0.023002093631870214,
+        "score_variance": 0.02701152407901301,
+        "explained": 0.14843406967391304,
+        "policy_cross_entropy": 2.4651923257601442,
+        "policy_kl": 0.2726655523020302
+       },
+       "comintern": {
+        "samples": 3034,
+        "value_loss": 0.02268143277915856,
+        "score_variance": 0.026121883597192263,
+        "explained": 0.13170760849740193,
+        "policy_cross_entropy": 0.6705249928998905,
+        "policy_kl": 0.10214124529826098
+       },
+       "all": {
+        "samples": 20010,
+        "value_loss": 0.023774248111856414,
+        "score_variance": 0.02704026403257323,
+        "explained": 0.12078343306050965,
+        "policy_cross_entropy": 2.172687643419075,
+        "policy_kl": 0.2714037340999639
+       }
+      }
+     },
+     {
+      "from_hours": 3.0,
+      "to_hours": 4.0,
+      "network_updates": 8,
+      "games": 192,
+      "losses": {
+       "axis": {
+        "samples": 7983,
+        "value_loss": 0.026319104380103996,
+        "score_variance": 0.032181714339597794,
+        "explained": 0.18217208373763316,
+        "policy_cross_entropy": 2.4559319825165993,
+        "policy_kl": 0.3177524000821279
+       },
+       "allies": {
+        "samples": 3828,
+        "value_loss": 0.02367397593961574,
+        "score_variance": 0.03229230482046779,
+        "explained": 0.2668849104691192,
+        "policy_cross_entropy": 2.484301828321568,
+        "policy_kl": 0.2758291197628869
+       },
+       "comintern": {
+        "samples": 2242,
+        "value_loss": 0.02428906832823909,
+        "score_variance": 0.030581873076982933,
+        "explained": 0.2057691081544657,
+        "policy_cross_entropy": 0.6415244723005147,
+        "policy_kl": 0.09686513331594913
+       },
+       "all": {
+        "samples": 14053,
+        "value_loss": 0.025274708699575273,
+        "score_variance": 0.0320666410302637,
+        "explained": 0.21180679087274434,
+        "policy_cross_entropy": 2.1741912959612,
+        "policy_kl": 0.27109250047693123
+       }
+      }
+     }
+    ],
+    "after_first_hour": {
+     "from_hours": 1.0,
+     "to_hours": 3.696471813275279,
+     "network_updates": 30,
+     "games": 720,
+     "losses": {
+      "axis": {
+       "samples": 30670,
+       "value_loss": 0.024619926453003337,
+       "score_variance": 0.028083696836869704,
+       "explained": 0.1233374083186567,
+       "policy_cross_entropy": 2.4369116215570843,
+       "policy_kl": 0.3176046330895035
+      },
+      "allies": {
+       "samples": 15100,
+       "value_loss": 0.022671250379792986,
+       "score_variance": 0.02836185967048105,
+       "explained": 0.20064302400490452,
+       "policy_cross_entropy": 2.470481906392521,
+       "policy_kl": 0.2803403680941552
+      },
+      "comintern": {
+       "samples": 8355,
+       "value_loss": 0.023306626555223555,
+       "score_variance": 0.0276793622788583,
+       "explained": 0.15797819615861142,
+       "policy_cross_entropy": 0.6561517519778739,
+       "policy_kl": 0.09703090904541868
+      },
+      "all": {
+       "samples": 54125,
+       "value_loss": 0.023873549929189455,
+       "score_variance": 0.02820557632426725,
+       "explained": 0.15358758655644444,
+       "policy_cross_entropy": 2.171390376119314,
+       "policy_kl": 0.27315966559170973
+      }
+     }
+    }
+   }
+  },
+  "evaluations": {
+   "final-one": {
+    "axis": {
+     "scores": {
+      "3001": 29.299999999999997,
+      "3002": 1.2999999999999972,
+      "3003": 13.800000000000011,
+      "3004": -2.299999999999997,
+      "3005": 11.700000000000003,
+      "3006": -7.5,
+      "3007": 13.399999999999991,
+      "3008": -7.3999999999999915,
+      "3009": 20.599999999999994,
+      "3010": -2.3999999999999915,
+      "3011": -6.6000000000000085,
+      "3012": 3.299999999999997,
+      "3013": -2.3999999999999915,
+      "3014": 9.600000000000009,
+      "3015": 34.19999999999999,
+      "3016": 24.900000000000006
+     },
+     "unfinished": 0,
+     "decisions": 12481,
+     "games": 16,
+     "mean": 8.34375,
+     "standard_error": 3.3798541481105357,
+     "decisions_per_game": 780.0625
+    },
+    "allies": {
+     "scores": {
+      "3001": -79.10000000000002,
+      "3002": -81.5,
+      "3003": -45.599999999999994,
+      "3004": -92.1,
+      "3005": -68.4,
+      "3006": -89.6,
+      "3007": -43.0,
+      "3008": -83.7,
+      "3009": -69.9,
+      "3010": -78.0,
+      "3011": -37.0,
+      "3012": -74.0,
+      "3013": -2.9000000000000057,
+      "3014": -86.4,
+      "3015": -49.800000000000004,
+      "3016": -70.2
+     },
+     "unfinished": 0,
+     "decisions": 4842,
+     "games": 16,
+     "mean": -65.7,
+     "standard_error": 6.005157505566916,
+     "decisions_per_game": 302.625
+    },
+    "comintern": {
+     "scores": {
+      "3001": -85.3,
+      "3002": -104.60000000000001,
+      "3003": -99.50000000000001,
+      "3004": -95.5,
+      "3005": -104.9,
+      "3006": -104.50000000000001,
+      "3007": -103.60000000000001,
+      "3008": -68.90000000000002,
+      "3009": -99.99999999999999,
+      "3010": -106.90000000000002,
+      "3011": -105.1,
+      "3012": -82.70000000000002,
+      "3013": -94.40000000000002,
+      "3014": -106.39999999999999,
+      "3015": -84.2,
+      "3016": -103.00000000000001
+     },
+     "unfinished": 0,
+     "decisions": 2866,
+     "games": 16,
+     "mean": -96.84375,
+     "standard_error": 2.758818719881149,
+     "decisions_per_game": 179.125
+    }
+   },
+   "final-three": {
+    "axis": {
+     "scores": {
+      "3001": 9.399999999999991,
+      "3002": 4.1000000000000085,
+      "3003": 5.5,
+      "3004": 8.0,
+      "3005": 7.400000000000006,
+      "3006": 0.29999999999999716,
+      "3007": 5.200000000000003,
+      "3008": -2.3999999999999915,
+      "3009": 20.900000000000006,
+      "3010": 6.400000000000006,
+      "3011": -13.5,
+      "3012": 21.599999999999994,
+      "3013": 0.29999999999999716,
+      "3014": 26.200000000000017,
+      "3015": 1.200000000000017,
+      "3016": 3.200000000000003
+     },
+     "unfinished": 0,
+     "decisions": 13699,
+     "games": 16,
+     "mean": 6.487500000000003,
+     "standard_error": 2.448177468376561,
+     "decisions_per_game": 856.1875
+    },
+    "allies": {
+     "scores": {
+      "3001": -35.8,
+      "3002": -89.30000000000001,
+      "3003": -50.10000000000001,
+      "3004": -70.69999999999999,
+      "3005": -108.8,
+      "3006": -80.1,
+      "3007": -75.9,
+      "3008": -75.70000000000002,
+      "3009": -100.29999999999998,
+      "3010": -53.699999999999996,
+      "3011": -73.4,
+      "3012": -90.89999999999999,
+      "3013": -89.4,
+      "3014": -106.3,
+      "3015": -97.40000000000002,
+      "3016": -81.10000000000001
+     },
+     "unfinished": 0,
+     "decisions": 5513,
+     "games": 16,
+     "mean": -79.93125,
+     "standard_error": 5.097170119700407,
+     "decisions_per_game": 344.5625
+    },
+    "comintern": {
+     "scores": {
+      "3001": -97.49999999999999,
+      "3002": -107.7,
+      "3003": -106.7,
+      "3004": -65.9,
+      "3005": -67.1,
+      "3006": -105.80000000000003,
+      "3007": -90.60000000000001,
+      "3008": -107.00000000000001,
+      "3009": -94.1,
+      "3010": -101.8,
+      "3011": -89.5,
+      "3012": -104.10000000000001,
+      "3013": -101.30000000000001,
+      "3014": -98.0,
+      "3015": -98.10000000000001,
+      "3016": -96.00000000000001
+     },
+     "unfinished": 0,
+     "decisions": 3109,
+     "games": 16,
+     "mean": -95.7,
+     "standard_error": 3.176226797107957,
+     "decisions_per_game": 194.3125
+    }
+   },
+   "first-one": {
+    "axis": {
+     "scores": {
+      "3001": 48.30000000000001,
+      "3002": 56.599999999999994,
+      "3003": 50.8,
+      "3004": 52.80000000000001,
+      "3005": 42.599999999999994,
+      "3006": 45.5,
+      "3007": 15.799999999999997,
+      "3008": 45.2,
+      "3009": 55.400000000000006,
+      "3010": 25.89999999999999,
+      "3011": 39.3,
+      "3012": 43.2,
+      "3013": 24.89999999999999,
+      "3014": 43.20000000000002,
+      "3015": 45.69999999999999,
+      "3016": 40.2
+     },
+     "unfinished": 0,
+     "decisions": 1171,
+     "games": 16,
+     "mean": 42.2125,
+     "standard_error": 2.823840101115265,
+     "decisions_per_game": 73.1875
+    },
+    "allies": {
+     "scores": {
+      "3001": -82.1,
+      "3002": -74.79999999999998,
+      "3003": -61.49999999999999,
+      "3004": -73.6,
+      "3005": -82.5,
+      "3006": -76.7,
+      "3007": -69.0,
+      "3008": -77.0,
+      "3009": -92.39999999999999,
+      "3010": -73.4,
+      "3011": -75.69999999999999,
+      "3012": -85.8,
+      "3013": -80.80000000000001,
+      "3014": -90.69999999999999,
+      "3015": -60.7,
+      "3016": -69.30000000000001
+     },
+     "unfinished": 0,
+     "decisions": 1275,
+     "games": 16,
+     "mean": -76.625,
+     "standard_error": 2.264867545796,
+     "decisions_per_game": 79.6875
+    },
+    "comintern": {
+     "scores": {
+      "3001": -102.5,
+      "3002": -99.99999999999999,
+      "3003": -99.60000000000001,
+      "3004": -92.4,
+      "3005": -97.89999999999999,
+      "3006": -78.4,
+      "3007": -93.70000000000002,
+      "3008": -80.7,
+      "3009": -87.80000000000001,
+      "3010": -89.0,
+      "3011": -106.8,
+      "3012": -95.9,
+      "3013": -86.20000000000002,
+      "3014": -93.30000000000001,
+      "3015": -100.5,
+      "3016": -87.2
+     },
+     "unfinished": 0,
+     "decisions": 1964,
+     "games": 16,
+     "mean": -93.24375,
+     "standard_error": 1.9888013297377551,
+     "decisions_per_game": 122.75
+    }
+   },
+   "first-three": {
+    "axis": {
+     "scores": {
+      "3001": 24.000000000000014,
+      "3002": 45.60000000000001,
+      "3003": 44.39999999999999,
+      "3004": 47.7,
+      "3005": 63.0,
+      "3006": 38.30000000000001,
+      "3007": 53.60000000000001,
+      "3008": 41.89999999999999,
+      "3009": 13.800000000000011,
+      "3010": 38.30000000000001,
+      "3011": 56.999999999999986,
+      "3012": 40.400000000000006,
+      "3013": 24.0,
+      "3014": 18.60000000000001,
+      "3015": 45.599999999999994,
+      "3016": 39.10000000000001
+     },
+     "unfinished": 0,
+     "decisions": 1369,
+     "games": 16,
+     "mean": 39.706250000000004,
+     "standard_error": 3.4215672426292203,
+     "decisions_per_game": 85.5625
+    },
+    "allies": {
+     "scores": {
+      "3001": -68.0,
+      "3002": -74.8,
+      "3003": -58.000000000000014,
+      "3004": -73.5,
+      "3005": -63.40000000000001,
+      "3006": -74.8,
+      "3007": -85.30000000000001,
+      "3008": -70.4,
+      "3009": -92.5,
+      "3010": -62.800000000000004,
+      "3011": -74.5,
+      "3012": -79.7,
+      "3013": -73.9,
+      "3014": -83.30000000000001,
+      "3015": -90.0,
+      "3016": -80.30000000000001
+     },
+     "unfinished": 0,
+     "decisions": 1278,
+     "games": 16,
+     "mean": -75.325,
+     "standard_error": 2.4161522440994205,
+     "decisions_per_game": 79.875
+    },
+    "comintern": {
+     "scores": {
+      "3001": -102.80000000000001,
+      "3002": -100.80000000000001,
+      "3003": -95.4,
+      "3004": -97.10000000000002,
+      "3005": -97.90000000000002,
+      "3006": -108.7,
+      "3007": -103.4,
+      "3008": -100.7,
+      "3009": -90.3,
+      "3010": -105.5,
+      "3011": -103.00000000000001,
+      "3012": -90.40000000000002,
+      "3013": -90.60000000000001,
+      "3014": -91.5,
+      "3015": -102.8,
+      "3016": -101.80000000000001
+     },
+     "unfinished": 0,
+     "decisions": 2011,
+     "games": 16,
+     "mean": -98.91875,
+     "standard_error": 1.4558565276725128,
+     "decisions_per_game": 125.6875
+    }
+   },
+   "script": {
+    "axis": {
+     "scores": {
+      "3001": 48.39999999999999,
+      "3002": 2.499999999999986,
+      "3003": 30.700000000000003,
+      "3004": -5.499999999999986,
+      "3005": 43.30000000000001,
+      "3006": 43.19999999999999,
+      "3007": 3.0999999999999943,
+      "3008": 11.899999999999991,
+      "3009": 35.400000000000006,
+      "3010": 38.8,
+      "3011": -4.900000000000006,
+      "3012": 64.2,
+      "3013": 29.80000000000001,
+      "3014": 30.400000000000006,
+      "3015": 49.900000000000006,
+      "3016": -5.099999999999994
+     },
+     "unfinished": 0,
+     "decisions": 17890,
+     "games": 16,
+     "mean": 26.00625,
+     "standard_error": 5.636624793482355,
+     "decisions_per_game": 1118.125
+    },
+    "allies": {
+     "scores": {
+      "3001": -53.2,
+      "3002": -2.9000000000000057,
+      "3003": -35.10000000000001,
+      "3004": 4.900000000000006,
+      "3005": -51.3,
+      "3006": -69.0,
+      "3007": -4.1000000000000085,
+      "3008": -12.700000000000017,
+      "3009": -43.0,
+      "3010": -42.99999999999999,
+      "3011": 4.09999999999998,
+      "3012": -77.6,
+      "3013": -29.999999999999986,
+      "3014": -44.80000000000001,
+      "3015": -52.1,
+      "3016": 4.700000000000003
+     },
+     "unfinished": 0,
+     "decisions": 7880,
+     "games": 16,
+     "mean": -31.56875,
+     "standard_error": 6.800794798832952,
+     "decisions_per_game": 492.5
+    },
+    "comintern": {
+     "scores": {
+      "3001": -76.4,
+      "3002": -102.10000000000001,
+      "3003": -103.10000000000001,
+      "3004": -105.3,
+      "3005": -101.5,
+      "3006": -82.00000000000001,
+      "3007": -105.30000000000001,
+      "3008": -102.90000000000002,
+      "3009": -89.4,
+      "3010": -93.6,
+      "3011": -106.90000000000002,
+      "3012": -78.8,
+      "3013": -104.59999999999998,
+      "3014": -91.4,
+      "3015": -105.3,
+      "3016": -108.89999999999999
+     },
+     "unfinished": 0,
+     "decisions": 3805,
+     "games": 16,
+     "mean": -97.34375,
+     "standard_error": 2.6627987899639227,
+     "decisions_per_game": 237.8125
+    }
+   }
+  },
+  "paired": {
+   "final-one minus final-three": {
+    "axis": {
+     "seeds": 16,
+     "mean": 1.8562499999999975,
+     "standard_error": 3.534378407749609,
+     "first_higher": 7
+    },
+    "allies": {
+     "seeds": 16,
+     "mean": 14.23125,
+     "standard_error": 8.018300520008381,
+     "first_higher": 11
+    },
+    "comintern": {
+     "seeds": 16,
+     "mean": -1.1437500000000025,
+     "standard_error": 4.672249357911026,
+     "first_higher": 8
+    }
+   },
+   "final-one minus first-one": {
+    "axis": {
+     "seeds": 16,
+     "mean": -33.86875,
+     "standard_error": 4.061144325084578,
+     "first_higher": 0
+    },
+    "allies": {
+     "seeds": 16,
+     "mean": 10.924999999999995,
+     "standard_error": 5.843882128631047,
+     "first_higher": 10
+    },
+    "comintern": {
+     "seeds": 16,
+     "mean": -3.600000000000003,
+     "standard_error": 3.2192649264493074,
+     "first_higher": 6
+    }
+   },
+   "final-one minus first-three": {
+    "axis": {
+     "seeds": 16,
+     "mean": -31.362500000000004,
+     "standard_error": 5.2831325540188105,
+     "first_higher": 2
+    },
+    "allies": {
+     "seeds": 16,
+     "mean": 9.625000000000002,
+     "standard_error": 6.565373180558741,
+     "first_higher": 8
+    },
+    "comintern": {
+     "seeds": 16,
+     "mean": 2.075000000000001,
+     "standard_error": 2.9528870054010974,
+     "first_higher": 6
+    }
+   },
+   "final-one minus script": {
+    "axis": {
+     "seeds": 16,
+     "mean": -17.6625,
+     "standard_error": 5.759939778331019,
+     "first_higher": 3
+    },
+    "allies": {
+     "seeds": 16,
+     "mean": -34.13125,
+     "standard_error": 8.349394782208268,
+     "first_higher": 3
+    },
+    "comintern": {
+     "seeds": 16,
+     "mean": 0.49999999999999645,
+     "standard_error": 3.5260459441136036,
+     "first_higher": 8
+    }
+   },
+   "final-three minus first-one": {
+    "axis": {
+     "seeds": 16,
+     "mean": -35.724999999999994,
+     "standard_error": 3.3145449662560518,
+     "first_higher": 0
+    },
+    "allies": {
+     "seeds": 16,
+     "mean": -3.306250000000004,
+     "standard_error": 4.723703250187647,
+     "first_higher": 6
+    },
+    "comintern": {
+     "seeds": 16,
+     "mean": -2.4562500000000007,
+     "standard_error": 4.105118438709575,
+     "first_higher": 6
+    }
+   },
+   "final-three minus first-three": {
+    "axis": {
+     "seeds": 16,
+     "mean": -33.21875,
+     "standard_error": 5.196426807191648,
+     "first_higher": 2
+    },
+    "allies": {
+     "seeds": 16,
+     "mean": -4.6062499999999975,
+     "standard_error": 4.222217710615279,
+     "first_higher": 6
+    },
+    "comintern": {
+     "seeds": 16,
+     "mean": 3.2187500000000036,
+     "standard_error": 3.4047664965212143,
+     "first_higher": 9
+    }
+   },
+   "final-three minus script": {
+    "axis": {
+     "seeds": 16,
+     "mean": -19.518749999999997,
+     "standard_error": 5.0251303362035635,
+     "first_higher": 4
+    },
+    "allies": {
+     "seeds": 16,
+     "mean": -48.3625,
+     "standard_error": 7.943586904960924,
+     "first_higher": 1
+    },
+    "comintern": {
+     "seeds": 16,
+     "mean": 1.643749999999999,
+     "standard_error": 4.693186273293798,
+     "first_higher": 7
+    }
+   },
+   "first-one minus first-three": {
+    "axis": {
+     "seeds": 16,
+     "mean": 2.506249999999997,
+     "standard_error": 4.74268268625469,
+     "first_higher": 12
+    },
+    "allies": {
+     "seeds": 16,
+     "mean": -1.2999999999999932,
+     "standard_error": 2.954220145261125,
+     "first_higher": 5
+    },
+    "comintern": {
+     "seeds": 16,
+     "mean": 5.675000000000004,
+     "standard_error": 2.501324649060972,
+     "first_higher": 12
+    }
+   },
+   "first-one minus script": {
+    "axis": {
+     "seeds": 16,
+     "mean": 16.20625,
+     "standard_error": 6.13121432201648,
+     "first_higher": 10
+    },
+    "allies": {
+     "seeds": 16,
+     "mean": -45.05625,
+     "standard_error": 6.389907202964687,
+     "first_higher": 0
+    },
+    "comintern": {
+     "seeds": 16,
+     "mean": 4.1,
+     "standard_error": 3.1628573579386505,
+     "first_higher": 13
+    }
+   },
+   "first-three minus script": {
+    "axis": {
+     "seeds": 16,
+     "mean": 13.700000000000003,
+     "standard_error": 7.455445437173198,
+     "first_higher": 8
+    },
+    "allies": {
+     "seeds": 16,
+     "mean": -43.75625,
+     "standard_error": 7.252637271767651,
+     "first_higher": 0
+    },
+    "comintern": {
+     "seeds": 16,
+     "mean": -1.5750000000000046,
+     "standard_error": 2.9330373903742393,
+     "first_higher": 10
+    }
+   }
+  }
+ },
+ "load_by_part": {
+  "three networks, first part": {
+   "seconds_with_game_processes": 6686.2,
+   "batch_cores": {
+    "mean_window": 6.5,
+    "median_window": 6.54,
+    "highest_window": 7.28
+   },
+   "other_work_cores": {
+    "mean_window": 1.48,
+    "median_window": 1.03
+   },
+   "processes": {
+    "rest of the tree": {
+     "processes": 674,
+     "cpu_seconds": 20.4,
+     "performance_core_share": 0.927,
+     "waiting_for_a_core_seconds": 1.6,
+     "waiting_per_cpu_second": 0.079,
+     "instructions": 148787690232,
+     "cycles": 75461402774,
+     "instructions_per_cycle": {
+      "performance": 2.02,
+      "efficiency": 0.98
+     },
+     "gigahertz": {
+      "performance": 3.79,
+      "efficiency": 2.56
+     },
+     "efficiency_second_vs_performance_second": 0.326,
+     "performance_core_equivalent_cpu_seconds": 19.4,
+     "cpu_seconds_by_qos": {
+      "legacy": 20.4
+     }
+    },
+    "coordinator": {
+     "processes": 1,
+     "cpu_seconds": 7082.1,
+     "performance_core_share": 0.99,
+     "waiting_for_a_core_seconds": 113.2,
+     "waiting_per_cpu_second": 0.016,
+     "instructions": 101196285281392,
+     "cycles": 26181663921473,
+     "instructions_per_cycle": {
+      "performance": 3.88,
+      "efficiency": 1.37
+     },
+     "gigahertz": {
+      "performance": 3.71,
+      "efficiency": 2.54
+     },
+     "efficiency_second_vs_performance_second": 0.241,
+     "performance_core_equivalent_cpu_seconds": 7030.5,
+     "cpu_seconds_by_qos": {
+      "legacy": 7082.1
+     }
+    },
+    "game processes": {
+     "processes": 6,
+     "cpu_seconds": 36353.2,
+     "performance_core_share": 0.908,
+     "waiting_for_a_core_seconds": 2759.1,
+     "waiting_per_cpu_second": 0.076,
+     "instructions": 361572813010343,
+     "cycles": 133652264479367,
+     "instructions_per_cycle": {
+      "performance": 2.8,
+      "efficiency": 1.37
+     },
+     "gigahertz": {
+      "performance": 3.79,
+      "efficiency": 2.53
+     },
+     "efficiency_second_vs_performance_second": 0.327,
+     "performance_core_equivalent_cpu_seconds": 34097.4,
+     "cpu_seconds_by_qos": {
+      "legacy": 36353.2
+     }
+    }
+   }
+  },
+  "one network": {
+   "seconds_with_game_processes": 13307.0,
+   "batch_cores": {
+    "mean_window": 7.7,
+    "median_window": 7.75,
+    "highest_window": 8.63
+   },
+   "other_work_cores": {
+    "mean_window": 0.52,
+    "median_window": 0.29
+   },
+   "processes": {
+    "rest of the tree": {
+     "processes": 1336,
+     "cpu_seconds": 41.1,
+     "performance_core_share": 0.926,
+     "waiting_for_a_core_seconds": 1.4,
+     "waiting_per_cpu_second": 0.035,
+     "instructions": 307614015832,
+     "cycles": 152480703264,
+     "instructions_per_cycle": {
+      "performance": 2.08,
+      "efficiency": 0.83
+     },
+     "gigahertz": {
+      "performance": 3.8,
+      "efficiency": 2.54
+     },
+     "efficiency_second_vs_performance_second": 0.266,
+     "performance_core_equivalent_cpu_seconds": 38.9,
+     "cpu_seconds_by_qos": {
+      "legacy": 41.1
+     }
+    },
+    "coordinator": {
+     "processes": 1,
+     "cpu_seconds": 13729.2,
+     "performance_core_share": 0.995,
+     "waiting_for_a_core_seconds": 67.4,
+     "waiting_per_cpu_second": 0.005,
+     "instructions": 215541354814579,
+     "cycles": 51196416277102,
+     "instructions_per_cycle": {
+      "performance": 4.22,
+      "efficiency": 1.29
+     },
+     "gigahertz": {
+      "performance": 3.73,
+      "efficiency": 2.5
+     },
+     "efficiency_second_vs_performance_second": 0.204,
+     "performance_core_equivalent_cpu_seconds": 13679.8,
+     "cpu_seconds_by_qos": {
+      "legacy": 13729.2
+     }
+    },
+    "game processes": {
+     "processes": 6,
+     "cpu_seconds": 88657.7,
+     "performance_core_share": 0.914,
+     "waiting_for_a_core_seconds": 3805.1,
+     "waiting_per_cpu_second": 0.043,
+     "instructions": 899770360852691,
+     "cycles": 326473192974061,
+     "instructions_per_cycle": {
+      "performance": 2.84,
+      "efficiency": 1.34
+     },
+     "gigahertz": {
+      "performance": 3.79,
+      "efficiency": 2.5
+     },
+     "efficiency_second_vs_performance_second": 0.31,
+     "performance_core_equivalent_cpu_seconds": 83420.8,
+     "cpu_seconds_by_qos": {
+      "legacy": 88657.7
+     }
+    }
+   }
+  },
+  "three networks, resumed": {
+   "seconds_with_game_processes": 6608.1,
+   "batch_cores": {
+    "mean_window": 6.54,
+    "median_window": 6.6,
+    "highest_window": 7.34
+   },
+   "other_work_cores": {
+    "mean_window": 0.49,
+    "median_window": 0.29
+   },
+   "processes": {
+    "rest of the tree": {
+     "processes": 667,
+     "cpu_seconds": 20.3,
+     "performance_core_share": 0.946,
+     "waiting_for_a_core_seconds": 0.6,
+     "waiting_per_cpu_second": 0.028,
+     "instructions": 157796954375,
+     "cycles": 75185796306,
+     "instructions_per_cycle": {
+      "performance": 2.15,
+      "efficiency": 0.8
+     },
+     "gigahertz": {
+      "performance": 3.78,
+      "efficiency": 2.53
+     },
+     "efficiency_second_vs_performance_second": 0.249,
+     "performance_core_equivalent_cpu_seconds": 19.4,
+     "cpu_seconds_by_qos": {
+      "legacy": 20.3
+     }
+    },
+    "coordinator": {
+     "processes": 1,
+     "cpu_seconds": 7021.7,
+     "performance_core_share": 0.995,
+     "waiting_for_a_core_seconds": 63.5,
+     "waiting_per_cpu_second": 0.009,
+     "instructions": 104429576940174,
+     "cycles": 25955439059379,
+     "instructions_per_cycle": {
+      "performance": 4.03,
+      "efficiency": 1.26
+     },
+     "gigahertz": {
+      "performance": 3.7,
+      "efficiency": 2.5
+     },
+     "efficiency_second_vs_performance_second": 0.21,
+     "performance_core_equivalent_cpu_seconds": 6991.6,
+     "cpu_seconds_by_qos": {
+      "legacy": 7021.7
+     }
+    },
+    "game processes": {
+     "processes": 6,
+     "cpu_seconds": 36139.7,
+     "performance_core_share": 0.927,
+     "waiting_for_a_core_seconds": 1478.5,
+     "waiting_per_cpu_second": 0.041,
+     "instructions": 369063013265218,
+     "cycles": 133418193672083,
+     "instructions_per_cycle": {
+      "performance": 2.84,
+      "efficiency": 1.35
+     },
+     "gigahertz": {
+      "performance": 3.79,
+      "efficiency": 2.47
+     },
+     "efficiency_second_vs_performance_second": 0.31,
+     "performance_core_equivalent_cpu_seconds": 34314.2,
+     "cpu_seconds_by_qos": {
+      "legacy": 36139.7
+     }
+    }
+   }
+  }
+ }
+}

@@ -196,7 +196,10 @@ policy's cross-entropy and KL divergence against the search's visit shares
 (`fresh_game_losses` in `learning.py`), and each game's own sums under
 `fresh_losses`. Divided by the training samples, these are the losses of
 [the loss](../../docs/design/README.md#81-the-loss) on games the networks have
-not trained on.
+not trained on. `tools/compare_training_runs.py` compares runs by them, per hour
+of active time, and puts each value loss beside the variance of the games'
+final scores, which differs between runs whose games differ; it also compares
+runs' decisions per hour and their held-out evaluation games.
 
 `--sample-fraction F` keeps that share of a worker game's decisions as training
 samples, from its own random stream, so the games play the same.

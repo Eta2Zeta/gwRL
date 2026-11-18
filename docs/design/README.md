@@ -1482,9 +1482,13 @@ feature `deciding_player` (`src/zone_encoding.cpp`). In a training step it reads
 the minibatch once and gives its values and its action probabilities for every
 decision, so its policy loss averages over all 32 training samples, and it takes
 one Adam step. The inference server evaluates every state with it, a chance
-state once, in one forward pass of one network (section 9.2). Whether it learns
-as well as three networks is being measured
-([open question](#one-network-per-alliance-or-one-shared-network)).
+state once, in one forward pass of one network (section 9.2). In matched runs
+on 17 November it played 21.6% more decisions an hour on the Mac, and its value
+head and its held-out evaluation games did as well as three networks', but its
+action probabilities fit its searches slightly less well. Whether it becomes the
+default waits for the owner
+([Q-010](../questions.md#q-010-one-network-for-the-three-alliances-by-default);
+[open question](#one-network-per-alliance-or-one-shared-network)).
 
 In the training command the minibatch size, 32, is `--batch-size` and the number
 of training steps per network update is `--epochs`. The second name misleads: a
@@ -2273,8 +2277,10 @@ the others pay, and how much, is open:
   ([record](../archive/records/network_split_2026_11_17.md)). Only one network
   for all three alliances makes a forward pass's PyTorch calls one network's
   without padding: the same states through one network took 15% less time on
-  one core and 15% to 38% less on the GPU
-  ([open question](#one-network-per-alliance-or-one-shared-network)).
+  one core and 15% to 38% less on the GPU, and in matched training runs on the
+  Mac one network played 21.6% more decisions an hour
+  ([record](../archive/records/one_network_comparison_2026_11_17.md#speed);
+  [open question](#one-network-per-alliance-or-one-shared-network)).
 - **Smaller call overheads: compiling.** PyTorch's compiler, `torch.compile`,
   reads a forward pass's PyTorch calls once, ahead of the forward passes it
   serves, and writes routines that each do the work of several PyTorch calls,
@@ -2453,11 +2459,27 @@ game, against 338 for the scripted Axis. In self-play, with noise and the action
 drawn from the visit shares, the same networks made 208 Axis decisions a game
 ([record](../archive/records/three_round_training_2026_11_14.md)). So comparing a
 trained network with generation 0 compares it with a player that does almost
-nothing. Over three game rounds, that is the best Axis player measured (see
+nothing. Over three game rounds, and over eleven on 18 November, that is the
+best Axis player measured (see
 [the objective](#is-the-final-wealth-gap-the-right-goal)).
 
 A few games do not establish strength. The scripted opponents are simple
 controls, not expert play.
+
+**Losses on fresh games.** Between held-out evaluations, a run shows how well
+its networks learn by how well they predict each game before training on it. In
+self-play that never stops, each game that ends is first scored by the networks
+serving self-play, with section 8.1's value loss and the KL divergence of the
+action probabilities from the visit shares, by alliance (`fresh_game_losses` in
+`studies/campaign/learning.py`). Two runs play different games, whose final
+scores can be predicted more or less well, so a run's value loss is compared
+beside the variance of its games' final scores, which is the value loss of
+always predicting their mean. The *explained variance* is one minus the value
+loss divided by that variance. On 17 November one network's value loss was 18%
+higher than three networks', but its games' final scores varied 21% more, and
+the two explained 15.4% and 13.1% of that variance
+([record](../archive/records/one_network_comparison_2026_11_17.md#learning-on-each-game-before-training-on-it)).
+`tools/compare_training_runs.py` reports both for each hour of a run.
 
 ## 11. Known gaps and open questions
 
@@ -2744,11 +2766,23 @@ stopped at states rated by another alliance's network than the choosing one's,
 and such a rating set the bottom of the scale in [section
 4.6](#46-a-real-search-decision-612)'s example. Whether the networks agree better
 after more training, and how much the disagreement changes searches, is not
-measured. **Would settle it:** an equal-compute comparison, which the owner chose
-to make ([Q-009](../questions.md#answered)): matched runs of the Mac profile, one
-with three networks and one with one network, compared on how well the networks
-predict each game before they train on it and in held-out evaluation games
-(section 10); one network is kept if it learns at least as well. The
+measured.
+
+**Learning, measured** in the matched runs the owner chose
+([Q-009](../questions.md#answered)): the Mac profile on the night of 17 November,
+3.7 hours of training each
+([record](../archive/records/one_network_comparison_2026_11_17.md)). One network
+played 21.6% more decisions an hour. On each game before training on it, the
+two runs' value heads explained about the same share of the variance of the
+final scores ([section 10](#10-measuring-strength)), 15.4% with one network and
+13.1% with three. The one network's action probabilities fit its searches less
+well: a KL divergence from the visit shares of 0.273 against 0.252, most of the
+gap at Axis decisions. The two runs' last networks scored alike in held-out
+evaluation games, within the spread of 16 seeds per alliance. **Would settle
+it:** the owner's decision
+([Q-010](../questions.md#q-010-one-network-for-the-three-alliances-by-default)).
+The same comparison at a larger network size would show whether the gap in the
+action probabilities comes from the one network's size. The
 [plan](../plans/japan_china_full_rules_plan.md#2-training-approach) lists sharing
 as optional future work.
 
@@ -2769,7 +2803,13 @@ On 24 held-out three-round seeds on 14 November, an untrained Axis network that
 ended almost every phase at once beat the scripted Axis by 10.5 ± 2.3 points,
 scoring higher in 19 seeds. After 792 three-round games of training, the Axis
 moved and fought far more and scored 12.9 ± 2.2 below the untrained network
-([record](../archive/records/three_round_training_2026_11_14.md)).
+([record](../archive/records/three_round_training_2026_11_14.md)). Over eleven
+game rounds on 16 held-out seeds on 18 November, the untrained Axis networks of
+two runs scored +39.7 and +42.2 with 86 and 73 decisions a game, against +26.0
+for the scripted Axis with 1,118. After 3.7 hours of training the two runs' Axis
+networks made 856 and 780 decisions a game and scored +6.5 and +8.3, 33.2 ± 5.2
+and 33.9 ± 4.1 points below their untrained networks
+([record](../archive/records/one_network_comparison_2026_11_17.md#held-out-evaluation)).
 
 **Would settle it:** the owner's decision on the objective. A changed objective
 can be checked first with the same scripted comparison.
@@ -3088,6 +3128,10 @@ the dated records use instead.
 - **Held-out evaluation:** games of fixed networks, without exploration noise,
   against scripted opponents on seeds training never used; it measures playing
   strength.
+- **Explained variance:** one minus a value loss divided by the variance of the
+  same games' final scores: the share of the final scores' spread that the
+  network's values account for, 0 for always predicting the mean and 1 for
+  exact values.
 - **Residual block:** two convolutions whose result is added to their input;
   AlphaZero's networks are stacks of them, as this one is a stack of
   message-passing layers.
