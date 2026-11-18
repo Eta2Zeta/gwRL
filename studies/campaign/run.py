@@ -76,6 +76,9 @@ class RunConfig:
     # chooses, the default (docs/questions.md, Q-010); "three": a network for each
     # alliance.
     networks: str = "one"
+    # The inference server runs one network's zone and position layers compiled
+    # by torch.compile, for fixed numbers of states (design document, section 9.2).
+    compiled_forward: bool = False
 
     def __post_init__(self):
         if not isinstance(self.neural_device, str) or self.neural_device not in {"cpu", "mps", "cuda"} and not (
@@ -113,6 +116,8 @@ class RunConfig:
             raise ValueError("Only episode workers keep a share of their samples")
         if type(self.continuous) is not bool:
             raise ValueError("continuous must be Boolean")
+        if type(self.compiled_forward) is not bool:
+            raise ValueError("compiled_forward must be Boolean")
         if self.continuous and not self.games_per_process:
             raise ValueError("Self-play that never stops needs games per process, which share one inference server")
         if self.continuous and self.neural_device != "cpu":
@@ -561,7 +566,8 @@ def train(args) -> int:
                             learning_config=asdict(learner.config), rules_version=learner.compatibility["rules"])
             workers = (SharedEpisodeWorkers(config.episode_workers, config.games_per_process,
                                             device=resolve_neural_device(config.neural_device),
-                                            runtime_policy=learner._device_runtime, **settings)
+                                            runtime_policy=learner._device_runtime,
+                                            compiled_forward=config.compiled_forward, **settings)
                        if config.games_per_process else EpisodeWorkers(config.episode_workers, **settings))
         if getattr(args, "record_replay", False):
             replay_writer = ReplayTraceWriter(output / "replay.jsonl", {
@@ -785,6 +791,11 @@ def main(argv=None) -> int:
             training.add_argument("--networks", choices=("one", "three"), default=None,
                                   help="One network for all three alliances (one, the default) or a "
                                        "network for each alliance (three)")
+            continue
+        if field.name == "compiled_forward":
+            training.add_argument("--compiled-forward", action=argparse.BooleanOptionalAction, default=None,
+                                  help="Compile the inference server's zone and position layers for fixed "
+                                       "numbers of states (one network)")
             continue
         if field.name == "continuous":
             training.add_argument("--continuous", action=argparse.BooleanOptionalAction, default=None,

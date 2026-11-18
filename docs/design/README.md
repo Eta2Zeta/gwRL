@@ -1751,25 +1751,38 @@ of 8 states, three of the Axis, three of the Allies and two of the Comintern,
 decision 612 among them; its PyTorch calls are those the record cited below
 counted:
 
-![The forward pass of an inference batch of 8 states with one network for all three alliances: 3 states of the Axis, 3 of the Allies and 2 of the Comintern, decision 612 among them. Part 1: each state brings 37 zone vectors, a global vector and an action vector for each of its legal actions; collated, the forward pass's zone vectors are one array of 296 vectors of 64 numbers, in the order of their inference requests: the Axis's zone vectors 0 to 110, the Allies' 111 to 221, the Comintern's 222 to 295, decision 612's 222 to 258. Part 2: the forward pass is a list of PyTorch calls, each one for all 8 states: the embedding layer, message-passing layer 1, message-passing layer 2, then the summary, the heads and the outputs. Message-passing layer 1 is 20 PyTorch calls: every zone's message 1, every border's message 3, each zone's average 3, a zone's inputs side by side 2, the zone correction 3, adding it 1, the average zone beside the global vector 3, the global correction 3, adding it 1; each state's border terms come from a copy kept from an earlier forward pass, with no PyTorch call. Message-passing layer 2 is the same 20; the embedding layer, summary, heads and outputs are 106; 146 in all, for 1 state as for 8. A network for each alliance calls each network's linear layers on its own states, between a split and a join: 258 PyTorch calls for these 8. Part 3: one PyTorch call, the network's linear for every zone's message, multiplies all 296 zone vectors by its 64 × 64 message weights: 296 × 64 output numbers of 64 multiply-adds each, 1,212,416 multiply-adds or 2,424,832 FLOPs, an eighth of them for decision 612. One output number, the first of Shensi's message at decision 612 by the Comintern's network of 5 November, is −0.294 × w1 + 1.957 × w2 − 1.422 × w3 − 0.203 × w4 and so on to w64, plus a bias: 64 multiply-adds, each two FLOPs. A PyTorch call's time is its call overhead, the same for 1 state or 8, then its FLOPs, which grow with the states.](figures/inference_batch_forward_pass.svg)
+![The forward pass of an inference batch of 8 states with one network for all three alliances: 3 states of the Axis, 3 of the Allies and 2 of the Comintern, decision 612 among them. Part 1: each state brings 37 zone vectors, a global vector and an action vector for each of its legal actions; collated, the forward pass's zone vectors are one array of 296 vectors of 64 numbers, in the order of their inference requests: the Axis's zone vectors 0 to 110, the Allies' 111 to 221, the Comintern's 222 to 295, decision 612's 222 to 258. Part 2: the forward pass is a list of PyTorch calls, each one for all 8 states: the embedding layer, message-passing layer 1, message-passing layer 2, then the summary, the heads and the outputs. Message-passing layer 1 is 21 PyTorch calls: every zone's message 1, every border's message with its border's own term 4, each zone's average of the messages it receives 3, a zone's inputs side by side 3, the zone correction 3, adding it 1, the average zone beside the global vector 2, the global correction 3, adding it 1. Message-passing layer 2 is the same 21; the embedding layer, summary, heads and outputs are 96; 138 in all, for 1 state as for 8. A network for each alliance calls each network's linear layers on its own states, between a split and a join: 247 PyTorch calls for these 8. Part 3: one PyTorch call, the network's linear for every zone's message, multiplies all 296 zone vectors by its 64 × 64 message weights: 296 × 64 output numbers of 64 multiply-adds each, 1,212,416 multiply-adds or 2,424,832 FLOPs, an eighth of them for decision 612. One output number, the first of Shensi's message at decision 612 by the Comintern's network of 5 November, is −0.294 × w1 + 1.957 × w2 − 1.422 × w3 − 0.203 × w4 and so on to w64, plus a bias: 64 multiply-adds, each two FLOPs. A PyTorch call's time is its call overhead, the same for 1 state or 8, then its FLOPs, which grow with the states.](figures/inference_batch_forward_pass.svg)
 
 **What a forward pass is made of: PyTorch calls.** A forward pass is a list of
 PyTorch calls (section 6.3), each applying one function to whole arrays, for all
 the inference batch's states at once. PyTorch's documentation names such a
 function an *operator*. With one network, a message-passing layer (section 6.6)
-is the 20 PyTorch calls below, however many states the inference batch holds and
-whichever alliances choose at them. For decision 612's zones, as for any
-state's:
+is the 21 PyTorch calls below, however many states the inference batch holds and
+whichever alliances choose at them. The forward pass keeps each state's zone
+vectors together, an array of states by 37 zones by the width, and every state
+has the same map, so its borders are fixed indices along the zones
+(`_state_layers` in `studies/campaign/neural.py`). For decision 612's zones, as
+for any state's:
 
 | PyTorch calls | What they do |
 | --- | --- |
 | `linear` | every zone's message: the 37 zone vectors times the layer's message weights |
-| `index_select`, `add`, `gelu` | each of the 160 directed borders takes its source zone's message, adds the border's own term and passes the sum through the GELU activation function |
+| `select`, `index_select`, `add`, `gelu` | each of the 160 directed borders takes its source zone's message, adds the border's own term, which `select` picks from the network's, and passes the sum through the GELU activation function |
 | `new_zeros`, `index_add_`, `div` | each zone adds up the messages arriving at it and divides by their number |
-| `repeat_interleave`, `cat` | each zone's vector, the messages it received and the global vector, side by side |
+| `unsqueeze`, `expand`, `cat` | each zone's vector, the messages it received and the global vector, side by side |
 | `linear`, `gelu`, `layer_norm`, `add` | the zone correction, added to each zone's vector |
-| `view`, `mean`, `cat` | the average zone vector beside the global vector |
+| `mean`, `cat` | the average zone vector beside the global vector |
 | `linear`, `gelu`, `layer_norm`, `add` | the global correction, added to the global vector |
+
+On a GPU `index_add_` adds the messages with atomic additions, which PyTorch's
+compiler could not build there. The compiled zone and position layers (section
+9.3) therefore average with a fixed matrix instead: 37 rows and 160 columns,
+holding 1 divided by the zone's number of incoming borders where a border ends at
+the zone, times the messages, one `matmul`. It does more arithmetic, 5,920
+multiply-adds per state and number of the width against 160 additions, and in
+forward passes as written it was 5% to 10% slower on the Mac's GPU, so those
+keep the additions
+([record](../archive/records/compiled_forward_2026_11_18.md)).
 
 **What a PyTorch call computes: FLOPs.** A *floating-point operation*, or *FLOP*,
 is one multiplication or one addition of two numbers. Each output number of a
@@ -1792,19 +1805,17 @@ about 3.4 million FLOPs for each state with 14 legal actions (section 9.3).
 **How the states enter.** How many PyTorch calls a forward pass makes does not
 depend on how many states the inference batch holds; how many FLOPs those calls
 do grows in proportion to them. A forward pass of the 64×2 network on one CPU
-core is 146 PyTorch calls, for 1 state as for 8, as in the figure: 40 for the two
-message-passing layers and 106 for the rest, the embedding layer's embedding
-lookups, the summary, the value and policy heads and the outputs. The record
-counted them with a network for each alliance and states of one alliance, which
-take the same path through the code as one network's states (`_by_network` and
-`NetworkStack.border_terms` in `studies/campaign/neural.py`). With a network for
-each alliance and states of all three alliances a forward pass is 258 PyTorch
-calls: each network's linear layers, with their activation functions and layer
+core is 138 PyTorch calls, for 1 state as for 8, as in the figure: 42 for the two
+message-passing layers and 96 for the rest, the embedding layer's embedding
+lookups, the summary, the value and policy heads and the outputs. With a network
+for each alliance and states of all three alliances it is 247 PyTorch calls:
+each network's linear layers, with their activation functions and layer
 normalizations, are called on that network's own states, between a split of the
-forward pass's vectors by network and a join, which adds 22 PyTorch calls to each
-message-passing layer and 68 elsewhere. On the GPU 25 more PyTorch calls carry
-the states' arrays over, and at 512×16 a forward pass is 426 to 871 PyTorch calls
-([record](../archive/records/pass_calls_2026_11_17.md#how-many-calls-a-pass-makes)).
+forward pass's vectors by network and a join, which adds 20 PyTorch calls to each
+message-passing layer and 69 elsewhere. On the GPU 24 or 25 more PyTorch calls
+carry the states' arrays over, and at 512×16 a forward pass is 432 to 456
+PyTorch calls with one network, 821 to 846 with a network for each alliance
+([record](../archive/records/compiled_forward_2026_11_18.md#pytorch-calls)).
 The FLOPs, by contrast, follow the states: in the figure's forward pass, the
 network's `linear` PyTorch call for the messages multiplies the zone vectors of
 all 8 states, 296 of them, in one PyTorch call, eight times decision 612's
@@ -1817,8 +1828,8 @@ its FLOPs, which grow with the states. A forward pass of the 64×2 network over
 one state takes one core 0.45 ms, 3.1 µs a PyTorch call, of which at most about
 2.1 µs is the call overhead, since the same core does a state's 3.4 million FLOPs
 in about 0.14 ms in large inference batches. An inference batch of 8 states pays
-the same 146 call overheads as an inference batch of one (with a network for each
-alliance, 258 when its states belong to all three), so its time per state is much
+the same 138 call overheads as an inference batch of one (with a network for each
+alliance, 247 when its states belong to all three), so its time per state is much
 lower: on one core a forward pass of 8 states took 1.67 ms, about 0.21 ms a state
 ([record](../archive/records/pass_calls_2026_11_17.md#what-the-calls-cost)). A
 PyTorch call is not a training step either: a training step (section 8.4) reads a
@@ -1842,7 +1853,7 @@ of its busy time in arithmetic, the GELU activation function (section 6.2) alone
 14%, mostly in the border messages (section 6.6). About 31% went to Python's and
 PyTorch's own work around the PyTorch calls, where their call overheads lie, and
 12% to allocating and copying memory. At about 0.7 µs each, the call overheads
-come to some 0.1 to 0.18 ms for 146 to 258 PyTorch calls, part of the forward
+come to some 0.1 to 0.18 ms for that day's 146 to 258 PyTorch calls, part of the forward
 pass's fixed cost of about 0.27 ms; the rest is the forward pass's own Python
 work and turning the inference batch's arrays into tensors (inferred). That
 training iteration kept a network for each alliance; in training with one
@@ -2138,9 +2149,9 @@ than one core at 64×2 but 1.7 and 3.7 times as fast at 256×8 and 512×16. Merg
 16 at a time, 119 states an inference batch, a 512×16 inference batch waited 84%
 of its time for the GPU's arithmetic, a 64×2 inference batch only 30%
 ([record](../archive/records/coordinator_rounds_2026_11_17.md#replayed-rounds-on-the-gpu)).
-Three of the inference server's levers (below), half precision, compiling and
-fewer PyTorch calls, were tried on those inference batches and did not pay as
-they stand. Fewer PyTorch calls do let the GPU do more: the same states through
+Half precision, and the forward pass compiled whole as written (below), were
+tried on those inference batches and did not pay. Fewer PyTorch calls do let the
+GPU do more: the same states through
 one network instead of three took 15% to 38% less time an inference batch
 ([record](../archive/records/network_split_2026_11_17.md#inference-batches-on-the-gpu)),
 which is one reason one network serves all three alliances since 18 November
@@ -2300,17 +2311,18 @@ in large inference batches of large networks, where the arithmetic fills it. Fro
 GPU's, and these levers are what would raise it. The levers take the forms below,
 beside two changes around the forward pass: leaner request handling and a second
 inference server. The first, fewer PyTorch calls, came with one network for all
-three alliances on 18 November; the others are not built. Compiling and half
-precision were tried on real inference batches saved from a training iteration
-and did not pay as they stand; which of the others pay, and how much, is open:
+three alliances on 18 November, and the second, compiling, is built for the zone
+and position layers as a setting; the others are not built. Half precision was
+tried on real inference batches saved from a training iteration and did not pay
+as it stands; which of the others pay, and how much, is open:
 
 - **Fewer PyTorch calls.** One network for all three alliances makes a forward
-  pass's PyTorch calls one network's, 146 at 64×2 on one core. A network for
-  each alliance makes 258 when an inference batch holds states of all three: 43%
-  to 50% of its PyTorch calls split the forward pass's vectors by network, call
-  each network's linear layer on that network's part and join the results
-  (`_by_network` in `studies/campaign/neural.py`;
-  [record](../archive/records/pass_calls_2026_11_17.md#how-many-calls-a-pass-makes)).
+  pass's PyTorch calls one network's, 138 at 64×2 on one core. A network for
+  each alliance makes 247 when an inference batch holds states of all three: 44%
+  to 47% of its PyTorch calls, at sizes from 64×2 to 512×16, split the forward
+  pass's vectors by network, call each network's linear layer on that network's
+  part and join the results (`_by_network` in `studies/campaign/neural.py`;
+  [record](../archive/records/compiled_forward_2026_11_18.md#pytorch-calls)).
   The same states through one network took 15% less time on one core and 15% to
   38% less on the GPU
   ([record](../archive/records/network_split_2026_11_17.md)), and in matched
@@ -2330,32 +2342,50 @@ and did not pay as they stand; which of the others pay, and how much, is open:
   states on, by 12% to 66%
   ([record](../archive/records/network_split_2026_11_17.md)).
 - **Smaller call overheads: compiling.** PyTorch's compiler, `torch.compile`,
-  reads a forward pass's PyTorch calls once, ahead of the forward passes it
-  serves, and writes routines that each do the work of several PyTorch calls,
-  such as a linear layer's matrix product, its GELU activation function and the
-  addition after it. A compiled forward pass pays fewer call overheads and moves
-  its numbers through memory fewer times. Its routines work best for arrays of
-  fixed sizes, and a forward pass's arrays change size with the inference batch
-  size, so inference batches would be padded with empty states up to a few fixed
-  sizes, each compiled once, at the cost of the empty states' arithmetic.
-  Fewer passes through memory would matter most on the GPU, where the matrix
+  reads a set of PyTorch calls once, ahead of the forward passes it serves, and
+  writes routines that each do the work of several PyTorch calls, such as a
+  linear layer's matrix product, its GELU activation function and the addition
+  after it. Compiled code pays fewer call overheads and moves its numbers through
+  memory fewer times. Its routines work best for arrays of fixed sizes, while a
+  forward pass's arrays change size with the inference batch size. With
+  `--compiled-forward` the inference server compiles one network's zone and
+  position layers, from the zone vectors through the message-passing layers to
+  the state vectors and the values, for fixed numbers of states, the *state
+  buckets* 1, 2, 3, 4, 6, 8, 10, 12, 16, 20 and so on up to 512, each at most a
+  third more than the one below (`STATE_BUCKETS` and `compiled_state_layers` in
+  `studies/campaign/neural.py`). An inference batch is padded to the next bucket
+  with empty states, whose zone and position vectors start at zero, and each
+  bucket is compiled when an inference batch first needs it. The parts whose
+  sizes follow the legal actions, the embedding lookups, the actions' vectors and
+  the policy readout, run as written, and a network for each alliance never
+  compiles, since each network's count of states would set its own array sizes.
+  On the saved inference batches, the compiled layers took 6% to 9% less time per
+  inference batch on the Mac's GPU than the same layers as written, at 256×8 and
+  512×16 as saved, about 9 states, and 21% to 24% less merged 8 at a time, about
+  60 states. At 64×2, where the layers they compile are a smaller part of the
+  time, they were 9% slower on the GPU and about as fast on one core
+  ([record](../archive/records/compiled_forward_2026_11_18.md#speed)). Their
+  outputs equal the uncompiled ones up to rounding. Compiling the buckets an inference
+  batch first needs takes time: with PyTorch's compile cache empty, about 17
+  seconds for the buckets of the inference batches as saved at 256×8, 36 seconds
+  merged 8 at a time at 512×16, and a minute on one core at 64×2. PyTorch keeps
+  the compiled code on disk, and a later run starts with it. The setting is off
+  unless given. Fewer passes through memory matter most on the GPU, where the matrix
   products are only 41% to 45% of a forward pass's time at every size, and the
   rest is operations that each read and write whole arrays with little
   arithmetic, such as additions, GELU and joins of vectors side by side; at
   512×16 the per-border work of the message-passing layers alone, along each
   state's 160 borders, is 28% to 32%
   ([record](../archive/records/network_split_2026_11_17.md#where-the-gpus-time-goes)).
-  One network needs fixed sizes only for the whole inference batch; with a
-  network for each alliance, each network's count of states sets the sizes of
-  its arrays, so each network would need its own.
-  Compiled as it is written, the forward pass was never faster on the saved
-  inference batches: 5% to 7% slower on the GPU and 12% to 21% slower on one
-  core. PyTorch compiled it again for each new mix of states, up to its limit of
-  8, and inference batches merged into larger ones made it write GPU code that
-  did not build ([record](../archive/records/coordinator_rounds_2026_11_17.md#compiling)). On an NVIDIA GPU, such as the Windows PC's (section 9.2), a *CUDA graph* goes further:
+  Compiled whole and as it was written, the forward pass had never been faster:
+  PyTorch compiled it again for each new mix of states, and larger inference
+  batches made it write GPU code that did not build
+  ([record](../archive/records/coordinator_rounds_2026_11_17.md#compiling)).
+  The actions' vectors and the policy readout are not compiled yet. On an NVIDIA
+  GPU, such as the Windows PC's (section 9.2), a *CUDA graph* goes further:
   PyTorch records a forward pass's PyTorch calls on the GPU once, and each later
   forward pass of the same inference batch size replays the record with a single
-  call overhead.
+  call overhead; it has not been tried.
 - **Cheaper arithmetic: half precision.** The network computes with numbers of
   32 bits, which keep about 7 significant digits; that is the float rounding of
   section 6.3. *Half-precision* numbers take 16 bits and keep about 3. A forward
@@ -3091,7 +3121,7 @@ the dated records use instead.
   the arrays that hold them all.
 - **PyTorch call:** one instruction to PyTorch, the library that does the
   network's arithmetic, to apply one function, such as a matrix product or GELU,
-  to whole arrays at once. A forward pass is a list of 146 to 871 PyTorch calls,
+  to whole arrays at once. A forward pass is a list of 138 to 846 PyTorch calls,
   however many states it holds; a PyTorch call is not a training step.
 - **Call overhead:** what a PyTorch call costs whatever the size of its arrays:
   Python's and PyTorch's work to check them, choose a routine and make room for
@@ -3113,7 +3143,7 @@ the dated records use instead.
   which its inference server runs the forward passes (section 9.2).
 - **CUDA:** NVIDIA's software for computing on its GPUs.
 
-**The inference server's levers (section 9.3; none of them built)**
+**The inference server's levers (section 9.3)**
 
 - **Grouped matrix product:** one PyTorch call that multiplies each network's
   states by that network's own weights.
@@ -3121,7 +3151,11 @@ the dated records use instead.
   network's states padded with empty ones to the largest network's count.
 - **Compiling a forward pass:** having PyTorch's compiler, `torch.compile`, turn
   a forward pass's PyTorch calls, once and ahead of time, into fewer routines that
-  each do the work of several PyTorch calls.
+  each do the work of several PyTorch calls; built for one network's zone and
+  position layers (`--compiled-forward`).
+- **State bucket:** one of the fixed numbers of states the zone and position
+  layers are compiled for; an inference batch is padded with empty states to the
+  next one.
 - **CUDA graph:** a forward pass's PyTorch calls recorded once on an NVIDIA GPU and
   replayed with a single call overhead.
 - **Half precision:** numbers of 16 bits, with about 3 significant digits,

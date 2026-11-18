@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="700" viewBox="0 0 960 700" role="img" aria-labelledby="title desc">
   <title id="title">The forward pass of an inference batch of 8 states: its PyTorch calls and their FLOPs</title>
-  <desc id="desc">The forward pass of an inference batch of 8 states with one network for all three alliances: 3 states of the Axis, 3 of the Allies and 2 of the Comintern, decision 612 among them. Part 1: each state brings 37 zone vectors, a global vector and an action vector for each of its legal actions; collated, the forward pass's zone vectors are one array of 296 vectors of 64 numbers, in the order of their inference requests: the Axis's zone vectors 0 to 110, the Allies' 111 to 221, the Comintern's 222 to 295, decision 612's 222 to 258. Part 2: the forward pass is a list of PyTorch calls, each one for all 8 states: the embedding layer, message-passing layer 1, message-passing layer 2, then the summary, the heads and the outputs. Message-passing layer 1 is 20 PyTorch calls: every zone's message 1, every border's message 3, each zone's average 3, a zone's inputs side by side 2, the zone correction 3, adding it 1, the average zone beside the global vector 3, the global correction 3, adding it 1; each state's border terms come from a copy kept from an earlier forward pass, with no PyTorch call. Message-passing layer 2 is the same 20; the embedding layer, summary, heads and outputs are 106; 146 in all, for 1 state as for 8. A network for each alliance calls each network's linear layers on its own states, between a split and a join: 258 PyTorch calls for these 8. Part 3: one PyTorch call, the network's linear for every zone's message, multiplies all 296 zone vectors by its 64 × 64 message weights: 296 × 64 output numbers of 64 multiply-adds each, 1,212,416 multiply-adds or 2,424,832 FLOPs, an eighth of them for decision 612. One output number, the first of Shensi's message at decision 612 by the Comintern's network of 5 November, is −0.294 × w1 + 1.957 × w2 − 1.422 × w3 − 0.203 × w4 and so on to w64, plus a bias: 64 multiply-adds, each two FLOPs. A PyTorch call's time is its call overhead, the same for 1 state or 8, then its FLOPs, which grow with the states.</desc>
+  <desc id="desc">The forward pass of an inference batch of 8 states with one network for all three alliances: 3 states of the Axis, 3 of the Allies and 2 of the Comintern, decision 612 among them. Part 1: each state brings 37 zone vectors, a global vector and an action vector for each of its legal actions; collated, the forward pass's zone vectors are one array of 296 vectors of 64 numbers, in the order of their inference requests: the Axis's zone vectors 0 to 110, the Allies' 111 to 221, the Comintern's 222 to 295, decision 612's 222 to 258. Part 2: the forward pass is a list of PyTorch calls, each one for all 8 states: the embedding layer, message-passing layer 1, message-passing layer 2, then the summary, the heads and the outputs. Message-passing layer 1 is 21 PyTorch calls: every zone's message 1, every border's message with its border's own term 4, each zone's average of the messages it receives 3, a zone's inputs side by side 3, the zone correction 3, adding it 1, the average zone beside the global vector 2, the global correction 3, adding it 1. Message-passing layer 2 is the same 21; the embedding layer, summary, heads and outputs are 96; 138 in all, for 1 state as for 8. A network for each alliance calls each network's linear layers on its own states, between a split and a join: 247 PyTorch calls for these 8. Part 3: one PyTorch call, the network's linear for every zone's message, multiplies all 296 zone vectors by its 64 × 64 message weights: 296 × 64 output numbers of 64 multiply-adds each, 1,212,416 multiply-adds or 2,424,832 FLOPs, an eighth of them for decision 612. One output number, the first of Shensi's message at decision 612 by the Comintern's network of 5 November, is −0.294 × w1 + 1.957 × w2 − 1.422 × w3 − 0.203 × w4 and so on to w64, plus a bias: 64 multiply-adds, each two FLOPs. A PyTorch call's time is its call overhead, the same for 1 state or 8, then its FLOPs, which grow with the states.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#8c959f"/>
@@ -82,65 +82,59 @@
   <text class="head" x="476" y="92">2. The forward pass: a list of PyTorch calls, in order</text>
   <rect x="476" y="102" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
   <text class="label" x="506" y="111">one PyTorch call for all 8 states</text>
-  <rect x="728" y="102" width="23" height="10" fill="none" stroke="#8c959f" stroke-dasharray="2 2"/>
-  <text class="label" x="758" y="111">no PyTorch call</text>
 
   <rect x="476" y="122" width="460" height="26" rx="4" fill="#f6f8fa" stroke="#d0d7de"/>
   <text class="body" x="488" y="140">Embedding layer: embedding lookups, identity embeddings, static features</text>
 
-  <rect x="476" y="154" width="460" height="208" rx="4" fill="#ffffff" stroke="#57606a"/>
-  <text class="bold" x="488" y="173">Message-passing layer 1: 20 PyTorch calls</text>
+  <rect x="476" y="154" width="460" height="191" rx="4" fill="#ffffff" stroke="#57606a"/>
+  <text class="bold" x="488" y="173">Message-passing layer 1: 21 PyTorch calls</text>
   <text class="count" x="924" y="173" text-anchor="end">calls</text>
   <g>
     <!-- k0: all -->
     <rect x="488" y="181" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
     <text class="row" x="522" y="190"><tspan class="code">linear</tspan>: every zone's message</text>
     <text class="count" x="924" y="190" text-anchor="end">1</text>
-    <!-- k1: none -->
-    <rect x="488" y="198" width="23" height="10" fill="none" stroke="#8c959f" stroke-dasharray="2 2"/>
-    <text class="row" x="522" y="207">each state's border terms, a copy kept from an earlier forward pass</text>
-    <text class="count" x="924" y="207" text-anchor="end">0</text>
+    <!-- k1: all -->
+    <rect x="488" y="198" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
+    <text class="row" x="522" y="207"><tspan class="code">select, index_select, add, gelu</tspan>: every border's message</text>
+    <text class="count" x="924" y="207" text-anchor="end">4</text>
     <!-- k2: all -->
     <rect x="488" y="215" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
-    <text class="row" x="522" y="224"><tspan class="code">index_select, add, gelu</tspan>: every border's message</text>
+    <text class="row" x="522" y="224"><tspan class="code">new_zeros, index_add_, div</tspan>: each zone's average</text>
     <text class="count" x="924" y="224" text-anchor="end">3</text>
     <!-- k3: all -->
     <rect x="488" y="232" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
-    <text class="row" x="522" y="241"><tspan class="code">new_zeros, index_add_, div</tspan>: each zone's average</text>
+    <text class="row" x="522" y="241"><tspan class="code">unsqueeze, expand, cat</tspan>: a zone's inputs side by side</text>
     <text class="count" x="924" y="241" text-anchor="end">3</text>
     <!-- k4: all -->
     <rect x="488" y="249" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
-    <text class="row" x="522" y="258"><tspan class="code">repeat_interleave, cat</tspan>: a zone's inputs side by side</text>
-    <text class="count" x="924" y="258" text-anchor="end">2</text>
+    <text class="row" x="522" y="258"><tspan class="code">linear, gelu, layer_norm</tspan>: zone correction</text>
+    <text class="count" x="924" y="258" text-anchor="end">3</text>
     <!-- k5: all -->
     <rect x="488" y="266" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
-    <text class="row" x="522" y="275"><tspan class="code">linear, gelu, layer_norm</tspan>: zone correction</text>
-    <text class="count" x="924" y="275" text-anchor="end">3</text>
+    <text class="row" x="522" y="275"><tspan class="code">add</tspan>: the correction added to every zone vector</text>
+    <text class="count" x="924" y="275" text-anchor="end">1</text>
     <!-- k6: all -->
     <rect x="488" y="283" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
-    <text class="row" x="522" y="292"><tspan class="code">add</tspan>: the correction added to every zone vector</text>
-    <text class="count" x="924" y="292" text-anchor="end">1</text>
+    <text class="row" x="522" y="292"><tspan class="code">mean, cat</tspan>: the average zone beside the global vector</text>
+    <text class="count" x="924" y="292" text-anchor="end">2</text>
     <!-- k7: all -->
     <rect x="488" y="300" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
-    <text class="row" x="522" y="309"><tspan class="code">view, mean, cat</tspan>: the average zone beside the global vector</text>
+    <text class="row" x="522" y="309"><tspan class="code">linear, gelu, layer_norm</tspan>: global correction</text>
     <text class="count" x="924" y="309" text-anchor="end">3</text>
     <!-- k8: all -->
     <rect x="488" y="317" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
-    <text class="row" x="522" y="326"><tspan class="code">linear, gelu, layer_norm</tspan>: global correction</text>
-    <text class="count" x="924" y="326" text-anchor="end">3</text>
-    <!-- k9: all -->
-    <rect x="488" y="334" width="23" height="10" fill="#eaeef2" stroke="#8c959f"/>
-    <text class="row" x="522" y="343"><tspan class="code">add</tspan>: the correction added to every global vector</text>
-    <text class="count" x="924" y="343" text-anchor="end">1</text>
+    <text class="row" x="522" y="326"><tspan class="code">add</tspan>: the correction added to every global vector</text>
+    <text class="count" x="924" y="326" text-anchor="end">1</text>
   </g>
 
-  <rect x="476" y="368" width="460" height="26" rx="4" fill="#f6f8fa" stroke="#d0d7de"/>
-  <text class="body" x="488" y="386">Message-passing layer 2: the same 20 PyTorch calls</text>
-  <rect x="476" y="400" width="460" height="26" rx="4" fill="#f6f8fa" stroke="#d0d7de"/>
-  <text class="body" x="488" y="418">Summary, value head, policy head, outputs</text>
-  <text class="count" x="924" y="418" text-anchor="end">106 with the embedding layer</text>
-  <text class="label" x="476" y="446">146 PyTorch calls for these 8 states, as for 1 state. A network for each alliance</text>
-  <text class="label" x="476" y="464">calls each network's linear layers on its own states, split and joined: 258.</text>
+  <rect x="476" y="351" width="460" height="26" rx="4" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text class="body" x="488" y="369">Message-passing layer 2: the same 21 PyTorch calls</text>
+  <rect x="476" y="383" width="460" height="26" rx="4" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text class="body" x="488" y="401">Summary, value head, policy head, outputs</text>
+  <text class="count" x="924" y="401" text-anchor="end">96 with the embedding layer</text>
+  <text class="label" x="476" y="433">138 PyTorch calls for these 8 states, as for 1 state. A network for each alliance</text>
+  <text class="label" x="476" y="451">calls each network's linear layers on its own states, split and joined: 247.</text>
 
   <!-- Part 3: inside one call -->
   <line x1="24" y1="480" x2="936" y2="480" stroke="#d0d7de"/>

@@ -31,10 +31,10 @@ positions, in order, up to three times as many as its largest network has, so
 that one network evaluates as many positions as a layout padding each network
 to the largest network's count would hold. --autocast float16 or bfloat16 runs
 every pass under PyTorch's automatic mixed precision, which does matrix products in half
-precision. --compile compiles the pass with torch.compile, shapes dynamic,
-and reports how often it compiled; --no-grad runs the rounds under
-torch.no_grad instead of the coordinator's torch.inference_mode, which a
-compiled pass on the CPU does not support. --weights names a file of the three alliances' state dicts;
+precision. --compile runs one network's zone and position layers compiled for
+fixed numbers of states, as the inference server does with --compiled-forward
+(with --networks one; neural.compiled_state_layers), and reports how often it
+compiled. --weights names a file of the three alliances' state dicts;
 --make-weights writes one from fresh networks of --hidden-dim and
 --message-layers whose three column tables are filled with random numbers,
 since a fresh network's rows are all zero and would compare sums of zeros. Run
@@ -171,8 +171,6 @@ def replay(rounds, models, device, repeat: int, keep_outputs: bool, autocast: st
     import contextlib
     import torch
     from studies.campaign import features, neural, shared_evaluator
-    if compiled:
-        neural._forward = torch.compile(neural._forward, dynamic=True)
     write = _writer(shared_evaluator)
     version = next(iter(models.values())).layout_version
     steps = _StepTimes()
@@ -189,7 +187,7 @@ def replay(rounds, models, device, repeat: int, keep_outputs: bool, autocast: st
             memories[pipe] = memory
             requests.append((pipe, (actor, count, version, header)))
         prepared.append((requests, memories))
-    server = shared_evaluator.SharedEvaluatorServer(models, device, [], [])
+    server = shared_evaluator.SharedEvaluatorServer(models, device, [], [], compiled_forward=compiled)
     mixed = (torch.autocast(device_type=device.type, dtype=getattr(torch, autocast))
              if autocast else contextlib.nullcontext())
     passes, outputs, warm_up = [], None, 0.0
@@ -210,29 +208,6 @@ def replay(rounds, models, device, repeat: int, keep_outputs: bool, autocast: st
         if keep_outputs and outputs is None:
             outputs = [[pipe.replies[-1] for pipe, _ in requests] for requests, _ in prepared]
     return passes, outputs, warm_up
-
-
-def _no_grad_for_inference_mode(torch):
-    """A stand-in for torch.inference_mode: no_grad where inference mode is asked for,
-    nothing where it is turned off, as PyTorch's compiler does internally."""
-
-    class NoGrad(torch.no_grad):
-        def __new__(cls, mode: bool = True):  # no_grad would take the mode for a function to decorate
-            return object.__new__(cls)
-
-        def __init__(self, mode: bool = True) -> None:
-            super().__init__()
-            self.mode = mode
-
-        def __enter__(self):
-            return super().__enter__() if self.mode else None
-
-        def __exit__(self, *exception):
-            return super().__exit__(*exception) if self.mode else None
-
-        def clone(self):
-            return self.__class__(self.mode)
-    return NoGrad
 
 
 def _fit(xs, ys):
@@ -331,9 +306,8 @@ def main(argv=None) -> int:
                              "over as many positions as a padded layout of the three would hold")
     parser.add_argument("--autocast", choices=("float16", "bfloat16"),
                         help="Run every pass under automatic mixed precision of this type")
-    parser.add_argument("--compile", action="store_true", help="Compile the pass with torch.compile")
-    parser.add_argument("--no-grad", action="store_true",
-                        help="Answer under torch.no_grad instead of torch.inference_mode")
+    parser.add_argument("--compile", action="store_true",
+                        help="Compile one network's zone and position layers for fixed numbers of states")
     parser.add_argument("--repeat", type=int, default=3)
     parser.add_argument("--limit", type=int, help="Replay only the first N rounds, after merging")
     parser.add_argument("--outputs", type=Path, help="Save every reply of the first pass here")
@@ -362,14 +336,15 @@ def main(argv=None) -> int:
     if args.networks != "three":
         rounds = one_network(rounds, padded=args.networks == "padded")
     models, config = load_models(args.weights, device)
-    if args.no_grad:  # The server enters torch.inference_mode itself; make that no_grad.
-        torch.inference_mode = _no_grad_for_inference_mode(torch)
+    if args.networks != "three":  # One network serves all three alliances: the Axis network.
+        models = dict.fromkeys(models, models["axis"])
+    if args.compile and args.networks == "three":
+        parser.error("--compile compiles one network: add --networks one")
     with torch.inference_mode():
         passes, outputs, warm_up = replay(rounds, models, device, args.repeat, args.outputs is not None,
                                           args.autocast, args.compile)
     report = report_of(rounds, passes, root=args.root.resolve(), device=device, config=config,
                        merge=args.merge, autocast=args.autocast, compiled=args.compile, warm_up=warm_up)
-    report["no_grad"] = args.no_grad
     report["networks"] = args.networks
     summary = {key: value for key, value in report.items() if key not in ("per_round", "pass_seconds")}
     print(json.dumps(summary, indent=1))

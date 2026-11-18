@@ -211,11 +211,87 @@ def _by_network(x: Tensor, sizes: Sequence[int], layers: Sequence[Any],
     return torch.cat([apply(layer, rows) for (layer, _), rows in zip(parts, x.split([size for _, size in parts]))])
 
 
-def _border_indices(spec_sources: Tensor, spec_targets: Tensor, in_degree: Tensor, positions: int,
-                    zones: int) -> tuple[Tensor, Tensor, Tensor]:
-    """Every position's borders as rows of the batch's zone vectors, and each zone's in-degree."""
-    shift = torch.arange(positions, device=spec_sources.device).repeat_interleave(len(spec_sources)) * zones
-    return spec_sources.repeat(positions) + shift, spec_targets.repeat(positions) + shift, in_degree.repeat(positions, 1)
+def _zone_terms(model: "CampaignPolicyValueNet") -> tuple[Tensor, Tensor]:
+    """Each zone's own learned vector and its map facts' vector: (zones, dim) each."""
+    return model.zone_identity.weight, _linear(model.map_facts, model.zone_static)
+
+
+def _border_terms(model: "CampaignPolicyValueNet", layer: int) -> Tensor:
+    """Each border's own term in a message-passing layer: (borders, dim)."""
+    return _linear(model.border_facts[layer], model.edge_static)
+
+
+def _state_layers(models: Sequence[Any], sizes: Sequence[int], local: Tensor, glob: Tensor,
+                  zone_terms: Sequence[Tensor], border_terms: Sequence[Tensor], *,
+                  averaging_matrix: bool = False) -> tuple[Tensor, Tensor, Tensor]:
+    """The zone and position layers: zone vectors, state vectors and values.
+
+    `local` holds each state's zones' answers, (states, zones, dim), and `glob`
+    each state's own, (states, dim); the states come grouped by network, sizes[i]
+    for models[i]. Every state has the map's zones and borders, so a message
+    layer gathers each border's source zone with one fixed index along the zone
+    axis. Each zone averages the messages it receives by adding them in and
+    dividing by its in-degree, or, with `averaging_matrix`, by a matrix product
+    with a fixed (zones, borders) matrix, which needs no atomic addition on a GPU:
+    the compiled layers use it (compiled_state_layers).
+    """
+    model = models[0]
+    zones = local.shape[1]
+    for term in zone_terms:
+        local = local + term
+    h = _by_network(local, sizes, [m.zone_norm for m in models], _norm)
+    u = _by_network(glob, sizes, [m.global_norm for m in models], _norm)
+    for layer, border in enumerate(border_terms):
+        sent = F.gelu(_by_network(h, sizes, [m.messages[layer] for m in models], _linear).index_select(
+            1, model.edge_source) + border)
+        if averaging_matrix:
+            received = torch.matmul(model.border_average, sent)
+        else:
+            received = sent.new_zeros(h.shape).index_add_(1, model.edge_target, sent) / model.in_degree
+        h = h + _by_network(torch.cat((h, received, u.unsqueeze(1).expand(-1, zones, -1)), dim=2), sizes,
+                            [m.zone_updates[layer] for m in models], _apply_block)
+        u = u + _by_network(torch.cat((u, h.mean(1)), dim=1), sizes,
+                            [m.position_updates[layer] for m in models], _apply_block)
+    states = _by_network(torch.cat((u, h.mean(1), h.amax(1)), dim=1), sizes,
+                         [m.state_encoder for m in models], _apply_block)
+    return h, states, _by_network(states, sizes, [m.value_head for m in models], _apply_head)  # value_scale units.
+
+
+# The state counts the compiled zone and position layers are compiled for: each at
+# most a third more than the one below, so padding costs at most a third more work.
+STATE_BUCKETS = (1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128, 160, 192, 256, 320, 384, 512)
+
+
+def state_bucket(count: int) -> int:
+    """The smallest fixed state count at least `count`; above 512, a multiple of 128."""
+    for size in STATE_BUCKETS:
+        if size >= count:
+            return size
+    return -(-count // 128) * 128
+
+
+def _one_network_state_layers(model: "CampaignPolicyValueNet", local: Tensor, glob: Tensor):
+    return _state_layers((model,), (local.shape[0],), local, glob, _zone_terms(model),
+                         [_border_terms(model, layer) for layer in range(model.config.message_layers)],
+                         averaging_matrix=True)
+
+
+_compiled_layers: Any = None
+
+
+def compiled_state_layers(model: "CampaignPolicyValueNet", local: Tensor, glob: Tensor):
+    """One network's zone and position layers, compiled by torch.compile for the shape
+    of `local`: once per state bucket, and again only for a network of another size.
+
+    The compiled code reads the network's weights as they are at each call, so new
+    weights copied in need no new compilation. For inference only.
+    """
+    global _compiled_layers
+    if _compiled_layers is None:
+        # One compilation per bucket and network size, beyond the default limit of 8.
+        torch._dynamo.config.cache_size_limit = max(torch._dynamo.config.cache_size_limit, 128)
+        _compiled_layers = torch.compile(_one_network_state_layers, dynamic=False, fullgraph=True)
+    return _compiled_layers(model, local, glob)
 
 
 def distinct_networks(models: Mapping[str, Any]) -> list[Any]:
@@ -262,6 +338,8 @@ class _OneNetwork:
     """A pass's view of one network: its own tables and fixed terms, worked out for
     this pass, so that training reaches every parameter."""
 
+    compiled = False
+
     def __init__(self, model: "CampaignPolicyValueNet") -> None:
         self.models = (model,)
         self.zone_table = model.zone_columns.weight
@@ -270,16 +348,12 @@ class _OneNetwork:
         self.no_zone = model.no_zone.unsqueeze(0)
 
     def zone_terms(self, batch: ZoneBatch, t: dict[str, Tensor]) -> tuple[Tensor, Tensor]:
-        model = self.models[0]
-        return model.zone_identity.weight, _linear(model.map_facts, model.zone_static)
+        """Each zone's own learned vector and its map facts' vector: (zones, dim) each."""
+        return _zone_terms(self.models[0])
 
     def border_terms(self, layer: int, batch: ZoneBatch, t: dict[str, Tensor]) -> Tensor:
-        model = self.models[0]
-        return _linear(model.border_facts[layer], model.edge_static).repeat(batch.positions, 1)
-
-    def borders(self, positions: int, zones: int) -> tuple[Tensor, Tensor, Tensor]:
-        model = self.models[0]
-        return _border_indices(model.edge_source, model.edge_target, model.in_degree, positions, zones)
+        """Each border's own term in a message-passing layer: (borders, dim)."""
+        return _border_terms(self.models[0], layer)
 
 
 class NetworkStack:
@@ -295,10 +369,12 @@ class NetworkStack:
     output is the network's own, up to floating-point rounding.
 
     The stack reads the networks' weights once, when it is built, and is for
-    inference only; build a new one after the weights change.
+    inference only; build a new one after the weights change. With `compiled`,
+    one network runs its zone and position layers compiled for fixed numbers of
+    states (compiled_state_layers); several networks always run them as written.
     """
 
-    def __init__(self, models: Sequence["CampaignPolicyValueNet"]) -> None:
+    def __init__(self, models: Sequence["CampaignPolicyValueNet"], *, compiled: bool = False) -> None:
         models = tuple(models)
         if not models:
             raise ValueError("A network stack needs at least one network")
@@ -307,6 +383,7 @@ class NetworkStack:
             if model.config != first.config or model.layout_version != first.layout_version:
                 raise ValueError("Stacked networks must share their configuration and input layout")
         self.models, self.spec, self.config = models, first.spec, first.config
+        self.compiled = compiled and len(models) == 1
         with torch.inference_mode():
             self.zone_table = torch.cat([model.zone_columns.weight for model in models])
             self.global_table = torch.cat([model.global_columns.weight for model in models])
@@ -314,16 +391,16 @@ class NetworkStack:
             self.no_zone = torch.stack([model.no_zone for model in models])
             self.identity = torch.stack([model.zone_identity.weight for model in models])
             self.facts = torch.stack([_linear(model.map_facts, model.zone_static) for model in models])
-            self.border = [torch.stack([_linear(model.border_facts[layer], model.edge_static) for model in models])
+            self.border = [torch.stack([_border_terms(model, layer) for model in models])
                            for layer in range(first.config.message_layers)]
-        self._borders: dict[int, tuple[Tensor, Tensor, Tensor]] = {}
-        self._repeated: dict[tuple[int, int, int], Tensor] = {}
 
     def _single(self, batch: ZoneBatch) -> int | None:
         present = [index for index, size in enumerate(batch.network_positions) if size]
         return present[0] if len(present) == 1 else None
 
     def zone_terms(self, batch: ZoneBatch, t: dict[str, Tensor]) -> tuple[Tensor, Tensor]:
+        """Each zone's own vector and its map facts' vector: (zones, dim) each when one
+        network has every state, else (states, zones, dim)."""
         single = self._single(batch)
         if single is not None:
             return self.identity[single], self.facts[single]
@@ -331,26 +408,11 @@ class NetworkStack:
         return self.identity.index_select(0, network), self.facts.index_select(0, network)
 
     def border_terms(self, layer: int, batch: ZoneBatch, t: dict[str, Tensor]) -> Tensor:
-        single, positions = self._single(batch), batch.positions
-        if single is None:
-            return self.border[layer].index_select(0, t["position_network"]).view(-1, self.config.hidden_dim)
-        key = (layer, single, positions)
-        repeated = self._repeated.get(key)
-        if repeated is None:
-            if len(self._repeated) >= 64:  # A few megabytes at most.
-                self._repeated.clear()
-            repeated = self._repeated[key] = self.border[layer][single].repeat(positions, 1)
-        return repeated
-
-    def borders(self, positions: int, zones: int) -> tuple[Tensor, Tensor, Tensor]:
-        found = self._borders.get(positions)
-        if found is None:
-            if len(self._borders) > 256:
-                self._borders.clear()
-            model = self.models[0]
-            found = self._borders[positions] = _border_indices(model.edge_source, model.edge_target,
-                                                               model.in_degree, positions, zones)
-        return found
+        """(borders, dim) when one network has every state, else (states, borders, dim)."""
+        single = self._single(batch)
+        if single is not None:
+            return self.border[layer][single]
+        return self.border[layer].index_select(0, t["position_network"])
 
     def forward_packed(self, batch: ZoneBatch, *, non_blocking: bool = False) -> tuple[Tensor, Tensor]:
         """Every listed option's logit, in position order, and each position's values,
@@ -365,7 +427,9 @@ def _forward(networks: Any, batch: ZoneBatch, *, non_blocking: bool = False) -> 
 
     `networks` is one network (_OneNetwork) or several (NetworkStack); each
     layer reads each network's own rows. With non_blocking, keep `batch` until
-    the outputs are read (batch_tensors).
+    the outputs are read (batch_tensors). A compiled stack, outside training,
+    runs the zone and position layers compiled, the states padded with empty
+    ones to the next of STATE_BUCKETS.
     """
     models = networks.models
     model = models[0]
@@ -373,32 +437,27 @@ def _forward(networks: Any, batch: ZoneBatch, *, non_blocking: bool = False) -> 
     if device.type == "mps":
         # Also covers callers using the normal PyTorch model.to('mps') API.
         _require_no_mps_fallback()
-    t = batch_tensors(batch, device, non_blocking=non_blocking)
     positions, zones, dim = batch.positions, batch.zones, model.config.hidden_dim
-    nodes = positions * zones
-    sizes = batch.network_positions
-    node_sizes = [size * zones for size in sizes]
-    identity, facts = networks.zone_terms(batch, t)
-    local = _bag(networks.zone_table, t["zone_column"], t["zone_weight"], t["zone_bags"])
-    local = local.view(positions, zones, dim) + identity + facts
-    h = _by_network(local.view(nodes, dim), node_sizes, [m.zone_norm for m in models], _norm)
-    u = _by_network(_bag(networks.global_table, t["global_column"], t["global_weight"], t["global_bags"]),
-                    sizes, [m.global_norm for m in models], _norm)
-    sources, targets, degree = networks.borders(positions, zones)
-    for layer in range(model.config.message_layers):
-        sent = F.gelu(_by_network(h, node_sizes, [m.messages[layer] for m in models], _linear).index_select(0, sources)
-                      + networks.border_terms(layer, batch, t))
-        # Zeros of the messages' own type, so that a pass under automatic mixed
-        # precision, whose messages are half-precision, can add them up.
-        received = sent.new_zeros((nodes, dim)).index_add_(0, targets, sent) / degree
-        h = h + _by_network(torch.cat((h, received, u.repeat_interleave(zones, 0)), dim=1), node_sizes,
-                            [m.zone_updates[layer] for m in models], _apply_block)
-        u = u + _by_network(torch.cat((u, h.view(positions, zones, dim).mean(1)), dim=1), sizes,
-                            [m.position_updates[layer] for m in models], _apply_block)
-    grid = h.view(positions, zones, dim)
-    states = _by_network(torch.cat((u, grid.mean(1), grid.amax(1)), dim=1), sizes,
-                         [m.state_encoder for m in models], _apply_block)
-    values = _by_network(states, sizes, [m.value_head for m in models], _apply_head)  # Raw-value/value_scale units.
+    compiled = networks.compiled and not torch.is_grad_enabled()
+    padded = state_bucket(positions) if compiled else positions
+    if padded > positions:
+        # Empty bags for the padded states: their zone and position vectors start at zero.
+        integers = batch.integers
+        integers["zone_bags"] = np.concatenate(
+            (integers["zone_bags"], np.full((padded - positions) * zones, integers["zone_bags"][-1], np.int64)))
+        integers["global_bags"] = np.concatenate(
+            (integers["global_bags"], np.full(padded - positions, integers["global_bags"][-1], np.int64)))
+    t = batch_tensors(batch, device, non_blocking=non_blocking)
+    local = _bag(networks.zone_table, t["zone_column"], t["zone_weight"], t["zone_bags"]).view(padded, zones, dim)
+    glob = _bag(networks.global_table, t["global_column"], t["global_weight"], t["global_bags"])
+    if compiled:
+        h, states, values = compiled_state_layers(model, local, glob)
+        h, states, values = h[:positions], states[:positions], values[:positions]
+    else:
+        h, states, values = _state_layers(models, batch.network_positions, local, glob, networks.zone_terms(batch, t),
+                                          [networks.border_terms(layer, batch, t)
+                                           for layer in range(model.config.message_layers)])
+    h = h.reshape(positions * zones, dim)
     if not batch.options:
         return values.new_empty((0,)), values
     option_sizes = batch.network_options
@@ -477,10 +536,14 @@ class CampaignPolicyValueNet(nn.Module):
             self.policy_head = _head(dim * 2, dim, 1)
             self.factor_heads = nn.ModuleList(_head(dim * 2, dim, 1) for _ in range(GROUP_LEVELS))
             self.value_head = _head(dim, dim, 3)
-        degree = np.maximum(np.bincount(spec.edge_target, minlength=zones), 1).astype(np.float32)[:, None]
+        # Each zone's average of the messages it receives, as a (zones, borders) matrix:
+        # 1 / in-degree where a border ends at the zone. A zone no border reaches gets 0.
+        degree = np.maximum(np.bincount(spec.edge_target, minlength=zones), 1).astype(np.float32)
+        average = np.zeros((zones, len(spec.edge_target)), dtype=np.float32)
+        average[spec.edge_target, np.arange(len(spec.edge_target))] = 1.0 / degree[spec.edge_target]
         for name, values in (("zone_static", spec.zone_static), ("edge_source", spec.edge_source),
                              ("edge_target", spec.edge_target), ("edge_static", spec.edge_static),
-                             ("in_degree", degree)):
+                             ("in_degree", degree[:, None]), ("border_average", average)):
             self.register_buffer(name, torch.from_numpy(np.array(values)), persistent=False)
         self.to(target)
 

@@ -132,12 +132,12 @@ class SharedEpisodeWorkers:
 
     def __init__(self, processes: int, games_per_process: int, *, device: Any, runtime_policy: Any = None,
                  calendar_rounds: int | None, model_config: Mapping[str, Any], learning_config: Mapping[str, Any],
-                 rules_version: str):
+                 rules_version: str, compiled_forward: bool = False):
         from .neural import CampaignModelConfig, alliance_networks
         if type(processes) is not int or processes <= 0 or type(games_per_process) is not int or games_per_process <= 0:
             raise ValueError("Shared episode workers need positive process and game counts")
         self.processes, self.games_per_process = processes, games_per_process
-        self.device, self.runtime_policy = device, runtime_policy
+        self.device, self.runtime_policy, self.compiled_forward = device, runtime_policy, compiled_forward
         self.settings = {"calendar_rounds": calendar_rounds, "model_config": dict(model_config),
                          "learning_config": dict(learning_config), "rules_version": rules_version}
         # The networks the inference server evaluates: one for all three alliances, or one for each.
@@ -164,7 +164,8 @@ class SharedEpisodeWorkers:
                                                   processes=self.processes, games_per_process=self.games_per_process,
                                                   models=self.models, device=self.device,
                                                   runtime_policy=self.runtime_policy, keep_playing=keep_playing,
-                                                  exit_seconds=120.0, stop_seconds=15.0)
+                                                  exit_seconds=120.0, stop_seconds=15.0,
+                                                  compiled_forward=self.compiled_forward)
         if stopped or stop():
             return None
         if sorted(record["root"] for record in records) != sorted(root for root, _ in games):
@@ -197,7 +198,8 @@ class SharedEpisodeWorkers:
                                                   processes=self.processes, games_per_process=self.games_per_process,
                                                   models=self.models, device=self.device,
                                                   runtime_policy=self.runtime_policy, keep_playing=keep,
-                                                  exit_seconds=120.0, stop_seconds=15.0, feed=feed)
+                                                  exit_seconds=120.0, stop_seconds=15.0, feed=feed,
+                                                  compiled_forward=self.compiled_forward)
         return records
 
     def report(self, server: Any = None) -> dict[str, Any]:

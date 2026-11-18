@@ -109,6 +109,14 @@ changes its outputs in the last digits, so unlike one-state evaluation a game
 need not repeat exactly from its seed. In either mode a game that fails
 costs only that game, recorded with its seed in `failed_games`.
 
+`--compiled-forward` has the inference server run one network's zone and
+position layers compiled by `torch.compile` for fixed numbers of states, each
+inference batch padded with empty states to the next of them
+([running training on the Mac](../../docs/design/README.md#92-running-training-on-the-mac)).
+It pays for networks of 256×8 and larger on the GPU, makes the 64×2 network
+slower there, and costs up to a minute of compiling as a run starts, seconds once
+PyTorch has the compiled code cached on disk; it is off unless given.
+
 `--cpu-budget N` checks the run's busy cores against the allowance: one per game
 process plus the inference server, or tensor threads plus parallel search
 workers plus one inference server without worker processes. It counts and does not measure:

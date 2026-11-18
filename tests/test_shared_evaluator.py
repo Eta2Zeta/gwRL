@@ -171,12 +171,19 @@ class SharedEvaluatorTests(unittest.TestCase):
         server = self.assertServesFourRequests(models, NeuralEvaluator(models, version="test"), positions=4)
         self.assertEqual(len(server.stack.models), 1)
 
-    def assertServesFourRequests(self, models, reference, *, positions):
+    def test_a_compiled_forward_pass_answers_as_written(self):
+        one = self.models[PLAYERS[2]]
+        models = {player: one for player in PLAYERS}
+        server = self.assertServesFourRequests(models, NeuralEvaluator(models, version="test"), positions=4,
+                                               compiled_forward=True)
+        self.assertTrue(server.stack.compiled)
+
+    def assertServesFourRequests(self, models, reference, *, positions, compiled_forward=False):
         memories = [shared_memory.SharedMemory(create=True, size=BUFFER_BYTES) for _ in range(2)]
         pipes = [Pipe() for _ in memories]
         try:
             server = SharedEvaluatorServer(models, torch.device("cpu"), [parent for parent, _ in pipes],
-                                           [memory.name for memory in memories])
+                                           [memory.name for memory in memories], compiled_forward=compiled_forward)
             serving = threading.Thread(target=server.serve, args=(lambda: True,), daemon=True)
             serving.start()
             results = {}

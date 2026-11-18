@@ -187,10 +187,12 @@ class SharedEvaluatorServer:
     """Answers every game thread's requests, batching whatever is waiting."""
 
     def __init__(self, models: dict[str, Any], device: Any, connections: Sequence[Connection],
-                 buffer_names: Sequence[str], runtime_policy: Any = None) -> None:
+                 buffer_names: Sequence[str], runtime_policy: Any = None, *, compiled_forward: bool = False) -> None:
         if set(models) != set(PLAYERS):
             raise ValueError("Provide one campaign model for Axis, Allies and Comintern")
         self.models, self.device = models, device
+        # One network's zone and position layers compiled for fixed numbers of states.
+        self.compiled_forward = compiled_forward
         # MPS graph-cache housekeeping after completed forwards (device_runtime).
         self.runtime_policy = runtime_policy
         self.connections = list(connections)
@@ -219,7 +221,7 @@ class SharedEvaluatorServer:
             networks = distinct_networks(self.models)
             self._network_of = {player: next(index for index, network in enumerate(networks)
                                              if network is self.models[player]) for player in PLAYERS}
-            self._stack = NetworkStack(networks)
+            self._stack = NetworkStack(networks, compiled=self.compiled_forward)
         return self._stack
 
     def serve(self, keep_running: Callable[[], bool]) -> None:
@@ -366,7 +368,8 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
                       models: dict[str, Any], device: Any, runtime_policy: Any = None,
                       keep_playing: Callable[[SharedEvaluatorServer, list[Any]], bool] = lambda *_: True,
                       exit_seconds: float = 20.0, stop_seconds: float = 20.0,
-                      feed: Callable[[], Any] | None = None) -> tuple[list[Any], ServerStats]:
+                      feed: Callable[[], Any] | None = None,
+                      compiled_forward: bool = False) -> tuple[list[Any], ServerStats]:
     """Play tasks in game processes, evaluating every waiting position here.
 
     `target(slots, connections, buffer_names, tasks, results)` is the game process,
@@ -443,7 +446,8 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
         for _, child in pipes:
             child.close()
         server = SharedEvaluatorServer(models, device, [parent for parent, _ in pipes],
-                                       [memory.name for memory in memories], runtime_policy)
+                                       [memory.name for memory in memories], runtime_policy,
+                                       compiled_forward=compiled_forward)
 
         def keep_running() -> bool:
             nonlocal stopping, fed_out
