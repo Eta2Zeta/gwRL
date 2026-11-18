@@ -2006,7 +2006,11 @@ the playing time the inference batches held one state each and the other game
 threads waited, which cost about 9% of the decisions an hour (worked out from
 each game's decisions and time;
 [record](../archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail)).
-The network update after it took about 22 seconds. Self-play that never stops
+With the inference server on the GPU, training iterations of 63 concurrent games
+at 256×8 lost 10% to 14% of their decisions an hour the same way on 18 November
+([record](../archive/records/gpu_training_compiled_2026_11_18.md#the-games-uneven-ends)).
+The network update after the profiled training iteration of 17 November took
+about 22 seconds. Self-play that never stops
 (section 9.1) plays through both. In two matched pairs of runs of four network
 updates the same day, it played 6.5% and 12.5% more decisions per wall-clock hour
 in steady play, its inference batches held about 10.5 states against 8.5, and the
@@ -2364,7 +2368,14 @@ as it stands; which of the others pay, and how much, is open:
   512×16 as saved, about 9 states, and 21% to 24% less merged 8 at a time, about
   60 states. At 64×2, where the layers they compile are a smaller part of the
   time, they were 9% slower on the GPU and about as fast on one core
-  ([record](../archive/records/compiled_forward_2026_11_18.md#speed)). Their
+  ([record](../archive/records/compiled_forward_2026_11_18.md#speed)). In
+  training at 256×8 on the Mac's GPU, with 63 concurrent games whose inference
+  batches held about 24 states, two matched pairs of training iterations played
+  4.6% more decisions an hour with the compiled layers on average, while two
+  runs of one setting differed by 5% to 6%. So a gain in training is not
+  established; from the forward pass's timings alone a gain of about 10% would
+  be expected, an inference
+  ([record](../archive/records/gpu_training_compiled_2026_11_18.md)). Their
   outputs equal the uncompiled ones up to rounding. Compiling the buckets an inference
   batch first needs takes time: with PyTorch's compile cache empty, about 17
   seconds for the buckets of the inference batches as saved at 256×8, 36 seconds

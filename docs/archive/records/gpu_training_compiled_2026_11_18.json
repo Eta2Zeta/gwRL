@@ -1,0 +1,234 @@
+{
+ "record": "gpu_training_compiled_2026_11_18.md",
+ "date": "2026-11-18",
+ "code": "bb092ff",
+ "torch": "2.14.0",
+ "machine": "Mac, Apple M4 Max; inference server and network updates on its GPU (mps)",
+ "malloc_nano_zone": "0 (inherited from the agent shell; not unset)",
+ "order": [
+  "compiled-a",
+  "written-a",
+  "written-b",
+  "compiled-b"
+ ],
+ "command": "tools/supervise_campaign_training.py --profile mac --run-dir RUN --seconds 3600 --max-restarts 0 -- --calendar-rounds 11 --complete-episodes --batches 1 --transitions-per-batch 20000 --simulations 64 --max-depth 16 --hidden-dim 256 --message-layers 8 --batch-size 32 --epochs 525 --replay-capacity 8000 --sample-fraction 0.05 --seed 20261118 --neural-device mps --no-continuous --episode-workers 7 --games-per-process 9 --parallel-envs 63 (--compiled-forward | --no-compiled-forward)",
+ "runs": {
+  "compiled-a": {
+   "compiled_forward": true,
+   "games": 63,
+   "decisions": 66023,
+   "decisions_per_game": {
+    "mean": 1048.0,
+    "min": 846,
+    "max": 1342
+   },
+   "evaluations": 3368150,
+   "evaluations_per_decision": 51.01,
+   "playing_seconds": 1183.0,
+   "decisions_per_hour_playing": 200910,
+   "game_end_seconds": {
+    "first": 833.6,
+    "median": 1045.9,
+    "last": 1181.8
+   },
+   "decisions_per_hour_all_games_playing": 230635,
+   "estimate_from_ten_first_games": 228831,
+   "network_update_seconds": 36.2,
+   "inference_server": {
+    "inference_batches": 140856,
+    "states_per_inference_batch": 23.91,
+    "answering_seconds": 1102.5,
+    "idle_seconds": 22.4,
+    "busy_share": 0.9811,
+    "microseconds_per_inference_batch": 7827.1,
+    "microseconds_per_state": 327.3,
+    "gpu_cache_clears": 71,
+    "gpu_cache_clear_seconds": 23.5
+   },
+   "cores_while_games_play": {
+    "game_processes": 4.37,
+    "inference_server": 0.71,
+    "run_mean_of_half_minutes": 5.17,
+    "other_work_mean_of_half_minutes": 0.99
+   },
+   "peak_memory_bytes_sampled": 9131792696
+  },
+  "written-a": {
+   "compiled_forward": false,
+   "games": 63,
+   "decisions": 68924,
+   "decisions_per_game": {
+    "mean": 1094.0,
+    "min": 795,
+    "max": 1335
+   },
+   "evaluations": 3519920,
+   "evaluations_per_decision": 51.07,
+   "playing_seconds": 1222.7,
+   "decisions_per_hour_playing": 202932,
+   "game_end_seconds": {
+    "first": 756.2,
+    "median": 1084.6,
+    "last": 1221.5
+   },
+   "decisions_per_hour_all_games_playing": 230517,
+   "estimate_from_ten_first_games": 229013,
+   "network_update_seconds": 39.0,
+   "inference_server": {
+    "inference_batches": 141935,
+    "states_per_inference_batch": 24.8,
+    "answering_seconds": 1149.9,
+    "idle_seconds": 19.5,
+    "busy_share": 0.9841,
+    "microseconds_per_inference_batch": 8101.6,
+    "microseconds_per_state": 326.7,
+    "gpu_cache_clears": 71,
+    "gpu_cache_clear_seconds": 22.9
+   },
+   "cores_while_games_play": {
+    "game_processes": 4.35,
+    "inference_server": 0.65,
+    "run_mean_of_half_minutes": 5.04,
+    "other_work_mean_of_half_minutes": 0.93
+   },
+   "peak_memory_bytes_sampled": 9630619816
+  },
+  "written-b": {
+   "compiled_forward": false,
+   "games": 63,
+   "decisions": 70731,
+   "decisions_per_game": {
+    "mean": 1122.7,
+    "min": 925,
+    "max": 1521
+   },
+   "evaluations": 3629286,
+   "evaluations_per_decision": 51.31,
+   "playing_seconds": 1333.9,
+   "decisions_per_hour_playing": 190888,
+   "game_end_seconds": {
+    "first": 937.7,
+    "median": 1159.0,
+    "last": 1332.9
+   },
+   "decisions_per_hour_all_games_playing": 221000,
+   "estimate_from_ten_first_games": 218786,
+   "network_update_seconds": 32.1,
+   "inference_server": {
+    "inference_batches": 160071,
+    "states_per_inference_batch": 22.67,
+    "answering_seconds": 1250.4,
+    "idle_seconds": 22.1,
+    "busy_share": 0.9834,
+    "microseconds_per_inference_batch": 7811.4,
+    "microseconds_per_state": 344.5,
+    "gpu_cache_clears": 80,
+    "gpu_cache_clear_seconds": 24.0
+   },
+   "cores_while_games_play": {
+    "game_processes": 4.2,
+    "inference_server": 0.65,
+    "run_mean_of_half_minutes": 4.85,
+    "other_work_mean_of_half_minutes": 1.89
+   },
+   "peak_memory_bytes_sampled": 8916474000
+  },
+  "compiled-b": {
+   "compiled_forward": true,
+   "games": 63,
+   "decisions": 66763,
+   "decisions_per_game": {
+    "mean": 1059.7,
+    "min": 882,
+    "max": 1269
+   },
+   "evaluations": 3416558,
+   "evaluations_per_decision": 51.17,
+   "playing_seconds": 1139.5,
+   "decisions_per_hour_playing": 210920,
+   "game_end_seconds": {
+    "first": 834.5,
+    "median": 1033.0,
+    "last": 1138.3
+   },
+   "decisions_per_hour_all_games_playing": 234948,
+   "estimate_from_ten_first_games": 235770,
+   "network_update_seconds": 34.9,
+   "inference_server": {
+    "inference_batches": 134524,
+    "states_per_inference_batch": 25.4,
+    "answering_seconds": 1063.5,
+    "idle_seconds": 19.9,
+    "busy_share": 0.9826,
+    "microseconds_per_inference_batch": 7905.9,
+    "microseconds_per_state": 311.3,
+    "gpu_cache_clears": 67,
+    "gpu_cache_clear_seconds": 21.2
+   },
+   "cores_while_games_play": {
+    "game_processes": 4.54,
+    "inference_server": 0.71,
+    "run_mean_of_half_minutes": 5.28,
+    "other_work_mean_of_half_minutes": 2.51
+   },
+   "peak_memory_bytes_sampled": 11137616824
+  }
+ },
+ "comparison": {
+  "decisions_per_hour_playing": {
+   "as_written_mean": 196910.0,
+   "compiled_mean": 205915.0,
+   "change_percent": 4.6,
+   "first_pair_change_percent": -1.0,
+   "second_pair_change_percent": 10.5,
+   "as_written_spread_percent": 6.3,
+   "compiled_spread_percent": 5.0
+  },
+  "decisions_per_hour_all_games_playing": {
+   "as_written_mean": 225758.5,
+   "compiled_mean": 232791.5,
+   "change_percent": 3.1,
+   "first_pair_change_percent": 0.1,
+   "second_pair_change_percent": 6.3,
+   "as_written_spread_percent": 4.3,
+   "compiled_spread_percent": 1.9
+  },
+  "microseconds_per_state": {
+   "as_written_mean": 335.6,
+   "compiled_mean": 319.3,
+   "change_percent": -4.9,
+   "first_pair_change_percent": 0.2,
+   "second_pair_change_percent": -9.6,
+   "as_written_spread_percent": 5.2,
+   "compiled_spread_percent": 4.9
+  },
+  "microseconds_per_inference_batch": {
+   "as_written_mean": 7956.5,
+   "compiled_mean": 7866.5,
+   "change_percent": -1.1,
+   "first_pair_change_percent": -3.4,
+   "second_pair_change_percent": 1.2,
+   "as_written_spread_percent": 3.7,
+   "compiled_spread_percent": 1.0
+  },
+  "states_per_inference_batch": {
+   "as_written_mean": 23.73,
+   "compiled_mean": 24.66,
+   "change_percent": 3.9,
+   "first_pair_change_percent": -3.6,
+   "second_pair_change_percent": 12.0,
+   "as_written_spread_percent": 9.4,
+   "compiled_spread_percent": 6.2
+  },
+  "decisions_per_game_mean": {
+   "as_written": [
+    1094.0,
+    1122.7
+   ],
+   "compiled": [
+    1048.0,
+    1059.7
+   ]
+  }
+ }
+}
