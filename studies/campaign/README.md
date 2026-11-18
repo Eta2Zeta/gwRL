@@ -121,10 +121,13 @@ position layers compiled by `torch.compile` for fixed numbers of states, each
 inference batch padded with empty states to the next of them
 ([running training on the Mac](../../docs/design/README.md#92-running-training-on-the-mac)).
 On saved inference batches it made the GPU forward pass of networks of 256×8
-and larger 6% to 24% faster and the 64×2 network's slower; in training at 256×8
-on the GPU it played 4.6% more decisions an hour on average, while two runs of
-one setting differed by 5% to 6%
-([record](../../docs/archive/records/gpu_training_compiled_2026_11_18.md)).
+and larger 6% to 24% faster and the 64×2 network's slower. In training at 256×8
+on the GPU it paid with 126 concurrent games, whose inference batches hold about
+60 states: 7.9% more decisions an hour while playing than two runs without it,
+which differed from each other by 6%
+([record](../../docs/archive/records/compiled_layers_126_games_2026_11_18.md)).
+With 63 concurrent games, about 24 states an inference batch, no gain was
+established ([record](../../docs/archive/records/gpu_training_compiled_2026_11_18.md)).
 Compiling costs up to a minute as a run starts, seconds once PyTorch has the
 compiled code cached on disk; it is off unless given.
 

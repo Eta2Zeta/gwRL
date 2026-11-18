@@ -2272,7 +2272,11 @@ GPU: about 205,000 decisions an hour while playing with 63 concurrent games and
 held about 25 and 48 states, and the inference server, busy 98% of the time,
 set the pace. With 126 concurrent games the CPU cores came close behind: at the
 game processes' CPU time per network evaluation, 1.6 ms, the allowance could
-feed only about a fifth more network evaluations a second (inferred).
+feed only about a fifth more network evaluations a second (inferred). With the
+compiled layers (below) the same layout played about 286,000 decisions an hour
+while playing and 326,000 while all the games played, and the CPU cores were
+about an eighth behind
+([record](../archive/records/compiled_layers_126_games_2026_11_18.md)).
 
 **Where an inference batch's states come from.** An inference batch holds the
 inference requests waiting when it starts, and a game asks for one network
@@ -2329,12 +2333,12 @@ until the other part limits instead. Where the CPU cores limit, a cheaper engine
 pays directly, until the CPU cores' line in the figure reaches the network's line
 above it: with the GPU in inference batches of 64, up to about 1.8 times at 64×2
 and 1.5 times at 128×4 (worked out). In the setups trained so far the inference
-server limits instead, with the CPU cores about a fifth behind:
+server limits instead, with the CPU cores an eighth to a fifth behind:
 
 | Setup | What limits | The CPU cores could feed | What pays |
 | --- | --- | --- | --- |
 | 64×2 on one CPU core, 24 concurrent games (the Mac profile) | the inference server, busy 98% | about a fifth more | a cheaper inference server; a cheaper engine little |
-| 256×8 on the GPU, 126 concurrent games | the inference server, busy 98% | about a fifth more | a cheaper inference server; self-play that never stops, about a tenth; a cheaper engine little by itself |
+| 256×8 on the GPU, 126 concurrent games, compiled layers | the inference server, busy 98% | about an eighth more | a cheaper inference server; self-play that never stops, about a tenth; a cheaper engine little by itself |
 | 512×16 on the GPU, not trained yet | the GPU's forward pass, about 2,000 states a second as written and 2,700 compiled, in inference batches of about 60 | about twice as much | a cheaper forward pass on the GPU; the engine not at all |
 
 The CPU cores' rates are inferred: the 9 CPU cores of the allowance, less the
@@ -2342,16 +2346,19 @@ inference server's process, divided by the game processes' CPU time per network
 evaluation, against the network evaluations a second measured in training or,
 at 512×16, in replayed forward passes
 ([64×2](../archive/records/one_network_comparison_2026_11_17.md#speed),
-[256×8](../archive/records/concurrent_games_gpu_2026_11_18.md#what-limits-next),
+[256×8](../archive/records/compiled_layers_126_games_2026_11_18.md#what-this-does-and-does-not-show),
 [512×16](../archive/records/compiled_forward_2026_11_18.md#speed)).
 
-A cheaper inference server pays until the CPU cores limit, about a fifth. At
-256×8 it has room in its own work: in training an inference batch of about 60
-states took it about 14.0 ms, while the forward pass alone, replayed from saved
-inference batches, takes 9.4 ms as written and 7.4 ms with the compiled layers,
-and reading the inference requests, replying and the GPU cache clears took about
-1 ms more; the remaining 3.6 ms are not broken down
-([record](../archive/records/concurrent_games_gpu_2026_11_18.md#the-inference-servers-time-by-inference-batch-size)).
+A cheaper inference server pays until the CPU cores limit. At 256×8 the compiled
+layers made it about a tenth cheaper in the inference batches of steady play
+(below), and it has room in its own work beyond them: in training an inference
+batch of 60 states took it about 14.0 ms as written and 12.5 ms compiled, while
+the forward pass alone, replayed from saved inference batches, takes 9.4 ms as
+written and 7.4 ms compiled, and reading the inference requests, replying and the
+GPU cache clears took about 1 ms more. The remaining 3.6 ms as written, and
+4.1 ms compiled, are not broken down
+([as written](../archive/records/concurrent_games_gpu_2026_11_18.md#the-inference-servers-time-by-inference-batch-size),
+[compiled](../archive/records/compiled_layers_126_games_2026_11_18.md#results)).
 Self-play that never stops does not make the inference server cheaper but keeps
 its inference batches full: in a training iteration, fewer games are left to fill
 them as games end, which cost the 126-game run 9.7% of its decisions an hour
@@ -2446,10 +2453,14 @@ as it stands; which of the others pay, and how much, is open:
   training at 256×8 on the Mac's GPU, with 63 concurrent games whose inference
   batches held about 24 states, two matched pairs of training iterations played
   4.6% more decisions an hour with the compiled layers on average, while two
-  runs of one setting differed by 5% to 6%. So a gain in training is not
-  established; from the forward pass's timings alone a gain of about 10% would
-  be expected, an inference
-  ([record](../archive/records/gpu_training_compiled_2026_11_18.md)). Their
+  runs of one setting differed by 5% to 6%, so no gain was established there
+  ([record](../archive/records/gpu_training_compiled_2026_11_18.md)). With 126
+  concurrent games, whose inference batches hold about 60 states in steady
+  play, the compiled layers pay: inference batches of 40 to 80 states took 8% to
+  12% less time than in two runs with the layers as written, which differed by
+  4% at those sizes, and the compiled run played 7.9% more decisions an hour
+  while playing than the two runs' mean, 11.2% more while all the games played
+  ([record](../archive/records/compiled_layers_126_games_2026_11_18.md)). Their
   outputs equal the uncompiled ones up to rounding. Compiling the buckets an inference
   batch first needs takes time: with PyTorch's compile cache empty, about 17
   seconds for the buckets of the inference batches as saved at 256×8, 36 seconds

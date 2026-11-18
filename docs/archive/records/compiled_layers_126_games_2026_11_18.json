@@ -1,0 +1,1696 @@
+{
+ "record": "compiled_layers_126_games_2026_11_18.md",
+ "date": "2026-11-18",
+ "code": "0faad2b, run from a copy of that commit with its compiled engine module (tmp/concurrent-games-2026-11-18/runtime)",
+ "torch": "2.14.0",
+ "machine": "Apple M4 Max: 14 CPU cores (10 performance, 4 efficiency), 36 GB memory, 32-core GPU",
+ "malloc_nano_zone": "unset in the training process and its game processes (the Mac profile's unset_environment)",
+ "order": [
+  "as-written-1 from 11:45:47 to 12:17:08 (the games-126 run of concurrent_games_gpu_2026_11_18)",
+  "warm-up with the compiled layers from 14:02:08 to 14:08:11, stopped by its time budget, not compared",
+  "compiled from 14:08:13 to 14:36:36",
+  "as-written-2 from 14:36:41 to 15:09:52"
+ ],
+ "compile_cache": "PyTorch's compile cache (torchinductor_home) held every state bucket from the morning's work: no file in it changed during the warm-up or the runs; its entries were read at 14:08",
+ "command": ".venv/bin/python tools/supervise_campaign_training.py --profile mac --working-directory RUNTIME --control-dir OUT/NAME-control --run-dir OUT/NAME --seconds 5400 --max-restarts 0 -- --calendar-rounds 11 --complete-episodes --batches 1 --transitions-per-batch 20000 --simulations 64 --max-depth 16 --hidden-dim 256 --message-layers 8 --batch-size 32 --epochs 525 --replay-capacity 8000 --sample-fraction 0.05 --seed 20261118 --neural-device mps --no-continuous --episode-workers 7 --games-per-process 18 --parallel-envs 126 --compiled-forward (or --no-compiled-forward)",
+ "load_log_note": "as-written-2's load log has one half-minute window of 57.19 cores of the run's processes, impossible on 14 cores: a sampling artifact; its mean window is inflated by it, the medians and the CPU-second totals are not",
+ "definitions": "as in concurrent_games_gpu_2026_11_18.json",
+ "runs": {
+  "as-written-1": {
+   "games": 126,
+   "decisions": 139298,
+   "decisions_per_game": {
+    "mean": 1105.5,
+    "min": 788,
+    "max": 1356
+   },
+   "evaluations": 7142472,
+   "evaluations_per_decision": 51.27,
+   "playing_seconds": 1839.8,
+   "decisions_per_hour_playing": 272568,
+   "game_end_seconds": {
+    "first": 1172.4,
+    "median": 1669.0,
+    "last": 1838.2
+   },
+   "decisions_per_hour_all_games_playing": 301969,
+   "estimate_from_ten_first_games": 297493,
+   "network_update_seconds": 30.9,
+   "inference_server": {
+    "inference_batches": 148612,
+    "states_per_inference_batch": 48.1,
+    "median_state_in_an_inference_batch_of": 60,
+    "largest_inference_batch": 126,
+    "answering_seconds": 1704.5,
+    "serving_seconds": 1803.8,
+    "reading_and_replying_seconds": 99.3,
+    "idle_seconds": 33.2,
+    "busy_share": 0.9819,
+    "microseconds_per_inference_batch": 11469.4,
+    "microseconds_per_state": 238.6,
+    "serving_microseconds_per_state": 252.6,
+    "gpu_cache_clears": 74,
+    "gpu_cache_clear_seconds": 27.8,
+    "line_microseconds": {
+     "per_inference_batch": 4561,
+     "per_state": 157.7,
+     "over_sizes_with_100_or_more": 88
+    },
+    "by_size": {
+     "1": {
+      "inference_batches": 1962,
+      "microseconds": 3691
+     },
+     "2": {
+      "inference_batches": 2059,
+      "microseconds": 3624
+     },
+     "3": {
+      "inference_batches": 2105,
+      "microseconds": 3772
+     },
+     "4": {
+      "inference_batches": 2224,
+      "microseconds": 4005
+     },
+     "5": {
+      "inference_batches": 2044,
+      "microseconds": 4213
+     },
+     "6": {
+      "inference_batches": 1628,
+      "microseconds": 4751
+     },
+     "7": {
+      "inference_batches": 1240,
+      "microseconds": 5246
+     },
+     "8": {
+      "inference_batches": 1372,
+      "microseconds": 5215
+     },
+     "9": {
+      "inference_batches": 1141,
+      "microseconds": 5413
+     },
+     "10": {
+      "inference_batches": 960,
+      "microseconds": 5601
+     },
+     "11": {
+      "inference_batches": 1033,
+      "microseconds": 5934
+     },
+     "12": {
+      "inference_batches": 1039,
+      "microseconds": 6021
+     },
+     "13": {
+      "inference_batches": 882,
+      "microseconds": 6684
+     },
+     "14": {
+      "inference_batches": 895,
+      "microseconds": 6489
+     },
+     "15": {
+      "inference_batches": 710,
+      "microseconds": 6691
+     },
+     "16": {
+      "inference_batches": 856,
+      "microseconds": 6897
+     },
+     "17": {
+      "inference_batches": 671,
+      "microseconds": 7854
+     },
+     "18": {
+      "inference_batches": 796,
+      "microseconds": 7460
+     },
+     "19": {
+      "inference_batches": 765,
+      "microseconds": 7602
+     },
+     "20": {
+      "inference_batches": 558,
+      "microseconds": 7751
+     },
+     "21": {
+      "inference_batches": 616,
+      "microseconds": 8515
+     },
+     "22": {
+      "inference_batches": 590,
+      "microseconds": 8410
+     },
+     "23": {
+      "inference_batches": 589,
+      "microseconds": 8850
+     },
+     "24": {
+      "inference_batches": 522,
+      "microseconds": 8725
+     },
+     "25": {
+      "inference_batches": 648,
+      "microseconds": 9023
+     },
+     "26": {
+      "inference_batches": 553,
+      "microseconds": 10187
+     },
+     "27": {
+      "inference_batches": 643,
+      "microseconds": 9626
+     },
+     "28": {
+      "inference_batches": 636,
+      "microseconds": 9672
+     },
+     "29": {
+      "inference_batches": 664,
+      "microseconds": 10183
+     },
+     "30": {
+      "inference_batches": 738,
+      "microseconds": 10503
+     },
+     "31": {
+      "inference_batches": 825,
+      "microseconds": 10049
+     },
+     "32": {
+      "inference_batches": 778,
+      "microseconds": 10426
+     },
+     "33": {
+      "inference_batches": 830,
+      "microseconds": 11142
+     },
+     "34": {
+      "inference_batches": 884,
+      "microseconds": 11976
+     },
+     "35": {
+      "inference_batches": 882,
+      "microseconds": 11016
+     },
+     "36": {
+      "inference_batches": 964,
+      "microseconds": 11320
+     },
+     "37": {
+      "inference_batches": 1055,
+      "microseconds": 11434
+     },
+     "38": {
+      "inference_batches": 1220,
+      "microseconds": 11900
+     },
+     "39": {
+      "inference_batches": 1340,
+      "microseconds": 11611
+     },
+     "40": {
+      "inference_batches": 1312,
+      "microseconds": 11804
+     },
+     "41": {
+      "inference_batches": 1605,
+      "microseconds": 12316
+     },
+     "42": {
+      "inference_batches": 1452,
+      "microseconds": 12337
+     },
+     "43": {
+      "inference_batches": 1781,
+      "microseconds": 12189
+     },
+     "44": {
+      "inference_batches": 1798,
+      "microseconds": 12686
+     },
+     "45": {
+      "inference_batches": 2144,
+      "microseconds": 12240
+     },
+     "46": {
+      "inference_batches": 2174,
+      "microseconds": 12246
+     },
+     "47": {
+      "inference_batches": 2360,
+      "microseconds": 12557
+     },
+     "48": {
+      "inference_batches": 2443,
+      "microseconds": 12894
+     },
+     "49": {
+      "inference_batches": 2738,
+      "microseconds": 12544
+     },
+     "50": {
+      "inference_batches": 2917,
+      "microseconds": 13080
+     },
+     "51": {
+      "inference_batches": 3306,
+      "microseconds": 13099
+     },
+     "52": {
+      "inference_batches": 3417,
+      "microseconds": 13020
+     },
+     "53": {
+      "inference_batches": 3412,
+      "microseconds": 13661
+     },
+     "54": {
+      "inference_batches": 3575,
+      "microseconds": 13155
+     },
+     "55": {
+      "inference_batches": 3557,
+      "microseconds": 13347
+     },
+     "56": {
+      "inference_batches": 3928,
+      "microseconds": 13628
+     },
+     "57": {
+      "inference_batches": 3856,
+      "microseconds": 13648
+     },
+     "58": {
+      "inference_batches": 4133,
+      "microseconds": 13520
+     },
+     "59": {
+      "inference_batches": 3989,
+      "microseconds": 13839
+     },
+     "60": {
+      "inference_batches": 3875,
+      "microseconds": 14020
+     },
+     "61": {
+      "inference_batches": 3858,
+      "microseconds": 14036
+     },
+     "62": {
+      "inference_batches": 3858,
+      "microseconds": 14090
+     },
+     "63": {
+      "inference_batches": 3786,
+      "microseconds": 14215
+     },
+     "64": {
+      "inference_batches": 3543,
+      "microseconds": 14447
+     },
+     "65": {
+      "inference_batches": 3413,
+      "microseconds": 14382
+     },
+     "66": {
+      "inference_batches": 3310,
+      "microseconds": 14577
+     },
+     "67": {
+      "inference_batches": 3166,
+      "microseconds": 14727
+     },
+     "68": {
+      "inference_batches": 2914,
+      "microseconds": 14617
+     },
+     "69": {
+      "inference_batches": 2683,
+      "microseconds": 15111
+     },
+     "70": {
+      "inference_batches": 2510,
+      "microseconds": 15249
+     },
+     "71": {
+      "inference_batches": 2027,
+      "microseconds": 15223
+     },
+     "72": {
+      "inference_batches": 2000,
+      "microseconds": 15464
+     },
+     "73": {
+      "inference_batches": 1766,
+      "microseconds": 15359
+     },
+     "74": {
+      "inference_batches": 1627,
+      "microseconds": 15549
+     },
+     "75": {
+      "inference_batches": 1362,
+      "microseconds": 15591
+     },
+     "76": {
+      "inference_batches": 1196,
+      "microseconds": 15779
+     },
+     "77": {
+      "inference_batches": 921,
+      "microseconds": 15842
+     },
+     "78": {
+      "inference_batches": 821,
+      "microseconds": 16514
+     },
+     "79": {
+      "inference_batches": 685,
+      "microseconds": 16195
+     },
+     "80": {
+      "inference_batches": 641,
+      "microseconds": 16555
+     },
+     "81": {
+      "inference_batches": 538,
+      "microseconds": 17016
+     },
+     "82": {
+      "inference_batches": 386,
+      "microseconds": 17111
+     },
+     "83": {
+      "inference_batches": 371,
+      "microseconds": 16822
+     },
+     "84": {
+      "inference_batches": 291,
+      "microseconds": 17051
+     },
+     "85": {
+      "inference_batches": 291,
+      "microseconds": 16750
+     },
+     "86": {
+      "inference_batches": 185,
+      "microseconds": 17384
+     },
+     "87": {
+      "inference_batches": 163,
+      "microseconds": 17549
+     },
+     "88": {
+      "inference_batches": 121,
+      "microseconds": 17650
+     },
+     "89": {
+      "inference_batches": 83,
+      "microseconds": 17446
+     },
+     "90": {
+      "inference_batches": 87,
+      "microseconds": 18024
+     },
+     "91": {
+      "inference_batches": 54,
+      "microseconds": 17870
+     },
+     "92": {
+      "inference_batches": 46,
+      "microseconds": 17105
+     },
+     "93": {
+      "inference_batches": 34,
+      "microseconds": 18483
+     },
+     "94": {
+      "inference_batches": 26,
+      "microseconds": 18066
+     },
+     "95": {
+      "inference_batches": 22,
+      "microseconds": 19049
+     },
+     "96": {
+      "inference_batches": 10,
+      "microseconds": 17643
+     },
+     "97": {
+      "inference_batches": 13,
+      "microseconds": 18957
+     },
+     "98": {
+      "inference_batches": 14,
+      "microseconds": 18786
+     },
+     "99": {
+      "inference_batches": 13,
+      "microseconds": 18710
+     },
+     "100": {
+      "inference_batches": 7,
+      "microseconds": 18760
+     },
+     "101": {
+      "inference_batches": 4,
+      "microseconds": 19510
+     },
+     "102": {
+      "inference_batches": 7,
+      "microseconds": 19364
+     },
+     "103": {
+      "inference_batches": 3,
+      "microseconds": 23087
+     },
+     "104": {
+      "inference_batches": 2,
+      "microseconds": 19767
+     },
+     "105": {
+      "inference_batches": 1,
+      "microseconds": 20046
+     },
+     "107": {
+      "inference_batches": 4,
+      "microseconds": 20877
+     },
+     "108": {
+      "inference_batches": 1,
+      "microseconds": 19944
+     },
+     "109": {
+      "inference_batches": 1,
+      "microseconds": 20188
+     },
+     "111": {
+      "inference_batches": 3,
+      "microseconds": 22351
+     },
+     "112": {
+      "inference_batches": 2,
+      "microseconds": 23265
+     },
+     "117": {
+      "inference_batches": 1,
+      "microseconds": 29940
+     },
+     "119": {
+      "inference_batches": 1,
+      "microseconds": 21453
+     },
+     "120": {
+      "inference_batches": 1,
+      "microseconds": 30389
+     },
+     "124": {
+      "inference_batches": 2,
+      "microseconds": 25111
+     },
+     "125": {
+      "inference_batches": 8,
+      "microseconds": 30764
+     },
+     "126": {
+      "inference_batches": 40,
+      "microseconds": 31353
+     }
+    }
+   },
+   "cores_while_games_play": {
+    "seconds_with_game_processes": 1842.2,
+    "game_processes": 6.2,
+    "inference_server_process": 0.59,
+    "run_mean_of_half_minutes": 6.84,
+    "other_work_mean_of_half_minutes": 0.81,
+    "game_processes_waiting_for_a_core_per_cpu_second": 1.015,
+    "inference_server_waiting_for_a_core_per_cpu_second": 0.096,
+    "game_processes_performance_core_share": 0.825,
+    "game_process_cpu_seconds": 11420.8,
+    "game_process_instructions": 95248377333809
+   },
+   "peak_memory_bytes_sampled": 12478998512
+  },
+  "compiled": {
+   "games": 126,
+   "decisions": 132018,
+   "decisions_per_game": {
+    "mean": 1047.8,
+    "min": 822,
+    "max": 1396
+   },
+   "evaluations": 6733758,
+   "evaluations_per_decision": 51.01,
+   "playing_seconds": 1662.5,
+   "decisions_per_hour_playing": 285875,
+   "game_end_seconds": {
+    "first": 1153.8,
+    "median": 1457.2,
+    "last": 1661.0
+   },
+   "decisions_per_hour_all_games_playing": 326248,
+   "estimate_from_ten_first_games": 323060,
+   "network_update_seconds": 31.3,
+   "inference_server": {
+    "inference_batches": 152312,
+    "states_per_inference_batch": 44.2,
+    "median_state_in_an_inference_batch_of": 59,
+    "largest_inference_batch": 126,
+    "answering_seconds": 1520.2,
+    "serving_seconds": 1623.7,
+    "reading_and_replying_seconds": 103.6,
+    "idle_seconds": 35.9,
+    "busy_share": 0.9784,
+    "microseconds_per_inference_batch": 9980.8,
+    "microseconds_per_state": 225.8,
+    "serving_microseconds_per_state": 241.1,
+    "gpu_cache_clears": 76,
+    "gpu_cache_clear_seconds": 27.6,
+    "line_microseconds": {
+     "per_inference_batch": 4480,
+     "per_state": 139.8,
+     "over_sizes_with_100_or_more": 89
+    },
+    "by_size": {
+     "1": {
+      "inference_batches": 9072,
+      "microseconds": 2834
+     },
+     "2": {
+      "inference_batches": 4190,
+      "microseconds": 3734
+     },
+     "3": {
+      "inference_batches": 3501,
+      "microseconds": 4149
+     },
+     "4": {
+      "inference_batches": 2823,
+      "microseconds": 4618
+     },
+     "5": {
+      "inference_batches": 1579,
+      "microseconds": 4761
+     },
+     "6": {
+      "inference_batches": 1092,
+      "microseconds": 5364
+     },
+     "7": {
+      "inference_batches": 997,
+      "microseconds": 5116
+     },
+     "8": {
+      "inference_batches": 800,
+      "microseconds": 6002
+     },
+     "9": {
+      "inference_batches": 1027,
+      "microseconds": 5335
+     },
+     "10": {
+      "inference_batches": 1083,
+      "microseconds": 5834
+     },
+     "11": {
+      "inference_batches": 936,
+      "microseconds": 5906
+     },
+     "12": {
+      "inference_batches": 941,
+      "microseconds": 6726
+     },
+     "13": {
+      "inference_batches": 936,
+      "microseconds": 6710
+     },
+     "14": {
+      "inference_batches": 880,
+      "microseconds": 6815
+     },
+     "15": {
+      "inference_batches": 745,
+      "microseconds": 7547
+     },
+     "16": {
+      "inference_batches": 861,
+      "microseconds": 6998
+     },
+     "17": {
+      "inference_batches": 826,
+      "microseconds": 7418
+     },
+     "18": {
+      "inference_batches": 792,
+      "microseconds": 7743
+     },
+     "19": {
+      "inference_batches": 671,
+      "microseconds": 7920
+     },
+     "20": {
+      "inference_batches": 578,
+      "microseconds": 9014
+     },
+     "21": {
+      "inference_batches": 708,
+      "microseconds": 8764
+     },
+     "22": {
+      "inference_batches": 792,
+      "microseconds": 8438
+     },
+     "23": {
+      "inference_batches": 680,
+      "microseconds": 9666
+     },
+     "24": {
+      "inference_batches": 673,
+      "microseconds": 9578
+     },
+     "25": {
+      "inference_batches": 753,
+      "microseconds": 9023
+     },
+     "26": {
+      "inference_batches": 639,
+      "microseconds": 9179
+     },
+     "27": {
+      "inference_batches": 703,
+      "microseconds": 9829
+     },
+     "28": {
+      "inference_batches": 793,
+      "microseconds": 10250
+     },
+     "29": {
+      "inference_batches": 634,
+      "microseconds": 10133
+     },
+     "30": {
+      "inference_batches": 710,
+      "microseconds": 10495
+     },
+     "31": {
+      "inference_batches": 750,
+      "microseconds": 10135
+     },
+     "32": {
+      "inference_batches": 843,
+      "microseconds": 9942
+     },
+     "33": {
+      "inference_batches": 882,
+      "microseconds": 11030
+     },
+     "34": {
+      "inference_batches": 901,
+      "microseconds": 10417
+     },
+     "35": {
+      "inference_batches": 967,
+      "microseconds": 10790
+     },
+     "36": {
+      "inference_batches": 1014,
+      "microseconds": 11202
+     },
+     "37": {
+      "inference_batches": 1230,
+      "microseconds": 10711
+     },
+     "38": {
+      "inference_batches": 1273,
+      "microseconds": 10992
+     },
+     "39": {
+      "inference_batches": 1319,
+      "microseconds": 10948
+     },
+     "40": {
+      "inference_batches": 1382,
+      "microseconds": 10780
+     },
+     "41": {
+      "inference_batches": 1504,
+      "microseconds": 11473
+     },
+     "42": {
+      "inference_batches": 1665,
+      "microseconds": 11562
+     },
+     "43": {
+      "inference_batches": 1777,
+      "microseconds": 11451
+     },
+     "44": {
+      "inference_batches": 1986,
+      "microseconds": 11332
+     },
+     "45": {
+      "inference_batches": 2118,
+      "microseconds": 11588
+     },
+     "46": {
+      "inference_batches": 2241,
+      "microseconds": 11598
+     },
+     "47": {
+      "inference_batches": 2472,
+      "microseconds": 11759
+     },
+     "48": {
+      "inference_batches": 2574,
+      "microseconds": 12001
+     },
+     "49": {
+      "inference_batches": 2729,
+      "microseconds": 12316
+     },
+     "50": {
+      "inference_batches": 2869,
+      "microseconds": 12141
+     },
+     "51": {
+      "inference_batches": 2991,
+      "microseconds": 12334
+     },
+     "52": {
+      "inference_batches": 3154,
+      "microseconds": 12086
+     },
+     "53": {
+      "inference_batches": 3277,
+      "microseconds": 12227
+     },
+     "54": {
+      "inference_batches": 3337,
+      "microseconds": 12601
+     },
+     "55": {
+      "inference_batches": 3492,
+      "microseconds": 12370
+     },
+     "56": {
+      "inference_batches": 3464,
+      "microseconds": 12345
+     },
+     "57": {
+      "inference_batches": 3427,
+      "microseconds": 12474
+     },
+     "58": {
+      "inference_batches": 3679,
+      "microseconds": 12495
+     },
+     "59": {
+      "inference_batches": 3671,
+      "microseconds": 12617
+     },
+     "60": {
+      "inference_batches": 3652,
+      "microseconds": 12471
+     },
+     "61": {
+      "inference_batches": 3954,
+      "microseconds": 12672
+     },
+     "62": {
+      "inference_batches": 3381,
+      "microseconds": 12395
+     },
+     "63": {
+      "inference_batches": 3386,
+      "microseconds": 12577
+     },
+     "64": {
+      "inference_batches": 3327,
+      "microseconds": 13260
+     },
+     "65": {
+      "inference_batches": 3322,
+      "microseconds": 13258
+     },
+     "66": {
+      "inference_batches": 2944,
+      "microseconds": 13446
+     },
+     "67": {
+      "inference_batches": 2701,
+      "microseconds": 13775
+     },
+     "68": {
+      "inference_batches": 2584,
+      "microseconds": 13224
+     },
+     "69": {
+      "inference_batches": 2279,
+      "microseconds": 13570
+     },
+     "70": {
+      "inference_batches": 2012,
+      "microseconds": 13635
+     },
+     "71": {
+      "inference_batches": 1952,
+      "microseconds": 13610
+     },
+     "72": {
+      "inference_batches": 1675,
+      "microseconds": 14096
+     },
+     "73": {
+      "inference_batches": 1591,
+      "microseconds": 13926
+     },
+     "74": {
+      "inference_batches": 1281,
+      "microseconds": 13786
+     },
+     "75": {
+      "inference_batches": 1194,
+      "microseconds": 13874
+     },
+     "76": {
+      "inference_batches": 1093,
+      "microseconds": 13926
+     },
+     "77": {
+      "inference_batches": 851,
+      "microseconds": 13933
+     },
+     "78": {
+      "inference_batches": 663,
+      "microseconds": 13955
+     },
+     "79": {
+      "inference_batches": 667,
+      "microseconds": 14100
+     },
+     "80": {
+      "inference_batches": 448,
+      "microseconds": 14301
+     },
+     "81": {
+      "inference_batches": 408,
+      "microseconds": 16006
+     },
+     "82": {
+      "inference_batches": 364,
+      "microseconds": 14781
+     },
+     "83": {
+      "inference_batches": 354,
+      "microseconds": 14300
+     },
+     "84": {
+      "inference_batches": 293,
+      "microseconds": 15185
+     },
+     "85": {
+      "inference_batches": 207,
+      "microseconds": 15091
+     },
+     "86": {
+      "inference_batches": 195,
+      "microseconds": 14894
+     },
+     "87": {
+      "inference_batches": 157,
+      "microseconds": 17229
+     },
+     "88": {
+      "inference_batches": 152,
+      "microseconds": 16024
+     },
+     "89": {
+      "inference_batches": 108,
+      "microseconds": 15087
+     },
+     "90": {
+      "inference_batches": 81,
+      "microseconds": 15996
+     },
+     "91": {
+      "inference_batches": 79,
+      "microseconds": 16239
+     },
+     "92": {
+      "inference_batches": 70,
+      "microseconds": 15799
+     },
+     "93": {
+      "inference_batches": 51,
+      "microseconds": 16494
+     },
+     "94": {
+      "inference_batches": 41,
+      "microseconds": 15924
+     },
+     "95": {
+      "inference_batches": 30,
+      "microseconds": 16376
+     },
+     "96": {
+      "inference_batches": 21,
+      "microseconds": 17791
+     },
+     "97": {
+      "inference_batches": 23,
+      "microseconds": 17265
+     },
+     "98": {
+      "inference_batches": 57,
+      "microseconds": 15008
+     },
+     "99": {
+      "inference_batches": 19,
+      "microseconds": 17234
+     },
+     "100": {
+      "inference_batches": 18,
+      "microseconds": 18018
+     },
+     "101": {
+      "inference_batches": 14,
+      "microseconds": 17259
+     },
+     "102": {
+      "inference_batches": 11,
+      "microseconds": 17706
+     },
+     "103": {
+      "inference_batches": 18,
+      "microseconds": 16427
+     },
+     "104": {
+      "inference_batches": 5,
+      "microseconds": 17069
+     },
+     "105": {
+      "inference_batches": 12,
+      "microseconds": 16885
+     },
+     "106": {
+      "inference_batches": 6,
+      "microseconds": 15824
+     },
+     "107": {
+      "inference_batches": 10,
+      "microseconds": 17987
+     },
+     "108": {
+      "inference_batches": 5,
+      "microseconds": 17669
+     },
+     "109": {
+      "inference_batches": 4,
+      "microseconds": 19356
+     },
+     "110": {
+      "inference_batches": 1,
+      "microseconds": 18711
+     },
+     "111": {
+      "inference_batches": 10,
+      "microseconds": 21266
+     },
+     "112": {
+      "inference_batches": 5,
+      "microseconds": 17821
+     },
+     "113": {
+      "inference_batches": 6,
+      "microseconds": 18214
+     },
+     "114": {
+      "inference_batches": 9,
+      "microseconds": 17087
+     },
+     "115": {
+      "inference_batches": 1,
+      "microseconds": 20430
+     },
+     "116": {
+      "inference_batches": 1,
+      "microseconds": 19529
+     },
+     "117": {
+      "inference_batches": 4,
+      "microseconds": 18016
+     },
+     "118": {
+      "inference_batches": 5,
+      "microseconds": 19227
+     },
+     "119": {
+      "inference_batches": 2,
+      "microseconds": 39826
+     },
+     "120": {
+      "inference_batches": 2,
+      "microseconds": 15914
+     },
+     "121": {
+      "inference_batches": 2,
+      "microseconds": 17920
+     },
+     "122": {
+      "inference_batches": 8,
+      "microseconds": 18745
+     },
+     "123": {
+      "inference_batches": 10,
+      "microseconds": 20927
+     },
+     "124": {
+      "inference_batches": 17,
+      "microseconds": 20558
+     },
+     "125": {
+      "inference_batches": 14,
+      "microseconds": 42199
+     },
+     "126": {
+      "inference_batches": 42,
+      "microseconds": 40551
+     }
+    }
+   },
+   "cores_while_games_play": {
+    "seconds_with_game_processes": 1657.3,
+    "game_processes": 6.49,
+    "inference_server_process": 0.67,
+    "run_mean_of_half_minutes": 7.18,
+    "other_work_mean_of_half_minutes": 1.02,
+    "game_processes_waiting_for_a_core_per_cpu_second": 1.119,
+    "inference_server_waiting_for_a_core_per_cpu_second": 0.104,
+    "game_processes_performance_core_share": 0.821,
+    "game_process_cpu_seconds": 10757.0,
+    "game_process_instructions": 90858688583133
+   },
+   "peak_memory_bytes_sampled": 13387405288
+  },
+  "as-written-2": {
+   "games": 126,
+   "decisions": 138921,
+   "decisions_per_game": {
+    "mean": 1102.5,
+    "min": 913,
+    "max": 1327
+   },
+   "evaluations": 7119200,
+   "evaluations_per_decision": 51.25,
+   "playing_seconds": 1943.9,
+   "decisions_per_hour_playing": 257270,
+   "game_end_seconds": {
+    "first": 1406.1,
+    "median": 1779.6,
+    "last": 1942.4
+   },
+   "decisions_per_hour_all_games_playing": 284598,
+   "estimate_from_ten_first_games": 286192,
+   "network_update_seconds": 36.9,
+   "inference_server": {
+    "inference_batches": 147933,
+    "states_per_inference_batch": 48.1,
+    "median_state_in_an_inference_batch_of": 59,
+    "largest_inference_batch": 126,
+    "answering_seconds": 1791.0,
+    "serving_seconds": 1904.0,
+    "reading_and_replying_seconds": 113.0,
+    "idle_seconds": 36.6,
+    "busy_share": 0.9812,
+    "microseconds_per_inference_batch": 12107.1,
+    "microseconds_per_state": 251.6,
+    "serving_microseconds_per_state": 267.5,
+    "gpu_cache_clears": 74,
+    "gpu_cache_clear_seconds": 32.4,
+    "line_microseconds": {
+     "per_inference_batch": 5629,
+     "per_state": 150.0,
+     "over_sizes_with_100_or_more": 91
+    },
+    "by_size": {
+     "1": {
+      "inference_batches": 5784,
+      "microseconds": 3575
+     },
+     "2": {
+      "inference_batches": 2058,
+      "microseconds": 4084
+     },
+     "3": {
+      "inference_batches": 1308,
+      "microseconds": 4407
+     },
+     "4": {
+      "inference_batches": 1371,
+      "microseconds": 4766
+     },
+     "5": {
+      "inference_batches": 1228,
+      "microseconds": 5450
+     },
+     "6": {
+      "inference_batches": 1071,
+      "microseconds": 5354
+     },
+     "7": {
+      "inference_batches": 1138,
+      "microseconds": 5585
+     },
+     "8": {
+      "inference_batches": 741,
+      "microseconds": 6069
+     },
+     "9": {
+      "inference_batches": 773,
+      "microseconds": 6869
+     },
+     "10": {
+      "inference_batches": 678,
+      "microseconds": 6809
+     },
+     "11": {
+      "inference_batches": 614,
+      "microseconds": 7383
+     },
+     "12": {
+      "inference_batches": 775,
+      "microseconds": 7083
+     },
+     "13": {
+      "inference_batches": 586,
+      "microseconds": 7888
+     },
+     "14": {
+      "inference_batches": 592,
+      "microseconds": 8071
+     },
+     "15": {
+      "inference_batches": 572,
+      "microseconds": 8302
+     },
+     "16": {
+      "inference_batches": 709,
+      "microseconds": 9006
+     },
+     "17": {
+      "inference_batches": 641,
+      "microseconds": 8305
+     },
+     "18": {
+      "inference_batches": 707,
+      "microseconds": 9118
+     },
+     "19": {
+      "inference_batches": 638,
+      "microseconds": 10094
+     },
+     "20": {
+      "inference_batches": 669,
+      "microseconds": 9449
+     },
+     "21": {
+      "inference_batches": 803,
+      "microseconds": 9610
+     },
+     "22": {
+      "inference_batches": 798,
+      "microseconds": 10026
+     },
+     "23": {
+      "inference_batches": 693,
+      "microseconds": 11001
+     },
+     "24": {
+      "inference_batches": 737,
+      "microseconds": 10688
+     },
+     "25": {
+      "inference_batches": 710,
+      "microseconds": 10486
+     },
+     "26": {
+      "inference_batches": 639,
+      "microseconds": 11516
+     },
+     "27": {
+      "inference_batches": 745,
+      "microseconds": 10866
+     },
+     "28": {
+      "inference_batches": 869,
+      "microseconds": 10967
+     },
+     "29": {
+      "inference_batches": 798,
+      "microseconds": 11562
+     },
+     "30": {
+      "inference_batches": 860,
+      "microseconds": 11684
+     },
+     "31": {
+      "inference_batches": 877,
+      "microseconds": 11636
+     },
+     "32": {
+      "inference_batches": 925,
+      "microseconds": 11623
+     },
+     "33": {
+      "inference_batches": 1004,
+      "microseconds": 11796
+     },
+     "34": {
+      "inference_batches": 1073,
+      "microseconds": 12770
+     },
+     "35": {
+      "inference_batches": 1059,
+      "microseconds": 12721
+     },
+     "36": {
+      "inference_batches": 1187,
+      "microseconds": 12414
+     },
+     "37": {
+      "inference_batches": 1141,
+      "microseconds": 12596
+     },
+     "38": {
+      "inference_batches": 1355,
+      "microseconds": 12690
+     },
+     "39": {
+      "inference_batches": 1411,
+      "microseconds": 12896
+     },
+     "40": {
+      "inference_batches": 1540,
+      "microseconds": 12769
+     },
+     "41": {
+      "inference_batches": 1667,
+      "microseconds": 12881
+     },
+     "42": {
+      "inference_batches": 1879,
+      "microseconds": 13748
+     },
+     "43": {
+      "inference_batches": 1900,
+      "microseconds": 12890
+     },
+     "44": {
+      "inference_batches": 2002,
+      "microseconds": 13389
+     },
+     "45": {
+      "inference_batches": 2149,
+      "microseconds": 13916
+     },
+     "46": {
+      "inference_batches": 2399,
+      "microseconds": 13315
+     },
+     "47": {
+      "inference_batches": 2369,
+      "microseconds": 13688
+     },
+     "48": {
+      "inference_batches": 2602,
+      "microseconds": 13235
+     },
+     "49": {
+      "inference_batches": 2728,
+      "microseconds": 13898
+     },
+     "50": {
+      "inference_batches": 2761,
+      "microseconds": 13827
+     },
+     "51": {
+      "inference_batches": 3008,
+      "microseconds": 13865
+     },
+     "52": {
+      "inference_batches": 3179,
+      "microseconds": 13603
+     },
+     "53": {
+      "inference_batches": 3327,
+      "microseconds": 13455
+     },
+     "54": {
+      "inference_batches": 3544,
+      "microseconds": 14174
+     },
+     "55": {
+      "inference_batches": 3702,
+      "microseconds": 13724
+     },
+     "56": {
+      "inference_batches": 3699,
+      "microseconds": 13997
+     },
+     "57": {
+      "inference_batches": 3690,
+      "microseconds": 13986
+     },
+     "58": {
+      "inference_batches": 3666,
+      "microseconds": 14058
+     },
+     "59": {
+      "inference_batches": 4086,
+      "microseconds": 14146
+     },
+     "60": {
+      "inference_batches": 3569,
+      "microseconds": 14543
+     },
+     "61": {
+      "inference_batches": 3665,
+      "microseconds": 14565
+     },
+     "62": {
+      "inference_batches": 3891,
+      "microseconds": 14639
+     },
+     "63": {
+      "inference_batches": 3601,
+      "microseconds": 14591
+     },
+     "64": {
+      "inference_batches": 3621,
+      "microseconds": 14481
+     },
+     "65": {
+      "inference_batches": 3239,
+      "microseconds": 14613
+     },
+     "66": {
+      "inference_batches": 2998,
+      "microseconds": 14862
+     },
+     "67": {
+      "inference_batches": 3162,
+      "microseconds": 14652
+     },
+     "68": {
+      "inference_batches": 2699,
+      "microseconds": 14824
+     },
+     "69": {
+      "inference_batches": 2483,
+      "microseconds": 15782
+     },
+     "70": {
+      "inference_batches": 2321,
+      "microseconds": 15699
+     },
+     "71": {
+      "inference_batches": 2154,
+      "microseconds": 15401
+     },
+     "72": {
+      "inference_batches": 1826,
+      "microseconds": 15454
+     },
+     "73": {
+      "inference_batches": 1713,
+      "microseconds": 15947
+     },
+     "74": {
+      "inference_batches": 1491,
+      "microseconds": 15915
+     },
+     "75": {
+      "inference_batches": 1326,
+      "microseconds": 16065
+     },
+     "76": {
+      "inference_batches": 1134,
+      "microseconds": 16309
+     },
+     "77": {
+      "inference_batches": 959,
+      "microseconds": 16455
+     },
+     "78": {
+      "inference_batches": 818,
+      "microseconds": 16293
+     },
+     "79": {
+      "inference_batches": 677,
+      "microseconds": 17890
+     },
+     "80": {
+      "inference_batches": 570,
+      "microseconds": 18164
+     },
+     "81": {
+      "inference_batches": 454,
+      "microseconds": 17140
+     },
+     "82": {
+      "inference_batches": 473,
+      "microseconds": 17191
+     },
+     "83": {
+      "inference_batches": 366,
+      "microseconds": 17588
+     },
+     "84": {
+      "inference_batches": 350,
+      "microseconds": 17524
+     },
+     "85": {
+      "inference_batches": 248,
+      "microseconds": 18541
+     },
+     "86": {
+      "inference_batches": 211,
+      "microseconds": 19712
+     },
+     "87": {
+      "inference_batches": 183,
+      "microseconds": 20133
+     },
+     "88": {
+      "inference_batches": 173,
+      "microseconds": 19821
+     },
+     "89": {
+      "inference_batches": 149,
+      "microseconds": 20233
+     },
+     "90": {
+      "inference_batches": 116,
+      "microseconds": 19919
+     },
+     "91": {
+      "inference_batches": 104,
+      "microseconds": 21676
+     },
+     "92": {
+      "inference_batches": 92,
+      "microseconds": 20402
+     },
+     "93": {
+      "inference_batches": 88,
+      "microseconds": 20349
+     },
+     "94": {
+      "inference_batches": 67,
+      "microseconds": 20963
+     },
+     "95": {
+      "inference_batches": 71,
+      "microseconds": 21859
+     },
+     "96": {
+      "inference_batches": 67,
+      "microseconds": 22699
+     },
+     "97": {
+      "inference_batches": 38,
+      "microseconds": 24999
+     },
+     "98": {
+      "inference_batches": 42,
+      "microseconds": 26488
+     },
+     "99": {
+      "inference_batches": 36,
+      "microseconds": 24531
+     },
+     "100": {
+      "inference_batches": 40,
+      "microseconds": 24561
+     },
+     "101": {
+      "inference_batches": 33,
+      "microseconds": 24694
+     },
+     "102": {
+      "inference_batches": 38,
+      "microseconds": 25613
+     },
+     "103": {
+      "inference_batches": 46,
+      "microseconds": 29014
+     },
+     "104": {
+      "inference_batches": 25,
+      "microseconds": 25235
+     },
+     "105": {
+      "inference_batches": 36,
+      "microseconds": 26752
+     },
+     "106": {
+      "inference_batches": 15,
+      "microseconds": 28244
+     },
+     "107": {
+      "inference_batches": 16,
+      "microseconds": 21699
+     },
+     "108": {
+      "inference_batches": 16,
+      "microseconds": 28703
+     },
+     "109": {
+      "inference_batches": 21,
+      "microseconds": 25229
+     },
+     "110": {
+      "inference_batches": 18,
+      "microseconds": 32839
+     },
+     "111": {
+      "inference_batches": 15,
+      "microseconds": 26620
+     },
+     "112": {
+      "inference_batches": 11,
+      "microseconds": 26720
+     },
+     "113": {
+      "inference_batches": 15,
+      "microseconds": 30116
+     },
+     "114": {
+      "inference_batches": 10,
+      "microseconds": 29036
+     },
+     "115": {
+      "inference_batches": 12,
+      "microseconds": 26738
+     },
+     "116": {
+      "inference_batches": 6,
+      "microseconds": 27890
+     },
+     "117": {
+      "inference_batches": 8,
+      "microseconds": 40188
+     },
+     "118": {
+      "inference_batches": 11,
+      "microseconds": 20941
+     },
+     "119": {
+      "inference_batches": 2,
+      "microseconds": 50517
+     },
+     "120": {
+      "inference_batches": 1,
+      "microseconds": 35234
+     },
+     "121": {
+      "inference_batches": 3,
+      "microseconds": 29873
+     },
+     "122": {
+      "inference_batches": 2,
+      "microseconds": 32514
+     },
+     "123": {
+      "inference_batches": 6,
+      "microseconds": 37792
+     },
+     "124": {
+      "inference_batches": 1,
+      "microseconds": 40269
+     },
+     "125": {
+      "inference_batches": 2,
+      "microseconds": 30760
+     },
+     "126": {
+      "inference_batches": 45,
+      "microseconds": 30296
+     }
+    }
+   },
+   "cores_while_games_play": {
+    "seconds_with_game_processes": 1936.8,
+    "game_processes": 6.05,
+    "inference_server_process": 0.57,
+    "run_mean_of_half_minutes": 7.51,
+    "other_work_mean_of_half_minutes": 1.9,
+    "game_processes_waiting_for_a_core_per_cpu_second": 1.411,
+    "inference_server_waiting_for_a_core_per_cpu_second": 0.201,
+    "game_processes_performance_core_share": 0.787,
+    "game_process_cpu_seconds": 11709.7,
+    "game_process_instructions": 94383690609141
+   },
+   "peak_memory_bytes_sampled": 13288987752
+  }
+ },
+ "same_size_change_percent": {
+  "1-16 states": {
+   "compiled_vs_as_written_1": 1.2,
+   "compiled_vs_as_written_2": -12.7,
+   "as_written_2_vs_as_written_1": 15.1
+  },
+  "17-32 states": {
+   "compiled_vs_as_written_1": 1.9,
+   "compiled_vs_as_written_2": -12.4,
+   "as_written_2_vs_as_written_1": 16.7
+  },
+  "33-48 states": {
+   "compiled_vs_as_written_1": -6.4,
+   "compiled_vs_as_written_2": -13.4,
+   "as_written_2_vs_as_written_1": 8.2
+  },
+  "49-64 states": {
+   "compiled_vs_as_written_1": -8.3,
+   "compiled_vs_as_written_2": -11.6,
+   "as_written_2_vs_as_written_1": 3.7
+  },
+  "65-80 states": {
+   "compiled_vs_as_written_1": -9.6,
+   "compiled_vs_as_written_2": -11.6,
+   "as_written_2_vs_as_written_1": 2.3
+  },
+  "40-80 states": {
+   "compiled_vs_as_written_1": -8.4,
+   "compiled_vs_as_written_2": -11.9,
+   "as_written_2_vs_as_written_1": 4.0
+  }
+ },
+ "same_size_note": "mean over sizes with at least 200 inference batches in both runs of the ratio of mean serving times, weighted by the two runs' inference batches of that size"
+}
