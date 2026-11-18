@@ -1977,24 +1977,27 @@ fails. In random play these make applying an action take 29% fewer instructions,
 and in training iterations the game processes ran 10.6% fewer instructions per
 decision ([record](../archive/records/move_checks_2026_11_16.md)).
 
-**What limits self-play** is the inference server. In two matched pairs of
-Mac-profile training iterations after the engine work of 16 November, it was busy
-about 96% of the time with inference batches of about 8 states, the training kept
-only about 7 of its 9 cores busy, and it played about 301,000 decisions an hour
-while playing ([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
-Less engine work per decision now buys decisions per hour only by filling the
-inference server's inference batches: the game threads ask sooner, more states
-wait for each inference batch, and each costs less. That is how the engine work of
-16 November raised it, with inference batches of about 5 states before and 8
-after; the rest of its saving left cores idle. By the inference server's cost
-above, inference batches of all 24 game threads would answer about 31% more
-states a second than inference batches of 8 (inferred); larger inference batches
-need more concurrent games. Otherwise the inference server's own cost has to fall,
-each inference batch's fixed part and the network's arithmetic, or part of its
-work move elsewhere
-([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). Before that
-work, which of the inference server and the cores set the pace depended on the
-Mac's other work
+**What limits self-play** is the inference server. In the Mac profile as it runs
+now, with one network and self-play that never stops, the inference server waited
+for inference requests less than 2% of the time through the night of
+17 November, with inference batches of about 10 states, and the run played about
+395,000 decisions an hour
+([record](../archive/records/one_network_comparison_2026_11_17.md#speed)). The
+CPU cores are not far behind. The six game processes kept 6.7 CPU cores busy and
+the main training process 1.0, so even an inference server that cost nothing
+would let the game processes use only about a fifth more CPU time, up to the
+allowance of 9 CPU cores, before the CPU cores limited instead (inferred). Less
+engine work per decision buys decisions per hour only by filling the inference
+server's inference batches: the game threads ask sooner, more states wait for
+each inference batch, and each costs less. That is how the engine work of
+16 November raised decisions per hour by 26%, with inference batches of about
+5 states before and 8 after
+([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
+Otherwise the inference server's own cost has to fall, each inference batch's
+fixed part and the network's arithmetic, or part of its work move elsewhere
+([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). Before the
+engine work of 16 November, which of the inference server and the CPU cores set
+the pace depended on the Mac's other work
 ([record](../archive/records/move_checks_2026_11_16.md#training-batches)).
 
 **Self-play that never stops.** Alternating training iterations pay for their
@@ -2008,7 +2011,9 @@ each game's decisions and time;
 [record](../archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail)).
 With the inference server on the GPU, training iterations of 63 concurrent games
 at 256×8 lost 10% to 14% of their decisions an hour the same way on 18 November
-([record](../archive/records/gpu_training_compiled_2026_11_18.md#the-games-uneven-ends)).
+([record](../archive/records/gpu_training_compiled_2026_11_18.md#the-games-uneven-ends)),
+and one of 126 concurrent games 9.7%
+([record](../archive/records/concurrent_games_gpu_2026_11_18.md#results)).
 The network update after the profiled training iteration of 17 November took
 about 22 seconds. Self-play that never stops
 (section 9.1) plays through both. In two matched pairs of runs of four network
@@ -2259,6 +2264,16 @@ cores where a 15 November training iteration measured about 192,000
 rate as an upper bound, about a tenth too high, and every number of days as a
 lower bound.
 
+Training runs have since measured the 256×8 row at 64 simulations, on the Mac's
+GPU: about 205,000 decisions an hour while playing with 63 concurrent games and
+273,000 with 126, and about 228,000 and 302,000 while all the games played
+([record](../archive/records/concurrent_games_gpu_2026_11_18.md)). The table's
+324,000 assumes inference batches of 64 states. Those runs' inference batches
+held about 25 and 48 states, and the inference server, busy 98% of the time,
+set the pace. With 126 concurrent games the CPU cores came close behind: at the
+game processes' CPU time per network evaluation, 1.6 ms, the allowance could
+feed only about a fifth more network evaluations a second (inferred).
+
 **Where an inference batch's states come from.** An inference batch holds the
 inference requests waiting when it starts, and a game asks for one network
 evaluation at a time: its search plays one simulation after another, and a
@@ -2274,7 +2289,10 @@ about 10 states while all 24 play, about 8 over a whole training iteration, and
 one at its end (section 9.2). It could never fill an inference batch of 64, and in
 inference batches of 4 and of 16 states the GPU gives 11% and 35% of its rate in
 inference batches of 64 at 64×2, and 25% and 56% at 512×16. So moving the network
-to the GPU means more concurrent games as well. A search could instead ask for
+to the GPU means more concurrent games as well. In training at 256×8 on the Mac's
+GPU, inference batches held about 0.4 states for each concurrent game: 25.5
+states on average with 63 concurrent games, and 48 with 126
+([record](../archive/records/concurrent_games_gpu_2026_11_18.md)). A search could instead ask for
 several network evaluations at once: choose a few new states before asking,
 steering each later choice away from the paths already chosen, and wait for all
 of them together. That would fill inference batches with fewer games and less
@@ -2315,8 +2333,9 @@ in large inference batches of large networks, where the arithmetic fills it. Fro
 GPU's, and these levers are what would raise it. The levers take the forms below,
 beside two changes around the forward pass: leaner request handling and a second
 inference server. The first, fewer PyTorch calls, came with one network for all
-three alliances on 18 November, and the second, compiling, is built for the zone
-and position layers as a setting; the others are not built. Half precision was
+three alliances on 18 November; the second, compiling, is built for the zone and
+position layers as a setting; and more concurrent games, for larger inference
+batches, are a setting too. The others are not built. Half precision was
 tried on real inference batches saved from a training iteration and did not pay
 as it stands; which of the others pay, and how much, is open:
 
@@ -2421,9 +2440,17 @@ as it stands; which of the others pay, and how much, is open:
 - **Larger inference batches.** More concurrent games fill larger inference
   batches, each game with its search tree in memory, and so would a search that
   asks for several network evaluations at once (both above, where an inference
-  batch's states come from). On the GPU the inference server's core could also
-  collate the next inference batch while the GPU computes the current one; now it
-  waits for each forward pass's outputs before its next inference batch. In
+  batch's states come from). More concurrent games need only a setting,
+  `--games-per-process`. At 256×8 on the Mac's GPU, 126 concurrent games instead
+  of 63 doubled the inference batches, to 48 states on average, cut the
+  inference server's time a state by a quarter, from 323 µs to 239 µs, and
+  played 33% more decisions an hour. Memory at the sampled peak rose from 8.0 GB
+  to 12.5 GB, and the game processes went from 4.4 CPU cores to 6.2 and waited
+  for a free CPU core as long as they computed
+  ([record](../archive/records/concurrent_games_gpu_2026_11_18.md)). On the GPU
+  the inference server's CPU core could also collate the next inference batch
+  while the GPU computes the current one; now it waits for each forward pass's
+  outputs before its next inference batch. In
   alternating training iterations, a training iteration's end empties its
   inference batches too, since its last games play alone; self-play that never
   stops has no such end (section 9.2).
@@ -2628,26 +2655,33 @@ measured and what would settle it.
   pair a nation, or the game as a whole, with a mark that only units or
   territories carry
   ([what is still asked](network_input.md#what-the-global-features-ask-about-a-nation)).
-- **The inference server limits self-play on the Mac.** Since the engine work of
-  16 November it is busy about 96% of the time while the training keeps about 7
-  of its 9 cores busy
-  ([record](../archive/records/engine_speed_in_training_2026_11_16.md)), so in the
-  Mac profile a faster engine plays more decisions an hour only as far as it fills
-  the inference server's inference batches. An inference batch costs the
-  inference server about 0.62 ms besides 0.13 ms a state (section 9.2); a seventh
-  game process, now that cores are idle, would fill its inference batches further,
-  which is untested. The inference server's own levers, none of them built, are
-  listed in section 9.3, with the first measurements of three of them. In
+- **The inference server limits self-play on the Mac.** In the Mac profile it is
+  busy about 98% of the time, while the game processes keep about 6.7 of the 9
+  CPU cores of the allowance busy
+  ([record](../archive/records/one_network_comparison_2026_11_17.md#speed)), so a
+  faster engine plays more decisions an hour only as far as it fills the
+  inference server's inference batches (section 9.2). A seventh game process
+  would fill them further, which is untested. With the network on the GPU at
+  256×8 the inference server limits too, busy 98% of the time even when 126
+  concurrent games fill its inference batches with 48 states on average, and the
+  CPU cores come close behind
+  ([record](../archive/records/concurrent_games_gpu_2026_11_18.md)). The
+  inference server's levers are listed in section 9.3: fewer PyTorch calls came
+  with one network, compiling and more concurrent games are settings, and the
+  others are not built. In
   self-play that never stops the network updates run on a thread of the
   inference server's process, and while one runs the inference server answers
-  about 29% fewer evaluations a second, about 3% of the decisions an hour; a
-  trainer process of its own would avoid that, which is untested
+  about 29% fewer network evaluations a second, about 3% of the decisions an
+  hour; a trainer process of its own would avoid that, which is untested
   ([record](../archive/records/self_play_never_stops_2026_11_17.md#the-inference-server-while-a-network-update-runs)).
-  Within the engine, listing a state's legal actions now
+  Self-play that never stops needs the inference server on the CPU for now
+  (`RunConfig` in `studies/campaign/run.py`), so with the network on the GPU a
+  training iteration's uneven ends still cost about a tenth of the decisions an
+  hour (section 9.2). Within the engine, listing a state's legal actions now
   costs the most each time, and checking a naval route copies the whole state and
   works out its carriers' reach and supply again with no cache
   ([record](../archive/records/naval_route_checks_2026_11_16.md)). When the
-  Mac's other work needs more than one core, part of the training runs on the
+  Mac's other work needs more than one CPU core, part of the training runs on the
   efficiency cores
   ([record](../archive/records/self_play_limits_2026_11_16.md)).
 

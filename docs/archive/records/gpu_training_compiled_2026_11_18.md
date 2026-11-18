@@ -46,10 +46,17 @@ self-play that never stops needs the inference server on the CPU
 runs started from the same seed; the GPU's float rounding, which depends on
 which states share an inference batch, made their games differ.
 
-- **The allocator.** The runs inherited `MallocNanoZone=0` from the agent's
-  shell, which turns off macOS's nano allocator for small allocations; training
-  runs otherwise leave it unset. All four ran with it, so the comparison holds,
-  but the rates are probably lower than with it unset, by an amount not measured.
+- **The allocator.** The agent's shell set `MallocNanoZone=0`, which turns off
+  macOS's nano allocator for small allocations, but the supervisor starts the
+  training process without the variables the Mac profile lists
+  (`unset_environment` in `studies/campaign/profiles/mac.json`, applied by
+  `supervise` in `tools/supervise_campaign_training.py`), and the game processes
+  inherit the training process's environment. So all four runs trained with the
+  variable unset, as training runs do; only the supervisor and the load logger,
+  which do little work, kept it. This record first said that the runs had
+  inherited it. A run started the same way on the same day, for the
+  [record of concurrent games](concurrent_games_gpu_2026_11_18.md), showed the
+  variable absent from its training process and its game processes.
 - **Decisions per hour while playing** are a run's decisions divided by its
   playing time (`collection` in `timings_seconds_this_invocation` of the run's
   `manifest.json`), which ends with its last game. **While all 63 games played**
@@ -126,7 +133,7 @@ the CPU.
 
 - **Measured:** four training iterations at 256×8 on the Mac's GPU, two with the
   compiled layers and two with the layers as written, in the order compiled, as
-  written, as written, compiled, with `MallocNanoZone=0`.
+  written, as written, compiled.
 - **Compiling did not measurably change decisions per hour in these runs.** The
   4.6% gain on average is within the 5% to 6% between two runs of one setting.
   The gain of about 10% that the forward pass alone predicts (inferred above) is
@@ -138,7 +145,7 @@ the CPU.
 - **Not measured:** the inference server's time per inference batch by its
   number of states, which would compare the two settings at equal inference
   batch sizes whatever games were played (the run's manifest keeps only the
-  inference server's totals); runs with `MallocNanoZone` unset; how long the
+  inference server's totals); how long the
   compiled runs spent compiling as they started, with PyTorch's compile cache
   filled by earlier runs (in the earlier record a first run with the cache took 3
   to 33 seconds, running included); larger networks; more concurrent games; the

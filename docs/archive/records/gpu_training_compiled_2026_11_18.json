@@ -4,7 +4,7 @@
  "code": "bb092ff",
  "torch": "2.14.0",
  "machine": "Mac, Apple M4 Max; inference server and network updates on its GPU (mps)",
- "malloc_nano_zone": "0 (inherited from the agent shell; not unset)",
+ "malloc_nano_zone": "unset in the training process and the game processes: the supervisor drops the Mac profile's unset_environment (corrected on 18 November; first recorded as inherited from the agent shell)",
  "order": [
   "compiled-a",
   "written-a",

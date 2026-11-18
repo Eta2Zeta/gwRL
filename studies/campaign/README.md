@@ -109,6 +109,13 @@ changes its outputs in the last digits, so unlike one-state evaluation a game
 need not repeat exactly from its seed. In either mode a game that fails
 costs only that game, recorded with its seed in `failed_games`.
 
+An inference batch holds at most one state for each concurrent game, the
+processes times the games in each, and on the GPU a larger inference batch costs
+much less per state. At 256×8 on the Mac's GPU, 7 processes of 18 games, 126
+concurrent games, played 33% more decisions an hour than 7 of 9, with 12.5 GB of
+memory at the sampled peak instead of 8.0 GB
+([record](../../docs/archive/records/concurrent_games_gpu_2026_11_18.md)).
+
 `--compiled-forward` has the inference server run one network's zone and
 position layers compiled by `torch.compile` for fixed numbers of states, each
 inference batch padded with empty states to the next of them
