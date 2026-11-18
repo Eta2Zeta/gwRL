@@ -69,8 +69,9 @@ class RunConfig:
     games_per_process: int = 0
     # Self-play that never stops: the game threads play one game after another,
     # a trainer thread runs a network update after every parallel_envs finished
-    # games, and the inference server takes up the new networks between two
-    # inference batches (design document, section 9.1).
+    # games, on neural_device beside the inference server, and the inference
+    # server takes up the new networks between two inference batches (design
+    # document, section 9.1).
     continuous: bool = False
     # "one": one network for all three alliances, told by its input which alliance
     # chooses, the default (docs/questions.md, Q-010); "three": a network for each
@@ -120,8 +121,6 @@ class RunConfig:
             raise ValueError("compiled_forward must be Boolean")
         if self.continuous and not self.games_per_process:
             raise ValueError("Self-play that never stops needs games per process, which share one inference server")
-        if self.continuous and self.neural_device != "cpu":
-            raise ValueError("Self-play that never stops runs its networks on the CPU for now")
         if self.networks not in ("three", "one"):
             raise ValueError("networks must be three or one")
         if self.cpu_budget is not None:
@@ -468,6 +467,13 @@ def train(args) -> int:
                     trainer["error"] = error
                 trainer["seconds"] = time.perf_counter() - began
 
+            # The trainer works on the inference server's device beside it. Until it
+            # ends, no thread releases the device's caches and the inference server
+            # runs no compiled layers: on the Mac's GPU either beside the trainer's
+            # work aborts or deadlocks the process (device_runtime, answer_as_written).
+            if learner._device_runtime is not None:
+                learner._device_runtime.hold()
+            server.answer_as_written(True)
             trainer["thread"] = threading.Thread(target=work, name="campaign-trainer", daemon=True)
             trainer["thread"].start()
 
@@ -475,6 +481,8 @@ def train(args) -> int:
             nonlocal stopped, signal_name
             trainer["thread"].join()
             trainer["thread"] = None
+            if learner._device_runtime is not None:
+                learner._device_runtime.release()
             if trainer["error"] is not None:
                 raise trainer["error"]
             timings["learning_updates"] += trainer["seconds"]
@@ -485,6 +493,7 @@ def train(args) -> int:
                 if trainer["before"] is not None:
                     serving["before_update"] = serving_between(trainer["before"], trainer["started"])
                 server.take_up(trainer["weights"], trainer["version"])
+                server.answer_as_written(False)
                 state["mark"] = serving_mark(server)
             state["version"] = trainer["version"]
             episodes = trainer["episodes"]

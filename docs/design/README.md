@@ -1666,8 +1666,9 @@ in iterations, and its self-play always used the latest parameters, while 5,000
 TPUs played and 16 others trained
 ([preprint](https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/alphazero-shedding-new-light-on-chess-shogi-and-go/alphazero_preprint.pdf),
 pages 3 and 4). Here the network update runs on a thread of the inference
-server's process (`self_play_never_stops` in `studies/campaign/run.py`, run with
-`--continuous`), which needs the inference server on the CPU (section 9.2).
+server's process, on the inference server's device, the CPU or the GPU
+(`self_play_never_stops` in `studies/campaign/run.py`, run with `--continuous`;
+section 9.2).
 
 Training can also alternate between playing and learning, as the Windows profile
 does, whose inference server runs on the GPU. A training iteration's 24 games
@@ -2023,9 +2024,24 @@ cores the run kept busy no longer fell to about 2 at each training iteration's
 end ([record](../archive/records/self_play_never_stops_2026_11_17.md)). Its
 network updates take longer, 34 to 48 seconds, because the trainer thread runs
 in the inference server's process and the two take turns at Python's lock: while
-a network update runs, the inference server answers about 29% fewer evaluations
-a second, which costs about 3% of the decisions an hour (worked out;
+a network update runs, the inference server answers about 29% fewer network
+evaluations a second, which costs about 3% of the decisions an hour (worked out;
 [record](../archive/records/self_play_never_stops_2026_11_17.md#the-inference-server-while-a-network-update-runs)).
+
+With the inference server on the GPU, the network update trains on the GPU too,
+beside it. Two things then wait until the network update has ended, because on
+the Mac's GPU, with PyTorch 2.14, each stopped the process in a test on
+18 November when a training thread worked beside it. The first is releasing the
+GPU's caches, which the training process does after every 2,048 forward passes
+and training steps: it starts by waiting for all the GPU's work, and that wait,
+made while the other thread was handing work to the GPU, aborted the process
+(`hold` and `release` of `MPSGraphCachePolicy` in
+`studies/campaign/device_runtime.py`). The second is the compiled layers
+(section 9.3): a compiled kernel waits for its turn on the GPU while it holds
+Python's lock, and the training thread's work, already in line, needed that lock
+to finish, so neither went on. While a network update runs, the inference server
+therefore answers with the layers as written (`answer_as_written` in
+`studies/campaign/shared_evaluator.py`).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept training sample was drawn 8 to 12 times
@@ -2754,10 +2770,11 @@ measured and what would settle it.
   about 29% fewer network evaluations a second, about 3% of the decisions an
   hour; a trainer process of its own would avoid that, which is untested
   ([record](../archive/records/self_play_never_stops_2026_11_17.md#the-inference-server-while-a-network-update-runs)).
-  Self-play that never stops needs the inference server on the CPU for now
-  (`RunConfig` in `studies/campaign/run.py`), so with the network on the GPU a
-  training iteration's uneven ends still cost about a tenth of the decisions an
-  hour (section 9.2). Within the engine, listing a state's legal actions now
+  With the network on the GPU, the inference server runs without the compiled
+  layers while a network update trains beside it, and holds back the GPU's
+  cache releases, because of two faults of PyTorch 2.14 on the Mac's GPU
+  (section 9.2); a trainer process of its own would avoid both. Within the
+  engine, listing a state's legal actions now
   costs the most each time, and checking a naval route copies the whole state and
   works out its carriers' reach and supply again with no cache
   ([record](../archive/records/naval_route_checks_2026_11_16.md)). When the

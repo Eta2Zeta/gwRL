@@ -23,7 +23,7 @@ from studies.campaign import run
 from studies.campaign.curriculum import make_env
 from studies.campaign.episode_workers import EpisodeWorkers, SharedEpisodeWorkers, _play_game
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet
-from studies.campaign.shared_evaluator import game_process, play_shared_games
+from studies.campaign.shared_evaluator import SharedEvaluatorServer, game_process, play_shared_games
 from studies.shared.multiplayer_mcts import PLAYERS
 
 TINY = dict(calendar_rounds=1, simulations=2, max_depth=2, hidden_dim=16, complete_episodes=True,
@@ -206,7 +206,13 @@ class SharedTrainingRunTests(unittest.TestCase):
     def test_self_play_that_never_stops_trains_beside_its_games_and_resumes(self):
         # Stopped after its first network update, then resumed from that checkpoint;
         # the games in play at the stop are lost.
-        self.assertEqual(self.train(*ARGUMENTS, "--continuous", "--stop-after-waves", "1"), 130)
+        as_written, answer_as_written = [], SharedEvaluatorServer.answer_as_written
+
+        def recorded(server, value):
+            as_written.append(value)
+            answer_as_written(server, value)
+        with patch.object(SharedEvaluatorServer, "answer_as_written", recorded):
+            self.assertEqual(self.train(*ARGUMENTS, "--continuous", "--stop-after-waves", "1"), 130)
         self.assertEqual(self.train("--resume", str(self.run_dir / "checkpoint.pt")), 0)
         manifest = json.loads((self.run_dir / "manifest.json").read_text())
         self.assertEqual(manifest["status"], "completed")
@@ -216,6 +222,9 @@ class SharedTrainingRunTests(unittest.TestCase):
         # finished games, all of them complete.
         self.assertTrue(all(update["rollout"]["games"] >= 4 and update["rollout"]["terminal"]
                             and not update["rollout"]["bootstrap_samples"] for update in updates))
+        # While the first network update trained beside the games, the inference
+        # server ran the layers as written, and the compiled ones again after it.
+        self.assertEqual(as_written, [True, False])
         # The games went on through the first network update, and the inference
         # server took up its networks: the second update's games were answered by a
         # version no game before the first update saw.
@@ -226,15 +235,13 @@ class SharedTrainingRunTests(unittest.TestCase):
         self.assertTrue((self.run_dir / "models" / "generation-000002.pt").exists())
         self.assertGreaterEqual(manifest["counters"]["episodes"], 8)
 
-    def test_self_play_that_never_stops_needs_one_cpu_inference_server(self):
+    def test_self_play_that_never_stops_needs_one_inference_server(self):
         with self.assertRaisesRegex(ValueError, "needs games per process"):
             run.RunConfig(complete_episodes=True, parallel_envs=4, episode_workers=2, continuous=True)
-        with self.assertRaisesRegex(ValueError, "on the CPU"):
-            run.RunConfig(complete_episodes=True, parallel_envs=4, episode_workers=2, games_per_process=2,
-                          continuous=True, neural_device="mps")
-        config = run.RunConfig(complete_episodes=True, parallel_envs=4, episode_workers=2, games_per_process=2,
-                               continuous=True)
-        self.assertEqual(run.busy_cores(config), 4)  # Two game processes, the inference server, the trainer.
+        for device in ("cpu", "mps", "cuda"):  # The trainer works beside the inference server, on its device.
+            config = run.RunConfig(complete_episodes=True, parallel_envs=4, episode_workers=2, games_per_process=2,
+                                   continuous=True, neural_device=device)
+            self.assertEqual(run.busy_cores(config), 4)  # Two game processes, the inference server, the trainer.
 
     def test_games_per_process_needs_episode_workers(self):
         with self.assertRaisesRegex(ValueError, "needs episode workers"):

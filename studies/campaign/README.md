@@ -200,8 +200,13 @@ between two inference batches
 training iteration is then those 24 games and their network update, and
 `--batches` counts network updates. Stopping a run, by a signal,
 `--stop-after-waves` or `--batches`, loses the games then in play. It needs
-`--games-per-process` and the inference server on the CPU; `--no-continuous`
-alternates instead, as the Windows profile does. On 17 November 2026, in two
+`--games-per-process`. With `--neural-device mps` or `cuda` the network update
+trains on the GPU beside the inference server, which meanwhile runs the layers
+as written instead of `--compiled-forward`'s
+([running training on the Mac](../../docs/design/README.md#92-running-training-on-the-mac)).
+The supervisor counts a core for the network updates, so the Mac's allowance
+leaves six game processes. `--no-continuous` alternates instead, as the Windows
+profile does. On 17 November 2026, in two
 matched pairs of runs of four network updates, it played 6.5% and 12.5% more
 decisions per wall-clock hour in steady play than alternating training
 iterations ([record](../../docs/archive/records/self_play_never_stops_2026_11_17.md)).

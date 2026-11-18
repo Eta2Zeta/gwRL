@@ -203,10 +203,11 @@ def fresh_game_losses(models: Mapping[str, nn.Module], records: Any, value_scale
                 model.train(training)
             target = torch.as_tensor([record["values"] for record in owned], dtype=predicted.dtype,
                                      device=predicted.device) / value_scale
-            errors = ((predicted - target) ** 2).mean(1).double().cpu().tolist()
+            # To the host first: the Mac's GPU has no 64-bit floats.
+            errors = ((predicted - target) ** 2).mean(1).cpu().double().tolist()
             for record, error, scores in zip(owned, errors, logits, strict=True):
                 shares = torch.as_tensor(record["policy"], dtype=torch.float64)
-                logs = torch.log_softmax(scores.double().cpu(), 0)
+                logs = torch.log_softmax(scores.cpu().double(), 0)
                 cross_entropy = float(-(shares * logs).sum())
                 entropy = float(-(shares[shares > 0] * shares[shares > 0].log()).sum())
                 total = totals.setdefault(record["owner"], {"samples": 0, "value_squared_error": 0.0,

@@ -177,6 +177,14 @@ class SharedEvaluatorTests(unittest.TestCase):
         server = self.assertServesFourRequests(models, NeuralEvaluator(models, version="test"), positions=4,
                                                compiled_forward=True)
         self.assertTrue(server.stack.compiled)
+        # While a network update trains beside the games, the layers as written answer.
+        server.answer_as_written(True)
+        written = server.stack
+        self.assertFalse(written.compiled)
+        server.answer_as_written(True)
+        self.assertIs(server.stack, written)  # Asked again: the same stack.
+        server.answer_as_written(False)
+        self.assertTrue(server.stack.compiled)
 
     def assertServesFourRequests(self, models, reference, *, positions, compiled_forward=False):
         memories = [shared_memory.SharedMemory(create=True, size=BUFFER_BYTES) for _ in range(2)]

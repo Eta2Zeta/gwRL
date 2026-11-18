@@ -48,6 +48,28 @@ class MPSRuntimePolicyTests(unittest.TestCase):
                 with self.subTest(value=value), self.assertRaises(ValueError):
                     policy.completed(value)
 
+    def test_a_held_policy_counts_without_releasing_until_released(self):
+        # While a network update trains beside self-play, no thread may release the cache.
+        with patch("torch.__version__", "2.14.0"), patch("torch.backends.mps.is_available", return_value=True), \
+             patch("torch.mps.synchronize") as synchronize, patch("torch.mps.empty_cache") as clear:
+            policy = MPSGraphCachePolicy(clear_every=4)
+            self.assertEqual(clear.call_count, 1)
+            policy.hold()
+            self.assertFalse(policy.completed(3))
+            self.assertFalse(policy.completed(3))  # Due, but held.
+            self.assertEqual(clear.call_count, 1)
+            self.assertEqual(policy.stats()["pending_actor_forwards"], 6)
+            self.assertTrue(policy.release())  # The trainer has ended: the due release happens now.
+            self.assertEqual(clear.call_count, 2)
+            self.assertEqual(policy.stats()["pending_actor_forwards"], 0)
+            policy.hold()
+            self.assertFalse(policy.completed(1))
+            self.assertFalse(policy.release())  # Nothing due.
+            self.assertTrue(policy.completed(3))  # Released policies clear as before.
+            self.assertEqual(clear.call_count, 3)
+            self.assertEqual(policy.stats()["total_actor_forwards"], 10)
+            self.assertEqual(synchronize.call_count, clear.call_count)
+
     def test_fallback_and_fast_math_cannot_be_silently_enabled(self):
         with patch("torch.__version__", "2.14.0"), patch("torch.backends.mps.is_available", return_value=True):
             for name in ("PYTORCH_ENABLE_MPS_FALLBACK", "PYTORCH_MPS_FAST_MATH"):

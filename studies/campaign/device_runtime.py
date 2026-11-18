@@ -36,6 +36,13 @@ class MPSGraphCachePolicy:
     input snapshots and random generators are untouched. Counters/timings are
     derived process-local state and must not enter learning checkpoints. A fresh
     controller or explicit restore reset starts with an empty compilation cache.
+
+    A release must not run while another thread works on the device: on PyTorch
+    2.14 a synchronize from one thread while another encodes MPS work aborts the
+    process (failed assertion in setCurrentCommandEncoder). While a network
+    update trains beside self-play, hold() keeps completed() counting without
+    releasing, and release(), called once that thread has ended, releases if one
+    came due.
     """
     def __init__(self, *, clear_every: int = DEFAULT_CLEAR_EVERY):
         if type(clear_every) is not int or clear_every <= 0:
@@ -54,6 +61,7 @@ class MPSGraphCachePolicy:
         self.clears = 0
         self.resets = 0
         self.clear_seconds = 0.0
+        self.held = False
         self.reset()
 
     def _clear(self) -> None:
@@ -69,6 +77,18 @@ class MPSGraphCachePolicy:
             raise ValueError("Completed MPS actor forwards must be a positive integer")
         self.total_actor_forwards += actor_forwards
         self.pending_actor_forwards += actor_forwards
+        if self.pending_actor_forwards >= self.clear_every and not self.held:
+            self._clear()
+            return True
+        return False
+
+    def hold(self) -> None:
+        """Keep counting, without releasing, while another thread works on the device."""
+        self.held = True
+
+    def release(self) -> bool:
+        """After hold(), once no other thread works on the device: release if one came due."""
+        self.held = False
         if self.pending_actor_forwards >= self.clear_every:
             self._clear()
             return True

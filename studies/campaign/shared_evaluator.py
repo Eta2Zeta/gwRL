@@ -194,8 +194,10 @@ class SharedEvaluatorServer:
         if set(models) != set(PLAYERS):
             raise ValueError("Provide one campaign model for Axis, Allies and Comintern")
         self.models, self.device = models, device
-        # One network's zone and position layers compiled for fixed numbers of states.
+        # One network's zone and position layers compiled for fixed numbers of states,
+        # unless the layers as written are asked for (answer_as_written).
         self.compiled_forward = compiled_forward
+        self.as_written = False
         # MPS graph-cache housekeeping after completed forwards (device_runtime).
         self.runtime_policy = runtime_policy
         self.connections = list(connections)
@@ -215,6 +217,16 @@ class SharedEvaluatorServer:
         self._stack = None  # The stack copied the old tables; the next batch builds a new one.
         self.network_version = version
 
+    def answer_as_written(self, as_written: bool) -> None:
+        """Run the layers as written, not compiled, from the next inference batch while
+        as_written holds: while a network update trains beside self-play on the same
+        device. On PyTorch 2.14 a compiled MPS kernel waits for the GPU's dispatch
+        queue while it holds Python's lock, and a trainer's operation already on that
+        queue can need the lock, which deadlocks the process."""
+        if as_written != self.as_written:
+            self.as_written = as_written
+            self._stack = None  # The next inference batch builds the stack it needs.
+
     @property
     def stack(self) -> Any:
         """The networks for one pass, which reads their weights once, at the first request:
@@ -224,7 +236,7 @@ class SharedEvaluatorServer:
             networks = distinct_networks(self.models)
             self._network_of = {player: next(index for index, network in enumerate(networks)
                                              if network is self.models[player]) for player in PLAYERS}
-            self._stack = NetworkStack(networks, compiled=self.compiled_forward)
+            self._stack = NetworkStack(networks, compiled=self.compiled_forward and not self.as_written)
         return self._stack
 
     def serve(self, keep_running: Callable[[], bool]) -> None:
