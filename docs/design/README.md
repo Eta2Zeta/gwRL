@@ -2032,16 +2032,30 @@ under which each kept training sample was drawn 8 to 12 times
 ([section 8.7](#87-how-often-a-training-sample-is-drawn)). Decisions per hour is
 the speed of one setup, a network and a search;
 [section 9.3](#93-what-a-larger-network-and-a-longer-search-cost) shows how it
-changes with the network's size and the search's budget. Measured on the Mac:
+changes with the network's size and the search's budget. Measured on the Mac,
+all with eleven-round games and 64 simulations per decision:
 
-| Setup | Network | Decisions per hour |
-| --- | --- | ---: |
-| 31 October: graph input, network on the GPU | older graph network | about 54,000 |
-| 2 November, best: zone input, network on the CPU | 64×2 | about 144,000 |
-| Night of 2 November, training iterations 1–2: inference batches on the GPU | 256×8 | about 151,000 |
+| Setup | Network | CPU cores allowed | Decisions per hour |
+| --- | --- | ---: | ---: |
+| 28 October: graph input, ten processes each playing one game and running its own network on the CPU, no learning | older graph network, 64 wide | 12 | about 19,000 |
+| 31 October: graph input, network on the GPU | older graph network, 64 wide | 12 | about 54,000 |
+| 2 November, best: zone input, network on the CPU | 64×2 | 12 | about 144,000 |
+| Night of 2 November, training iterations 1–2: inference batches on the GPU | 256×8 | 12 | about 151,000 |
+| 17 November: the Mac profile, one network, self-play that never stops | 64×2 | 9 | about 395,000 |
+| 18 November: 126 concurrent games, compiled layers, inference batches on the GPU | 256×8 | 9 | about 286,000 |
 
 Graph input was the network input until 2 November, replaced then by the zone
-input of section 5.
+input of section 5. The rate of 28 October is worked out from its record's ten
+games, 1,310 decisions each on average, which took 41 minutes each on average
+([record](../archive/README.md#stage-a-learning-and-speed-on-the-old-pipeline)).
+The others come from the records cited below and in section 9.3; the rate of
+17 November counts the network updates' time, which self-play that never stops
+plays through, and that of 18 November is while playing.
+So at the same width of 64, decisions per hour rose about twenty times from
+28 October to 17 November, within fewer CPU cores; network evaluations a second
+rose about seventeen times, from 345 to about 5,900, since a decision now needs
+about 54 network evaluations instead of 65. At 256×8 on the GPU, decisions per
+hour rose about 1.9 times from 2 to 18 November.
 
 On 2 November the Mac profile played 124 eleven-round games per hour with learning
 (64×2, network evaluations on the CPU). The night run's network had about five
