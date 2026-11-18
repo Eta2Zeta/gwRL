@@ -195,9 +195,15 @@ class CampaignLearningTests(unittest.TestCase):
         self.compatibility = {"scenario": "toy-scenario-v1", "rules": "toy-rules-v1", "schema": "toy-schema-v1"}
 
     def learner(self, *, real=False, config=None, compatibility=None):
-        models = {player: CampaignPolicyValueNet(self.model_config) if real else TinyNet(self.model_config)
-                  for player in PLAYERS}
-        return CampaignLearner(models, self.model_config, config or self.config,
+        config = config or self.config
+        def network():
+            return CampaignPolicyValueNet(self.model_config) if real else TinyNet(self.model_config)
+        if config.networks == "one":  # The default: one network serves all three alliances.
+            shared = network()
+            models = {player: shared for player in PLAYERS}
+        else:
+            models = {player: network() for player in PLAYERS}
+        return CampaignLearner(models, self.model_config, config,
                                compatibility=compatibility or self.compatibility)
 
     def assert_tree_equal(self, left, right):
@@ -320,7 +326,8 @@ class CampaignLearningTests(unittest.TestCase):
             self.assertEqual(path.read_bytes(), before)
 
     def test_terminal_targets_are_raw_three_component_gaps_without_clipping(self):
-        learner = self.learner()
+        # A network for each alliance, so that each policy's samples can be counted.
+        learner = self.learner(config=replace(self.config, networks="three"))
         learner.begin_batch(LearningToyEnv())
         before = {p: copy.deepcopy(model.state_dict()) for p, model in learner.models.items()}
         learner.collect(5)
@@ -344,7 +351,7 @@ class CampaignLearningTests(unittest.TestCase):
             self.assertFalse(torch.equal(before[player]["values"], learner.models[player].values))
 
     def test_policy_loss_routes_only_to_actual_owner_and_scale_is_applied_once(self):
-        learner = self.learner(config=replace(self.config, epochs=1))
+        learner = self.learner(config=replace(self.config, epochs=1, networks="three"))
         env = LearningToyEnv()
         learner.replay = [{"input": env.zone_input(env.legal_actions()), "owner": "axis", "policy": [1.0, 0.0],
                            "values": [20.0, 30.0, -50.0], "rollout_version": "exact-fixture",
@@ -358,7 +365,8 @@ class CampaignLearningTests(unittest.TestCase):
             self.assert_tree_equal(before[player], learner.models[player].state_dict())
 
     def test_unused_policy_menus_are_skipped_without_changing_learning(self):
-        learner = self.learner(real=True, config=replace(self.config, epochs=1))
+        # With a network for each alliance, a network reads other alliances' menus unused.
+        learner = self.learner(real=True, config=replace(self.config, epochs=1, networks="three"))
         for index, node in enumerate((0, 1, 3, 4)):
             env = LearningToyEnv()
             env.node, env.score = node, index * 3
@@ -433,7 +441,8 @@ class CampaignLearningTests(unittest.TestCase):
         self.assertEqual(learner.replay[0]["target_source"], "bootstrap")
 
     def test_chance_cutoff_averages_value_heads_without_policy_or_execution_roll(self):
-        learner = self.learner()
+        # A network for each alliance: a chance state takes the average of the three.
+        learner = self.learner(config=replace(self.config, networks="three"))
         with torch.no_grad():
             learner.models["allies"].values.copy_(torch.tensor([0.8, 0.1, -0.9]))
             learner.models["comintern"].values.copy_(torch.tensor([-0.1, 0.7, -0.6]))
@@ -704,7 +713,8 @@ class CampaignLearningTests(unittest.TestCase):
         self.assertEqual(result["rollout"]["terminal_samples"], 4)
         for player in PLAYERS:
             self.assertNotEqual(before[player], learner.model_versions()[player])
-            self.assertTrue(all(np.isfinite(loss["total"]) for loss in result["update"]["losses"][player]))
+        for losses in result["update"]["losses"].values():  # One network's, under "all".
+            self.assertTrue(all(np.isfinite(loss["total"]) for loss in losses))
         payload = learner.checkpoint()
         resumed = self.learner(real=True, config=learner.config)
         resumed.restore(payload, env_template=LearningToyEnv())
@@ -721,7 +731,8 @@ class CampaignLearningTests(unittest.TestCase):
         mixed_models = {player: TinyNet(self.model_config) for player in PLAYERS}
         mixed_models["allies"] = TinyNet(replace(self.model_config, value_scale=200))
         with self.assertRaisesRegex(ValueError, "Every actor model configuration"):
-            CampaignLearner(mixed_models, self.model_config, self.config, compatibility=self.compatibility)
+            CampaignLearner(mixed_models, self.model_config, replace(self.config, networks="three"),
+                            compatibility=self.compatibility)
 
 
 if __name__ == "__main__":

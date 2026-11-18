@@ -3,8 +3,10 @@
 `gwRL` is a C++20 Global War 1936 simulation core with Python bindings, and
 reinforcement learning for the 1936–1941 Japan–China campaign. The engine
 implements the campaign's rules. Training is by self-play: each of the three
-alliances chooses its moves by a search guided by its own network, which reads
-a fixed [encoding of the position](docs/design/README.md#5-how-a-decision-becomes-numbers).
+alliances chooses its moves by a search guided by one network that all three
+share, which reads a fixed
+[encoding of the position](docs/design/README.md#5-how-a-decision-becomes-numbers)
+and is told which alliance is choosing.
 No run has yet shown robust playing strength.
 
 ## Start here

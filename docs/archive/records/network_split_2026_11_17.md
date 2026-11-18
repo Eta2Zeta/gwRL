@@ -214,8 +214,8 @@ averages above. At 512×16, 87 states, the operations were:
   would be empty, with no legal actions, but it would pad the legal actions and
   the policy groups as well (above), so its arithmetic is about the stand-in's.
 - **Not measured:** a padded product itself; whether one network shared by the
-  three alliances learns as well as three (the design document's
-  [open question](../../design/README.md#one-network-per-alliance-or-one-shared-network));
+  three alliances learns as well as three (measured later, in
+  [matched runs](one_network_comparison_2026_11_17.md));
   the shares in games of other lengths or later in training; the Windows PC's
   NVIDIA GPU; a compiled forward pass of one network; the operations' times on
   one core.

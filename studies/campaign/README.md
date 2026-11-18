@@ -1,14 +1,16 @@
 # Regional campaign learning
 
 This study uses the approved 1936 China campaign and the shared C++ engine.
-Three separate policy/value networks guide vector MCTS. Each reads the engine's
-fixed [zone encoding](../../docs/design/README.md#5-how-a-decision-becomes-numbers) of a
-decision: each of the 37 map zones has values for fixed features, and messages
-travel along the map's borders ([network](../../docs/design/README.md#6-inside-a-network-brick-by-brick)). A training
-iteration (a *batch* in the code and its flags) holds all three networks fixed
-while its games play; a network update then trains all three together.
-Each policy learns choices made by its actual alliance, including reactions and
-controlled minors. Every value target retains `[Axis, Allies, Comintern]`.
+One policy/value network guides vector MCTS for all three alliances. It reads
+the engine's fixed
+[zone encoding](../../docs/design/README.md#5-how-a-decision-becomes-numbers) of a
+decision, which names the alliance choosing: each of the 37 map zones has values
+for fixed features, and messages travel along the map's borders
+([network](../../docs/design/README.md#6-inside-a-network-brick-by-brick)). A
+training iteration (a *batch* in the code and its flags) holds the network fixed
+while its games play; a network update then trains it. Its policy learns every
+alliance's choices, including reactions and controlled minors. Every value target
+retains `[Axis, Allies, Comintern]`.
 A decision with one legal action is played without a search or a network
 evaluation, and still records its training sample.
 
@@ -182,11 +184,12 @@ matched pairs of runs of four network updates, it played 6.5% and 12.5% more
 decisions per wall-clock hour in steady play than alternating training
 iterations ([record](../../docs/archive/records/self_play_never_stops_2026_11_17.md)).
 
-`--networks one` trains one network for all three alliances instead of a
-network for each (`--networks three`, the default). The input tells it which
-alliance is choosing; its policy learns from every decision, the inference
-server evaluates every state with it in a forward pass of one network, and
-checkpoints and model exports hold it once
+One network serves all three alliances by default (`--networks one`). The
+input tells it which alliance is choosing; its policy learns from every
+decision, the inference server evaluates every state with it in a forward pass
+of one network, and checkpoints and model exports hold it once. `--networks
+three` keeps a network for each alliance instead, each policy learning from its
+own alliance's decisions
 ([one training step](../../docs/design/README.md#84-one-training-step-and-one-network-update)).
 In self-play that never stops, each finished game is first scored by the
 networks then serving, before its training samples join the replay buffer:

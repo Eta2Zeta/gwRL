@@ -53,7 +53,7 @@ numbers.
      [6.9 The whole network](#69-the-whole-network) ·
      [6.10 More detail](#610-more-detail-how-other-game-networks-read-their-input)
 7. [Self-play and training samples](#7-self-play-and-training-samples)
-8. [Training the networks](#8-training-the-networks)
+8. [Training the network](#8-training-the-network)
    - [8.1 The loss](#81-the-loss) · [8.2 The gradient](#82-the-gradient) ·
      [8.3 Adam](#83-adam) ·
      [8.4 Training steps and network updates](#84-one-training-step-and-one-network-update) ·
@@ -69,19 +69,20 @@ numbers.
 
 Three agents, one per alliance (Axis, Allies and Comintern), learn the campaign
 by playing it against each other many thousands of times, in the manner of
-AlphaZero:
+AlphaZero. They share one neural network, which is told which alliance is
+choosing:
 
 - **They look ahead before they act.** At every decision the agent whose turn
   it is plays possible continuations on copies of the game, a *search*
-  (section 4), guided by its own neural network (sections 3, 5 and 6).
+  (section 4), guided by the network (sections 3, 5 and 6).
 - **They keep some of their decisions** as *training samples*: each with what
   the search preferred there and how the game ended (section 7).
 - **They learn from them, while they play.** Self-play never stops: after every
-  24 games that end, a *network update* adjusts each network to propose what the
+  24 games that end, a *network update* adjusts the network to propose what the
   search preferred and to predict how games end (section 8), while the games go
-  on, and every game takes up the new networks as soon as they are ready. Those
-  games and their network update make one *training iteration*. Better networks
-  make the next searches better, and the loop repeats (section 9).
+  on, and every game takes up the new network as soon as it is ready. Those
+  games and their network update make one *training iteration*. A better
+  network makes the next searches better, and the loop repeats (section 9).
 
 Whether that works for this game on this hardware is unproven: no training run
 has yet shown robust playing strength ([section 10](#10-measuring-strength)).
@@ -119,7 +120,11 @@ thousand decisions.
 **A legal action is a small data structure:** a kind plus labelled details. The
 running example of this document is decision 612 of a game the networks played
 on 5 November, after their first network update
-([record](../archive/records/training_sample_2026_11_05.md)). In game round 5,
+([record](../archive/records/training_sample_2026_11_05.md)). That run kept a
+network for each alliance, the setting before 18 November (`--networks three`,
+section 8.4), so the examples speak of the Comintern's network, the one that
+chose at decision 612; today one network serves all three alliances and gives
+the same kinds of output at every decision. In game round 5,
 during the CCP's Combat Movement, the Comintern chooses for the CCP. The CCP's
 mountain infantry in Shensi has one movement point left and may attack one of
 four neighbouring zones the KMT holds, Hopeh, Suiyuan, Szechwan or Tsinghai, or
@@ -160,9 +165,10 @@ that identifies a state exactly.
 
 In reinforcement-learning terms an agent needs a *policy*, how likely it is to
 choose each legal action, and a *value function*, how good a state is for it.
-Here one neural network per alliance gives both, for any decision its alliance
-faces (`CampaignPolicyValueNet` in `studies/campaign/neural.py`). Given a
-decision, it returns:
+Here one neural network gives both, for any decision of any alliance, which its
+input names (`CampaignPolicyValueNet` in `studies/campaign/neural.py`; with
+`--networks three` each alliance has a network of its own, section 8.4). Given
+a decision, it returns:
 
 - **three values:** its estimates of the three alliances' final scores. Inside,
   the network works in hundreds of points: it outputs 0.251 for a final score of
@@ -225,9 +231,10 @@ found.
    legal action a PUCT score (section 4.3) and play the action with the highest
    score on the copy; a tie is broken at random.
 3. At a chance event, roll the dice on the copy.
-4. At a decision no simulation has asked the network about yet, ask the deciding
-   alliance's network for the state's values for all three alliances and a
-   prior for each legal action, and stop.
+4. At a decision no simulation has asked the network about yet, ask the
+   network, told which alliance decides there, for the state's values for all
+   three alliances and a prior for each legal action, and stop. With a network
+   for each alliance, the deciding alliance's network is asked.
 5. Stop also at the end of the game, using the true final scores; on returning to
    a state already on this simulation's path; or after 16 actions and dice
    rolls, the depth limit. The last two use an estimate of the state reached
@@ -400,7 +407,7 @@ rated it, the only one of the search's 64 stops rated by that network alone, and
 it put the Comintern at −106.02, far below anything before. Five of the attack's
 simulations reached the depth limit: 44, 49, 50, 52 and 53. The low value says
 more about the network than the state: simulations 49 and 50 stopped at chance
-events, which all three networks rate together
+events, which that run's three networks rated together
 ([section 4.7](#47-more-detail-on-the-search)), and there the Axis network gave
 the Comintern about 5 points less than the Comintern's own network did
 ([record](../archive/records/depth_limit_2026_11_09.md#simulation-53-at-decision-612)).
@@ -446,9 +453,9 @@ state:
 
 | What the 16th action or dice roll reached | What the simulation uses |
 | --- | --- |
-| A decision no simulation has asked the network about | The deciding alliance's network's value, as at any new state, so the limit changes nothing |
-| A decision asked about before | The value its network gave it then; nothing new joins the tree |
-| A chance event | The average of the three networks' values, since no alliance decides there |
+| A decision no simulation has asked the network about | The network's value, as at any new state, so the limit changes nothing |
+| A decision asked about before | The value the network gave it then; nothing new joins the tree |
+| A chance event | The network's value; with a network for each alliance, the average of the three networks' values, since no alliance decides there |
 
 **Why there is a limit.** It is as old as the search (commit `6480d5b`, 23
 October). That first version had nothing else to end a simulation caught in a
@@ -476,8 +483,9 @@ simulations reached depths of 16 to 19; at five of them 1 to 6 of the 64 visits
 moved to other actions, and the most-visited action stayed the same at all ten.
 So in this game the limit hardly mattered. At the eight chance events, though,
 the three networks' values for the same state differed by 2.5 to 17 points, more
-than a search's actions usually differ;
-[section 11](#one-network-per-alliance-or-one-shared-network) takes that up.
+than a search's actions usually differ. One network for all three alliances, the
+setting since 18 November, gives a search one network's values everywhere
+([section 8.4](#84-one-training-step-and-one-network-update)).
 Better-trained networks may crowd the simulations into fewer continuations and
 meet the limit more often; that has not been measured.
 
@@ -1193,14 +1201,14 @@ Training learns from self-play in *training iterations*. In the Mac profile
 self-play never stops: 24 games are in play at a time, in 6 game processes of 4
 games each ([section 9.2](#92-running-training-on-the-mac)), and a game thread
 that finishes a game starts the next at once. After every 24 games that end, a
-network update trains the networks on their training samples and older ones
+network update trains the network on their training samples and older ones
 (section 8.4), beside the games, which go on; when it is done, every game takes
-up the new networks at once ([section 9.1](#91-the-training-loop)). A training
+up the new network at once ([section 9.1](#91-the-training-loop)). A training
 iteration is those 24 games and their network update. At every decision the
 alliance to act searches (section 4) and plays the action drawn from the visit
 shares. Training can also alternate between playing and learning, as the Windows
 profile does: a training iteration's 24 games then start together with the
-networks held fixed, and the network update runs when the last of them has
+network held fixed, and the network update runs when the last of them has
 ended. The code and the dated records name a training iteration's games a
 *batch* (as in the flag `--transitions-per-batch`); this document keeps "batch"
 for the inference batches of section 9.2.
@@ -1228,13 +1236,13 @@ and played again from the same seeds.
 ### 7.2 What a training sample stores
 
 A *training sample* is one decision of a self-play game, saved so that training
-can show it to the networks again and compare their outputs with better ones. It
+can show it to the network again and compare its outputs with better ones. It
 stores four things (`_decide` and `play_episode` in `studies/campaign/learning.py`):
 
 | Part | What it stores | What training does with it |
 | --- | --- | --- |
-| 1. What the network read | The decision's input (section 5): the non-zero zone, global and action feature values, and each legal action's zones. It is not a copy of the game. | Shows the decision to the networks again. |
-| 2. Who chose | The alliance to act. | Only that alliance's network learns action probabilities from the training sample; all three learn values from it. |
+| 1. What the network read | The decision's input (section 5): the non-zero zone, global and action feature values, and each legal action's zones. It is not a copy of the game. | Shows the decision to the network again. |
+| 2. Who chose | The alliance to act. | The input names it already; with a network for each alliance, only that alliance's network learns action probabilities from the training sample, and all three learn values from it. |
 | 3. How the search split its simulations | Each legal action's visit share (section 4.5). | The *policy target*: the action probabilities the network should give. |
 | 4. How the game ended | The three alliances' final scores, written into every training sample of the game when it ends. | The *value target*: the values the network should predict, the final scores divided by 100. |
 
@@ -1277,7 +1285,7 @@ network's arbitrary first guesses, the exploration noise and the rare game ends
 it reaches; only the final scores carry information. From the second training
 iteration on, the values differ between states.
 
-## 8. Training the networks
+## 8. Training the network
 
 Training changes a network's parameters so that, on the saved training samples,
 its action probabilities come closer to the visit shares and its values closer
@@ -1330,9 +1338,10 @@ training can remove on this training sample. Most of the loss comes from the att
 to which the search gave 0.56 and the network 0.10.
 
 In a training step the two losses are averaged over the training samples of the
-training step's minibatch: the value loss over all of them, the policy loss over those
-where the network's own alliance chose, or over all of them for one network serving
-all three alliances (section 8.4). The training step lowers their sum.
+training step's minibatch: the value loss over all of them, and the policy loss
+over all of them too, since the network serves all three alliances; with a
+network for each alliance, a network's policy loss is averaged over those where
+its own alliance chose (section 8.4). The training step lowers their sum.
 
 ### 8.2 The gradient
 
@@ -1395,10 +1404,10 @@ small average beside its typical size and moves much less. In the very first
 Adam step the corrected averages are the gradient and its size, so every
 parameter moves by exactly the learning rate, unless its gradient is so small
 that $\epsilon$ counts. **An Adam step**, the optimizer step, is this rule applied
-once to every parameter of one network, by `optimizer.step()`. Each of the three
-networks has its own Adam, whose averages carry over from one network update to
-the next and are saved in checkpoints, the full saves from which a run can
-resume.
+once to every parameter of one network, by `optimizer.step()`. The network has
+its own Adam, whose averages carry over from one network update to the next and
+are saved in checkpoints, the full saves from which a run can resume; with a
+network for each alliance, each of the three networks has its own.
 
 **A real network update, run again**
 ([record](../archive/records/adam_steps_2026_11_09.md)). Re-running the
@@ -1448,47 +1457,76 @@ samples
 ([record](../archive/records/training_sample_2026_11_05.md#the-update-after-the-batch)).
 
 **A network update** follows each training iteration's games. It runs in the main
-training process, on the CPU, while the game processes wait, and it is many
-*training steps* one after another, 700 in the 5 November run and 525 today. Each training
-step does four things (`CampaignLearner.update` in `studies/campaign/learning.py`):
+training process, on the CPU: beside the games, which go on, in self-play that
+never stops, as in the Mac profile (section 9.1); while the game processes wait,
+in alternating training iterations. It is many *training steps* one after
+another, 700 in the 5 November run and 525 today. Each training step does four
+things (`CampaignLearner.update` in `studies/campaign/learning.py`):
 
 1. **Draw a minibatch.** It picks 32 different training samples at random from
    the whole replay buffer, the training step's *minibatch*, so one training step
    mixes decisions of many games and of all three alliances. Nothing is played: a
    training step only reads stored decisions.
-2. **Read.** Each of the three networks reads the 32 decisions at once. It
-   gives its three values for every decision, and its action probabilities for
-   those where its alliance was choosing.
-3. **Compare.** It computes each network's losses (section 8.1), averaged over
-   the training samples they use. On 5 November a minibatch held 16 of the Axis's
-   decisions on average, and 8 each of the Allies' and the Comintern's.
-4. **Adam step.** Each network takes one Adam step (section 8.3) to lower the sum
-   of its two losses; all three take theirs together.
+2. **Read.** The network reads the 32 decisions at once. For every decision it
+   gives its three values and its action probabilities, those of the alliance
+   that was choosing there, which its input names.
+3. **Compare.** It computes its losses (section 8.1), averaged over the 32
+   training samples. On 5 November a minibatch held 16 of the Axis's decisions on
+   average, and 8 each of the Allies' and the Comintern's.
+4. **Adam step.** The network takes one Adam step (section 8.3) to lower the sum
+   of its two losses.
 
-The next training step draws a new minibatch of 32. After the last, the networks
-are saved as a *model export*, and every game takes them up at once
-(section 9.1). The networks after $k$ network updates are *generation* $k$; a fresh
+The next training step draws a new minibatch of 32. After the last, the network
+is saved as a *model export*, and every game takes it up at once
+(section 9.1). The network after $k$ network updates is *generation* $k$; a fresh
 network is generation 0. Playing takes minutes and the training steps under a
 minute: on 5 November the 32 games took 851 seconds and the 700 training steps
-49, and on 15 November a training iteration of today's 24 games played in 499
-seconds, also 64×2.
+49, on 15 November a training iteration of today's 24 games played in 499
+seconds, also 64×2, and on 17 November a network update's 525 training steps
+took 13.7 seconds beside the games
+([record](../archive/records/one_network_comparison_2026_11_17.md#speed)).
 
-![Where a training step's minibatch of 32 training samples comes from. 1: self-play plays 24 games at a time, in 6 game processes of 4 games each, and a game that ends is replaced at once; at each decision a random draw keeps it as a training sample with chance 5%, and when a game ends its final scores are added to its training samples; on 5 November 32 games kept 1,611 training samples from 33,062 decisions. 2: when a game ends, its training samples join the replay buffer in the main training process, the latest 8,000 training samples, about five network updates' worth of games, drawn as five bars from the oldest games, whose training samples leave first, to the newest; purple dots spread over all five bars mark one training step's minibatch of 32, drawn at random. 3: one training step, 525 per network update, each with a new minibatch: draw 32 different training samples at random from the whole replay buffer; each of the three networks reads all 32 at once; it compares its values with the final scores on all 32, and its action probabilities with the visit shares on its own alliance's training samples; each network takes one Adam step. 4: after the last training step every game takes up the new networks at once. With 64×2 networks on the CPU, 24 games finish about every 6 minutes, and a network update's 525 training steps take about 40 seconds beside the games, which go on.](figures/training_update.svg)
+![Where a training step's minibatch of 32 training samples comes from. 1: self-play plays 24 games at a time, in 6 game processes of 4 games each, and a game that ends is replaced at once; at each decision a random draw keeps it as a training sample with chance 5%, and when a game ends its final scores are added to its training samples; on 5 November 32 games kept 1,611 training samples from 33,062 decisions. 2: when a game ends, its training samples join the replay buffer in the main training process, the latest 8,000 training samples, about five network updates' worth of games, drawn as five bars from the oldest games, whose training samples leave first, to the newest; purple dots spread over all five bars mark one training step's minibatch of 32, drawn at random. 3: one training step, 525 per network update, each with a new minibatch: draw 32 different training samples at random from the whole replay buffer; the network reads all 32 at once; it compares its values with the final scores and its action probabilities with the visit shares, on all 32; its input names who chose each; the network takes one Adam step. 4: after the last training step every game takes up the new network at once. With a 64×2 network on the CPU, 24 games finish about every 5 minutes, and a network update's 525 training steps take about 14 seconds beside the games, which go on.](figures/training_update.svg)
 
-**One network for all three alliances.** With `--networks one` training keeps
-a single network instead of three, which serves every alliance; the default is
-`--networks three`. Its input tells it which alliance is choosing, in the global
-feature `deciding_player` (`src/zone_encoding.cpp`). In a training step it reads
-the minibatch once and gives its values and its action probabilities for every
-decision, so its policy loss averages over all 32 training samples, and it takes
-one Adam step. The inference server evaluates every state with it, a chance
-state once, in one forward pass of one network (section 9.2). In matched runs
-on 17 November it played 21.6% more decisions an hour on the Mac, and its value
-head and its held-out evaluation games did as well as three networks', but its
-action probabilities fit its searches slightly less well. Whether it becomes the
-default waits for the owner
-([Q-010](../questions.md#q-010-one-network-for-the-three-alliances-by-default);
-[open question](#one-network-per-alliance-or-one-shared-network)).
+**One network for all three alliances.** The network's input tells it which
+alliance is choosing, in the global feature `deciding_player`
+(`src/zone_encoding.cpp`), and the inference server evaluates every state with
+it, a chance state once, in one forward pass of one network (section 9.2). The
+owner chose one network on 18 November
+([Q-010](../questions.md#answered)), from matched runs of the Mac profile on
+17 November, 3.7 hours of training each
+([record](../archive/records/one_network_comparison_2026_11_17.md)):
+
+- **It is faster.** One network played 21.6% more decisions an hour than a
+  network for each alliance. The inference server sets the pace of self-play on
+  the Mac (section 9.2), and with one network the inference server's forward
+  pass took 20% less time per network evaluation, and a network update 61%
+  less. On the Mac's GPU
+  the same states through one network took 15% to 38% less time (section 9.3).
+- **It learned the values as well.** On each game before training on it, the
+  one network's value head explained 15.4% of the variance of those games' final
+  scores, and the three networks' value heads 13.1% of theirs (section 10); the
+  two runs' held-out evaluation games scored alike.
+- **A search compares one network's values.** With a network for each alliance a
+  search compares values that different networks gave. On 9 November, with
+  networks after one network update, their values for one alliance differed by
+  2.5 to 17 points at the same state (section 4.7), while the best and worst
+  actions' average results in a search lay a median 1.45 points apart, and in one
+  game 9.3% of the simulations stopped at states rated by another alliance's
+  network than the choosing one's
+  ([record](../archive/records/depth_limit_2026_11_09.md#positions-rated-by-another-alliances-network)).
+- **Its action probabilities fit its searches less well:** the one network's
+  KL divergence from its searches' visit shares was 0.273, against 0.252 for the
+  three networks, most of the gap at Axis decisions; the gap's cause is open
+  ([known gaps](#known-gaps)).
+
+**A network for each alliance.** `--networks three` keeps three networks
+instead, the setting before 18 November. In a training step each of them reads
+the minibatch, gives its values for all 32 decisions and its action
+probabilities for those where its own alliance chose, and takes its own Adam
+step. The inference server evaluates each state with the deciding alliance's
+network and a chance state with all three, averaging their values
+(section 9.2).
 
 In the training command the minibatch size, 32, is `--batch-size` and the number
 of training steps per network update is `--epochs`. The second name misleads: a
@@ -1525,11 +1563,13 @@ treasury, each true of every state. They are among the 670. No other removed
 embedding had moved: each feature asked about something that cannot happen
 ([list](network_input.md#8-features-removed-as-impossible)).
 
-The three networks moved the same zone and global embeddings, because every
-network learns values from every training sample. Action embeddings feed only the
-action probabilities, which each network learns from its own alliance's decisions
-alone, so each moved the embeddings of the action features its own decisions
-used.
+That run kept a network for each alliance. Its three networks moved the same
+zone and global embeddings, because every network learns values from every
+training sample. Action embeddings feed only the action probabilities, which
+each of those networks learned from its own alliance's decisions alone, so each
+moved the embeddings of the action features its own decisions used. One network,
+the setting since 18 November, learns its action probabilities from every
+decision, so it moves the action embeddings of all three alliances' decisions.
 
 **Features that always have non-zero values together get identical embeddings.**
 Of the Comintern network's 1,840 moved zone embeddings, only 1,480 were different
@@ -1555,7 +1595,7 @@ $\sqrt{250}$. So for the same time, many cheap training steps with a little nois
 make more progress than a few exact ones; that is the usual reasoning behind
 small minibatches, not something measured here. Drawing at random keeps a
 minibatch from being 32 neighbouring states of one game, which would push the
-networks 32 times in nearly the same direction; keeping only 5% of decisions
+network 32 times in nearly the same direction; keeping only 5% of decisions
 serves the same purpose. Both choices are standard. DQN, which learned Atari
 games, took minibatches of 32 experiences drawn at random from a replay memory;
 AlphaGo trained its value network on one state from each self-play game;
@@ -1598,27 +1638,27 @@ With all the bricks in place, training runs self-play and network updates side
 by side, in a loop of four steps:
 
 1. **Self-play, game after game** (section 7.1). At every decision, the alliance
-   to act runs a search (section 4), guided by its own network (sections 3, 5
+   to act runs a search (section 4), guided by the network (sections 3, 5
    and 6), and picks an action. A game thread that finishes a game starts the
    next at once.
 2. **Keep some decisions as training samples** (section 7.2): what the network
    read, how the search split its simulations and, added when the game ends, the
    final scores. A finished game's training samples join the replay buffer at
    once.
-3. **Train the three networks** in a network update after every 24 games that
-   end, on the replay buffer's training samples (section 8), so that their action
-   probabilities come closer to the search's visit shares and their values closer
+3. **Train the network** in a network update after every 24 games that end,
+   on the replay buffer's training samples (section 8), so that its action
+   probabilities come closer to the search's visit shares and its values closer
    to the final scores. The network update runs beside self-play, which goes on
-   with the networks it has.
-4. **Take up the new networks.** When the network update is done, the inference
-   server answers every game with the new networks from its next inference batch
-   on, and the run saves them.
+   with the network it has.
+4. **Take up the new network.** When the network update is done, the inference
+   server answers every game with the new network from its next inference batch
+   on, and the run saves it.
 
-![The training loop of self-play that never stops. 1: self-play plays game after game with the newest networks; at every decision the alliance to act searches, asking its network many times, and a random 5% of decisions are kept as training samples. When a game ends, its final scores are added to its training samples. 2: the training samples join a replay buffer of recent training samples; a training sample records what the network read, how many simulations began with each action and, once the game ends, the final scores. 3: after every 24 finished games, a network update's training steps train the three networks, one per alliance, beside self-play: each network's action probabilities shift toward the search's visit shares and its predicted final scores toward the real ones. 4: when the network update is done, every game takes up the new networks at once.](figures/training_loop.svg)
+![The training loop of self-play that never stops. 1: self-play plays game after game with the newest network; at every decision the alliance to act searches, asking the network many times, and a random 5% of decisions are kept as training samples. When a game ends, its final scores are added to its training samples. 2: the training samples join a replay buffer of recent training samples; a training sample records what the network read, how many simulations began with each action and, once the game ends, the final scores. 3: after every 24 finished games, a network update's training steps train the network, one for all three alliances, beside self-play: its action probabilities shift toward the search's visit shares and its predicted final scores toward the real ones. 4: when the network update is done, every game takes up the new network at once.](figures/training_loop.svg)
 
 A *training iteration* is one turn of this loop: 24 games that ended and the
 network update that trains on them. A game may so be played by more than one
-version of the networks. Each training sample records the version that answered
+version of the network. Each training sample records the version that answered
 its search's last evaluation, and each game the decisions at which its version
 changed (`network_versions` in `play_episode`, `studies/campaign/learning.py`).
 AlphaZero trained this way: its one network was updated continually instead of
@@ -1631,9 +1671,9 @@ server's process (`self_play_never_stops` in `studies/campaign/run.py`, run with
 
 Training can also alternate between playing and learning, as the Windows profile
 does, whose inference server runs on the GPU. A training iteration's 24 games
-then start together with the networks held fixed, and the network update runs
+then start together with the network held fixed, and the network update runs
 when the last of them has ended, so self-play stands still while the last games
-finish and while the networks update (section 9.2).
+finish and while the network updates (section 9.2).
 
 The idea comes from AlphaZero. The search chooses better than the bare network,
 the network learns to imitate the search and to predict outcomes, and a better
@@ -1644,7 +1684,7 @@ hardware is unproven: no training run has yet shown robust playing strength.
 
 **Layout.** The Mac profile (`studies/campaign/profiles/mac.json`) runs 6 game
 processes of 4 games each. One *inference server*, the main training process,
-runs the networks for all their states together, on the CPU: for this small
+runs the network for all their states together, on the CPU: for this small
 network the GPU's cost per forward pass outweighs its speed. In self-play that
 never stops, the same process runs the network updates, on a thread of their own
 (section 9.1). Training stays within the
@@ -1676,27 +1716,29 @@ operating system keeps between two processes, and waits.
 The inference server works in *inference batches*. Each time it is free, it takes
 every inference request waiting at that moment as one inference batch: it reads
 their notes, collates their states, evaluates them all in one forward pass of the
-three alliance networks, and sends each state's priors and values back through
+network, and sends each state's priors and values back through
 the pipe its inference request came by, as lists of numbers. The number of states
 in an inference batch is its *inference batch size*. *Collating* the inference
 batch joins the arrays of all its states end to end, one array of each kind for
 the whole forward pass, and shifts each state's indices to point into the joined
-arrays (`pack_zone_arrays` in `studies/campaign/features.py`). The forward pass
-puts each network's states together, the Axis's first, then the Allies' and the
-Comintern's. If decision 612 came seventh in an inference batch of 8 states,
+arrays (`pack_zone_arrays` in `studies/campaign/features.py`). The states keep
+the order in which their inference requests were taken, and a chance state
+appears once. If decision 612 came seventh in an inference batch of 8 states,
 after three of the Axis and three of the Allies, its 37 zone vectors would be
 numbers 222 to 258 of the forward pass's 296 zone vectors, counting from 0, and
 every index in its arrays that names one of its zones would grow by 222 (figure
-below). In the forward pass each network's linear layers read only its own
-alliance's states, so every output is that network's own, up to floating-point
-rounding; a chance state, which all three networks rate, appears once for each
+below). With a network for each alliance (`--networks three`) the forward pass
+puts each network's states together, the Axis's first, then the Allies' and the
+Comintern's; each network's linear layers read only its own alliance's states,
+so every output is that network's own, up to floating-point rounding; and a
+chance state, which all three networks rate, appears once for each
 (`NetworkStack` in `studies/campaign/neural.py`). The forward pass gives every
 legal action of every state the logarithm of its probability (section 6.8). The
 inference server turns each state's logarithms into its priors on the CPU, one
 state at a time, after copying them back from the GPU's memory when the forward
 pass ran there (`collect` in `studies/campaign/shared_evaluator.py`).
 
-**What a forward pass looks like.** A *forward pass* runs the networks over the
+**What a forward pass looks like.** A *forward pass* runs the network over the
 states of one inference batch, collated. Each state keeps its own vectors through
 the whole network of section 6: its 37 zone vectors, its global vector and an
 action vector for each of its legal actions. But the vectors of all the inference
@@ -1706,18 +1748,18 @@ each. Every layer of section 6, the embedding layer, the message-passing layers,
 the summary and the heads, works on such whole arrays, so on all the inference
 batch's states at once. The figure shows the forward pass of an inference batch
 of 8 states, three of the Axis, three of the Allies and two of the Comintern,
-decision 612 among them; the PyTorch calls of a forward pass of that mix were
-counted in the record cited below:
+decision 612 among them; its PyTorch calls are those the record cited below
+counted:
 
-![The forward pass of an inference batch of 8 states: 3 of the Axis, 3 of the Allies and 2 of the Comintern, decision 612 among them. Part 1: each state brings 37 zone vectors, a global vector and an action vector for each of its legal actions; collated, the forward pass's zone vectors are one array of 296 vectors of 64 numbers, each network's states together: the Axis's zone vectors 0 to 110, the Allies' 111 to 221, the Comintern's 222 to 295, decision 612's 222 to 258. Part 2: the forward pass is a list of PyTorch calls: the embedding layer, message-passing layer 1, message-passing layer 2, then the summary, the heads and the outputs. Message-passing layer 1 is 42 PyTorch calls: those that apply a network's linear layers are made once per network, on its own states, between a split and a join (every zone's message 5 calls, the border terms 2, the zone correction 11, the global correction 11); the others once for all 8 states (every border's message 3, each zone's average 3, a zone's inputs side by side 2, adding the zone correction 1, the average zone beside the global vector 3, adding the global correction 1). Message-passing layer 2 is the same 42; the embedding layer, summary, heads and outputs are 174; 258 in all. If all 8 states were one alliance's, each linear layer would be one PyTorch call and the forward pass 146 PyTorch calls, for 1 state as for 8. Part 3: one PyTorch call, the Comintern network's linear for every zone's message, multiplies its 74 zone vectors by its 64 × 64 message weights: 74 × 64 output numbers of 64 multiply-adds each, 303,104 multiply-adds or 606,208 FLOPs, half of them for decision 612. One output number, the first of Shensi's message at decision 612, is −0.294 × w1 + 1.957 × w2 − 1.422 × w3 − 0.203 × w4 and so on to w64, plus a bias: 64 multiply-adds, each two FLOPs. A PyTorch call's time is its call overhead, the same for 1 state or 8, then its FLOPs, which grow with the states.](figures/inference_batch_forward_pass.svg)
+![The forward pass of an inference batch of 8 states with one network for all three alliances: 3 states of the Axis, 3 of the Allies and 2 of the Comintern, decision 612 among them. Part 1: each state brings 37 zone vectors, a global vector and an action vector for each of its legal actions; collated, the forward pass's zone vectors are one array of 296 vectors of 64 numbers, in the order of their inference requests: the Axis's zone vectors 0 to 110, the Allies' 111 to 221, the Comintern's 222 to 295, decision 612's 222 to 258. Part 2: the forward pass is a list of PyTorch calls, each one for all 8 states: the embedding layer, message-passing layer 1, message-passing layer 2, then the summary, the heads and the outputs. Message-passing layer 1 is 20 PyTorch calls: every zone's message 1, every border's message 3, each zone's average 3, a zone's inputs side by side 2, the zone correction 3, adding it 1, the average zone beside the global vector 3, the global correction 3, adding it 1; each state's border terms come from a copy kept from an earlier forward pass, with no PyTorch call. Message-passing layer 2 is the same 20; the embedding layer, summary, heads and outputs are 106; 146 in all, for 1 state as for 8. A network for each alliance calls each network's linear layers on its own states, between a split and a join: 258 PyTorch calls for these 8. Part 3: one PyTorch call, the network's linear for every zone's message, multiplies all 296 zone vectors by its 64 × 64 message weights: 296 × 64 output numbers of 64 multiply-adds each, 1,212,416 multiply-adds or 2,424,832 FLOPs, an eighth of them for decision 612. One output number, the first of Shensi's message at decision 612 by the Comintern's network of 5 November, is −0.294 × w1 + 1.957 × w2 − 1.422 × w3 − 0.203 × w4 and so on to w64, plus a bias: 64 multiply-adds, each two FLOPs. A PyTorch call's time is its call overhead, the same for 1 state or 8, then its FLOPs, which grow with the states.](figures/inference_batch_forward_pass.svg)
 
 **What a forward pass is made of: PyTorch calls.** A forward pass is a list of
 PyTorch calls (section 6.3), each applying one function to whole arrays, for all
 the inference batch's states at once. PyTorch's documentation names such a
-function an *operator*. When an inference batch's states all belong to one
-alliance, a message-passing layer (section 6.6) is the 20 PyTorch calls below,
-however many states the inference batch holds. For decision 612's zones, as for
-any state's:
+function an *operator*. With one network, a message-passing layer (section 6.6)
+is the 20 PyTorch calls below, however many states the inference batch holds and
+whichever alliances choose at them. For decision 612's zones, as for any
+state's:
 
 | PyTorch calls | What they do |
 | --- | --- |
@@ -1750,19 +1792,22 @@ about 3.4 million FLOPs for each state with 14 legal actions (section 9.3).
 **How the states enter.** How many PyTorch calls a forward pass makes does not
 depend on how many states the inference batch holds; how many FLOPs those calls
 do grows in proportion to them. A forward pass of the 64×2 network on one CPU
-core is 146 PyTorch calls when its states belong to one alliance, for 1 state as
-for 8: 40 for the two message-passing layers and 106 for the rest, the embedding
-layer's embedding lookups, the summary, the value and policy heads and the
-outputs. With states of all three alliances it is 258, as in the figure: each
-network's linear layers, with their activation functions and layer
+core is 146 PyTorch calls, for 1 state as for 8, as in the figure: 40 for the two
+message-passing layers and 106 for the rest, the embedding layer's embedding
+lookups, the summary, the value and policy heads and the outputs. The record
+counted them with a network for each alliance and states of one alliance, which
+take the same path through the code as one network's states (`_by_network` and
+`NetworkStack.border_terms` in `studies/campaign/neural.py`). With a network for
+each alliance and states of all three alliances a forward pass is 258 PyTorch
+calls: each network's linear layers, with their activation functions and layer
 normalizations, are called on that network's own states, between a split of the
 forward pass's vectors by network and a join, which adds 22 PyTorch calls to each
 message-passing layer and 68 elsewhere. On the GPU 25 more PyTorch calls carry
 the states' arrays over, and at 512×16 a forward pass is 426 to 871 PyTorch calls
 ([record](../archive/records/pass_calls_2026_11_17.md#how-many-calls-a-pass-makes)).
 The FLOPs, by contrast, follow the states: in the figure's forward pass, the
-Comintern network's `linear` PyTorch call for the messages multiplies the zone
-vectors of its two states, 74 of them, in one PyTorch call, twice decision 612's
+network's `linear` PyTorch call for the messages multiplies the zone vectors of
+all 8 states, 296 of them, in one PyTorch call, eight times decision 612's
 303,104 FLOPs.
 
 A PyTorch call costs a fixed *call overhead*, whatever the size of its arrays:
@@ -1772,8 +1817,8 @@ its FLOPs, which grow with the states. A forward pass of the 64×2 network over
 one state takes one core 0.45 ms, 3.1 µs a PyTorch call, of which at most about
 2.1 µs is the call overhead, since the same core does a state's 3.4 million FLOPs
 in about 0.14 ms in large inference batches. An inference batch of 8 states pays
-the same 146 call overheads as an inference batch of one when its states belong
-to one alliance, and 258 when they belong to three, so its time per state is much
+the same 146 call overheads as an inference batch of one (with a network for each
+alliance, 258 when its states belong to all three), so its time per state is much
 lower: on one core a forward pass of 8 states took 1.67 ms, about 0.21 ms a state
 ([record](../archive/records/pass_calls_2026_11_17.md#what-the-calls-cost)). A
 PyTorch call is not a training step either: a training step (section 8.4) reads a
@@ -1799,7 +1844,11 @@ PyTorch's own work around the PyTorch calls, where their call overheads lie, and
 12% to allocating and copying memory. At about 0.7 µs each, the call overheads
 come to some 0.1 to 0.18 ms for 146 to 258 PyTorch calls, part of the forward
 pass's fixed cost of about 0.27 ms; the rest is the forward pass's own Python
-work and turning the inference batch's arrays into tensors (inferred).
+work and turning the inference batch's arrays into tensors (inferred). That
+training iteration kept a network for each alliance; in training with one
+network, that night, a forward pass took 20% less time per network evaluation,
+154 µs against 192 µs
+([record](../archive/records/one_network_comparison_2026_11_17.md#speed)).
 
 **What an inference batch costs.** An inference batch costs its forward pass and
 the *request handling* around it, the inference server's work outside the forward
@@ -1939,7 +1988,7 @@ Mac's other work
 
 **Self-play that never stops.** Alternating training iterations pay for their
 end twice: self-play stands still while a training iteration's last games finish,
-and again while the networks update. In a training iteration timed with the
+and again while the network updates. In a training iteration timed with the
 profiler on 17 November, 23 games ended between 231 and 299 seconds and the
 longest, 1,445 decisions, played alone until 332 seconds: for the last tenth of
 the playing time the inference batches held one state each and the other game
@@ -2092,10 +2141,14 @@ of its time for the GPU's arithmetic, a 64×2 inference batch only 30%
 Three of the inference server's levers (below), half precision, compiling and
 fewer PyTorch calls, were tried on those inference batches and did not pay as
 they stand. Fewer PyTorch calls do let the GPU do more: the same states through
-one network instead of the three took 15% to 38% less time an inference batch
+one network instead of three took 15% to 38% less time an inference batch
 ([record](../archive/records/network_split_2026_11_17.md#inference-batches-on-the-gpu)),
-but no way to get there with three networks has paid (below). The rates used
-below, in states evaluated per second:
+which is one reason one network serves all three alliances since 18 November
+(section 8.4). The rates below were measured on 14 November with a network for
+each alliance, the three stacked as the inference server stacks them, so one
+network's forward pass is somewhat faster; they are in states evaluated per
+second
+([record](../archive/records/network_and_search_cost_2026_11_14.md#the-network)):
 
 | Network | Arithmetic per state | One CPU core, inference batches of 16 | GPU, inference batches of 64 | GPU, inference batches of 256 |
 | --- | ---: | ---: | ---: | ---: |
@@ -2107,7 +2160,7 @@ below, in states evaluated per second:
 
 Four threads on one forward pass are at most about twice as fast as one core, and
 slower than one core on inference batches of a few states. Training adds little:
-with 5% of decisions kept and each drawn about ten times, the networks train on
+with 5% of decisions kept and each drawn about ten times, the network trains on
 about half a training sample per decision, against 50 or more network evaluations
 per decision in self-play.
 
@@ -2246,41 +2299,36 @@ in large inference batches of large networks, where the arithmetic fills it. Fro
 256×8 on the network needs the GPU, so there the inference server's speed is the
 GPU's, and these levers are what would raise it. The levers take the forms below,
 beside two changes around the forward pass: leaner request handling and a second
-inference server. None of them is built. Three were tried on real inference
-batches saved from a training iteration and did not pay as they stand; which of
-the others pay, and how much, is open:
+inference server. The first, fewer PyTorch calls, came with one network for all
+three alliances on 18 November; the others are not built. Compiling and half
+precision were tried on real inference batches saved from a training iteration
+and did not pay as they stand; which of the others pay, and how much, is open:
 
-- **Fewer PyTorch calls.** In a forward pass with states of all three alliances,
-  43% to 50% of the PyTorch calls are ones that states of one alliance would not
-  need: the forward pass splits its vectors by network, calls each network's
-  linear layer on that network's part and joins the results (`_by_network` in
-  `studies/campaign/neural.py`;
+- **Fewer PyTorch calls.** One network for all three alliances makes a forward
+  pass's PyTorch calls one network's, 146 at 64×2 on one core. A network for
+  each alliance makes 258 when an inference batch holds states of all three: 43%
+  to 50% of its PyTorch calls split the forward pass's vectors by network, call
+  each network's linear layer on that network's part and join the results
+  (`_by_network` in `studies/campaign/neural.py`;
   [record](../archive/records/pass_calls_2026_11_17.md#how-many-calls-a-pass-makes)).
-  A *grouped matrix product*, one PyTorch call that multiplies each network's
-  states by that network's own weights, calls each linear layer once for all
-  three networks, as for states of one alliance. PyTorch offers one only as a
-  private function, `torch._grouped_mm`. Tried on 17 November for every kind of
-  layer, it cut a three-alliance forward pass of the 64×2 network from 258
-  PyTorch calls to 176, with replies equal up to rounding, but on one core real
-  inference batches were no faster, and on the Mac's GPU the grouped product is
-  about twice as slow as the split, so it was removed
-  ([record](../archive/records/grouped_layers_2026_11_17.md)). A *padded
-  product* would call each linear layer once with a standard batched matrix
-  product (`torch.baddbmm`), each network's states padded with empty ones to the
-  largest network's count. But in these games the Axis decides at two thirds of
-  the states, so the padding doubles the states and the arithmetic, in large
-  inference batches as in small. A stand-in for it, one network over that many
-  states, was faster than today's forward pass on the Mac's GPU only in small
-  inference batches of the two smaller networks, by 20% and 21% as saved, about
-  9 states, and by 13% at 64×2 with 22 states; it was slower from 60 states on,
-  by 12% to 66%, and at 512×16 never faster. It is not built
-  ([record](../archive/records/network_split_2026_11_17.md)). Only one network
-  for all three alliances makes a forward pass's PyTorch calls one network's
-  without padding: the same states through one network took 15% less time on
-  one core and 15% to 38% less on the GPU, and in matched training runs on the
-  Mac one network played 21.6% more decisions an hour
+  The same states through one network took 15% less time on one core and 15% to
+  38% less on the GPU
+  ([record](../archive/records/network_split_2026_11_17.md)), and in matched
+  training runs on the Mac one network played 21.6% more decisions an hour
   ([record](../archive/records/one_network_comparison_2026_11_17.md#speed);
-  [open question](#one-network-per-alliance-or-one-shared-network)).
+  section 8.4). Two ways to keep three networks with fewer PyTorch calls did not
+  pay. A *grouped matrix product*, one PyTorch call that multiplies each
+  network's states by that network's own weights, cut a three-alliance forward
+  pass of the 64×2 network from 258 PyTorch calls to 176, but on one core real
+  inference batches were no faster, and on the Mac's GPU PyTorch's grouped
+  product, the private function `torch._grouped_mm`, is about twice as slow as
+  the split ([record](../archive/records/grouped_layers_2026_11_17.md)). A
+  *padded product*, one standard batched matrix product (`torch.baddbmm`) with
+  each network's states padded with empty ones to the largest network's count,
+  would double the states and the arithmetic, since the Axis decides at two
+  thirds of the states; a stand-in for it was slower than the split from 60
+  states on, by 12% to 66%
+  ([record](../archive/records/network_split_2026_11_17.md)).
 - **Smaller call overheads: compiling.** PyTorch's compiler, `torch.compile`,
   reads a forward pass's PyTorch calls once, ahead of the forward passes it
   serves, and writes routines that each do the work of several PyTorch calls,
@@ -2297,9 +2345,9 @@ the others pay, and how much, is open:
   512×16 the per-border work of the message-passing layers alone, along each
   state's 160 borders, is 28% to 32%
   ([record](../archive/records/network_split_2026_11_17.md#where-the-gpus-time-goes)).
-  With three networks each network's count of states sets the sizes of its
-  arrays, so each network would need its own fixed sizes; one network for all
-  three alliances would need them only for the whole inference batch.
+  One network needs fixed sizes only for the whole inference batch; with a
+  network for each alliance, each network's count of states sets the sizes of
+  its arrays, so each network would need its own.
   Compiled as it is written, the forward pass was never faster on the saved
   inference batches: 5% to 7% slower on the GPU and 12% to 21% slower on one
   core. PyTorch compiled it again for each new mix of states, up to its limit of
@@ -2308,7 +2356,7 @@ the others pay, and how much, is open:
   PyTorch records a forward pass's PyTorch calls on the GPU once, and each later
   forward pass of the same inference batch size replays the record with a single
   call overhead.
-- **Cheaper arithmetic: half precision.** The networks compute with numbers of
+- **Cheaper arithmetic: half precision.** The network computes with numbers of
   32 bits, which keep about 7 significant digits; that is the float rounding of
   section 6.3. *Half-precision* numbers take 16 bits and keep about 3. A forward
   pass in half precision moves half as many bytes, and many GPUs compute with such
@@ -2467,8 +2515,8 @@ A few games do not establish strength. The scripted opponents are simple
 controls, not expert play.
 
 **Losses on fresh games.** Between held-out evaluations, a run shows how well
-its networks learn by how well they predict each game before training on it. In
-self-play that never stops, each game that ends is first scored by the networks
+its network learns by how well it predicts each game before training on it. In
+self-play that never stops, each game that ends is first scored by the network
 serving self-play, with section 8.1's value loss and the KL divergence of the
 action probabilities from the visit shares, by alliance (`fresh_game_losses` in
 `studies/campaign/learning.py`). Two runs play different games, whose final
@@ -2522,6 +2570,17 @@ measured and what would settle it.
   Two design questions below may also be part of the reason: the
   [objective](#is-the-final-wealth-gap-the-right-goal) and
   [flat search targets](#are-64-simulations-enough-when-there-are-many-legal-actions).
+- **One network's action probabilities fit its searches less well** than a
+  network for each alliance did. In the matched runs of 17 November, at 64×2,
+  the one network's KL divergence from its searches' visit shares was 0.273,
+  against 0.252 for the three networks, most of the gap at Axis decisions, 0.318
+  against 0.289, while both runs' searches spread their visits alike
+  ([record](../archive/records/one_network_comparison_2026_11_17.md#learning-on-each-game-before-training-on-it)).
+  The cause is not measured: the one network holds three alliances' strategies
+  in the parameters of one 64×2 network, where three networks have three times
+  as many, and the comparison was one run of each. The same comparison at a
+  larger network size would show whether size closes the gap; every run records
+  the fit by alliance (`fresh_games` in `manifest.json`).
 - **Input pruning left out two rules** it could not prove for the whole game:
   warlords never owning ships or planes, and per-flag unit-class rules. Nor
   does each kind of thing have its own list of marks yet, so some global features
@@ -2730,62 +2789,6 @@ $\operatorname{sign}(a)\ln(1 + |a|)$
 (1, 2 to 3, 4 to 7, more), so each range learns its own effect. **Would settle
 it:** held-out value error on fixed data first, which is cheap, then games.
 
-#### One network per alliance, or one shared network?
-
-**Now.** Each alliance has its own network, by default. All three value heads
-learn from every kept decision, but each policy only from its own alliance's
-decisions (`CampaignLearner.update` in `studies/campaign/learning.py`). A search
-rates each new state with the network of the alliance that decides there, so one
-search compares values that different networks gave. `--networks one` trains one
-network for all three alliances instead (section 8.4).
-
-**Alternative.** One network told which alliance is choosing: the input already
-names it, in the global feature `deciding_player` (`src/zone_encoding.cpp`). Its
-policy would learn from all three alliances' decisions, and a search would
-compare values that one network gave. **The catch:** one network must hold three
-different strategies.
-
-**Speed, measured** on 17 November on inference batches saved from a training
-iteration ([record](../archive/records/network_split_2026_11_17.md)): the same
-states through one network took 15% less time an inference batch on one core,
-the inference server's device in the Mac profile, where it limits self-play
-([section 9.2](#92-running-training-on-the-mac)), and 15% to 38% less on the
-Mac's GPU at sizes from 64×2 to 512×16. The three networks' forward pass calls
-each linear layer once per network, on that network's states. Padding the three
-networks into one product would not get there, since the Axis decides at two
-thirds of the states, and with one network a compiled forward pass would need
-fixed sizes only for the whole inference batch
-([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)).
-
-**Agreement, measured** on 9 November, with networks after one network update
-([record](../archive/records/depth_limit_2026_11_09.md#positions-rated-by-another-alliances-network)):
-at eight states that all three networks rated, their values for one alliance
-differed by 2.5 to 17 points, while the best and worst actions' average results in
-a search lay a median 1.45 points apart. In one game 9.3% of the simulations
-stopped at states rated by another alliance's network than the choosing one's,
-and such a rating set the bottom of the scale in [section
-4.6](#46-a-real-search-decision-612)'s example. Whether the networks agree better
-after more training, and how much the disagreement changes searches, is not
-measured.
-
-**Learning, measured** in the matched runs the owner chose
-([Q-009](../questions.md#answered)): the Mac profile on the night of 17 November,
-3.7 hours of training each
-([record](../archive/records/one_network_comparison_2026_11_17.md)). One network
-played 21.6% more decisions an hour. On each game before training on it, the
-two runs' value heads explained about the same share of the variance of the
-final scores ([section 10](#10-measuring-strength)), 15.4% with one network and
-13.1% with three. The one network's action probabilities fit its searches less
-well: a KL divergence from the visit shares of 0.273 against 0.252, most of the
-gap at Axis decisions. The two runs' last networks scored alike in held-out
-evaluation games, within the spread of 16 seeds per alliance. **Would settle
-it:** the owner's decision
-([Q-010](../questions.md#q-010-one-network-for-the-three-alliances-by-default)).
-The same comparison at a larger network size would show whether the gap in the
-action probabilities comes from the one network's size. The
-[plan](../plans/japan_china_full_rules_plan.md#2-training-approach) lists sharing
-as optional future work.
-
 #### Is the final wealth gap the right goal?
 
 **Now.** Each alliance maximizes its wealth minus the other two alliances'
@@ -2837,7 +2840,7 @@ equal compute.
 #### Search-guided self-play or direct policy learning, and which opponents?
 
 **Now.** AlphaZero-style: every decision is searched, and all three alliances play
-their latest networks.
+with their latest network.
 
 **Open.** The [plan](../plans/japan_china_full_rules_plan.md#2-training-approach)
 keeps masked PPO, a policy trained without a search at every decision, as a
@@ -2905,8 +2908,9 @@ the dated records use instead.
 
 **What a network gives (section 3)**
 
-- **Network:** one per alliance; it turns a decision into three values and a
-  probability for every legal action.
+- **Network:** it turns a decision into three values and a probability for
+  every legal action; one network serves all three alliances, or, with
+  `--networks three`, each alliance has its own.
 - **Policy:** how likely an agent is to choose each legal action.
 - **Value:** a network's estimate of an alliance's final score, in hundreds of
   points.
@@ -3015,12 +3019,12 @@ the dated records use instead.
 - **Training iteration:** one turn of the training loop: 24 games that ended (in
   the Mac profile) and the network update that trains on them. In self-play that
   never stops the games go on through the network update; in alternating
-  training iterations they start together with the networks held fixed, and the
+  training iterations they start together with the network held fixed, and the
   network update follows the last of them. The code and the dated records call a
   training iteration's games a batch.
 - **Self-play that never stops:** training in which the game threads play one
   game after another while network updates run beside them, and every game takes
-  up new networks at once (section 9.1; `--continuous`).
+  up the new network at once (section 9.1; `--continuous`).
 - **Training sample:** one saved decision: what the network read, who chose, how
   the search split its simulations among the legal actions and the final scores.
 - **Policy target:** a training sample's visit shares, the action probabilities a
@@ -3046,15 +3050,15 @@ the dated records use instead.
   draws from.
 - **Minibatch:** the 32 training samples one training step draws at random from
   the replay buffer; the training command's `--batch-size`.
-- **Training step:** one minibatch, read by the three networks, and one Adam step
-  for each. The training command names the number of training steps per network
-  update `--epochs`.
+- **Training step:** one minibatch, read by the network, and one Adam step. The
+  training command names the number of training steps per network update
+  `--epochs`.
 - **Network update:** the training steps after a training iteration's games, 525
   in the Mac training command; in self-play that never stops they run beside the
   games.
-- **Generation:** the networks after a given number of network updates; a fresh
+- **Generation:** the network after a given number of network updates; a fresh
   network is generation 0.
-- **Model export:** the saved networks after a network update.
+- **Model export:** the saved network after a network update.
 - **Checkpoint:** a full save of a training run, for resuming it.
 
 **Running it (section 9)**
@@ -3064,7 +3068,7 @@ the dated records use instead.
 - **Game thread:** a thread that plays one game, searching at every decision.
 - **Concurrent games:** the games being played at the same moment, each holding
   its search tree in memory.
-- **Inference server:** the process that runs the three networks for every game's
+- **Inference server:** the process that runs the network for every game's
   states and sends each game thread its priors and values; the tools and the
   dated records name it the coordinator.
 - **Network evaluation:** a network's output for one state, its priors and values;
@@ -3080,9 +3084,9 @@ the dated records use instead.
   inference request waiting when it starts, answered in one forward pass. Its
   number of states is the *inference batch size*.
 - **Collating:** joining the arrays of an inference batch's states end to end for
-  one forward pass, each network's states together, with each state's indices
-  shifted to point into the joined arrays.
-- **Forward pass:** one run of the networks over all the states of an inference
+  one forward pass, with each state's indices shifted to point into the joined
+  arrays; with a network for each alliance, each network's states together.
+- **Forward pass:** one run of the network over all the states of an inference
   batch at once. Each state keeps its own vectors, but every PyTorch call works on
   the arrays that hold them all.
 - **PyTorch call:** one instruction to PyTorch, the library that does the
@@ -3113,13 +3117,15 @@ the dated records use instead.
 
 - **Grouped matrix product:** one PyTorch call that multiplies each network's
   states by that network's own weights.
+- **Padded product:** one batched matrix product of three networks, each
+  network's states padded with empty ones to the largest network's count.
 - **Compiling a forward pass:** having PyTorch's compiler, `torch.compile`, turn
   a forward pass's PyTorch calls, once and ahead of time, into fewer routines that
   each do the work of several PyTorch calls.
 - **CUDA graph:** a forward pass's PyTorch calls recorded once on an NVIDIA GPU and
   replayed with a single call overhead.
 - **Half precision:** numbers of 16 bits, with about 3 significant digits,
-  instead of the 32 bits, with about 7, that the networks compute with.
+  instead of the 32 bits, with about 7, that the network computes with.
 - **Second inference server:** a second inference server serving half the game
   processes.
 

@@ -286,10 +286,11 @@ class LearningConfig:
     # Share of a worker game's decisions kept as samples: a whole game holds over a
     # thousand close, strongly correlated positions.
     sample_fraction: float = 1.0
-    # "three": a network for each alliance, whose policy learns from that
-    # alliance's decisions. "one": one network for all three alliances, which the
-    # input tells who is choosing, and whose policy learns from every decision.
-    networks: str = "three"
+    # "one", the default: one network for all three alliances, which the input
+    # tells who is choosing, and whose policy learns from every decision. "three":
+    # a network for each alliance, whose policy learns from that alliance's
+    # decisions.
+    networks: str = "one"
 
     def __post_init__(self) -> None:
         for name in ("simulations", "max_depth", "batch_size", "epochs", "replay_capacity"):

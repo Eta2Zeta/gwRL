@@ -237,8 +237,10 @@ nor a practical guarantee that this self-play procedure converges to equilibrium
 
 Freezing rollout snapshots is an engineering choice for reproducibility and
 consistent search targets. Later asynchronous collection can be considered after
-correctness and profiling. Policy parameter sharing across alliances is optional
-future experimentation; three decision-making sides are the fixed contract.
+correctness and profiling. Since 18 November one network, told which alliance
+is choosing, serves all three alliances
+([design document, section 8.4](../design/README.md#84-one-training-step-and-one-network-update));
+three decision-making sides are the fixed contract.
 
 ### Closed-map applicability policy
 

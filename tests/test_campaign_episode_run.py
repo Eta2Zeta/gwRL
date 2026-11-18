@@ -139,10 +139,15 @@ class CampaignEpisodeRunTests(unittest.TestCase):
         model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers, value_scale=config.value_scale)
         learning_config = LearningConfig(simulations=config.simulations, max_depth=config.max_depth,
             batch_size=config.batch_size, epochs=config.epochs, learning_rate=config.learning_rate,
-            replay_capacity=config.replay_capacity, value_scale=config.value_scale, seed=config.seed)
-        learner = CampaignLearner({player: TinyNet(model_config).eval() for player in PLAYERS},
-            model_config, learning_config, compatibility={"scenario": "toy-scenario-v1",
-                "rules": "toy-rules-v1", "schema": "toy-schema-v1"})
+            replay_capacity=config.replay_capacity, value_scale=config.value_scale, seed=config.seed,
+            networks=config.networks)
+        if config.networks == "one":  # The default: one network serves all three alliances.
+            shared = TinyNet(model_config).eval()
+            models = {player: shared for player in PLAYERS}
+        else:
+            models = {player: TinyNet(model_config).eval() for player in PLAYERS}
+        learner = CampaignLearner(models, model_config, learning_config, compatibility={
+            "scenario": "toy-scenario-v1", "rules": "toy-rules-v1", "schema": "toy-schema-v1"})
         self.learners.append(learner)
         return learner
 

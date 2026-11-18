@@ -72,9 +72,10 @@ class RunConfig:
     # games, and the inference server takes up the new networks between two
     # inference batches (design document, section 9.1).
     continuous: bool = False
-    # "three": a network for each alliance; "one": one network for all three
-    # alliances, told by its input which alliance chooses (docs/questions.md, Q-009).
-    networks: str = "three"
+    # "one": one network for all three alliances, told by its input which alliance
+    # chooses, the default (docs/questions.md, Q-010); "three": a network for each
+    # alliance.
+    networks: str = "one"
 
     def __post_init__(self):
         if not isinstance(self.neural_device, str) or self.neural_device not in {"cpu", "mps", "cuda"} and not (
@@ -781,9 +782,9 @@ def main(argv=None) -> int:
                                   help="Freeze each batch until all games finish; a guard saves without updating")
             continue
         if field.name == "networks":
-            training.add_argument("--networks", choices=("three", "one"), default=None,
-                                  help="A network for each alliance (three, the default) or one network "
-                                       "for all three alliances")
+            training.add_argument("--networks", choices=("one", "three"), default=None,
+                                  help="One network for all three alliances (one, the default) or a "
+                                       "network for each alliance (three)")
             continue
         if field.name == "continuous":
             training.add_argument("--continuous", action=argparse.BooleanOptionalAction, default=None,

@@ -4,10 +4,10 @@ Game processes keep the rules, the search and the network's input
 preparation. For each position a search asks about, a game thread writes the
 decision's zone input, a few integer arrays, into its own shared-memory buffer
 and sends a short header through its own pipe. The serving process merges
-every waiting position into one pass of the networks, each alliance's network
-reading its own alliance's positions, or one network reading every position
-when it serves all three alliances, evaluates it on its device and
-replies with the priors and values. A thread waits for its reply before
+every waiting position into one pass of the networks, one network reading
+every position when it serves all three alliances, as by default, or each
+alliance's network reading its own alliance's positions, evaluates it on its
+device and replies with the priors and values. A thread waits for its reply before
 preparing its next position, so its buffer is never overwritten while the
 server reads it. When the server stops, it closes the pipes still open, and a
 thread waiting for a reply raises EvaluatorClosed instead of waiting forever.

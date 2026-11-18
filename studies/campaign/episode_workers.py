@@ -58,7 +58,7 @@ def _play(task: Mapping[str, Any]) -> dict[str, Any]:
     settings = _WORKER["settings"]
     if _WORKER["version"] != task["batch_version"]:
         models = alliance_networks(CampaignModelConfig(**settings["model_config"]),
-                                   settings["learning_config"].get("networks", "three"))
+                                   settings["learning_config"].get("networks", "one"))
         load_alliance_weights(models, task["weights"])
         _WORKER.update(version=task["batch_version"],
                        evaluator=NeuralEvaluator(models, version=task["batch_version"]))
@@ -140,9 +140,9 @@ class SharedEpisodeWorkers:
         self.device, self.runtime_policy = device, runtime_policy
         self.settings = {"calendar_rounds": calendar_rounds, "model_config": dict(model_config),
                          "learning_config": dict(learning_config), "rules_version": rules_version}
-        # The networks the inference server evaluates: one for each alliance, or one for all three.
+        # The networks the inference server evaluates: one for all three alliances, or one for each.
         self.models = alliance_networks(CampaignModelConfig(**model_config),
-                                        learning_config.get("networks", "three"), device=device)
+                                        learning_config.get("networks", "one"), device=device)
         self.serving = None
 
     def play(self, games: Sequence[tuple[int, int]], *, weights: Mapping[str, Any], batch_version: str,

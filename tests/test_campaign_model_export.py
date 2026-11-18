@@ -191,7 +191,8 @@ class CampaignModelExportTests(unittest.TestCase):
         from studies.campaign.neural import CampaignModelConfig
         from test_campaign_learning import TinyNet
         model_config = CampaignModelConfig(**self.learner.model_config)
-        learner = CampaignLearner({player: TinyNet(model_config) for player in PLAYERS},
+        shared = TinyNet(model_config)  # One network for all three alliances, the default.
+        learner = CampaignLearner({player: shared for player in PLAYERS},
             model_config, LearningConfig(value_scale=self.config.value_scale),
             compatibility=self.learner.compatibility)
         expected = save_model_export(self.path, learner, self.runner)

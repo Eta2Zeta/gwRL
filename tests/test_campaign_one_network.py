@@ -1,4 +1,4 @@
-"""One network for all three alliances, told by its input which alliance chooses (Q-009)."""
+"""One network for all three alliances, told by its input which alliance chooses (Q-009, Q-010)."""
 from __future__ import annotations
 
 from dataclasses import asdict, replace
@@ -45,8 +45,9 @@ def weights_of(model):
 
 class OneNetworkTests(unittest.TestCase):
     def test_the_settings_name_three_networks_or_one(self):
-        self.assertEqual(run.RunConfig().networks, "three")
-        self.assertEqual(LearningConfig().networks, "three")
+        # One network is the default since the owner's answer to Q-010.
+        self.assertEqual(run.RunConfig().networks, "one")
+        self.assertEqual(LearningConfig().networks, "one")
         with self.assertRaisesRegex(ValueError, "three or one"):
             run.RunConfig(networks="two")
         with self.assertRaisesRegex(ValueError, "three or one"):

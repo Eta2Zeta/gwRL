@@ -228,9 +228,9 @@ def distinct_networks(models: Mapping[str, Any]) -> list[Any]:
     return list(found.values())
 
 
-def alliance_networks(config: "CampaignModelConfig", networks: str = "three", *,
+def alliance_networks(config: "CampaignModelConfig", networks: str = "one", *,
                       device: str | torch.device = "cpu") -> dict[str, "CampaignPolicyValueNet"]:
-    """A fresh network for each alliance, or, with networks "one", one network for all three."""
+    """One fresh network for all three alliances, or, with networks "three", one for each."""
     if networks == "one":
         model = CampaignPolicyValueNet(config, device=device).eval()
         return {player: model for player in PLAYERS}
