@@ -2329,8 +2329,9 @@ back in time: half of all states were answered in inference batches of at least
 averages over a whole training iteration, 25.5 and 48 states, are lower, because
 fewer games are left at its end. So an inference batch of 64 states needs about
 128 concurrent games, each holding its search tree in memory. At 800 simulations
-30 GB holds the search trees of only about 115 games beside the processes' other
-memory, so inference batches hold about 57 states. The Mac profile has 24
+30 GB hold only about 105 concurrent games, each with its search tree and its
+other working memory, so inference batches hold about 50 states (below, when
+memory would limit). The Mac profile has 24
 concurrent games, and its inference batches on one CPU core hold about 10 states
 (section 9.2). There an inference batch takes about 1.5 ms and a game thread's
 engine work for a network evaluation about 1.1 ms of a CPU core, not much less
@@ -2568,6 +2569,37 @@ operation of a forward pass on such inference batches, and
 `tools/benchmark_network_sizes.py` times forward passes of sampled states, as
 for the rates above.
 
+**When memory would limit.** The allowance's 30 GB hold the processes, about
+3 GB, and for each concurrent game its search tree and about 70 MB besides. In
+training at 256×8 on the GPU with 64 simulations, 63 concurrent games held
+8.0 GB at the sampled peak and 126 held 12.5 to 13.4 GB, about 70 to 85 MB a
+game, of which its search tree is about 11 MB
+([record](../archive/records/memory_in_training_2026_11_18.md)). With the search
+trees measured above, the 30 GB hold (inferred):
+
+| Simulations per decision | Search tree | Memory per concurrent game | Concurrent games in 30 GB | States per inference batch |
+| ---: | ---: | ---: | ---: | ---: |
+| 64 | 11 MB | about 80 MB | about 330 | about 165 |
+| 256 | 56 MB | about 125 MB | about 215 | about 105 |
+| 800 | about 190 MB | about 260 MB | about 105 | about 50 |
+| 1,600 | about 390 MB | about 460 MB | about 60 | about 30 |
+
+At 64 simulations memory is far from the limit: the CPU cores limit long before
+330 concurrent games (above). With longer searches it limits how full the
+inference batches can be. At 1,600 simulations, the search of AlphaGo Zero,
+inference batches of about 30 states would give the GPU less than its rate in
+inference batches of 64 (above, where an inference batch's states come from). A
+search that asks for several network evaluations at once would need fewer
+concurrent games, and a search tree that kept fewer copies of the game
+(section 4.7) less memory a game. Two other parts grow with the settings. The
+replay buffer's 8,000 training samples take about 17 KB each as saved, about
+0.13 GB; a million would take about 17 GB. The network is small beside them:
+512×16 has about 60 million parameters with its embedding tables, about 1 GB with
+their gradients and Adam's two running averages (section 8.3). On the Windows
+PC, which allows 12 GB, memory limits about two and a half times sooner. One part
+grows with every game played, the learner's record of the games' events, a
+known gap (section 11).
+
 Three things follow, inferred:
 
 - **The engine is the main cost of a simulation.** A network evaluation takes
@@ -2577,8 +2609,9 @@ Three things follow, inferred:
   the allowance keep it busy from 256×8 on, and all 10 performance cores would
   nearly keep it busy at 128×4.
 - **Memory grows with the search.** A search tree holds about 0.24 MB per
-  simulation, so at 800 simulations each concurrent game holds about 190 MB, and
-  memory, not the GPU, sets how many games can fill an inference batch.
+  simulation, so at 800 simulations each concurrent game holds about 260 MB with
+  its other working memory, and memory, not the GPU, sets how many games can fill
+  an inference batch (above, when memory would limit).
 - **What each part of a computer buys.** More cores, like a cheaper engine, raise
   the cores' line in the figure, and with it decisions per hour wherever the cores
   limit. A faster GPU raises its line and moves the crossing to larger networks,
@@ -2745,6 +2778,18 @@ measured and what would settle it.
   as many, and the comparison was one run of each. The same comparison at a
   larger network size would show whether size closes the gap; every run records
   the fit by alliance (`fresh_games` in `manifest.json`).
+- **The learner keeps every game's events.** Besides the replay buffer, the
+  learner keeps an event for every transition of every game it has played
+  (`action_history` in `studies/campaign/learning.py`), in memory and in every
+  checkpoint, and never drops one, though the training loop reads only the
+  current training iteration's events, for its progress report (`train` in
+  `studies/campaign/run.py`). After the 997 games of the night of 17 November
+  they took about 2.0 GB of the main training process's memory and 626 MB of its
+  checkpoint, about 2.0 MB and 0.63 MB a game
+  ([record](../archive/records/memory_in_training_2026_11_18.md)). A run resumed
+  night after night would fill the 30 GB of the allowance with them within about
+  five nights, and every checkpoint save would write them all (inferred).
+  Keeping only the current training iteration's events would end that.
 - **Input pruning left out two rules** it could not prove for the whole game:
   warlords never owning ships or planes, and per-flag unit-class rules. Nor
   does each kind of thing have its own list of marks yet, so some global features

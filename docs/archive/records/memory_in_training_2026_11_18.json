@@ -1,0 +1,61 @@
+{
+ "record": "memory_in_training_2026_11_18.md",
+ "date": "2026-11-18",
+ "code": "the checkpoints' own runs: 9634d40 (night of 17 November) and 0faad2b (18 November); read with the checkout at 8f9330e",
+ "torch": "2.14.0",
+ "method": "each checkpoint loaded with torch.load; each part's saved size is len(pickle.dumps(part, protocol=5)); its size in memory is sys.getsizeof summed over dictionaries, lists and their contents, which does not see inside the native CampaignZoneInput objects of the replay buffer",
+ "script": "\"\"\"What a training checkpoint holds: sizes of its parts, pickled and in memory.\"\"\"\nimport pickle\nimport sys\n\nimport numpy as np\nimport torch\n\n\ndef deep_size(value, seen):\n    if id(value) in seen:\n        return 0\n    seen.add(id(value))\n    size = sys.getsizeof(value)\n    if isinstance(value, dict):\n        size += sum(deep_size(k, seen) + deep_size(v, seen) for k, v in value.items())\n    elif isinstance(value, (list, tuple, set, frozenset)):\n        size += sum(deep_size(v, seen) for v in value)\n    elif isinstance(value, np.ndarray):\n        size += value.nbytes if value.base is None else 0\n    elif isinstance(value, torch.Tensor):\n        size += value.numel() * value.element_size()\n    return size\n\n\npath = sys.argv[1]\nstate = torch.load(path, map_location=\"cpu\", weights_only=False)\nlearner = state.get(\"learner\", state)\nprint(\"top keys:\", sorted(state.keys())[:20])\nholder = learner if isinstance(learner, dict) and \"action_history\" in learner else next(\n    (v for v in state.values() if isinstance(v, dict) and \"action_history\" in v), None)\nif holder is None:\n    raise SystemExit(\"no action_history found\")\nprint(\"learner keys:\", sorted(holder.keys()))\nfor name in (\"action_history\", \"replay\"):\n    part = holder[name]\n    pickled = len(pickle.dumps(part, protocol=pickle.HIGHEST_PROTOCOL))\n    memory = deep_size(part, set())\n    print(f\"{name}: {len(part)} items, pickled {pickled / 1e6:.1f} MB ({pickled / max(len(part), 1):.0f} B each), \"\n          f\"in memory about {memory / 1e6:.1f} MB ({memory / max(len(part), 1):.0f} B each)\")\nprint(\"counters:\", holder.get(\"counters\"))\nimport json, os\nresult = {\"checkpoint\": path, \"checkpoint_bytes\": os.path.getsize(path), \"counters\": holder.get(\"counters\")}\nfor name in (\"action_history\", \"replay\"):\n    part = holder[name]\n    result[name] = {\"items\": len(part), \"pickled_bytes\": len(pickle.dumps(part, protocol=pickle.HIGHEST_PROTOCOL)),\n                    \"python_object_bytes\": deep_size(part, set())}\nprint(\"JSON \" + json.dumps(result))\n",
+ "checkpoints": {
+  "night_of_17_november_one_network_64x2": {
+   "checkpoint": "tmp/one-network-2026-11-17/one/checkpoint.pt",
+   "checkpoint_bytes": 814610965,
+   "counters": {
+    "transitions": 1671059,
+    "decisions": 1460330,
+    "chance_events": 210729,
+    "episodes": 997,
+    "batches": 41,
+    "updates": 41
+   },
+   "action_history": {
+    "items": 1671059,
+    "pickled_bytes": 625792418,
+    "python_object_bytes": 2040961627
+   },
+   "replay": {
+    "items": 8000,
+    "pickled_bytes": 133497539,
+    "python_object_bytes": 13341709
+   }
+  },
+  "18_november_126_games_256x8": {
+   "checkpoint": "tmp/concurrent-games-2026-11-18/games-126/checkpoint.pt",
+   "checkpoint_bytes": 563240735,
+   "counters": {
+    "transitions": 159096,
+    "decisions": 139298,
+    "chance_events": 19798,
+    "episodes": 126,
+    "batches": 1,
+    "updates": 1
+   },
+   "action_history": {
+    "items": 159096,
+    "pickled_bytes": 58039122,
+    "python_object_bytes": 183431017
+   },
+   "replay": {
+    "items": 6909,
+    "pickled_bytes": 111863438,
+    "python_object_bytes": 12044509
+   }
+  }
+ },
+ "peak_memory_bytes_sampled": {
+  "night_of_17_november_one_network_64x2_whole_run": 9981753632,
+  "256x8_63_concurrent_games": 7957612344,
+  "256x8_126_concurrent_games_as_written_first": 12478998512,
+  "256x8_126_concurrent_games_compiled": 13387405288,
+  "256x8_126_concurrent_games_as_written_second": 13288987752
+ }
+}
