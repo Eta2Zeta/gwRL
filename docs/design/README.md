@@ -682,12 +682,14 @@ with names.
 
 ## 6. Inside a network, brick by brick
 
-This section opens the box of [section 3](#3-what-a-network-gives-at-a-decision).
-It builds a network from small parts and shows each on decision 612, with the
-Comintern's network after its first network update, the network that faced that
-decision. A network's size is written width × number of message-passing layers,
-both explained below: 64×2 here and in the Mac profile's measurements
-(section 9.2), 256×8 in the night run of 2 November.
+This section opens the box of [section 3](#3-what-a-network-gives-at-a-decision):
+a network is a function that takes one state and gives its three values, the
+estimates of the alliances' final scores, and a probability for each legal
+action. This section builds that function from small parts and shows each on
+decision 612, with the Comintern's network after its first network update, the
+network that faced that decision. A network's size is written width × number of
+message-passing layers, both explained below: 64×2 here and in the Mac profile's
+measurements (section 9.2), 256×8 in the night run of 2 November.
 Which plays better, and how big a network this game needs, is
 [open](#how-big-should-the-network-and-the-search-be).
 
@@ -695,8 +697,12 @@ In the usual picture of a neural network, the feature vectors of section 5 are
 its *input layer*, and linear layers follow. Section 6.2 defines a linear layer,
 and section 6.3 shows the first one, the *embedding layer*, which reads the
 feature values. Nothing else stands between the feature values and the network.
-The embedding layer turns each feature vector into a vector of its own, and
-section 6.3 ends with a plan of how the later layers combine those vectors;
+Sections 6.3 to 6.7 then follow the numbers from the feature values to the
+values: the embedding layer turns each feature vector into a vector of its own
+(6.3), the vectors of the zones and of the state as a whole are completed (6.4,
+6.5), message-passing layers mix them along the borders (6.6), and a summary
+vector of the state gives the three values (6.7), whose figure draws that whole
+path with decision 612's numbers. Section 6.8 adds the action probabilities, and
 section 6.9 draws the whole network.
 
 ### 6.1 Vectors
@@ -998,7 +1004,7 @@ the result:
    layer without an activation function.
 
 Then layer normalization rescales the sum. For Shensi at decision 612, the first 4
-of the 64 numbers:
+of the 64 numbers ([record](../archive/records/value_path_2026_11_18.md)):
 
 | Part | First 4 numbers |
 | --- | --- |
@@ -1091,13 +1097,51 @@ message-passing layers, its *network depth*.
 
 ### 6.7 The values
 
-A linear layer (with its activation function and a layer normalization) combines
-the global vector with the average and the largest value, number by number, of
-the 37 zone vectors after the message-passing layers into one *summary vector* of
-the state. Two more linear layers, the *value head*, turn the summary vector into
-three numbers: the predicted final scores of the Axis, the Allies and the
-Comintern, in hundreds of points. At decision 612 they were 0.251, −0.424 and
-−1.024: +25.1, −42.4 and −102.4 (section 3).
+The values are where the numbers of sections 6.3 to 6.6 end up. In the terms of
+section 3 the network is a value function: from one state, here decision 612, it
+estimates each alliance's final score. The figure follows decision 612's numbers
+along the whole path, in the Comintern's network after one network update
+([record](../archive/records/value_path_2026_11_18.md)):
+
+![Decision 612, the Comintern's network after one network update, width 64; each vector shown by its first 4 of 64 numbers. Left, every zone, Shensi shown, all 37 the same way: Shensi's feature vector, 9 non-zero feature values of 42,532, goes through the embedding layer, gets its identity embedding and static features added and is layer-normalized into Shensi's zone vector, −0.294, 1.957, −1.422, −0.203, …. Right, the state as a whole: the global feature vector, 176 non-zero feature values of 4,076, goes through the embedding layer and layer normalization into the global vector, −1.063, −1.073, −1.086, 0.935, …. Two message-passing layers follow: each adds to Shensi's vector what its 4 neighbours send and the global vector, and to the global vector the average of the 37 zone vectors. After them Shensi's vector is 0.027, 1.158, −0.829, 1.170, …, and the global vector −1.064, −0.207, −2.095, −0.117, …. For each of the 64 numbers, the average of the 37 zone vectors, 0.159, −1.371, 0.093, 0.126, …, and their largest value, 1.995, 1.158, 2.248, 3.327, …, are joined with the global vector into 3 × 64 = 192 numbers, which a linear layer, GELU and layer normalization turn into the summary vector of the state, −0.597, 3.316, 1.445, −0.710, …. The value head's first linear layer and GELU turn it into 64 numbers, −0.154, −0.154, −0.155, 0.395, …; its second linear layer, with no activation function, into 3 numbers: Axis 0.251, Allies −0.424, Comintern −1.024. Times 100, from hundreds of points to points, these are the values: Axis +25.1, Allies −42.4, Comintern −102.4. The values read the board only through the summary vector, and never read the legal actions; training moves them toward the final scores.](figures/value_path.svg)
+
+1. **A vector for every zone and one for the state as a whole** (sections 6.3
+   to 6.5). Shensi's zone vector begins −0.294, 1.957, −1.422, −0.203, and the
+   global vector begins −1.063, −1.073, −1.086, 0.935.
+2. **Two message-passing layers** (section 6.6) add to every zone vector what
+   its neighbours send and the global vector, and to the global vector the
+   average of the 37 zone vectors. After them Shensi's vector begins 0.027,
+   1.158, −0.829, 1.170, and the global vector begins −1.064, −0.207, −2.095,
+   −0.117.
+3. **The summary vector.** For each of the 64 numbers, the network takes the
+   average of the 37 zone vectors and the largest value among them. The average
+   describes the board as a whole; the largest keeps what stands out in a single
+   zone, which an average over 37 zones would dilute. At decision 612 the
+   largest first number is Eastern Manchuria's, and the largest second number is
+   Shensi's own 1.158. The average, the largest and the global vector, joined
+   into 3 × 64 = 192 numbers, go through a linear layer, GELU and layer
+   normalization into the 64 numbers of the *summary vector* of the state,
+   which begins −0.597, 3.316, 1.445, −0.710.
+4. **The value head**, two linear layers. The first, followed by GELU, turns the
+   summary vector into 64 numbers. The second turns those into 3 numbers,
+   without an activation function, so that a value can have any size and sign:
+   the predicted final scores of the Axis, the Allies and the Comintern in
+   hundreds of points, 0.251, −0.424 and −1.024 at decision 612. Times 100 they
+   are the values of section 3: +25.1 for the Axis, −42.4 for the Allies and
+   −102.4 for the Comintern.
+
+The board reaches the values only through the summary vector. The values never
+read the legal actions: the action vectors join only for the action
+probabilities (section 6.8), so the values of a state do not depend on which
+actions are legal in it.
+
+**What the values approximate.** In reinforcement learning a value function
+gives one agent's expected return; this game has three players, so the network
+gives one value for each alliance: the final score that alliance can expect from
+the state, when the game goes on as in self-play. Training moves the values
+toward the final scores that self-play games reached (the value loss of
+[section 8.1](#81-the-loss)): decision 612's game ended with the Comintern
+at −106.2, where the network had predicted −102.4.
 
 ### 6.8 The action probabilities
 

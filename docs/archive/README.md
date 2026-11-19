@@ -30,6 +30,7 @@ the first learning stage.
 | 9 Nov | [What Adam did in one real update](records/adam_steps_2026_11_09.md) | Re-running the 5 November update gave generation 1 exactly; how the steps shrink. |
 | 14 Nov | [Does self-play learn three-round games?](records/three_round_training_2026_11_14.md) | 792 games on the PC taught the value heads the average scores, but no alliance played clearly better than the scripted policy; the untrained Axis, which with the noise off does almost nothing, scored best. |
 | 17 Nov | [One network for the three alliances, against three](records/one_network_comparison_2026_11_17.md) | Matched Mac runs of 3.7 hours: one network played 21.6% more decisions an hour; its value head explained about as much of the final scores' variance on each new game, 15.4% against 13.1%, but its action probabilities fit its searches less well, a KL divergence of 0.273 against 0.252; the two runs' held-out games scored alike, and both trained Axis networks about 33 points below the untrained, nearly passive one. |
+| 18 Nov | [Decision 612's path to its values](records/value_path_2026_11_18.md) | The 5 November game replayed to decision 612: the numbers of every step from the Comintern network's feature values to its three values, 0.251, −0.424 and −1.024. |
 
 ### The network's input
 

@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="822" viewBox="0 0 960 822" role="img" aria-labelledby="title desc">
+  <title id="title">From decision 612's feature values to its three values</title>
+  <desc id="desc">Decision 612, the Comintern's network after one network update, width 64; each vector shown by its first 4 of 64 numbers. Left, every zone, Shensi shown, all 37 the same way: Shensi's feature vector, 9 non-zero feature values of 42,532, goes through the embedding layer, gets its identity embedding and static features added and is layer-normalized into Shensi's zone vector, −0.294, 1.957, −1.422, −0.203, …. Right, the state as a whole: the global feature vector, 176 non-zero feature values of 4,076, goes through the embedding layer and layer normalization into the global vector, −1.063, −1.073, −1.086, 0.935, …. Two message-passing layers follow: each adds to Shensi's vector what its 4 neighbours send and the global vector, and to the global vector the average of the 37 zone vectors. After them Shensi's vector is 0.027, 1.158, −0.829, 1.170, …, and the global vector −1.064, −0.207, −2.095, −0.117, …. For each of the 64 numbers, the average of the 37 zone vectors, 0.159, −1.371, 0.093, 0.126, …, and their largest value, 1.995, 1.158, 2.248, 3.327, …, are joined with the global vector into 3 × 64 = 192 numbers, which a linear layer, GELU and layer normalization turn into the summary vector of the state, −0.597, 3.316, 1.445, −0.710, …. The value head's first linear layer and GELU turn it into 64 numbers, −0.154, −0.154, −0.155, 0.395, …; its second linear layer, with no activation function, into 3 numbers: Axis 0.251, Allies −0.424, Comintern -1.024. Times 100, from hundreds of points to points, these are the values: Axis +25.1, Allies −42.4, Comintern −102.4. The values read the board only through the summary vector, and never read the legal actions; training moves them toward the final scores.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+      .title { font-size: 15px; font-weight: 600; }
+      .sub { font-size: 12px; fill: #57606a; font-style: italic; }
+      .cap { font-size: 11px; font-weight: 600; fill: #57606a; letter-spacing: 0.04em; }
+      .boxhead { font-size: 13px; font-weight: 600; }
+      .numbers { font-size: 12px; fill: #1f2328; }
+      .op { font-size: 12px; fill: #57606a; }
+      .opbold { font-size: 12px; fill: #1f2328; font-weight: 600; }
+      .value { font-size: 14px; font-weight: 600; }
+      .label { font-size: 12px; fill: #57606a; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="821" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="title" x="24" y="36">From decision 612's feature values to its three values</text>
+  <text class="sub" x="24" y="58">The Comintern's network after one network update, width 64. Each box is a vector, shown by its first 4 of 64 numbers; each arrow is a layer.</text>
+  <text class="cap" x="24" y="90">EVERY ZONE: SHENSI SHOWN, ALL 37 THE SAME WAY</text>
+  <text class="cap" x="500" y="90">THE STATE AS A WHOLE</text>
+  <rect x="24" y="100" width="436" height="44" rx="7" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text class="boxhead" x="38" y="118">Shensi's feature vector</text>
+  <text class="numbers" x="38" y="136">9 non-zero feature values of 42,532</text>
+  <rect x="500" y="100" width="436" height="44" rx="7" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text class="boxhead" x="514" y="118">The global feature vector</text>
+  <text class="numbers" x="514" y="136">176 non-zero feature values of 4,076</text>
+  <line x1="54" y1="146" x2="54" y2="186" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text class="op" x="70" y="162">embedding layer, + identity embedding and static features,</text>
+  <text class="op" x="70" y="178">layer normalization (sections 6.3 and 6.4)</text>
+  <line x1="530" y1="146" x2="530" y2="186" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text class="op" x="546" y="170">embedding layer, layer normalization (section 6.5)</text>
+  <rect x="24" y="188" width="436" height="44" rx="7" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="boxhead" x="38" y="206">Shensi's zone vector</text>
+  <text class="numbers" x="38" y="224">−0.294, 1.957, −1.422, −0.203, …</text>
+  <rect x="500" y="188" width="436" height="44" rx="7" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="boxhead" x="514" y="206">The global vector</text>
+  <text class="numbers" x="514" y="224">−1.063, −1.073, −1.086, 0.935, …</text>
+  <line x1="54" y1="234" x2="54" y2="292" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text class="opbold" x="70" y="250">2 message-passing layers (section 6.6): each adds</text>
+  <text class="op" x="70" y="266">what Shensi's 4 neighbours send, and the global vector</text>
+  <text class="op" x="70" y="282"></text>
+  <line x1="530" y1="234" x2="530" y2="292" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text class="opbold" x="546" y="250">the same 2 message-passing layers: each adds</text>
+  <text class="op" x="546" y="266">the average of the 37 zone vectors</text>
+  <line x1="466" y1="263" x2="494" y2="263" stroke="#57606a" stroke-width="1.3" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <rect x="24" y="294" width="436" height="44" rx="7" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="boxhead" x="38" y="312">Shensi's vector after the message-passing layers</text>
+  <text class="numbers" x="38" y="330">0.027, 1.158, −0.829, 1.170, …</text>
+  <rect x="500" y="294" width="436" height="44" rx="7" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="boxhead" x="514" y="312">The global vector after the message-passing layers</text>
+  <text class="numbers" x="514" y="330">−1.064, −0.207, −2.095, −0.117, …</text>
+  <line x1="54" y1="340" x2="54" y2="380" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text class="op" x="70" y="356">all 37 zone vectors after the message-passing layers: for</text>
+  <text class="op" x="70" y="372">each of the 64 numbers, their average and their largest value</text>
+  <rect x="24" y="382" width="212.0" height="44" rx="7" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="boxhead" x="38" y="400">Average of the 37</text>
+  <text class="numbers" x="38" y="418">0.159, −1.371, 0.093, 0.126, …</text>
+  <rect x="248.0" y="382" width="212.0" height="44" rx="7" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="boxhead" x="262.0" y="400">Largest of the 37</text>
+  <text class="numbers" x="262.0" y="418">1.995, 1.158, 2.248, 3.327, …</text>
+  <line x1="130.0" y1="428" x2="312" y2="476" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="354.0" y1="428" x2="412" y2="476" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="600" y1="340" x2="600" y2="476" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text class="op" x="616" y="394">joined: the average, the largest and the</text>
+  <text class="op" x="616" y="410">global vector, 3 × 64 = 192 numbers; then</text>
+  <text class="op" x="616" y="426">a linear layer, GELU and layer</text>
+  <text class="op" x="616" y="442">normalization (section 6.7)</text>
+  <rect x="262" y="478" width="436" height="44" rx="7" fill="#fbefff" stroke="#c297ff"/>
+  <text class="boxhead" x="276" y="496">The summary vector of the state</text>
+  <text class="numbers" x="276" y="514">−0.597, 3.316, 1.445, −0.710, …</text>
+  <line x1="292" y1="524" x2="292" y2="564" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text class="op" x="308" y="548">value head, first linear layer, then GELU: 64 numbers</text>
+  <rect x="262" y="566" width="436" height="44" rx="7" fill="#fbefff" stroke="#c297ff"/>
+  <text class="boxhead" x="276" y="584">The value head's 64 numbers in between</text>
+  <text class="numbers" x="276" y="602">−0.154, −0.154, −0.155, 0.395, …</text>
+  <line x1="292" y1="612" x2="292" y2="652" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text class="op" x="308" y="636">value head, second linear layer: 3 numbers, no activation function</text>
+  <rect x="262" y="654" width="436" height="34" rx="7" fill="#fbefff" stroke="#c297ff"/>
+  <text class="boxhead" x="276" y="676.0">Axis 0.251, Allies −0.424, Comintern −1.024</text>
+  <line x1="292" y1="690" x2="292" y2="726" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text class="op" x="308" y="712">× 100: from hundreds of points to points</text>
+  <rect x="262" y="728" width="436" height="40" rx="7" fill="#dafbe1" stroke="#4ac26b"/>
+  <text class="value" x="276" y="753">The values: Axis +25.1, Allies −42.4, Comintern −102.4</text>
+  <text class="label" x="24" y="798">The values read the board only through the summary vector, and never read the legal actions; training moves them toward the final scores (section 8.1).</text>
+</svg>

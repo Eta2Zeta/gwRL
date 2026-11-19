@@ -1,0 +1,424 @@
+{
+ "date": "2026-11-18",
+ "design_section": "docs/design/README.md#67-the-values",
+ "numbers": "the first 4 of each vector's 64 numbers, rounded to 3 decimals",
+ "source": {
+  "commit": "d64117d",
+  "run": "studies/campaign/runs/sample-example-2026-11-05",
+  "networks": "models/generation-000001.pt",
+  "network": "comintern",
+  "replay": "play_episode, 64 simulations, depth 16, root noise, temperature 1, run seed 1936, environment seed 1105",
+  "stopped_at": "the 613th call of _decide, the training sample record's decision 612 (it counts from 0)",
+  "values": "the training sample record's network values, which the traced values matched within 1e-6"
+ },
+ "decision": 612,
+ "decision_call": 613,
+ "owner": "comintern",
+ "network": "comintern, generation 1 of sample-example-2026-11-05",
+ "zones": 37,
+ "borders": 160,
+ "width": 64,
+ "legal_actions": 5,
+ "shensi": {
+  "embedding_layer": [
+   -0.001,
+   0.137,
+   -0.118,
+   -0.104
+  ],
+  "zone_vector": [
+   -0.294,
+   1.957,
+   -1.422,
+   -0.203
+  ],
+  "after_layer_1": [
+   -0.934,
+   1.513,
+   -0.295,
+   1.622
+  ],
+  "after_layer_2": [
+   0.027,
+   1.158,
+   -0.829,
+   1.17
+  ]
+ },
+ "shensi_parts": {
+  "identity_embedding": [
+   0.204,
+   1.874,
+   -1.609,
+   0.437
+  ],
+  "static_features": [
+   -0.449,
+   -0.205,
+   0.425,
+   -0.504
+  ]
+ },
+ "global": {
+  "embedding_layer": [
+   -1.179,
+   -1.182,
+   -1.184,
+   1.185
+  ],
+  "global_vector": [
+   -1.063,
+   -1.073,
+   -1.086,
+   0.935
+  ],
+  "after_layer_1": [
+   -0.581,
+   -0.248,
+   -1.655,
+   0.333
+  ],
+  "after_layer_2": [
+   -1.064,
+   -0.207,
+   -2.095,
+   -0.117
+  ]
+ },
+ "mean_over_zones": [
+  0.159,
+  -1.371,
+  0.093,
+  0.126
+ ],
+ "largest_over_zones": [
+  1.995,
+  1.158,
+  2.248,
+  3.327
+ ],
+ "largest_from_zone": [
+  "land_manchuria_eastern",
+  "land_china_shensi",
+  "land_jap_tokyo",
+  "land_mongolia_kobdo"
+ ],
+ "largest_zone_counts": {
+  "land_china_beiping": 2,
+  "land_china_hopeh": 3,
+  "land_china_hunan": 1,
+  "land_china_nanking": 3,
+  "land_china_shantung": 1,
+  "land_china_shensi": 2,
+  "land_china_sikang": 1,
+  "land_china_sinkiang": 2,
+  "land_china_suiyuan": 2,
+  "land_china_szechwan": 3,
+  "land_china_yunnan": 3,
+  "land_hainan": 2,
+  "land_jap_hokkaido": 2,
+  "land_jap_kyushu": 3,
+  "land_jap_tokyo": 3,
+  "land_korea": 3,
+  "land_manchuria_eastern": 2,
+  "land_manchuria_northern": 1,
+  "land_manchuria_rehe": 2,
+  "land_manchuria_western": 2,
+  "land_mongolia_central_mongolia": 2,
+  "land_mongolia_kerulen": 1,
+  "land_mongolia_kobdo": 5,
+  "land_mongolia_ulyassutai": 2,
+  "land_tibet": 1,
+  "sea_p14": 2,
+  "sea_p15": 2,
+  "sea_p16": 4,
+  "sea_p32": 1,
+  "sea_p41": 1
+ },
+ "joined_length": 192,
+ "summary_before_activation": [
+  -2.173,
+  4.122,
+  2.192,
+  -1.256
+ ],
+ "summary": [
+  -0.597,
+  3.316,
+  1.445,
+  -0.71
+ ],
+ "value_hidden_before_activation": [
+  -0.495,
+  -0.498,
+  -0.508,
+  0.556
+ ],
+ "value_hidden": [
+  -0.154,
+  -0.154,
+  -0.155,
+  0.395
+ ],
+ "value_hidden_positive": 31,
+ "values": [
+  0.2507990598678589,
+  -0.4243242144584656,
+  -1.0244572162628174
+ ],
+ "values_points": [
+  25.1,
+  -42.4,
+  -102.4
+ ],
+ "value_layer_weights_first": [
+  [
+   0.094,
+   -0.057,
+   0.068,
+   -0.008
+  ],
+  [
+   0.074,
+   -0.108,
+   -0.052,
+   -0.042
+  ],
+  [
+   -0.024,
+   0.003,
+   0.001,
+   -0.111
+  ]
+ ],
+ "value_layer_bias": [
+  0.109,
+  0.101,
+  0.083
+ ],
+ "summary_norm": 7.983,
+ "zone_vectors_after_layer_2": {
+  "land_china_beiping": [
+   -1.108,
+   -1.245,
+   1.22,
+   0.697
+  ],
+  "land_china_hopeh": [
+   -0.784,
+   -2.241,
+   -1.025,
+   -1.05
+  ],
+  "land_china_hunan": [
+   0.297,
+   -1.67,
+   -0.678,
+   0.356
+  ],
+  "land_china_kweichow": [
+   -1.644,
+   -2.161,
+   -1.689,
+   -0.301
+  ],
+  "land_china_nanking": [
+   0.555,
+   -1.357,
+   -1.301,
+   -1.19
+  ],
+  "land_china_shantung": [
+   0.083,
+   0.087,
+   -0.522,
+   -1.331
+  ],
+  "land_china_shensi": [
+   0.027,
+   1.158,
+   -0.829,
+   1.17
+  ],
+  "land_china_sikang": [
+   0.856,
+   -3.605,
+   1.325,
+   1.243
+  ],
+  "land_china_sinkiang": [
+   0.647,
+   -1.355,
+   -0.789,
+   1.574
+  ],
+  "land_china_suiyuan": [
+   -0.52,
+   -1.237,
+   1.367,
+   0.183
+  ],
+  "land_china_szechwan": [
+   0.663,
+   -0.402,
+   -0.243,
+   0.081
+  ],
+  "land_china_tsinghai": [
+   0.18,
+   -0.362,
+   -1.352,
+   -0.928
+  ],
+  "land_china_yunnan": [
+   0.169,
+   -1.493,
+   -0.387,
+   0.603
+  ],
+  "land_formosa": [
+   -1.063,
+   -1.925,
+   1.883,
+   -0.652
+  ],
+  "land_hainan": [
+   -0.075,
+   -0.446,
+   0.658,
+   -1.561
+  ],
+  "land_jap_hokkaido": [
+   0.649,
+   -1.378,
+   1.824,
+   0.75
+  ],
+  "land_jap_honshu": [
+   -0.899,
+   -2.358,
+   0.827,
+   0.014
+  ],
+  "land_jap_kyushu": [
+   0.596,
+   -2.215,
+   0.685,
+   0.327
+  ],
+  "land_jap_okinawa": [
+   1.049,
+   -1.617,
+   1.736,
+   1.45
+  ],
+  "land_jap_tokyo": [
+   0.859,
+   -2.06,
+   2.248,
+   0.947
+  ],
+  "land_korea": [
+   0.834,
+   -1.643,
+   1.661,
+   1.404
+  ],
+  "land_kwangtung": [
+   1.262,
+   -1.057,
+   1.109,
+   -0.602
+  ],
+  "land_manchuria_eastern": [
+   1.995,
+   -1.351,
+   -0.455,
+   0.027
+  ],
+  "land_manchuria_northern": [
+   0.501,
+   -1.546,
+   -1.963,
+   -0.321
+  ],
+  "land_manchuria_rehe": [
+   -0.388,
+   -1.09,
+   1.484,
+   0.803
+  ],
+  "land_manchuria_western": [
+   -0.193,
+   -1.133,
+   0.486,
+   -1.596
+  ],
+  "land_mongolia_central_mongolia": [
+   -1.436,
+   -1.812,
+   0.306,
+   -0.154
+  ],
+  "land_mongolia_kerulen": [
+   1.874,
+   -1.351,
+   -1.612,
+   -0.393
+  ],
+  "land_mongolia_kobdo": [
+   0.602,
+   -1.24,
+   0.519,
+   3.327
+  ],
+  "land_mongolia_ulyassutai": [
+   -3.174,
+   -0.65,
+   -1.059,
+   0.067
+  ],
+  "land_tibet": [
+   0.726,
+   -0.486,
+   -0.474,
+   1.722
+  ],
+  "sea_p14": [
+   -0.607,
+   -2.465,
+   -0.272,
+   -1.614
+  ],
+  "sea_p15": [
+   1.946,
+   -2.026,
+   -1.668,
+   1.609
+  ],
+  "sea_p16": [
+   -0.215,
+   -1.091,
+   -0.646,
+   -0.487
+  ],
+  "sea_p32": [
+   0.599,
+   -2.743,
+   -0.022,
+   -0.233
+  ],
+  "sea_p33": [
+   0.729,
+   -1.778,
+   1.719,
+   -2.054
+  ],
+  "sea_p41": [
+   0.274,
+   0.617,
+   -0.645,
+   0.781
+  ]
+ }
+}
