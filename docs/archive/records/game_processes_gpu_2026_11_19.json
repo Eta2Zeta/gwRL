@@ -1,0 +1,1334 @@
+{
+ "date": "2026-11-19",
+ "question": "Where do the game processes' CPU time and a game thread's wall time go in training at 256x8 on the Mac's GPU, on main after the zone input pruning (673076c)?",
+ "code": "673076c, run from a git archive copy with its compiled engine module; PyTorch 2.14.0",
+ "machine": "Apple M4 Max, 10 performance and 4 efficiency cores, 36 GB",
+ "commands": {
+  "run": "tmp/engine-profile-2026-11-19/run.sh (copied below)",
+  "driver": "#!/bin/bash\n# Where the game processes' CPU time goes in training at 256x8 on the Mac's GPU, on main 673076c:\n# one training iteration of 126 eleven-round games in 7 processes of 18, compiled layers, with every\n# game thread's CPU time charged to the engine call it is in and native stack samples of four game processes.\nset -u\ncd REPO\nOUT=$PWD/tmp/engine-profile-2026-11-19\nLEARNING=(--calendar-rounds 11 --complete-episodes --batches 1 --transitions-per-batch 20000 --simulations 64\n          --max-depth 16 --hidden-dim 256 --message-layers 8 --batch-size 32 --epochs 525 --replay-capacity 8000\n          --sample-fraction 0.05 --seed 20261119 --neural-device mps --no-continuous --compiled-forward\n          --episode-workers 7 --games-per-process 18 --parallel-envs 126)\necho \"== $(date '+%F %T') start\" >> $OUT/driver.log\n(cd $OUT/code && env -u MallocNanoZone .venv/bin/python tools/profile_game_process_cpu.py --output $OUT/game.json \\\n  --profile mac --control-dir $OUT/game-control --run-dir $OUT/game-run --seconds 3600 \\\n  --sample-at 180,420,660,900 --sample-seconds 20 -- \"${LEARNING[@]}\" > $OUT/game.log 2>&1) &\nprofiler=$!\n.venv/bin/python tools/log_process_load.py record --pid $profiler --output $OUT/game-load.jsonl > /dev/null 2>&1 &\nlogger=$!\nwait $profiler\necho \"== $(date '+%F %T') end, exit $?\" >> $OUT/driver.log\nwait $logger\necho \"== $(date '+%F %T') done\" >> $OUT/driver.log\n",
+  "native_samples": "samples.py (below): parse macOS sample call graphs; a game thread is a thread with frames in the engine module; states by innermost frame",
+  "samples_script": "\"\"\"Read macOS /usr/bin/sample reports of game processes: where game threads spend their samples.\n\nparse(path) yields (thread, frames, samples) for every leaf of the call graph, frames from the\nthread's root to the innermost function, each frame (function, library).\n\"\"\"\nfrom __future__ import annotations\n\nimport re\nimport sys\nfrom collections import Counter\n\nLINE = re.compile(r\"^(?P<prefix>[ +!:|]*)(?P<count>\\d+) (?P<frame>.*)$\")\nFRAME = re.compile(r\"^(?P<function>.*?)\\s+\\(in (?P<library>[^)]+)\\)(?:\\s+\\+ [0-9,.]+)?(?:\\s+\\[[0-9a-fx,.]+\\])?\\s*$\")\nENGINE = \"gwrl_cpp.cpython-313-darwin.so\"\n\n\ndef frame_of(text: str) -> tuple[str, str]:\n    match = FRAME.match(text.strip())\n    if match:\n        return match.group(\"function\"), match.group(\"library\")\n    return text.strip().split(\"  [\")[0], \"?\"\n\n\ndef parse(path):\n    text = open(path, errors=\"replace\").read()\n    graph = text.split(\"Call graph:\", 1)[1].split(\"Total number in stack\", 1)[0]\n    stack = []  # [depth, frame, count, children total]\n    thread = None\n\n    def close(to_depth):\n        nonlocal stack\n        while stack and stack[-1][0] >= to_depth:\n            depth, frame, count, children = stack.pop()\n            if stack:\n                stack[-1][3] += count\n            own = count - children\n            if own > 0:\n                yield thread, [entry[1] for entry in stack] + [frame], own\n\n    for line in graph.splitlines():\n        match = LINE.match(line)\n        if not match:\n            continue\n        depth = len(match.group(\"prefix\")) // 2\n        if depth <= 2:  # A thread's line.\n            yield from close(0)\n            thread = match.group(\"frame\").strip()\n            stack = []\n            continue\n        yield from close(depth)\n        stack.append([depth, frame_of(match.group(\"frame\")), int(match.group(\"count\")), 0])\n    yield from close(0)\n\n\nWAITS = (\"__psynch_cvwait\", \"__psynch_mutexwait\", \"read\", \"__read_nocancel\", \"__semwait_signal\", \"__select\",\n         \"kevent\", \"kevent64\", \"mach_msg2_trap\", \"__workq_kernreturn\", \"__ulock_wait\", \"__ulock_wait2\", \"poll\",\n         \"__recvfrom\", \"recvfrom\", \"__wait4\", \"__sigsuspend\", \"semaphore_wait_trap\", \"__recvmsg\", \"__sendmsg\")\n\n\ndef main(paths):\n    leaves = Counter()\n    total = 0\n    for path in paths:\n        for thread, frames, count in parse(path):\n            total += count\n            leaves[frames[-1][0]] += count\n    print(total)\n    for name, count in leaves.most_common(25):\n        print(count, name[:150])\n\n\nif __name__ == \"__main__\":\n    main(sys.argv[1:])\n\n\ndef in_engine(frames) -> bool:\n    return any(library == ENGINE for _, library in frames)\n\n\ndef thread_state(frames) -> str:\n    \"\"\"What a game thread's sample was doing.\"\"\"\n    leaf = frames[-1][0]\n    names = [function for function, _ in frames]\n    gil = any(name in (\"take_gil\", \"PyEval_RestoreThread\", \"PyEval_AcquireThread\", \"_PyEval_ReInitThreads\")\n              for name in names)\n    if leaf in WAITS or leaf.startswith(\"__psynch\") or leaf.startswith(\"__ulock\"):\n        if gil:\n            return \"wait: interpreter lock after an engine call\" if in_engine(frames) else \"wait: interpreter lock\"\n        if leaf in (\"read\", \"__read_nocancel\", \"__recvfrom\", \"recvfrom\", \"__recvmsg\"):\n            return \"wait: pipe read (inference server)\"\n        return \"wait: other\"\n    if gil:\n        return \"wait: interpreter lock (spinning)\"\n    if in_engine(frames):\n        return \"engine\"\n    return \"python and other libraries\"\n\n\ndef game_threads(paths):\n    \"\"\"Every sample of threads that ever called the engine, by thread.\"\"\"\n    for path in paths:\n        by_thread = {}\n        for thread, frames, count in parse(path):\n            by_thread.setdefault(thread, []).append((frames, count))\n        for thread, rows in by_thread.items():\n            if any(in_engine(frames) for frames, _ in rows):\n                for frames, count in rows:\n                    yield path, thread, frames, count\n\n\ndef entry(frames) -> str:\n    \"\"\"The first engine function below pybind11's dispatcher: the call Python made.\"\"\"\n    seen_dispatch = False\n    for function, library in frames:\n        if library != ENGINE:\n            continue\n        if \"dispatcher\" in function or function.startswith(\"pybind11::\"):\n            seen_dispatch = True\n            continue\n        if seen_dispatch and not function.startswith(\"pybind11::\") and \"NativeCampaignEnv::call\" not in function:\n            return function\n    return \"?\"\n\n\ndef discover(paths):\n    states, entries, inclusive = Counter(), Counter(), Counter()\n    engine = 0\n    for path, thread, frames, count in game_threads(paths):\n        state = thread_state(frames)\n        states[state] += count\n        if state == \"engine\":\n            engine += count\n            entries[entry(frames)[:140]] += count\n            for name in {function for function, library in frames if library == ENGINE}:\n                inclusive[name[:140]] += count\n    total = sum(states.values())\n    print(\"game-thread samples\", total)\n    for name, count in states.most_common():\n        print(f\"  {count / total:6.1%} {name}\")\n    print(\"engine samples\", engine)\n    for name, count in entries.most_common(30):\n        print(f\"  {count / engine:6.1%} {name}\")\n    print(\"inclusive\")\n    for name, count in inclusive.most_common(120):\n        print(f\"  {count / engine:6.1%} {name}\")\n\n\n# Engine calls, by the first engine function below pybind11's dispatcher.\nCALLS = (\n    (\"listing legal actions\", (\"Engine::legalActions\", \"std::vector<game::campaign::Action>>::value\")),\n    (\"playing an action\", (\"CampaignEnv::applyAction\",)),\n    (\"encoding the state (zone_input)\", (\"ZoneInputHandle>::value\", \"zoneArrays\", \"ZoneInput::~ZoneInput\")),\n    (\"copying the game (clone_for_search)\", (\"NativeCampaignEnv>>::value\",)),\n    (\"destroying a copy\", (\"default_delete<(anonymous namespace)::NativeCampaignEnv>\",)),\n    (\"rolling dice\", (\"CampaignEnv::resolveChance\",)),\n    (\"destroying action objects\", (\"Action::~Action\",)),\n)\n\n# Rule checks and other work, counted with everything they call, so rows overlap.\nCHECKS = (\n    (\"naval routes: enumerating and validating\", (\"visitNavalRoutes\", \"validateNavalRoute\")),\n    (\"aircraft landing plans\", (\"solveReachablePlan\", \"reachablePlan(\", \"flightKeepsLanding\", \"airLandingsKept\",\n                                \"engagementKeepsLanding\", \"preservesLandingPlan\", \"reachableShortfall\")),\n    (\"supply paths\", (\"traceSupply\", \"inSupply(\")),\n    (\"naval orders that can still be completed\", (\"NavalOrderCompletion::possible\", \"forwardNavalOrderActions\",\n                                                  \"forwardNavalOrderDecision\")),\n    (\"movement allowances\", (\"allowance(\", \"allowanceNow(\", \"allowanceBeforeSurprise\")),\n    (\"the economy's menu\", (\"economyActions\",)),\n    (\"factory capacity\", (\"capacity(game::campaign::State\", \"canFactoryBuy\")),\n    (\"encoding the state\", (\"encodeZoneInput\", \"zoneArrays\")),\n    (\"copying whole states\", (\"State::State(game::campaign::State const&)\", \"Engine::Engine(game::campaign::Engine const&)\")),\n    (\"destroying whole states\", (\"State::~State\", \"NativeCampaignEnv>::operator()\", \"dealloc_impl\")),\n    (\"the planning key\", (\"State::planningKey\",)),\n    (\"checking the whole state\", (\"State::validate\",)),\n    (\"writing actions as canonical JSON\", (\"canonicalJson\", \"actionJson\")),\n    (\"converting to and from Python objects\", (\"type_caster\", \"list_caster\", \"pybind11_object_dealloc\",\n                                               \"clear_instance\", \"make_move_constructor\", \"make_copy_constructor\")),\n)\n\n\ndef kind_of_work(function: str, library: str) -> str:\n    if \"memcmp\" in function:\n        return \"comparing strings\"\n    if function.startswith((\"operator new\", \"operator delete\", \"malloc\", \"free\", \"_free\", \"_malloc\", \"nanov2\", \"_nanov2\",\n                            \"szone\", \"_szone\", \"xzm\", \"_xzm\", \"mfm_\", \"tiny_\", \"small_\", \"_realloc\", \"realloc\",\n                            \"default_zone\", \"_platform_bzero$VARIANT\")) or \"malloc\" in function:\n        return \"allocating and freeing memory\"\n    if \"__init_copy_ctor_external\" in function or \"basic_string\" in function:\n        return \"copying and building strings\"\n    if \"_platform_memmove\" in function or \"_platform_memset\" in function or function.startswith((\"memcpy\", \"bzero\", \"memset\")):\n        return \"copying and filling memory\"\n    if \"__tree\" in function or \"__hash_table\" in function or \"NameTable\" in function or \"murmur2\" in function \\\n            or \"lowerBound\" in function or \"SlotMap\" in function and \"lookup\" in function:\n        return \"looking up maps and hash tables\"\n    if \"game::json::\" in function or \"__variant_detail\" in function:\n        return \"reading and copying JSON values\"\n    if library == ENGINE:\n        return \"the rules' own code\"\n    if library.startswith(\"python\") or library.startswith(\"libpython\"):\n        return \"Python's interpreter\"\n    return \"other libraries\"\n\n\ndef report(paths):\n    \"\"\"Shares for the record: thread states, engine calls, checks and kinds of work.\"\"\"\n    states, calls, checks, kinds, inclusive = Counter(), Counter(), Counter(), Counter(), Counter()\n    per_file = {}\n    for path, thread, frames, count in game_threads(paths):\n        state = thread_state(frames)\n        states[state] += count\n        per_file.setdefault(path, Counter())[state] += count\n        if state != \"engine\":\n            continue\n        first = entry(frames)\n        calls[next((name for name, keys in CALLS if any(key in first for key in keys)), \"other calls\")] += count\n        names = [function for function, library in frames if library == ENGINE]\n        for check, keys in CHECKS:\n            if any(any(key in name for key in keys) for name in names):\n                checks[check] += count\n        for name in set(names):\n            inclusive[name] += count\n        kinds[kind_of_work(*frames[-1])] += count\n    engine = states[\"engine\"]\n    total = sum(states.values())\n\n    def shares(counter, whole):\n        return {name: round(count / whole, 4) for name, count in counter.most_common()}\n\n    return {\"game_thread_samples\": total, \"engine_samples\": engine,\n            \"thread_states\": shares(states, total),\n            \"thread_states_by_sample\": {Path(path).name: shares(counter, sum(counter.values()))\n                                        for path, counter in per_file.items()},\n            \"engine_calls\": shares(calls, engine), \"checks_inclusive_overlapping\": shares(checks, engine),\n            \"kind_of_innermost_work\": shares(kinds, engine),\n            \"top_inclusive_functions\": {name[:160]: round(count / engine, 4) for name, count in inclusive.most_common(60)}}\n\n\nfrom pathlib import Path  # noqa: E402\n\n\ndef callers_of(paths, kinds, depth=1):\n    \"\"\"For engine samples whose innermost work is one of `kinds`, the nearest named engine callers.\"\"\"\n    result = Counter()\n    skip = (\"std::\", \"game::json::\", \"decltype\", \"void std::\", \"bool std::\", \"operator new\", \"operator delete\")\n    for path, thread, frames, count in game_threads(paths):\n        if thread_state(frames) != \"engine\" or kind_of_work(*frames[-1]) not in kinds:\n            continue\n        named = [function for function, library in frames if library == ENGINE and not function.startswith(skip)\n                 and \"basic_string\" not in function]\n        result[\" <- \".join(name[:90] for name in reversed(named[-depth:])) if named else \"?\"] += count\n    return result\n\n\ndef inside_call(paths, call_name, top=40):\n    \"\"\"Within one engine call (a CALLS name), each engine function's inclusive share of its samples.\"\"\"\n    keys = dict(CALLS)[call_name]\n    inclusive, total = Counter(), 0\n    for path, thread, frames, count in game_threads(paths):\n        if thread_state(frames) != \"engine\":\n            continue\n        if not any(key in entry(frames) for key in keys):\n            continue\n        total += count\n        for name in {function for function, library in frames if library == ENGINE}:\n            inclusive[name] += count\n    return total, [(round(count / total, 4), name[:150]) for name, count in inclusive.most_common(top)]\n",
+  "profile": "(from the git archive copy of 673076c) .venv/bin/python tools/profile_game_process_cpu.py --output OUT/game.json --profile mac --control-dir OUT/game-control --run-dir OUT/game-run --seconds 3600 --sample-at 180,420,660,900 --sample-seconds 20 -- --calendar-rounds 11 --complete-episodes --batches 1 --transitions-per-batch 20000 --simulations 64 --max-depth 16 --hidden-dim 256 --message-layers 8 --batch-size 32 --epochs 525 --replay-capacity 8000 --sample-fraction 0.05 --seed 20261119 --neural-device mps --no-continuous --compiled-forward --episode-workers 7 --games-per-process 18 --parallel-envs 126",
+  "load": ".venv/bin/python tools/log_process_load.py record --pid PROFILER_PID --output OUT/game-load.jsonl, then summarize"
+ },
+ "profile_summary": {
+  "games": 126,
+  "complete_games": 126,
+  "decisions_per_game": 1042.031746031746,
+  "chance_events_per_game": 145.36507936507937,
+  "evaluations_per_game": 53152.48412698413,
+  "thread_cpu_seconds_per_game": 90.90776208038095,
+  "thread_cpu_ms_per_decision": 87.24087574737996,
+  "seconds_per_game": {
+   "search": 10.115106504119048,
+   "engine": 47.447165896222224,
+   "encode": 11.822993809055557,
+   "adapter": 8.952689351563492,
+   "input": 1.804922513230159,
+   "messaging": 4.998808193769841,
+   "game loop": 5.7660758124206355
+  },
+  "share_of_thread_cpu": {
+   "search": 0.11126779795959818,
+   "engine": 0.5219264539178654,
+   "encode": 0.1300548329261656,
+   "adapter": 0.09848102237570752,
+   "input": 0.019854437860149284,
+   "messaging": 0.05498769389295799,
+   "game loop": 0.06342776106755606
+  },
+  "seconds_per_game_by_call": {
+   "engine/legal_actions": 24.43404908420635,
+   "encode/zone_input": 11.380301842103176,
+   "engine/apply_action": 10.187736920150794,
+   "search": 10.115106504119048,
+   "engine/clone_for_search": 4.186527020603175,
+   "game loop": 4.0419837115,
+   "adapter/legal_actions": 3.9001232173174603,
+   "engine/planning_key": 2.818944952563492,
+   "messaging/recv": 2.731252382952381,
+   "engine/resolve_chance": 2.609780181277778,
+   "input/prepare_into": 1.6369505057539684,
+   "game loop/make_env": 1.6186613095714284,
+   "messaging/send": 1.2901062519285715,
+   "engine/clone_for_search_continuing": 1.2229555407539683,
+   "adapter/planning_key": 1.0337746218174602,
+   "messaging/evaluate": 0.9774495588888888,
+   "adapter/clone_for_search": 0.9053237251507936,
+   "engine/legal_interrupts": 0.7941716260873016,
+   "adapter/zone_input": 0.789686918515873,
+   "adapter/decision_kind": 0.7648801098015873,
+   "engine/is_terminal": 0.7186935953492064,
+   "adapter/apply_action": 0.6620309393333333,
+   "encode/arrays": 0.44269196695238094,
+   "adapter/current_decision_player": 0.3131271856190476,
+   "engine/current_decision_player": 0.25379725396031744,
+   "adapter/is_terminal": 0.24323843111111113,
+   "adapter/clone_for_search_continuing": 0.22249598937301587,
+   "engine/decision_kind": 0.211429729015873,
+   "input/make_zone_input": 0.16797200747619048,
+   "adapter/resolve_chance": 0.11779262984126984,
+   "game loop/_decide": 0.10543079134920635,
+   "engine/returns": 0.003937752166666667,
+   "engine/apply_interrupt": 0.003627717873015873,
+   "engine/observation": 0.0014385327936507937,
+   "adapter/returns": 0.00021558368253968255,
+   "engine/wealth": 7.598942063492063e-05
+  },
+  "calls_per_game": {
+   "adapter/apply_action": 52406.3253968254,
+   "adapter/clone_for_search": 53199.19841269841,
+   "adapter/clone_for_search_continuing": 17277.65873015873,
+   "adapter/current_decision_player": 124894.06349206349,
+   "adapter/decision_kind": 91375.22222222222,
+   "adapter/is_terminal": 179373.6507936508,
+   "adapter/legal_actions": 55228.88888888889,
+   "adapter/planning_key": 74116.37301587302,
+   "adapter/resolve_chance": 18438.5873015873,
+   "adapter/returns": 104.9047619047619,
+   "adapter/zone_input": 54194.51587301587,
+   "encode/arrays": 53152.48412698413,
+   "encode/zone_input": 53372.9126984127,
+   "engine/apply_action": 52334.666666666664,
+   "engine/apply_interrupt": 36.11904761904762,
+   "engine/clone_for_search": 53199.19841269841,
+   "engine/clone_for_search_continuing": 17277.65873015873,
+   "engine/current_decision_player": 70772.6507936508,
+   "engine/decision_kind": 70845.91269841269,
+   "engine/is_terminal": 304414.07936507935,
+   "engine/legal_actions": 53305.25396825397,
+   "engine/legal_interrupts": 43108.40476190476,
+   "engine/observation": 1.0,
+   "engine/planning_key": 663980.4761904762,
+   "engine/resolve_chance": 18438.5873015873,
+   "engine/returns": 104.9047619047619,
+   "engine/wealth": 1.0,
+   "game loop/_decide": 1042.031746031746,
+   "game loop/make_env": 1.0,
+   "input/make_zone_input": 54194.51587301587,
+   "input/prepare_into": 53152.48412698413,
+   "messaging/evaluate": 53152.48412698413,
+   "messaging/recv": 53152.48412698413,
+   "messaging/send": 53152.48412698413,
+   "search": 1042.031746031746
+  },
+  "microseconds_per_call": {
+   "adapter/apply_action": 12.63265329748605,
+   "adapter/clone_for_search": 17.017619666515444,
+   "adapter/clone_for_search_continuing": 12.877670108429777,
+   "adapter/current_decision_player": 2.5071422681266635,
+   "adapter/decision_kind": 8.370760597894016,
+   "adapter/is_terminal": 1.3560432651890972,
+   "adapter/legal_actions": 70.6174485089469,
+   "adapter/planning_key": 13.94799259262273,
+   "adapter/resolve_chance": 6.388376067787448,
+   "adapter/returns": 2.0550419125435013,
+   "adapter/zone_input": 14.571343719836937,
+   "encode/arrays": 8.3287164132304,
+   "encode/zone_input": 213.2224243860992,
+   "engine/apply_action": 194.66517260994868,
+   "engine/apply_interrupt": 100.43780531751263,
+   "engine/clone_for_search": 78.69530266463319,
+   "engine/clone_for_search_continuing": 70.78248041901988,
+   "engine/current_decision_player": 3.5860922420484815,
+   "engine/decision_kind": 2.9843602963507325,
+   "engine/is_terminal": 2.360907868808813,
+   "engine/legal_actions": 458.3797518112959,
+   "engine/legal_interrupts": 18.42266329440048,
+   "engine/observation": 1438.5327936507938,
+   "engine/planning_key": 4.245523857473817,
+   "engine/resolve_chance": 141.53905278053014,
+   "engine/returns": 37.53644825238312,
+   "engine/wealth": 75.98942063492063,
+   "game loop/_decide": 101.1780991804777,
+   "game loop/make_env": 1618661.3095714285,
+   "input/make_zone_input": 3.09942813899784,
+   "input/prepare_into": 30.79725308497729,
+   "messaging/evaluate": 18.38953672520196,
+   "messaging/recv": 51.38522550380285,
+   "messaging/send": 24.271796005741493,
+   "search": 9707.100136477882
+  },
+  "estimated_instrumentation_seconds_per_game": 1.550480430025558,
+  "wrapped_call_overhead_ns": 634.4556564285715,
+  "searches_per_game": {
+   "all": 1042.031746031746,
+   "one legal move": 222.6904761904762
+  },
+  "search_seconds_per_game": {
+   "all": 84.55350747264286,
+   "one legal move": 0.011836154142857143
+  },
+  "evaluations_by_menu_size": {
+   "0": 7.658730158730159,
+   "1": 8290.29365079365,
+   "2+": 44854.531746031746
+  },
+  "evaluation_seconds_by_menu_size": {
+   "0": 0.0018106560555555555,
+   "1": 2.5773796977936505,
+   "2+": 17.637213357365077
+  },
+  "wall_seconds_per_game": 1194.8984981061412,
+  "wall_share": {
+   "own CPU": 0.0760799032089048,
+   "waiting for the coordinator": 0.7567158569139023,
+   "other, mostly the interpreter lock": 0.16720423987719288
+  },
+  "game_processes": 7,
+  "process_cpu_seconds_per_game": 90.97611983333333,
+  "unaccounted_process_cpu_seconds_per_game": 0.06835775295238022
+ },
+ "batch": {
+  "playing_seconds": 1352.0415959169914,
+  "games": 126,
+  "games_per_hour": 335.4926367427003,
+  "decisions_per_hour": 349593.97804579034,
+  "coordinator_busy": 0.8909828854506069,
+  "evaluator": {
+   "evaluations": 6697213,
+   "forward_seconds": 1204.6459223793645,
+   "idle_seconds": 42.28882107080426,
+   "inference_batches": {
+    "1": [
+     8137,
+     24.10857080941787
+    ],
+    "10": [
+     827,
+     4.468092451017583
+    ],
+    "100": [
+     7,
+     0.10570949802058749
+    ],
+    "101": [
+     17,
+     0.27215837300173007
+    ],
+    "102": [
+     8,
+     0.11512979204417206
+    ],
+    "103": [
+     17,
+     0.24488295405171812
+    ],
+    "104": [
+     8,
+     0.12290120901889168
+    ],
+    "105": [
+     9,
+     0.15881825008546002
+    ],
+    "106": [
+     6,
+     0.13440808295854367
+    ],
+    "107": [
+     16,
+     0.2599415000586305
+    ],
+    "108": [
+     25,
+     0.6290273770573549
+    ],
+    "109": [
+     5,
+     0.07546312504564412
+    ],
+    "11": [
+     865,
+     4.468713108217344
+    ],
+    "110": [
+     8,
+     0.11953445899416693
+    ],
+    "111": [
+     4,
+     0.06144670897629112
+    ],
+    "112": [
+     11,
+     0.1797193749807775
+    ],
+    "113": [
+     1,
+     0.013087083003483713
+    ],
+    "114": [
+     3,
+     0.04958583301049657
+    ],
+    "115": [
+     10,
+     0.19963300102972426
+    ],
+    "116": [
+     4,
+     0.06643237502430566
+    ],
+    "117": [
+     2,
+     0.03169324900954962
+    ],
+    "118": [
+     2,
+     0.031232707988237962
+    ],
+    "119": [
+     5,
+     0.09619562496664003
+    ],
+    "12": [
+     950,
+     5.211300656752428
+    ],
+    "120": [
+     2,
+     0.030165292002493516
+    ],
+    "121": [
+     5,
+     0.08341175102395937
+    ],
+    "122": [
+     4,
+     0.06262262599193491
+    ],
+    "123": [
+     3,
+     0.04173199998331256
+    ],
+    "124": [
+     3,
+     0.04316529101924971
+    ],
+    "125": [
+     6,
+     0.4249811249319464
+    ],
+    "126": [
+     27,
+     0.8326157520350534
+    ],
+    "13": [
+     944,
+     5.181662896386115
+    ],
+    "14": [
+     967,
+     5.667942707485054
+    ],
+    "15": [
+     849,
+     5.342534549272386
+    ],
+    "16": [
+     921,
+     5.643627334735356
+    ],
+    "17": [
+     968,
+     5.99224098835839
+    ],
+    "18": [
+     843,
+     5.916744582209503
+    ],
+    "19": [
+     793,
+     5.185193369194167
+    ],
+    "2": [
+     3355,
+     10.87427525583189
+    ],
+    "20": [
+     896,
+     5.91640225352603
+    ],
+    "21": [
+     808,
+     5.453905379836215
+    ],
+    "22": [
+     817,
+     5.706476529885549
+    ],
+    "23": [
+     832,
+     6.009787844930543
+    ],
+    "24": [
+     729,
+     5.531899667636026
+    ],
+    "25": [
+     826,
+     6.12908842190518
+    ],
+    "26": [
+     840,
+     6.175347452634014
+    ],
+    "27": [
+     864,
+     6.706461666821269
+    ],
+    "28": [
+     861,
+     6.504452696128283
+    ],
+    "29": [
+     929,
+     7.023613049183041
+    ],
+    "3": [
+     2291,
+     8.00256258121226
+    ],
+    "30": [
+     1053,
+     8.071799093828304
+    ],
+    "31": [
+     1046,
+     7.995020637637936
+    ],
+    "32": [
+     1080,
+     8.392864011664642
+    ],
+    "33": [
+     1201,
+     9.590019527822733
+    ],
+    "34": [
+     1360,
+     10.991368387039984
+    ],
+    "35": [
+     1472,
+     12.308630405081203
+    ],
+    "36": [
+     1585,
+     12.824603799177567
+    ],
+    "37": [
+     1677,
+     13.603898212633794
+    ],
+    "38": [
+     1810,
+     14.94713541053352
+    ],
+    "39": [
+     1936,
+     16.0466054007411
+    ],
+    "4": [
+     1014,
+     4.171785202837782
+    ],
+    "40": [
+     1950,
+     16.22112762508914
+    ],
+    "41": [
+     2248,
+     19.335369756241562
+    ],
+    "42": [
+     2314,
+     20.01887436094694
+    ],
+    "43": [
+     2591,
+     22.73690172896022
+    ],
+    "44": [
+     2706,
+     23.79873113890062
+    ],
+    "45": [
+     2759,
+     24.27058216984733
+    ],
+    "46": [
+     3033,
+     26.657590070390143
+    ],
+    "47": [
+     3102,
+     27.39748583731125
+    ],
+    "48": [
+     3317,
+     29.55954307349748
+    ],
+    "49": [
+     3584,
+     33.786240962013835
+    ],
+    "5": [
+     849,
+     3.8871548045426607
+    ],
+    "50": [
+     3649,
+     34.71241772981011
+    ],
+    "51": [
+     3792,
+     35.94758934772108
+    ],
+    "52": [
+     3908,
+     37.42052451733616
+    ],
+    "53": [
+     4029,
+     39.06690248250379
+    ],
+    "54": [
+     3933,
+     37.93805677027558
+    ],
+    "55": [
+     4279,
+     41.30691504420247
+    ],
+    "56": [
+     4276,
+     41.49049979672418
+    ],
+    "57": [
+     4279,
+     41.8232349921891
+    ],
+    "58": [
+     4208,
+     41.255470016243635
+    ],
+    "59": [
+     4319,
+     42.36821282314486
+    ],
+    "6": [
+     849,
+     3.6097301008703653
+    ],
+    "60": [
+     4050,
+     39.958174347906606
+    ],
+    "61": [
+     3891,
+     38.490714354178635
+    ],
+    "62": [
+     3479,
+     34.52863733761478
+    ],
+    "63": [
+     3445,
+     33.9203246953839
+    ],
+    "64": [
+     3065,
+     30.65912361984374
+    ],
+    "65": [
+     2928,
+     31.02669867957593
+    ],
+    "66": [
+     2549,
+     27.023728086758638
+    ],
+    "67": [
+     2224,
+     23.7199277151376
+    ],
+    "68": [
+     1882,
+     20.173285493045114
+    ],
+    "69": [
+     1585,
+     17.077984214236494
+    ],
+    "7": [
+     1057,
+     4.636621068202658
+    ],
+    "70": [
+     1340,
+     14.494962683325866
+    ],
+    "71": [
+     1033,
+     11.202751006901963
+    ],
+    "72": [
+     770,
+     8.530025411222596
+    ],
+    "73": [
+     644,
+     7.4006072551128455
+    ],
+    "74": [
+     558,
+     6.216655249823816
+    ],
+    "75": [
+     418,
+     4.647034997004084
+    ],
+    "76": [
+     308,
+     3.4558878438547254
+    ],
+    "77": [
+     223,
+     2.574069748952752
+    ],
+    "78": [
+     156,
+     1.805230254860362
+    ],
+    "79": [
+     142,
+     1.596351957297884
+    ],
+    "8": [
+     986,
+     4.889992451440776
+    ],
+    "80": [
+     113,
+     1.2640385888516903
+    ],
+    "81": [
+     66,
+     0.8908635429979768
+    ],
+    "82": [
+     62,
+     0.8213498310069554
+    ],
+    "83": [
+     72,
+     0.835724293923704
+    ],
+    "84": [
+     38,
+     0.5265540819091257
+    ],
+    "85": [
+     35,
+     0.49447375093586743
+    ],
+    "86": [
+     29,
+     0.4109596249763854
+    ],
+    "87": [
+     30,
+     0.45880949910497293
+    ],
+    "88": [
+     27,
+     0.44299350201617926
+    ],
+    "89": [
+     19,
+     0.27955695998389274
+    ],
+    "9": [
+     898,
+     4.398666404362302
+    ],
+    "90": [
+     28,
+     0.4288965829764493
+    ],
+    "91": [
+     22,
+     0.6773717931064311
+    ],
+    "92": [
+     13,
+     0.19246558294980787
+    ],
+    "93": [
+     20,
+     0.3210713329608552
+    ],
+    "94": [
+     11,
+     0.17399158497573808
+    ],
+    "95": [
+     12,
+     0.19696245715022087
+    ],
+    "96": [
+     15,
+     0.21025695995194837
+    ],
+    "97": [
+     7,
+     0.10649712602025829
+    ],
+    "98": [
+     10,
+     0.16399012500187382
+    ],
+    "99": [
+     9,
+     0.1448010429739952
+    ]
+   },
+   "network_passes": 154807,
+   "serving_rounds": 154807
+  }
+ },
+ "native_sample_times": [
+  {
+   "at_seconds": 180.0,
+   "pid": 62438,
+   "seconds": 20
+  },
+  {
+   "at_seconds": 420.0,
+   "pid": 62439,
+   "seconds": 20
+  },
+  {
+   "at_seconds": 660.0,
+   "pid": 62440,
+   "seconds": 20
+  },
+  {
+   "at_seconds": 900.0,
+   "pid": 62441,
+   "seconds": 20
+  }
+ ],
+ "native": {
+  "game_thread_samples": 438642,
+  "engine_samples": 32222,
+  "thread_states": {
+   "wait: interpreter lock after an engine call": 0.3874,
+   "wait: pipe read (inference server)": 0.3301,
+   "wait: interpreter lock": 0.1713,
+   "engine": 0.0735,
+   "python and other libraries": 0.0314,
+   "wait: other": 0.005,
+   "wait: interpreter lock (spinning)": 0.0014
+  },
+  "thread_states_by_sample": {
+   "game.sample-180s.txt": {
+    "wait: pipe read (inference server)": 0.3959,
+    "wait: interpreter lock after an engine call": 0.3087,
+    "wait: interpreter lock": 0.1749,
+    "engine": 0.0847,
+    "python and other libraries": 0.0296,
+    "wait: other": 0.0049,
+    "wait: interpreter lock (spinning)": 0.0013
+   },
+   "game.sample-420s.txt": {
+    "wait: interpreter lock after an engine call": 0.4045,
+    "wait: pipe read (inference server)": 0.3092,
+    "wait: interpreter lock": 0.1811,
+    "engine": 0.0662,
+    "python and other libraries": 0.0322,
+    "wait: other": 0.0054,
+    "wait: interpreter lock (spinning)": 0.0014
+   },
+   "game.sample-660s.txt": {
+    "wait: interpreter lock after an engine call": 0.4424,
+    "wait: pipe read (inference server)": 0.2767,
+    "wait: interpreter lock": 0.1719,
+    "engine": 0.07,
+    "python and other libraries": 0.0335,
+    "wait: other": 0.0042,
+    "wait: interpreter lock (spinning)": 0.0014
+   },
+   "game.sample-900s.txt": {
+    "wait: interpreter lock after an engine call": 0.4009,
+    "wait: pipe read (inference server)": 0.333,
+    "wait: interpreter lock": 0.1567,
+    "engine": 0.0719,
+    "python and other libraries": 0.0305,
+    "wait: other": 0.0055,
+    "wait: interpreter lock (spinning)": 0.0015
+   }
+  },
+  "engine_calls": {
+   "listing legal actions": 0.4235,
+   "encoding the state (zone_input)": 0.2054,
+   "playing an action": 0.1732,
+   "copying the game (clone_for_search)": 0.0579,
+   "other calls": 0.0522,
+   "destroying a copy": 0.0418,
+   "rolling dice": 0.0328,
+   "destroying action objects": 0.0132
+  },
+  "checks_inclusive_overlapping": {
+   "encoding the state": 0.1982,
+   "naval routes: enumerating and validating": 0.132,
+   "naval orders that can still be completed": 0.0933,
+   "copying whole states": 0.0916,
+   "converting to and from Python objects": 0.0891,
+   "movement allowances": 0.0884,
+   "aircraft landing plans": 0.0776,
+   "supply paths": 0.077,
+   "destroying whole states": 0.0721,
+   "writing actions as canonical JSON": 0.0418,
+   "the economy's menu": 0.0359,
+   "the planning key": 0.0333,
+   "checking the whole state": 0.0267,
+   "factory capacity": 0.0065
+  },
+  "kind_of_innermost_work": {
+   "the rules' own code": 0.2984,
+   "allocating and freeing memory": 0.2169,
+   "copying and building strings": 0.1959,
+   "comparing strings": 0.0827,
+   "copying and filling memory": 0.0821,
+   "looking up maps and hash tables": 0.0701,
+   "other libraries": 0.0363,
+   "reading and copying JSON values": 0.0095,
+   "Python's interpreter": 0.0079
+  },
+  "top_inclusive_functions": {
+   "pybind11::cpp_function::dispatcher(_object*, _object* const*, unsigned long, _object*)": 0.9363,
+   "pybind11::cpp_function::initialize<pybind11_init_gwrl_cpp(pybind11::module_&)::$_4, std::vector<game::campaign::Action>, (anonymous namespace)::NativeCampaignEn": 0.4375,
+   "std::enable_if<!std::is_void<std::vector<game::campaign::Action>>::value, std::vector<game::campaign::Action>>::type pybind11::detail::argument_loader<(anonymou": 0.4183,
+   "game::campaign::Engine::legalActions() const": 0.4182,
+   "game::campaign::Engine::actionMenu() const": 0.4118,
+   "game::campaign::(anonymous namespace)::TrainingRules::actions(game::campaign::State const&) const": 0.3523,
+   "game::campaign::PoliticsRules::actions(game::campaign::State const&) const": 0.2658,
+   "game::campaign::MovementRules::actions(game::campaign::State const&) const": 0.2558,
+   "game::campaign::NavalRules::actions(game::campaign::State const&) const": 0.2095,
+   "pybind11::cpp_function::initialize<pybind11_init_gwrl_cpp(pybind11::module_&)::$_16, (anonymous namespace)::ZoneInputHandle, (anonymous namespace)::NativeCampai": 0.1984,
+   "std::enable_if<!std::is_void<(anonymous namespace)::ZoneInputHandle>::value, (anonymous namespace)::ZoneInputHandle>::type pybind11::detail::argument_loader<(an": 0.1964,
+   "game::campaign::encodeZoneInput(game::campaign::State const&, game::campaign::ZoneSchedule const&, std::vector<game::campaign::ZoneOption> const&)": 0.1904,
+   "pybind11::cpp_function::initialize<pybind11_init_gwrl_cpp(pybind11::module_&)::$_6, void, (anonymous namespace)::NativeCampaignEnv&, game::campaign::Action, pyb": 0.1747,
+   "game::campaign::CampaignEnv::applyAction(game::campaign::Action const&)": 0.1732,
+   "game::campaign::Engine::step(game::campaign::Action const&)": 0.1731,
+   "game::campaign::Engine::step(game::campaign::Action const&)::$_0::operator()(game::campaign::Engine&) const": 0.1679,
+   "game::campaign::(anonymous namespace)::visitNavalRoutes(game::campaign::State const&, std::vector<std::basic_string<char>> const&, std::function<bool (game::cam": 0.1252,
+   "game::campaign::validateNavalRoute(game::campaign::State const&, game::campaign::NavalRouteRequest const&)": 0.123,
+   "std::__function::__func<game::campaign::(anonymous namespace)::visitNavalRoutes(game::campaign::State const&, std::vector<std::basic_string<char>> const&, std::": 0.1213,
+   "game::campaign::LandCombatRules::actions(game::campaign::State const&) const": 0.1121,
+   "game::campaign::AirRules::actions(game::campaign::State const&) const": 0.1114,
+   "game::campaign::(anonymous namespace)::TrainingRules::apply(game::campaign::State&, game::campaign::Action const&) const": 0.0971,
+   "game::campaign::(anonymous namespace)::NavalOrderCompletion::possible(std::vector<std::basic_string<char>> const&)": 0.0918,
+   "game::campaign::State::State(game::campaign::State const&)": 0.0916,
+   "<deduplicated_symbol>": 0.0901,
+   "game::campaign::(anonymous namespace)::allowance(game::campaign::State const&, game::campaign::UnitState const&, bool, game::campaign::Number<game::campaign::Zo": 0.0884,
+   "game::campaign::(anonymous namespace)::allowanceBeforeSurprise(game::campaign::State const&, game::campaign::UnitState const&, game::campaign::Number<game::camp": 0.0858,
+   "game::campaign::forwardNavalOrderActions(game::campaign::State const&, std::vector<game::campaign::Action>)": 0.0808,
+   "game::campaign::forwardNavalOrderActions(game::campaign::State const&, std::vector<game::campaign::Action>)::$_0::operator()(game::campaign::Action const&) cons": 0.0805,
+   "game::campaign::inSupply(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>, game::campaign::Number<game::campaign::ZoneKind>)": 0.0763,
+   "game::campaign::(anonymous namespace)::traceSupply(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>, game::campaign::Number<game": 0.0755,
+   "game::campaign::PoliticsRules::apply(game::campaign::State&, game::campaign::Action const&) const": 0.0733,
+   "game::campaign::NavalRules::apply(game::campaign::State&, game::campaign::Action const&) const": 0.0709,
+   "game::campaign::(anonymous namespace)::solveReachablePlan(game::campaign::State const&, game::campaign::(anonymous namespace)::LandingPreview const*, int)": 0.0691,
+   "pybind11_object_dealloc": 0.0635,
+   "game::campaign::navalOperationActions(game::campaign::State const&)": 0.0635,
+   "pybind11::detail::clear_instance(_object*)": 0.0632,
+   "game::campaign::Engine::Engine(game::campaign::Engine const&)": 0.0576,
+   "game::campaign::Engine::cloneForSearch(unsigned long long) const": 0.0566,
+   "game::campaign::applyNavalMovementAction(game::campaign::State&, game::campaign::Action const&)": 0.0555,
+   "game::campaign::State::~State()": 0.0482,
+   "std::basic_string<char>::__init_copy_ctor_external(char const*, unsigned long)": 0.048,
+   "game::json::Value::find(std::basic_string<char> const&) const": 0.047,
+   "game::campaign::(anonymous namespace)::reachablePlan(game::campaign::State const&, int, game::campaign::(anonymous namespace)::LandingPreview const*)": 0.0461,
+   "pybind11::cpp_function::initialize<pybind11_init_gwrl_cpp(pybind11::module_&)::$_19, std::unique_ptr<(anonymous namespace)::NativeCampaignEnv>, (anonymous names": 0.0461,
+   "std::enable_if<!std::is_void<std::unique_ptr<(anonymous namespace)::NativeCampaignEnv>>::value, std::unique_ptr<(anonymous namespace)::NativeCampaignEnv>>::type": 0.045,
+   "game::campaign::CampaignEnv::cloneForSearch(unsigned long long) const": 0.0444,
+   "pybind11::class_<(anonymous namespace)::NativeCampaignEnv>::dealloc_impl(pybind11::detail::value_and_holder&)": 0.0419,
+   "pybind11::class_<(anonymous namespace)::NativeCampaignEnv>::dealloc_without_manipulating_gil(pybind11::detail::value_and_holder&)": 0.0419,
+   "std::default_delete<(anonymous namespace)::NativeCampaignEnv>::operator()[abi:nqe220106]((anonymous namespace)::NativeCampaignEnv*) const": 0.0418,
+   "game::campaign::navalFacilitySeaZones(game::campaign::State const&, std::basic_string<char> const&)": 0.0394,
+   "game::campaign::(anonymous namespace)::routeChoices(game::campaign::State&, game::campaign::BattleState&)": 0.0374,
+   "game::campaign::EconomyRules::actions(game::campaign::State const&) const": 0.0368,
+   "game::campaign::(anonymous namespace)::canBerth(game::campaign::State const&, game::campaign::UnitState const&, std::basic_string<char> const&)": 0.036,
+   "game::campaign::economyActions(game::campaign::State const&)": 0.0359,
+   "game::campaign::Marks::lowerBound(game::campaign::MarkKey const&) const": 0.0352,
+   "game::campaign::(anonymous namespace)::solveReachablePlan(game::campaign::State const&, game::campaign::(anonymous namespace)::LandingPreview const*, int)::$_6:": 0.0341,
+   "game::campaign::navalEndZones(game::campaign::State const&, std::basic_string<char> const&)": 0.0341,
+   "game::campaign::navalEndZones(game::campaign::State const&, std::basic_string<char> const&)::$_0::operator()() const": 0.0337,
+   "game::campaign::State::planningKey() const": 0.0333
+  }
+ },
+ "load": {
+  "seconds_with_game_processes": 1336.0,
+  "batch_cores": {
+   "mean_window": 9.33,
+   "median_window": 9.85,
+   "highest_window": 11.09
+  },
+  "other_work_cores": {
+   "mean_window": 0.7,
+   "median_window": 0.65
+  },
+  "windows": [
+   {
+    "batch_cores": 8.84,
+    "other_cores": 0.9
+   },
+   {
+    "batch_cores": 10.26,
+    "other_cores": 0.74
+   },
+   {
+    "batch_cores": 11.09,
+    "other_cores": 1.27
+   },
+   {
+    "batch_cores": 9.61,
+    "other_cores": 1.73
+   },
+   {
+    "batch_cores": 9.32,
+    "other_cores": 0.91
+   },
+   {
+    "batch_cores": 9.03,
+    "other_cores": 0.88
+   },
+   {
+    "batch_cores": 9.58,
+    "other_cores": 0.98
+   },
+   {
+    "batch_cores": 9.64,
+    "other_cores": 0.63
+   },
+   {
+    "batch_cores": 9.71,
+    "other_cores": 0.65
+   },
+   {
+    "batch_cores": 9.88,
+    "other_cores": 0.77
+   },
+   {
+    "batch_cores": 9.74,
+    "other_cores": 0.82
+   },
+   {
+    "batch_cores": 9.76,
+    "other_cores": 0.46
+   },
+   {
+    "batch_cores": 9.89,
+    "other_cores": 0.52
+   },
+   {
+    "batch_cores": 9.83,
+    "other_cores": 0.46
+   },
+   {
+    "batch_cores": 9.93,
+    "other_cores": 0.53
+   },
+   {
+    "batch_cores": 9.97,
+    "other_cores": 0.59
+   },
+   {
+    "batch_cores": 9.85,
+    "other_cores": 0.95
+   },
+   {
+    "batch_cores": 9.89,
+    "other_cores": 0.47
+   },
+   {
+    "batch_cores": 9.85,
+    "other_cores": 0.84
+   },
+   {
+    "batch_cores": 9.83,
+    "other_cores": 1.02
+   },
+   {
+    "batch_cores": 9.83,
+    "other_cores": 0.47
+   },
+   {
+    "batch_cores": 9.88,
+    "other_cores": 0.91
+   },
+   {
+    "batch_cores": 10.02,
+    "other_cores": 0.7
+   },
+   {
+    "batch_cores": 10.15,
+    "other_cores": 0.72
+   },
+   {
+    "batch_cores": 9.81,
+    "other_cores": 0.69
+   },
+   {
+    "batch_cores": 9.82,
+    "other_cores": 0.87
+   },
+   {
+    "batch_cores": 10.24,
+    "other_cores": 0.49
+   },
+   {
+    "batch_cores": 10.14,
+    "other_cores": 0.4
+   },
+   {
+    "batch_cores": 10.3,
+    "other_cores": 0.32
+   },
+   {
+    "batch_cores": 10.16,
+    "other_cores": 0.5
+   },
+   {
+    "batch_cores": 10.36,
+    "other_cores": 0.46
+   },
+   {
+    "batch_cores": 10.33,
+    "other_cores": 0.41
+   },
+   {
+    "batch_cores": 10.26,
+    "other_cores": 0.37
+   },
+   {
+    "batch_cores": 10.24,
+    "other_cores": 0.38
+   },
+   {
+    "batch_cores": 10.04,
+    "other_cores": 0.57
+   },
+   {
+    "batch_cores": 10.0,
+    "other_cores": 0.65
+   },
+   {
+    "batch_cores": 9.9,
+    "other_cores": 0.35
+   },
+   {
+    "batch_cores": 9.23,
+    "other_cores": 1.38
+   },
+   {
+    "batch_cores": 8.9,
+    "other_cores": 0.5
+   },
+   {
+    "batch_cores": 8.03,
+    "other_cores": 0.96
+   },
+   {
+    "batch_cores": 6.42,
+    "other_cores": 0.84
+   },
+   {
+    "batch_cores": 5.06,
+    "other_cores": 0.86
+   },
+   {
+    "batch_cores": 3.95,
+    "other_cores": 0.59
+   },
+   {
+    "batch_cores": 2.09,
+    "other_cores": 0.45
+   }
+  ],
+  "processes": {
+   "rest of the tree": {
+    "processes": 8,
+    "cpu_seconds": 53.1,
+    "performance_core_share": 0.99,
+    "waiting_for_a_core_seconds": 1.2,
+    "waiting_per_cpu_second": 0.023,
+    "instructions": 775395615668,
+    "cycles": 203252386740,
+    "instructions_per_cycle": {
+     "performance": 3.83,
+     "efficiency": 1.29
+    },
+    "gigahertz": {
+     "performance": 3.84,
+     "efficiency": 2.59
+    },
+    "efficiency_second_vs_performance_second": 0.226,
+    "performance_core_equivalent_cpu_seconds": 52.7,
+    "cpu_seconds_by_qos": {
+     "default": 49.1,
+     "legacy": 4.0
+    }
+   },
+   "coordinator": {
+    "processes": 1,
+    "cpu_seconds": 838.1,
+    "performance_core_share": 0.956,
+    "waiting_for_a_core_seconds": 112.8,
+    "waiting_per_cpu_second": 0.135,
+    "instructions": 7750078937138,
+    "cycles": 3199852375384,
+    "instructions_per_cycle": {
+     "performance": 2.47,
+     "efficiency": 0.97
+    },
+    "gigahertz": {
+     "performance": 3.87,
+     "efficiency": 2.59
+    },
+    "efficiency_second_vs_performance_second": 0.264,
+    "performance_core_equivalent_cpu_seconds": 811.0,
+    "cpu_seconds_by_qos": {
+     "legacy": 838.1
+    }
+   },
+   "game processes": {
+    "processes": 7,
+    "cpu_seconds": 11454.2,
+    "performance_core_share": 0.799,
+    "waiting_for_a_core_seconds": 14378.1,
+    "waiting_per_cpu_second": 1.255,
+    "instructions": 93224558949418,
+    "cycles": 41045989308271,
+    "instructions_per_cycle": {
+     "performance": 2.4,
+     "efficiency": 1.5
+    },
+    "gigahertz": {
+     "performance": 3.84,
+     "efficiency": 2.58
+    },
+    "efficiency_second_vs_performance_second": 0.419,
+    "performance_core_equivalent_cpu_seconds": 10117.9,
+    "cpu_seconds_by_qos": {
+     "legacy": 11454.2
+    }
+   }
+  }
+ },
+ "game_process_cpu_seconds": {
+  "user": 10080.9,
+  "system": 1355.5,
+  "system_share": 0.1185
+ },
+ "inference_batches": {
+  "count": 154807,
+  "states_per_batch": 43.261693592667
+ },
+ "native_inside_calls": {
+  "listing legal actions": {
+   "samples": 13646,
+   "inclusive": {
+    "game::campaign::Engine::legalActions() const": 0.9875,
+    "game::campaign::Engine::actionMenu() const": 0.9724,
+    "game::campaign::(anonymous namespace)::TrainingRules::actions(game::campaign::State const&) const": 0.8318,
+    "game::campaign::PoliticsRules::actions(game::campaign::State const&) const": 0.6277,
+    "game::campaign::MovementRules::actions(game::campaign::State const&) const": 0.6041,
+    "game::campaign::NavalRules::actions(game::campaign::State const&) const": 0.4948,
+    "game::campaign::LandCombatRules::actions(game::campaign::State const&) const": 0.2647,
+    "game::campaign::AirRules::actions(game::campaign::State const&) const": 0.2629,
+    "game::campaign::forwardNavalOrderActions(game::campaign::State const&, std::vector<game::campaign::Action>)": 0.1909,
+    "game::campaign::forwardNavalOrderActions(game::campaign::State const&, std::vector<game::campaign::Action>)::$_0::operator()(game::campaign::Action co": 0.19,
+    "game::campaign::(anonymous namespace)::NavalOrderCompletion::possible(std::vector<std::basic_string<char>> const&)": 0.1892,
+    "game::campaign::(anonymous namespace)::visitNavalRoutes(game::campaign::State const&, std::vector<std::basic_string<char>> const&, std::function<bool ": 0.185,
+    "std::__function::__func<game::campaign::(anonymous namespace)::visitNavalRoutes(game::campaign::State const&, std::vector<std::basic_string<char>> con": 0.1828,
+    "game::campaign::validateNavalRoute(game::campaign::State const&, game::campaign::NavalRouteRequest const&)": 0.1767,
+    "game::campaign::navalOperationActions(game::campaign::State const&)": 0.1499,
+    "game::campaign::(anonymous namespace)::allowance(game::campaign::State const&, game::campaign::UnitState const&, bool, game::campaign::Number<game::ca": 0.1301,
+    "game::campaign::(anonymous namespace)::solveReachablePlan(game::campaign::State const&, game::campaign::(anonymous namespace)::LandingPreview const*, ": 0.0584,
+    "game::campaign::(anonymous namespace)::allowanceBeforeSurprise(game::campaign::State const&, game::campaign::UnitState const&, game::campaign::Number<": 0.1255,
+    "<deduplicated_symbol>": 0.1134,
+    "game::campaign::inSupply(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>, game::campaign::Number<game::campaign::Zone": 0.1116,
+    "game::campaign::(anonymous namespace)::traceSupply(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>, game::campaign::N": 0.0309,
+    "game::campaign::EconomyRules::actions(game::campaign::State const&) const": 0.0869,
+    "game::campaign::economyActions(game::campaign::State const&)": 0.0846,
+    "game::campaign::(anonymous namespace)::canBerth(game::campaign::State const&, game::campaign::UnitState const&, std::basic_string<char> const&)": 0.0846,
+    "game::json::Value::find(std::basic_string<char> const&) const": 0.0765,
+    "game::campaign::(anonymous namespace)::reachablePlan(game::campaign::State const&, int, game::campaign::(anonymous namespace)::LandingPreview const*)": 0.0759,
+    "game::campaign::navalMovementActions(game::campaign::State const&)": 0.0722,
+    "game::campaign::navalFacilitySeaZones(game::campaign::State const&, std::basic_string<char> const&)": 0.0707,
+    "game::campaign::Marks::lowerBound(game::campaign::MarkKey const&) const": 0.0649,
+    "game::campaign::validateSingleRoute(game::campaign::State const&, game::campaign::RouteRequest const&)": 0.0648,
+    "game::campaign::(anonymous namespace)::flightKeepsLanding(game::campaign::State const&, std::basic_string<char> const&, std::vector<game::campaign::Nu": 0.061,
+    "game::campaign::State::State(game::campaign::State const&)": 0.0602,
+    "game::campaign::canonicalJson(game::json::Value const&)": 0.0599,
+    "game::campaign::(anonymous namespace)::writeJson(std::basic_string<char>&, game::json::Value const&)": 0.0585,
+    "game::campaign::navalEndZones(game::campaign::State const&, std::basic_string<char> const&)": 0.0583,
+    "game::campaign::navalEndZones(game::campaign::State const&, std::basic_string<char> const&)::$_0::operator()() const": 0.0576,
+    "std::__tree<std::__value_type<std::basic_string<char>, game::json::Value>, std::__map_value_compare<std::basic_string<char>, std::pair<std::basic_stri": 0.028,
+    "std::__tree_node<std::__value_type<std::basic_string<char>, game::json::Value>, void*>* std::__tree<std::__value_type<std::basic_string<char>, game::j": 0.0542,
+    "decltype(auto) std::__variant_detail::__visitation::__base::__dispatcher<5ul>::__dispatch[abi:nqe220106]<void std::__variant_detail::__ctor<std::__var": 0.0509,
+    "game::campaign::Action::Action(game::campaign::Action const&)": 0.05,
+    "game::campaign::(anonymous namespace)::canLoad(game::campaign::State const&, std::basic_string<char> const&, std::basic_string<char> const&)": 0.0485,
+    "std::basic_string<char>::__init_copy_ctor_external(char const*, unsigned long)": 0.0484,
+    "game::campaign::navalFacilityUsable(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>, std::basic_string<char> const&, ": 0.0469,
+    "game::campaign::SlotMap<game::campaign::UnitKind, game::campaign::UnitState>::lookup(std::basic_string_view<char>) const": 0.0468,
+    "std::__function::__func<game::campaign::MovementRules::actions(game::campaign::State const&) const::$_0, void (std::vector<game::campaign::Number<game": 0.0466,
+    "game::campaign::(anonymous namespace)::writeString(std::basic_string<char>&, std::basic_string_view<char>)": 0.0427,
+    "game::campaign::airLandingsKept(game::campaign::State const&, game::campaign::State const&)": 0.0384,
+    "game::campaign::(anonymous namespace)::appendEscaped(std::basic_string<char>&, std::basic_string_view<char>)": 0.0344,
+    "game::campaign::(anonymous namespace)::flightPaths(game::campaign::State const&, std::basic_string<char> const&, bool, int, bool)": 0.0314,
+    "game::campaign::movementController(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>)": 0.0301,
+    "game::json::Value::require(std::basic_string<char> const&) const": 0.0284,
+    "decltype(auto) std::__variant_detail::__visitation::__base::__dispatcher<5ul>::__dispatch[abi:nqe220106]<std::__variant_detail::__dtor<std::__variant_": 0.0278,
+    "game::campaign::facilityBlockaded(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>, std::basic_string<char> const&)": 0.0274
+   }
+  },
+  "playing an action": {
+   "samples": 5580,
+   "inclusive": {
+    "game::campaign::CampaignEnv::applyAction(game::campaign::Action const&)": 1.0,
+    "game::campaign::Engine::step(game::campaign::Action const&)": 0.9996,
+    "game::campaign::Engine::step(game::campaign::Action const&)::$_0::operator()(game::campaign::Engine&) const": 0.9694,
+    "game::campaign::(anonymous namespace)::TrainingRules::apply(game::campaign::State&, game::campaign::Action const&) const": 0.5602,
+    "game::campaign::PoliticsRules::apply(game::campaign::State&, game::campaign::Action const&) const": 0.4224,
+    "game::campaign::NavalRules::apply(game::campaign::State&, game::campaign::Action const&) const": 0.4088,
+    "game::campaign::applyNavalMovementAction(game::campaign::State&, game::campaign::Action const&)": 0.3203,
+    "game::campaign::validateNavalRoute(game::campaign::State const&, game::campaign::NavalRouteRequest const&)": 0.2781,
+    "game::campaign::(anonymous namespace)::visitNavalRoutes(game::campaign::State const&, std::vector<std::basic_string<char>> const&, std::function<bool ": 0.2706,
+    "std::__function::__func<game::campaign::(anonymous namespace)::visitNavalRoutes(game::campaign::State const&, std::vector<std::basic_string<char>> con": 0.2536,
+    "game::campaign::(anonymous namespace)::routeChoices(game::campaign::State&, game::campaign::BattleState&)": 0.2158,
+    "game::campaign::(anonymous namespace)::allowance(game::campaign::State const&, game::campaign::UnitState const&, bool, game::campaign::Number<game::ca": 0.1925,
+    "game::campaign::(anonymous namespace)::allowanceBeforeSurprise(game::campaign::State const&, game::campaign::UnitState const&, game::campaign::Number<": 0.1884,
+    "game::campaign::inSupply(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>, game::campaign::Number<game::campaign::Zone": 0.1679,
+    "game::campaign::(anonymous namespace)::traceSupply(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>, game::campaign::N": 0.041,
+    "game::campaign::State::planningKey() const": 0.155,
+    "game::campaign::(anonymous namespace)::writeState<game::campaign::(anonymous namespace)::KeyWriter>(game::campaign::(anonymous namespace)::KeyWriter&,": 0.1509,
+    "game::campaign::State::validate(unsigned long) const": 0.1231,
+    "game::campaign::(anonymous namespace)::solveReachablePlan(game::campaign::State const&, game::campaign::(anonymous namespace)::LandingPreview const*, ": 0.0543,
+    "game::campaign::(anonymous namespace)::reachablePlan(game::campaign::State const&, int, game::campaign::(anonymous namespace)::LandingPreview const*)": 0.0787,
+    "game::campaign::navalFacilityUsable(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>, std::basic_string<char> const&, ": 0.0771,
+    "game::campaign::contentDigest(std::basic_string_view<char>)": 0.0767,
+    "game::campaign::airLandingsKept(game::campaign::State const&, game::campaign::State const&)": 0.0749,
+    "<deduplicated_symbol>": 0.0724,
+    "game::json::Value::find(std::basic_string<char> const&) const": 0.072,
+    "game::campaign::forwardNavalOrderDecision(game::campaign::State&)": 0.072,
+    "game::campaign::(anonymous namespace)::NavalOrderCompletion::possible(std::vector<std::basic_string<char>> const&)": 0.0676,
+    "game::campaign::(anonymous namespace)::buildContext(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>, std::optional<ga": 0.0606,
+    "game::campaign::navalFacilitySeaZones(game::campaign::State const&, std::basic_string<char> const&)": 0.0548,
+    "game::campaign::navalEndZones(game::campaign::State const&, std::basic_string<char> const&)": 0.0543,
+    "game::campaign::navalEndZones(game::campaign::State const&, std::basic_string<char> const&)::$_0::operator()() const": 0.0539,
+    "game::campaign::State::State(game::campaign::State const&)": 0.0534,
+    "game::campaign::refreshPoliticalState(game::campaign::State&)": 0.0527,
+    "game::campaign::(anonymous namespace)::continueRoute(game::campaign::State&, std::basic_string<char> const&)": 0.0489,
+    "game::campaign::(anonymous namespace)::moveTo(game::campaign::State&, std::vector<std::basic_string<char>> const&, game::campaign::Number<game::campai": 0.0473,
+    "game::json::Value::require(std::basic_string<char> const&) const": 0.0418,
+    "game::campaign::Marks::lowerBound(game::campaign::MarkKey const&) const": 0.0418,
+    "game::campaign::(anonymous namespace)::writeIntMap<game::campaign::(anonymous namespace)::KeyWriter>(game::campaign::(anonymous namespace)::KeyWriter&": 0.0405,
+    "game::campaign::LandCombatRules::apply(game::campaign::State&, game::campaign::Action const&) const": 0.0396,
+    "game::campaign::(anonymous namespace)::advance(game::campaign::State&, game::campaign::BattleState&)": 0.0339,
+    "game::campaign::facilityBlockaded(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>, std::basic_string<char> const&)": 0.0332,
+    "std::basic_string<char>::__init_copy_ctor_external(char const*, unsigned long)": 0.0326,
+    "game::campaign::(anonymous namespace)::writeString(game::campaign::(anonymous namespace)::KeyWriter&, std::basic_string_view<char>)": 0.0326,
+    "game::campaign::Engine::endPhase()": 0.0319,
+    "std::__try_key_extraction_impl[abi:nqe220106]<std::basic_string<char>, std::pair<std::__tree_iterator<std::__value_type<std::basic_string<char>, bool>": 0.0312,
+    "game::campaign::(anonymous namespace)::shoot(game::campaign::State&, game::campaign::BattleState&, std::basic_string<char> const&)": 0.0306,
+    "game::campaign::landCombatStats(game::campaign::State const&, game::campaign::BattleState const&, std::basic_string<char> const&, bool, int)": 0.029,
+    "game::campaign::(anonymous namespace)::encounter(game::campaign::State&, std::basic_string<char> const&)": 0.0272,
+    "game::campaign::effectiveTerritorialIpp(game::campaign::State const&, game::campaign::Number<game::campaign::ZoneKind>)": 0.0271,
+    "game::campaign::(anonymous namespace)::requestPairing(game::campaign::State&, game::campaign::BattleState&, bool, std::basic_string<char> const&)": 0.0263,
+    "game::campaign::(anonymous namespace)::writeString(game::campaign::(anonymous namespace)::KeyWriter&, game::campaign::MarkKey const&)": 0.0233,
+    "game::campaign::NameTable<game::campaign::ZoneKind>::find(std::basic_string_view<char>) const": 0.0228,
+    "std::__tree<std::__value_type<std::basic_string<char>, game::json::Value>, std::__map_value_compare<std::basic_string<char>, std::pair<std::basic_stri": 0.0217,
+    "game::campaign::beginLandBattle(game::campaign::State&, std::basic_string<char> const&)": 0.0213,
+    "game::campaign::State::~State()": 0.0211
+   }
+  },
+  "encoding the state (zone_input)": {
+   "samples": 6618,
+   "inclusive": {
+    "std::enable_if<!std::is_void<(anonymous namespace)::ZoneInputHandle>::value, (anonymous namespace)::ZoneInputHandle>::type pybind11::detail::argument_": 0.956,
+    "game::campaign::encodeZoneInput(game::campaign::State const&, game::campaign::ZoneSchedule const&, std::vector<game::campaign::ZoneOption> const&)": 0.9269,
+    "std::__hash_table<std::__hash_value_type<std::basic_string<char>, int>>::find<std::basic_string<char>>(std::basic_string<char> const&) const": 0.1281,
+    "std::__introsort<std::_ClassicAlgPolicy, std::__less<void, void>&, std::array<int, 3ul>*, false>(std::array<int, 3ul>*, std::array<int, 3ul>*, std::__": 0.1139,
+    "game::campaign::(anonymous namespace)::unitSignature(game::campaign::UnitState const&)": 0.113,
+    "game::campaign::(anonymous namespace)::optionValue(game::campaign::(anonymous namespace)::Context const&, game::campaign::State const&, game::campaign": 0.0984,
+    "game::campaign::(anonymous namespace)::encodeNations(game::campaign::(anonymous namespace)::Context const&, game::campaign::State const&, game::campai": 0.0686,
+    "<deduplicated_symbol>": 0.0665,
+    "std::__partition_with_equals_on_right[abi:nqe220106]<std::_ClassicAlgPolicy, std::array<int, 3ul>*, std::__less<void, void>&>(std::array<int, 3ul>*, s": 0.0636,
+    "game::campaign::(anonymous namespace)::Vocabulary::operator()(std::basic_string<char> const&) const": 0.0532,
+    "std::__hash_table<std::__hash_value_type<std::basic_string<char>, int>>::__emplace_unique[abi:nqe220106]<std::piecewise_construct_t const&, std::tuple": 0.0316,
+    "game::campaign::(anonymous namespace)::baseName(game::campaign::MarkKey const&, std::basic_string<char>*)": 0.0503,
+    "game::campaign::(anonymous namespace)::Layout::at(int, std::initializer_list<int>) const": 0.0456,
+    "game::campaign::(anonymous namespace)::Builder::merge(std::vector<std::pair<int, int>>&)": 0.0426,
+    "std::__murmur2_or_cityhash<unsigned long, 64ul>::operator()[abi:nqe220106](void const*, unsigned long) const": 0.0391,
+    "(anonymous namespace)::zoneArrays(game::campaign::ZoneInput const&)": 0.0381,
+    "game::campaign::(anonymous namespace)::projectFacts(game::campaign::(anonymous namespace)::Context const&, game::campaign::State const&, game::campaig": 0.0348,
+    "game::campaign::(anonymous namespace)::unitFacts<game::campaign::(anonymous namespace)::encodeUnits(game::campaign::(anonymous namespace)::Context con": 0.0302,
+    "std::__introsort<std::_ClassicAlgPolicy, std::__less<void, void>&, std::pair<int, int>*, false>(std::pair<int, int>*, std::pair<int, int>*, std::__les": 0.0299,
+    "std::basic_string<char>::__assign_external(char const*, unsigned long)": 0.0251,
+    "(anonymous namespace)::int32Array(std::vector<int> const&)": 0.019,
+    "pybind11::array_t<int, 16>::array_t(long, int const*, pybind11::handle)": 0.0187,
+    "pybind11::array::array<int>(pybind11::detail::any_container<long>, pybind11::detail::any_container<long>, int const*, pybind11::handle)": 0.0183,
+    "pybind11::array::array(pybind11::dtype const&, pybind11::detail::any_container<long>, pybind11::detail::any_container<long>, void const*, pybind11::ha": 0.0151,
+    "game::campaign::MarkKey::name() const": 0.0148,
+    "game::campaign::(anonymous namespace)::withoutNation(game::campaign::(anonymous namespace)::Context const&, std::basic_string<char> const&, std::basic": 0.0128,
+    "game::campaign::SlotMap<game::campaign::UnitKind, game::campaign::UnitState>::lookup(std::basic_string_view<char>) const": 0.0125,
+    "std::basic_string<char>::__init_copy_ctor_external(char const*, unsigned long)": 0.0122,
+    "game::campaign::SlotMap<game::campaign::UnitKind, game::campaign::UnitState>::find(std::basic_string_view<char>) const": 0.0107,
+    "game::campaign::SlotMap<game::campaign::FacilityKind, game::campaign::FacilityState>::lookup(std::basic_string_view<char>) const": 0.0101,
+    "game::campaign::(anonymous namespace)::unitFacts<game::campaign::(anonymous namespace)::optionValue(game::campaign::(anonymous namespace)::Context con": 0.005,
+    "game::campaign::(anonymous namespace)::flagValue(game::campaign::State const&, std::basic_string<char> const&, int)": 0.0092,
+    "std::__partition_with_equals_on_right[abi:nqe220106]<std::_ClassicAlgPolicy, std::pair<int, int>*, std::__less<void, void>&>(std::pair<int, int>*, std": 0.008,
+    "game::campaign::(anonymous namespace)::dataFacts(game::campaign::(anonymous namespace)::Context const&, game::campaign::State const&, game::campaign::": 0.0076,
+    "std::vector<std::array<int, 3ul>>::emplace_back<std::array<int, 3ul>>(std::array<int, 3ul>&&)::'lambda0'()::operator()() const": 0.0074,
+    "game::campaign::SlotMap<game::campaign::UnitKind, game::campaign::UnitState>::upper_bound(std::basic_string_view<char>) const": 0.0073,
+    "game::campaign::ZoneInput::~ZoneInput()": 0.006,
+    "pybind11::class_<(anonymous namespace)::ZoneInputHandle>::dealloc_impl(pybind11::detail::value_and_holder&)": 0.0059,
+    "pybind11::class_<(anonymous namespace)::ZoneInputHandle>::dealloc_without_manipulating_gil(pybind11::detail::value_and_holder&)": 0.0059,
+    "pybind11::detail::clear_instance(_object*)": 0.0059,
+    "pybind11_object_dealloc": 0.0059,
+    "DYLD-STUB$$memcmp": 0.0057,
+    "std::__sort3[abi:nqe220106]<std::_ClassicAlgPolicy, std::__less<void, void>&, std::array<int, 3ul>*, 0>(std::array<int, 3ul>*, std::array<int, 3ul>*, ": 0.0056,
+    "pybind11::str::str(char const*)": 0.0056,
+    "pybind11::cast<game::campaign::Action const&, 0>(pybind11::handle const&)": 0.0048,
+    "std::__tree_balance_after_insert[abi:nqe220106]<std::__tree_node_base<void*>*>(std::__tree_node_base<void*>*, std::__tree_node_base<void*>*)": 0.0045,
+    "game::campaign::(anonymous namespace)::Builder::option(int, long, int)": 0.0042,
+    "DYLD-STUB$$memmove": 0.0036,
+    "pybind11::detail::type_caster_generic::type_caster_generic(std::type_info const&)": 0.0036,
+    "pybind11::detail::get_type_info(std::type_info const&, bool)": 0.0035,
+    "pybind11::detail::load_type<std::basic_string<char>, void>(pybind11::detail::type_caster<std::basic_string<char>, void>&, pybind11::handle const&)": 0.0027,
+    "game::campaign::(anonymous namespace)::Vocabulary::find<game::campaign::ZoneKind>(game::campaign::Number<game::campaign::ZoneKind>) const": 0.0026,
+    "pybind11::detail::accessor<pybind11::detail::accessor_policies::tuple_item>::get_cache() const": 0.0026,
+    "std::__function::__func<game::campaign::(anonymous namespace)::encodeProjects(game::campaign::(anonymous namespace)::Context const&, game::campaign::S": 0.0026,
+    "DYLD-STUB$$operator delete(void*)": 0.0026
+   }
+  }
+ },
+ "native_lock_waits_outside_engine_calls": {
+  "after a pipe read": 0.878,
+  "after a NumPy copy": 0.061,
+  "after a pipe write": 0.044,
+  "other": 0.017
+ },
+ "native_encoding_string_work": {
+  "setup": "share of the encoding call's engine samples with these frames anywhere in the stack, each sample counted once",
+  "unit signatures or ranking (unitSignature, rankUnits)": 0.113,
+  "hash tables keyed by strings (std::__hash_table over strings, Vocabulary, string hashing)": 0.224,
+  "either": 0.337
+ }
+}
