@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="678" viewBox="0 0 960 678" role="img" aria-labelledby="title desc">
+  <title id="title">Each zone has its own 42,532 input neurons; each feature has one embedding, used by every zone</title>
+  <desc id="desc">Decision 612's zone features as a matrix: one row per zone, each row that zone's input layer of 42,532 input neurons, one per zone feature, holding the zone's feature value after feature scaling; one column per zone feature. Shown are 8 columns, 0 possessor:ccp, 3 possessor:kmt, 186 units:ccp:militia, 188 units:ccp:mountain_infantry, 312 units:kmt:infantry, 321 units:kmt:militia, 27,571 project:kmt:fortification, 29,244 rail_to:land_china_hopeh, and 5 of the 37 rows. Shensi: 0.69 for possessor:ccp, 0.69 for units:ccp:militia, 0.69 for units:ccp:mountain_infantry, 0.69 for rail_to:land_china_hopeh; Hopeh: 0.69 for possessor:kmt, 0.69 for project:kmt:fortification; Suiyuan: 0.69 for possessor:kmt, 1.39 for units:kmt:militia; Szechwan: 0.69 for possessor:kmt; Tsinghai: 0.69 for possessor:kmt, 1.10 for units:kmt:infantry, 0.69 for units:kmt:militia; every other entry shown is 0. To the right, each zone's row gives its own 64 outputs. Below the matrix, the zone embedding table: one embedding of 64 learned numbers under each column, 42,532 in all, the same for every row. Column 3, possessor:kmt, is outlined: Hopeh, Suiyuan, Szechwan and Tsinghai each hold 0.69 in it, and each adds 0.69 times embedding 3 to its own outputs, one embedding used in four zones. Column 321, units:kmt:militia: Suiyuan adds 1.39 times embedding 321 for its 3 militia, Tsinghai 0.69 times embedding 321 for its 1. A zone's outputs add up, along its row, each input times the embedding under its column. The board has 37 rows of 42,532 input neurons, 37 × 42,532 = 1,573,684 in all, and the table has 42,532 embeddings, one per column, not one per zone.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+    <pattern id="outcells" width="3" height="12" patternUnits="userSpaceOnUse">
+      <rect width="3" height="12" fill="#ddf4ff"/>
+      <line x1="2.75" y1="0" x2="2.75" y2="12" stroke="#9fd5fb" stroke-width="0.5"/>
+    </pattern>
+    <pattern id="embcells" width="26" height="2.5" patternUnits="userSpaceOnUse">
+      <rect width="26" height="2.5" fill="#fff8c5"/>
+      <line x1="0" y1="2.4" x2="26" y2="2.4" stroke="#e9d27c" stroke-width="0.4"/>
+    </pattern>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+      .title { font-size: 15px; font-weight: 600; }
+      .head { font-size: 14px; font-weight: 600; }
+      .sub { font-size: 12px; fill: #57606a; font-style: italic; }
+      .body { font-size: 13px; }
+      .bold { font-weight: 600; }
+      .label { font-size: 12px; fill: #57606a; }
+      .small { font-size: 11px; fill: #57606a; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; }
+      .num { font-size: 12px; font-weight: 600; }
+      .zero { font-size: 12px; fill: #8c959f; }
+      .shared { font-size: 12px; fill: #953800; }
+      .sharedhead { font-size: 12px; font-weight: 600; fill: #953800; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="677" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="title" x="24" y="36">Each zone has its own 42,532 input neurons; each feature has one embedding, used by every zone</text>
+  <text class="sub" x="24" y="58">Decision 612. A zone's row is its input layer: one input neuron per zone feature, holding the zone's feature value after feature scaling.</text>
+  <text class="mono" x="193.0" y="196" transform="rotate(-40 193.0 196)">possessor:ccp</text>
+  <text class="small" x="197.0" y="222" text-anchor="middle">0</text>
+  <text class="mono" x="239.0" y="196" transform="rotate(-40 239.0 196)">possessor:kmt</text>
+  <text class="small" x="243.0" y="222" text-anchor="middle">3</text>
+  <text class="mono" x="285.0" y="196" transform="rotate(-40 285.0 196)">units:ccp:militia</text>
+  <text class="small" x="289.0" y="222" text-anchor="middle">186</text>
+  <text class="mono" x="331.0" y="196" transform="rotate(-40 331.0 196)">units:ccp:mountain_infantry</text>
+  <text class="small" x="335.0" y="222" text-anchor="middle">188</text>
+  <text class="mono" x="377.0" y="196" transform="rotate(-40 377.0 196)">units:kmt:infantry</text>
+  <text class="small" x="381.0" y="222" text-anchor="middle">312</text>
+  <text class="mono" x="423.0" y="196" transform="rotate(-40 423.0 196)">units:kmt:militia</text>
+  <text class="small" x="427.0" y="222" text-anchor="middle">321</text>
+  <text class="mono" x="469.0" y="196" transform="rotate(-40 469.0 196)">project:kmt:fortification</text>
+  <text class="small" x="473.0" y="222" text-anchor="middle">27,571</text>
+  <text class="mono" x="515.0" y="196" transform="rotate(-40 515.0 196)">rail_to:land_china_hopeh</text>
+  <text class="small" x="519.0" y="222" text-anchor="middle">29,244</text>
+  <text class="label" x="549" y="222">… 42,524 more columns</text>
+  <text class="small" x="24" y="222">feature number</text>
+  <text class="label" x="700" y="222">the zone's 64 outputs</text>
+  <rect x="219" y="210" width="48" height="390" rx="6" fill="none" stroke="#bc4c00" stroke-width="1.6"/>
+  <text class="body bold" x="30" y="252">Shensi</text>
+  <rect x="177" y="236" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="197.0" y="252" text-anchor="middle">0.69</text>
+  <rect x="223" y="236" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="243.0" y="252" text-anchor="middle">0</text>
+  <rect x="269" y="236" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="289.0" y="252" text-anchor="middle">0.69</text>
+  <rect x="315" y="236" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="335.0" y="252" text-anchor="middle">0.69</text>
+  <rect x="361" y="236" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="381.0" y="252" text-anchor="middle">0</text>
+  <rect x="407" y="236" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="427.0" y="252" text-anchor="middle">0</text>
+  <rect x="453" y="236" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="473.0" y="252" text-anchor="middle">0</text>
+  <rect x="499" y="236" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="519.0" y="252" text-anchor="middle">0.69</text>
+  <text class="label" x="549" y="252">…</text>
+  <line x1="573" y1="247" x2="694" y2="247" stroke="#57606a" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <rect x="700" y="241" width="192" height="12" fill="url(#outcells)" stroke="#54aeff"/>
+  <text class="body bold" x="30" y="282">Hopeh</text>
+  <rect x="177" y="266" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="197.0" y="282" text-anchor="middle">0</text>
+  <rect x="223" y="266" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="243.0" y="282" text-anchor="middle">0.69</text>
+  <rect x="269" y="266" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="289.0" y="282" text-anchor="middle">0</text>
+  <rect x="315" y="266" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="335.0" y="282" text-anchor="middle">0</text>
+  <rect x="361" y="266" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="381.0" y="282" text-anchor="middle">0</text>
+  <rect x="407" y="266" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="427.0" y="282" text-anchor="middle">0</text>
+  <rect x="453" y="266" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="473.0" y="282" text-anchor="middle">0.69</text>
+  <rect x="499" y="266" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="519.0" y="282" text-anchor="middle">0</text>
+  <text class="label" x="549" y="282">…</text>
+  <line x1="573" y1="277" x2="694" y2="277" stroke="#57606a" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <rect x="700" y="271" width="192" height="12" fill="url(#outcells)" stroke="#54aeff"/>
+  <text class="body bold" x="30" y="312">Suiyuan</text>
+  <rect x="177" y="296" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="197.0" y="312" text-anchor="middle">0</text>
+  <rect x="223" y="296" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="243.0" y="312" text-anchor="middle">0.69</text>
+  <rect x="269" y="296" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="289.0" y="312" text-anchor="middle">0</text>
+  <rect x="315" y="296" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="335.0" y="312" text-anchor="middle">0</text>
+  <rect x="361" y="296" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="381.0" y="312" text-anchor="middle">0</text>
+  <rect x="407" y="296" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="427.0" y="312" text-anchor="middle">1.39</text>
+  <rect x="453" y="296" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="473.0" y="312" text-anchor="middle">0</text>
+  <rect x="499" y="296" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="519.0" y="312" text-anchor="middle">0</text>
+  <text class="label" x="549" y="312">…</text>
+  <line x1="573" y1="307" x2="694" y2="307" stroke="#57606a" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <rect x="700" y="301" width="192" height="12" fill="url(#outcells)" stroke="#54aeff"/>
+  <text class="body bold" x="30" y="342">Szechwan</text>
+  <rect x="177" y="326" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="197.0" y="342" text-anchor="middle">0</text>
+  <rect x="223" y="326" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="243.0" y="342" text-anchor="middle">0.69</text>
+  <rect x="269" y="326" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="289.0" y="342" text-anchor="middle">0</text>
+  <rect x="315" y="326" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="335.0" y="342" text-anchor="middle">0</text>
+  <rect x="361" y="326" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="381.0" y="342" text-anchor="middle">0</text>
+  <rect x="407" y="326" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="427.0" y="342" text-anchor="middle">0</text>
+  <rect x="453" y="326" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="473.0" y="342" text-anchor="middle">0</text>
+  <rect x="499" y="326" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="519.0" y="342" text-anchor="middle">0</text>
+  <text class="label" x="549" y="342">…</text>
+  <line x1="573" y1="337" x2="694" y2="337" stroke="#57606a" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <rect x="700" y="331" width="192" height="12" fill="url(#outcells)" stroke="#54aeff"/>
+  <text class="body bold" x="30" y="372">Tsinghai</text>
+  <rect x="177" y="356" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="197.0" y="372" text-anchor="middle">0</text>
+  <rect x="223" y="356" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="243.0" y="372" text-anchor="middle">0.69</text>
+  <rect x="269" y="356" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="289.0" y="372" text-anchor="middle">0</text>
+  <rect x="315" y="356" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="335.0" y="372" text-anchor="middle">0</text>
+  <rect x="361" y="356" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="381.0" y="372" text-anchor="middle">1.10</text>
+  <rect x="407" y="356" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>
+  <text class="num" x="427.0" y="372" text-anchor="middle">0.69</text>
+  <rect x="453" y="356" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="473.0" y="372" text-anchor="middle">0</text>
+  <rect x="499" y="356" width="40" height="22" rx="4" fill="#f6f8fa" stroke="#d8dee4"/>
+  <text class="zero" x="519.0" y="372" text-anchor="middle">0</text>
+  <text class="label" x="549" y="372">…</text>
+  <line x1="573" y1="367" x2="694" y2="367" stroke="#57606a" stroke-width="1.3" marker-end="url(#arrow)"/>
+  <rect x="700" y="361" width="192" height="12" fill="url(#outcells)" stroke="#54aeff"/>
+  <text class="label" x="30" y="400">… 32 more zones</text>
+  <text class="label" x="796.0" y="398" text-anchor="middle">⋮</text>
+  <text class="head" x="24" y="446">Zone embedding</text>
+  <text class="head" x="24" y="464">table</text>
+  <text class="label" x="24" y="486">one embedding of 64</text>
+  <text class="label" x="24" y="502">learned numbers under</text>
+  <text class="label" x="24" y="518">each column, 42,532</text>
+  <text class="label" x="24" y="534">in all, the same for</text>
+  <text class="label" x="24" y="550">every row</text>
+  <line x1="197.0" y1="408" x2="197.0" y2="426" stroke="#d4a72c" stroke-width="1" stroke-dasharray="3 3"/>
+  <rect x="184.0" y="432" width="26" height="160" fill="url(#embcells)" stroke="#d4a72c"/>
+  <text class="small" x="197.0" y="608" text-anchor="middle">0</text>
+  <line x1="243.0" y1="408" x2="243.0" y2="426" stroke="#d4a72c" stroke-width="1" stroke-dasharray="3 3"/>
+  <rect x="230.0" y="432" width="26" height="160" fill="url(#embcells)" stroke="#d4a72c"/>
+  <text class="small" x="243.0" y="608" text-anchor="middle">3</text>
+  <line x1="289.0" y1="408" x2="289.0" y2="426" stroke="#d4a72c" stroke-width="1" stroke-dasharray="3 3"/>
+  <rect x="276.0" y="432" width="26" height="160" fill="url(#embcells)" stroke="#d4a72c"/>
+  <text class="small" x="289.0" y="608" text-anchor="middle">186</text>
+  <line x1="335.0" y1="408" x2="335.0" y2="426" stroke="#d4a72c" stroke-width="1" stroke-dasharray="3 3"/>
+  <rect x="322.0" y="432" width="26" height="160" fill="url(#embcells)" stroke="#d4a72c"/>
+  <text class="small" x="335.0" y="608" text-anchor="middle">188</text>
+  <line x1="381.0" y1="408" x2="381.0" y2="426" stroke="#d4a72c" stroke-width="1" stroke-dasharray="3 3"/>
+  <rect x="368.0" y="432" width="26" height="160" fill="url(#embcells)" stroke="#d4a72c"/>
+  <text class="small" x="381.0" y="608" text-anchor="middle">312</text>
+  <line x1="427.0" y1="408" x2="427.0" y2="426" stroke="#d4a72c" stroke-width="1" stroke-dasharray="3 3"/>
+  <rect x="414.0" y="432" width="26" height="160" fill="url(#embcells)" stroke="#d4a72c"/>
+  <text class="small" x="427.0" y="608" text-anchor="middle">321</text>
+  <line x1="473.0" y1="408" x2="473.0" y2="426" stroke="#d4a72c" stroke-width="1" stroke-dasharray="3 3"/>
+  <rect x="460.0" y="432" width="26" height="160" fill="url(#embcells)" stroke="#d4a72c"/>
+  <text class="small" x="473.0" y="608" text-anchor="middle">27,571</text>
+  <line x1="519.0" y1="408" x2="519.0" y2="426" stroke="#d4a72c" stroke-width="1" stroke-dasharray="3 3"/>
+  <rect x="506.0" y="432" width="26" height="160" fill="url(#embcells)" stroke="#d4a72c"/>
+  <text class="small" x="519.0" y="608" text-anchor="middle">29,244</text>
+  <text class="label" x="549" y="516.0">… 42,524 more</text>
+  <text class="label" x="549" y="532.0">embeddings</text>
+  <text class="sharedhead" x="700" y="446">Column 3, possessor:kmt:</text>
+  <text class="shared" x="700" y="463">Hopeh, Suiyuan, Szechwan and Tsinghai</text>
+  <text class="shared" x="700" y="480">each hold 0.69 in it, and each adds</text>
+  <text class="shared" x="700" y="497">0.69 × embedding 3 to its own outputs:</text>
+  <text class="shared" x="700" y="514">one embedding, used in four zones.</text>
+  <text class="label" x="700" y="548">Column 321, units:kmt:militia: Suiyuan</text>
+  <text class="label" x="700" y="565">adds 1.39 × embedding 321 for its 3 militia,</text>
+  <text class="label" x="700" y="582">Tsinghai 0.69 × embedding 321 for its 1.</text>
+  <text class="label" x="24" y="638">A zone's outputs add up, along its row, each input times the embedding under its column. The board has 37 rows of 42,532 input neurons,</text>
+  <text class="label" x="24" y="656">37 × 42,532 = 1,573,684 in all, and the table has 42,532 embeddings, one per column, not one per zone.</text>
+</svg>
