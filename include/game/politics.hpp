@@ -47,6 +47,10 @@ bool alliesPossible(const Id& first, const Id& second);
 // Whether `attacker` can be recorded as having attacked this warlord. A warlord
 // attacks nobody, and one the KMT attacks joins the CCP at once instead.
 bool warlordAttackPossible(const Id& warlord, const Id& attacker);
+// Facts that never change during a game. A nation of this campaign other than
+// Dadao is in every position, and the KMT and the CCP are always at war.
+bool alwaysInGame(const Id& nation);
+bool alwaysAtWar(const Id& first, const Id& second);
 
 NationId originalNation(const State&, ZoneId zone);
 std::vector<ZoneId> possessedLand(const State&, NationId nation);

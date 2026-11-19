@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="436" viewBox="0 0 960 436" role="img" aria-labelledby="title desc">
   <title id="title">Decision 612's legal actions as a feature matrix</title>
-  <desc id="desc">A feature matrix of real feature values from decision 612's five legal actions, one row per action, with 10 of the 12,627 action-feature columns: kind:movement_route, kind:end_phase, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path for Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and true:combat. Each of the four attacks has the value 1 for kind:movement_route, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path:land_china_shensi, the path column of its own destination and true:combat, and has 19 non-zero feature values in all; ending the phase has the value 1 for kind:end_phase and has 4. On the right, the action's zones: each attack has Shensi as its source zone and its destination as its target zone; ending the phase names no zone. In all 80 non-zero feature values.</desc>
+  <desc id="desc">A feature matrix of real feature values from decision 612's five legal actions, one row per action, with 10 of the 11,046 action-feature columns: kind:movement_route, kind:end_phase, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path for Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and true:combat. Each of the four attacks has the value 1 for kind:movement_route, unit:0_source:ccp:mountain_infantry, unit_stat:0_source:move_1, zone:1_path:land_china_shensi, the path column of its own destination and true:combat, and has 19 non-zero feature values in all; ending the phase has the value 1 for kind:end_phase and has 4. On the right, the action's zones: each attack has Shensi as its source zone and its destination as its target zone; ending the phase names no zone. In all 80 non-zero feature values.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -21,7 +21,7 @@
   </defs>
   <rect x="0.5" y="0.5" width="959" height="435" rx="10" fill="#ffffff" stroke="#d0d7de"/>
   <text class="title" x="24" y="36">Decision 612's legal actions, drawn as a feature matrix, and each action's zones</text>
-  <text class="body bold" x="24" y="64">One row per legal action; every legal action has values for the same 12,627 action features, one column each</text>
+  <text class="body bold" x="24" y="64">One row per legal action; every legal action has values for the same 11,046 action features, one column each</text>
   <text class="mono" x="164.0" y="246" transform="rotate(-40 164.0 246)">kind:movement_route</text>
   <text class="mono" x="204.0" y="246" transform="rotate(-40 204.0 246)">kind:end_phase</text>
   <text class="mono" x="244.0" y="246" transform="rotate(-40 244.0 246)">unit:0_source:ccp:mountain_infantry</text>

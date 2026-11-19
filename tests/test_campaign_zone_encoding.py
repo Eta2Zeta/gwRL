@@ -1,9 +1,11 @@
 """The zone encoding as the adapter hands it to the network: cached, selectable, portable."""
 from __future__ import annotations
 
+import importlib.util
 import pickle
 import random
 import re
+import sys
 import unittest
 from pathlib import Path
 
@@ -186,15 +188,55 @@ class EngineNamesHaveColumnsTests(unittest.TestCase):
 
     def test_marks(self):
         # Every mark a position may hold is in the engine's mark table
-        # (include/game/marks.hpp); the code names marks only through it.
+        # (include/game/marks.hpp), with the kinds of thing the rules put it on.
+        # The input asks about a mark on exactly those kinds, except where a mark
+        # has features of its own; a family per kind shows it.
         self.assertGreater(len(self.marks), 200)
-        # The four bombing-reduction marks have no question yet (docs/questions.md,
-        # Q-003); fixture marks are for test rules. Drop a name here once it has one.
-        unasked = {"bombing_reduction", "bombing_reduction_turn", "city_bombing_reduction",
-                   "city_bombing_reduction_turn", "fixture"}
-        known = lambda flag: f"nation_flag:japan:{flag}" in self.global_columns or f"state_flag:{flag}" in self.global_columns
-        self.assertEqual(sorted(mark for mark in self.marks if mark not in unasked and not known(mark)), [])
-        self.assertEqual(sorted(mark for mark in unasked if known(mark) or mark not in self.marks), [])
+        places = dict(zip(self.marks, gwrl_cpp.mark_places()))
+        feature = {
+            "unit": lambda mark: f"unit_cargo_flag:0_source:{mark}" in self.action_columns,
+            "nation": lambda mark: f"nation_flag:japan:{mark}" in self.global_columns,
+            "territory": lambda mark: f"territory_flag:{mark}" in self.zone_columns,
+            "facility": lambda mark: f"facility_flag:0_source:{mark}" in self.action_columns,
+            "project": lambda mark: f"project_flag:0_source:{mark}" in self.action_columns,
+            "battle": lambda mark: f"battle_flag:{mark}" in self.zone_columns,
+            "game": lambda mark: f"state_flag:{mark}" in self.global_columns,
+        }
+        own = {"nation": {"economy_researched_round"}, "territory": {"aligned_turn", "last_possession_change_turn"},
+               "facility": {"border", "original_owner", "original_type"}, "project": {"border", "row"},
+               "game": {"__campaign_started", "evolution_pending"}}
+        wrong = []
+        for mark, kinds in places.items():
+            for kind, asked in feature.items():
+                expected = (kind in kinds and mark not in own.get(kind, ())
+                            and not (kind == "game" and mark.endswith("_sequence")))
+                if asked(mark) != expected:
+                    wrong.append(f"{kind}:{mark}")
+        self.assertEqual(wrong, [])
+        self.assertIn("bombing_reduction", {m for m, kinds in places.items() if "nation" in kinds})
+        self.assertEqual(places["fixture"], [])
+
+    def test_mark_table_matches_the_code(self):
+        # tools/mark_writes.py lists every place the rule code gives a mark a
+        # value and the kind of thing it lands on. The mark table must name
+        # exactly those kinds, so a rule that starts putting a mark somewhere
+        # new fails here.
+        spec = importlib.util.spec_from_file_location("mark_writes", ROOT / "tools" / "mark_writes.py")
+        tool = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = tool  # its dataclass looks its module up there
+        spec.loader.exec_module(tool)
+        found = tool.writes(ROOT)
+        self.assertGreater(len(found), 300)
+        self.assertEqual([f"{w.file}:{w.line} {w.mark} on {w.receiver}: {w.why}" for w in found
+                          if w.kind is None or w.mark == "?"], [])
+        written = {}
+        for w in found:
+            written.setdefault(w.mark, set()).add(w.kind)
+        places = dict(zip(self.marks, gwrl_cpp.mark_places()))
+        # The code names __campaign_started mark::campaign_started.
+        differ = [f"{mark}: table {sorted(kinds)}, code {sorted(written.get(mark.lstrip('_'), ()))}"
+                  for mark, kinds in places.items() if set(kinds) != written.get(mark.lstrip("_"), set())]
+        self.assertEqual(differ, [])
 
     def test_words_in_battle_notes(self):
         found = {}

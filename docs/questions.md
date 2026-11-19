@@ -34,12 +34,10 @@ Other open things stay in the pages that own them, and
 | --- | --- | --- | --- |
 | [Q-001](#q-001-mongolia-at-war-with-the-ccp) | May Mongolia attack land that was Chinese at the start, which now puts it at war with the CCP? | A printed rule | No: rule 4.5 does not allow the attack |
 | [Q-002](#q-002-chinese-land-that-japan-holds) | Is an attack on Chinese land that Japan now holds an attack on China? | A printed rule | Yes, as now; it cannot arise if Q-001 is answered as recommended |
-| [Q-003](#q-003-one-list-of-marks-for-each-kind-of-thing) | Should the network's input ask about a mark only where the engine can put it, and learn the four marks it does not know? | The network's input | Yes, before the next long run |
-| [Q-004](#q-004-features-whose-value-never-changes) | Should the input drop features whose value never changes? | The network's input | Yes, in the same change as Q-003 |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
 
-Q-001 to Q-004 were raised on 14 November 2026, while the global features
+Q-001 and Q-002 were raised on 14 November 2026, while the global features
 about nations were being pruned (commit `bce7a4c`). Their numbers are in the
 [record of which features random games give values to](archive/records/answer_census_2026_11_15.md).
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
@@ -231,133 +229,6 @@ once Japan has attacked it, and to apply C only to land a Chinese nation holds.
 
 **If answered.** As for Q-001.
 
-## Q-003: One list of marks for each kind of thing
-
-**The question.** Should the network's input ask about a mark only where the
-engine can put that mark, and should it learn the four marks it does not know?
-
-**What happens now.** The engine puts *marks* on things to remember what has
-happened to them: on a unit that has moved, on a nation that has finished its
-research this turn, on a city that is damaged, on a facility built this turn.
-The code calls a mark a flag; the engine's mark table, `GWRL_MARKS` in
-`include/game/marks.hpp`, lists every mark a state may hold
-([names held as numbers](engine/names.md#what-a-mark-is)). The network's input has one feature for each
-pairing of a thing and a mark
-([the network's input](design/network_input.md#3-features-and-feature-values)). But
-it keeps only two lists of marks, `kActorFlags` and `kRecordFlags` in
-`src/zone_encoding.cpp`: one of 119 for units and nations together, and one of
-108 for territories, facilities, construction projects, battles and the game
-as a whole. So it asks about every pairing, including those that cannot
-happen. `nation_flag:japan:air_battle` asks whether Japan, the nation, carries
-the mark of a unit that is in an air battle. Only a unit ever gets that mark.
-
-Of the layout's 59,235 features, 8,902 are about marks: 5,660 of the 42,532
-zone features, 1,890 of the 4,076 global features and 1,352 of the 12,627
-action features. In 480 random games, 290 of them ever had a non-zero value; of
-the 1,560 that ask a nation about a mark, 88 did
-([record](archive/records/answer_census_2026_11_15.md#which-questions-were-answered)). The engine's code puts 43
-of the 119 marks on a nation and 11 of the 108 on the game as a whole; the
-record [lists them](archive/records/answer_census_2026_11_15.md#the-marks-the-engine-puts-on-a-nation) with the
-source files that write each. A change would have to make such a list for
-every kind of thing.
-
-**Four marks are on no list.** With Improved Construction, a factory or a city
-takes less damage from strategic bombing in each player turn: a minor factory
-1 less, a medium factory 3, a major factory 5, a city 5 (rulebook 8.2.1,
-page 46). The engine notes on the nation that holds the factory or the city
-how much has been taken off this turn, in four marks: `bombing_reduction` and
-`bombing_reduction_turn` (`applyFacilityBombDamage` in `src/air.cpp`), and
-`city_bombing_reduction` and `city_bombing_reduction_turn`
-(`applyCityBombDamage`, the same file). The input has no feature for any of
-them. Put on Japan by hand, the first pair arrives as
-`nation_flag:japan:other = 3` and the second as `nation_flag:japan:other = 5`,
-which says only that Japan carries some unlisted mark, and the name check
-reports them ([record](archive/records/answer_census_2026_11_15.md#four-marks-without-a-question)). No random
-game has reached this: it needs a nation that has completed Improved
-Construction to be bombed. The engine's mark table lists them, and the test
-that checks every mark in it has a feature (`test_marks` in
-`tests/test_campaign_zone_encoding.py`) names these four as the ones this
-question leaves open.
-
-**Why it matters.** Play is not affected: the rules are applied. For learning,
-the features that can never have a non-zero value cost no time, because a
-feature whose value is 0 is never read, but their embeddings never train and
-they make the layout harder to read. The four missing marks mean the network cannot see how much of
-a factory's or a city's protection is already used up, which matters to a
-player choosing what to bomb next. That is rare.
-
-**The choices.**
-
-| Choice | What it changes |
-| --- | --- |
-| A. Give each kind of thing its own list, and add the four marks | One layout change, so networks trained before it no longer load; those so far are experiments. Work of about the size of the pruning of 14 November (commit `bce7a4c`): each mark of the engine's table is given the kinds of thing it can be on, and a test keeps the lists in step with the table. Most of the 8,902 features go. |
-| B. Only add the four marks | A small layout change. The features that can never have a non-zero value stay. |
-| C. Leave it | Nothing changes. The name check reports the four marks if a game ever reaches them. |
-
-**Recommendation: A, before the next long training run.** After a long run a
-layout change costs the networks it trained.
-
-**If answered.** The lists and the reason for each belong in
-[the network's input, section 8](design/network_input.md#8-features-removed-as-impossible),
-which now describes the gap.
-
-## Q-004: Features whose value never changes
-
-**The question.** Should the input drop features that have the same value in
-every state, and features that always repeat another feature?
-
-**What happens now.** The engine leaves 37 global features only one possible value:
-
-| Features | How many | Always | Where that is settled |
-| --- | ---: | --- | --- |
-| `nation_present` for every nation but Dadao | 12 | 1 | `loadScenario` in `src/campaign_setup.cpp` creates these twelve nations, and no code removes a nation |
-| `alliance` and `player` of Japan, the KMT, the CCP and Mongolia | 8 | 1 | `alliancePossible` in `src/politics.cpp`: each keeps its alliance and its player for good |
-| `power_status` of Japan, Mongolia and the eight warlords | 10 | 1 | `powerStatusPossible`, the same file: Japan is always a major power, Mongolia a minor one, a warlord a warlord |
-| `controller` of Japan, the KMT, the CCP and Mongolia | 4 | 1 | `controllerPossible`, the same file: the first three under themselves, Mongolia under nobody |
-| `at_war` between the KMT and the CCP, both ways | 2 | 1 | They start at war (`china_minor_setup.json` of the scenario), and the engine ends a war only for a nation that is incorporated (`incorporateNation`), which these two never are. Under the Truce it treats them as friends while the war stays recorded (`politicallyFriendly`) |
-| `state_flag:__campaign_started` | 1 | 1 | `Engine::start` in `src/campaign_runtime.cpp` sets it once |
-
-The reasons for the middle three rows are in
-[what the global features ask about a nation](design/network_input.md#what-the-global-features-ask-about-a-nation).
-
-And every `player` feature always has the value of the `alliance` feature
-for the same nation: a nation's player is the agent that decides for it, and in
-this campaign each alliance is one agent
-([approved scenario decisions](plans/japan_china_full_rules_plan.md#approved-scenario-decisions);
-the rule `alliancePossible` covers both). In 710,254 encoded states none of
-these ever differed ([record](archive/records/answer_census_2026_11_15.md#which-questions-were-answered)). At
-decision 612, the example of the
-[design document](design/README.md#52-three-parts-zone-features-global-features-and-action-features),
-45 of its 176 non-zero global feature values are of these kinds; its feature
-values are listed in the [record of that training sample](archive/records/training_sample_2026_11_05.md).
-
-Sixteen features of this kind were removed on 14 November 2026: thirteen that
-said a nation's income had been worked out (commit `c998709`), and three that
-said Japan, the KMT and the CCP keep a treasury (commit `bce7a4c`).
-
-**Why it matters.** Little. A feature with the same value everywhere cannot
-tell two states apart, so the network learns nothing from it: its embedding is a
-constant added to every state. Unlike a feature whose value is always 0, it is
-read at every network evaluation: 45 of the 1,096 embeddings that decision 612
-looks up
-([its size](design/README.md#69-the-whole-network)). Whether that shows in
-speed has not been measured.
-
-**The choices.**
-
-| Choice | What it changes |
-| --- | --- |
-| A. Remove the 37 fixed features and the `player` family | 71 features go, leaving 4,005 global features. A layout change. The encoder reports any state that breaks one of these rules, as it does for a missing treasury. |
-| B. Remove only the 37 fixed features | 4,039 global features remain. `player` stays, in case an alliance is ever given more than one player. |
-| C. Keep them | Nothing changes. |
-
-**Recommendation: A, in the same layout change as Q-003.** Nothing the network
-can learn is lost either way, so this is tidiness. Keeping the features as a
-plain record of who is who costs almost nothing, so C is a fair choice too.
-
-**If answered.** The removed features join the list in
-[the network's input, section 8](design/network_input.md#8-features-removed-as-impossible).
-
 ## Q-005: The supervisor's count of cores
 
 **The question.** Should the supervisor keep a training run within the owner's
@@ -517,6 +388,17 @@ These are open too, and stay in the pages that own them:
 
 An answered question is listed here with its number, the answer, the date and
 the page that now states it.
+
+- **Q-003**, one list of marks for each kind of thing. Answered on 18 November
+  2026: yes, with the four bombing-reduction marks added. The engine's mark
+  table now says which kinds of thing the rules put each mark on, and the input
+  asks about a mark only there. Stated in
+  [the network's input, section 8](design/network_input.md#8-features-removed-as-impossible)
+  and [names held as numbers](engine/names.md#what-a-mark-is).
+- **Q-004**, features whose value never changes. Answered on 18 November 2026:
+  remove them, and the `player` family with them; the encoder reports a
+  position that breaks one. Stated in
+  [what the global features ask about a nation](design/network_input.md#what-the-global-features-ask-about-a-nation).
 
 - **Q-007**, self-play stopping at each training iteration's end. Answered on
   17 November 2026: self-play never stops; network updates run beside the games.

@@ -237,6 +237,17 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         return arguments;
     }, "What each mark's argument names, in mark number order (\"\" for a mark without one): the marks are "
        "name_tables()[\"marks\"], numbered by include/game/marks.hpp.");
+    module.def("mark_places", [] {
+        std::vector<std::vector<std::string>> places;
+        for (const auto& name : game::campaign::markNames()) {
+            const auto mark = game::campaign::markNumber(name);
+            auto& kinds = places.emplace_back();
+            for (const auto& [place, kind] : game::campaign::markPlaceNames)
+                if (game::campaign::markOn(mark, place)) kinds.emplace_back(kind);
+        }
+        return places;
+    }, "The kinds of thing the rules put each mark on (unit, nation, territory, facility, project, battle, game), "
+       "in mark number order: the mark table's fourth column (include/game/marks.hpp).");
     module.def("zone_encoding_unknowns", [](bool reset) { return game::campaign::zoneEncodingUnknowns(reset); },
                py::arg("reset") = false,
                "Names counted in an \"other\" column of the zone encoding since the last reset.");

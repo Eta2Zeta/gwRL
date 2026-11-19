@@ -257,6 +257,19 @@ bool warPossible(const Id& first,const Id& second) {
 bool alliesPossible(const Id& first,const Id& second) {
     return (first=="ccp"&&second=="kmt")||(first=="kmt"&&second=="ccp");
 }
+// Setup (loadScenario) creates every nation but Dadao, which ensureDadao creates
+// when Japan first wins over a warlord, and no code removes a nation: a warlord
+// that is incorporated keeps its record.
+bool alwaysInGame(const Id& nation) {
+    return nation=="japan"||nation=="kmt"||nation=="ccp"||nation=="mongolia"||isWarlord(nation);
+}
+// Setup puts the KMT and the CCP at war (china_minor_setup.json), and only
+// incorporateNation ends a war, for the nation it incorporates, which is never
+// the KMT or the CCP. Under the Chinese Truce they are friends while the war
+// stays recorded (politicallyFriendly).
+bool alwaysAtWar(const Id& first,const Id& second) {
+    return (first=="kmt"&&second=="ccp")||(first=="ccp"&&second=="kmt");
+}
 // recordLandAttack records who attacked a warlord's land, unless it is the
 // KMT, whose attack makes the warlord join the CCP there and then. Only the
 // nation whose turn it is, or Dadao on Japan's turn, moves units

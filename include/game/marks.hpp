@@ -48,247 +48,281 @@ struct MarkKind {
 };
 using MarkId = Number<MarkKind>;
 
-// Each row: the identifier code uses (mark::<identifier>), the mark's name and
-// what its argument names ("" for a mark without one). The identifier is the
-// name except for __campaign_started, a name C++ reserves. Add a row, in name
-// order, when a rule starts to note a new mark. fixture:<name> is for test rules
-// and tools, such as a test's own bookkeeping; no rule of the game notes one.
+// Each row: the identifier code uses (mark::<identifier>), the mark's name,
+// what its argument names ("" for a mark without one) and the kinds of thing
+// the rules put it on: unit, nation, territory, facility, project (a
+// construction project), battle and game (the position as a whole), or
+// nowhere. The identifier is the name except for __campaign_started, a name
+// C++ reserves. Add a row, in name order, when a rule starts to note a new
+// mark, and add a kind when a rule starts to put a mark on another kind of
+// thing: tools/mark_writes.py lists every place the code gives a mark a value
+// and what it lands on, and a test checks the table against it. The network's
+// input asks about a mark only on the kinds listed here. A mark the rules only
+// read, never set, is on nowhere. fixture:<name> is for test rules and tools,
+// such as a test's own bookkeeping; no rule of the game notes one.
 #define GWRL_MARKS(X) \
-    X(campaign_started, "__campaign_started", "") \
-    X(access_to_resources_completed, "access_to_resources_completed", "") \
-    X(air_allied_loaded_turn, "air_allied_loaded_turn", "") \
-    X(air_battle, "air_battle", "battle") \
-    X(air_battle_turn, "air_battle_turn", "") \
-    X(air_combat, "air_combat", "") \
-    X(air_decision_sequence, "air_decision_sequence", "") \
-    X(air_defending_carrier, "air_defending_carrier", "unit") \
-    X(air_in_flight, "air_in_flight", "") \
-    X(air_landed_after_combat, "air_landed_after_combat", "") \
-    X(air_mission, "air_mission", "") \
-    X(air_mission_sequence, "air_mission_sequence", "") \
-    X(air_roll_sequence, "air_roll_sequence", "") \
-    X(air_scramble_origin, "air_scramble_origin", "zone") \
-    X(air_scramble_source, "air_scramble_source", "scramble source") \
-    X(air_scramble_turn, "air_scramble_turn", "") \
-    X(air_scramble_used, "air_scramble_used", "") \
-    X(air_screening_continued, "air_screening_continued", "") \
-    X(air_screening_ready, "air_screening_ready", "") \
-    X(air_screening_wait, "air_screening_wait", "") \
-    X(air_transport_unloaded, "air_transport_unloaded", "") \
-    X(air_waiting_port_evacuation, "air_waiting_port_evacuation", "") \
-    X(airborne_assault, "airborne_assault", "") \
-    X(aligned_turn, "aligned_turn", "") \
-    X(amphibious_assault, "amphibious_assault", "") \
-    X(amphibious_preparation, "amphibious_preparation", "") \
-    X(amphibious_sequence, "amphibious_sequence", "") \
-    X(amphibious_transport, "amphibious_transport", "unit") \
-    X(artillery_city_bombing, "artillery_city_bombing", "") \
-    X(assault_declared, "assault_declared", "") \
-    X(assault_zone, "assault_zone", "zone") \
-    X(attack_rolled, "attack_rolled", "") \
-    X(attrition, "attrition", "") \
-    X(blitz_eligible, "blitz_eligible", "") \
-    X(blitz_from, "blitz_from", "zone") \
-    X(blitz_pairing_done, "blitz_pairing_done", "") \
-    X(blitz_to, "blitz_to", "zone") \
-    X(blitz_with, "blitz_with", "unit") \
-    X(bomb_damage, "bomb_damage", "") \
-    X(bombing_reduction, "bombing_reduction", "facility") \
-    X(bombing_reduction_turn, "bombing_reduction_turn", "facility") \
-    X(border, "border", "zone") \
-    X(capture_done, "capture_done", "") \
-    X(captured_max_damage, "captured_max_damage", "") \
-    X(captured_port_pending, "captured_port_pending", "nation") \
-    X(carpet_return_started, "carpet_return_started", "") \
-    X(casualty_dispute_decided, "casualty_dispute_decided", "") \
-    X(chinese_truce_termination, "chinese_truce_termination", "") \
-    X(city_bombing_reduction, "city_bombing_reduction", "zone") \
-    X(city_bombing_reduction_turn, "city_bombing_reduction_turn", "zone") \
-    X(city_damage, "city_damage", "") \
-    X(city_destroyed, "city_destroyed", "") \
-    X(city_ipp_lost, "city_ipp_lost", "") \
-    X(civil_war_eliminated, "civil_war_eliminated", "") \
-    X(coastal_fire_turn, "coastal_fire_turn", "") \
-    X(coastal_shots_used, "coastal_shots_used", "") \
-    X(combat, "combat", "") \
-    X(combat_move, "combat_move", "") \
-    X(completed, "completed", "") \
-    X(controller_unresolved, "controller_unresolved", "") \
-    X(crossed_enemy_fortification, "crossed_enemy_fortification", "") \
-    X(crossing_used, "crossing_used", "crossing") \
-    X(damage, "damage", "") \
-    X(direct_axis_control_after_japan_surrender, "direct_axis_control_after_japan_surrender", "") \
-    X(economy_last_paid_turn, "economy_last_paid_turn", "") \
-    X(economy_militia_placed, "economy_militia_placed", "zone") \
-    X(economy_militia_upgrades, "economy_militia_upgrades", "") \
-    X(economy_production_cap, "economy_production_cap", "facility") \
-    X(economy_purchased, "economy_purchased", "") \
-    X(economy_repair_cap, "economy_repair_cap", "facility") \
-    X(economy_repairs_finished, "economy_repairs_finished", "") \
-    X(economy_research_capacity, "economy_research_capacity", "") \
-    X(economy_research_finished, "economy_research_finished", "") \
-    X(economy_research_used, "economy_research_used", "") \
-    X(economy_researched_round, "economy_researched_round", "technology") \
-    X(economy_sequence, "economy_sequence", "") \
-    X(economy_start_damage, "economy_start_damage", "facility") \
-    X(economy_start_type, "economy_start_type", "facility:type") \
-    X(economy_used, "economy_used", "facility") \
-    X(escort, "escort", "") \
-    X(evolution_pending, "evolution_pending", "nation") \
-    X(evolved_during_own_turn, "evolved_during_own_turn", "") \
-    X(evolved_turn_serial, "evolved_turn_serial", "") \
-    X(facility_upgrade, "facility_upgrade", "") \
-    X(finished, "finished", "") \
-    X(first_allies_major_war_declared, "first_allies_major_war_declared", "") \
-    X(fixture, "fixture", "name") \
-    X(foreign_consent, "foreign_consent", "nation") \
-    X(from_attack_naval_transport, "from_attack_naval_transport", "") \
-    X(ignore_fortification, "ignore_fortification", "") \
-    X(immediate, "immediate", "") \
-    X(immediate_land_battles, "immediate_land_battles", "") \
-    X(immediate_naval_battles, "immediate_naval_battles", "") \
-    X(in_port, "in_port", "facility") \
-    X(incorporated, "incorporated", "") \
-    X(influence_attempted, "influence_attempted", "") \
-    X(japanese_surprise_attack, "japanese_surprise_attack", "") \
-    X(land_battle_sequence, "land_battle_sequence", "") \
-    X(land_decision_sequence, "land_decision_sequence", "") \
-    X(land_retreating, "land_retreating", "") \
-    X(land_roll_sequence, "land_roll_sequence", "") \
-    X(last_possession_change_turn, "last_possession_change_turn", "") \
-    X(launched_from_carrier, "launched_from_carrier", "") \
-    X(lease_available_after_turns, "lease_available_after_turns", "") \
-    X(lease_declared, "lease_declared", "nation") \
-    X(lease_delivered, "lease_delivered", "nation") \
-    X(lease_militia_upgrade, "lease_militia_upgrade", "") \
-    X(lease_received, "lease_received", "") \
-    X(lease_repair, "lease_repair", "") \
-    X(lease_repair_target, "lease_repair_target", "repair target") \
-    X(lease_repair_wait, "lease_repair_wait", "repair target") \
-    X(lease_sender, "lease_sender", "nation") \
-    X(lease_wait_controller, "lease_wait_controller", "nation") \
-    X(lend_to, "lend_to", "nation") \
-    X(logistics_damaged_turn, "logistics_damaged_turn", "facility or railroad") \
-    X(logistics_last_turn_start, "logistics_last_turn_start", "") \
-    X(logistics_rail_created_turn, "logistics_rail_created_turn", "railroad") \
-    X(logistics_start_damaged, "logistics_start_damaged", "facility") \
-    X(map_declined_combat, "map_declined_combat", "") \
-    X(map_range, "map_range", "") \
-    X(maritime_air_patrol, "maritime_air_patrol", "") \
-    X(moved_this_turn, "moved_this_turn", "") \
-    X(must_withdraw_from_chinese_gift, "must_withdraw_from_chinese_gift", "") \
-    X(national_objective_award, "national_objective_award", "") \
-    X(naval_battle, "naval_battle", "") \
-    X(naval_battle_sequence, "naval_battle_sequence", "") \
-    X(naval_berthing, "naval_berthing", "") \
-    X(naval_casualty_dispute_decided, "naval_casualty_dispute_decided", "") \
-    X(naval_combat, "naval_combat", "") \
-    X(naval_combat_turn, "naval_combat_turn", "") \
-    X(naval_combat_unloaded, "naval_combat_unloaded", "") \
-    X(naval_decision_sequence, "naval_decision_sequence", "") \
-    X(naval_escort, "naval_escort", "") \
-    X(naval_last_origin, "naval_last_origin", "zone") \
-    X(naval_loaded_completed_turns, "naval_loaded_completed_turns", "") \
-    X(naval_move_decisions, "naval_move_decisions", "") \
-    X(naval_move_sequence, "naval_move_sequence", "") \
-    X(naval_movement_immediate, "naval_movement_immediate", "") \
-    X(naval_movement_plan, "naval_movement_plan", "") \
-    X(naval_movement_spent, "naval_movement_spent", "") \
-    X(naval_operation_decision_sequence, "naval_operation_decision_sequence", "") \
-    X(naval_raider, "naval_raider", "") \
-    X(naval_retreated, "naval_retreated", "") \
-    X(naval_roll_sequence, "naval_roll_sequence", "") \
-    X(naval_scramble_origin, "naval_scramble_origin", "facility") \
-    X(naval_scramble_turn, "naval_scramble_turn", "") \
-    X(naval_scramble_used, "naval_scramble_used", "") \
-    X(naval_scrambled, "naval_scrambled", "") \
-    X(naval_screening_continuing, "naval_screening_continuing", "") \
-    X(naval_start_sea, "naval_start_sea", "zone") \
-    X(naval_strategic_destination, "naval_strategic_destination", "facility") \
-    X(naval_strategic_moved, "naval_strategic_moved", "") \
-    X(naval_unloaded, "naval_unloaded", "") \
-    X(newly_placed, "newly_placed", "") \
-    X(objective_evolution, "objective_evolution", "") \
-    X(objective_one_china, "objective_one_china", "") \
-    X(on_map, "on_map", "") \
-    X(one_china_bonus_awarded, "one_china_bonus_awarded", "") \
-    X(one_china_bonus_eligible_at_surrender, "one_china_bonus_eligible_at_surrender", "") \
-    X(original_owner, "original_owner", "nation") \
-    X(original_type, "original_type", "type") \
-    X(payment, "payment", "payment number") \
-    X(placed_this_turn, "placed_this_turn", "") \
-    X(politics_combat_finished, "politics_combat_finished", "") \
-    X(politics_sequence, "politics_sequence", "") \
-    X(port_aa_done, "port_aa_done", "") \
-    X(port_crew_prepared, "port_crew_prepared", "") \
-    X(port_unloaded_round, "port_unloaded_round", "") \
-    X(possessed_land_ipp, "possessed_land_ipp", "") \
-    X(price, "price", "price method") \
-    X(purchased, "purchased", "row or cap group") \
-    X(raider, "raider", "") \
-    X(rail_build_permission, "rail_build_permission", "nation:zone:zone") \
-    X(rail_declined, "rail_declined", "project") \
-    X(rail_permission, "rail_permission", "nation") \
-    X(rail_used, "rail_used", "player:region") \
-    X(recruitment_attempted, "recruitment_attempted", "") \
-    X(repair, "repair", "") \
-    X(repair_at, "repair_at", "facility") \
-    X(repairing, "repairing", "") \
-    X(researched_this_turn, "researched_this_turn", "") \
-    X(retreated, "retreated", "") \
-    X(rocket_launched, "rocket_launched", "") \
-    X(rocket_mission, "rocket_mission", "") \
-    X(row, "row", "build-chart row") \
-    X(scrambled, "scrambled", "") \
-    X(ship_crew, "ship_crew", "unit") \
-    X(shore_bombardment, "shore_bombardment", "") \
-    X(shore_dispute_decided, "shore_dispute_decided", "") \
-    X(shore_resolved, "shore_resolved", "") \
-    X(skeleton_crew, "skeleton_crew", "") \
-    X(skeleton_crew_until_own_turn, "skeleton_crew_until_own_turn", "") \
-    X(slip_attempted, "slip_attempted", "") \
-    X(stages_paid, "stages_paid", "") \
-    X(stages_total, "stages_total", "") \
-    X(stranded_aircraft_lost, "stranded_aircraft_lost", "") \
-    X(strategic_moved, "strategic_moved", "") \
-    X(strategic_naval_movement_in_progress, "strategic_naval_movement_in_progress", "") \
-    X(strategic_naval_used, "strategic_naval_used", "") \
-    X(submerged, "submerged", "") \
-    X(surprise_attack_available, "surprise_attack_available", "") \
-    X(surprise_attack_linked_land, "surprise_attack_linked_land", "zone") \
-    X(surprise_attack_naval_sea, "surprise_attack_naval_sea", "zone") \
-    X(surprise_attack_target, "surprise_attack_target", "nation") \
-    X(surprise_attack_used, "surprise_attack_used", "") \
-    X(surprise_attack_zone, "surprise_attack_zone", "zone") \
-    X(surrendered, "surrendered", "") \
-    X(target, "target", "repair target") \
-    X(towed_by, "towed_by", "unit") \
-    X(towing, "towing", "unit") \
-    X(transport_unloaded, "transport_unloaded", "") \
-    X(truce_low_morale_eliminates, "truce_low_morale_eliminates", "") \
-    X(uncontested, "uncontested", "") \
-    X(under_construction, "under_construction", "") \
-    X(unit_upgrade, "unit_upgrade", "") \
-    X(unloaded_combat, "unloaded_combat", "") \
-    X(unloaded_noncombat, "unloaded_noncombat", "") \
-    X(upgraded_this_turn, "upgraded_this_turn", "")
+    X(campaign_started, "__campaign_started", "", game) \
+    X(access_to_resources_completed, "access_to_resources_completed", "", nowhere) \
+    X(air_allied_loaded_turn, "air_allied_loaded_turn", "", unit) \
+    X(air_battle, "air_battle", "battle", unit) \
+    X(air_battle_turn, "air_battle_turn", "", unit) \
+    X(air_combat, "air_combat", "", unit) \
+    X(air_decision_sequence, "air_decision_sequence", "", game) \
+    X(air_defending_carrier, "air_defending_carrier", "unit", unit) \
+    X(air_in_flight, "air_in_flight", "", unit) \
+    X(air_landed_after_combat, "air_landed_after_combat", "", unit) \
+    X(air_mission, "air_mission", "", battle) \
+    X(air_mission_sequence, "air_mission_sequence", "", game) \
+    X(air_roll_sequence, "air_roll_sequence", "", game) \
+    X(air_scramble_origin, "air_scramble_origin", "zone", unit) \
+    X(air_scramble_source, "air_scramble_source", "scramble source", unit) \
+    X(air_scramble_turn, "air_scramble_turn", "", facility) \
+    X(air_scramble_used, "air_scramble_used", "", facility) \
+    X(air_screening_continued, "air_screening_continued", "", unit) \
+    X(air_screening_ready, "air_screening_ready", "", unit) \
+    X(air_screening_wait, "air_screening_wait", "", unit) \
+    X(air_transport_unloaded, "air_transport_unloaded", "", unit) \
+    X(air_waiting_port_evacuation, "air_waiting_port_evacuation", "", battle) \
+    X(airborne_assault, "airborne_assault", "", unit | battle) \
+    X(aligned_turn, "aligned_turn", "", territory) \
+    X(amphibious_assault, "amphibious_assault", "", unit | battle) \
+    X(amphibious_preparation, "amphibious_preparation", "", battle) \
+    X(amphibious_sequence, "amphibious_sequence", "", game) \
+    X(amphibious_transport, "amphibious_transport", "unit", unit) \
+    X(artillery_city_bombing, "artillery_city_bombing", "", battle) \
+    X(assault_declared, "assault_declared", "", unit) \
+    X(assault_zone, "assault_zone", "zone", unit) \
+    X(attack_rolled, "attack_rolled", "", battle) \
+    X(attrition, "attrition", "", unit | battle) \
+    X(blitz_eligible, "blitz_eligible", "", unit) \
+    X(blitz_from, "blitz_from", "zone", unit) \
+    X(blitz_pairing_done, "blitz_pairing_done", "", battle) \
+    X(blitz_to, "blitz_to", "zone", unit) \
+    X(blitz_with, "blitz_with", "unit", unit) \
+    X(bomb_damage, "bomb_damage", "", battle) \
+    X(bombing_reduction, "bombing_reduction", "facility", nation) \
+    X(bombing_reduction_turn, "bombing_reduction_turn", "facility", nation) \
+    X(border, "border", "zone", facility | project) \
+    X(capture_done, "capture_done", "", battle) \
+    X(captured_max_damage, "captured_max_damage", "", facility) \
+    X(captured_port_pending, "captured_port_pending", "nation", unit) \
+    X(carpet_return_started, "carpet_return_started", "", battle) \
+    X(casualty_dispute_decided, "casualty_dispute_decided", "", battle) \
+    X(chinese_truce_termination, "chinese_truce_termination", "", battle) \
+    X(city_bombing_reduction, "city_bombing_reduction", "zone", nation) \
+    X(city_bombing_reduction_turn, "city_bombing_reduction_turn", "zone", nation) \
+    X(city_damage, "city_damage", "", territory) \
+    X(city_destroyed, "city_destroyed", "", territory) \
+    X(city_ipp_lost, "city_ipp_lost", "", territory) \
+    X(civil_war_eliminated, "civil_war_eliminated", "", nation) \
+    X(coastal_fire_turn, "coastal_fire_turn", "", facility) \
+    X(coastal_shots_used, "coastal_shots_used", "", facility) \
+    X(combat, "combat", "", nowhere) \
+    X(combat_move, "combat_move", "", unit) \
+    X(completed, "completed", "", project) \
+    X(controller_unresolved, "controller_unresolved", "", nation) \
+    X(crossed_enemy_fortification, "crossed_enemy_fortification", "", unit) \
+    X(crossing_used, "crossing_used", "crossing", game) \
+    X(damage, "damage", "", project) \
+    X(direct_axis_control_after_japan_surrender, "direct_axis_control_after_japan_surrender", "", nation) \
+    X(economy_last_paid_turn, "economy_last_paid_turn", "", project) \
+    X(economy_militia_placed, "economy_militia_placed", "zone", nation) \
+    X(economy_militia_upgrades, "economy_militia_upgrades", "", nation) \
+    X(economy_production_cap, "economy_production_cap", "facility", nation) \
+    X(economy_purchased, "economy_purchased", "", project) \
+    X(economy_repair_cap, "economy_repair_cap", "facility", nation) \
+    X(economy_repairs_finished, "economy_repairs_finished", "", nation) \
+    X(economy_research_capacity, "economy_research_capacity", "", nation) \
+    X(economy_research_finished, "economy_research_finished", "", nation) \
+    X(economy_research_used, "economy_research_used", "", nation) \
+    X(economy_researched_round, "economy_researched_round", "technology", nation) \
+    X(economy_sequence, "economy_sequence", "", game) \
+    X(economy_start_damage, "economy_start_damage", "facility", nation) \
+    X(economy_start_type, "economy_start_type", "facility:type", nation) \
+    X(economy_used, "economy_used", "facility", nation) \
+    X(escort, "escort", "", nowhere) \
+    X(evolution_pending, "evolution_pending", "nation", game) \
+    X(evolved_during_own_turn, "evolved_during_own_turn", "", nation) \
+    X(evolved_turn_serial, "evolved_turn_serial", "", nation) \
+    X(facility_upgrade, "facility_upgrade", "", project) \
+    X(finished, "finished", "", battle) \
+    X(first_allies_major_war_declared, "first_allies_major_war_declared", "", nation) \
+    X(fixture, "fixture", "name", nowhere) \
+    X(foreign_consent, "foreign_consent", "nation", project) \
+    X(from_attack_naval_transport, "from_attack_naval_transport", "", unit) \
+    X(ignore_fortification, "ignore_fortification", "", battle) \
+    X(immediate, "immediate", "", battle) \
+    X(immediate_land_battles, "immediate_land_battles", "", game) \
+    X(immediate_naval_battles, "immediate_naval_battles", "", game) \
+    X(in_port, "in_port", "facility", unit) \
+    X(incorporated, "incorporated", "", nation) \
+    X(influence_attempted, "influence_attempted", "", nation) \
+    X(japanese_surprise_attack, "japanese_surprise_attack", "", battle) \
+    X(land_battle_sequence, "land_battle_sequence", "", game) \
+    X(land_decision_sequence, "land_decision_sequence", "", game) \
+    X(land_retreating, "land_retreating", "", unit) \
+    X(land_roll_sequence, "land_roll_sequence", "", game) \
+    X(last_possession_change_turn, "last_possession_change_turn", "", territory) \
+    X(launched_from_carrier, "launched_from_carrier", "", unit) \
+    X(lease_available_after_turns, "lease_available_after_turns", "", project) \
+    X(lease_declared, "lease_declared", "nation", nation) \
+    X(lease_delivered, "lease_delivered", "nation", nation) \
+    X(lease_militia_upgrade, "lease_militia_upgrade", "", project) \
+    X(lease_received, "lease_received", "", project) \
+    X(lease_repair, "lease_repair", "", project) \
+    X(lease_repair_target, "lease_repair_target", "repair target", project) \
+    X(lease_repair_wait, "lease_repair_wait", "repair target", nation) \
+    X(lease_sender, "lease_sender", "nation", project) \
+    X(lease_wait_controller, "lease_wait_controller", "nation", project) \
+    X(lend_to, "lend_to", "nation", project) \
+    X(logistics_damaged_turn, "logistics_damaged_turn", "facility or railroad", game) \
+    X(logistics_last_turn_start, "logistics_last_turn_start", "", nation) \
+    X(logistics_rail_created_turn, "logistics_rail_created_turn", "railroad", game) \
+    X(logistics_start_damaged, "logistics_start_damaged", "facility", game) \
+    X(map_declined_combat, "map_declined_combat", "", unit) \
+    X(map_range, "map_range", "", unit) \
+    X(maritime_air_patrol, "maritime_air_patrol", "", unit) \
+    X(moved_this_turn, "moved_this_turn", "", facility) \
+    X(must_withdraw_from_chinese_gift, "must_withdraw_from_chinese_gift", "", unit) \
+    X(national_objective_award, "national_objective_award", "", project) \
+    X(naval_battle, "naval_battle", "", battle) \
+    X(naval_battle_sequence, "naval_battle_sequence", "", game) \
+    X(naval_berthing, "naval_berthing", "", game) \
+    X(naval_casualty_dispute_decided, "naval_casualty_dispute_decided", "", battle) \
+    X(naval_combat, "naval_combat", "", unit) \
+    X(naval_combat_turn, "naval_combat_turn", "", unit) \
+    X(naval_combat_unloaded, "naval_combat_unloaded", "", unit) \
+    X(naval_decision_sequence, "naval_decision_sequence", "", game) \
+    X(naval_escort, "naval_escort", "", nowhere) \
+    X(naval_last_origin, "naval_last_origin", "zone", unit) \
+    X(naval_loaded_completed_turns, "naval_loaded_completed_turns", "", unit) \
+    X(naval_move_decisions, "naval_move_decisions", "", game) \
+    X(naval_move_sequence, "naval_move_sequence", "", game) \
+    X(naval_movement_immediate, "naval_movement_immediate", "", battle) \
+    X(naval_movement_plan, "naval_movement_plan", "", battle) \
+    X(naval_movement_spent, "naval_movement_spent", "", unit) \
+    X(naval_operation_decision_sequence, "naval_operation_decision_sequence", "", game) \
+    X(naval_raider, "naval_raider", "", nowhere) \
+    X(naval_retreated, "naval_retreated", "", unit) \
+    X(naval_roll_sequence, "naval_roll_sequence", "", game) \
+    X(naval_scramble_origin, "naval_scramble_origin", "facility", unit) \
+    X(naval_scramble_turn, "naval_scramble_turn", "", facility) \
+    X(naval_scramble_used, "naval_scramble_used", "", facility) \
+    X(naval_scrambled, "naval_scrambled", "", nowhere) \
+    X(naval_screening_continuing, "naval_screening_continuing", "", unit) \
+    X(naval_start_sea, "naval_start_sea", "zone", unit) \
+    X(naval_strategic_destination, "naval_strategic_destination", "facility", unit) \
+    X(naval_strategic_moved, "naval_strategic_moved", "", unit) \
+    X(naval_unloaded, "naval_unloaded", "", unit) \
+    X(newly_placed, "newly_placed", "", nowhere) \
+    X(objective_evolution, "objective_evolution", "", nation) \
+    X(objective_one_china, "objective_one_china", "", nation) \
+    X(on_map, "on_map", "", unit) \
+    X(one_china_bonus_awarded, "one_china_bonus_awarded", "", nation) \
+    X(one_china_bonus_eligible_at_surrender, "one_china_bonus_eligible_at_surrender", "", nation) \
+    X(original_owner, "original_owner", "nation", facility) \
+    X(original_type, "original_type", "type", facility) \
+    X(payment, "payment", "payment number", project) \
+    X(placed_this_turn, "placed_this_turn", "", unit | facility) \
+    X(politics_combat_finished, "politics_combat_finished", "", nation) \
+    X(politics_sequence, "politics_sequence", "", game) \
+    X(port_aa_done, "port_aa_done", "", battle) \
+    X(port_crew_prepared, "port_crew_prepared", "", battle) \
+    X(port_unloaded_round, "port_unloaded_round", "", unit) \
+    X(possessed_land_ipp, "possessed_land_ipp", "", nation) \
+    X(price, "price", "price method", project) \
+    X(purchased, "purchased", "row or cap group", nation) \
+    X(raider, "raider", "", unit) \
+    X(rail_build_permission, "rail_build_permission", "nation:zone:zone", nation) \
+    X(rail_declined, "rail_declined", "project", nation) \
+    X(rail_permission, "rail_permission", "nation", nation) \
+    X(rail_used, "rail_used", "player:region", nation) \
+    X(recruitment_attempted, "recruitment_attempted", "", nation) \
+    X(repair, "repair", "", unit) \
+    X(repair_at, "repair_at", "facility", unit) \
+    X(repairing, "repairing", "", unit) \
+    X(researched_this_turn, "researched_this_turn", "", facility) \
+    X(retreated, "retreated", "", unit) \
+    X(rocket_launched, "rocket_launched", "", unit) \
+    X(rocket_mission, "rocket_mission", "", battle) \
+    X(row, "row", "build-chart row", project) \
+    X(scrambled, "scrambled", "", unit) \
+    X(ship_crew, "ship_crew", "unit", unit) \
+    X(shore_bombardment, "shore_bombardment", "", unit) \
+    X(shore_dispute_decided, "shore_dispute_decided", "", battle) \
+    X(shore_resolved, "shore_resolved", "", battle) \
+    X(skeleton_crew, "skeleton_crew", "", nowhere) \
+    X(skeleton_crew_until_own_turn, "skeleton_crew_until_own_turn", "", unit) \
+    X(slip_attempted, "slip_attempted", "", battle) \
+    X(stages_paid, "stages_paid", "", project) \
+    X(stages_total, "stages_total", "", project) \
+    X(stranded_aircraft_lost, "stranded_aircraft_lost", "", game) \
+    X(strategic_moved, "strategic_moved", "", unit) \
+    X(strategic_naval_movement_in_progress, "strategic_naval_movement_in_progress", "", nowhere) \
+    X(strategic_naval_used, "strategic_naval_used", "", nation) \
+    X(submerged, "submerged", "", unit) \
+    X(surprise_attack_available, "surprise_attack_available", "", nation) \
+    X(surprise_attack_linked_land, "surprise_attack_linked_land", "zone", nation) \
+    X(surprise_attack_naval_sea, "surprise_attack_naval_sea", "zone", nation) \
+    X(surprise_attack_target, "surprise_attack_target", "nation", nation) \
+    X(surprise_attack_used, "surprise_attack_used", "", nation) \
+    X(surprise_attack_zone, "surprise_attack_zone", "zone", nation) \
+    X(surrendered, "surrendered", "", nation) \
+    X(target, "target", "repair target", project) \
+    X(towed_by, "towed_by", "unit", unit) \
+    X(towing, "towing", "unit", unit) \
+    X(transport_unloaded, "transport_unloaded", "", unit) \
+    X(truce_low_morale_eliminates, "truce_low_morale_eliminates", "", battle) \
+    X(uncontested, "uncontested", "", battle) \
+    X(under_construction, "under_construction", "", nowhere) \
+    X(unit_upgrade, "unit_upgrade", "", project) \
+    X(unloaded_combat, "unloaded_combat", "", unit) \
+    X(unloaded_noncombat, "unloaded_noncombat", "", nowhere) \
+    X(upgraded_this_turn, "upgraded_this_turn", "", facility)
 
 // The bases whose argument follows an underscore instead of a colon.
 #define GWRL_MARKS_JOINED_BY_UNDERSCORE(X) X(evolution_pending)
 
+// The kinds of thing a mark can be on, as bits.
+enum class MarkPlace : std::uint8_t {
+    unit = 1 << 0,
+    nation = 1 << 1,
+    territory = 1 << 2,
+    facility = 1 << 3,
+    project = 1 << 4,
+    battle = 1 << 5,
+    game = 1 << 6,
+};
+inline constexpr std::pair<MarkPlace, std::string_view> markPlaceNames[] = {
+    {MarkPlace::unit, "unit"},         {MarkPlace::nation, "nation"},   {MarkPlace::territory, "territory"},
+    {MarkPlace::facility, "facility"}, {MarkPlace::project, "project"}, {MarkPlace::battle, "battle"},
+    {MarkPlace::game, "game"}};
+
 namespace mark_table {
+// The table's fourth column names the kinds with these bits.
+enum : std::uint8_t {
+    nowhere = 0,
+    unit = static_cast<std::uint8_t>(MarkPlace::unit),
+    nation = static_cast<std::uint8_t>(MarkPlace::nation),
+    territory = static_cast<std::uint8_t>(MarkPlace::territory),
+    facility = static_cast<std::uint8_t>(MarkPlace::facility),
+    project = static_cast<std::uint8_t>(MarkPlace::project),
+    battle = static_cast<std::uint8_t>(MarkPlace::battle),
+    game = static_cast<std::uint8_t>(MarkPlace::game),
+};
 struct Row {
     std::string_view name;
     std::string_view argument;
+    std::uint8_t places;
 };
 inline constexpr Row rows[] = {
-#define GWRL_ROW(identifier, name, argument) Row {name, argument},
+#define GWRL_ROW(identifier, name, argument, places) Row {name, argument, static_cast<std::uint8_t>(places)},
     GWRL_MARKS(GWRL_ROW)
 #undef GWRL_ROW
 };
 inline constexpr std::size_t count = std::size(rows);
 enum class Index : MarkKind::Rep {
-#define GWRL_ROW(identifier, name, argument) identifier,
+#define GWRL_ROW(identifier, name, argument, places) identifier,
     GWRL_MARKS(GWRL_ROW)
 #undef GWRL_ROW
 };
@@ -337,7 +371,7 @@ static_assert(joinedBasesTakeArguments(), "A base joined by an underscore must b
 
 // mark::placed_this_turn and so on: each base's number.
 namespace mark {
-#define GWRL_ROW(identifier, name, argument) \
+#define GWRL_ROW(identifier, name, argument, places) \
     inline constexpr MarkId identifier = MarkId::fromIndex(static_cast<std::size_t>(mark_table::Index::identifier));
 GWRL_MARKS(GWRL_ROW)
 #undef GWRL_ROW
@@ -354,6 +388,11 @@ inline std::string_view markArgument(MarkId base) {
     return mark_table::rows[base.index()].argument;
 }
 inline bool markTakesArgument(MarkId base) { return !markArgument(base).empty(); }
+// Whether the rules put this mark on that kind of thing (the table's fourth column).
+inline bool markOn(MarkId base, MarkPlace place) {
+    markName(base);
+    return (mark_table::rows[base.index()].places & static_cast<std::uint8_t>(place)) != 0;
+}
 inline char markSeparator(MarkId base) {
     markName(base);
     return mark_table::separator(base.index());

@@ -30,7 +30,8 @@ number, finds its index through a list kept for each. The rest the encoder
 reads as names:
 
 - a unit's marks are a base and a whole number, such as `repairing` → 1, and
-  the encoder asks about them through its own lists of the bases' names;
+  the encoder asks about them through the engine's own mark table, which also
+  says what kinds of thing each base can be on;
 - a battle's notes, and a legal action's details, are small trees of named
   entries, such as `target` → `rail_land_manchuria_northern__land_manchuria_western`
   and `damage` → 1.
@@ -53,15 +54,15 @@ process spent per game in the 2 November profile: about 4%, a rough estimate.
 The input for one decision is one bundle with three parts:
 
 1. **The zone features:** each of the 37 zones (31 land and 6 sea) has values for
-   the same list of 42,532 zone features.
-2. **The global features:** 4,076 features about the state as a whole: the game
+   the same list of 35,329 zone features.
+2. **The global features:** 2,784 features about the state as a whole: the game
    round, the phase, whose turn it is, treasuries, wars and so on.
 3. **The action features:** every legal action has values for the same list of
-   12,627 action features about itself.
+   11,046 action features about itself.
 
 **A real decision** (game seed 5): the CCP's first Combat Movement decision of
 game round 1, chosen by the Comintern player. It has 13 legal actions, and its
-input holds 326 non-zero zone feature values, 104 global ones and 244 across the
+input holds 326 non-zero zone feature values, 59 global ones and 244 across the
 13 legal actions. Each earlier decision took the action that ends the phase, or
 else the first listed action.
 
@@ -88,7 +89,7 @@ a column. Its name, such as `units:ccp:cavalry`, is a readable label for that
 meaning; the network only sees the number. A name is built as
 `family:part:part`. The *feature family* says what kind of fact it is, and the
 parts say which nation, which unit type, which zone and so on. The zone features
-have 42 families, the global features 55 and the action features 45.
+have 42 families, the global features 54 and the action features 45.
 
 **A feature value** is a whole number: a count ("how many?"), 1 for "yes", or a
 number such as the game round. Almost every feature value is 0, so only the
@@ -123,15 +124,15 @@ The largest zone feature families:
 
 | Feature family | Features | Asks, for one zone |
 | --- | ---: | --- |
-| `unit_stat` | 13,321 | how many units of an alliance and type have a condition: damaged, moved, movement points left, ... |
+| `unit_stat` | 11,881 | how many units of an alliance and type have a condition: damaged, moved, movement points left, landed after combat, ... |
 | `battle_data_unit`, `battle_data_zone` | 8,365 | what a battle's notes say about unit types and zones |
-| `unit_reference_here` | 4,501 | how many units, by alliance and type, point at this zone, and why: a blitz destination, an assault target, a route, ... |
+| `unit_reference_here` | 3,781 | how many units, by alliance and type, point at this zone, and why: a blitz destination, an assault target, a route, ... |
 | `battle_data_word` | 3,706 | which words a battle's notes hold, such as the battle's next step or its situation |
-| `unit_flag` | 1,920 | how many units carry each mark, such as "landed after combat" |
-| `facility_flag` | 1,744 | marks on a facility here |
 | `unit_facility` | 1,601 | units inside a facility, by type and facility type |
 | `units` | 586 | how many units of each nation and type are here |
 | `carried` | 277 | carried units, by carrier type and cargo type |
+| `unit_flag` | 205 | how many units of an alliance and class carry each of the other unit marks, such as "repairing" |
+| `facility_flag` | 177 | marks on a facility here |
 | `possessor`, `capital_of` | 27 | who holds the zone, whose capital it is |
 | `rail_to`, `rail_damage_toward`, `rail_repair_toward` | 106 | railroads to each neighbour, the damage on this side, and repairs under way |
 
@@ -174,10 +175,12 @@ their values include:
 | `turn_nation:ccp` | 1 | the CCP's turn |
 | `treasury:japan` | 15 | Japan's money: 15 IPP, the game's unit of money |
 | `income:japan:territorial` | 15 | the income Japan's land gives it each turn |
-| `nation_present:<nation>` | 1 | one feature for each nation in the game |
+| `alliance:warlord_tibet:~none` | 1 | the warlord of Tibet has joined no side yet |
 
 A feature about a nation exists only where the rules can ever give it a non-zero
-value: there is no `treasury:mongolia`, because Mongolia keeps no treasury
+value: there is no `treasury:mongolia`, because Mongolia keeps no treasury. Nor
+is there one whose value can never change: Japan is a major power in every
+state, so there is no `power_status:japan:major`
 ([section 8](#what-the-global-features-ask-about-a-nation)).
 
 An income feature's value is the nation's income as the state stands, not what it
@@ -189,7 +192,7 @@ land taken in a battle counts at the next decision
 
 ### Every legal action has the same features
 
-Every legal action has values for the same fixed list of 12,627 action features.
+Every legal action has values for the same fixed list of 11,046 action features.
 So every legal action is a feature vector of the same length, a row of the
 action feature matrix, almost all zeros, and only its non-zero feature values are
 stored. An action has non-zero values only for the features that apply to it: the
@@ -564,11 +567,13 @@ railroad it repaired was lost
 ### Fixed lists and "other" features
 
 Names come from fixed lists: nations, unit types, facilities, technologies,
-projects, decision kinds, marks, battle notes, the words battle notes use,
-labels and known values. A name not on its list goes into that list's one shared
-"other" feature, so the network sees "some unlisted name is present" but not
-which one. The encoder counts every such name, and
-`gwrl_cpp.zone_encoding_unknowns()` reports them.
+projects, decision kinds, battle notes, the words battle notes use, labels and
+known values. A name not on its list goes into that list's one shared "other"
+feature, so the network sees "some unlisted name is present" but not which one.
+The encoder counts every such name, and `gwrl_cpp.zone_encoding_unknowns()`
+reports them. Marks need no such list: the encoder takes them from the engine's
+mark table, which holds every mark the code can name
+([names held as numbers](../engine/names.md#what-a-mark-is)).
 
 In a battle note, the encoder first tries a name as a unit, zone, facility,
 construction project or railroad. A name ending in a number that is none of
@@ -638,8 +643,11 @@ written on 2 November.
 Three checks keep the lists complete:
 
 - **The engine's source.** Tests read the rule code for the usual ways it writes
-  battle notes, marks, the words in battle notes and actions, battle stages and
-  prices, and fail on a name without a feature (`tests/test_campaign_zone_encoding.py`).
+  battle notes, the words in battle notes and actions, battle stages and prices,
+  and fail on a name without a feature (`tests/test_campaign_zone_encoding.py`).
+  For marks they check the mark table against `tools/mark_writes.py`, which
+  finds every place the rule code gives a mark a value and the kind of thing it
+  lands on (section 8).
 - **Whole games.** The encoding test plays two whole random games and fails on
   any unlisted name.
 - **Many games.** `tools/check_zone_names.py` plays hundreds of random games,
@@ -649,17 +657,7 @@ The random games choose uniformly random actions, but now and then end the phase
 instead, so some phases do little and others much.
 
 A name written another way, and met in no random game, can still slip into an
-"other" feature, but it is counted and reported, never dropped. Four such
-names are known. Under Improved Construction a factory or a city takes less
-bombing damage in each player turn (rulebook 8.2.1, page 46), and the engine
-notes on the nation that holds it how much has been taken off:
-`bombing_reduction` and `bombing_reduction_turn` for a factory
-(`applyFacilityBombDamage` in `src/air.cpp`), `city_bombing_reduction` and
-`city_bombing_reduction_turn` for a city (`applyCityBombDamage`). The engine
-puts these names together in a variable, so the source check does not see
-them, and no random game has reached them
-([Q-003](../questions.md#q-003-one-list-of-marks-for-each-kind-of-thing);
-[record](../archive/records/answer_census_2026_11_15.md#four-marks-without-a-question)).
+"other" feature, but it is counted and reported, never dropped.
 
 Some details are summarized on purpose rather than named:
 
@@ -709,6 +707,39 @@ nation; a rare situation keeps its feature.
   which never changes during a game. They went with the features
   [listed below](#what-the-global-features-ask-about-a-nation), and the encoder
   reports a treasury that is missing.
+- **Marks on things they are never on.** The engine's mark table says which
+  kinds of thing the rules put each mark on: a unit, a nation, a territory, a
+  facility, a construction project, a battle or the game as a whole
+  ([names held as numbers](../engine/names.md#what-a-mark-is)). Each family of
+  marks asks about a mark only on its own kind: `nation_flag` asks a nation
+  about the 48 marks a nation gets, but for its research rounds, which are
+  `researched_round`, and not about a unit's `air_battle`; and
+  `state_flag` asks about the 9 marks of the game as a whole that are not
+  counters or features of their own. Until 18 November 2026 the input kept
+  two shared lists, one for units and nations and one for everything else, and
+  asked every kind about every mark of its list: 8,902 features, of which 290
+  ever had a value in 480 random games
+  ([record](../archive/records/answer_census_2026_11_15.md#which-questions-were-answered)).
+  1,680 remain. The four marks a nation gets when Improved Construction spares
+  one of its factories or cities from bombing (rulebook 8.2.1, page 46;
+  `applyFacilityBombDamage` and `applyCityBombDamage` in `src/air.cpp`), which
+  neither list had, have their features. Twelve marks are on nothing: the test
+  rules' `fixture`, and eleven that some rule reads but none sets, such as
+  `escort`. The same change took eight of these eleven out of `unit_stat`, in
+  the zone and the action features, and three nation marks no unit carries, and
+  an "other" column nothing wrote, out of `unit_reference_here` and
+  `unit_reference_place`. And `unit_flag` now asks only about the three unit
+  classes a unit type has, not about an "other" class.
+- **Facts that never change.** A feature with one possible value tells no two
+  states apart. Every nation but Dadao is in every game (`alwaysInGame` in
+  `src/politics.cpp`); Japan, the KMT, the CCP and Mongolia each have one
+  possible alliance and one possible controller, and Japan, Mongolia and the
+  warlords one possible power status; the KMT and the CCP are always at war
+  (`alwaysAtWar`); and the campaign has always started. Their 33 features went
+  on 18 November 2026, with the 38 `player` features: a nation's player is the
+  agent of its alliance, so each repeated an `alliance` feature. The encoder
+  reports a state that breaks one of these facts (`encodeNations` in
+  `src/zone_encoding.cpp`).
 - **Kept on purpose:** the coastal defense ship, reserved for nobody and
   capturable; and "warlords never own ships or planes", which lend-lease and
   recruitment might break, so it could not be proved.
@@ -724,16 +755,19 @@ no longer makes ([keeping the lists complete](#keeping-the-lists-complete)).
 The global features ask about a nation only what the rules can ever make of it.
 Each rule is a short function in the engine's politics or economy module
 (`src/politics.cpp`, `src/economy.cpp`), with its reason beside it, and the
-layout keeps the features the rule allows. On 14 November 2026 this took the
-global features from 6,477 to 4,076.
+layout keeps the features the rule allows, unless it allows only one. On 14
+November 2026 this took the global features from 6,477 to 2,784, and on 18
+November 2026 the facts that never change and the marks a nation is never given
+took them to 2,784.
 
 | Features | Kept for | Why no other value can happen |
 | --- | --- | --- |
 | `treasury` | Japan, the KMT and the CCP | The scenario opens an account for these three. No rule opens or closes one later: a lost capital or a surrender only empties it. |
 | `technology_stage`, `researched_round` | Japan, the KMT and the CCP, each with the 16 technologies | Only a major power researches. Japan is one from the start, and only the KMT and the CCP are promoted to one. |
-| `power_status` | Japan as a major power; the KMT and the CCP as minor or major; Mongolia and Dadao as minor; each warlord as a warlord | Setup gives every nation its status. The only later change is the promotion of the KMT or the CCP. |
-| `alliance`, `player` | Japan and Dadao in the Axis; the KMT in the Allies; the CCP and Mongolia in the Comintern; each warlord in any of the three or in none | Only incorporation changes them. Only warlords are incorporated, and Dadao, which joins Japan and so stays in the Axis. |
-| `controller` | Japan, the KMT and the CCP under themselves; Mongolia under nobody; Dadao under Japan or nobody; each warlord under nobody, the KMT, the CCP, Dadao or Japan | A warlord comes under the nation that incorporates it. Dadao is created under Japan and is left under nobody if Japan surrenders. Nothing else changes a controller. |
+| `nation_present` | Dadao | Setup creates every other nation, and no code removes one. Dadao is created when Japan first wins over a warlord. |
+| `power_status` | the KMT and the CCP as minor or major; Dadao as minor | Setup gives every nation its status. The only later change is the promotion of the KMT or the CCP. So Japan is always a major power, Mongolia a minor one and each warlord a warlord, and they are not asked. |
+| `alliance` | Dadao in the Axis; each warlord in any of the three or in none | Only incorporation changes an alliance. Only warlords are incorporated, and Dadao, which joins Japan and so stays in the Axis. So Japan, the KMT, the CCP and Mongolia keep the alliance setup gives them and are not asked. No nation is asked its player: the player is its alliance's agent. |
+| `controller` | Dadao under Japan or nobody; each warlord under nobody, the KMT, the CCP, Dadao or Japan | A warlord comes under the nation that incorporates it. Dadao is created under Japan and is left under nobody if Japan surrenders. Nothing else changes a controller, so Japan, the KMT and the CCP, under themselves, and Mongolia, under nobody, are not asked. |
 | `turn_nation`, `completed_turns` | the CCP, Mongolia, Japan and the KMT | The turn passes only along the scenario's turn order. |
 | `surrendered` | Japan and the KMT | The KMT surrenders when it holds no land, Japan when an enemy holds Tokyo at the end of Japan's turn. The CCP never surrenders, and no rule makes any other nation surrender. |
 | `evolution_awarded`, `state_flag_nation` | the KMT and the CCP | Only they evolve into major powers and then choose a capital. The mark that the choice is pending is the only game-wide mark that names a nation. |
@@ -741,7 +775,7 @@ global features from 6,477 to 4,076.
 | `attacked_warlord` | each warlord, attacked by the CCP, Japan, Dadao or Mongolia | A warlord never attacks. One the KMT attacks joins the CCP at once and is not recorded. |
 | `alignment_queue` | the warlords | Only warlords wait to be aligned at the end of the Combat Phase. |
 | `allied` | the KMT with the CCP | Nations are allies under the Chinese Truce, or as two major powers of one alliance. The only possible major powers, Japan, the KMT and the CCP, are in three different alliances. |
-| `at_war` | every pair except a nation with itself, two warlords, and Japan with Dadao | One side of every war is Japan, the KMT, the CCP, Dadao or Mongolia: only they declare war, invade China or take over the wars of a nation they incorporate. Japan and Dadao are both in the Axis for good. |
+| `at_war` | every pair except a nation with itself, two warlords, Japan with Dadao, and the KMT with the CCP | One side of every war is Japan, the KMT, the CCP, Dadao or Mongolia: only they declare war, invade China or take over the wars of a nation they incorporate. Japan and Dadao are both in the Axis for good. The KMT and the CCP start at war, and only incorporation ends a war, so they are not asked. |
 
 A rare value keeps its feature. Mongolia cannot declare war, so it is the
 invader only when it attacks land that was Chinese at the start and is now held
@@ -750,26 +784,13 @@ only if Japan wins it over after Dadao has joined Japan. Both have their
 features.
 
 `tests/zone_encoding_tests.cpp` checks which of these features exist, that the
-allowed rare values are read, and that a ruled-out value is counted in its
-feature family's `~impossible` feature and reported.
+allowed rare values are read, that a ruled-out value is counted in its
+feature family's `~impossible` feature and reported, and that a state breaking
+a fact that never changes is reported.
 
-**Still there, though no value is possible.** The marks are one shared list for
-units and nations, and another for territories, facilities, projects, battles
-and the game as a whole. So `nation_flag` asks every nation about every unit
-mark, such as `nation_flag:japan:air_battle`, and `state_flag` asks the game
-about every territory mark. Giving each kind of thing its own list of marks
-would remove these features in all three parts; it has not been done, and
-whether to do it is an open question
-([Q-003](../questions.md#q-003-one-list-of-marks-for-each-kind-of-thing)). Three
-feature families that name nations have not been judged nation by nation either,
-because many rules write their values: `pending_nation`, `chance_nation` and
-`unsited_project`.
-
-**Still there, though the value never changes.** 37 global features have
-only one possible value, such as `power_status:japan:major`, and every
-`player` feature repeats an `alliance` feature. They are not impossible, so
-they stay until the owner decides
-([Q-004](../questions.md#q-004-features-whose-value-never-changes)).
+**Not judged nation by nation.** Three feature families that name nations have
+not been judged nation by nation, because many rules write their values:
+`pending_nation`, `chance_nation` and `unsited_project`.
 
 ## 9. Static features and the layout version
 
@@ -781,11 +802,11 @@ features*:
 - the 160 directed borders, with 22 static features each, such as rivers, narrow
   crossings, railway connections and terrain.
 
-The layout version, now `campaign-zone-v1-9e192fe5c085f13e`, is a hash of every
+The layout version, now `campaign-zone-v1-8cbe8cede50d5629`, is a hash of every
 feature name and every static feature. A network refuses inputs of another
 layout, and a training run cannot resume across a layout change. It last changed
-on 14 November 2026, when the global features about nations that the rules rule
-out were removed.
+on 18 November 2026, when the marks on things the rules never put them on and
+the facts that never change were removed (section 8).
 
 ## 10. Why the encoder translates names
 

@@ -275,19 +275,44 @@ void railroadRepairNamesItsBorder() {
             "The board shows which railroad is being repaired");
 }
 
-void unknownNamesAreCountedNotDropped() {
+void marksAreAskedWhereTheRulesPutThem() {
     CampaignEnv env(scenario, 1, true);
     auto s = env.engine().state().clone();
-    // Every mark is in the engine's mark table, but the encoder's lists lack
-    // the four bombing-reduction marks (docs/questions.md, Q-003).
+    const auto spec = zoneEncodingSpec(s);
+    const std::set<std::string> zone(spec->zoneColumnNames.begin(), spec->zoneColumnNames.end());
+    const std::set<std::string> global(spec->globalColumnNames.begin(), spec->globalColumnNames.end());
+    const std::set<std::string> action(spec->actionColumnNames.begin(), spec->actionColumnNames.end());
+    // The mark table says which kinds of thing each mark is on.
+    require(markOn(mark::scrambled, MarkPlace::unit) && !markOn(mark::scrambled, MarkPlace::nation) &&
+                markOn(mark::bombing_reduction, MarkPlace::nation) && markOn(mark::border, MarkPlace::facility) &&
+                markOn(mark::border, MarkPlace::project) && !markOn(mark::escort, MarkPlace::unit),
+            "The mark table names the kinds of thing a mark is on");
+    require(global.contains("nation_flag:japan:bombing_reduction") && global.contains("nation_flag:japan:city_bombing_reduction") &&
+                zone.contains("nation_flag_here:japan:city_bombing_reduction_turn") &&
+                !global.contains("nation_flag:japan:scrambled") && !global.contains("nation_flag:japan:economy_researched_round") &&
+                !zone.contains("nation_flag_here:japan:surprise_attack_target") && global.contains("state_flag:crossing_used") &&
+                !global.contains("state_flag:moved_this_turn") && !global.contains("state_flag:land_battle_sequence") &&
+                !global.contains("state_flag:__campaign_started") && zone.contains("battle_flag:attack_rolled") &&
+                !zone.contains("battle_flag:city_damage") && zone.contains("territory_flag:city_damage") &&
+                !zone.contains("territory_flag:last_possession_change_turn") && zone.contains("unit_flag:axis:naval:repairing") &&
+                !zone.contains("unit_flag:axis:land:combat_move") && !zone.contains("unit_flag:axis:land:escort") &&
+                action.contains("unit_cargo_flag:0_source:combat_move") && !action.contains("unit_cargo_flag:0_source:completed"),
+            "A mark is asked about only on the kinds of thing the rules put it on");
+    // The bombing reductions a nation has used are read, also at the place they were used.
+    const auto japan = nationNumber(s, "japan");
+    s.nations.at(japan).turnFlags[MarkKey(mark::city_bombing_reduction, "land_jap_tokyo")] = 5;
+    // A mark where the rules never put it counts in its family's shared column and is reported.
     s.units.at("setup_japan_land_jap_hokkaido_infantry_1").turnFlags[MarkKey(mark::bombing_reduction, "x")] = 1;
     zoneEncodingUnknowns(true);
-    const auto spec = zoneEncodingSpec(s);
     const auto z = encodeZoneInput(s, scheduleOf(env), {});
     const auto unknown = zoneEncodingUnknowns(true);
-    require(unknown.contains("actor_flag:bombing_reduction"), "Unknown flags are reported");
-    require(zoneAnswers(*spec, z, "land_jap_hokkaido").at("unit_flag:axis:land:other") == 1,
-            "Unknown flags still count in an other column");
+    require(positionAnswers(*spec, z).at("nation_flag:japan:city_bombing_reduction") == 5 &&
+                zoneAnswers(*spec, z, "land_jap_tokyo").at("nation_flag_here:japan:city_bombing_reduction") == 5,
+            "A bombing reduction is read on the nation and at the city");
+    require(unknown.size() == 1 && unknown.contains("impossible_unit_flag:axis:land:bombing_reduction"),
+            "A mark on a kind of thing the rules never put it on is reported");
+    require(zoneAnswers(*spec, z, "land_jap_hokkaido").at("unit_flag:~impossible") == 1,
+            "A mark on a kind of thing the rules never put it on still counts");
 }
 
 // Only Japan, the KMT and the CCP keep an income account, and only Japan has
@@ -346,28 +371,27 @@ void nationQuestionsFollowTheRules() {
                                       "turn_nation:~impossible"} &&
                 questionsOf(*spec, "completed_turns").size() == 5,
             "Only the nations of the turn order take turns");
+    // A nation in every game with one possible value of a fact always has it,
+    // so the position does not ask: Japan's, the KMT's, the CCP's and Mongolia's
+    // alliance and controller, and Japan's, Mongolia's and the warlords' status.
     std::set<std::string> statuses{"power_status:ccp:major", "power_status:ccp:minor", "power_status:dadao:minor",
-                                   "power_status:japan:major", "power_status:kmt:major", "power_status:kmt:minor",
-                                   "power_status:mongolia:minor", "power_status:~impossible"};
-    std::set<std::string> sides{"alliance:ccp:comintern", "alliance:dadao:axis", "alliance:japan:axis",
-                                "alliance:kmt:allies", "alliance:mongolia:comintern", "alliance:~impossible"};
-    std::set<std::string> controllers{"controller:ccp:ccp", "controller:dadao:japan", "controller:dadao:~none",
-                                      "controller:japan:japan", "controller:kmt:kmt", "controller:mongolia:~none",
-                                      "controller:~impossible"};
+                                   "power_status:kmt:major", "power_status:kmt:minor", "power_status:~impossible"};
+    std::set<std::string> sides{"alliance:dadao:axis", "alliance:~impossible"};
+    std::set<std::string> controllers{"controller:dadao:japan", "controller:dadao:~none", "controller:~impossible"};
     std::set<std::string> attacks{"attacked_warlord:~impossible"}, queue{"alignment_queue:~impossible"};
     int warlords = 0;
     for (const auto& nation : spec->nations) {
         if (!isWarlord(nation)) continue;
         ++warlords;
-        statuses.insert("power_status:" + nation + ":warlord");
         for (const std::string side : {"allies", "axis", "comintern", "~none"}) sides.insert("alliance:" + nation + ":" + side);
         for (const std::string by : {"ccp", "dadao", "japan", "kmt", "~none"}) controllers.insert("controller:" + nation + ":" + by);
         for (const std::string by : {"ccp", "dadao", "japan", "mongolia"}) attacks.insert("attacked_warlord:" + nation + ":" + by);
         queue.insert("alignment_queue:" + nation);
     }
     require(warlords == 8 && questionsOf(*spec, "power_status") == statuses && questionsOf(*spec, "alliance") == sides &&
-                questionsOf(*spec, "player").size() == sides.size() && questionsOf(*spec, "controller") == controllers,
-            "A nation's status, alliance, player and controller questions are the ones it can answer");
+                questionsOf(*spec, "player").empty() && questionsOf(*spec, "controller") == controllers &&
+                questionsOf(*spec, "nation_present") == std::set<std::string>{"nation_present:dadao"},
+            "A nation's status, alliance and controller questions are the ones whose answer can change");
     require(questionsOf(*spec, "attacked_warlord") == attacks && questionsOf(*spec, "alignment_queue") == queue,
             "Only warlords are attacked as warlords or wait to be aligned");
     require(questionsOf(*spec, "allied") == std::set<std::string>{"allied:ccp:kmt", "allied:kmt:ccp", "allied:~impossible"} &&
@@ -390,10 +414,11 @@ void nationQuestionsFollowTheRules() {
                 !questionsOf(*spec, "technology_stage").contains("technology_stage:japan:other"),
             "Only nations that can become major powers have technology questions");
     const auto wars = questionsOf(*spec, "at_war");
-    require(wars.size() == 13 * 13 - 13 - 8 * 7 - 2 + 1 && wars.contains("at_war:ccp:mongolia") &&
+    require(wars.size() == 13 * 13 - 13 - 8 * 7 - 2 - 2 + 1 && wars.contains("at_war:ccp:mongolia") &&
+                !wars.contains("at_war:kmt:ccp") && !wars.contains("at_war:ccp:kmt") &&
                 wars.contains("at_war:dadao:warlord_tibet") && !wars.contains("at_war:japan:japan") &&
                 !wars.contains("at_war:japan:dadao") && !wars.contains("at_war:warlord_tibet:warlord_yunnan"),
-            "No nation fights itself, no warlord a warlord, and Japan never Dadao");
+            "No nation fights itself, no warlord a warlord, Japan never Dadao, and the KMT and the CCP always fight");
 
     // The opening answers only kept questions.
     auto s = env.engine().state().clone();
@@ -401,9 +426,8 @@ void nationQuestionsFollowTheRules() {
     auto answers = positionAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}));
     require(zoneEncodingUnknowns(true).empty(), "The opening answers no ruled-out question");
     for (const std::string expected :
-         {"treasury:japan", "alliance:japan:axis", "player:mongolia:comintern", "controller:mongolia:~none",
-          "controller:kmt:kmt", "power_status:kmt:minor", "power_status:warlord_tibet:warlord", "at_war:ccp:kmt",
-          "alliance:warlord_tibet:~none", "turn_nation:ccp"})
+         {"treasury:japan", "power_status:kmt:minor", "controller:warlord_tibet:~none", "alliance:warlord_tibet:~none",
+          "turn_nation:ccp"})
         require(answers.contains(expected), "The opening answers " + expected);
     require(answers.at("treasury:japan") == 15 && !answers.contains("completed_turns:ccp"), "The opening's values are read");
 
@@ -427,9 +451,8 @@ void nationQuestionsFollowTheRules() {
     answers = positionAnswers(*spec, encodeZoneInput(s, scheduleOf(env), {}));
     require(zoneEncodingUnknowns(true).empty(), "Rare answers the rules allow are not reported");
     for (const std::string expected :
-         {"nation_present:dadao", "power_status:dadao:minor", "alliance:dadao:axis", "player:dadao:axis",
-          "controller:dadao:japan", "controller:warlord_tibet:japan", "alliance:warlord_tibet:axis",
-          "player:warlord_tibet:axis", "power_status:ccp:major", "technology_stage:ccp:radar", "researched_round:ccp:radar",
+         {"nation_present:dadao", "power_status:dadao:minor", "alliance:dadao:axis", "controller:dadao:japan",
+          "controller:warlord_tibet:japan", "alliance:warlord_tibet:axis", "power_status:ccp:major", "technology_stage:ccp:radar", "researched_round:ccp:radar",
           "at_war:ccp:mongolia", "allied:ccp:kmt", "at_war:dadao:warlord_yunnan", "surrendered:kmt", "evolution_awarded:ccp",
           "china_invader:mongolia", "attacked_warlord:warlord_yunnan:dadao", "alignment_queue:warlord_yunnan",
           "state_flag_nation:evolution_pending:ccp"})
@@ -437,11 +460,19 @@ void nationQuestionsFollowTheRules() {
 
     // An answer the rules rule out is counted in its family's shared column and reported.
     auto broken = env.engine().state().clone();
+    ensureDadao(broken);
     auto& mongolia = broken.nations.at(nationNumber(broken, "mongolia"));
     mongolia.treasury = 3;
     mongolia.alliance = mongolia.player = "axis";
     mongolia.controllerNation = nationNumber(s, "japan");
     mongolia.powerStatus = "major";
+    auto& kmt = broken.nations.at(nationNumber(broken, "kmt"));
+    kmt.player = "axis";
+    kmt.powerStatus = "warlord";
+    kmt.atWarWith.erase(nationNumber(broken, "ccp"));
+    broken.nations.at(nationNumber(broken, "dadao")).alliance = broken.nations.at(nationNumber(broken, "dadao")).player = "allies";
+    broken.nations.at(nationNumber(broken, "warlord_tibet")).controllerNation = nationNumber(broken, "mongolia");
+    broken.flags.erase(MarkKey(mark::campaign_started));
     mongolia.technologyStages[technologyNumber(s, "radar")] = 2;
     mongolia.gameFlags[MarkKey(mark::economy_researched_round, "radar")] = 1;
     mongolia.allies.insert(nationNumber(s, "ccp"));
@@ -457,14 +488,16 @@ void nationQuestionsFollowTheRules() {
     answers = positionAnswers(*spec, encodeZoneInput(broken, scheduleOf(env), {}));
     const auto unknown = zoneEncodingUnknowns(true);
     for (const std::string family :
-         {"treasury", "alliance", "player", "controller", "power_status", "technology_stage", "researched_round", "allied",
+         {"treasury", "alliance", "controller", "power_status", "technology_stage", "researched_round", "allied",
           "at_war", "completed_turns", "surrendered", "evolution_awarded", "china_invader", "attacked_warlord",
           "alignment_queue", "state_flag_nation"})
         require(answers.contains(impossible(family)), "A ruled-out answer still counts: " + family);
     require(answers.at("treasury:~impossible") == 3, "A ruled-out treasury keeps its amount");
     for (const std::string report :
-         {"impossible_treasury:mongolia", "treasury_missing:japan", "impossible_alliance:mongolia:axis",
-          "impossible_player:mongolia:axis", "impossible_controller:mongolia:japan", "impossible_power_status:mongolia:major",
+         {"impossible_treasury:mongolia", "treasury_missing:japan", "impossible_alliance:dadao:allies",
+          "alliance_changed:mongolia", "player_not_alliance:kmt", "impossible_controller:warlord_tibet:mongolia",
+          "controller_changed:mongolia", "impossible_power_status:kmt:warlord", "power_status_changed:mongolia",
+          "war_ended:kmt:ccp", "campaign_not_started:state",
           "impossible_technology_stage:mongolia:radar", "impossible_researched_round:mongolia:radar",
           "impossible_allied:mongolia:ccp", "impossible_at_war:warlord_tibet:warlord_yunnan",
           "impossible_completed_turns:dadao", "impossible_surrendered:ccp", "impossible_evolution_awarded:japan",
@@ -596,7 +629,7 @@ int main() {
                  {"random play stays well formed and deterministic", randomPlayStaysWellFormedAndDeterministic},
                  {"identical units differ only by rank", identicalUnitsDifferOnlyByRank},
                  {"a railroad repair names its border", railroadRepairNamesItsBorder},
-                 {"unknown names are counted, not dropped", unknownNamesAreCountedNotDropped},
+                 {"marks are asked where the rules put them", marksAreAskedWhereTheRulesPutThem},
                  {"income questions follow the rules", incomeQuestionsFollowTheRules},
                  {"nation questions follow the rules", nationQuestionsFollowTheRules},
                  {"battle notes keep their words", battleNotesKeepTheirWords},

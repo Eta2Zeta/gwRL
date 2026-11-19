@@ -33,22 +33,26 @@ def tables(scenario: Path) -> dict[str, list[str]]:
     return gwrl_cpp.CampaignEnv(str(scenario)).name_tables()
 
 
-def table(names: list[str], arguments: list[str] | None = None) -> str:
+def table(names: list[str], arguments: list[str] | None = None, places: list[list[str]] | None = None) -> str:
     """One kind's table as Markdown: each number with its name, and for marks what
-    each one's argument names (a dash for a mark without one)."""
+    each one's argument names (a dash for a mark without one) and the kinds of
+    thing the rules put it on."""
     if arguments is None:
         lines = ["| Number | Name |", "| ---: | --- |"]
         lines += [f"| {number} | `{name}` |" for number, name in enumerate(names)]
     else:
-        lines = ["| Number | Name | Argument |", "| ---: | --- | --- |"]
-        lines += [f"| {number} | `{name}` | {argument or '—'} |"
-                  for number, (name, argument) in enumerate(zip(names, arguments, strict=True))]
+        lines = ["| Number | Name | Argument | On |", "| ---: | --- | --- | --- |"]
+        lines += [f"| {number} | `{name}` | {argument or '—'} | {', '.join(place) or 'nowhere'} |"
+                  for number, (name, argument, place) in enumerate(zip(names, arguments, places, strict=True))]
     return "\n".join(lines)
 
 
 def kind_table(kind: str, names: list[str]) -> str:
-    """A kind's table; the mark table also says what each argument names."""
-    return table(names, gwrl_cpp.mark_arguments() if kind == "marks" else None)
+    """A kind's table; the mark table also says what each argument names and what
+    each mark is put on."""
+    if kind == "marks":
+        return table(names, gwrl_cpp.mark_arguments(), gwrl_cpp.mark_places())
+    return table(names)
 
 
 def main(argv: list[str] | None = None) -> int:

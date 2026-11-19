@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="578" viewBox="0 0 960 578" role="img" aria-labelledby="title desc">
   <title id="title">One real training sample</title>
-  <desc id="desc">One real training sample, from game round 5 of a self-play game: the Comintern chooses the CCP's Combat Movement. 1, what the network read: 840 non-zero zone feature values from all 37 zones, 176 global feature values, 80 action feature values for the five legal actions, and each action's zones, 12 KB in all; in Hopeh, for example, possessor:kmt = 1 and project:kmt:major_shipyard = 1. 2, who chose: the Comintern, for the CCP. 3, how the search split its 64 simulations, stored as visit shares: the mountain infantry in Shensi attacking Hopeh 36 visits, visit share 0.56, the network's own probability 0.10, the action played; attacking Suiyuan 2, 0.03, 0.10; attacking Szechwan 5, 0.08, 0.09; attacking Tsinghai 9, 0.14, 0.18; ending Combat Movement 12, 0.19, 0.53. 4, how the game ended, stored as the value target: Axis +49.0, the network predicted +25.1; Allies −63.8, predicted −42.4; Comintern −106.2, predicted −102.4.</desc>
+  <desc id="desc">One real training sample, from game round 5 of a self-play game: the Comintern chooses the CCP's Combat Movement. 1, what the network read: 840 non-zero zone feature values from all 37 zones, 131 global feature values, 80 action feature values for the five legal actions, and each action's zones, 12 KB in all; in Hopeh, for example, possessor:kmt = 1 and project:kmt:major_shipyard = 1. 2, who chose: the Comintern, for the CCP. 3, how the search split its 64 simulations, stored as visit shares: the mountain infantry in Shensi attacking Hopeh 36 visits, visit share 0.56, the network's own probability 0.10, the action played; attacking Suiyuan 2, 0.03, 0.10; attacking Szechwan 5, 0.08, 0.09; attacking Tsinghai 9, 0.14, 0.18; ending Combat Movement 12, 0.19, 0.53. 4, how the game ended, stored as the value target: Axis +49.0, the network predicted +25.1; Allies −63.8, predicted −42.4; Comintern −106.2, predicted −102.4.</desc>
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
     .heading { font-size: 16px; font-weight: 600; }
@@ -83,7 +83,7 @@
   <text class="title" x="68" y="111" text-anchor="start">What the network read</text>
   <text class="sub" x="68" y="130" text-anchor="start">stored: the decision&#x27;s input</text>
   <text class="body" x="44" y="160" text-anchor="start">840 non-zero zone feature values (37 zones)</text>
-  <text class="body" x="44" y="179" text-anchor="start">176 global feature values</text>
+  <text class="body" x="44" y="179" text-anchor="start">131 global feature values</text>
   <text class="body" x="44" y="198" text-anchor="start">80 action feature values (5 legal actions)</text>
   <text class="body" x="44" y="217" text-anchor="start">and each action&#x27;s zones: 12 KB in all</text>
   <text class="note" x="44" y="244" text-anchor="start">In Shensi, one of its 9 feature values:</text>

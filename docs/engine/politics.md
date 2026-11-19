@@ -233,13 +233,14 @@ or the repair of a facility.
 Whatever happens in a game, the rules above make only some things possible for
 each nation: only some power statuses, alliances, controllers, wars and allies,
 and only for some nations a promotion to major power, a surrender, an invasion
-of China or a recorded attack on a warlord. The functions declared at the top of
+of China or a recorded attack on a warlord. Some facts never change at all:
+which nations are in the game, and the war between the KMT and the CCP. The functions declared at the top of
 `include/game/politics.hpp` state what is possible, and the reason for each is
 beside its definition in `src/politics.cpp`. The network's input has only the
 features they allow
 ([the network's input](../design/network_input.md#what-the-global-features-ask-about-a-nation)),
-so a rule change that makes something new possible for a nation must change
-its function too.
+and leaves out a fact that can have only one value, so a rule change that makes
+something new possible for a nation must change its function too.
 
 | Function | What it states |
 | --- | --- |
@@ -252,6 +253,8 @@ its function too.
 | `warPossible` | No warlord is at war with a warlord, and Japan and Dadao are never at war. |
 | `alliesPossible` | Only the KMT and the CCP are ever allies. |
 | `warlordAttackPossible` | A warlord is recorded as attacked by the CCP, Japan, Dadao or Mongolia, never by the KMT or by a warlord. |
+| `alwaysInGame` | Every nation but Dadao is in the game from setup to the end: setup creates them, and no code removes a nation, not even one incorporated. Dadao is created when Japan first wins over a warlord (`ensureDadao`). |
+| `alwaysAtWar` | The KMT and the CCP are always at war: setup puts them at war, and only `incorporateNation` ends a war, never for either of them. Under the Chinese Truce they are friends while the war stays recorded. |
 
 Tests: `tests/politics_tests.cpp`, `tests/politics_warlords_tests.cpp`,
 `tests/politics_influence_tests.cpp` and `tests/land_truce_tests.cpp`; the

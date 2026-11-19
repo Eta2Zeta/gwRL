@@ -17,63 +17,12 @@ namespace game::campaign {
 namespace {
 using V = json::Value;
 
-// Names of flags, option kinds, decision kinds, battle stages, dice purposes,
-// pending political records and battle-data fields. Collected from the engine
-// source and from random games; a name missing here is counted in its list's
-// "other" column and reported by zoneEncodingUnknowns, never dropped.
-const std::vector<std::string> kActorFlags{
-    "access_to_resources_completed", "air_allied_loaded_turn", "air_battle", "air_battle_turn", "air_combat",
-    "air_defending_carrier", "air_in_flight", "air_landed_after_combat", "air_scramble_origin", "air_scramble_source",
-    "air_screening_continued", "air_screening_ready", "air_screening_wait", "air_transport_unloaded",
-    "airborne_assault", "amphibious_assault", "amphibious_transport", "assault_declared", "assault_zone", "attrition",
-    "blitz_eligible", "blitz_from", "blitz_to", "blitz_with", "captured_port_pending",
-    "civil_war_eliminated", "combat", "combat_move", "controller_unresolved", "crossed_enemy_fortification",
-    "direct_axis_control_after_japan_surrender", "economy_militia_placed", "economy_militia_upgrades",
-    "economy_production_cap", "economy_repair_cap", "economy_repairs_finished", "economy_research_capacity",
-    "economy_research_finished", "economy_research_used", "economy_researched_round", "economy_start_damage",
-    "economy_start_type", "economy_used", "escort", "evolved_during_own_turn", "evolved_turn_serial",
-    "first_allies_major_war_declared", "from_attack_naval_transport", "in_port", "incorporated",
-    "influence_attempted", "land_retreating", "launched_from_carrier", "lease_declared", "lease_delivered",
-    "lease_repair_wait", "logistics_last_turn_start", "map_declined_combat", "map_range", "maritime_air_patrol",
-    "must_withdraw_from_chinese_gift", "naval_combat", "naval_combat_turn", "naval_combat_unloaded", "naval_escort",
-    "naval_last_origin", "naval_loaded_completed_turns", "naval_movement_spent", "naval_raider", "naval_retreated",
-    "naval_scramble_origin", "naval_scrambled", "naval_screening_continuing", "naval_start_sea",
-    "naval_strategic_destination", "naval_strategic_moved", "naval_unloaded", "newly_placed", "objective_evolution",
-    "objective_one_china", "on_map", "one_china_bonus_awarded", "one_china_bonus_eligible_at_surrender",
-    "placed_this_turn", "politics_combat_finished", "port_unloaded_round", "possessed_land_ipp", "purchased",
-    "raider", "rail_build_permission", "rail_declined", "rail_permission", "rail_used", "recruitment_attempted",
-    "repair", "repair_at", "repairing", "retreated", "rocket_launched", "scrambled", "ship_crew", "shore_bombardment",
-    "skeleton_crew", "skeleton_crew_until_own_turn", "strategic_moved", "strategic_naval_used", "submerged",
-    "surprise_attack_available", "surprise_attack_linked_land", "surprise_attack_naval_sea", "surprise_attack_target",
-    "surprise_attack_used", "surprise_attack_zone", "surrendered", "towed_by", "towing", "transport_unloaded",
-    "unloaded_combat", "unloaded_noncombat"
-};
-const std::vector<std::string> kRecordFlags{
-    "__campaign_started", "air_decision_sequence", "air_mission", "air_mission_sequence", "air_roll_sequence",
-    "air_scramble_turn", "air_scramble_used", "air_waiting_port_evacuation", "airborne_assault", "aligned_turn",
-    "amphibious_assault", "amphibious_preparation", "amphibious_sequence", "artillery_city_bombing",
-    "attack_rolled", "attrition",
-    "blitz_pairing_done", "bomb_damage", "border", "capture_done", "captured_max_damage",
-    "carpet_return_started", "casualty_dispute_decided", "chinese_truce_termination", "city_damage",
-    "city_destroyed", "city_ipp_lost", "coastal_fire_turn", "coastal_shots_used", "completed", "crossing_used",
-    "damage", "economy_last_paid_turn", "economy_purchased", "economy_sequence", "economy_start_damage",
-    "evolution_pending", "facility_upgrade", "finished", "foreign_consent", "ignore_fortification", "immediate",
-    "immediate_land_battles", "immediate_naval_battles", "japanese_surprise_attack", "land_battle_sequence",
-    "land_decision_sequence", "land_roll_sequence", "last_possession_change_turn", "lease_available_after_turns",
-    "lease_militia_upgrade", "lease_received", "lease_repair", "lease_repair_target", "lease_sender",
-    "lease_wait_controller", "lend_to", "logistics_damaged_turn", "logistics_rail_created_turn",
-    "logistics_start_damaged", "moved_this_turn", "movement_ends_in_owner_home_country",
-    "movement_starts_in_owner_home_country", "national_objective_award", "naval_battle", "naval_battle_sequence",
-    "naval_berthing", "naval_casualty_dispute_decided", "naval_decision_sequence", "naval_move_decisions",
-    "naval_move_sequence", "naval_movement_immediate", "naval_movement_plan", "naval_operation_decision_sequence",
-    "naval_roll_sequence", "naval_scramble_turn", "naval_scramble_used", "original_owner", "original_type",
-    "owner_is_major_power", "payment", "placed_this_turn", "politics_sequence", "port_aa_done",
-    "port_crew_prepared", "price", "researched_this_turn", "rocket_mission", "row", "shore_dispute_decided",
-    "shore_resolved", "slip_attempted", "stages_paid", "stages_total", "starts_at_seaplane_base",
-    "stranded_aircraft_lost", "strategic_naval_movement_in_progress", "surprise_attack_naval_sea",
-    "surprise_attack_target", "surprise_attack_used", "surprise_attack_zone", "target", "towards",
-    "truce_low_morale_eliminates", "uncontested", "under_construction", "unit_upgrade", "upgraded_this_turn"
-};
+// Names of option kinds, decision kinds, battle stages, dice purposes, pending
+// political records and battle-data fields. Collected from the engine source
+// and from random games; a name missing here is counted in its list's "other"
+// column and reported by zoneEncodingUnknowns, never dropped. Marks come from
+// the engine's own table (include/game/marks.hpp), which also says what kinds
+// of thing each can be on.
 const std::vector<std::string> kActionKinds{
     "air_allied_load", "air_allied_unload", "air_artillery_city_bomb", "air_assault", "air_begin_bombing",
     "air_blitz", "air_bomb", "air_choose_casualty", "air_choose_rail_border", "air_choose_technology_loss",
@@ -221,21 +170,20 @@ const std::vector<std::string> kTopUnitFlags{
     "air_battle", "air_combat", "air_in_flight", "air_landed_after_combat", "air_screening_ready",
     "air_screening_wait", "air_transport_unloaded", "airborne_assault", "amphibious_assault", "amphibious_transport",
     "assault_declared", "assault_zone", "attrition", "blitz_eligible", "blitz_from", "blitz_to", "blitz_with",
-    "captured_port_pending", "combat", "combat_move", "crossed_enemy_fortification", "escort",
-    "from_attack_naval_transport", "in_port", "land_retreating", "launched_from_carrier", "map_range",
-    "maritime_air_patrol", "must_withdraw_from_chinese_gift", "naval_combat", "naval_combat_unloaded", "naval_escort",
-    "naval_loaded_completed_turns", "naval_movement_spent", "naval_raider", "naval_retreated", "naval_scrambled",
-    "naval_strategic_moved", "naval_unloaded", "newly_placed", "on_map", "placed_this_turn", "raider", "repair",
-    "retreated", "rocket_launched", "scrambled", "shore_bombardment", "skeleton_crew", "skeleton_crew_until_own_turn",
-    "strategic_moved", "submerged", "towed_by", "towing", "transport_unloaded", "unloaded_combat",
-    "unloaded_noncombat"};
-// Unit flags whose argument names a place; the unit is also counted there.
+    "captured_port_pending", "combat_move", "crossed_enemy_fortification", "from_attack_naval_transport", "in_port",
+    "land_retreating", "launched_from_carrier", "map_range", "maritime_air_patrol",
+    "must_withdraw_from_chinese_gift", "naval_combat", "naval_combat_unloaded", "naval_loaded_completed_turns",
+    "naval_movement_spent", "naval_retreated", "naval_strategic_moved", "naval_unloaded", "on_map",
+    "placed_this_turn", "raider", "repair", "retreated", "rocket_launched", "scrambled", "shore_bombardment",
+    "skeleton_crew_until_own_turn", "strategic_moved", "submerged", "towed_by", "towing", "transport_unloaded",
+    "unloaded_combat"};
+// Unit marks whose argument names a place; the unit is also counted there.
+// route and turn_origin are the unit's own route and the zone its turn began in.
 const std::vector<std::string> kRefKinds{
     "air_battle", "air_defending_carrier", "air_scramble_origin", "air_scramble_source", "amphibious_transport",
     "assault_zone", "blitz_from", "blitz_to", "blitz_with", "captured_port_pending", "in_port", "naval_last_origin",
     "naval_scramble_origin", "naval_start_sea", "naval_strategic_destination", "repair_at", "route", "ship_crew",
-    "surprise_attack_naval_sea", "surprise_attack_target", "surprise_attack_zone", "towed_by", "towing",
-    "turn_origin"};
+    "towed_by", "towing", "turn_origin"};
 
 std::mutex unknownMutex;
 std::map<std::string, long> unknownNames;
@@ -395,8 +343,8 @@ class Layout {
 
 struct Context {
     ZoneEncodingSpec spec;
-    Vocabulary zones, nations, nationOrNone, players, playerOrNone, unitTypes, facilityTypes, technologies, projectTypes,
-        rows, terrains, unitClasses, actorFlags, topUnitFlags, unitStats, refKinds, recordFlags, actionKinds,
+    Vocabulary zones, nations, nationOrNone, createdNations, players, playerOrNone, unitTypes, facilityTypes, technologies, projectTypes,
+        rows, terrains, unitClasses, marks, topUnitFlags, unitStats, refKinds, actionKinds,
         decisionKinds, adapterKinds, battleStages, chancePurposes, pendingNames, dataKeys, phases, scheduleKinds,
         powerStatuses, incomeComponents, enumValues, parameterKeys, roleGroups, repairTargets, repairStats,
         facilityStats, projectClasses, projectStats, chanceStats, positions, ranks, battleWordKeys, battleWords;
@@ -407,6 +355,12 @@ struct Context {
     std::unordered_map<std::string, int> roleOfKey;
     Layout zone, global, action;
     int noNation{-1};  // The "~none" column of nationOrNone.
+    // The one alliance, power status and controller column a nation always has,
+    // or -1 where its value can change (onlyValue below), and how many nations
+    // are in every game. The input leaves these fixed features out.
+    std::vector<int> fixedAlliance, fixedPower, fixedController;
+    std::vector<std::pair<NationId, NationId>> warsThatNeverEnd;
+    int alwaysInGameCount{0};
     // Zone families.
     int zPossessor, zStartPossessor, zChanged, zAligned, zTerritoryFlag, zCapitalOf, zDeclinedRail, zUnitNationType,
         zUnitStat, zUnitClassFlag, zUnitRef, zUnitAtFacility, zUnitFacilityBorder, zCarried, zNationHere, zFacility, zFacilityFlag, zFacilityBorder,
@@ -415,7 +369,7 @@ struct Context {
         zBattleData, zBattleDataUnit, zBattleDataRank, zBattleDataZone, zBattleDataWord, zBattleHits, zBattleOrder;
     // Global families.
     int gRound, gCompletedRounds, gRoundsLeft, gPhase, gTurnNation, gIncomeCollected, gTerminal, gPresent, gAlliance,
-        gPlayer, gPower, gController, gTreasury, gIncome, gTech, gWar, gAlly, gNationFlag,
+        gPower, gController, gTreasury, gIncome, gTech, gWar, gAlly, gNationFlag,
         gResearched, gCompletedTurns, gSurrendered, gEvolved, gTruce, gTruceEnded, gForeignWarPending,
         gTruceOfferPending, gInvader, gAttackedWarlord, gAlignmentQueue, gPending, gPendingNation, gPendingValue,
         gDecisionKind, gDecisionNation, gDecisionReaction, gDecisionDepth, gDecisionStack, gAdapterKind, gOwner,
@@ -589,12 +543,19 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->rows = Vocabulary("row", rows, true);
     c->terrains = Vocabulary("terrain", terrains, true);
     c->unitClasses = Vocabulary("unit_class", kUnitClasses, true);
-    c->actorFlags = Vocabulary("actor_flag", kActorFlags, true);
+    // Every mark of the engine's table, in name order, which is number order.
+    c->marks = Vocabulary("mark", markNames(), false, false);
     c->topUnitFlags = Vocabulary("top_unit_flag", kTopUnitFlags, false);
+    for (const auto& name : kTopUnitFlags)
+        if (!markOn(markNumber(name), MarkPlace::unit))
+            throw std::logic_error("Zone encoding counts " + name + " on units, which the mark table never puts there");
+    for (const auto& name : kRefKinds)
+        if (name != "route" && name != "turn_origin" && !markOn(markNumber(name), MarkPlace::unit))
+            throw std::logic_error("Zone encoding places " + name + " on units, which the mark table never puts there");
     // Base statistics keep their listed order; unitFacts emits them by position.
     c->unitStats = Vocabulary("unit_stat", unitStats, false, false);
-    c->refKinds = Vocabulary("unit_reference", kRefKinds, true);
-    c->recordFlags = Vocabulary("record_flag", kRecordFlags, true);
+    // Looked up only with find, so no "other" column.
+    c->refKinds = Vocabulary("unit_reference", kRefKinds, false);
     c->actionKinds = Vocabulary("action_kind", kActionKinds, true);
     c->decisionKinds = Vocabulary("decision_kind", kDecisionKinds, true);
     c->adapterKinds = Vocabulary("adapter_kind", adapter, true);
@@ -730,20 +691,51 @@ std::shared_ptr<const Context> buildContext(const State& s) {
         return t < 0 || (n < 0 ? owned[t] != 0 : ownable[cell(n, t)] != 0);
     };
     using Cell = std::vector<int>;
+    // A mark column's mark (the marks vocabulary is in number order), and
+    // whether the rules put it on a kind of thing: the mark table's fourth
+    // column, checked against the code by tools/mark_writes.py. The last axis
+    // of every mark family is the mark. Marks with features of their own are
+    // left out of the family that would repeat them.
+    const auto markAt = [](int m) { return MarkId::fromIndex(static_cast<std::size_t>(m)); };
+    const auto on = [&](const Cell& x, MarkPlace place) { return markOn(markAt(x.back()), place); };
+    const auto is = [&](const Cell& x, MarkId mark) { return markAt(x.back()) == mark; };
+    // A territory's turns of changing hands and of joining a side are
+    // changed_hands_this_turn and aligned_this_turn.
+    const auto territoryMark = [&](const Cell& x) {
+        return on(x, MarkPlace::territory) && !is(x, mark::last_possession_change_turn) && !is(x, mark::aligned_turn);
+    };
+    // A facility's sea borders, first owner and first type are facility_border,
+    // facility_original_owner and facility_original_type.
+    const auto facilityMark = [&](const Cell& x) {
+        return on(x, MarkPlace::facility) && !is(x, mark::border) && !is(x, mark::original_owner) &&
+               !is(x, mark::original_type);
+    };
+    // A project's build-chart row and sea border are project_row and project_border.
+    const auto projectMark = [&](const Cell& x) {
+        return on(x, MarkPlace::project) && !is(x, mark::row) && !is(x, mark::border);
+    };
 
     auto& z = c->zone;
     c->zPossessor = z.add("possessor", {&c->nationOrNone});
     c->zStartPossessor = z.add("turn_start_possessor", {&c->nationOrNone});
     c->zChanged = z.add("changed_hands_this_turn", {});
     c->zAligned = z.add("aligned_this_turn", {});
-    c->zTerritoryFlag = z.add("territory_flag", {&c->recordFlags});
+    c->zTerritoryFlag = z.add("territory_flag", {&c->marks}, territoryMark);
     c->zCapitalOf = z.add("capital_of", {&c->nations});
     c->zDeclinedRail = z.add("declined_rail_request", {});
     c->zUnitNationType = z.add("units", {&c->nations, &c->unitTypes},
                                [&](const Cell& x) { return ownable[cell(x[0], x[1])] != 0; });
     c->zUnitStat = z.add("unit_stat", {&c->playerOrNone, &c->unitTypes, &c->unitStats},
                          [&](const Cell& x) { return owned[x[1]] != 0; });
-    c->zUnitClassFlag = z.add("unit_flag", {&c->playerOrNone, &c->unitClasses, &c->actorFlags});
+    // The marks that change what a unit may do this turn are counted by unit type
+    // in unit_stat; the others here, by unit class, for the classes the catalog's
+    // unit types have.
+    std::vector<char> classUsed(static_cast<std::size_t>(c->unitClasses.size()), 0);
+    for (const int cls : c->unitClassOfType) classUsed[static_cast<std::size_t>(cls)] = 1;
+    c->zUnitClassFlag = z.add("unit_flag", {&c->playerOrNone, &c->unitClasses, &c->marks}, [&](const Cell& x) {
+        return classUsed[static_cast<std::size_t>(x[1])] && on(x, MarkPlace::unit) &&
+               c->topUnitFlags.find(c->marks.names()[static_cast<std::size_t>(x[2])]) < 0;
+    });
     c->zUnitRef = z.add("unit_reference_here", {&c->playerOrNone, &c->unitTypes, &c->refKinds},
                         [&](const Cell& x) { return owned[x[1]] != 0; });
     c->zCarried = z.add("carried", {&c->playerOrNone, &c->unitTypes, &c->unitTypes},
@@ -752,9 +744,13 @@ std::shared_ptr<const Context> buildContext(const State& s) {
                                [&](const Cell& x) { return atFacility(x[1]); });
     c->zUnitFacilityBorder = z.add("unit_facility_border", {&c->playerOrNone, &c->unitTypes, &c->zones},
                                    [&](const Cell& x) { return atFacility(x[1]) && sea[x[2]]; });
-    c->zNationHere = z.add("nation_flag_here", {&c->nations, &c->actorFlags});
+    // A nation's mark about a zone or a facility also counts in that zone.
+    c->zNationHere = z.add("nation_flag_here", {&c->nations, &c->marks}, [&](const Cell& x) {
+        const auto argument = markArgument(markAt(x[1]));
+        return on(x, MarkPlace::nation) && (argument == "zone" || argument == "facility");
+    });
     c->zFacility = z.add("facility", {&c->facilityTypes, &c->facilityStats});
-    c->zFacilityFlag = z.add("facility_flag", {&c->facilityTypes, &c->recordFlags});
+    c->zFacilityFlag = z.add("facility_flag", {&c->facilityTypes, &c->marks}, facilityMark);
     c->zFacilityBorder = z.add("facility_border", {&c->facilityTypes, &c->zones});
     c->zFacilityOriginalOwner = z.add("facility_original_owner", {&c->facilityTypes, &c->nations});
     c->zFacilityOriginalType = z.add("facility_original_type", {&c->facilityTypes, &c->facilityTypes});
@@ -762,7 +758,7 @@ std::shared_ptr<const Context> buildContext(const State& s) {
                         [&](const Cell& x) { return projectOf(x[0], x[1]); });
     c->zProjectStat = z.add("project_stat", {&c->projectTypes, &c->projectStats},
                             [&](const Cell& x) { return projectOf(-1, x[0]); });
-    c->zProjectFlag = z.add("project_flag", {&c->projectClasses, &c->recordFlags});
+    c->zProjectFlag = z.add("project_flag", {&c->projectClasses, &c->marks}, projectMark);
     c->zProjectRow = z.add("project_row", {&c->rows});
     c->zProjectBorder = z.add("project_border", {&c->zones});
     c->zRepair = z.add("repair", {&c->nations, &c->repairTargets, &c->repairStats});
@@ -774,7 +770,7 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->zBattleRound = z.add("battle_round", {});
     c->zBattleAttacker = z.add("battle_attacker", {&c->nations});
     c->zBattleDefender = z.add("battle_defender", {&c->nationOrNone});
-    c->zBattleFlag = z.add("battle_flag", {&c->recordFlags});
+    c->zBattleFlag = z.add("battle_flag", {&c->marks}, [&](const Cell& x) { return on(x, MarkPlace::battle); });
     c->zBattleData = z.add("battle_data", {&c->dataKeys});
     c->zBattleDataUnit = z.add("battle_data_unit", {&c->dataKeys, &c->unitTypes},
                                [&](const Cell& x) { return owned[x[1]] != 0; });
@@ -806,25 +802,65 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->gTurnNation = g.add("turn_nation", {&c->nations}, takesTurns);
     c->gIncomeCollected = g.add("income_collected", {});
     c->gTerminal = g.add("terminal", {});
-    c->gPresent = g.add("nation_present", {&c->nations});
-    c->gAlliance = g.add("alliance", {&c->nations, &c->playerOrNone}, side);
-    c->gPlayer = g.add("player", {&c->nations, &c->playerOrNone}, side);
-    c->gPower = g.add("power_status", {&c->nations, &c->powerStatuses}, [&](const Cell& x) {
-        return powerStatusPossible(nationName(x[0]), c->powerStatuses.names()[static_cast<std::size_t>(x[1])]);
-    });
+    // A fact with one possible value tells no two positions apart. A nation in
+    // every game (alwaysInGame) whose rule allows it one alliance, one power
+    // status or one controller always has that one, so the input leaves the
+    // fact out; encodeNations reports a position that breaks it. So only the
+    // nations created in play are asked whether they are present. A nation's
+    // player is not asked at all: it is the agent of its alliance
+    // (alliancePossible), which encodeNations checks.
+    const auto onlyValue = [&](int values, const std::function<bool(int, int)>& possible) {
+        std::vector<int> only(static_cast<std::size_t>(c->nations.size()), -1);
+        for (int n = 0; n < c->nations.size(); ++n) {
+            if (!alwaysInGame(nationName(n))) continue;
+            int found = -1, count = 0;
+            for (int v = 0; v < values; ++v)
+                if (possible(n, v)) found = v, ++count;
+            if (count == 1) only[static_cast<std::size_t>(n)] = found;
+        }
+        return only;
+    };
+    const auto power = [&](int n, int v) {
+        return powerStatusPossible(nationName(n), c->powerStatuses.names()[static_cast<std::size_t>(v)]);
+    };
+    const auto controlled = [&](int n, int v) {
+        return controllerPossible(nationName(n), orNone(c->nationOrNone.names()[static_cast<std::size_t>(v)]));
+    };
+    c->fixedAlliance = onlyValue(c->playerOrNone.size(), [&](int n, int v) { return side({n, v}); });
+    c->fixedPower = onlyValue(c->powerStatuses.size(), power);
+    c->fixedController = onlyValue(c->nationOrNone.size(), controlled);
+    std::vector<std::string> created;
+    for (int n = 0; n < c->nations.size(); ++n) {
+        if (alwaysInGame(nationName(n))) ++c->alwaysInGameCount;
+        else created.push_back(nationName(n));
+        for (int m = 0; m < c->nations.size(); ++m)
+            if (alwaysAtWar(nationName(n), nationName(m)))
+                c->warsThatNeverEnd.emplace_back(NationId::fromIndex(static_cast<std::size_t>(n)),
+                                            NationId::fromIndex(static_cast<std::size_t>(m)));
+    }
+    c->createdNations = Vocabulary("nation", created, false);
+    c->gPresent = g.add("nation_present", {&c->createdNations});
+    c->gAlliance = g.add("alliance", {&c->nations, &c->playerOrNone},
+                         [&](const Cell& x) { return side(x) && c->fixedAlliance[static_cast<std::size_t>(x[0])] < 0; });
+    c->gPower = g.add("power_status", {&c->nations, &c->powerStatuses},
+                      [&](const Cell& x) { return power(x[0], x[1]) && c->fixedPower[static_cast<std::size_t>(x[0])] < 0; });
     c->gController = g.add("controller", {&c->nations, &c->nationOrNone}, [&](const Cell& x) {
-        return controllerPossible(nationName(x[0]), orNone(c->nationOrNone.names()[static_cast<std::size_t>(x[1])]));
+        return controlled(x[0], x[1]) && c->fixedController[static_cast<std::size_t>(x[0])] < 0;
     });
     c->gTreasury = g.add("treasury", {&c->nations}, [&](const Cell& x) { return keepsAccount(nationName(x[0])); });
     c->gIncome = g.add("income", {&c->nations, &c->incomeComponents}, [&](const Cell& x) {
         return incomePartPossible(nationName(x[0]), c->incomeComponents.names()[static_cast<std::size_t>(x[1])]);
     });
     c->gTech = g.add("technology_stage", {&c->nations, &c->technologies}, researches);
-    c->gWar = g.add("at_war", {&c->nations, &c->nations},
-                    [&](const Cell& x) { return warPossible(nationName(x[0]), nationName(x[1])); });
+    c->gWar = g.add("at_war", {&c->nations, &c->nations}, [&](const Cell& x) {
+        return warPossible(nationName(x[0]), nationName(x[1])) && !alwaysAtWar(nationName(x[0]), nationName(x[1]));
+    });
     c->gAlly = g.add("allied", {&c->nations, &c->nations},
                      [&](const Cell& x) { return alliesPossible(nationName(x[0]), nationName(x[1])); });
-    c->gNationFlag = g.add("nation_flag", {&c->nations, &c->actorFlags});
+    // A nation's research rounds are researched_round.
+    c->gNationFlag = g.add("nation_flag", {&c->nations, &c->marks}, [&](const Cell& x) {
+        return on(x, MarkPlace::nation) && !is(x, mark::economy_researched_round);
+    });
     c->gResearched = g.add("researched_round", {&c->nations, &c->technologies}, researches);
     c->gCompletedTurns = g.add("completed_turns", {&c->nations}, takesTurns);
     c->gSurrendered = g.add("surrendered", {&c->nations}, [&](const Cell& x) { return canSurrender(nationName(x[0])); });
@@ -856,11 +892,18 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->gChanceTech = g.add("chance_technology", {&c->technologies});
     c->gChanceNation = g.add("chance_nation", {&c->nations});
     c->gChanceStat = g.add("chance_stat", {&c->chanceStats});
-    c->gStateFlag = g.add("state_flag", {&c->recordFlags});
+    // Sequence counters only number records, so they are skipped; a game-wide
+    // mark about a nation is state_flag_nation; and the campaign has always
+    // started (Engine::start), which the encoder checks instead.
+    c->gStateFlag = g.add("state_flag", {&c->marks}, [&](const Cell& x) {
+        const auto name = markName(markAt(x[0]));
+        return on(x, MarkPlace::game) && !name.ends_with("_sequence") && markArgument(markAt(x[0])) != "nation" &&
+               !is(x, mark::campaign_started);
+    });
     // The only game-wide mark that names a nation says its capital choice is
     // pending, and only a nation that can evolve gets one (chooseEvolution).
-    c->gStateFlagNation = g.add("state_flag_nation", {&c->recordFlags, &c->nations}, [&](const Cell& x) {
-        return c->recordFlags.names()[static_cast<std::size_t>(x[0])] == "evolution_pending" && canEvolve(nationName(x[1]));
+    c->gStateFlagNation = g.add("state_flag_nation", {&c->marks, &c->nations}, [&](const Cell& x) {
+        return markAt(x[0]) == mark::evolution_pending && canEvolve(nationName(x[1]));
     });
     c->gVisited = g.add("visited_configurations", {});
     c->gDeclinedRails = g.add("declined_rail_requests", {});
@@ -869,7 +912,7 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->gUnsitedProjectStat = g.add("unsited_project_stat", {&c->projectTypes, &c->projectStats},
                                    [&](const Cell& x) { return projectOf(-1, x[0]); });
     c->gUnsitedProjectRow = g.add("unsited_project_row", {&c->rows});
-    c->gUnsitedProjectFlag = g.add("unsited_project_flag", {&c->projectClasses, &c->recordFlags});
+    c->gUnsitedProjectFlag = g.add("unsited_project_flag", {&c->projectClasses, &c->marks}, projectMark);
 
     auto& a = c->action;
     c->aScheduleKind = a.add("schedule", {&c->scheduleKinds});
@@ -891,14 +934,14 @@ std::shared_ptr<const Context> buildContext(const State& s) {
     c->aUnitCargo = a.add("unit_cargo", {&c->roleGroups, &c->unitTypes},
                           [&](const Cell& x) { return canBeCarried[x[1]] != 0; });
     c->aUnitCargoOrigin = a.add("unit_cargo_turn_origin", {&c->roleGroups, &c->zones});
-    c->aUnitCargoFlag = a.add("unit_cargo_flag", {&c->roleGroups, &c->actorFlags});
+    c->aUnitCargoFlag = a.add("unit_cargo_flag", {&c->roleGroups, &c->marks}, [&](const Cell& x) { return on(x, MarkPlace::unit); });
     c->aUnitLaterPeers = a.add("unit_later_peers", {&c->roleGroups, &c->unitTypes},
                                [&](const Cell& x) { return owned[x[1]] != 0; });
     c->aProjectStat = a.add("project_stat", {&c->roleGroups, &c->projectStats});
     c->aProjectBorder = a.add("project_border", {&c->roleGroups, &c->zones});
-    c->aProjectFlag = a.add("project_flag", {&c->roleGroups, &c->recordFlags});
+    c->aProjectFlag = a.add("project_flag", {&c->roleGroups, &c->marks}, projectMark);
     c->aFacilityBorder = a.add("facility_border", {&c->roleGroups, &c->zones});
-    c->aFacilityFlag = a.add("facility_flag", {&c->roleGroups, &c->recordFlags});
+    c->aFacilityFlag = a.add("facility_flag", {&c->roleGroups, &c->marks}, facilityMark);
     c->aFacilityDamage = a.add("facility_damage", {&c->roleGroups});
     c->aUnitCarrier = a.add("unit_carried_by", {&c->roleGroups, &c->unitTypes},
                             [&](const Cell& x) { return canCarry[x[1]] != 0; });
@@ -1212,7 +1255,7 @@ void unitFacts(const Context& c, const State& s, const UnitState& u, const UnitR
         if (const int top = c.topUnitFlags.find(base); top >= 0)
             emit(static_cast<int>(kUnitBaseStats.size()) + top, v);
         else
-            other(c.actorFlags(base), v);
+            other(c.marks(base), v);
         if (!argument.empty() && c.refKinds.find(base) >= 0) {
             const FacilityState* facility = nullptr;
             const int zone = resolve(argument, &facility);
@@ -1281,7 +1324,7 @@ void encodeTerritories(const Context& c, const State& s, Builder& b) {
             } else if (base == "aligned_turn") {
                 if (value == static_cast<int>(s.clock.playerTurnSerial)) b.zone(zone, c.zone.at(c.zAligned, {}), 1);
             } else {
-                b.zone(zone, c.zone.at(c.zTerritoryFlag, {c.recordFlags(base)}), flagValue(s, base, value));
+                b.zone(zone, c.zone.at(c.zTerritoryFlag, {c.marks(base)}), flagValue(s, base, value));
             }
         }
     }
@@ -1308,7 +1351,7 @@ void encodeFacilities(const Context& c, const State& s, Builder& b) {
             else if (base == "original_type")
                 b.zone(zone, c.zone.at(c.zFacilityOriginalType, {type, c.facilityTypes(argument)}), 1);
             else
-                b.zone(zone, c.zone.at(c.zFacilityFlag, {type, c.recordFlags(base)}), flagValue(s, base, value));
+                b.zone(zone, c.zone.at(c.zFacilityFlag, {type, c.marks(base)}), flagValue(s, base, value));
         }
     }
 }
@@ -1329,7 +1372,7 @@ void projectFacts(const Context& c, const State& s, const BuildProject& p, int t
         const auto base = baseName(name, &argument);
         if (base == "row") row(c.rows(argument));
         else if (base == "border" && c.zones.find(argument) >= 0) border(c.zones.find(argument));
-        else flag(c.recordFlags(base), flagValue(s, base, value));
+        else flag(c.marks(base), flagValue(s, base, value));
     }
 }
 
@@ -1488,7 +1531,7 @@ void encodeBattles(const Context& c, const State& s, Builder& b, UnitRoles& role
         b.zone(zone, c.zone.at(c.zBattleDefender, {nationOrNone(c, battle.defender)}), 1);
         for (const auto& [name, value] : battle.flags) {
             const auto base = baseName(name);
-            b.zone(zone, c.zone.at(c.zBattleFlag, {c.recordFlags(base)}), flagValue(s, base, value));
+            b.zone(zone, c.zone.at(c.zBattleFlag, {c.marks(base)}), flagValue(s, base, value));
         }
         long hits = 0;
         for (const auto& [side, count] : battle.pendingHits) hits += count;
@@ -1510,13 +1553,24 @@ void encodeBattles(const Context& c, const State& s, Builder& b, UnitRoles& role
 }
 
 void encodeNations(const Context& c, const State& s, Builder& b) {
+    int inEveryGame = 0;
     for (const auto& [id, n] : s.nations) {
         const int nation = c.nations(id);
-        b.global(c.global.at(c.gPresent, {nation}), 1);
-        b.global(c.global.at(c.gAlliance, {nation, c.playerOrNone(n.alliance ? *n.alliance : "~none")}), 1);
-        b.global(c.global.at(c.gPlayer, {nation, c.playerOrNone(n.player ? *n.player : "~none")}), 1);
-        b.global(c.global.at(c.gPower, {nation, c.powerStatuses(n.powerStatus)}), 1);
-        b.global(c.global.at(c.gController, {nation, nationOrNone(c, n.controllerNation)}), 1);
+        const auto& who = nationName(s, id);
+        // A fact the nation can have only one value of is left out of the input
+        // (onlyValue); a position where it has another is reported.
+        const auto fact = [&](int family, const std::vector<int>& fixed, int value, const char* broken) {
+            const int only = fixed[static_cast<std::size_t>(nation)];
+            if (only < 0) b.global(c.global.at(family, {nation, value}), 1);
+            else if (value != only) noteUnknown(broken, who);
+        };
+        if (alwaysInGame(who)) ++inEveryGame;
+        else b.global(c.global.at(c.gPresent, {c.createdNations(who)}), 1);
+        const int alliance = c.playerOrNone(n.alliance ? *n.alliance : "~none");
+        fact(c.gAlliance, c.fixedAlliance, alliance, "alliance_changed");
+        if (c.playerOrNone(n.player ? *n.player : "~none") != alliance) noteUnknown("player_not_alliance", who);
+        fact(c.gPower, c.fixedPower, c.powerStatuses(n.powerStatus), "power_status_changed");
+        fact(c.gController, c.fixedController, nationOrNone(c, n.controllerNation), "controller_changed");
         // Whether a nation keeps a treasury never changes (keepsAccount), so the
         // position asks only how much is in it. A nation that should keep one
         // and has none would read as an empty one, so it is reported.
@@ -1529,7 +1583,8 @@ void encodeNations(const Context& c, const State& s, Builder& b) {
         if (!n.incomeKnown) noteUnknown("income_not_evaluated", nationName(s, id));
         for (const auto& [name, stage] : n.technologyStages) b.global(c.global.at(c.gTech, {nation, c.technologies(name)}), stage);
         for (const auto& other : n.atWarWith)
-            if (const int m = c.nations.find(other); m >= 0) b.global(c.global.at(c.gWar, {nation, m}), 1);
+            if (const int m = c.nations.find(other); m >= 0 && !alwaysAtWar(who, nationName(s, other)))
+                b.global(c.global.at(c.gWar, {nation, m}), 1);
         for (const auto& other : n.allies)
             if (const int m = c.nations.find(other); m >= 0) b.global(c.global.at(c.gAlly, {nation, m}), 1);
         const auto flagged = [&](const MarkKey& name, int value) {
@@ -1540,7 +1595,7 @@ void encodeNations(const Context& c, const State& s, Builder& b) {
                          1 + std::clamp(s.clock.roundIndex - value, 0, 30));
                 return;
             }
-            const int flag = c.actorFlags(base);
+            const int flag = c.marks(base);
             const int v = flagValue(s, base, value);
             b.global(c.global.at(c.gNationFlag, {nation, flag}), v);
             // Capacities used at a facility or zone also count where they are.
@@ -1553,6 +1608,11 @@ void encodeNations(const Context& c, const State& s, Builder& b) {
         for (const auto& [name, value] : n.turnFlags) flagged(name, value);
         for (const auto& [name, value] : n.gameFlags) flagged(name, value);
     }
+    // The facts left out because they never change, checked.
+    if (inEveryGame != c.alwaysInGameCount) noteUnknown("nation_missing", std::to_string(inEveryGame));
+    for (const auto& [first, second] : c.warsThatNeverEnd)
+        if (const auto n = s.nations.find(first); n == s.nations.end() || !n->second.atWarWith.contains(second))
+            noteUnknown("war_ended", nationName(s, first) + ":" + nationName(s, second));
     for (const auto& [nation, count] : s.completedTurns)
         if (const int n = c.nations.find(nation); n >= 0) b.global(c.global.at(c.gCompletedTurns, {n}), count);
 }
@@ -1640,16 +1700,24 @@ void encodeClock(const Context& c, const State& s, Builder& b, const ZoneSchedul
         b.global(c.global.at(c.gChanceStat, {c.chanceStats.find("modifier")}), modifier);
         b.global(c.global.at(c.gChanceStat, {c.chanceStats.find("rerolls")}), rerolls);
     }
+    bool started = false;
     for (const auto& [name, value] : s.flags) {
+        // The campaign has always started (Engine::start), so the input does
+        // not say so; a position where it has not is reported below.
+        if (name.base() == mark::campaign_started) {
+            started = value != 0;
+            continue;
+        }
         std::string argument, suffix;
         auto base = withoutNation(c, baseName(name, &argument), &suffix);
         // Sequence counters only number records; they say nothing about play.
         if (base.size() > 9 && base.compare(base.size() - 9, 9, "_sequence") == 0) continue;
-        const int flag = c.recordFlags(base);
+        const int flag = c.marks(base);
         const int n = c.nations.find(!suffix.empty() ? suffix : argument);
         if (n >= 0) b.global(c.global.at(c.gStateFlagNation, {flag, n}), flagValue(s, base, value));
         else b.global(c.global.at(c.gStateFlag, {flag}), flagValue(s, base, value));
     }
+    if (!started) noteUnknown("campaign_not_started", "state");
     if (s.actionInterface.isObject()) {
         if (const auto* visited = s.actionInterface.find("visited_configurations"); visited && visited->isArray())
             b.global(c.global.at(c.gVisited, {}), static_cast<long>(visited->asArray().size()));
@@ -1714,7 +1782,7 @@ void optionValue(const Context& c, const State& s, Builder& b, const UnitRoles& 
                         b.option(c.action.at(c.aUnitCargoOrigin, {role, origin}), 1, role);
                     const auto cargoFlag = [&](const MarkKey& name, int value) {
                         const auto base = baseName(name);
-                        b.option(c.action.at(c.aUnitCargoFlag, {role, c.actorFlags(base)}), flagValue(s, base, value), role);
+                        b.option(c.action.at(c.aUnitCargoFlag, {role, c.marks(base)}), flagValue(s, base, value), role);
                     };
                     for (const auto& name : load.commitments) cargoFlag(name, 1);
                     for (const auto& [name, value] : load.turnFlags) cargoFlag(name, value);
@@ -1742,7 +1810,7 @@ void optionValue(const Context& c, const State& s, Builder& b, const UnitRoles& 
                 if (base == "border" && c.zones.find(argument) >= 0)
                     b.option(c.action.at(c.aFacilityBorder, {role, c.zones.find(argument)}), 1, role);
                 else if (base != "original_owner" && base != "original_type")
-                    b.option(c.action.at(c.aFacilityFlag, {role, c.recordFlags(base)}), flagValue(s, base, flagged), role);
+                    b.option(c.action.at(c.aFacilityFlag, {role, c.marks(base)}), flagValue(s, base, flagged), role);
             }
             b.zoneRef(role == 1 ? 3 : role, c.zones.find(f->second.zone));
         } else if (const auto battle = s.battles.find(text); battle != s.battles.end()) {
