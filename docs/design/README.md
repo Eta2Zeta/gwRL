@@ -2050,26 +2050,30 @@ waited for inference requests only 5.6% of the time
 
 **The game processes** do most of the CPU work: about 65 ms per decision in the
 Mac profile since the engine work of 16 November, against 110 to 117 ms just
-before it ([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
-A training iteration at 256×8 on the GPU, timed with the profiler on 19 November
-with 126 concurrent games in 7 game processes of 18, showed where their time
-went while the search still ran in Python. A network evaluation cost a game
-thread 1.71 ms of CPU, 87 ms a decision. Calls into the engine took 52% of it:
-listing a state's legal actions 27% (0.46 ms each time), applying an action 11%
-(0.19 ms), copying the game for the search 6%, the planning key 3% and rolling
-dice 3%. Encoding the state for the network took 13% (0.22 ms). The search's
-and the adapter's Python, the game loop and the inference requests took the
-remaining 35%
-([record](../archive/records/game_processes_gpu_2026_11_19.md#a-game-threads-cpu-per-network-evaluation));
-that Python part is what the search in C++ takes out (section 9.3).
+before it ([record](../archive/records/engine_speed_in_training_2026_11_16.md)),
+both measured while the search ran in Python. A training iteration at 256×8 on
+the GPU with 126 concurrent games in 7 game processes of 18, timed with the
+profiler on 19 November, shows where their time goes with the search in C++
+(section 4.7). A network evaluation costs a game thread 1.00 ms of CPU, 51 ms a
+decision, against 1.71 ms and 87 ms while the search ran in Python. Nearly all
+of it is the search's one call into the engine. Worked out from stack samples,
+listing a state's legal actions takes about 0.38 ms of a network evaluation,
+encoding the state for the network 0.17 ms, playing an action 0.17 ms, copying
+the game for the search 0.10 ms and rolling dice 0.06 ms; the search's own work
+on its tree takes about 0.03 ms and the inference requests 0.01 ms
+([record](../archive/records/search_in_cpp_2026_11_19.md#where-a-game-threads-time-goes-now)).
+The Python search's code, the adapter's and the inference requests' Python had
+taken 0.59 ms
+([record](../archive/records/game_processes_gpu_2026_11_19.md#a-game-threads-cpu-per-network-evaluation)).
 Inside the engine a few rule checks take the most. Listing legal actions spends
-about a fifth of its time finding which naval orders can still be completed and
-about a fifth enumerating and checking the routes a naval force could sail;
-movement allowances and Supply Paths take about a tenth each. By kind of work,
-only about 30% of the engine's time goes to the rules' own logic, and 57% to
-allocating memory, building, copying and comparing strings, copying memory and
-looking up maps
-([record](../archive/records/game_processes_gpu_2026_11_19.md#inside-the-engine)).
+about a seventh of its time finding which naval orders can still be completed,
+a seventh enumerating and checking the routes a naval force could sail, and
+about a ninth each on movement allowances and Supply Paths. Playing an action
+spends a fifth on naval routes and a sixth on the planning key of the state it
+reaches. By kind of work, only about 31% of the engine's time goes to the rules'
+own logic, and 65% to allocating memory, building, copying and comparing
+strings, copying memory and looking up maps
+([record](../archive/records/search_in_cpp_2026_11_19.md#where-a-game-threads-time-goes-now)).
 The engine now holds zones, nations, unit types, facility types, technologies
 and the bases of marks as numbers, and keeps units and facilities in slot maps
 found through a hash table, which together took 23.9% of the instructions out
@@ -2442,7 +2446,15 @@ policy readout stopped making the GPU compile a graph for nearly every
 inference batch (below, fewer graph compiles), a profiled run of that layout
 played about 358,000 decisions an hour while playing, and the CPU cores were no
 longer behind: the run kept a median of 9.5 of them busy, over the allowance of
-9 ([record](../archive/records/readout_without_repeat_2026_11_18.md)).
+9 ([record](../archive/records/readout_without_repeat_2026_11_18.md)). Since the
+search runs in C++ (section 4.7), the same layout plays about 406,000 to 411,000
+decisions an hour while playing, 12.5% to 16.8% more than the code before it in
+matched runs, and keeps a median of 6.5 CPU cores busy. The inference server,
+busy about 97% of the time before and after, now sets the pace alone. It
+answered more network evaluations a second because each cost it less: its
+inference batches grew from about 43 states to about 47, and its process ran
+more of its time on performance cores
+([record](../archive/records/search_in_cpp_2026_11_19.md)).
 
 **Where an inference batch's states come from.** An inference batch holds the
 inference requests waiting when it starts, and a game asks for one network
@@ -2500,22 +2512,24 @@ until the other part limits instead. Where the CPU cores limit, a cheaper engine
 pays directly, until the CPU cores' line in the figure reaches the network's line
 above it: with the GPU in inference batches of 64, up to about 1.8 times at 64×2
 and 1.5 times at 128×4 (worked out). In the Mac profile the inference server
-limits instead, with the CPU cores about a fifth behind, and at 256×8 on the GPU
-both limit:
+limits instead, with the CPU cores about a fifth behind, as measured while the
+search ran in Python, and at 256×8 on the GPU the inference server limits alone
+since the search runs in C++:
 
 | Setup | What limits | The CPU cores could feed | What pays |
 | --- | --- | --- | --- |
-| 64×2 on one CPU core, 24 concurrent games (the Mac profile) | the inference server, busy 98% | about a fifth more | a cheaper inference server; a cheaper engine little |
-| 256×8 on the GPU, 126 concurrent games, compiled layers | the inference server, busy 97%, and the CPU cores, a median of 9.5 busy, over the allowance | nothing more: the run already went over the allowance | a cheaper engine; self-play that never stops, about 9% measured before the CPU cores limited |
-| 512×16 on the GPU, not trained yet | the GPU's forward pass, about 2,000 states a second as written and 2,700 compiled, in inference batches of about 60 | about twice as much | a cheaper forward pass on the GPU; the engine not at all |
+| 64×2 on one CPU core, 24 concurrent games (the Mac profile) | the inference server, busy 98% | about a fifth more with the Python search; not measured with the C++ search | a cheaper inference server; a cheaper engine little |
+| 256×8 on the GPU, 126 concurrent games, compiled layers | the inference server, busy 97%; the CPU cores a median of 6.5 busy | about 1.5 times as much | a cheaper inference server; more concurrent games, for larger inference batches; self-play that never stops, about 9% measured with the Python search |
+| 512×16 on the GPU, not trained yet | the GPU's forward pass, about 2,000 states a second as written and 2,700 compiled, in inference batches of about 60 | three to four times as much | a cheaper forward pass on the GPU; the engine not at all |
 
 The CPU cores' rates are inferred: the 9 CPU cores of the allowance, less the
 inference server's process, divided by the game processes' CPU time per network
 evaluation, against the network evaluations a second measured in training or,
 at 512×16, in replayed forward passes
 ([64×2](../archive/records/one_network_comparison_2026_11_17.md#speed),
-[256×8](../archive/records/readout_without_repeat_2026_11_18.md#results),
-[512×16](../archive/records/compiled_forward_2026_11_18.md#speed)).
+[256×8](../archive/records/search_in_cpp_2026_11_19.md#the-matched-runs),
+[512×16](../archive/records/compiled_forward_2026_11_18.md#speed)). At 256×8 and
+512×16 that CPU time is the C++ search's, 0.98 ms a network evaluation.
 
 A cheaper inference server pays until the CPU cores limit. At 256×8 the compiled
 layers made it about a tenth cheaper in the inference batches of steady play
@@ -2741,42 +2755,34 @@ operation of a forward pass on such inference batches, and
 for the rates above.
 
 **The engine's levers.** The game processes have levers of their own, which
-act on the CPU time a game thread spends for each network evaluation, 1.71 ms at
-256×8 on the GPU with 126 concurrent games while the search ran in Python
-(section 9.2), and on the waiting around it. An *engine call* is a call from
-Python into the engine, such as listing a state's legal actions. It gives up
-Python's lock (section 9.2) while the engine works and must take the lock back
-to return its result (`NativeCampaignEnv::call` in `src/python_bindings.cpp`).
-With the Python search a network evaluation made about 27 engine calls, 12.5 of
-them for the state's planning key, which the adapter asks for in nearly every
-one of its methods to notice whether the state has changed (`_sync` in
-`studies/shared/campaign_adapter.py`). In stack samples taken while all 126
-games played, a game thread computed about a tenth of its time, waited for the
-inference server's reply a third, and waited for Python's lock more than half:
-mostly to take it back at the end of an engine call, and otherwise right after a
-reply arrived. Each process's 18 game threads held the lock for their Python
-work about 56% of the time
-([record](../archive/records/game_processes_gpu_2026_11_19.md#a-game-threads-time)).
-The operating system's own work, for the pipes, the lock's hand-overs between
-threads and memory, was 11.9% of the game processes' CPU and was not broken
-down. Inside the engine, about 57% of the time is allocating memory, building,
-copying and comparing strings, copying memory and looking up maps, much of it
-because units, facilities, battles, railroads, construction projects, repair
-jobs and the details of actions are still held by name and as JSON
-([names held as numbers](../engine/names.md#what-is-still-a-name)), and every
-copy of the game copies them. The levers, each with the CPU it would take out of
-a network evaluation's 1.71 ms, worked out from that profile's shares and not
-measured:
+act on the CPU time they spend for each network evaluation: 0.98 ms at 256×8 on
+the GPU with 126 concurrent games since the search runs in C++
+([record](../archive/records/search_in_cpp_2026_11_19.md#the-matched-runs)).
+Inside the engine, about 65% of the time is allocating memory, building,
+copying and comparing strings, copying memory and looking up maps (section 9.2),
+much of it because units, facilities, battles, railroads, construction
+projects, repair jobs and the details of actions are still held by name and as
+JSON ([names held as numbers](../engine/names.md#what-is-still-a-name)), and
+every copy of the game copies them. The levers, with the CPU each would take out
+of a network evaluation, worked out from the stack samples' shares
+([record](../archive/records/search_in_cpp_2026_11_19.md#where-a-game-threads-time-goes-now))
+and not measured, except the first, which is built:
 
-- **The search in C++, now built** ([section 4.7](#47-more-detail-on-the-search)).
-  The search's simulations, the adapter's offers of declarations and the
-  inference requests run in C++, with the requests and replies sent through the
-  pipe as short binary messages (`include/game/inference_client.hpp`). That
-  removes the Python part, 0.59 ms, the 27 engine calls and their trips through
-  Python's lock, and the conversion of each legal action into a Python object:
-  about 0.7 ms, two fifths of the CPU, and nearly all the waiting for the lock.
-  An action is still played after the comparison of its canonical JSON with the
-  menu's (`Engine::step`), the fifth lever below.
+- **The search in C++, built** ([section 4.7](#47-more-detail-on-the-search)).
+  An *engine call* is a call from Python into the engine, such as listing a
+  state's legal actions; it gives up Python's lock while the engine works and
+  takes it back to return (`NativeCampaignEnv::call` in
+  `src/python_bindings.cpp`). The Python search made about 27 engine calls for
+  each network evaluation, 12.5 of them for the state's planning key, and its
+  game threads waited for Python's lock more than half their time; its Python
+  took 0.59 ms of a network evaluation's 1.71 ms
+  ([record](../archive/records/game_processes_gpu_2026_11_19.md#a-game-threads-cpu-per-network-evaluation)).
+  The C++ search makes one engine call a decision. In matched training
+  iterations it cut the game processes' CPU per network evaluation from
+  1.62 ms to 0.97 ms, 40%, and their time in the operating system's kernel from
+  11.9% of their CPU to 2.3%, and it played 12.5% to 16.8% more decisions an
+  hour while playing, as many more as the inference server allowed
+  ([record](../archive/records/search_in_cpp_2026_11_19.md)).
 - **The rest of the names as numbers.** Units, facilities, battles, railroads,
   construction projects and repair jobs held by number, and the details of
   actions as typed fields instead of JSON, as zones, nations, unit types and
@@ -2784,51 +2790,54 @@ measured:
   instructions out of a searched game
   ([names held as numbers](../engine/names.md#1-why-numbers)); taking half of
   today's allocation, string and map work out of the engine would save about
-  0.3 ms, a sixth of the CPU. Play stays the same, which
+  0.3 ms, a third of the CPU. Play stays the same, which
   `tools/compare_engine_builds.py` checks.
 - **Encoding without strings.** The encoder ranks units that look alike by a
   text signature built for every unit, and looks features up in hash tables
   keyed by strings (`unitSignature` and `rankUnits` in `src/zone_encoding.cpp`);
-  the two take about a third of its 0.22 ms. Numbers instead would save up to
-  about 0.07 ms, 4% of the CPU, and leave the network's input exactly as it is.
+  the two took about a third of its time in the 19 November profile
+  ([record](../archive/records/game_processes_gpu_2026_11_19.md)). Encoding
+  takes about 0.17 ms, so numbers instead would save up to about 0.06 ms, 6% of
+  the CPU, and leave the network's input exactly as it is.
 - **Fewer and lighter copies.** The search copies the whole game at each new
   state of its tree, and the naval-route and landing checks copy the whole state
   for every stop they probe (`validateNavalRoute`, `engagementKeepsLanding` in
   `src/naval_movement.cpp`). Copying and destroying whole states take about
-  0.18 ms, 11% of the CPU; copies that share the parts an action leaves
+  0.17 ms, 17% of the CPU; copies that share the parts an action leaves
   unchanged, and checks that work on the state as it is, would take out part of
   that.
-- **Lighter bookkeeping per action.** Listing legal actions copies the whole
-  list once more to return it (`Engine::legalActions` in
-  `src/campaign_runtime.cpp`) and writes every legal action as canonical JSON,
-  which playing an action compares with the action played (`Engine::step`):
-  about 0.06 ms, 3% of the CPU.
+- **Lighter bookkeeping per action.** Listing legal actions writes every legal
+  action as canonical JSON, which playing an action compares with the action
+  played (`Engine::step` in `src/campaign_runtime.cpp`): about 0.04 ms, 4% of
+  the CPU.
 - **Starting each game from a prepared copy** instead of reading the scenario
-  again: 1.6 seconds a game, 0.03 ms a network evaluation, 1.8% of the CPU.
+  again: 1.4 seconds a game, about 0.03 ms a network evaluation, 2.6% of the
+  CPU.
 
-What they pay depends on the inference server, which limits together with the
-CPU cores. A game thread that needs less CPU comes back sooner for its turn
-(above, where an inference batch's states come from), so the inference batches
-fill towards their limit of about 63 states with 126 concurrent games. An
-inference batch of 64 states costs the inference server about 158 µs a state
-against about 210 µs at 40
-([record](../archive/records/readout_without_repeat_2026_11_18.md#results)), so
-full inference batches would give at most about a fifth more network
-evaluations a second, and a game thread's CPU would have to fall by about a
-fifth for the CPU cores to keep up (inferred). Beyond that only more concurrent
-games fill larger inference batches, which the GPU answers more cheaply a
-state; memory holds about 330 concurrent games at 64 simulations (below). So at
-256×8 the engine's levers pay together with more concurrent games; at 512×16,
-where the GPU's forward pass limits (above), they pay nothing; on a faster GPU
-the engine's cost sets how many CPU cores keep it busy.
+What they pay depends on the inference server. At 256×8 on the GPU with 126
+concurrent games it limits alone since the search runs in C++, busy about 97% of
+the time, and the CPU cores keep a median of 6.5 busy (above), so these levers
+would pay nothing there: they would only lower the CPU cores' load. More
+concurrent games fill larger inference batches, which the GPU answers more
+cheaply a state, until the CPU cores limit again: at 0.98 ms a network
+evaluation the allowance feeds about 8,600 network evaluations a second, about
+1.5 times the 5,800 measured (inferred), and memory holds about 330 concurrent
+games at 64 simulations (below). So at 256×8 the engine's levers pay again only
+with more concurrent games; at 512×16, where the GPU's forward pass limits
+(above), they pay nothing; on a faster GPU the engine's cost sets how many CPU
+cores keep it busy.
 
 **When memory would limit.** The allowance's 30 GB hold the processes, about
 3 GB, and for each concurrent game its search tree and about 70 MB besides. In
 training at 256×8 on the GPU with 64 simulations, 63 concurrent games held
 8.0 GB at the sampled peak and 126 held 12.5 to 13.4 GB, about 70 to 85 MB a
 game, of which its search tree is about 11 MB
-([record](../archive/records/memory_in_training_2026_11_18.md)). With the search
-trees measured above, the 30 GB hold (inferred):
+([record](../archive/records/memory_in_training_2026_11_18.md)), all with the
+Python search. In the matched runs of the C++ search, 126 concurrent games held
+9.5 and 11.0 GB, against 11.0 and 12.0 GB with the Python search
+([record](../archive/records/search_in_cpp_2026_11_19.md#the-matched-runs)), so
+the table below, worked out with the Python search, may count about 10 MB a
+game too many. With the search trees measured above, the 30 GB hold (inferred):
 
 | Simulations per decision | Search tree | Memory per concurrent game | Concurrent games in 30 GB | States per inference batch |
 | ---: | ---: | ---: | ---: | ---: |
@@ -2999,7 +3008,16 @@ measured and what would settle it.
   4.5 hours of replays in builds with memory checks did not reproduce it. Two
   crashes close together and none under changed timing suggest a race between
   game threads in one process, but that is unproven. A ThreadSanitizer run is the
-  suggested next check.
+  suggested next check. Since the search runs in C++, a process's game threads
+  run side by side without taking turns at Python's lock, and the 378 games of
+  its three training iterations of 19 November all finished
+  ([record](../archive/records/search_in_cpp_2026_11_19.md#the-matched-runs)).
+- **Two searches.** Self-play runs the C++ search (section 4.7). Held-out
+  evaluation with fixed opponents, the batching of several searches' network
+  evaluations in one process (`studies/campaign/batching.py`) and tools still
+  run the Python search, which is also what the C++ search is checked against
+  (`tests/test_campaign_native_search.py`). A change to the search must be made
+  in both, or that check fails.
 - **No training run has yet made the agents stronger.** The most games a training
   run has played is 792 three-round games, on the PC on the night of 14 November
   ([record](../archive/records/three_round_training_2026_11_14.md)). Earlier runs
@@ -3053,12 +3071,12 @@ measured and what would settle it.
   faster engine plays more decisions an hour only as far as it fills the
   inference server's inference batches (section 9.2). A seventh game process
   would fill them further, which is untested. With the network on the GPU at
-  256×8 and 126 concurrent games the inference server is busy 97% of the time,
-  and since the policy readout stopped making the GPU compile, the run's CPU
-  cores go a little over the allowance: a median of 9.5 busy with 6 or 7 game
-  processes ([record](../archive/records/readout_without_repeat_2026_11_18.md)).
-  The owner accepts that small excess (19 November), and the supervisor's count
-  of cores accepts these layouts (Q-005 in `docs/questions.md`). The
+  256×8 and 126 concurrent games the inference server is busy 97% of the time.
+  Since the search runs in C++ the run keeps a median of 6.5 CPU cores busy
+  ([record](../archive/records/search_in_cpp_2026_11_19.md)); with the Python
+  search it went a little over the allowance, a median of 9.5, which the owner
+  accepted (19 November), and the supervisor's count of cores accepts these
+  layouts (Q-005 in `docs/questions.md`). The
   inference server's levers are listed in section 9.3: fewer PyTorch calls came
   with one network, compiling and more concurrent games are settings, and the
   others are not built. In

@@ -234,7 +234,7 @@ calls, so that the rows overlap:
   process.
 - **The game processes' CPU is where the engine's levers act.** Of a network
   evaluation's 1.71 ms, 1.12 ms is the engine with the encoding and 0.59 ms
-  Python. About 57% of the engine's samples are memory allocation, strings,
+  Python. About 65% of the engine's samples are memory allocation, strings,
   memory copies and map lookups, not the rules' own code.
 - **Python's lock is a second limit in waiting.** It was held about 56% of the
   time in a sampled process, so at the same Python work per network evaluation

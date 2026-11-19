@@ -1,0 +1,685 @@
+{
+ "date": "2026-11-19",
+ "question": "What the C++ search changes in training at 256x8 on the GPU with 126 concurrent games",
+ "code": {
+  "before": "2a90d89",
+  "after": "the C++ search on 2a90d89; main holds it as cd09de0, after the rules change dc3084a"
+ },
+ "machine": "Apple M4 Max, 10 performance and 4 efficiency cores, 36 GB; PyTorch 2.14.0 (tmp/gpu-mps-env); MallocNanoZone unset",
+ "commands": {
+  "run": "OUT/pair.sh, from each copy: .venv/bin/python tools/supervise_campaign_training.py --profile mac --control-dir OUT/NAME-control --run-dir OUT/NAME --seconds 3600 --max-restarts 0 -- --calendar-rounds 11 --complete-episodes --batches 1 --transitions-per-batch 20000 --simulations 64 --max-depth 16 --hidden-dim 256 --message-layers 8 --batch-size 32 --epochs 525 --replay-capacity 8000 --sample-fraction 0.05 --seed 20261119 --neural-device mps --no-continuous --compiled-forward --episode-workers 7 --games-per-process 18 --parallel-envs 126",
+  "load": ".venv/bin/python tools/log_process_load.py record --pid SUPERVISOR --output OUT/NAME-load.jsonl; summarized with tools/log_process_load.py summarize",
+  "profile": ".venv/bin/python tools/profile_game_process_cpu.py --output OUT/profile-new.json --profile mac --control-dir OUT/profile-new-control --run-dir OUT/profile-new --seconds 3600 --sample-at 180,420,660,900 --sample-seconds 20 -- (the run's training options)",
+  "order": [
+   "before 1, 11:46-12:09",
+   "after 1, 12:09-12:29",
+   "before 2, 12:29-12:51",
+   "after 2, 12:51-13:11",
+   "profiled after, 13:11-13:32"
+  ]
+ },
+ "matched_runs": [
+  {
+   "run": "old-1",
+   "code": "before",
+   "status": "completed",
+   "games": 126,
+   "decisions": 130624,
+   "chance_events": 18134,
+   "playing_seconds": 1351.9,
+   "decisions_per_hour_while_playing": 347846,
+   "games_per_hour_while_playing": 335.5,
+   "network_evaluations": 6652508,
+   "network_evaluations_per_second": 4920.9,
+   "inference_batches": 156270,
+   "mean_inference_batch_states": 42.57,
+   "inference_server_waiting_share": 0.0279,
+   "inference_server_answering_share": 0.8942,
+   "inference_server_answering_us_per_evaluation": 181.7,
+   "peak_rss_bytes_sampled": 10988084280,
+   "batch_cpu_cores": {
+    "mean_window": 8.8,
+    "median_window": 9.32,
+    "highest_window": 10.98
+   },
+   "other_work_cpu_cores": {
+    "mean_window": 1.14,
+    "median_window": 1.1
+   },
+   "game_processes_cpu_seconds": 10790.6,
+   "game_processes_cpu_ms_per_network_evaluation": 1.622,
+   "game_processes_cpu_ms_per_decision": 82.6,
+   "game_processes_instructions_per_network_evaluation": 13387059,
+   "game_processes_performance_core_share": 0.812,
+   "game_processes_waiting_for_a_core_per_cpu_second": 1.261,
+   "inference_server_cpu_seconds": 857.6,
+   "load_summary": {
+    "seconds_with_game_processes": 1341.6,
+    "batch_cores": {
+     "mean_window": 8.8,
+     "median_window": 9.32,
+     "highest_window": 10.98
+    },
+    "other_work_cores": {
+     "mean_window": 1.14,
+     "median_window": 1.1
+    },
+    "processes": {
+     "rest of the tree": {
+      "processes": 3,
+      "cpu_seconds": 3.6,
+      "performance_core_share": 0.862,
+      "waiting_for_a_core_seconds": 1.1,
+      "waiting_per_cpu_second": 0.297,
+      "instructions": 21455595541,
+      "cycles": 13221896639,
+      "instructions_per_cycle": {
+       "performance": 1.65,
+       "efficiency": 1.36
+      },
+      "gigahertz": {
+       "performance": 3.86,
+       "efficiency": 2.59
+      },
+      "efficiency_second_vs_performance_second": 0.551,
+      "performance_core_equivalent_cpu_seconds": 3.4,
+      "cpu_seconds_by_qos": {
+       "legacy": 3.6
+      }
+     },
+     "coordinator": {
+      "processes": 1,
+      "cpu_seconds": 857.6,
+      "performance_core_share": 0.962,
+      "waiting_for_a_core_seconds": 102.6,
+      "waiting_per_cpu_second": 0.12,
+      "instructions": 7988998585210,
+      "cycles": 3280235541731,
+      "instructions_per_cycle": {
+       "performance": 2.48,
+       "efficiency": 0.91
+      },
+      "gigahertz": {
+       "performance": 3.87,
+       "efficiency": 2.59
+      },
+      "efficiency_second_vs_performance_second": 0.244,
+      "performance_core_equivalent_cpu_seconds": 833.2,
+      "cpu_seconds_by_qos": {
+       "legacy": 857.6
+      }
+     },
+     "game processes": {
+      "processes": 7,
+      "cpu_seconds": 10790.6,
+      "performance_core_share": 0.812,
+      "waiting_for_a_core_seconds": 13604.0,
+      "waiting_per_cpu_second": 1.261,
+      "instructions": 89057517311291,
+      "cycles": 38836193344996,
+      "instructions_per_cycle": {
+       "performance": 2.42,
+       "efficiency": 1.47
+      },
+      "gigahertz": {
+       "performance": 3.83,
+       "efficiency": 2.58
+      },
+      "efficiency_second_vs_performance_second": 0.409,
+      "performance_core_equivalent_cpu_seconds": 9595.6,
+      "cpu_seconds_by_qos": {
+       "legacy": 10790.6
+      }
+     }
+    }
+   }
+  },
+  {
+   "run": "new-1",
+   "code": "after",
+   "status": "completed",
+   "games": 126,
+   "decisions": 131091,
+   "chance_events": 18151,
+   "playing_seconds": 1161.8,
+   "decisions_per_hour_while_playing": 406191,
+   "games_per_hour_while_playing": 390.4,
+   "network_evaluations": 6681041,
+   "network_evaluations_per_second": 5750.4,
+   "inference_batches": 144397,
+   "mean_inference_batch_states": 46.27,
+   "inference_server_waiting_share": 0.0294,
+   "inference_server_answering_share": 0.8985,
+   "inference_server_answering_us_per_evaluation": 156.3,
+   "peak_rss_bytes_sampled": 9546338120,
+   "batch_cpu_cores": {
+    "mean_window": 6.39,
+    "median_window": 6.5,
+    "highest_window": 9.48
+   },
+   "other_work_cpu_cores": {
+    "mean_window": 1.24,
+    "median_window": 1.1
+   },
+   "game_processes_cpu_seconds": 6493.3,
+   "game_processes_cpu_ms_per_network_evaluation": 0.972,
+   "game_processes_cpu_ms_per_decision": 49.5,
+   "game_processes_instructions_per_network_evaluation": 10538486,
+   "game_processes_performance_core_share": 0.754,
+   "game_processes_waiting_for_a_core_per_cpu_second": 1.917,
+   "inference_server_cpu_seconds": 634.1,
+   "load_summary": {
+    "seconds_with_game_processes": 1132.2,
+    "batch_cores": {
+     "mean_window": 6.39,
+     "median_window": 6.5,
+     "highest_window": 9.48
+    },
+    "other_work_cores": {
+     "mean_window": 1.24,
+     "median_window": 1.1
+    },
+    "processes": {
+     "rest of the tree": {
+      "processes": 4,
+      "cpu_seconds": 2.7,
+      "performance_core_share": 0.912,
+      "waiting_for_a_core_seconds": 1.8,
+      "waiting_per_cpu_second": 0.663,
+      "instructions": 18436789902,
+      "cycles": 10192653477,
+      "instructions_per_cycle": {
+       "performance": 1.83,
+       "efficiency": 1.44
+      },
+      "gigahertz": {
+       "performance": 3.96,
+       "efficiency": 2.59
+      },
+      "efficiency_second_vs_performance_second": 0.512,
+      "performance_core_equivalent_cpu_seconds": 2.5,
+      "cpu_seconds_by_qos": {
+       "legacy": 2.7
+      }
+     },
+     "coordinator": {
+      "processes": 1,
+      "cpu_seconds": 634.1,
+      "performance_core_share": 0.98,
+      "waiting_for_a_core_seconds": 136.2,
+      "waiting_per_cpu_second": 0.215,
+      "instructions": 6859951916329,
+      "cycles": 2455867983485,
+      "instructions_per_cycle": {
+       "performance": 2.82,
+       "efficiency": 0.92
+      },
+      "gigahertz": {
+       "performance": 3.9,
+       "efficiency": 2.58
+      },
+      "efficiency_second_vs_performance_second": 0.216,
+      "performance_core_equivalent_cpu_seconds": 623.9,
+      "cpu_seconds_by_qos": {
+       "legacy": 634.1
+      }
+     },
+     "game processes": {
+      "processes": 7,
+      "cpu_seconds": 6493.3,
+      "performance_core_share": 0.754,
+      "waiting_for_a_core_seconds": 12447.2,
+      "waiting_per_cpu_second": 1.917,
+      "instructions": 70408053867629,
+      "cycles": 23093959293541,
+      "instructions_per_cycle": {
+       "performance": 3.27,
+       "efficiency": 2.04
+      },
+      "gigahertz": {
+       "performance": 3.88,
+       "efficiency": 2.58
+      },
+      "efficiency_second_vs_performance_second": 0.415,
+      "performance_core_equivalent_cpu_seconds": 5558.2,
+      "cpu_seconds_by_qos": {
+       "legacy": 6493.3
+      }
+     }
+    }
+   }
+  },
+  {
+   "run": "old-2",
+   "code": "before",
+   "status": "completed",
+   "games": 126,
+   "decisions": 131122,
+   "chance_events": 18073,
+   "playing_seconds": 1293.5,
+   "decisions_per_hour_while_playing": 364941,
+   "games_per_hour_while_playing": 350.7,
+   "network_evaluations": 6692243,
+   "network_evaluations_per_second": 5173.9,
+   "inference_batches": 151614,
+   "mean_inference_batch_states": 44.14,
+   "inference_server_waiting_share": 0.0267,
+   "inference_server_answering_share": 0.8932,
+   "inference_server_answering_us_per_evaluation": 172.6,
+   "peak_rss_bytes_sampled": 11953475544,
+   "batch_cpu_cores": {
+    "mean_window": 9.15,
+    "median_window": 9.54,
+    "highest_window": 11.36
+   },
+   "other_work_cpu_cores": {
+    "mean_window": 0.82,
+    "median_window": 0.69
+   },
+   "game_processes_cpu_seconds": 10753.2,
+   "game_processes_cpu_ms_per_network_evaluation": 1.607,
+   "game_processes_cpu_ms_per_decision": 82.0,
+   "game_processes_instructions_per_network_evaluation": 13402254,
+   "game_processes_performance_core_share": 0.802,
+   "game_processes_waiting_for_a_core_per_cpu_second": 1.141,
+   "inference_server_cpu_seconds": 811.1,
+   "load_summary": {
+    "seconds_with_game_processes": 1286.7,
+    "batch_cores": {
+     "mean_window": 9.15,
+     "median_window": 9.54,
+     "highest_window": 11.36
+    },
+    "other_work_cores": {
+     "mean_window": 0.82,
+     "median_window": 0.69
+    },
+    "processes": {
+     "rest of the tree": {
+      "processes": 3,
+      "cpu_seconds": 3.4,
+      "performance_core_share": 0.842,
+      "waiting_for_a_core_seconds": 0.8,
+      "waiting_per_cpu_second": 0.221,
+      "instructions": 21530372819,
+      "cycles": 12424985263,
+      "instructions_per_cycle": {
+       "performance": 1.77,
+       "efficiency": 1.47
+      },
+      "gigahertz": {
+       "performance": 3.86,
+       "efficiency": 2.59
+      },
+      "efficiency_second_vs_performance_second": 0.56,
+      "performance_core_equivalent_cpu_seconds": 3.2,
+      "cpu_seconds_by_qos": {
+       "legacy": 3.4
+      }
+     },
+     "coordinator": {
+      "processes": 1,
+      "cpu_seconds": 811.1,
+      "performance_core_share": 0.965,
+      "waiting_for_a_core_seconds": 98.4,
+      "waiting_per_cpu_second": 0.121,
+      "instructions": 7747459153870,
+      "cycles": 3101970020720,
+      "instructions_per_cycle": {
+       "performance": 2.54,
+       "efficiency": 0.81
+      },
+      "gigahertz": {
+       "performance": 3.87,
+       "efficiency": 2.58
+      },
+      "efficiency_second_vs_performance_second": 0.213,
+      "performance_core_equivalent_cpu_seconds": 788.6,
+      "cpu_seconds_by_qos": {
+       "legacy": 811.1
+      }
+     },
+     "game processes": {
+      "processes": 7,
+      "cpu_seconds": 10753.2,
+      "performance_core_share": 0.802,
+      "waiting_for_a_core_seconds": 12267.2,
+      "waiting_per_cpu_second": 1.141,
+      "instructions": 89691143026914,
+      "cycles": 38536149374203,
+      "instructions_per_cycle": {
+       "performance": 2.46,
+       "efficiency": 1.51
+      },
+      "gigahertz": {
+       "performance": 3.83,
+       "efficiency": 2.58
+      },
+      "efficiency_second_vs_performance_second": 0.412,
+      "performance_core_equivalent_cpu_seconds": 9499.3,
+      "cpu_seconds_by_qos": {
+       "legacy": 10753.2
+      }
+     }
+    }
+   }
+  },
+  {
+   "run": "new-2",
+   "code": "after",
+   "status": "completed",
+   "games": 126,
+   "decisions": 132112,
+   "chance_events": 18344,
+   "playing_seconds": 1157.9,
+   "decisions_per_hour_while_playing": 410731,
+   "games_per_hour_while_playing": 391.7,
+   "network_evaluations": 6754063,
+   "network_evaluations_per_second": 5832.8,
+   "inference_batches": 141512,
+   "mean_inference_batch_states": 47.73,
+   "inference_server_waiting_share": 0.0254,
+   "inference_server_answering_share": 0.9025,
+   "inference_server_answering_us_per_evaluation": 154.7,
+   "peak_rss_bytes_sampled": 11028318008,
+   "batch_cpu_cores": {
+    "mean_window": 6.35,
+    "median_window": 6.62,
+    "highest_window": 9.5
+   },
+   "other_work_cpu_cores": {
+    "mean_window": 0.91,
+    "median_window": 0.85
+   },
+   "game_processes_cpu_seconds": 6611.0,
+   "game_processes_cpu_ms_per_network_evaluation": 0.979,
+   "game_processes_cpu_ms_per_decision": 50.0,
+   "game_processes_instructions_per_network_evaluation": 10502135,
+   "game_processes_performance_core_share": 0.749,
+   "game_processes_waiting_for_a_core_per_cpu_second": 1.924,
+   "inference_server_cpu_seconds": 641.7,
+   "load_summary": {
+    "seconds_with_game_processes": 1152.1,
+    "batch_cores": {
+     "mean_window": 6.35,
+     "median_window": 6.62,
+     "highest_window": 9.5
+    },
+    "other_work_cores": {
+     "mean_window": 0.91,
+     "median_window": 0.85
+    },
+    "processes": {
+     "rest of the tree": {
+      "processes": 3,
+      "cpu_seconds": 2.7,
+      "performance_core_share": 0.93,
+      "waiting_for_a_core_seconds": 1.6,
+      "waiting_per_cpu_second": 0.612,
+      "instructions": 19154376743,
+      "cycles": 10373625274,
+      "instructions_per_cycle": {
+       "performance": 1.87,
+       "efficiency": 1.43
+      },
+      "gigahertz": {
+       "performance": 3.97,
+       "efficiency": 2.59
+      },
+      "efficiency_second_vs_performance_second": 0.5,
+      "performance_core_equivalent_cpu_seconds": 2.6,
+      "cpu_seconds_by_qos": {
+       "legacy": 2.7
+      }
+     },
+     "coordinator": {
+      "processes": 1,
+      "cpu_seconds": 641.7,
+      "performance_core_share": 0.982,
+      "waiting_for_a_core_seconds": 143.5,
+      "waiting_per_cpu_second": 0.224,
+      "instructions": 7005374065543,
+      "cycles": 2488643178990,
+      "instructions_per_cycle": {
+       "performance": 2.84,
+       "efficiency": 0.9
+      },
+      "gigahertz": {
+       "performance": 3.9,
+       "efficiency": 2.57
+      },
+      "efficiency_second_vs_performance_second": 0.208,
+      "performance_core_equivalent_cpu_seconds": 632.7,
+      "cpu_seconds_by_qos": {
+       "legacy": 641.7
+      }
+     },
+     "game processes": {
+      "processes": 7,
+      "cpu_seconds": 6611.0,
+      "performance_core_share": 0.749,
+      "waiting_for_a_core_seconds": 12717.8,
+      "waiting_per_cpu_second": 1.924,
+      "instructions": 70932078759177,
+      "cycles": 23472792491901,
+      "instructions_per_cycle": {
+       "performance": 3.24,
+       "efficiency": 2.03
+      },
+      "gigahertz": {
+       "performance": 3.88,
+       "efficiency": 2.58
+      },
+      "efficiency_second_vs_performance_second": 0.415,
+      "performance_core_equivalent_cpu_seconds": 5640.4,
+      "cpu_seconds_by_qos": {
+       "legacy": 6611.0
+      }
+     }
+    }
+   }
+  }
+ ],
+ "profile_of_the_code_after": {
+  "batch": {
+   "playing_seconds": 1180.0837378340075,
+   "games": 126,
+   "games_per_hour": 384.3795024517185,
+   "decisions_per_hour": 405288.5271327032,
+   "coordinator_busy": 0.9003253906550533,
+   "evaluator": {
+    "evaluations": 6786292,
+    "forward_seconds": 1062.4593522710784,
+    "idle_seconds": 31.8702658736147,
+    "network_passes": 149601,
+    "serving_rounds": 149601
+   }
+  },
+  "summary": {
+   "games": 126,
+   "complete_games": 126,
+   "decisions_per_game": 1054.3968253968253,
+   "chance_events_per_game": 144.96825396825398,
+   "evaluations_per_game": 53859.46031746032,
+   "thread_cpu_seconds_per_game": 53.74168864283333,
+   "thread_cpu_ms_per_decision": 50.96912978906921,
+   "share_of_thread_cpu": {
+    "search": 0.9646955597645835,
+    "engine": 0.004881349258217745,
+    "encode": 0.0004471038840973036,
+    "adapter": 0.0016760882159532683,
+    "input": 9.613921003489886e-06,
+    "messaging": 0.0,
+    "game loop": 0.02829028495614467
+   },
+   "seconds_per_game_by_call": {
+    "search/search_decision": 51.844368407992064,
+    "game loop/make_env": 1.3914237496984128,
+    "engine/apply_action": 0.19939187364285715,
+    "game loop/_decide": 0.08127413534126984,
+    "adapter/legal_actions": 0.04962378226984127,
+    "game loop": 0.04766980069047619,
+    "engine/legal_actions": 0.024438368936507936,
+    "encode/zone_input": 0.02402811773015873,
+    "adapter/planning_key": 0.01893980631746032,
+    "engine/resolve_chance": 0.01624094099206349,
+    "engine/planning_key": 0.01294862980952381,
+    "adapter/decision_kind": 0.009167910476190476,
+    "adapter/apply_action": 0.006664070412698412,
+    "engine/legal_interrupts": 0.004495171095238095,
+    "adapter/is_terminal": 0.002369253111111111,
+    "engine/is_terminal": 0.002185945611111111,
+    "adapter/current_decision_player": 0.001877436246031746,
+    "adapter/zone_input": 0.0010112152142857142,
+    "engine/decision_kind": 0.0009216769920634921,
+    "engine/current_decision_player": 0.0008809351984126984,
+    "engine/observation": 0.0005991514206349207,
+    "input/make_zone_input": 0.0005166683492063492,
+    "adapter/resolve_chance": 0.00042018882539682543,
+    "engine/apply_interrupt": 0.0001694570238095238,
+    "engine/wealth": 3.847057142857142e-05,
+    "engine/returns": 2.1330698412698413e-05,
+    "adapter/returns": 2.1481666666666666e-06
+   },
+   "calls_per_game": {
+    "adapter/apply_action": 1054.3968253968253,
+    "adapter/current_decision_player": 1054.3968253968253,
+    "adapter/decision_kind": 2398.7301587301586,
+    "adapter/is_terminal": 2400.7301587301586,
+    "adapter/legal_actions": 1054.3968253968253,
+    "adapter/planning_key": 2398.7301587301586,
+    "adapter/resolve_chance": 144.96825396825398,
+    "adapter/returns": 1.0,
+    "adapter/zone_input": 224.23015873015873,
+    "encode/zone_input": 224.23015873015873,
+    "engine/apply_action": 1051.373015873016,
+    "engine/apply_interrupt": 1.619047619047619,
+    "engine/current_decision_player": 1197.3412698412699,
+    "engine/decision_kind": 1200.3650793650793,
+    "engine/is_terminal": 3825.3253968253966,
+    "engine/legal_actions": 1052.373015873016,
+    "engine/legal_interrupts": 803.515873015873,
+    "engine/observation": 1.0,
+    "engine/planning_key": 10439.238095238095,
+    "engine/resolve_chance": 144.96825396825398,
+    "engine/returns": 1.0,
+    "engine/wealth": 1.0,
+    "game loop/_decide": 1054.3968253968253,
+    "game loop/make_env": 1.0,
+    "input/make_zone_input": 224.23015873015873,
+    "search/search_decision": 1054.3968253968253
+   },
+   "wall_seconds_per_game": 1015.8525609434217,
+   "wall_share": {
+    "own CPU": 0.05290303997749777,
+    "waiting for the coordinator": 0.9315052438872792,
+    "other, mostly the interpreter lock": 0.015591716135223019
+   },
+   "process_cpu_seconds_per_game": 53.80584800793651,
+   "unaccounted_process_cpu_seconds_per_game": 0.06415936510317977,
+   "wrapped_call_overhead_ns": 606.360625
+  },
+  "peak_rss_bytes_sampled": 10253979656,
+  "game_process_cpu_seconds": {
+   "user": 6622.2,
+   "system": 157.3,
+   "system_share": 0.0232
+  },
+  "native_sample_times_seconds": [
+   180,
+   420,
+   660,
+   900
+  ],
+  "native": {
+   "game_thread_samples": 810349,
+   "engine_samples": 72273,
+   "thread_states": {
+    "wait: pipe read (inference server)": 0.9096,
+    "engine": 0.0892,
+    "wait: other": 0.0009,
+    "python and other libraries": 0.0003,
+    "wait: interpreter lock after an engine call": 0.0,
+    "wait: interpreter lock": 0.0
+   },
+   "engine_parts": {
+    "listing legal actions": 0.3905,
+    "encoding the state": 0.1798,
+    "playing an action": 0.1742,
+    "copying the game": 0.1021,
+    "rolling dice": 0.0658,
+    "destroying copies": 0.0355,
+    "the search's own work": 0.0283,
+    "sending requests and reading replies": 0.0116,
+    "listing declarations": 0.0046,
+    "from Python: playing an action": 0.0039,
+    "from Python: other calls": 0.0017,
+    "from Python: encoding the state (zone_input)": 0.0006,
+    "the state key": 0.0004,
+    "from Python: rolling dice": 0.0003,
+    "from Python: destroying action objects": 0.0003,
+    "from Python: listing legal actions": 0.0002,
+    "from Python: destroying a copy": 0.0001
+   },
+   "checks_inclusive_overlapping": {
+    "encoding the state": 0.1804,
+    "copying whole states": 0.1275,
+    "naval routes: enumerating and validating": 0.0923,
+    "movement allowances": 0.0714,
+    "supply paths": 0.0663,
+    "naval orders that can still be completed": 0.0646,
+    "destroying whole states": 0.046,
+    "the planning key": 0.0455,
+    "aircraft landing plans": 0.0418,
+    "writing actions as canonical JSON": 0.0379,
+    "the economy's menu": 0.0345,
+    "checking the whole state": 0.0294,
+    "factory capacity": 0.0074,
+    "converting to and from Python objects": 0.0008
+   },
+   "kind_of_innermost_work": {
+    "the rules' own code": 0.306,
+    "allocating and freeing memory": 0.2326,
+    "copying and building strings": 0.1998,
+    "comparing strings": 0.0803,
+    "copying and filling memory": 0.0777,
+    "looking up maps and hash tables": 0.063,
+    "other libraries": 0.0307,
+    "reading and copying JSON values": 0.0094,
+    "Python's interpreter": 0.0005
+   },
+   "checks_inside_parts": {
+    "listing legal actions": {
+     "naval orders that can still be completed": 0.149,
+     "naval routes: enumerating and validating": 0.1445,
+     "movement allowances": 0.1182,
+     "supply paths": 0.1099,
+     "aircraft landing plans": 0.0896,
+     "the economy's menu": 0.0882,
+     "writing actions as canonical JSON": 0.0797,
+     "copying whole states": 0.0484,
+     "destroying whole states": 0.0207,
+     "factory capacity": 0.019
+    },
+    "playing an action": {
+     "naval routes: enumerating and validating": 0.2021,
+     "the planning key": 0.1773,
+     "movement allowances": 0.1421,
+     "supply paths": 0.1321,
+     "checking the whole state": 0.1159,
+     "naval orders that can still be completed": 0.0357,
+     "writing actions as canonical JSON": 0.0353,
+     "aircraft landing plans": 0.0344,
+     "copying whole states": 0.0251,
+     "destroying whole states": 0.0093,
+     "the economy's menu": 0.0002
+    }
+   }
+  }
+ },
+ "scripts": {
+  "search_samples.py": "\"\"\"Stack samples of game processes running the C++ search: where a game thread's engine time goes.\"\"\"\nimport json, sys\nfrom collections import Counter\nfrom pathlib import Path\n\nsys.path.insert(0, \"SCRATCH/engine_profile\")\nfrom samples import CALLS, CHECKS, ENGINE, entry, game_threads, kind_of_work, thread_state  # noqa: E402\n\n# Parts of the C++ search, by the outermost frame below the search that matches one.\nPARTS = (\n    (\"playing an action\", (\"Engine::step(\",)),\n    (\"playing a declaration\", (\"Engine::interrupt(\",)),\n    (\"rolling dice\", (\"Engine::resolveChance(\",)),\n    (\"listing legal actions\", (\"Engine::actionMenu(\", \"Engine::legalActionMenu(\")),\n    (\"listing declarations\", (\"Engine::interruptMenu(\", \"Engine::legalInterruptMenu(\")),\n    (\"encoding the state\", (\"encodeZoneInput(\",)),\n    (\"copying the game\", (\"Engine::cloneForSearch\", \"Engine::clone(\")),\n    (\"destroying copies\", (\"Engine::~Engine\", \"State::~State\", \"__shared_ptr_emplace<game::campaign::Engine\",\n                           \"deque<game::campaign::(anonymous namespace)::Node\")),\n    (\"the state key\", (\"Engine::stateKey(\", \"State::planningKey(\")),\n    (\"sending requests and reading replies\", (\"InferenceClient::evaluate\",)),\n    (\"the zone encoding version\", (\"zoneEncodingSpec(\",)),\n)\n\n\ndef search_part(frames):\n    names = [function for function, library in frames if library == ENGINE]\n    inside = False\n    for name in names:\n        if \"searchDecision\" in name:\n            inside = True\n            continue\n        if not inside:\n            continue\n        for part, keys in PARTS:\n            if any(key in name for key in keys):\n                return part\n    return \"the search's own work\" if inside else None\n\n\ndef report(paths):\n    states, parts, checks, kinds, calls = Counter(), Counter(), Counter(), Counter(), Counter()\n    for path, thread, frames, count in game_threads(paths):\n        state = thread_state(frames)\n        states[state] += count\n        if state != \"engine\":\n            continue\n        part = search_part(frames)\n        if part is None:\n            first = entry(frames)\n            part = \"from Python: \" + next((name for name, keys in CALLS if any(key in first for key in keys)), \"other calls\")\n        parts[part] += count\n        names = [function for function, library in frames if library == ENGINE]\n        for check, keys in CHECKS:\n            if any(any(key in name for key in keys) for name in names):\n                checks[check] += count\n        kinds[kind_of_work(*frames[-1])] += count\n    engine, total = states[\"engine\"], sum(states.values())\n\n    def shares(counter, whole):\n        return {name: round(count / whole, 4) for name, count in counter.most_common()}\n\n    return {\"game_thread_samples\": total, \"engine_samples\": engine, \"thread_states\": shares(states, total),\n            \"engine_parts\": shares(parts, engine), \"checks_inclusive_overlapping\": shares(checks, engine),\n            \"kind_of_innermost_work\": shares(kinds, engine)}\n\n\nif __name__ == \"__main__\":\n    print(json.dumps(report(sys.argv[1:]), indent=1))\n",
+  "samples.py (the parser and classifiers it imports)": "\"\"\"Read macOS /usr/bin/sample reports of game processes: where game threads spend their samples.\n\nparse(path) yields (thread, frames, samples) for every leaf of the call graph, frames from the\nthread's root to the innermost function, each frame (function, library).\n\"\"\"\nfrom __future__ import annotations\n\nimport re\nimport sys\nfrom collections import Counter\n\nLINE = re.compile(r\"^(?P<prefix>[ +!:|]*)(?P<count>\\d+) (?P<frame>.*)$\")\nFRAME = re.compile(r\"^(?P<function>.*?)\\s+\\(in (?P<library>[^)]+)\\)(?:\\s+\\+ [0-9,.]+)?(?:\\s+\\[[0-9a-fx,.]+\\])?\\s*$\")\nENGINE = \"gwrl_cpp.cpython-313-darwin.so\"\n\n\ndef frame_of(text: str) -> tuple[str, str]:\n    match = FRAME.match(text.strip())\n    if match:\n        return match.group(\"function\"), match.group(\"library\")\n    return text.strip().split(\"  [\")[0], \"?\"\n\n\ndef parse(path):\n    text = open(path, errors=\"replace\").read()\n    graph = text.split(\"Call graph:\", 1)[1].split(\"Total number in stack\", 1)[0]\n    stack = []  # [depth, frame, count, children total]\n    thread = None\n\n    def close(to_depth):\n        nonlocal stack\n        while stack and stack[-1][0] >= to_depth:\n            depth, frame, count, children = stack.pop()\n            if stack:\n                stack[-1][3] += count\n            own = count - children\n            if own > 0:\n                yield thread, [entry[1] for entry in stack] + [frame], own\n\n    for line in graph.splitlines():\n        match = LINE.match(line)\n        if not match:\n            continue\n        depth = len(match.group(\"prefix\")) // 2\n        if depth <= 2:  # A thread's line.\n            yield from close(0)\n            thread = match.group(\"frame\").strip()\n            stack = []\n            continue\n        yield from close(depth)\n        stack.append([depth, frame_of(match.group(\"frame\")), int(match.group(\"count\")), 0])\n    yield from close(0)\n\n\nWAITS = (\"__psynch_cvwait\", \"__psynch_mutexwait\", \"read\", \"__read_nocancel\", \"__semwait_signal\", \"__select\",\n         \"kevent\", \"kevent64\", \"mach_msg2_trap\", \"__workq_kernreturn\", \"__ulock_wait\", \"__ulock_wait2\", \"poll\",\n         \"__recvfrom\", \"recvfrom\", \"__wait4\", \"__sigsuspend\", \"semaphore_wait_trap\", \"__recvmsg\", \"__sendmsg\")\n\n\ndef main(paths):\n    leaves = Counter()\n    total = 0\n    for path in paths:\n        for thread, frames, count in parse(path):\n            total += count\n            leaves[frames[-1][0]] += count\n    print(total)\n    for name, count in leaves.most_common(25):\n        print(count, name[:150])\n\n\nif __name__ == \"__main__\":\n    main(sys.argv[1:])\n\n\ndef in_engine(frames) -> bool:\n    return any(library == ENGINE for _, library in frames)\n\n\ndef thread_state(frames) -> str:\n    \"\"\"What a game thread's sample was doing.\"\"\"\n    leaf = frames[-1][0]\n    names = [function for function, _ in frames]\n    gil = any(name in (\"take_gil\", \"PyEval_RestoreThread\", \"PyEval_AcquireThread\", \"_PyEval_ReInitThreads\")\n              for name in names)\n    if leaf in WAITS or leaf.startswith(\"__psynch\") or leaf.startswith(\"__ulock\"):\n        if gil:\n            return \"wait: interpreter lock after an engine call\" if in_engine(frames) else \"wait: interpreter lock\"\n        if leaf in (\"read\", \"__read_nocancel\", \"__recvfrom\", \"recvfrom\", \"__recvmsg\"):\n            return \"wait: pipe read (inference server)\"\n        return \"wait: other\"\n    if gil:\n        return \"wait: interpreter lock (spinning)\"\n    if in_engine(frames):\n        return \"engine\"\n    return \"python and other libraries\"\n\n\ndef game_threads(paths):\n    \"\"\"Every sample of threads that ever called the engine, by thread.\"\"\"\n    for path in paths:\n        by_thread = {}\n        for thread, frames, count in parse(path):\n            by_thread.setdefault(thread, []).append((frames, count))\n        for thread, rows in by_thread.items():\n            if any(in_engine(frames) for frames, _ in rows):\n                for frames, count in rows:\n                    yield path, thread, frames, count\n\n\ndef entry(frames) -> str:\n    \"\"\"The first engine function below pybind11's dispatcher: the call Python made.\"\"\"\n    seen_dispatch = False\n    for function, library in frames:\n        if library != ENGINE:\n            continue\n        if \"dispatcher\" in function or function.startswith(\"pybind11::\"):\n            seen_dispatch = True\n            continue\n        if seen_dispatch and not function.startswith(\"pybind11::\") and \"NativeCampaignEnv::call\" not in function:\n            return function\n    return \"?\"\n\n\ndef discover(paths):\n    states, entries, inclusive = Counter(), Counter(), Counter()\n    engine = 0\n    for path, thread, frames, count in game_threads(paths):\n        state = thread_state(frames)\n        states[state] += count\n        if state == \"engine\":\n            engine += count\n            entries[entry(frames)[:140]] += count\n            for name in {function for function, library in frames if library == ENGINE}:\n                inclusive[name[:140]] += count\n    total = sum(states.values())\n    print(\"game-thread samples\", total)\n    for name, count in states.most_common():\n        print(f\"  {count / total:6.1%} {name}\")\n    print(\"engine samples\", engine)\n    for name, count in entries.most_common(30):\n        print(f\"  {count / engine:6.1%} {name}\")\n    print(\"inclusive\")\n    for name, count in inclusive.most_common(120):\n        print(f\"  {count / engine:6.1%} {name}\")\n\n\n# Engine calls, by the first engine function below pybind11's dispatcher.\nCALLS = (\n    (\"listing legal actions\", (\"Engine::legalActions\", \"std::vector<game::campaign::Action>>::value\")),\n    (\"playing an action\", (\"CampaignEnv::applyAction\",)),\n    (\"encoding the state (zone_input)\", (\"ZoneInputHandle>::value\", \"zoneArrays\", \"ZoneInput::~ZoneInput\")),\n    (\"copying the game (clone_for_search)\", (\"NativeCampaignEnv>>::value\",)),\n    (\"destroying a copy\", (\"default_delete<(anonymous namespace)::NativeCampaignEnv>\",)),\n    (\"rolling dice\", (\"CampaignEnv::resolveChance\",)),\n    (\"destroying action objects\", (\"Action::~Action\",)),\n)\n\n# Rule checks and other work, counted with everything they call, so rows overlap.\nCHECKS = (\n    (\"naval routes: enumerating and validating\", (\"visitNavalRoutes\", \"validateNavalRoute\")),\n    (\"aircraft landing plans\", (\"solveReachablePlan\", \"reachablePlan(\", \"flightKeepsLanding\", \"airLandingsKept\",\n                                \"engagementKeepsLanding\", \"preservesLandingPlan\", \"reachableShortfall\")),\n    (\"supply paths\", (\"traceSupply\", \"inSupply(\")),\n    (\"naval orders that can still be completed\", (\"NavalOrderCompletion::possible\", \"forwardNavalOrderActions\",\n                                                  \"forwardNavalOrderDecision\")),\n    (\"movement allowances\", (\"allowance(\", \"allowanceNow(\", \"allowanceBeforeSurprise\")),\n    (\"the economy's menu\", (\"economyActions\",)),\n    (\"factory capacity\", (\"capacity(game::campaign::State\", \"canFactoryBuy\")),\n    (\"encoding the state\", (\"encodeZoneInput\", \"zoneArrays\")),\n    (\"copying whole states\", (\"State::State(game::campaign::State const&)\", \"Engine::Engine(game::campaign::Engine const&)\")),\n    (\"destroying whole states\", (\"State::~State\", \"NativeCampaignEnv>::operator()\", \"dealloc_impl\")),\n    (\"the planning key\", (\"State::planningKey\",)),\n    (\"checking the whole state\", (\"State::validate\",)),\n    (\"writing actions as canonical JSON\", (\"canonicalJson\", \"actionJson\")),\n    (\"converting to and from Python objects\", (\"type_caster\", \"list_caster\", \"pybind11_object_dealloc\",\n                                               \"clear_instance\", \"make_move_constructor\", \"make_copy_constructor\")),\n)\n\n\ndef kind_of_work(function: str, library: str) -> str:\n    if \"memcmp\" in function:\n        return \"comparing strings\"\n    if function.startswith((\"operator new\", \"operator delete\", \"malloc\", \"free\", \"_free\", \"_malloc\", \"nanov2\", \"_nanov2\",\n                            \"szone\", \"_szone\", \"xzm\", \"_xzm\", \"mfm_\", \"tiny_\", \"small_\", \"_realloc\", \"realloc\",\n                            \"default_zone\", \"_platform_bzero$VARIANT\")) or \"malloc\" in function:\n        return \"allocating and freeing memory\"\n    if \"__init_copy_ctor_external\" in function or \"basic_string\" in function:\n        return \"copying and building strings\"\n    if \"_platform_memmove\" in function or \"_platform_memset\" in function or function.startswith((\"memcpy\", \"bzero\", \"memset\")):\n        return \"copying and filling memory\"\n    if \"__tree\" in function or \"__hash_table\" in function or \"NameTable\" in function or \"murmur2\" in function \\\n            or \"lowerBound\" in function or \"SlotMap\" in function and \"lookup\" in function:\n        return \"looking up maps and hash tables\"\n    if \"game::json::\" in function or \"__variant_detail\" in function:\n        return \"reading and copying JSON values\"\n    if library == ENGINE:\n        return \"the rules' own code\"\n    if library.startswith(\"python\") or library.startswith(\"libpython\"):\n        return \"Python's interpreter\"\n    return \"other libraries\"\n\n\ndef report(paths):\n    \"\"\"Shares for the record: thread states, engine calls, checks and kinds of work.\"\"\"\n    states, calls, checks, kinds, inclusive = Counter(), Counter(), Counter(), Counter(), Counter()\n    per_file = {}\n    for path, thread, frames, count in game_threads(paths):\n        state = thread_state(frames)\n        states[state] += count\n        per_file.setdefault(path, Counter())[state] += count\n        if state != \"engine\":\n            continue\n        first = entry(frames)\n        calls[next((name for name, keys in CALLS if any(key in first for key in keys)), \"other calls\")] += count\n        names = [function for function, library in frames if library == ENGINE]\n        for check, keys in CHECKS:\n            if any(any(key in name for key in keys) for name in names):\n                checks[check] += count\n        for name in set(names):\n            inclusive[name] += count\n        kinds[kind_of_work(*frames[-1])] += count\n    engine = states[\"engine\"]\n    total = sum(states.values())\n\n    def shares(counter, whole):\n        return {name: round(count / whole, 4) for name, count in counter.most_common()}\n\n    return {\"game_thread_samples\": total, \"engine_samples\": engine,\n            \"thread_states\": shares(states, total),\n            \"thread_states_by_sample\": {Path(path).name: shares(counter, sum(counter.values()))\n                                        for path, counter in per_file.items()},\n            \"engine_calls\": shares(calls, engine), \"checks_inclusive_overlapping\": shares(checks, engine),\n            \"kind_of_innermost_work\": shares(kinds, engine),\n            \"top_inclusive_functions\": {name[:160]: round(count / engine, 4) for name, count in inclusive.most_common(60)}}\n\n\nfrom pathlib import Path  # noqa: E402\n\n\ndef callers_of(paths, kinds, depth=1):\n    \"\"\"For engine samples whose innermost work is one of `kinds`, the nearest named engine callers.\"\"\"\n    result = Counter()\n    skip = (\"std::\", \"game::json::\", \"decltype\", \"void std::\", \"bool std::\", \"operator new\", \"operator delete\")\n    for path, thread, frames, count in game_threads(paths):\n        if thread_state(frames) != \"engine\" or kind_of_work(*frames[-1]) not in kinds:\n            continue\n        named = [function for function, library in frames if library == ENGINE and not function.startswith(skip)\n                 and \"basic_string\" not in function]\n        result[\" <- \".join(name[:90] for name in reversed(named[-depth:])) if named else \"?\"] += count\n    return result\n\n\ndef inside_call(paths, call_name, top=40):\n    \"\"\"Within one engine call (a CALLS name), each engine function's inclusive share of its samples.\"\"\"\n    keys = dict(CALLS)[call_name]\n    inclusive, total = Counter(), 0\n    for path, thread, frames, count in game_threads(paths):\n        if thread_state(frames) != \"engine\":\n            continue\n        if not any(key in entry(frames) for key in keys):\n            continue\n        total += count\n        for name in {function for function, library in frames if library == ENGINE}:\n            inclusive[name] += count\n    return total, [(round(count / total, 4), name[:150]) for name, count in inclusive.most_common(top)]\n",
+  "evidence.py": "\"\"\"Gather the matched runs' numbers into one evidence file.\"\"\"\nimport json, subprocess, sys\nfrom pathlib import Path\n\nOUT = Path(\"OUT\")\nTOOL = Path(\"REPO/tools/log_process_load.py\")\nPY = \"REPO/.venv/bin/python\"\n\n\ndef load(name):\n    text = subprocess.run([PY, str(TOOL), \"summarize\", str(OUT / f\"{name}-load.jsonl\")], capture_output=True, text=True, check=True).stdout\n    summary = json.loads(text)\n    summary.pop(\"windows\", None)\n    return summary\n\n\ndef run(name):\n    manifest = json.loads((OUT / name / \"manifest.json\").read_text())\n    state = json.loads((OUT / f\"{name}-control\" / \"state.json\").read_text())\n    counters, timings = manifest[\"counters\"], manifest[\"timings_seconds_this_invocation\"]\n    evaluator = manifest[\"runner\"][\"updates\"][0][\"evaluator\"]\n    playing = timings[\"collection\"]\n    summary = load(name)\n    games = summary[\"processes\"][\"game processes\"]\n    server = summary[\"processes\"][\"coordinator\"]\n    return {\n        \"run\": name, \"code\": \"before\" if name.startswith(\"old\") else \"after\", \"status\": manifest[\"status\"],\n        \"games\": counters[\"episodes\"], \"decisions\": counters[\"decisions\"], \"chance_events\": counters[\"chance_events\"],\n        \"playing_seconds\": round(playing, 1), \"decisions_per_hour_while_playing\": round(counters[\"decisions\"] / playing * 3600),\n        \"games_per_hour_while_playing\": round(counters[\"episodes\"] / playing * 3600, 1),\n        \"network_evaluations\": evaluator[\"evaluations\"], \"network_evaluations_per_second\": round(evaluator[\"evaluations\"] / playing, 1),\n        \"inference_batches\": evaluator[\"serving_rounds\"],\n        \"mean_inference_batch_states\": round(evaluator[\"evaluations\"] / evaluator[\"serving_rounds\"], 2),\n        \"inference_server_waiting_share\": round(evaluator[\"idle_seconds\"] / playing, 4),\n        \"inference_server_answering_share\": round(evaluator[\"forward_seconds\"] / playing, 4),\n        \"inference_server_answering_us_per_evaluation\": round(evaluator[\"forward_seconds\"] / evaluator[\"evaluations\"] * 1e6, 1),\n        \"peak_rss_bytes_sampled\": state[\"aggregate_sampled_peak_rss_bytes\"],\n        \"batch_cpu_cores\": summary[\"batch_cores\"], \"other_work_cpu_cores\": summary[\"other_work_cores\"],\n        \"game_processes_cpu_seconds\": games[\"cpu_seconds\"],\n        \"game_processes_cpu_ms_per_network_evaluation\": round(games[\"cpu_seconds\"] / evaluator[\"evaluations\"] * 1e3, 3),\n        \"game_processes_cpu_ms_per_decision\": round(games[\"cpu_seconds\"] / counters[\"decisions\"] * 1e3, 1),\n        \"game_processes_instructions_per_network_evaluation\": round(games[\"instructions\"] / evaluator[\"evaluations\"]),\n        \"game_processes_performance_core_share\": games[\"performance_core_share\"],\n        \"game_processes_waiting_for_a_core_per_cpu_second\": games[\"waiting_per_cpu_second\"],\n        \"inference_server_cpu_seconds\": server[\"cpu_seconds\"],\n        \"load_summary\": summary,\n    }\n\n\nif __name__ == \"__main__\":\n    runs = [run(name) for name in sys.argv[1:]]\n    print(json.dumps(runs, indent=1))\n"
+ }
+}
