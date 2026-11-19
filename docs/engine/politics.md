@@ -14,13 +14,18 @@ evolution, surrender), `src/politics_warlords.cpp` (warlords and the Truce),
 ## 1. War
 
 At the start the KMT and the CCP are at war with each other, and nobody else is
-at war. A war begins in one of two ways (`mayDeclareWar`):
+at war. A war begins in one of three ways:
 
 - **On a major power: by declaring it**, with the action `politics_declare_war`.
   This can be done out of turn
   ([overview, section 6](README.md#6-actions-taken-out-of-turn)).
 - **On a minor nation or a warlord: by attacking it.** Moving a land unit into
   its land during one's own Combat Movement declares the war.
+- **On all of China: by attacking original Chinese land**, when the attacker
+  is not Chinese. This is an invasion of China, set out
+  [below](#invading-china).
+
+`mayDeclareWar` decides who may start a war in the first two ways:
 
 | Who | May start a war with |
 | --- | --- |
@@ -39,15 +44,6 @@ follows rulebook 15.4 (page 105). Mongolia starts no war because the power
 that controls a minor power may not declare war for it (rulebook 4.5,
 page 27).
 
-Mongolia stays a nation of its own when it is attacked. In the full game it
-would stay one only when the KMT attacks it: an attack by anyone else makes it
-align with the USSR at the end of the attacker's Combat Phase (rulebook 4.7,
-page 29), and a minor power that aligns is incorporated into the major power
-(rulebook 4.6, page 28). This campaign has no USSR and turns that alignment off
-(`mongolia_campaign_override` in `game_content/rules/gw36_politics_v43.json`),
-so here Mongolia can be at war with Japan, where in the full game it would by
-then be Soviet ([Q-002](../questions.md#q-002-chinese-land-that-japan-holds)).
-
 The KMT's row is the engine's reading of the printed condition that the CCP
 has been eliminated before: it allows the attack only while the CCP has no
 units. Whether the permission should last once the CCP has been eliminated is
@@ -56,9 +52,7 @@ an open question
 
 No nation may declare war inside its own alliance (rulebook 5.1, page 35), and
 while the Chinese Truce holds the KMT and the CCP cannot declare war on each
-other; they break the Truce instead ([section 3](#3-the-chinese-truce)). One
-war inside an alliance can still arise: an invasion of China by Mongolia puts
-it at war with the CCP ([section 2](#2-the-warlords)).
+other; they break the Truce instead ([section 3](#3-the-chinese-truce)).
 
 **The nation whose turn it is declares first.** When another alliance declares
 a war out of turn, the alliance whose turn it is first gets a decision
@@ -74,6 +68,73 @@ Japan, the KMT and the CCP, are in three different alliances. The only allies
 are the KMT and the CCP under the Chinese Truce
 ([section 3](#3-the-chinese-truce)).
 
+### Invading China
+
+*Original Chinese land* is a land zone with a warlord's, the CCP's or the
+KMT's roundel printed in it, whoever holds the zone now: the rulebook's
+glossary (page 7) defines "originally" by the roundel printed on the map. Rule
+4.9 (page 30) makes an attack by a foreign nation on original Chinese land a
+declaration of war on all of China, that is on the KMT, the CCP and every
+warlord at once. The engine counts every nation except the KMT, the CCP, Dadao
+and the warlords as foreign (`canInvadeChina` in `src/politics.cpp`). It does
+not count an attack on a zone that Dadao holds, which rule 4.9 leaves out by
+pointing to rule 15.4 (page 105).
+
+Whether a foreign nation may attack original Chinese land at all is decided,
+together with rule 4.9, by one printed rule for a major power and by another
+for a minor power:
+
+| | A foreign major power | A foreign minor power |
+| --- | --- | --- |
+| The rule that decides | The declaration-of-war table of rulebook 5.1 (pages 35 and 36), because a major power's attack on original Chinese land is its own declaration of war on the KMT, the CCP and each warlord | Rule 4.5 (page 27): the major power that controls a minor power may move the minor power's units in combat only if the minor power is already at war, and may not, for the minor power, declare war or take any action that puts the minor power at war with a nation it is not already at war with |
+| The power's attack on original Chinese land is allowed when | the declaration-of-war table lets the major power declare war on the KMT, on the CCP and on every warlord | the minor power is already at war with the KMT, the CCP and every warlord still unaligned, so that its attack starts no war |
+| Who may attack original Chinese land | Japan, at any time: the declaration-of-war table lets an Axis major power declare war on every nation outside the Axis except Nationalist Spain. Never the USSR, which is outside this campaign: the declaration-of-war table answers No for the USSR against other Comintern nations, and the CCP is one (rule 4.3, page 26) | Never Mongolia, the only foreign minor power in this campaign. The CCP is in Mongolia's alliance, and nothing can put Mongolia and the CCP at war before Mongolia's attack: the declaration-of-war table answers No for the CCP against other Comintern nations, and rule 4.5 lets nobody declare war for Mongolia |
+| What the attack on original Chinese land does | It puts the attacker at war with the KMT, the CCP and every warlord still unaligned, and each of those warlords joins a side at the end of the attacker's Combat Phase ([section 2](#2-the-warlords)) | The same wars and the same choices of side as a major power's attack, where the engine allows Mongolia's attack (below): rule 4.9 does not ask whether the attacker is a major power |
+| The Chinese Truce | The CCP and the KMT may agree to it at the end of the attacker's Combat Phase (rule 6.6, page 42; rule 14.3, page 101; [section 3](#3-the-chinese-truce)) | Not offered: rules 6.6 and 14.3 name only a foreign major power |
+
+Rule 14.3 (page 101) adds that no nation other than the KMT, the CCP and Dadao
+may enter original Chinese land without a declaration of war, even where the
+zone is friendly. So a foreign nation that may not declare war on China cannot
+move into original Chinese land as a friend instead.
+
+An attack by the KMT, the CCP or Dadao on original Chinese land is no invasion,
+because those three are Chinese: it starts only the war that the attacker's row
+allows in the table of who may start a war, near the top of this section. Rule
+4.5 does not bind the KMT and the CCP, which have national reference sheets of
+their own (page 27), and rule 15.4 (page 105) lets Dadao attack Chinese land
+without the rest of China picking sides.
+
+**Mongolia in the full game.** In this campaign Mongolia stays a nation of its
+own when it is attacked. In the full game it would stay one only when the KMT
+attacks it: an attack by anyone else makes it align with the USSR at the end of
+the attacker's Combat Phase (rulebook 4.7, page 29), and a minor power that
+aligns is incorporated into the major power (rulebook 4.6, page 28). This
+campaign has no USSR and turns that alignment off (`mongolia_campaign_override`
+in `game_content/rules/gw36_politics_v43.json`), so here Mongolia can be at war
+with Japan, where in the full game it would by then be Soviet
+([Q-002](../questions.md#q-002-chinese-land-that-japan-holds)). In the full
+game and in this campaign alike, the printed rules keep the units that start as
+Mongolia's out of original Chinese land: while Mongolia is a minor power, by
+rule 4.5 (the minor power's column of the table above); once Mongolia is
+Soviet, by the USSR's rows of the declaration-of-war table (the major power's
+column).
+
+**What the engine does.** `recordLandAttack` (`src/politics.cpp`) applies
+rule 4.9 to every land attack by a foreign nation, major or minor power, and
+`beginCombatPoliticalResolution` (`src/politics_warlords.cpp`) offers the
+Truce only when the attacker is a major power and the attack started a new war
+with the KMT or the CCP. `mayDeclareWar` lets Japan attack original Chinese
+land at any time, as the declaration-of-war table does. The engine applies rule
+4.5 to Mongolia only for the nation that holds the attacked zone: `landAccess`
+(`src/movement.cpp`) offers Mongolia a combat move into a zone that nobody
+holds or whose holder Mongolia is already at war with, and does not ask about
+the wars with the rest of China that rule 4.9 then adds. So once the KMT has
+attacked Mongolia, the engine lets Mongolia attack a zone of original Chinese
+land that the KMT holds, and that attack puts Mongolia at war with the CCP, a
+nation of its own alliance. Whether the engine should forbid Mongolia every
+attack on original Chinese land, as the minor power's column of the table above
+reads the rules, is [Q-001](../questions.md#q-001-mongolia-at-war-with-the-ccp).
+
 ## 2. The warlords
 
 The eight warlords start unaligned: nobody plays them, they take no turn and
@@ -85,15 +146,10 @@ its units and anything it was building become that nation's
 (`incorporateNation`). Land gained this way may be entered the same turn, unlike
 land that was captured. A warlord joins a side in one of four ways.
 
-**A foreign power invades China.** The invasion is a land attack, by a nation
-that is not Chinese, on a zone that was originally the KMT's, the CCP's or a
-warlord's (`recordLandAttack`). In this campaign that is Japan or, more rarely,
-Mongolia, which starts no war itself. Whether Mongolia's attacks should count,
-and whether they should put it at war with the CCP, are open questions
-([Q-001](../questions.md#q-001-mongolia-at-war-with-the-ccp),
-[Q-002](../questions.md#q-002-chinese-land-that-japan-holds)). The attack
-puts the invader at war with the KMT, the CCP and every unaligned warlord at
-once, and every such warlord picks a side at the end of that Combat Phase. All
+**A foreign power invades China.** An invasion of China
+([section 1](#invading-china)) puts the invader at war with the KMT, the CCP
+and every unaligned warlord at once, and every such warlord picks a side at the
+end of that Combat Phase. All
 the warlords' neighbours are noted first, so that one warlord's result cannot
 change another's odds. Each warlord gets one roll of a twelve-sided die for all
 its land (RCL-003):
@@ -138,9 +194,9 @@ random games it was never offered
 ([record](../archive/records/move_census_2026_11_14.md)), so the engine's tests
 are the only evidence for this part.
 
-- **When it can be signed.** A major power invades China as described in
-  [section 2](#2-the-warlords), and the invasion starts a new war with the KMT
-  or the CCP. At the end of that Combat Phase, after the warlords have picked
+- **When it can be signed.** A major power invades China
+  ([section 1](#invading-china)), and the invasion starts a new war with the
+  KMT or the CCP (rulebook 6.6, page 42). At the end of that Combat Phase, after the warlords have picked
   sides, the CCP may offer the Truce (`truce_offer`, or
   `truce_decline_offer`), and the KMT accepts or refuses (`truce_accept`,
   `truce_reject`). Both must still be minor powers, and the KMT must not have

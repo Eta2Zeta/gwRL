@@ -60,7 +60,7 @@ attack at all?
   attacker is put at war with the KMT, the CCP and every warlord that has not
   yet joined a side, and those warlords pick a side at the end of that Combat
   Phase (`recordLandAttack` in `src/politics.cpp`, following rulebook 4.9,
-  page 30; [politics](engine/politics.md#2-the-warlords)).
+  page 30; [politics](engine/politics.md#invading-china)).
 - Mongolia may never declare war (`mayDeclareWar` in `src/politics.cpp`). It
   may make a combat move only into a zone whose holder is already at war with
   it, or that nobody holds (`landAccess` in `src/movement.cpp`).
