@@ -365,6 +365,12 @@ class CampaignAdapter:
             result._decision = replace(self._decision) if self._decision is not None else None
         return result
 
+    def scheduling(self) -> tuple[list[str], list[str]]:
+        """The alliances that passed on the offer now open, sorted, and the offer
+        order: with the engine's state, what the C++ search starts from."""
+        self._sync()
+        return sorted(self._passed), list(self.interrupt_order)
+
     def planning_key(self) -> str:
         self._sync()
         value = {"schema": SCHEMA, "raw_key": self._anchor, "order": self.interrupt_order, "passed": sorted(self._passed)}

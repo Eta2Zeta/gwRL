@@ -27,6 +27,7 @@ from studies.shared.file_replace import replace_file
 from studies.shared.multiplayer_mcts import (
     PLAYERS, MctsConfig, VectorMCTS, action_key, probabilities, vector,
 )
+from .native_search import search_decision
 from .neural import alliance_weights, distinct_networks
 
 CHECKPOINT_SCHEMA = "campaign-learning-checkpoint-v1"
@@ -96,7 +97,7 @@ def _decide(env: Any, result: Any, pending: list[dict[str, Any]], *, config: Lea
     policy = probabilities([math.exp(value - maximum) for value in logs], len(logs))
     index = _sample_index(result.actions, policy, rng)
     # The decision's zone input, as search already evaluated it: immutable and small.
-    features = make_zone_input(env, result.actions)
+    features = result.zone_input if result.zone_input is not None else make_zone_input(env, result.actions)
     pending.append({"input": features, "owner": owner, "policy": policy, "rollout_version": batch_version})
     action = result.actions[index]
     menu = [_selected_features(choice) for choice in result.actions] if replay is not None else None
@@ -131,8 +132,9 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
                  batch_version: str, environment_seed: int, max_transitions: int) -> dict[str, Any]:
     """Play one game to its end, or to the transition guard, with frozen policies.
 
-    A finished game returns terminal-labelled samples. A game stopped by the
-    guard returns no samples: complete-episode batches never bootstrap.
+    Each decision is searched in C++ (native_search.search_decision). A finished
+    game returns terminal-labelled samples. A game stopped by the guard returns
+    no samples: complete-episode batches never bootstrap.
     """
     search_random, policy_random = episode_streams(config.seed, environment_seed)
     # Its own stream, so the game plays the same whatever share is kept.
@@ -155,7 +157,7 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
                 simulations=config.simulations, max_depth=config.max_depth, c_puct=config.c_puct,
                 seed=search_random.getrandbits(64), rules_version=rules_version, mode=config.mode,
                 root_dirichlet_alpha=config.root_dirichlet_alpha, root_dirichlet_epsilon=config.root_dirichlet_epsilon)
-            result = VectorMCTS(evaluator, search).search(env, add_root_noise=config.root_noise, reuse_root=False)
+            result = search_decision(env, evaluator, search, add_root_noise=config.root_noise)
             version = getattr(evaluator, "network_version", None) or batch_version
             if not network_versions or network_versions[-1][1] != version:
                 network_versions.append([counts["decisions"], version])

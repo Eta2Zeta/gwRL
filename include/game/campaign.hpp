@@ -559,6 +559,8 @@ class Engine {
     // The cached menu itself, which stays valid after this engine changes.
     std::shared_ptr<const std::vector<Action>> legalActionMenu() const;
     std::vector<Action> legalInterrupts() const;
+    // The cached interrupt menu itself, like legalActionMenu.
+    std::shared_ptr<const std::vector<Action>> legalInterruptMenu() const;
     void step(const Action& action);
     void interrupt(const Action& action);
     void resolveChance();  // Execution service, never a policy action.
@@ -575,6 +577,13 @@ class Engine {
     // got to: a search can save copies of positions and still roll each
     // simulation's dice from one stream.
     Engine cloneForSearchContinuing(const Engine& source) const;
+    // The same, with the search dice at a given point of their stream: a search
+    // that keeps track of where its simulation's dice have got to
+    // (searchStream) needs no copy of the position that rolled them.
+    Engine cloneForSearchFrom(std::uint64_t searchStream) const;
+    std::uint64_t searchStream() const { return random_.search; }
+    // Where cloneForSearch(seed) starts the search dice.
+    static std::uint64_t searchStreamFor(std::uint64_t seed) { return RandomStreams::seeded(seed).search; }
     void setDiceTapeForTesting(std::vector<int> tape);
     std::string serialize() const;
     static Engine restore(std::shared_ptr<const Definition>, std::shared_ptr<const Rules>, const std::string&);
@@ -586,6 +595,9 @@ class Engine {
     // positions across builds (State::planningKey, State::canonicalKey).
     std::string planningKey() const;
     std::string canonicalKey() const;
+    // The state's planning key alone (State::planningKey), without the rules: the
+    // identity of a decision state among positions under the same rules.
+    std::string stateKey() const;
     void requireIntact() const {
         if (unfinished_) throw std::runtime_error("Search copy failed during a transition");
     }

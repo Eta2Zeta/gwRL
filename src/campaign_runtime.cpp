@@ -505,6 +505,11 @@ std::vector<Action> Engine::legalInterrupts() const {
     return interruptMenu()->actions;
 }
 
+std::shared_ptr<const std::vector<Action>> Engine::legalInterruptMenu() const {
+    const auto menu = interruptMenu();
+    return {menu, &menu->actions};
+}
+
 void Engine::interrupt(const Action& action) {
     const auto proposed=canonicalJson(actionJson(action));
     const auto menu=interruptMenu();
@@ -649,6 +654,12 @@ Engine Engine::cloneForSearchContinuing(const Engine& source) const {
     return result;
 }
 
+Engine Engine::cloneForSearchFrom(std::uint64_t searchStream) const {
+    Engine result = cloneForSearch(0);
+    result.random_.search = searchStream;
+    return result;
+}
+
 void Engine::setDiceTapeForTesting(std::vector<int> tape) {
     requireIntact();
     for (int face : tape) require(face > 0, "Invalid test dice tape face");
@@ -708,6 +719,13 @@ std::string Engine::planningKey() const {
     std::lock_guard lock(decisionCache_->mutex);
     if(!decisionCache_->stateKey)decisionCache_->stateKey=state_.planningKey();
     return contentDigest(canonicalJson(V(O{{"rules_id", V(rules_->id())}, {"state_key", V(*decisionCache_->stateKey)}})));
+}
+
+std::string Engine::stateKey() const {
+    requireIntact();
+    std::lock_guard lock(decisionCache_->mutex);
+    if(!decisionCache_->stateKey)decisionCache_->stateKey=state_.planningKey();
+    return *decisionCache_->stateKey;
 }
 
 std::string Engine::canonicalKey() const {

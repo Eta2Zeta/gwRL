@@ -175,6 +175,9 @@ class SharedEpisodeWorkerTests(unittest.TestCase):
 
             def evaluate(self, *_):
                 raise RuntimeError("rules")
+
+            def evaluate_zone(self, *_):  # The C++ search's way in.
+                raise RuntimeError("rules")
         learner = tiny_learner()
         task = {"root": 3, "seed": 91, "batch_version": "v", "max_transitions": 100}
         self.assertEqual(_play_game(settings(learner), Broken(), task)["failure"], "RuntimeError: rules")

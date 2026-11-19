@@ -205,8 +205,12 @@ The network answers in one look. A search looks ahead: it plays actions on copie
 of the game, asks the network about the states it reaches, and combines the
 network's outputs. Where looking ahead finds something the one look missed, the
 search chooses better than the network alone. The search is Monte Carlo tree
-search in AlphaZero's style (`studies/shared/multiplayer_mcts.py`, class
-`VectorMCTS`), made of many *simulations*: 64 per decision in current runs.
+search in AlphaZero's style, made of many *simulations*: 64 per decision in
+current runs. Self-play runs it in C++ (`searchDecision` in `src/search.cpp`).
+The same search in Python (`VectorMCTS` in `studies/shared/multiplayer_mcts.py`)
+serves held-out evaluation (section 10) and tools, and the C++ search is checked
+against it choice by choice
+([section 4.7](#47-more-detail-on-the-search)).
 
 ### 4.2 One simulation
 
@@ -226,7 +230,7 @@ found.
 
 **One simulation, in order:**
 
-1. Copy the game at the current state (`clone_for_search`).
+1. Copy the game at the current state (`Engine::cloneForSearch`).
 2. At a decision the search has already asked the network about, give every
    legal action a PUCT score (section 4.3) and play the action with the highest
    score on the copy; a tie is broken at random.
@@ -491,20 +495,23 @@ meet the limit more often; that has not been measured.
 
 **What the search remembers.** The tree holds, for every node, identified by its
 state's planning key, the actions tried there with their visit counts, value
-totals and priors (`Node` and `Edge`), and a saved copy of the game at that state
-(`Node.game`). A simulation walks the tree on these saved states. Following an
-action already played from a state needs only the tree: the engine rolls no dice
-inside an action, so an action from a state always reaches the same state. The
-simulation copies a saved state only to play an action no simulation has played
-from there yet, or to roll dice. In the toy example, simulation 4 follows A to
-RA in the tree alone, copies the saved RA and plays only x.
+totals and priors (`Node` and `Edge` in `src/search.cpp`), and a saved copy of
+the game at that state (`Node::game`). A simulation walks the tree on these saved
+states. Following an action already played from a state needs only the tree: the
+engine rolls no dice inside an action, so an action from a state always reaches
+the same state. The simulation copies a saved state only to play an action no
+simulation has played from there yet, or to roll dice. In the toy example,
+simulation 4 follows A to RA in the tree alone, copies the saved RA and plays
+only x. Passing on an offer of declarations changes nothing in the game, so the
+state after a pass shares the saved copy of the state before it.
 
 **The dice.** Each simulation rolls its own dice, from a stream seeded per
 simulation, so one action can lead to different outcomes in different
 simulations, and the tree keeps a branch per outcome; the real game's dice are
-untouched. Each copy a simulation makes continues that simulation's stream where
-its last copy left it (`clone_for_search_continuing`), so the dice come out
-exactly as if the simulation had played its whole path on one copy.
+untouched. Each copy a simulation makes starts its dice where the simulation's
+last roll left the stream (`Engine::searchStream` and
+`Engine::cloneForSearchFrom` in `include/game/campaign.hpp`), so the dice come
+out exactly as if the simulation had played its whole path on one copy.
 
 **A search at a larger decision**
 ([measurements](../archive/records/search_replays_2026_11_04.md)). At a game-round-5
@@ -531,6 +538,27 @@ gave identical search results on 151 real states and played 59% fewer actions.
 In a matched training iteration it raised games per hour while playing from 152
 to 184, for 0.5 GB more peak memory
 ([record](../archive/records/search_copies_2026_11_04.md)).
+
+**The search in C++.** Self-play runs a decision's whole search in one call into
+the engine (`search_decision` in `studies/campaign/native_search.py`, which calls
+`gwrl_cpp.search_campaign`). The simulations, the offers of declarations to the
+alliances in turn, as the adapter makes them (`CampaignAdapter` in
+`studies/shared/campaign_adapter.py`), and the inference requests all run in C++
+without Python's lock ([section 9.2](#92-running-training-on-the-mac)). The game
+thread comes back to Python once a decision, to choose the action from the visit
+counts, keep the training sample and play the action. The Python search did the
+same work through about 27 calls into the engine for each network evaluation
+([record](../archive/records/game_processes_gpu_2026_11_19.md)). The C++ search
+draws its random numbers exactly as Python's `random` module does (`PythonRandom`
+in `include/game/python_random.hpp`): each simulation's seed, the Dirichlet noise
+and the draws that break ties. It multiplies and adds in the Python search's
+order, without fusing a multiplication and an addition into one rounding, and it
+sums the priors as Python's `sum` does. So given the same network outputs, the
+two searches make the same choices and return the same visit counts, priors and
+values, which `tests/test_campaign_native_search.py` checks along real games.
+The Python search still serves held-out evaluation, whose fixed opponents
+(section 10) the C++ search does not play, the batching of several searches'
+network evaluations in one process (`studies/campaign/batching.py`), and tools.
 
 ## 5. How a decision becomes numbers
 
@@ -1966,19 +1994,21 @@ iteration's games end, and one when its last game plays alone
 ([record](../archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail); below).
 
 **What the cores and the GPU do.** In the Mac profile the GPU does nothing, and
-all the cores work at the same time. A game thread works in the engine and the
-search, listing legal actions, applying them on copies of the game and building
-the network's input, until a state needs a network evaluation. Then it sends the
-inference server an inference request and waits for the reply. *Python's lock*,
-CPython's global interpreter lock, lets only one thread of a process run Python
-at a time. The engine gives it up while it works, so the four game threads of a
-process can compute at once, and a thread that waits leaves its core to the
-others. That is
-why each process plays four games: in a 15 November training iteration a game
-thread computed about a third of the time, yet the 24 game threads and the
-inference server kept about 9 cores busy, and since the engine work of
-16 November about 7. The inference server, on a core of its own, answers
-inference batch after inference batch.
+all the cores work at the same time. A game thread searches each decision in C++
+([section 4.7](#47-more-detail-on-the-search)): it lists legal actions, applies
+them on copies of the game and builds the network's input, until a state needs a
+network evaluation. Then it writes the state's input into its shared memory,
+sends the inference server an inference request through its pipe and waits for
+the reply. *Python's lock*, CPython's global interpreter lock, lets only one
+thread of a process run Python at a time. The search runs without it, and a game
+thread takes it only once a decision, to choose and play its action and keep the
+training sample. So the game threads of a process compute at once, and a thread
+that waits leaves its core to the others. That is why each process plays several
+games: in a 15 November training iteration a game thread computed about a third
+of the time, yet the 24 game threads and the inference server kept about 9 cores
+busy, and since the engine work of 16 November about 7; both were measured
+before the search ran in C++. The inference server, on a core of its own,
+answers inference batch after inference batch.
 
 The M4 Max has 10 performance cores and 4 efficiency cores. An efficiency core
 runs at 2.6 GHz instead of 3.8 and, in the game processes, does about 42% of a
@@ -2022,14 +2052,16 @@ waited for inference requests only 5.6% of the time
 Mac profile since the engine work of 16 November, against 110 to 117 ms just
 before it ([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
 A training iteration at 256×8 on the GPU, timed with the profiler on 19 November
-with 126 concurrent games in 7 game processes of 18, shows where their time
-goes now. A network evaluation cost a game thread 1.71 ms of CPU, 87 ms a
-decision. Calls into the engine took 52% of it: listing a state's legal actions
-27% (0.46 ms each time), applying an action 11% (0.19 ms), copying the game
-for the search 6%, the planning key 3% and rolling dice 3%. Encoding the state
-for the network took 13% (0.22 ms). The search's and the adapter's Python, the
-game loop and the inference requests took the remaining 35%
-([record](../archive/records/game_processes_gpu_2026_11_19.md#a-game-threads-cpu-per-network-evaluation)).
+with 126 concurrent games in 7 game processes of 18, showed where their time
+went while the search still ran in Python. A network evaluation cost a game
+thread 1.71 ms of CPU, 87 ms a decision. Calls into the engine took 52% of it:
+listing a state's legal actions 27% (0.46 ms each time), applying an action 11%
+(0.19 ms), copying the game for the search 6%, the planning key 3% and rolling
+dice 3%. Encoding the state for the network took 13% (0.22 ms). The search's
+and the adapter's Python, the game loop and the inference requests took the
+remaining 35%
+([record](../archive/records/game_processes_gpu_2026_11_19.md#a-game-threads-cpu-per-network-evaluation));
+that Python part is what the search in C++ takes out (section 9.3).
 Inside the engine a few rule checks take the most. Listing legal actions spends
 about a fifth of its time finding which naval orders can still be completed and
 about a fifth enumerating and checking the routes a naval force could sail;
@@ -2416,7 +2448,7 @@ longer behind: the run kept a median of 9.5 of them busy, over the allowance of
 inference requests waiting when it starts, and a game asks for one network
 evaluation at a time: its search plays one simulation after another, and a
 simulation that reaches a new state waits for its network evaluation before the
-next begins (`_expand` in `studies/shared/multiplayer_mcts.py`). So an inference
+next begins (`Searcher::expand` in `src/search.cpp`). So an inference
 batch holds at most one state for each concurrent game, and in steady play at
 most about half. The inference server starts the next inference batch as soon as
 it has sent its replies, with the inference requests already waiting (`serve` in
@@ -2710,46 +2742,41 @@ for the rates above.
 
 **The engine's levers.** The game processes have levers of their own, which
 act on the CPU time a game thread spends for each network evaluation, 1.71 ms at
-256×8 on the GPU with 126 concurrent games (section 9.2), and on the waiting
-around it. An *engine call* is a call from Python into the engine, such as
-listing a state's legal actions. It gives up Python's lock (section 9.2) while
-the engine works and must take the lock back to return its result
-(`NativeCampaignEnv::call` in `src/python_bindings.cpp`). A network evaluation
-makes about 27 engine calls, 12.5 of them for the state's planning key, which
-the adapter asks for in nearly every one of its methods to notice whether the
-state has changed (`_sync` in `studies/shared/campaign_adapter.py`). In stack
-samples taken while all 126 games played, a game thread computed about a tenth
-of its time, waited for the inference server's reply a third, and waited for
-Python's lock more than half: mostly to take it back at the end of an engine
-call, and otherwise right after a reply arrived. Each process's 18 game threads
-held the lock for their Python work about 56% of the time
+256×8 on the GPU with 126 concurrent games while the search ran in Python
+(section 9.2), and on the waiting around it. An *engine call* is a call from
+Python into the engine, such as listing a state's legal actions. It gives up
+Python's lock (section 9.2) while the engine works and must take the lock back
+to return its result (`NativeCampaignEnv::call` in `src/python_bindings.cpp`).
+With the Python search a network evaluation made about 27 engine calls, 12.5 of
+them for the state's planning key, which the adapter asks for in nearly every
+one of its methods to notice whether the state has changed (`_sync` in
+`studies/shared/campaign_adapter.py`). In stack samples taken while all 126
+games played, a game thread computed about a tenth of its time, waited for the
+inference server's reply a third, and waited for Python's lock more than half:
+mostly to take it back at the end of an engine call, and otherwise right after a
+reply arrived. Each process's 18 game threads held the lock for their Python
+work about 56% of the time
 ([record](../archive/records/game_processes_gpu_2026_11_19.md#a-game-threads-time)).
-Waiting uses no CPU, but it caps a process: at the same Python work per network
-evaluation it could answer at most about 1.8 times as many network evaluations a
-second before its lock was busy all the time (inferred). The operating system's
-own work, for the pipes, the lock's hand-overs between threads and memory, is
-11.9% of the game processes' CPU and was not broken down. Inside the engine,
-about 57% of the time is allocating memory, building, copying and comparing
-strings, copying memory and looking up maps, much of it because units,
-facilities, battles, railroads, construction projects, repair jobs and the
-details of actions are still held by name and as JSON
+The operating system's own work, for the pipes, the lock's hand-overs between
+threads and memory, was 11.9% of the game processes' CPU and was not broken
+down. Inside the engine, about 57% of the time is allocating memory, building,
+copying and comparing strings, copying memory and looking up maps, much of it
+because units, facilities, battles, railroads, construction projects, repair
+jobs and the details of actions are still held by name and as JSON
 ([names held as numbers](../engine/names.md#what-is-still-a-name)), and every
 copy of the game copies them. The levers, each with the CPU it would take out of
-a network evaluation's 1.71 ms, worked out from the profile's shares and not
-measured; the savings overlap, since the first lever takes in the fifth:
+a network evaluation's 1.71 ms, worked out from that profile's shares and not
+measured:
 
-- **The search in C++.** The search's simulations, the adapter's bookkeeping and
-  the inference requests would run in the engine's C++, with the requests and
-  replies sent through the pipe in a fixed binary form. That removes the Python
-  part, 0.59 ms, most of the 27 engine calls and their trips through Python's
-  lock, the conversion of each legal action into a Python object, and the
-  comparison of canonical JSON when an action is played, since the search would
-  play an action by its place in the state's list: about 0.7 ms, two fifths of
-  the CPU, and nearly all the waiting for the lock. It is the largest lever and
-  the largest change: the search (`studies/shared/multiplayer_mcts.py`) and the
-  adapter's offers of declarations would be written again in C++. Drawing the
-  same random numbers as Python's `random` module would let a check compare the
-  two searches choice by choice.
+- **The search in C++, now built** ([section 4.7](#47-more-detail-on-the-search)).
+  The search's simulations, the adapter's offers of declarations and the
+  inference requests run in C++, with the requests and replies sent through the
+  pipe as short binary messages (`include/game/inference_client.hpp`). That
+  removes the Python part, 0.59 ms, the 27 engine calls and their trips through
+  Python's lock, and the conversion of each legal action into a Python object:
+  about 0.7 ms, two fifths of the CPU, and nearly all the waiting for the lock.
+  An action is still played after the comparison of its canonical JSON with the
+  menu's (`Engine::step`), the fifth lever below.
 - **The rest of the names as numbers.** Units, facilities, battles, railroads,
   construction projects and repair jobs held by number, and the details of
   actions as typed fields instead of JSON, as zones, nations, unit types and
@@ -2778,10 +2805,6 @@ measured; the savings overlap, since the first lever takes in the fifth:
   about 0.06 ms, 3% of the CPU.
 - **Starting each game from a prepared copy** instead of reading the scenario
   again: 1.6 seconds a game, 0.03 ms a network evaluation, 1.8% of the CPU.
-- **Fewer games per process**, a setting rather than a change of the engine,
-  would give each process's lock fewer game threads. More processes hold more
-  memory, and the supervisor's count of cores accepts at most 7 game processes,
-  6 in self-play that never stops (Q-005 in `docs/questions.md`).
 
 What they pay depends on the inference server, which limits together with the
 CPU cores. A game thread that needs less CPU comes back sooner for its turn
@@ -3519,14 +3542,16 @@ the dated records use instead.
 - **Game process:** an operating-system process that plays several games, one
   per game thread; the Mac profile runs 6 of 4.
 - **Game thread:** a thread that plays one game, searching at every decision.
-- **Adapter:** the Python layer around the engine that the search calls
-  (`studies/shared/campaign_adapter.py`); it also offers the alliances their
-  declarations in turn.
+- **Adapter:** the Python layer around the engine
+  (`studies/shared/campaign_adapter.py`) that the game loop and the Python search
+  call; it also offers the alliances their declarations in turn, as the C++
+  search does for itself (section 4.7).
 - **Engine call:** a call from Python into the engine, such as listing a state's
-  legal actions; a network evaluation makes about 27 (section 9.3).
+  legal actions. The Python search made about 27 for each network evaluation;
+  the C++ search runs a decision's whole search in one (section 9.3).
 - **Python's lock:** CPython's global interpreter lock, which lets only one
-  thread of a process run Python at a time; an engine call gives it up while the
-  engine works.
+  thread of a process run Python at a time; an engine call, the C++ search among
+  them, gives it up while the engine works.
 - **Concurrent games:** the games being played at the same moment, each holding
   its search tree in memory.
 - **Inference server:** the process that runs the network for every game's
@@ -3540,7 +3565,8 @@ the dated records use instead.
   writes each inference request's arrays into its own block of it.
 - **Pipe:** a channel the operating system keeps between two processes; each
   game thread sends its inference requests' notes and receives its replies
-  through its own.
+  through its own, as short binary messages
+  (`include/game/inference_client.hpp`).
 - **Inference batch:** the states the inference server evaluates together: every
   inference request waiting when it starts, answered in one forward pass. Its
   number of states is the *inference batch size*.

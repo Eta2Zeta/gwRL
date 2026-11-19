@@ -13,11 +13,13 @@ from unittest.mock import patch
 import numpy as np
 import torch
 
+import gwrl_cpp
+
 from studies.campaign.curriculum import make_env
 from studies.campaign.features import make_zone_input
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
-from studies.campaign.shared_evaluator import (BUFFER_BYTES, EvaluatorClosed, RemoteEvaluator, SharedEvaluatorServer,
-                                               evaluate_prepared, prepare_into, read_arrays)
+from studies.campaign.shared_evaluator import (BUFFER_BYTES, REQUEST, ZONE_FIELDS, EvaluatorClosed, RemoteEvaluator,
+                                               SharedEvaluatorServer, evaluate_prepared, read_request, reply_bytes)
 from studies.shared.multiplayer_mcts import PLAYERS, MctsConfig, UniformEvaluator, VectorMCTS
 from tools.benchmark_campaign_devices import Config, _shared_game_process
 from tests.machine import CPU_BUDGET
@@ -51,11 +53,36 @@ def restore(serialized):
     return env
 
 
+def exchange(zone, actor, size=BUFFER_BYTES):
+    """One request as a game thread's native client sends it: the bytes the server
+    receives, its arrays as the server reads them, and what the client returned."""
+    server_end, client_end = Pipe()
+    memory = shared_memory.SharedMemory(create=True, size=BUFFER_BYTES)
+    try:
+        client = gwrl_cpp.InferenceClient(client_end.fileno(), memory.name, size)
+        returned = []
+        asking = threading.Thread(target=lambda: returned.append(client.evaluate(zone, actor)), daemon=True)
+        asking.start()
+        message = server_end.recv_bytes()
+        _, count, layout, arrays = read_request(memory.buf, message)
+        copies = {name: array.copy() for name, array in arrays.items()}
+        del arrays  # Views into the buffer, which closes below.
+        server_end.send_bytes(reply_bytes([1.0] * count, (1.0, 2.0, 3.0), None))
+        asking.join(timeout=60)
+        client.close()
+        return message, layout, copies, returned[0]
+    finally:
+        memory.close()
+        memory.unlink()
+        server_end.close()
+        client_end.close()
+
+
 def prepared(env, actions):
-    """A decision's arrays as a game thread writes them and the server reads them."""
-    buffer = memoryview(bytearray(BUFFER_BYTES))
-    layout, header = prepare_into(buffer, env, actions)
-    return layout, {name: array.copy() for name, array in read_arrays(buffer, header).items()}
+    """A decision's arrays as a game thread's client writes them and the server reads them."""
+    actor = env.current_decision_player()
+    _, layout, arrays, _ = exchange(make_zone_input(env, actions), actor)
+    return layout, arrays
 
 
 class SharedBufferTests(unittest.TestCase):
@@ -104,19 +131,32 @@ class SharedBufferTests(unittest.TestCase):
         self.assertGreater(searches, 2)
         self.assertGreater(max(sizes), 20)
 
-    def test_the_header_packs_arrays_and_a_short_buffer_is_refused(self):
+    def test_the_request_names_each_field_and_a_short_buffer_is_refused(self):
         env = make_env(SEED, calendar_rounds=2)
         actions = tuple(env.legal_actions())
-        buffer = memoryview(bytearray(BUFFER_BYTES))
-        _, header = prepare_into(buffer, env, actions)
-        end = 0
-        for name, dtype, shape, offset in header:
-            self.assertEqual(offset, end, name)
-            end = offset + int(np.prod(shape)) * np.dtype(dtype).itemsize
-        self.assertEqual(end, make_zone_input(env, actions).nbytes)
-        with self.assertRaisesRegex(ValueError, "does not fit"):
-            prepare_into(memoryview(bytearray(end - 1)), env, actions)
-        self.assertEqual(len(prepare_into(memoryview(bytearray(end)), env, actions)[1]), len(header))
+        zone = make_zone_input(env, actions)
+        arrays = zone.arrays()
+        message, layout, read, (priors, values) = exchange(zone, env.current_decision_player(), size=zone.nbytes)
+        kind, actor, layout_length, count, *lengths = REQUEST.unpack_from(message)
+        self.assertEqual((kind, actor, count), (1, PLAYERS.index(env.current_decision_player()), len(actions)))
+        self.assertEqual(lengths, [len(arrays[name]) for name in ZONE_FIELDS])
+        self.assertEqual((layout, layout_length, len(message)), (zone.version, len(zone.version), REQUEST.size + layout_length))
+        self.assertEqual(sum(lengths) * 4, zone.nbytes)
+        self.assertEqual((priors, values), ([1.0] * len(actions), (1.0, 2.0, 3.0)))
+        self.assertSameArrays(read, arrays)
+        server_end, client_end = Pipe()
+        memory = shared_memory.SharedMemory(create=True, size=BUFFER_BYTES)
+        try:
+            client = gwrl_cpp.InferenceClient(client_end.fileno(), memory.name, zone.nbytes - 1)
+            with self.assertRaisesRegex(ValueError, "does not fit"):
+                client.evaluate(zone, env.current_decision_player())
+            self.assertFalse(server_end.poll(0.1))  # Nothing was sent.
+            client.close()
+        finally:
+            memory.close()
+            memory.unlink()
+            server_end.close()
+            client_end.close()
 
 
 class SharedEvaluatorTests(unittest.TestCase):
@@ -233,10 +273,15 @@ class SharedEvaluatorTests(unittest.TestCase):
         server_end, client_end = Pipe()
         try:
             env = restore(self.decisions[0])
-            _, header = prepare_into(memory.buf, env, tuple(env.legal_actions()))
+            arrays = make_zone_input(env, tuple(env.legal_actions())).arrays()
+            other = b"campaign-zone-v0-other"
+            message = REQUEST.pack(1, PLAYERS.index(env.current_decision_player()), len(other),
+                                   len(arrays["action_source"]), *(len(arrays[name]) for name in ZONE_FIELDS)) + other
             server = SharedEvaluatorServer(self.models, torch.device("cpu"), [server_end], [memory.name])
+            request = read_request(memory.buf, message)
             with self.assertRaisesRegex(ValueError, "layout"):
-                server.answer([(server_end, (env.current_decision_player(), 1, "campaign-zone-v0-other", header))])
+                server.answer([(server_end, request)])
+            del request  # Its arrays are views into the buffer, which closes below.
             server.close()
         finally:
             server_end.close()
@@ -248,39 +293,36 @@ class SharedEvaluatorTests(unittest.TestCase):
         memory = shared_memory.SharedMemory(create=True, size=BUFFER_BYTES)
         env = restore(self.decisions[0])
         menu = tuple(env.legal_actions())
-        def cause(evaluator):
-            # Only the type is kept: a stored exception would hold a failed
-            # send's buffers in a reference cycle, freed out of order later.
+        def closed(evaluator):
             try:
                 evaluator.evaluate(env, menu)
-            except EvaluatorClosed as error:
-                return type(error.__cause__)
-            return None
+            except EvaluatorClosed:
+                return True
+            return False
         def read_then_close(connection):
-            connection.recv()
+            connection.recv_bytes()
             connection.close()
         try:
-            # A request read but never answered: the reply's recv meets EOF.
+            # A request read but never answered: reading the reply meets the end of the pipe.
             server_end, client_end = Pipe()
             evaluator = RemoteEvaluator(client_end, memory.name, "test")
             threading.Thread(target=read_then_close, args=(server_end,), daemon=True).start()
-            self.assertIs(cause(evaluator), EOFError)
+            self.assertTrue(closed(evaluator))
             evaluator.close()
             # A stopped server closes the pipes still open, so a thread waiting
             # on its request stops, and nothing more can be sent.
             server_end, client_end = Pipe()
             server = SharedEvaluatorServer(self.models, torch.device("cpu"), [server_end], [memory.name])
             evaluator = RemoteEvaluator(client_end, memory.name, "test")
-            causes = []
-            waiting = threading.Thread(target=lambda: causes.append(cause(evaluator)), daemon=True)
+            outcomes = []
+            waiting = threading.Thread(target=lambda: outcomes.append(closed(evaluator)), daemon=True)
             waiting.start()
             self.assertTrue(server_end.poll(120), "The request never arrived")
             server.serve(lambda: False)
             waiting.join(timeout=30)
             self.assertTrue(server_end.closed)
-            self.assertEqual(len(causes), 1)
-            self.assertTrue(causes[0] is not None and issubclass(causes[0], (EOFError, OSError)), causes[0])
-            self.assertIs(cause(evaluator), BrokenPipeError)
+            self.assertEqual(outcomes, [True])
+            self.assertTrue(closed(evaluator))  # Sending to the closed pipe fails too.
             self.assertEqual((evaluator.stats.requests, server.stats.requests), (0, 0))
             evaluator.close()
             server.close()

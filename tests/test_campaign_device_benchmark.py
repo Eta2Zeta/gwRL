@@ -211,15 +211,13 @@ class CampaignDeviceBenchmarkTests(unittest.TestCase):
 
     def play_shared_toy(self, rounds=3, fail=None):
         config = Config(mode="selfplay", devices=("cpu",), seeds=(7,), threads=1, cpu_budget=5, calendar_rounds=rounds)
-        class Search:
-            def __init__(self, evaluator, settings): pass
-            def search(self, env, **kwargs):
-                if fail is not None:
-                    raise fail
-                return SimpleNamespace(actions=["move"], policy=[1.])
+        def search(env, evaluator, settings, **kwargs):  # The C++ search's entry point.
+            if fail is not None:
+                raise fail
+            return SimpleNamespace(actions=["move"], policy=[1.])
         evaluator = SimpleNamespace(stats=SimpleNamespace(requests=0, prepare_seconds=0., wait_seconds=0.))
         with patch("studies.campaign.curriculum.make_env", side_effect=lambda seed, **_: ToyEnv(seed)), \
-             patch("studies.shared.multiplayer_mcts.VectorMCTS", Search):
+             patch("studies.campaign.native_search.search_decision", search):
             return play_shared_game(config, 7, evaluator, time.time() + 60)
 
     def test_shared_games_stop_at_a_closed_pipe_and_fail_at_a_false_terminal(self):

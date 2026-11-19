@@ -31,6 +31,9 @@ add_library(gw_engine STATIC
     src/politics.cpp
     src/politics_influence.cpp
     src/politics_warlords.cpp
+    src/inference_client.cpp
+    src/python_random.cpp
+    src/search.cpp
     src/simple_json.cpp
     src/zone_encoding.cpp
 )

@@ -286,10 +286,12 @@ class SearchResult:
     priors: list[float]
     values: Vector | None  # None when a one-action root was not searched.
     action_values: list[Vector | None]
-    root: Node
+    root: Node | None  # None from the C++ search, which keeps no Python tree.
     cache_identity: tuple[str, ...]
     reused_root: bool
     simulations: list[Simulation]
+    # The root's zone input as the network read it, when the search kept it.
+    zone_input: Any = None
 
     def best_action(self) -> Any:
         if not self.actions:

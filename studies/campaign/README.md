@@ -142,7 +142,15 @@ work. Each Python-facing environment protects its own operations with an
 independent mutex; clones get separate mutexes, so different boards can run
 native operations concurrently. Overlapping operations on one board remain
 serialized. This is per-call protection, not a transaction across several calls
-on a shared Python adapter; search workers own independent adapters.
+on a shared Python adapter; search workers own independent adapters. A
+self-play decision's whole search is one such call
+([native_search.py](native_search.py)): its simulations run on the search's own
+copies of the board, and a game thread's native client
+(`gwrl_cpp.InferenceClient`) writes each inference request into the thread's
+shared memory and exchanges binary messages with the inference server through
+the thread's pipe, as `include/game/inference_client.hpp` describes them. On
+Windows, whose pipes are not file descriptors, `RemoteEvaluator` sends the same
+messages from Python.
 
 ## Long unattended runs
 

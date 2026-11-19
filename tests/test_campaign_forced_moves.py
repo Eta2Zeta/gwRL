@@ -41,6 +41,15 @@ class PositionEvaluator:
     def evaluate_batch(self, requests):
         return [self.evaluate(env, actions) for env, actions in requests]
 
+    def evaluate_zone(self, zone, actor):
+        """The C++ search's way in: the position's zone input, which depends only on the position."""
+        self.menus.append(zone.action_count)
+        self.stats.requests += 1
+        arrays = zone.arrays()
+        digest = hashlib.sha256(b"".join(arrays[name].tobytes() for name in sorted(arrays)) + str(actor).encode()).digest()
+        return Evaluation([1 + digest[index % 32] for index in range(zone.action_count)],
+                          tuple(float(byte) for byte in digest[:3]))
+
 
 class ForcedMoveGameTests(unittest.TestCase):
     def episode(self, searched):

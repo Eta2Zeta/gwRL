@@ -7,16 +7,21 @@ game processes keep accounts. Each game thread charges its own CPU time
 (time.thread_time_ns) to the innermost instrumented call it is in, so time in
 nested calls is counted once, in the inner one:
 
-  search            VectorMCTS.search's own Python: the tree, selection, backing
-                    up values, and freeing the copies a finished search drops
+  search/search_decision
+                    the C++ search of a decision (studies/campaign/native_search.py):
+                    its tree, the engine's work for its simulations, encoding
+                    the states and the inference requests, all in C++ without
+                    Python's lock
+  search            VectorMCTS.search's own Python, where the Python search runs:
+                    the tree, selection, backing up values, and freeing the
+                    copies a finished search drops
   engine/<call>     gwrl_cpp.CampaignEnv calls: legal moves, playing moves,
                     dice, copies of the game, planning keys, decision kinds
   encode/<call>     the engine's zone encoding of a decision (zone_input) and its arrays
   adapter/<call>    CampaignAdapter's Python layer around the engine
-  input/<call>      readying the encoding for the coordinator: make_zone_input
-                    and shared_evaluator.prepare_into
-  messaging/<call>  the pipe to the coordinator (send, recv) and the remote
-                    evaluator's own code
+  input/<call>      readying the encoding for the coordinator (make_zone_input)
+  messaging/<call>  the pipe to the coordinator from Python (send_bytes,
+                    recv_bytes) and the remote evaluator's own code
   game loop[/call]  everything else in a game: creating it (make_env), choosing
                     and recording each move (_decide) and play_episode's own code
 
@@ -173,10 +178,10 @@ def _install() -> float:
     wrap(gwrl_cpp.CampaignZoneInput, ("select", "arrays", "without_actions"), "encode")
     wrap(campaign_adapter.CampaignAdapter, ADAPTER_CALLS, "adapter")
     wrap(features, ("make_zone_input",), "input")
-    wrap(shared_evaluator, ("prepare_into",), "input")
-    wrap(Connection, ("send", "recv"), "messaging")
+    wrap(Connection, ("send_bytes", "recv_bytes"), "messaging")
     wrap(curriculum, ("make_env",), "game loop")
     wrap(learning, ("_decide",), "game loop")
+    wrap(learning, ("search_decision",), "search")
     shared_evaluator.RemoteEvaluator.evaluate = _evaluations(shared_evaluator.RemoteEvaluator.evaluate)
     multiplayer_mcts.VectorMCTS.search = _searches(multiplayer_mcts.VectorMCTS.search)
 

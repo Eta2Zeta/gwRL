@@ -3,14 +3,16 @@
 Game processes keep the rules, the search and the network's input
 preparation. For each position a search asks about, a game thread writes the
 decision's zone input, a few integer arrays, into its own shared-memory buffer
-and sends a short header through its own pipe. The serving process merges
-every waiting position into one pass of the networks, one network reading
-every position when it serves all three alliances, as by default, or each
-alliance's network reading its own alliance's positions, evaluates it on its
-device and replies with the priors and values. A thread waits for its reply before
-preparing its next position, so its buffer is never overwritten while the
-server reads it. When the server stops, it closes the pipes still open, and a
-thread waiting for a reply raises EvaluatorClosed instead of waiting forever.
+and sends a short binary request through its own pipe; the C++ search does this
+without Python (InferenceClient, include/game/inference_client.hpp, which also
+describes the messages). The serving process merges every waiting position into
+one pass of the networks, one network reading every position when it serves all
+three alliances, as by default, or each alliance's network reading its own
+alliance's positions, evaluates it on its device and replies with the priors
+and values. A thread waits for its reply before preparing its next position, so
+its buffer is never overwritten while the server reads it. When the server
+stops, it closes the pipes still open, and a thread waiting for a reply raises
+EvaluatorClosed instead of waiting forever.
 
 The server lays the waiting positions out with features.pack_zone_arrays and
 runs neural.NetworkStack, whose pass is the one NeuralEvaluator's networks
@@ -30,34 +32,52 @@ try:
 except ImportError:  # Windows has no open-file limit for these pipes and buffers.
     resource = None
 import signal
+import struct
+import sys
 import threading
 import time
 from typing import Any, Callable, Sequence
 
 import numpy as np
 
+import gwrl_cpp
+
 from studies.shared.multiplayer_mcts import Evaluation, PLAYERS, vector
 
 BUFFER_BYTES = 2 * 1024 * 1024  # One decision's zone input; the largest measured is 145 KB.
 
-
-def prepare_into(buffer: memoryview, env: Any, actions: Sequence[Any]) -> tuple[str, list[tuple[str, str, tuple, int]]]:
-    """Write a decision's zone input into `buffer`; return its layout version and header."""
-    from .features import make_zone_input
-    zone = make_zone_input(env, actions)
-    header, offset = [], 0
-    for name, values in zone.arrays().items():
-        if offset + values.nbytes > len(buffer):
-            raise ValueError("A decision's zone input does not fit its shared buffer")
-        np.ndarray(values.shape, values.dtype, buffer=buffer, offset=offset)[...] = values
-        header.append((name, values.dtype.str, values.shape, offset))
-        offset += values.nbytes
-    return zone.version, header
+# A zone input's fields in the order InferenceClient writes them into a buffer.
+ZONE_FIELDS = ("zone_index", "zone_column", "zone_value", "global_column", "global_value", "action_offsets",
+               "action_column", "action_value", "action_source", "action_target", "path_offsets", "path_zone",
+               "factor_groups")
+# A request: kind 1, the actor's number (-1 at chance), the layout version's
+# length, the option count and each field's length; the layout version follows.
+REQUEST = struct.Struct("<BbHI" + "I" * len(ZONE_FIELDS))
+# A reply: the option count and the network version's length; then the priors
+# and the three values as doubles, and the network version.
+REPLY = struct.Struct("<II")
+VALUES = struct.Struct("<3d")
 
 
-def read_arrays(buffer: memoryview, header: Sequence[tuple[str, str, tuple, int]]) -> dict[str, np.ndarray]:
-    return {name: np.ndarray(shape, np.dtype(dtype), buffer=buffer, offset=offset)
-            for name, dtype, shape, offset in header}
+def read_request(buffer: memoryview, message: bytes) -> tuple[str | None, int, str, dict[str, np.ndarray]]:
+    """A request's actor (None at chance), option count, layout version and the
+    zone input's arrays, read in place from the thread's buffer."""
+    kind, actor, layout_length, count, *lengths = REQUEST.unpack_from(message)
+    if kind != 1 or not -1 <= actor < len(PLAYERS) or len(message) != REQUEST.size + layout_length:
+        raise ValueError("A game sent a malformed inference request")
+    layout = message[REQUEST.size:].decode()
+    arrays, offset = {}, 0
+    for name, length in zip(ZONE_FIELDS, lengths):
+        arrays[name] = np.ndarray((length,), np.int32, buffer=buffer, offset=offset)
+        offset += 4 * length
+    return (None if actor < 0 else PLAYERS[actor]), count, layout, arrays
+
+
+def reply_bytes(priors: Any, values: Sequence[float], version: str | None) -> bytes:
+    """A reply's bytes: priors as float64, the values, and the network version when named."""
+    named = b"" if version is None else version.encode()
+    weights = np.asarray(priors, dtype=np.float64)
+    return REPLY.pack(len(weights), len(named)) + weights.tobytes() + VALUES.pack(*values) + named
 
 
 @dataclass
@@ -67,24 +87,42 @@ class ClientStats:
     wait_seconds: float = 0.0
 
 
-class EvaluatorClosed(RuntimeError):
-    """The serving process closed this thread's pipe; its game cannot continue."""
+# The server closed this thread's pipe; its game cannot continue. The C++
+# client raises it, from a search or from RemoteEvaluator.evaluate.
+EvaluatorClosed = gwrl_cpp.InferenceClosed
 
 
 class RemoteEvaluator:
-    """One game thread's evaluator: one request in flight through its own pipe."""
+    """One game thread's evaluator: one request in flight through its own pipe.
 
-    def __init__(self, connection: Connection, buffer_name: str, version: str) -> None:
+    Its native client (gwrl_cpp.InferenceClient) is what the C++ search uses,
+    without Python's lock. Windows pipes are not file descriptors, so there, or
+    with native=False, Python sends the same messages, and the C++ search calls
+    evaluate_zone for each position."""
+
+    def __init__(self, connection: Connection, buffer_name: str, version: str, *,
+                 native: bool = sys.platform != "win32") -> None:
         # `version` labels the search's cache within one decision and never changes.
         # `network_version` is the version of the networks that answered, which in
         # self-play that never stops changes between two inference batches; the
         # server names it in a reply only when it differs from the last it sent here.
         self.connection, self.version = connection, version
-        self.network_version: str | None = None
-        self.memory = shared_memory.SharedMemory(name=buffer_name)
-        self.stats = ClientStats()
+        self.client = gwrl_cpp.InferenceClient(connection.fileno(), buffer_name, BUFFER_BYTES) if native else None
+        self.memory = None if native else shared_memory.SharedMemory(name=buffer_name)
+        self._stats, self._network_version = ClientStats(), None
+
+    @property
+    def network_version(self) -> str | None:
+        return self.client.network_version if self.client is not None else self._network_version
+
+    @property
+    def stats(self) -> ClientStats:
+        if self.client is None:
+            return self._stats
+        return ClientStats(self.client.requests, self.client.prepare_seconds, self.client.wait_seconds)
 
     def evaluate(self, env: Any, actions: Sequence[Any]) -> Evaluation:
+        """The Python search's way in."""
         if env.is_terminal():
             if actions:
                 raise ValueError("A terminal state cannot have policy actions")
@@ -94,26 +132,48 @@ class RemoteEvaluator:
             raise ValueError("An ownerless nonterminal evaluation must be a chance cutoff")
         if actor is not None and actor not in PLAYERS:
             raise ValueError(f"Unknown campaign decision player: {actor}")
+        from .features import make_zone_input
+        return self.evaluate_zone(make_zone_input(env, actions), actor)
+
+    def evaluate_zone(self, zone: Any, actor: str | None) -> Evaluation:
+        """One position from its zone input; actor None at a chance cutoff."""
+        if self.client is not None:
+            priors, values = self.client.evaluate(zone, actor)
+            return Evaluation(priors, vector(values))
         started = time.perf_counter()
-        layout, header = prepare_into(self.memory.buf, env, actions)
+        arrays, buffer, offset, lengths = zone.arrays(), self.memory.buf, 0, []
+        for name in ZONE_FIELDS:
+            values = arrays[name]
+            if offset + values.nbytes > len(buffer):
+                raise ValueError("A decision's zone input does not fit its shared buffer")
+            np.ndarray(values.shape, np.int32, buffer=buffer, offset=offset)[...] = values
+            lengths.append(len(values))
+            offset += values.nbytes
+        layout = zone.version.encode()
+        number = -1 if actor is None else PLAYERS.index(actor)
         sent = time.perf_counter()
         try:
-            self.connection.send((actor, len(actions), layout, header))
-            reply = self.connection.recv()
+            self.connection.send_bytes(REQUEST.pack(1, number, len(layout), zone.action_count, *lengths) + layout)
+            reply = self.connection.recv_bytes()
         except (EOFError, OSError) as error:  # BrokenPipeError is an OSError.
             raise EvaluatorClosed("The shared evaluator closed this game thread's pipe") from error
-        self.stats.requests += 1
-        self.stats.prepare_seconds += sent - started
-        self.stats.wait_seconds += time.perf_counter() - sent
-        priors, values = reply[0], reply[1]
-        if len(reply) > 2:
-            self.network_version = reply[2]
-        if len(priors) != len(actions):
+        count, named = REPLY.unpack_from(reply)
+        if count != zone.action_count:
             raise ValueError("The shared evaluator returned a different legal menu")
+        priors = np.frombuffer(reply, np.float64, count, REPLY.size).tolist()
+        values = VALUES.unpack_from(reply, REPLY.size + 8 * count)
+        if named:
+            self._network_version = reply[REPLY.size + 8 * count + VALUES.size:].decode()
+        self._stats.requests += 1
+        self._stats.prepare_seconds += sent - started
+        self._stats.wait_seconds += time.perf_counter() - sent
         return Evaluation(priors, vector(values))
 
     def close(self) -> None:
-        self.memory.close()
+        if self.client is not None:
+            self.client.close()
+        if self.memory is not None:
+            self.memory.close()
         self.connection.close()
 
 
@@ -146,10 +206,12 @@ def evaluate_prepared(model: Any, items: Sequence[dict[str, np.ndarray]],
 
 
 def collect(model: Any, scores: Any, lengths: Sequence[int], raw: Any,
-            batch: Any = None) -> tuple[list[list[float]], list[list[float]]]:
+            batch: Any = None, *, as_lists: bool = True) -> tuple[list[Any], list[list[float]]]:
     """Host priors and raw values from forward_prepared's device outputs.
 
-    Reading them back waits for the device, after which `batch` may go."""
+    Each position's priors are a list, or with as_lists=False a float64 array of
+    the same numbers. Reading them back waits for the device, after which
+    `batch` may go."""
     import torch
     # float(): a pass under automatic mixed precision may give 16-bit outputs, which numpy may not read.
     host = torch.cat((scores, (raw * model.config.value_scale).reshape(-1))).float().cpu().numpy().astype(np.float64)
@@ -163,9 +225,10 @@ def collect(model: Any, scores: Any, lengths: Sequence[int], raw: Any,
         offset += count
         if count:
             weights = np.exp(row - row.max())
-            priors.append((weights / weights.sum()).tolist())
+            weights = weights / weights.sum()
+            priors.append(weights.tolist() if as_lists else weights)
         else:
-            priors.append([])
+            priors.append([] if as_lists else row)
     return priors, values.tolist()
 
 
@@ -257,11 +320,11 @@ class SharedEvaluatorServer:
             requests = []
             for connection in ready:
                 try:
-                    message = connection.recv()
+                    message = connection.recv_bytes()
                 except EOFError:
                     open_connections.remove(connection)
                     continue
-                requests.append((connection, message))
+                requests.append((connection, read_request(self.memories[connection].buf, message)))
             self.stats.receive_seconds += time.perf_counter() - received
             if requests:
                 self.answer(requests)
@@ -274,11 +337,13 @@ class SharedEvaluatorServer:
         stack = self.stack
         rows: list[list[int]] = [[] for _ in stack.models]
         items = []
-        for row, (connection, (actor, count, layout, header)) in enumerate(requests):
+        for row, (connection, (actor, count, layout, arrays)) in enumerate(requests):
             readers = PLAYERS if actor is None else (actor,)
             if any(self.models[player].layout_version != layout for player in readers):
                 raise ValueError("A game sent a zone input of another layout")
-            items.append(read_arrays(self.memories[connection].buf, header))
+            if count != len(arrays["action_source"]):
+                raise ValueError("A game's request and zone input list different options")
+            items.append(arrays)
             # A chance position is rated by every network, once by each.
             for network in sorted({self._network_of[player] for player in readers}):
                 rows[network].append(row)
@@ -287,8 +352,8 @@ class SharedEvaluatorServer:
         with torch.inference_mode():
             outputs = forward_prepared(stack, [items[row] for row in order], self.device,
                                        [len(network_rows) for network_rows in rows])
-            row_priors, row_values = collect(stack, *outputs)
-        priors: list[list[float]] = [[] for _ in requests]
+            row_priors, row_values = collect(stack, *outputs, as_lists=False)
+        priors: list[Any] = [[] for _ in requests]
         chance: dict[int, list[list[float]]] = {}
         values: list[list[float] | None] = [None] * len(requests)
         for row, prior, value in zip(order, row_priors, row_values, strict=True):
@@ -302,10 +367,10 @@ class SharedEvaluatorServer:
         version = self.network_version
         for (connection, _), row_priors, value in zip(requests, priors, values, strict=True):
             if version is not None and self._named.get(connection) != version:
-                connection.send((row_priors, value, version))
+                connection.send_bytes(reply_bytes(row_priors, value, version))
                 self._named[connection] = version
             else:
-                connection.send((row_priors, value))
+                connection.send_bytes(reply_bytes(row_priors, value, None))
         sent = time.perf_counter()
         if self.runtime_policy is not None:
             self.runtime_policy.completed(1)

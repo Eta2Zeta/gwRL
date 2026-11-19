@@ -2,6 +2,10 @@
 #include "game/campaign_env.hpp"
 #include "game/campaign_actions.hpp"
 #include "game/catalog.hpp"
+#include "game/campaign_objective.hpp"
+#include "game/inference_client.hpp"
+#include "game/python_random.hpp"
+#include "game/search.hpp"
 #include "game/zone_encoding.hpp"
 
 #include <pybind11/numpy.h>
@@ -193,6 +197,62 @@ bool sameZoneInput(const ZoneInput& a, const ZoneInput& b) {
     return true;
 }
 
+int allianceNumber(const std::string& player) {
+    const auto& order = game::campaign::allianceOrder;
+    for (std::size_t i = 0; i < order.size(); ++i)
+        if (order[i] == player) return static_cast<int>(i);
+    throw std::invalid_argument("Unknown campaign decision player: " + player);
+}
+
+// float(value), as Python's search converts priors and values.
+double floatOf(py::handle value) {
+    const double result = PyFloat_AsDouble(value.ptr());
+    if (result == -1.0 && PyErr_Occurred()) throw py::error_already_set();
+    return result;
+}
+
+py::object valueTuple(const game::campaign::SearchValues& values) {
+    return py::make_tuple(values[0], values[1], values[2]);
+}
+
+// A Python evaluator the search calls, with Python's lock, for each position:
+// evaluate_zone(zone_input, actor) returns an Evaluation, or a (priors, values)
+// pair, where actor is the alliance choosing, or None at a chance position.
+class PythonSearchEvaluator final : public game::campaign::SearchEvaluator {
+  public:
+    explicit PythonSearchEvaluator(py::object evaluator) : evaluator_(std::move(evaluator)) {}
+
+    void evaluate(const std::shared_ptr<const ZoneInput>& input, const std::string& layout, int actor,
+                  std::size_t options, std::vector<double>& priors, game::campaign::SearchValues& values) override {
+        py::gil_scoped_acquire gil;
+        py::object who = actor < 0 ? py::object(py::none())
+                                   : py::object(py::str(game::campaign::allianceOrder[static_cast<std::size_t>(actor)]));
+        py::object result = evaluator_.attr("evaluate_zone")(ZoneInputHandle{input, layout}, who);
+        py::object weights, value;
+        if (py::hasattr(result, "priors")) {
+            weights = result.attr("priors");
+            value = result.attr("values");
+        } else {
+            const auto pair = result.cast<py::tuple>();
+            if (pair.size() != 2) throw std::invalid_argument("evaluate_zone returns an Evaluation or (priors, values)");
+            weights = pair[0];
+            value = pair[1];
+        }
+        priors.clear();
+        priors.reserve(options);
+        for (const auto weight : weights) priors.push_back(floatOf(weight));
+        std::size_t component = 0;
+        for (const auto item : value) {
+            if (component == 3) throw std::invalid_argument("Value must have three finite Axis/Allies/Comintern components");
+            values[component++] = floatOf(item);
+        }
+        if (component != 3) throw std::invalid_argument("Value must have three finite Axis/Allies/Comintern components");
+    }
+
+  private:
+    py::object evaluator_;
+};
+
 }  // namespace
 
 PYBIND11_MODULE(gwrl_cpp, module) {
@@ -251,6 +311,44 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     module.def("zone_encoding_unknowns", [](bool reset) { return game::campaign::zoneEncodingUnknowns(reset); },
                py::arg("reset") = false,
                "Names counted in an \"other\" column of the zone encoding since the last reset.");
+
+    py::register_exception<game::campaign::NoLegalSearchAction>(module, "NoLegalSearchAction", PyExc_ValueError);
+    py::register_exception<game::campaign::InferenceClosed>(module, "InferenceClosed", PyExc_RuntimeError);
+
+    py::class_<game::campaign::PythonRandom>(module, "PythonRandom",
+        "The search's copy of Python's random.Random(seed), exposed so that tests can compare its draws.")
+        .def(py::init<std::uint64_t>(), py::arg("seed"))
+        .def("random", &game::campaign::PythonRandom::random)
+        .def("getrandbits64", &game::campaign::PythonRandom::getrandbits64)
+        .def("randbelow", &game::campaign::PythonRandom::randbelow, py::arg("n"))
+        .def("gammavariate", &game::campaign::PythonRandom::gammavariate, py::arg("alpha"), py::arg("beta"));
+    module.def("python_sum", [](const std::vector<double>& values) {
+        return game::campaign::pythonSum(values.data(), values.size());
+    }, py::arg("values"), "The search's copy of Python's sum() of floats, exposed for tests.");
+
+    py::class_<game::campaign::InferenceClient>(module, "InferenceClient",
+        "One game thread's client of the inference server: it writes a zone input into the thread's "
+        "shared-memory buffer and exchanges binary messages through the thread's pipe "
+        "(include/game/inference_client.hpp), without Python's lock.")
+        .def(py::init<int, const std::string&, std::size_t>(), py::arg("descriptor"), py::arg("shared_memory_name"),
+             py::arg("size"))
+        .def("evaluate", [](game::campaign::InferenceClient& self, const ZoneInputHandle& zone,
+                            const std::optional<std::string>& actor) {
+            const int who = actor ? allianceNumber(*actor) : -1;
+            std::vector<double> priors;
+            game::campaign::SearchValues values{};
+            {
+                py::gil_scoped_release release;
+                self.evaluate(zone.input, zone.version, who, zone.input->actionCount(), priors, values);
+            }
+            return py::make_tuple(std::move(priors), valueTuple(values));
+        }, py::arg("zone"), py::arg("actor"),
+           "Priors for the zone input's options and its value vector; actor None at a chance position.")
+        .def("close", &game::campaign::InferenceClient::close)
+        .def_property_readonly("network_version", &game::campaign::InferenceClient::networkVersion)
+        .def_property_readonly("requests", &game::campaign::InferenceClient::requests)
+        .def_property_readonly("prepare_seconds", &game::campaign::InferenceClient::prepareSeconds)
+        .def_property_readonly("wait_seconds", &game::campaign::InferenceClient::waitSeconds);
 
     py::class_<game::campaign::Action>(module, "CampaignAction")
         .def_readonly("id", &game::campaign::Action::id)
@@ -472,6 +570,53 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def("restore", [](NativeCampaignEnv& self, const std::string& serialized) {
             self.call([&](CampaignEnv& env) { env.restore(serialized); });
         });
+    module.def("search_campaign", [](const NativeCampaignEnv& env, const std::vector<std::string>& passed,
+                                     const std::vector<std::string>& order, py::object evaluator, int simulations,
+                                     double cPuct, int maxDepth, std::uint64_t seed, bool rootNoise,
+                                     double dirichletAlpha, double dirichletEpsilon, bool searchForcedRoot) {
+        game::campaign::SearchSchedule schedule;
+        for (const auto& player : passed) schedule.passed |= static_cast<std::uint8_t>(1U << allianceNumber(player));
+        if (order.size() != 3) throw std::invalid_argument("Interrupt order must contain each alliance exactly once");
+        for (std::size_t i = 0; i < 3; ++i) schedule.order[i] = allianceNumber(order[i]);
+        const game::campaign::SearchSettings settings{simulations, cPuct, maxDepth, seed, rootNoise,
+                                                      dirichletAlpha, dirichletEpsilon, searchForcedRoot};
+        game::campaign::UniformSearchEvaluator uniform;
+        std::optional<PythonSearchEvaluator> callback;
+        game::campaign::SearchEvaluator* chosen = &uniform;
+        if (py::isinstance<game::campaign::InferenceClient>(evaluator))
+            chosen = &evaluator.cast<game::campaign::InferenceClient&>();
+        else if (!evaluator.is_none())
+            chosen = &callback.emplace(evaluator);
+        // The game itself stays the caller's: the search keeps a copy as its root.
+        auto root = env.call([](const CampaignEnv& game) {
+            return std::make_shared<const game::campaign::Engine>(game.engine().cloneForSearch(0));
+        });
+        game::campaign::SearchOutcome outcome;
+        {
+            py::gil_scoped_release release;
+            outcome = game::campaign::searchDecision(std::move(root), schedule, *chosen, settings);
+        }
+        py::list actionValues;
+        for (const auto& values : outcome.actionValues)
+            actionValues.append(values ? valueTuple(*values) : py::object(py::none()));
+        py::dict result;
+        result["action_ids"] = outcome.actionIds;
+        result["visit_counts"] = outcome.visits;
+        result["policy"] = outcome.policy;
+        result["priors"] = outcome.priors;
+        result["values"] = outcome.values ? valueTuple(*outcome.values) : py::object(py::none());
+        result["action_values"] = actionValues;
+        result["zone_input"] = outcome.rootInput ? py::cast(ZoneInputHandle{outcome.rootInput, outcome.layout})
+                                                 : py::object(py::none());
+        result["evaluations"] = outcome.evaluations;
+        result["positions"] = outcome.positions;
+        return result;
+    }, py::arg("env"), py::arg("passed"), py::arg("order"), py::arg("evaluator"), py::arg("simulations"),
+       py::arg("c_puct"), py::arg("max_depth"), py::arg("seed"), py::arg("root_noise"), py::arg("dirichlet_alpha"),
+       py::arg("dirichlet_epsilon"), py::arg("search_forced_root"),
+       "Search one decision of `env` (include/game/search.hpp) without Python's lock. The evaluator is an "
+       "InferenceClient, None for uniform priors and zero values, or an object whose evaluate_zone(zone_input, "
+       "actor) the search calls with Python's lock. Studies call it through studies/campaign/native_search.py.");
     module.attr("CAMPAIGN_SCHEMA") = "campaign_entities_v1";
     module.attr("CAMPAIGN_ACTION_SCHEMA") = game::campaign::trainingActionSchema;
 }

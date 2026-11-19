@@ -636,14 +636,15 @@ class NeuralEvaluator:
     def evaluate(self, env: Any, actions: Sequence[Any]) -> Evaluation:
         return self.evaluate_batch([(env, actions)])[0]
 
+    def evaluate_zone(self, zone: Any, actor: str | None) -> Evaluation:
+        """One position from its zone input: the C++ search's way in. `actor` is
+        the alliance choosing there, or None at a chance cutoff."""
+        return self.evaluate_zones([(zone, actor)])[0]
+
     def evaluate_batch(self, requests: Sequence[tuple[Any, Sequence[Any]]]) -> list[Evaluation]:
         results: list[Evaluation | None] = [None] * len(requests)
-        # Each alliance's network, or one network that serves all three alliances.
-        networks = distinct_networks(self.models)
-        network_of = {player: next(index for index, model in enumerate(networks) if model is self.models[player])
-                      for player in PLAYERS}
-        groups: list[list[tuple[int, Any]]] = [[] for _ in networks]
-        chance_values: dict[int, list[tuple[float, float, float]]] = {}
+        inputs: list[tuple[Any, str | None]] = []
+        rows: list[int] = []
         for row, (env, actions) in enumerate(requests):
             if env.is_terminal():
                 if actions:
@@ -651,15 +652,34 @@ class NeuralEvaluator:
                 results[row] = Evaluation([], vector(env.returns()))
                 continue
             actor = env.current_decision_player()
+            if actor is None and (env.decision_kind() != "chance" or actions):
+                raise ValueError("An ownerless nonterminal evaluation must be a chance cutoff")
+            inputs.append((make_zone_input(env, actions if actor is not None else ()), actor))
+            rows.append(row)
+        for row, evaluation in zip(rows, self.evaluate_zones(inputs), strict=True):
+            results[row] = evaluation
+        if any(result is None for result in results):
+            raise RuntimeError("A neural batch request was not evaluated")
+        return [result for result in results if result is not None]
+
+    def evaluate_zones(self, requests: Sequence[tuple[Any, str | None]]) -> list[Evaluation]:
+        """Positions from their zone inputs and the alliance choosing at each, None at a chance cutoff."""
+        results: list[Evaluation | None] = [None] * len(requests)
+        # Each alliance's network, or one network that serves all three alliances.
+        networks = distinct_networks(self.models)
+        network_of = {player: next(index for index, model in enumerate(networks) if model is self.models[player])
+                      for player in PLAYERS}
+        groups: list[list[tuple[int, Any]]] = [[] for _ in networks]
+        chance_values: dict[int, list[tuple[float, float, float]]] = {}
+        for row, (item, actor) in enumerate(requests):
             if actor is None:
-                if env.decision_kind() != "chance" or actions:
+                if item.action_count:
                     raise ValueError("An ownerless nonterminal evaluation must be a chance cutoff")
-                item = make_zone_input(env, ())
                 chance_values[row] = []
                 for group in groups:  # Every network rates a chance cutoff, once.
                     group.append((row, item))
             elif actor in PLAYERS:
-                groups[network_of[actor]].append((row, make_zone_input(env, actions)))
+                groups[network_of[actor]].append((row, item))
             else:
                 raise ValueError(f"Unknown campaign decision player: {actor}")
         for model, group in zip(networks, groups, strict=True):

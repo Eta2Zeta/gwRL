@@ -614,8 +614,9 @@ def play_shared_game(config, seed, evaluator, deadline_epoch):
     """
     import random
     from studies.campaign.curriculum import make_env
+    from studies.campaign.native_search import search_decision
     from studies.campaign.shared_evaluator import EvaluatorClosed
-    from studies.shared.multiplayer_mcts import MctsConfig, VectorMCTS
+    from studies.shared.multiplayer_mcts import MctsConfig
     started_epoch, started = time.time(), time.perf_counter()
     env = make_env(seed, calendar_rounds=config.calendar_rounds)
     search_rng = random.Random(seed ^ 0x9E3779B97F4A7C15)
@@ -638,7 +639,7 @@ def play_shared_game(config, seed, evaluator, deadline_epoch):
                                       seed=search_rng.getrandbits(64),
                                       search_forced_root=config.search_forced_roots)
                 before = time.perf_counter()
-                search = VectorMCTS(evaluator, settings).search(env, add_root_noise=True)
+                search = search_decision(env, evaluator, settings, add_root_noise=True)
                 timings["search"] += time.perf_counter() - before
                 chosen = policy_rng.choices(search.actions, weights=search.policy, k=1)[0]
                 before = time.perf_counter(); env.apply_action(chosen)
