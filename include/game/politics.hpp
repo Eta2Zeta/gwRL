@@ -7,7 +7,9 @@ namespace game::campaign {
 // Rule events called by later movement/combat/economy modules. These functions
 // never stand in for resolving a battle or proving a movement/supply path.
 enum class PossessionCause { Capture, Liberation, Alignment, Influence, Transfer };
-enum class DeclarationMode { MajorPowerDeclaration, LandAttack };
+// ChinaInvasion is the war that an invasion of China (mayInvadeChina) starts
+// with each Chinese nation; the attack that starts it keeps its own timing.
+enum class DeclarationMode { MajorPowerDeclaration, LandAttack, ChinaInvasion };
 
 struct PoliticalPermission {
     bool allowed {false};
@@ -82,6 +84,19 @@ void captureLand(State&, NationId attacker, ZoneId zone,
 PoliticalPermission mayDeclareWar(const State&, NationId actor, NationId target,
                                   DeclarationMode = DeclarationMode::MajorPowerDeclaration);
 void declareWar(State&, NationId actor, NationId target, DeclarationMode);
+// Rule 4.9 (page 30): an attack by a nation that is not Chinese on land that
+// was originally a warlord's, the CCP's or the KMT's, whoever holds it now,
+// declares war on all of China, unless Dadao holds the land (15.4, page 105).
+// invadesChina says whether this attack is one.
+bool invadesChina(const State&, NationId attacker, ZoneId zone);
+// Whether the attacker may start every war that this attack's invasion of
+// China starts: with the KMT, the CCP and each warlord still in the game that
+// it is not at war with yet. Each must be a war mayDeclareWar allows: none with
+// the attacker's own alliance (5.1, page 35) and none started by a controlled
+// minor power (4.5, page 27). So Mongolia, whose alliance holds the CCP, never
+// may (RCL-022). Every way of attacking land asks this before it offers the
+// attack, and recordLandAttack refuses an attack it denies.
+PoliticalPermission mayInvadeChina(const State&, NationId attacker, ZoneId zone);
 void recordLandAttack(State&, NationId attacker, ZoneId zone);
 void surrenderNation(State&, NationId nation, NationId attacker);
 

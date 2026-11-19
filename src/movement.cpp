@@ -274,16 +274,19 @@ bool landAccess(const State &s, NationId nation, ZoneId zone, bool combat) {
   if (!s.territories.contains(zone))
     return false;
   const auto owner = s.territories.at(zone).possessor;
-  if (!owner)
-    return combat;
-  if (*owner == nation || politicallyFriendly(s, nation, *owner))
+  if (owner && (*owner == nation || politicallyFriendly(s, nation, *owner)))
     return true;
   if (!combat)
     return false;
-  if (controlledBy(s, nation, s.currentNation()))
-    return hostile(s, nation, *owner);
-  return hostile(s, nation, *owner) ||
-         mayDeclareWar(s, nation, *owner, DeclarationMode::LandAttack).allowed;
+  // The holder must be an enemy already, or one this attack may declare war
+  // on; a controlled minor power may declare war on nobody (RB 4.5).
+  if (owner && !hostile(s, nation, *owner) &&
+      (controlledBy(s, nation, s.currentNation()) ||
+       !mayDeclareWar(s, nation, *owner, DeclarationMode::LandAttack).allowed))
+    return false;
+  // An attack on land that was Chinese at the start declares war on all of
+  // China, whoever holds the land or if nobody does (RB 4.9).
+  return mayInvadeChina(s, nation, zone).allowed;
 }
 bool aircraftFlightAccess(const State &s, NationId nation, ZoneId zone,
                           bool combat) {

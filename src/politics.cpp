@@ -20,6 +20,13 @@ bool marked(const Marks& flags,const MarkKey& key) { return flags.value(key)!=0;
 bool chinese(const Id& nation) {return nation=="ccp"||nation=="kmt"||nation=="dadao"||isWarlord(nation);}
 bool chinese(const State& s,NationId nation) {return chinese(nationName(s,nation));}
 bool warlord(const State& s,NationId nation) {return isWarlord(nationName(s,nation));}
+// The nations an invasion of China (RB 4.9) puts at war with the invader: the
+// KMT, the CCP and every warlord, while each is still in the game.
+bool chinaInvasionTarget(const State& s,NationId id,const NationState& n) {
+    const auto& known=knownNations(s);
+    return !marked(n.gameFlags,mark::incorporated)&&!s.politics.surrendered.contains(id)&&
+           (id==known.ccp||id==known.kmt||warlord(s,id));
+}
 bool hasUnits(const State& s,NationId nation) {
     return std::any_of(s.units.begin(),s.units.end(),[&](const auto& item){return item.second.owner==nation;});
 }
@@ -544,7 +551,7 @@ PoliticalPermission mayDeclareWar(const State& s,NationId actor,NationId target,
     if(a.alliance&&a.alliance==b.alliance)return {false,"Same alliance"};
     const auto& known=knownNations(s);
     if(s.politics.chineseTruce&&((actor==known.ccp&&target==known.kmt)||(actor==known.kmt&&target==known.ccp)))return {false,"Use Chinese Truce termination"};
-    if(b.powerStatus!="major"&&mode!=DeclarationMode::LandAttack)return {false,"Minor declarations require land combat movement"};
+    if(b.powerStatus!="major"&&mode==DeclarationMode::MajorPowerDeclaration)return {false,"Minor declarations require land combat movement"};
     if(mode==DeclarationMode::LandAttack&&(s.clock.phase!=Phase::CombatMovement||(actor!=s.currentNation()&&!controlledBy(s,actor,s.currentNation()))))return {false,"Land attack outside actor's combat movement"};
     if(actor==known.kmt&&(warlord(s,target)||target==known.mongolia)) {
         if(hasUnits(s,nationNumber(s, "ccp")))return {false,"CCP has not been eliminated"};
@@ -566,19 +573,42 @@ void declareWar(State& s,NationId actor,NationId target,DeclarationMode mode) {
     const auto permission=mayDeclareWar(s,actor,target,mode);require(permission.allowed,"Illegal declaration: "+permission.reason);
     commitDeclaration(s,actor,target);
 }
+bool invadesChina(const State& s,NationId attacker,ZoneId zone) {
+    if(chinese(s,attacker))return false;
+    const auto& known=knownNations(s);
+    const auto original=originalNation(s,zone);
+    return (original==known.ccp||original==known.kmt||warlord(s,original))&&
+           !isNation(s,s.territories.at(zone).possessor,"dadao");
+}
+PoliticalPermission mayInvadeChina(const State& s,NationId attacker,ZoneId zone) {
+    if(chinese(s,attacker))return {true,{}};
+    // The wars come first: they are cheap to check, and an attacker already at
+    // war with all of China needs no look at the zone's printed owner.
+    const auto& wars=s.nations.at(attacker).atWarWith;
+    const auto starts=[&](NationId id,const NationState& n){return id!=attacker&&!wars.contains(id)&&chinaInvasionTarget(s,id,n);};
+    if(std::none_of(s.nations.begin(),s.nations.end(),[&](const auto& item){return starts(item.first,item.second);})||
+       !invadesChina(s,attacker,zone))return {true,{}};
+    for(const auto& [id,n]:s.nations)
+        if(starts(id,n))
+            if(const auto permission=mayDeclareWar(s,attacker,id,DeclarationMode::ChinaInvasion);!permission.allowed)
+                return {false,"Invading China would start a war with "+nationName(s,id)+": "+permission.reason};
+    return {true,{}};
+}
 void recordLandAttack(State& s,NationId attacker,ZoneId zone) {
     require(s.territories.contains(zone),"Land attack target is not land");
     const auto defender=s.territories.at(zone).possessor;
     require(defender!=attacker,"Cannot attack one's own possession");
     if(defender&&s.politics.chineseTruce&&((attacker== knownNations(s).ccp&&*defender== knownNations(s).kmt)||(attacker== knownNations(s).kmt&&*defender== knownNations(s).ccp)))
         throw std::runtime_error("Chinese Truce prevents attacking the other faction");
+    if(const auto permission=mayInvadeChina(s,attacker,zone);!permission.allowed)
+        throw std::runtime_error("Illegal land attack: "+permission.reason);
+    const bool invasion=invadesChina(s,attacker,zone);
     bool newChinaDeclaration=false;
     if(!chinese(s,attacker))for(const char* name:{"ccp","kmt"}) {
         const auto china=findNation(s,name);  // Empty if absent: then neither set holds it.
         if(!s.politics.surrendered.contains(china)&&!s.nations.at(attacker).atWarWith.contains(china))newChinaDeclaration=true;
     }
     if(defender&&*defender!=attacker&&!s.nations.at(attacker).atWarWith.contains(*defender))declareWar(s,attacker,*defender,DeclarationMode::LandAttack);
-    const auto original=originalNation(s,zone);
     if(defender&&warlord(s,*defender)) {
         if(attacker== knownNations(s).kmt) {incorporateNation(s,*defender,nationNumber(s, "ccp"));refreshPoliticalState(s);}
         else {
@@ -591,11 +621,10 @@ void recordLandAttack(State& s,NationId attacker,ZoneId zone) {
         }
     }
     if(isNation(s, defender, "dadao")&&!chinese(s,attacker))s.politics.pending["dadao_attacked_by"]=V(nationName(s,attacker));
-    const auto& known=knownNations(s);
-    if(!chinese(s,attacker)&&(original==known.ccp||original==known.kmt||warlord(s,original))&&!isNation(s, defender, "dadao")) {
+    if(invasion) {
         s.politics.foreignChinaWarPending=true;s.politics.chinaInvader=attacker;
         if(newChinaDeclaration)s.politics.pending["truce_foreign_declaration"]=V(true);
-        for(auto& [id,n]:s.nations)if((id==known.ccp||id==known.kmt||warlord(s,id))&&!s.politics.surrendered.contains(id)&&!marked(n.gameFlags,mark::incorporated))warPair(s,attacker,id);
+        for(auto& [id,n]:s.nations)if(chinaInvasionTarget(s,id,n))warPair(s,attacker,id);
     }
 }
 void surrenderNation(State& s,NationId nation,NationId attacker) {

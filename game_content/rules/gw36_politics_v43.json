@@ -64,7 +64,7 @@
     {
       "id": "clarifications",
       "path": "game_content/rules/clarifications.md",
-      "sha256": "22f7e3d07c88528ae805b502b4f4fdbf74f5324bcab3f56765503c6497e81db3",
+      "sha256": "31b6322a8668754b676e3e60737e1c7c73f4ac710b92918d0cd4370d680b1933",
       "kind": "project_rule_register"
     },
     {
@@ -106,6 +106,15 @@
       "quote": "I don't get why this is separate? Shouldn't it just follow the same rules when KMT is the one breaking the truce with sharing zones? Which is just auto elimination for those with low morale?",
       "ruling": "Use the same attack-roll10+ elimination for eligible attacking minor KMT regular Infantry/Cavalry in shared truce-ending zones after voluntary or automatic termination.",
       "scope": "Low Morale consequence; developer confirmation separately covers third-party combat roles."
+    },
+    {
+      "id": "user_ruling_attacks_on_chinese_land_2026_11_19",
+      "kind": "user_ruling",
+      "date": "2026-11-19",
+      "question": "Q-001: may Mongolia attack land that was originally a warlord's, the CCP's or the KMT's, which puts it at war with the CCP of its own alliance? Q-002: is an attack on such land an attack on China when a nation outside China holds it?",
+      "quote": "For 1 and 2 let's just follow the rules for now, ussr or allied nations cannot attack original chinese lands beccause theycannot be at war with people in their own allience",
+      "ruling": "The printed owner decides, whoever holds the land (RB 4.9). The attack is allowed only if the attacker may start every war it starts: none inside its own alliance (RB 5.1) and none at all for a controlled minor power (RB 4.5). Mongolia may never make it.",
+      "scope": "Recorded as RCL-022; for now, pending any developer clarification."
     }
   ],
   "rules": [
@@ -365,6 +374,8 @@
       "parameters": {
         "trigger": "foreign_attack_on_original_warlord_ccp_or_kmt_land",
         "dadao_exception": true,
+        "applies_whoever_holds_the_land": true,
+        "attack_requires_every_resulting_war_to_be_declarable": true,
         "effect": "war_on_all_china",
         "alignment_timing": "end_of_attacker_combat",
         "scope": "each_whole_remaining_warlord",
@@ -457,6 +468,24 @@
           "source_id": "rulebook",
           "pdf_page": 39,
           "section": "5.7 KMT no-land surrender condition"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 27,
+          "section": "4.5"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 35,
+          "section": "5.1"
+        },
+        {
+          "source_id": "clarifications",
+          "section": "RCL-022 attacks on land that was Chinese at the start"
+        },
+        {
+          "source_id": "user_ruling_attacks_on_chinese_land_2026_11_19",
+          "section": "Q-001 and Q-002"
         }
       ],
       "notes": "The printed per-land-zone wording is superseded by the approved whole-warlord clarification; no per-zone split remains.",

@@ -32,202 +32,16 @@ Other open things stay in the pages that own them, and
 
 | Number | Question | About | Recommended |
 | --- | --- | --- | --- |
-| [Q-001](#q-001-mongolia-at-war-with-the-ccp) | May Mongolia attack land that was Chinese at the start, which now puts it at war with the CCP? | A printed rule | No: rule 4.5 does not allow the attack |
-| [Q-002](#q-002-chinese-land-that-japan-holds) | Is an attack on Chinese land that Japan now holds an attack on China? | A printed rule | Yes, as now; it cannot arise if Q-001 is answered as recommended |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
 
-Q-001 and Q-002 were raised on 14 November 2026, while the global features
-about nations were being pruned (commit `bce7a4c`). Their numbers are in the
-[record of which features random games give values to](archive/records/answer_census_2026_11_15.md).
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
-Q-006 was raised on 15 November 2026, while the printed sources of Q-001 were
-being looked up; its numbers are in the first record.
-
-## Q-001: Mongolia at war with the CCP
-
-**The question.** When Mongolia attacks land that was Chinese at the start of
-the game, the engine puts it at war with the CCP, which belongs to its own
-alliance and is played by the same player. Should Mongolia be able to make that
-attack at all?
-
-**What the engine does now.**
-
-- An attack by a nation that is not Chinese on a land zone that was originally
-  a warlord's, the CCP's or the KMT's is recorded as an invasion of China. The
-  attacker is put at war with the KMT, the CCP and every warlord that has not
-  yet joined a side, and those warlords pick a side at the end of that Combat
-  Phase (`recordLandAttack` in `src/politics.cpp`, following rulebook 4.9,
-  page 30; [politics](engine/politics.md#invading-china)).
-- Mongolia may never declare war (`mayDeclareWar` in `src/politics.cpp`). It
-  may make a combat move only into a zone whose holder is already at war with
-  it, or that nobody holds (`landAccess` in `src/movement.cpp`).
-- The second check looks only at the holder of the zone. It does not look at
-  the wars the first rule then adds.
-
-**A real case** (random game, seed 7155;
-[record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
-
-1. Game round 1: the CCP attacks the Ma Clique in Tsinghai and Mengjiang in
-   Suiyuan, so both join the KMT with their land at the end of that Combat
-   Phase (rulebook 4.9, page 30: a warlord attacked by the CCP aligns with the
-   KMT). Japan then attacks Nanking, and at the end of Japan's Combat Phase the
-   six other warlords join the KMT too (rulebook 4.9, page 30: an attack by a
-   foreign nation on Chinese land makes every warlord align with the CCP or
-   the KMT). Later in that game round the KMT destroys the CCP's last units.
-2. Game round 2: the KMT attacks Mongolia. The declaration-of-war table lets the
-   KMT attack Chinese warlords or Mongolia, by a combat move, once the CCP has
-   been eliminated (rulebook 5.1, page 35, the KMT's rows; the same rows are on
-   the KMT's national reference sheet, page 2; [Q-006](#q-006-the-kmt-after-the-ccp-comes-back)
-   is about their exact words). The KMT and Mongolia are now at war.
-3. Game round 3: a Mongolian cavalry moves into Tsinghai, which the KMT holds, as an
-   attack. The engine records Mongolia as invading China. No warlord is left
-   to join a side, and Mongolia was already at war with the KMT, so the attack
-   changes one thing: from that move on Mongolia and the CCP are at war.
-
-**How often.** In 480 random games Mongolia was recorded as the invader in 70,
-from game round 3 on, and in all 70 it came to be at war with the CCP. In 69 of them
-no warlord was left to join a side; the new enemies were the CCP alone in 46
-games and the CCP and the KMT in 23. Three times Mongolia then attacked land
-the CCP held ([record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
-
-**The printed rules.**
-
-| Rule | What it says |
-| --- | --- |
-| 4.9, page 30 | A foreign nation that attacks land which was originally a warlord's, the CCP's or the KMT's has thereby declared war on the whole of China, and every warlord aligns with the CCP or the KMT (or the Dadao Government) at the end of the attacker's Combat Phase. |
-| 4.5, page 27 | Whoever controls a minor power may move its units in combat only against nations it is already at war with, and may not declare war for it or take any action that puts it at war with a power it is not already at war with. |
-| 4.3, page 26, and 4.7, page 29 | Mongolia is a minor power of the Comintern, controlled by the USSR. The CCP is in the Comintern too. |
-| 4.7, page 29, and 4.6, page 28 | Attacked by the KMT, Mongolia stays a nation of its own. Attacked by anyone else, it aligns with the USSR at the end of the attacker's Combat Phase, and at once if the USSR is at war with a major power. A minor power that aligns is incorporated into the major power and ceases to exist; its land and units become the major power's. |
-| 5.1, page 35 | Nobody may declare war inside their own alliance; the table answers "No" for the USSR and for the CCP against other Comintern nations. |
-| 14.3, page 101 | Without a declaration of war no other nation may enter land that was originally the KMT's, the CCP's or a warlord's; that the land is friendly makes no difference. |
-
-This campaign leaves the USSR out and lets the Comintern player move Mongolia
-with the rights of a controlled minor power
-([approved scenario decisions](plans/japan_china_full_rules_plan.md#approved-scenario-decisions);
-`mongolia_campaign_override` in `game_content/rules/gw36_politics_v43.json`,
-which also turns off Mongolia's alignment with the USSR). In the full game,
-then, the only nation a Mongolia of its own can be at war with is the KMT, and
-the only Chinese land it can attack is land the KMT holds, as in the case
-above. Here it can also be at war with Japan; that case is
-[Q-002](#q-002-chinese-land-that-japan-holds).
-
-Read together, the rules do not allow this attack: by 4.9 it would be a
-declaration of war on all of China, which 4.5 forbids for a controlled minor
-power and 5.1 forbids against the CCP. The engine applies 4.5 to the holder of
-the zone only.
-
-**Why it matters.** Two nations of one alliance, moved by one player, become
-enemies (rulebook glossary, page 6: nations at war with each other are
-enemies), so their units may attack each other, and the Comintern's network is
-trained on such states. Random play reaches this in one game in seven.
-
-**The choices.**
-
-| Choice | What it changes |
-| --- | --- |
-| A. Keep it | Nothing. The engine stays against rules 4.5 and 5.1. |
-| B. Allow the attack, but never put a nation at war with its own alliance | Mongolia's attack still counts as an invasion and puts it at war with the KMT and with warlords that have not joined a side, but not with the CCP. No printed rule says this; it follows 5.1 and sets 4.5 aside. A small change in `recordLandAttack` with a test. |
-| C. Do not allow the attack | Mongolia is offered no combat move into a zone that was originally a warlord's, the CCP's or the KMT's. It can still defend itself, retake its own land and attack zones that were never Chinese. A check in `landAccess` with a test; `china_invader:mongolia` and the `at_war` questions that only this attack can answer may then leave the network's input. |
-
-**Recommendation: C.** It is what rules 4.9, 4.5 and 5.1 give when read
-together, and it treats Mongolia as the same rules treat the USSR, which they
-keep out of every zone that was originally a warlord's, the CCP's or the KMT's
-([Q-002](#q-002-chinese-land-that-japan-holds)). What C costs Mongolia: once the KMT has attacked it, Mongolia can
-fight on its own land but cannot strike back into China. If that seems wrong
-for the game, it is a question for the game's developers.
-
-**If answered.** The ruling becomes the next rule clarification, with the
-engine, its test and the politics page changed in the same commit.
-
-## Q-002: Chinese land that Japan holds
-
-**The question.** Is an attack on a zone that was Chinese at the start, but
-that a nation outside China now holds, an attack on China?
-
-**What the engine does now.** It goes by who possessed the zone at the start,
-not by who holds it now (`recordLandAttack` in `src/politics.cpp` asks
-`originalNation` for the zone's first owner). It makes one exception, for a
-zone that Dadao holds: an attack there is an attack on Dadao only.
-
-**A real case** (random game, seed 7024;
-[record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
-
-1. Game round 1: the CCP attacks Mengjiang in Suiyuan, so Mengjiang joins the KMT
-   with its land (rulebook 4.9, page 30).
-2. Game round 2: Japan takes Suiyuan from the KMT. A Japanese infantry also attacks
-   Kerulen, which puts Japan and Mongolia at war: an Axis major power may
-   declare war on any nation outside the Axis, and on a minor power it does so
-   by a land unit's combat move against it (rulebook 5.1, page 35).
-3. Game round 3: a Mongolian cavalry moves into Suiyuan, now Japan's, as an attack.
-   The engine treats that as Mongolia invading China: Mongolia is now also at
-   war with the KMT and the CCP, neither of which had any part in the fight.
-
-In the full game Mongolia would no longer exist at step 3. Japan's attack in
-step 2 makes it align with the USSR at the end of Japan's Combat Phase, and it
-is incorporated into the USSR (rulebook 4.7, page 29; 4.6, page 28). The attack
-in step 3 would be the USSR's. Rule 4.5, which binds a controlled minor power,
-would not apply to it; rule 5.1 forbids the USSR, too, to declare war on the
-CCP. This campaign has no USSR and keeps Mongolia a nation of its own
-(`mongolia_campaign_override` in `game_content/rules/gw36_politics_v43.json`),
-so the case arises only here.
-
-Read literally, the same rules keep the USSR out of every zone that was
-originally a warlord's, the CCP's or the KMT's, including those Japan has
-taken: it may not enter one without a declaration of war (rulebook 14.3,
-page 101), an attack on one is a declaration of war on all of China (4.9,
-page 30), and it may not declare war on the CCP (5.1, page 35). It can still
-fight Japan in Manchukuo and Korea, which 4.9 does not name; holding all of
-Manchukuo is one of its strategic objectives (page 23). The rules look built
-for this: the USSR helps the CCP by rail (Comintern Brothers, 15.2, page 103)
-and by an air transport that must land back in Soviet land (International Red
-Aid, 15.3, page 105), and neither puts a Soviet unit in China.
-
-**How often.** In 25 of the 70 games of Q-001 the zone Mongolia first attacked
-was held by Japan; in the other 45 the KMT held it
-([record](archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
-
-**The printed rules.**
-
-| Rule | What it says |
-| --- | --- |
-| 4.9, page 30 | It names the zones as those originally possessed by a warlord, the CCP or the KMT, and leaves out the Dadao Government, pointing to 15.4. |
-| Glossary, page 7 | It defines "originally" by the roundel printed in the land zone on the map. |
-| 14.3, page 101 | Without a declaration of war no other nation may enter land that was originally the KMT's, the CCP's or a warlord's; that the land is friendly makes no difference. |
-| 15.4, page 105, and 4.7, page 29 | Dadao may attack Chinese land without the rest of China picking sides; if a nation that is not Chinese attacks Dadao, Dadao aligns with Japan. |
-| 10.10.1, page 73 | A major power that conquers a zone of the Chinese Home Country it did not originally own keeps it or gives it to a Chinese faction. |
-
-Rules 4.9 and 14.3 both name the zones by their printed owner, and 14.3 adds
-that even a friendly zone counts. So the printed words agree with the engine.
-Rule 10.10.1 shows that taking Chinese land can end with China getting it
-back, but it does not say that attacking it is no attack on China.
-
-**Why it matters.** A nation that fights Japan on land Japan has conquered ends
-up at war with China as well.
-
-**The choices.**
-
-| Choice | What it changes |
-| --- | --- |
-| A. Keep it: the printed owner decides, whoever holds the zone | Nothing. |
-| B. Only a zone that the KMT, the CCP or a warlord holds counts | An attack on land held by a nation that is not Chinese is an attack on that nation only. No printed rule says this. A small change in `recordLandAttack` with a test. |
-
-**Recommendation: A.** Two printed rules say it.
-
-**This depends on Q-001.** If Q-001 is answered C, the case cannot arise in
-this campaign: Mongolia then never attacks such a zone, and the only other
-nation that is not Chinese is Japan, which is the holder here. But C rests on
-rule 4.5, which binds Mongolia here only because this campaign keeps it a
-minor power after Japan's attack; in the full game the same attack is the
-USSR's, and 4.5 does not bind the USSR. Read literally, rules 14.3, 4.9 and
-5.1 forbid the attack to the USSR all the same (above), so C agrees with the
-full game. Only if the developers allow the USSR to attack Chinese land that
-Japan holds is the recommendation to allow it to this campaign's Mongolia too,
-once Japan has attacked it, and to apply C only to land a Chinese nation holds.
-
-**If answered.** As for Q-001.
+Q-006 was raised on 15 November 2026, while the printed rules on Mongolia's
+attacks on Chinese land (Q-001, since answered) were being looked up. Its
+numbers are in the
+[record of which features random games give values to](archive/records/answer_census_2026_11_15.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -392,6 +206,17 @@ These are open too, and stay in the pages that own them:
 An answered question is listed here with its number, the answer, the date and
 the page that now states it.
 
+- **Q-001**, Mongolia at war with the CCP. Answered on 19 November 2026:
+  follow the printed rules for now, so Mongolia may not attack land that was
+  originally a warlord's, the CCP's or the KMT's, which would put it at war
+  with the CCP of its own alliance. Stated in
+  [rule clarification RCL-022](../game_content/rules/clarifications.md#rcl-022-an-attack-on-land-that-was-chinese-at-the-start)
+  and [the politics page](engine/politics.md#invading-china).
+- **Q-002**, Chinese land that Japan holds. Answered on 19 November 2026: the
+  printed owner decides, so an attack on such land is an attack on China
+  whoever holds it, and no nation that may not go to war with all of China,
+  such as the USSR or a nation of the Allies in the full game, may make it.
+  Stated in the same two places.
 - **Q-003**, one list of marks for each kind of thing. Answered on 18 November
   2026: yes, with the four bombing-reduction marks added. The engine's mark
   table now says which kinds of thing the rules put each mark on, and the input

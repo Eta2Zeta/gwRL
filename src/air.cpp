@@ -1634,7 +1634,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                         if (b.zone == zone && b.attacker == u.owner && !marked(b.flags, mark::air_mission) &&
                             !marked(b.flags, mark::finished))
                             existing = true;
-                    if (!existing)
+                    if (!existing && mayInvadeChina(s, u.owner, zone).allowed)
                         out.push_back(action(s, s.currentNation(), "air_ground_attack",
                                              {{"unit", V(id)}, {"path", V(zoneIds(s, path))}}));
                 }
@@ -1649,6 +1649,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                                        {{"unit", V(id)}, {"path", V(zoneIds(s, path))}, {"battle", V(bid)}}));
                 }
                 if (!u.commitments.contains(mark::air_screening_continued) && !u.cargo.empty() &&
+                    mayInvadeChina(s, u.owner, zone).allowed &&
                     (transport(s, u) || has(s, u, knownUnitClasses(s).strategic_bomber)) &&
                     std::all_of(u.cargo.begin(), u.cargo.end(), [&](const Id &c) {
                         const auto &cargo = s.units.at(c);

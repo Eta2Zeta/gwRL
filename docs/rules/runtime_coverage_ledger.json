@@ -3,7 +3,7 @@
   "scope": "Evidence index for all rows of the core rules ledger. A listed focused fixture exercises the named mechanic; it is not a claim that every clause or legal position has exhaustive coverage. Full initial-state campaign traces are separately recorded.",
   "ledger_sha256": "f0f404611cdc70c7cbfefcf75195b4edfb333dac0ecfc7870ff757f5a953a389",
   "evidence_file_sha256": {
-    "src/air.cpp": "da67c67781a738fa7f0ccabc00f79bc6b75a268f6d10d8be0f6f343ac84b942f",
+    "src/air.cpp": "df3e7003cb7d3ae622abac90928e1ce2eab9dcf14683764c872c595b77aed477",
     "src/campaign_objective.cpp": "9e0e01963a6d78558a5df71f9b116f9c8405ceac63d90db4e664785af950b0b5",
     "src/campaign_runtime.cpp": "7f98c8fc00e404803c09e9f7454dccc30c3108c718c8ed3eae3875de2c6a35b6",
     "src/campaign_setup.cpp": "1a7db3e6958d657e4bed2a39dd765b782a76e4c26fadc721f188b9cbe9fd3502",
@@ -11,11 +11,11 @@
     "src/economy.cpp": "1e67f1044592a63393237be5fe79462e0cde70e068055d99518bf32cd0cb1d93",
     "src/economy_lendlease.cpp": "072712e5c80734056353b7aa3f3af9c450a92aa21f9a7481b97c58f5ffddf15a",
     "src/land_combat.cpp": "95cb77e9abc9c285c2fa91f773676d04bb33265f9d1d72e220f625b7980f9a31",
-    "src/movement.cpp": "dc6d5405a0716547a1d4fad60d5ccef18f8fd1c3b65b8fedfca7b35031bf265e",
+    "src/movement.cpp": "d896cbacef06a81d2c10da038d2e95eb11065a70411e083ff4bbf878f47a41cf",
     "src/naval_combat.cpp": "febf83872c98152c43500d76596a551f78b52be3076d74a3b126336ab84b4bfb",
     "src/naval_movement.cpp": "624a6aff6bc5e0a661e64b6f357c02e1681c7ac2c69fd8312817ff248a0e5e5d",
-    "src/naval_operations.cpp": "a44be18906ec4632d91eaa68db33aba09e926d10592fd4066a282071b079ff89",
-    "src/politics.cpp": "6bd26386506c7b14c4a7bae9572d2aafd30e4705fe1444d1a3e7cef58a3a2d29",
+    "src/naval_operations.cpp": "0342f2d127a49b500856ff8d28ff197612599b3e9ba1b96e883fd74c37fdd35d",
+    "src/politics.cpp": "9775d40c3a75833a093c748bd1385e648014ad90a1576ed480bc6d75e282c24f",
     "src/politics_influence.cpp": "6c1e591c1aadd0ee709b9e367ee52e3e1cadbef9a031a9eadd254847ef001d24",
     "src/politics_warlords.cpp": "ad77f9a0a1905187c32c08e05f39467f0752c3a3a6831b916120d2afc0a7d9fb",
     "tests/air_integration_tests.cpp": "8f5b94cdd6192cfd3e68907a2085376a32a5f7f633021d91359ad7030ad8c448",
@@ -36,7 +36,7 @@
     "tests/naval_movement_tests.cpp": "cfae73a962193ece9d2a32bc81395792c44496949adf920039ffc1eec85bfe8e",
     "tests/naval_operations_tests.cpp": "9754af346578ab1e72a6551303d8147f16fcda40fc102f1853d7d7a69c348f17",
     "tests/politics_influence_tests.cpp": "69fba5d75fb4892ca40f70cf3ba10d19a31bba43dfa42aa841ea7957ea298486",
-    "tests/politics_tests.cpp": "ccf052e0fe5dea73ea7332dd2919071f999f798a4cc750b80299d33ea1cda8d0",
+    "tests/politics_tests.cpp": "1dc0bebc5897b23bfb33c075915e36779d33b5151b8d8f2952022064226f188b",
     "tests/politics_warlords_tests.cpp": "a8aeeab4a5173c1704b79222886fc82cb82e1f1ba3e5c79ec0900d333a5c62d2"
   },
   "rows": [
@@ -50,24 +50,24 @@
         {
           "file": "src/politics.cpp",
           "symbol": "originalNation",
-          "line": 281
+          "line": 288
         },
         {
           "file": "src/politics.cpp",
           "symbol": "politicallyFriendly",
-          "line": 318
+          "line": 325
         },
         {
           "file": "src/politics.cpp",
           "symbol": "atWarWithMajor",
-          "line": 314
+          "line": 321
         }
       ],
       "fixtures": [
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "initialIdentityAndHomeCountry",
-          "line": 95,
+          "line": 96,
           "behavior_assertions": [
             "Dormant Dadao became an active setup nation",
             "Dadao identity must remain dormant until created",
@@ -94,24 +94,24 @@
         {
           "file": "src/politics.cpp",
           "symbol": "originalNation",
-          "line": 281
+          "line": 288
         },
         {
           "file": "src/politics.cpp",
           "symbol": "politicallyFriendly",
-          "line": 318
+          "line": 325
         },
         {
           "file": "src/politics.cpp",
           "symbol": "atWarWithMajor",
-          "line": 314
+          "line": 321
         }
       ],
       "fixtures": [
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "initialIdentityAndHomeCountry",
-          "line": 95,
+          "line": 96,
           "behavior_assertions": [
             "Dormant Dadao became an active setup nation",
             "Dadao identity must remain dormant until created",
@@ -143,7 +143,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "politicallyFriendly",
-          "line": 318
+          "line": 325
         }
       ],
       "fixtures": [
@@ -196,7 +196,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 507
+          "line": 514
         },
         {
           "file": "src/land_combat.cpp",
@@ -280,7 +280,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 623
+          "line": 626
         },
         {
           "file": "src/air.cpp",
@@ -328,12 +328,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "borderApproach",
-          "line": 352
+          "line": 355
         },
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 623
+          "line": 626
         }
       ],
       "fixtures": [
@@ -456,12 +456,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "borderApproach",
-          "line": 352
+          "line": 355
         },
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 623
+          "line": 626
         }
       ],
       "fixtures": [
@@ -510,7 +510,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 623
+          "line": 626
         },
         {
           "file": "src/land_combat.cpp",
@@ -566,12 +566,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "borderApproach",
-          "line": 352
+          "line": 355
         },
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 623
+          "line": 626
         }
       ],
       "fixtures": [
@@ -666,12 +666,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "borderApproach",
-          "line": 352
+          "line": 355
         },
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 623
+          "line": 626
         }
       ],
       "fixtures": [
@@ -733,7 +733,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 623
+          "line": 626
         }
       ],
       "fixtures": [
@@ -799,12 +799,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "supplyRoute",
-          "line": 1013
+          "line": 1016
         },
         {
           "file": "src/movement.cpp",
           "symbol": "inSupply",
-          "line": 1029
+          "line": 1032
         }
       ],
       "fixtures": [
@@ -966,14 +966,14 @@
         {
           "file": "src/politics.cpp",
           "symbol": "refreshPoliticalState",
-          "line": 436
+          "line": 443
         }
       ],
       "fixtures": [
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "oneChinaPointIsNotSurrenderBonus",
-          "line": 191,
+          "line": 192,
           "behavior_assertions": [
             "Hainan-only KMT was mistaken for a surrendered faction",
             "The victory-point condition incorrectly awarded units",
@@ -990,7 +990,7 @@
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "ownTurnEvolutionExceptionAndOptionalFactory",
-          "line": 148,
+          "line": 149,
           "behavior_assertions": [
             "Own-turn evolution lost the explicit production grace period",
             "Evolution did not permanently terminate the Chinese Truce",
@@ -1037,24 +1037,24 @@
         {
           "file": "src/politics.cpp",
           "symbol": "originalNation",
-          "line": 281
+          "line": 288
         },
         {
           "file": "src/politics.cpp",
           "symbol": "politicallyFriendly",
-          "line": 318
+          "line": 325
         },
         {
           "file": "src/politics.cpp",
           "symbol": "atWarWithMajor",
-          "line": 314
+          "line": 321
         }
       ],
       "fixtures": [
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "initialIdentityAndHomeCountry",
-          "line": 95,
+          "line": 96,
           "behavior_assertions": [
             "Dormant Dadao became an active setup nation",
             "Dadao identity must remain dormant until created",
@@ -1081,7 +1081,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 569
+          "line": 597
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1116,7 +1116,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "incorporateNation",
-          "line": 382
+          "line": 389
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1163,7 +1163,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::finishTurn",
-          "line": 738
+          "line": 767
         }
       ],
       "fixtures": [
@@ -1222,7 +1222,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "incorporateNation",
-          "line": 382
+          "line": 389
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1277,7 +1277,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 569
+          "line": 597
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1360,7 +1360,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 569
+          "line": 597
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1443,7 +1443,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 569
+          "line": 597
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1539,19 +1539,19 @@
         {
           "file": "src/politics.cpp",
           "symbol": "mayDeclareWar",
-          "line": 538
+          "line": 545
         },
         {
           "file": "src/politics.cpp",
           "symbol": "declareWar",
-          "line": 565
+          "line": 572
         }
       ],
       "fixtures": [
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "declarationGatesAndUnknownAccounting",
-          "line": 417,
+          "line": 418,
           "behavior_assertions": [
             "A standalone declaration targeted a minor warlord",
             "Land-attack declaration escaped Combat Movement",
@@ -1569,7 +1569,7 @@
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "outOfTurnPriorityCheckpointAndClone",
-          "line": 375,
+          "line": 376,
           "behavior_assertions": [
             "Another player forged a national declaration",
             "Rejected interrupt partially mutated the campaign",
@@ -1597,19 +1597,19 @@
         {
           "file": "src/politics.cpp",
           "symbol": "mayDeclareWar",
-          "line": 538
+          "line": 545
         },
         {
           "file": "src/politics.cpp",
           "symbol": "declareWar",
-          "line": 565
+          "line": 572
         }
       ],
       "fixtures": [
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "declarationGatesAndUnknownAccounting",
-          "line": 417,
+          "line": 418,
           "behavior_assertions": [
             "A standalone declaration targeted a minor warlord",
             "Land-attack declaration escaped Combat Movement",
@@ -1627,7 +1627,7 @@
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "outOfTurnPriorityCheckpointAndClone",
-          "line": 375,
+          "line": 376,
           "behavior_assertions": [
             "Another player forged a national declaration",
             "Rejected interrupt partially mutated the campaign",
@@ -1668,19 +1668,19 @@
         {
           "file": "src/politics.cpp",
           "symbol": "surrenderNation",
-          "line": 601
+          "line": 630
         },
         {
           "file": "src/politics.cpp",
           "symbol": "refreshPoliticalState",
-          "line": 436
+          "line": 443
         }
       ],
       "fixtures": [
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "ccpNoUnitsIsNotSurrenderOrGameEnd",
-          "line": 233,
+          "line": 234,
           "behavior_assertions": [
             "No surviving CCP units became universal surrender or campaign termination",
             "Elimination incorrectly erased CCP land",
@@ -1692,7 +1692,7 @@
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "directAxisDadaoSurvivesJapan",
-          "line": 342,
+          "line": 343,
           "behavior_assertions": [
             "Approved direct Axis Dadao control was not preserved",
             "Japan's surrender removed separate Dadao land or wars",
@@ -1705,7 +1705,7 @@
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "japanSurrenderQueueBoundaryAndReplay",
-          "line": 307,
+          "line": 308,
           "behavior_assertions": [
             "Japan's own turn end did not request surrender dice",
             "Turn advanced before surrender chance resolved",
@@ -1729,19 +1729,19 @@
         {
           "file": "src/politics.cpp",
           "symbol": "surrenderNation",
-          "line": 601
+          "line": 630
         },
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::applyChance",
-          "line": 711
+          "line": 740
         }
       ],
       "fixtures": [
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "japanSurrenderQueueBoundaryAndReplay",
-          "line": 307,
+          "line": 308,
           "behavior_assertions": [
             "Japan's own turn end did not request surrender dice",
             "Turn advanced before surrender chance resolved",
@@ -1929,7 +1929,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::finishTurn",
-          "line": 738
+          "line": 767
         }
       ],
       "fixtures": [
@@ -2139,7 +2139,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "blitzPairValid",
-          "line": 432
+          "line": 435
         },
         {
           "file": "src/land_combat.cpp",
@@ -2205,7 +2205,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2074
+          "line": 2075
         },
         {
           "file": "src/naval_combat.cpp",
@@ -2392,7 +2392,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/land_combat.cpp",
@@ -2477,7 +2477,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationAction",
-          "line": 786
+          "line": 787
         },
         {
           "file": "src/land_combat.cpp",
@@ -2696,12 +2696,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 623
+          "line": 626
         },
         {
           "file": "src/movement.cpp",
           "symbol": "validateFactoryRailRoute",
-          "line": 681
+          "line": 684
         },
         {
           "file": "src/naval_movement.cpp",
@@ -2762,12 +2762,12 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2074
+          "line": 2075
         },
         {
           "file": "src/land_combat.cpp",
@@ -2910,7 +2910,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 507
+          "line": 514
         }
       ],
       "fixtures": [
@@ -3094,7 +3094,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "lendLeaseSupplyRoute",
-          "line": 1017
+          "line": 1020
         }
       ],
       "fixtures": [
@@ -3222,7 +3222,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 623
+          "line": 626
         }
       ],
       "fixtures": [
@@ -3374,7 +3374,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/land_combat.cpp",
@@ -3605,7 +3605,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationAction",
-          "line": 786
+          "line": 787
         }
       ],
       "fixtures": [
@@ -3707,12 +3707,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "seaBlockaded",
-          "line": 810
+          "line": 813
         },
         {
           "file": "src/movement.cpp",
           "symbol": "facilityBlockaded",
-          "line": 816
+          "line": 819
         }
       ],
       "fixtures": [
@@ -4107,7 +4107,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "blitzPairValid",
-          "line": 432
+          "line": 435
         }
       ],
       "fixtures": [
@@ -4172,7 +4172,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         }
       ],
       "fixtures": [
@@ -4246,7 +4246,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/land_combat.cpp",
@@ -4336,7 +4336,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2074
+          "line": 2075
         }
       ],
       "fixtures": [
@@ -4385,7 +4385,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2074
+          "line": 2075
         }
       ],
       "fixtures": [
@@ -4422,7 +4422,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2074
+          "line": 2075
         }
       ],
       "fixtures": [
@@ -4453,7 +4453,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2074
+          "line": 2075
         }
       ],
       "fixtures": [
@@ -4502,7 +4502,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationAction",
-          "line": 786
+          "line": 787
         },
         {
           "file": "src/naval_combat.cpp",
@@ -4545,7 +4545,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/air.cpp",
@@ -4663,7 +4663,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationAction",
-          "line": 786
+          "line": 787
         },
         {
           "file": "src/land_combat.cpp",
@@ -4720,7 +4720,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationAction",
-          "line": 786
+          "line": 787
         },
         {
           "file": "src/land_combat.cpp",
@@ -4790,7 +4790,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 507
+          "line": 514
         },
         {
           "file": "src/air.cpp",
@@ -4811,7 +4811,7 @@
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "mandatoryLiberationAndProvenWithdrawal",
-          "line": 274,
+          "line": 275,
           "behavior_assertions": [
             "Optional Chinese gift overrode mandatory allied-major liberation",
             "Unaligned Chinese gift guessed a withdrawal route",
@@ -4874,14 +4874,14 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 507
+          "line": 514
         }
       ],
       "fixtures": [
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "captureCapitalAndFacilities",
-          "line": 251,
+          "line": 252,
           "behavior_assertions": [
             "Air/naval presence alone established land possession",
             "Capture failed to distinguish possession from original nationality",
@@ -4902,7 +4902,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 623
+          "line": 626
         }
       ],
       "fixtures": [
@@ -4946,7 +4946,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 623
+          "line": 626
         }
       ],
       "fixtures": [
@@ -5003,7 +5003,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/air.cpp",
@@ -5134,12 +5134,12 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "queueDamagedPortEvacuation",
-          "line": 1164
+          "line": 1165
         },
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationAction",
-          "line": 786
+          "line": 787
         }
       ],
       "fixtures": [
@@ -5203,7 +5203,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "preparePortLandDefence",
-          "line": 1132
+          "line": 1133
         }
       ],
       "fixtures": [
@@ -5377,7 +5377,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "lendLeaseSupplyRoute",
-          "line": 1017
+          "line": 1020
         }
       ],
       "fixtures": [
@@ -5450,12 +5450,12 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "resolveCapturedPorts",
-          "line": 1159
+          "line": 1160
         },
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationChance",
-          "line": 996
+          "line": 997
         }
       ],
       "fixtures": [
@@ -5660,7 +5660,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 623
+          "line": 626
         },
         {
           "file": "src/land_combat.cpp",
@@ -5935,7 +5935,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/land_combat.cpp",
@@ -5999,7 +5999,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "navalFacilityUsable",
-          "line": 822
+          "line": 825
         }
       ],
       "fixtures": [
@@ -6079,7 +6079,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 507
+          "line": 514
         },
         {
           "file": "src/economy.cpp",
@@ -6091,7 +6091,7 @@
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "captureCapitalAndFacilities",
-          "line": 251,
+          "line": 252,
           "behavior_assertions": [
             "Air/naval presence alone established land possession",
             "Capture failed to distinguish possession from original nationality",
@@ -6147,7 +6147,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "navalFacilityUsable",
-          "line": 822
+          "line": 825
         }
       ],
       "fixtures": [
@@ -6218,7 +6218,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "navalFacilityUsable",
-          "line": 822
+          "line": 825
         }
       ],
       "fixtures": [
@@ -6338,7 +6338,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationChance",
-          "line": 996
+          "line": 997
         }
       ],
       "fixtures": [
@@ -6369,7 +6369,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "railUndamaged",
-          "line": 374
+          "line": 377
         }
       ],
       "fixtures": [
@@ -6436,19 +6436,19 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 569
+          "line": 597
         },
         {
           "file": "src/politics.cpp",
           "symbol": "refreshPoliticalState",
-          "line": 436
+          "line": 443
         }
       ],
       "fixtures": [
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "ccpNoUnitsIsNotSurrenderOrGameEnd",
-          "line": 233,
+          "line": 234,
           "behavior_assertions": [
             "No surviving CCP units became universal surrender or campaign termination",
             "Elimination incorrectly erased CCP land",
@@ -6479,14 +6479,14 @@
         {
           "file": "src/politics.cpp",
           "symbol": "refreshPoliticalState",
-          "line": 436
+          "line": 443
         }
       ],
       "fixtures": [
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "immediateEvolutionOutsideOwnTurn",
-          "line": 125,
+          "line": 126,
           "behavior_assertions": [
             "The thirteenth possessed IPP did not evolve KMT immediately",
             "Evolution was coupled to cash or income collection",
@@ -6500,7 +6500,7 @@
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "ownTurnEvolutionExceptionAndOptionalFactory",
-          "line": 148,
+          "line": 149,
           "behavior_assertions": [
             "Own-turn evolution lost the explicit production grace period",
             "Evolution did not permanently terminate the Chinese Truce",
@@ -6512,7 +6512,7 @@
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "ccpEvolutionLosesMinorActionsImmediately",
-          "line": 175,
+          "line": 176,
           "behavior_assertions": [
             "CCP did not evolve while preserving its own-turn production exception",
             "Evolved CCP retained minor influence/recruitment during its production grace period"
@@ -6749,7 +6749,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "declareWar",
-          "line": 565
+          "line": 572
         },
         {
           "file": "src/land_combat.cpp",
@@ -6779,7 +6779,7 @@
         {
           "file": "tests/politics_tests.cpp",
           "symbol": "declarationGatesAndUnknownAccounting",
-          "line": 417,
+          "line": 418,
           "behavior_assertions": [
             "A standalone declaration targeted a minor warlord",
             "Land-attack declaration escaped Combat Movement",

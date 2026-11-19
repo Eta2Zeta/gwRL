@@ -53,7 +53,11 @@ offers it: no river on this map is confirmed as navigable.
 only if it ends in land held by an enemy, or by a nation the mover may attack.
 Moves into one's own or friendly land wait for Noncombat Movement. Attacking
 land of a nation one is not yet at war with declares that war
-([politics](politics.md)).
+([politics](politics.md)). Attacking land that was a warlord's, the CCP's or
+the KMT's at the start declares war on all of China, whoever holds it, and is
+offered only if the mover may start each of those wars, which Mongolia never
+may (`landAccess`;
+[politics](politics.md#invading-china)).
 
 **An attack registers a battle.** Units that enter the same enemy zone join one
 battle. The engine remembers, for each unit, the zone it came from. That zone

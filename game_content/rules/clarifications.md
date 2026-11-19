@@ -1,6 +1,6 @@
 # GW36 v4.3 rule clarifications and open questions
 
-Updated: 6 November 2026.
+Updated: 19 November 2026.
 
 This is the project's shared register of **unclear official rules**, including
 interpretations adopted after discussion. It is **not publisher-issued errata**.
@@ -64,6 +64,7 @@ including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
 | RCL-019 | Several railroads on one border; the damage limit and repair of each side | Adopted: one railroad per border; each side holds its own damage and is repaired by its possessor |
 | RCL-020 | A patrol plane attacked in its own sea zone: the carrier choice or the patrol choice, before or after scrambles | Adopted: the patrol choice, made before any scramble; staying out costs nothing |
 | RCL-021 | Upgrading a unit aboard a transport into one the transport may not carry, or aboard a ship at sea | Adopted: neither allowed; the upgrade waits on the build queue |
+| RCL-022 | An attack on land that was Chinese at the start: when a nation outside China holds it, and when the attacker may not go to war with all of China | Adopted for now: the printed owner decides, and the attack is allowed only if the attacker may start every war it starts |
 
 ## Pilot discussion review
 
@@ -543,6 +544,65 @@ it is offered only on an infantry not aboard a transport, or aboard one that
 could carry the result. A Japanese naval transport at sea off Tokyo carries an
 infantry and a militia, and Japan has bought an upgrade for each. Neither is
 offered for them until the ship is in port or the units are ashore.
+
+## RCL-022: An attack on land that was Chinese at the start
+
+**Status: adopted by the user for now, 19 November 2026. No developer
+clarification yet.**
+
+**Sources:** RB glossary p7 (originally); §4.3 p26 (alliances); §4.5 p27
+(controlled minor powers); §4.7 p29 (Mongolia); §4.9 p30 (an attack on China);
+§5.1 p35 (declarations of war); §14.3 p101 (entering Chinese land); §15.4 p105
+(the Dadao Government).
+
+**Question:** §4.9 makes an attack by a foreign nation on a land zone that was
+originally a warlord's, the CCP's or the KMT's a declaration of war on all of
+China. Two questions follow, written up as Q-001 and Q-002 in the project's
+list of questions.
+
+- Does the zone's printed owner decide, when a nation outside China, such as
+  Japan, now holds the zone?
+- May an attacker make that attack if it may not go to war with every Chinese
+  nation? §4.5 forbids a controlled minor power to declare war or take any
+  action that puts it at war with a nation it is not at war with yet, and
+  §5.1 lets nobody declare war inside its own alliance. Mongolia, a controlled
+  minor power of the Comintern, shares its alliance with the CCP (§4.3), and in
+  the full game so does the USSR; the KMT is in the Allies.
+
+**The engine before this ruling** let Mongolia attack such a zone whenever the
+nation holding it was already at war with Mongolia, or nobody held it, and the
+attack then put Mongolia at war with the CCP, the KMT and every warlord that
+had not joined a side. In 70 of 480 random games Mongolia came to be at war
+with the CCP this way: once the KMT or Japan had attacked Mongolia, a Mongolian
+unit attacked a zone that had been a warlord's and that the KMT (45 games) or
+Japan (25 games) held
+([record](../../docs/archive/records/answer_census_2026_11_15.md#mongolia-as-the-invader-of-china)).
+
+**Adopted ruling:**
+
+- The printed owner decides: an attack by a nation that is not Chinese on a
+  land zone that was originally a warlord's, the CCP's or the KMT's declares
+  war on all of China whoever holds the zone now, or if nobody does. A zone the
+  Dadao Government holds is the one exception (§4.9, §15.4).
+- That attack is allowed only if the attacker may start every war it starts:
+  none with a nation of its own alliance (§5.1), and none at all for a
+  controlled minor power (§4.5). So Mongolia may never attack such a zone. In
+  the full game neither may the USSR, whose alliance holds the CCP, nor a
+  nation of the Allies, whose alliance holds the KMT.
+- Mongolia may still defend itself, retake its own land and attack land that
+  was never Chinese, such as Western Manchuria, which was Japan's.
+
+**Authority:** the user in chat on 19 November 2026, answering Q-001 and
+Q-002: "For 1 and 2 let's just follow the rules for now, ussr or allied
+nations cannot attack original chinese lands beccause theycannot be at war
+with people in their own allience".
+
+**Examples:** the KMT has attacked Mongolia and holds Tsinghai, which was the
+Ma Clique's. A Mongolian cavalry in Central Mongolia may not attack Tsinghai,
+although Mongolia and the KMT are at war, because the attack would put
+Mongolia at war with the CCP. Japan holds Suiyuan, which was Mengjiang's, and
+is at war with Mongolia; the cavalry may not attack Suiyuan either. If the KMT
+has taken Kobdo, a Mongolian zone, the cavalry may attack Kobdo.
 
 ## Maintenance
 

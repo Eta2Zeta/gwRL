@@ -1,5 +1,6 @@
 #include "game/politics.hpp"
 #include "game/catalog.hpp"
+#include "game/movement.hpp"
 
 #include <algorithm>
 #include <functional>
@@ -496,6 +497,49 @@ void capitalChoicesFollowPossession() {
     check(lone.decisions.empty() && !lone.flags.contains(MarkKey(mark::evolution_pending, "kmt")),
           "A capital choice without land stayed pending");
 }
+// RCL-022 (Q-001 and Q-002): an attack on land that was originally a warlord's,
+// the CCP's or the KMT's declares war on all of China, whoever holds the land
+// (RB 4.9). Mongolia may start no war (4.5) and none with the CCP of its own
+// alliance (5.1), so it may not make that attack; it may still attack land that
+// was never Chinese. Japan may start each of those wars, so it may invade.
+void onlyNationsFreeToFightAllOfChinaInvadeIt() {
+    auto s = fixture("mongolia", Phase::CombatMovement);
+    const auto mongolia = nationNumber(s, "mongolia"), kmt = nationNumber(s, "kmt"), japan = nationNumber(s, "japan");
+    for (const auto enemy : {kmt, japan}) {
+        s.nations.at(mongolia).atWarWith.insert(enemy);
+        s.nations.at(enemy).atWarWith.insert(mongolia);
+    }
+    const Id home = "land_mongolia_central_mongolia", tsinghai = "land_china_tsinghai",
+             suiyuan = "land_china_suiyuan", kobdo = "land_mongolia_kobdo";
+    s.territories.at(zoneNumber(s, tsinghai)).possessor = kmt;   // the case of Q-001
+    s.territories.at(zoneNumber(s, suiyuan)).possessor = japan;  // the case of Q-002
+    s.territories.at(zoneNumber(s, kobdo)).possessor = kmt;      // Mongolia's own land, taken
+    addUnit(s, "rider", "mongolia", home, "cavalry");
+    const auto attack = [&](const State& state, const Id& zone) {
+        return validateRoute(state, {"rider", zoneNumbers(state, {home, zone}), MovementMode::Ordinary, true}).allowed;
+    };
+    check(!attack(s, tsinghai), "Mongolia attacked land the KMT holds that was a warlord's");
+    check(!attack(s, suiyuan), "Mongolia attacked land Japan holds that was a warlord's");
+    check(attack(s, kobdo), "Mongolia could not retake its own land");
+    const auto refusal = mayInvadeChina(s, mongolia, zoneNumber(s, tsinghai));
+    check(!refusal.allowed && refusal.reason.find("ccp: Same alliance") != std::string::npos,
+          "Mongolia's invasion was not refused for the war with the CCP: " + refusal.reason);
+    rejects([&] { auto copy = s.clone(); recordLandAttack(copy, mongolia, zoneNumber(copy, tsinghai)); },
+            "recordLandAttack let Mongolia invade China");
+    auto empty = s.clone();
+    empty.territories.at(zoneNumber(empty, tsinghai)).possessor.reset();
+    check(!attack(empty, tsinghai), "Mongolia attacked land nobody holds that was a warlord's");
+    check(!s.nations.at(mongolia).atWarWith.contains(nationNumber(s, "ccp")), "Mongolia came to be at war with the CCP");
+
+    auto invader = fixture("japan", Phase::CombatMovement);
+    addUnit(invader, "regiment", "japan", "land_manchuria_rehe");
+    check(validateRoute(invader, {"regiment", zoneNumbers(invader, {"land_manchuria_rehe", suiyuan}), MovementMode::Ordinary, true}).allowed,
+          "Japan could not invade China");
+    recordLandAttack(invader, japan, zoneNumber(invader, suiyuan));
+    for (const Id china : {"kmt", "ccp", "warlord_yunnan"})
+        check(invader.nations.at(japan).atWarWith.contains(nationNumber(invader, china)),
+              "Japan's invasion left it at peace with " + china);
+}
 } // namespace
 
 int main() {
@@ -514,6 +558,7 @@ int main() {
         {"direct Axis Dadao after Japan surrender", directAxisDadaoSurvivesJapan},
         {"out-of-turn declaration priority and replay", outOfTurnPriorityCheckpointAndClone},
         {"declaration gates and unknown accounting", declarationGatesAndUnknownAccounting},
+        {"only nations free to fight all of China invade it", onlyNationsFreeToFightAllOfChinaInvadeIt},
     };
     int failures = 0;
     for (const auto& [name, test] : tests) {
