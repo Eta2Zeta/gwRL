@@ -210,6 +210,10 @@ profile does. On 17 November 2026, in two
 matched pairs of runs of four network updates, it played 6.5% and 12.5% more
 decisions per wall-clock hour in steady play than alternating training
 iterations ([record](../../docs/archive/records/self_play_never_stops_2026_11_17.md)).
+On the Mac's GPU at 256×8, with 6 processes of 21 games and
+`--compiled-forward`, it answered 8.7% more network evaluations per wall-clock
+second than alternating training iterations at the same layout
+([record](../../docs/archive/records/never_stops_gpu_2026_11_18.md)).
 
 One network serves all three alliances by default (`--networks one`). The
 input tells it which alliance is choosing; its policy learns from every

@@ -1,0 +1,160 @@
+{
+ "record": "never_stops_gpu_2026_11_18.md",
+ "date": "2026-11-18",
+ "code": "c2b1d20, run from a copy of that commit with its compiled engine module (tmp/never-stops-gpu-2026-11-18/runtime)",
+ "torch": "2.14.0 (tmp/gpu-mps-env)",
+ "machine": "Apple M4 Max: 14 CPU cores (10 performance, 4 efficiency), 36 GB memory, 32-core GPU",
+ "malloc_nano_zone": "unset in the training process and its game processes (the Mac profile's unset_environment)",
+ "order": [
+  "never-stops from 15:55:08 to 17:44:22, stopped by its time budget of 6,600 s after its second network update",
+  "alternating from 17:44:27 to 18:47:21, two training iterations"
+ ],
+ "command": ".venv/bin/python tools/supervise_campaign_training.py --profile mac --working-directory RUNTIME --control-dir OUT/NAME-control --run-dir OUT/NAME --seconds SECONDS --max-restarts 0 -- --calendar-rounds 11 --complete-episodes --transitions-per-batch 20000 --simulations 64 --max-depth 16 --hidden-dim 256 --message-layers 8 --batch-size 32 --epochs 525 --replay-capacity 8000 --sample-fraction 0.05 --seed 20261118 --neural-device mps --compiled-forward --episode-workers 6 --games-per-process 21 --parallel-envs 126 (--continuous --batches 3, or --no-continuous --batches 2)",
+ "thread_tests": {
+  "script": "\"\"\"Can one thread train on MPS while another runs forward passes there?\n\nThread A repeats an inference forward pass (linear layers, GELU, gather and\nindex_add_ along fixed borders, as a message-passing layer does) and checks every\noutput against one computed before the threads start. Thread B trains another\nnetwork with Adam, reading its loss back every training step as the learner does.\nWith --clear, thread A also synchronizes and empties the MPS caches every N\nforward passes while thread B trains, as the inference server's cache policy\nwould without deferral.\n\"\"\"\nimport argparse\nimport threading\nimport time\n\nimport torch\n\nparser = argparse.ArgumentParser()\nparser.add_argument(\"--seconds\", type=float, default=60)\nparser.add_argument(\"--clear\", type=int, default=0, help=\"empty the MPS caches every N forward passes in thread A\")\nparser.add_argument(\"--sync-only\", action=\"store_true\", help=\"with --clear, only synchronize\")\nparser.add_argument(\"--no-training\", action=\"store_true\")\nparser.add_argument(\"--compiled\", action=\"store_true\", help=\"thread A runs the network through torch.compile\")\nargs = parser.parse_args()\n\ndevice = torch.device(\"mps\")\ntorch.manual_seed(0)\nWIDTH, ZONES, BORDERS, LAYERS = 256, 37, 160, 8\nsource = torch.randint(0, ZONES, (BORDERS,), device=device)\ntarget = torch.randint(0, ZONES, (BORDERS,), device=device)\n\n\nclass Net(torch.nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.message = torch.nn.ModuleList(torch.nn.Linear(WIDTH, WIDTH) for _ in range(LAYERS))\n        self.update = torch.nn.ModuleList(torch.nn.Linear(2 * WIDTH, WIDTH) for _ in range(LAYERS))\n        self.norm = torch.nn.ModuleList(torch.nn.LayerNorm(WIDTH) for _ in range(LAYERS))\n        self.head = torch.nn.Linear(WIDTH, 3)\n\n    def forward(self, zones):  # zones: (states, ZONES, WIDTH)\n        for message, update, norm in zip(self.message, self.update, self.norm):\n            sent = torch.nn.functional.gelu(message(zones).index_select(1, source))\n            received = zones.new_zeros(zones.shape).index_add_(1, target, sent)\n            zones = zones + norm(torch.nn.functional.gelu(update(torch.cat((zones, received), -1))))\n        return self.head(zones.mean(1))\n\n\ninference_net, training_net = Net().to(device).eval(), Net().to(device)\ninputs = [torch.randn(states, ZONES, WIDTH, device=device) for states in (1, 9, 24, 60, 126)]\nwith torch.inference_mode():\n    expected = [inference_net(x).cpu() for x in inputs]\nforward = inference_net\nif args.compiled:\n    torch._dynamo.config.cache_size_limit = 64\n    forward = torch.compile(inference_net, dynamic=False, fullgraph=True)\n    with torch.inference_mode():\n        compiled_expected = [forward(x).cpu() for x in inputs]\n    print(\"compiled vs eager\", max((a - b).abs().max().item() for a, b in zip(compiled_expected, expected)))\n    expected = compiled_expected\noptimizer = torch.optim.Adam(training_net.parameters(), lr=1e-3)\nstop = time.monotonic() + args.seconds\ncounts = {\"forward\": 0, \"mismatch\": 0, \"largest_difference\": 0.0, \"clears\": 0, \"steps\": 0, \"errors\": []}\n\n\ndef infer():\n    try:\n        while time.monotonic() < stop:\n            with torch.inference_mode():\n                for x, want in zip(inputs, expected):\n                    got = forward(x).cpu()\n                    difference = (got - want).abs().max().item()\n                    counts[\"largest_difference\"] = max(counts[\"largest_difference\"], difference)\n                    counts[\"mismatch\"] += difference > 1e-5\n                    counts[\"forward\"] += 1\n                    if args.clear and counts[\"forward\"] % args.clear == 0:\n                        torch.mps.synchronize()\n                        if not args.sync_only:\n                            torch.mps.empty_cache()\n                        counts[\"clears\"] += 1\n    except BaseException as error:\n        counts[\"errors\"].append(f\"inference: {error!r}\")\n\n\ndef train():\n    try:\n        while time.monotonic() < stop:\n            x = torch.randn(32, ZONES, WIDTH, device=device)\n            goal = torch.randn(32, 3, device=device)\n            loss = torch.mean((training_net(x) - goal) ** 2)\n            optimizer.zero_grad(set_to_none=True)\n            loss.backward()\n            optimizer.step()\n            if not torch.isfinite(torch.tensor(loss.detach().tolist())):\n                raise ValueError(\"nonfinite loss\")\n            counts[\"steps\"] += 1\n    except BaseException as error:\n        counts[\"errors\"].append(f\"training: {error!r}\")\n\n\nprint('threads start', flush=True)\ndef report():\n    while time.monotonic() < stop:\n        time.sleep(10)\n        print('progress', counts['forward'], counts['steps'], flush=True)\nthreading.Thread(target=report, daemon=True).start()\nthreads = [threading.Thread(target=infer)] + ([] if args.no_training else [threading.Thread(target=train)])\nbegan = time.perf_counter()\nfor thread in threads:\n    thread.start()\nfor thread in threads:\n    thread.join()\ncounts[\"seconds\"] = round(time.perf_counter() - began, 1)\nprint(torch.__version__, counts)\n",
+  "eager_forward_beside_training_60_s": "12,770 forward passes and 1,423 training steps; outputs within 1.1e-6 of a single-thread reference; no error",
+  "eager_forward_beside_training_30_s_with_a_progress_thread": "6,375 forward passes and 713 training steps; outputs within 1.2e-6",
+  "synchronize_and_empty_cache_every_50_forward_passes": "aborted: failed assertion _status < MTLCommandBufferStatusCommitted in -[IOGPUMetalCommandBuffer setCurrentCommandEncoder:]",
+  "synchronize_alone_every_50_forward_passes": "aborted with the same assertion",
+  "compiled_forward_alone_30_s": "16,025 forward passes; outputs within 1.2e-6; no error",
+  "compiled_forward_beside_training": "deadlocked as the threads started, twice (timeouts of 400 s and 240 s); a sample of the stuck process: the forward-pass thread in at::native::mps::MetalKernelFunction::runCommandBlock, called through pybind11, waiting in dispatch_sync for the MPS stream's serial queue, which ran the training thread's index_select_out_mps block waiting in take_gil"
+ },
+ "smoke_run": "256x8, --continuous --compiled-forward, 2 processes of 4 games, 2 game rounds, 8 simulations, --epochs 300: 3 network updates of 39.0, 41.4 and 41.1 s beside self-play, 5 cache releases, completed",
+ "never_stops": {
+  "network_updates": [
+   {
+    "network_update": 1,
+    "ended_at_seconds": 2216.3,
+    "network_update_seconds": 113.5,
+    "games": 126,
+    "decisions_of_its_games": 130389,
+    "network_evaluations_so_far": 9031757,
+    "network_evaluations_per_wall_clock_second_since_previous": 4075,
+    "rollout_versions": [
+     "a2555a824d707a8385f1c9dc2eb68445cd572b06bedaa5cd1b3426464d525d3e"
+    ],
+    "during_update": {
+     "seconds": 117.4,
+     "network_evaluations_per_second": 2621,
+     "states_per_inference_batch": 60.3,
+     "microseconds_per_inference_batch": 20671
+    }
+   },
+   {
+    "network_update": 2,
+    "ended_at_seconds": 4585.7,
+    "network_update_seconds": 115.2,
+    "games": 126,
+    "decisions_of_its_games": 151155,
+    "network_evaluations_so_far": 18730688,
+    "network_evaluations_per_wall_clock_second_since_previous": 4093,
+    "rollout_versions": [
+     "5ae142272c8335e22fb33efd0e3243e1d3cdd19978d5d10a12e48fa203d79ba1",
+     "a2555a824d707a8385f1c9dc2eb68445cd572b06bedaa5cd1b3426464d525d3e"
+    ],
+    "during_update": {
+     "seconds": 118.8,
+     "network_evaluations_per_second": 2704,
+     "states_per_inference_batch": 60.0,
+     "microseconds_per_inference_batch": 20036
+    },
+    "between_updates": {
+     "seconds": 2250.5,
+     "network_evaluations_per_second": 4167,
+     "states_per_inference_batch": 56.7,
+     "microseconds_per_inference_batch": 12528,
+     "microseconds_per_state": 220.9,
+     "idle_seconds": 28.0
+    }
+   }
+  ],
+  "counters_at_stop": {
+   "batches": 2,
+   "chance_events": 55435,
+   "decisions": 448907,
+   "episodes": 376,
+   "transitions": 504342,
+   "updates": 2
+  },
+  "status": "interrupted",
+  "network_evaluations_per_wall_clock_second_start_to_second_update": 4085,
+  "mps_cache": {
+   "clears": 228,
+   "clear_seconds": 112.18720037600724,
+   "total_actor_forwards": 475672
+  }
+ },
+ "alternating": [
+  {
+   "iteration": 1,
+   "games": 126,
+   "decisions": 133704,
+   "seconds_with_network_update": 1737.1,
+   "playing_seconds": 1701.6,
+   "game_end_seconds": [
+    1150.7,
+    1494.6,
+    1701.6
+   ],
+   "decisions_per_wall_clock_hour": 277098,
+   "decisions_per_hour_while_playing": 282877,
+   "decisions_per_hour_all_games_playing": 322405,
+   "network_evaluations": 6823570,
+   "network_evaluations_per_wall_clock_second": 3928,
+   "network_evaluations_per_decision": 51.03,
+   "states_per_inference_batch": 42.7,
+   "answering_microseconds_per_state": 229.4
+  },
+  {
+   "iteration": 2,
+   "games": 126,
+   "decisions": 141750,
+   "seconds_with_network_update": 2028.9,
+   "playing_seconds": 1984.0,
+   "game_end_seconds": [
+    1289.0,
+    1755.3,
+    1984.0
+   ],
+   "decisions_per_wall_clock_hour": 251519,
+   "decisions_per_hour_while_playing": 257203,
+   "decisions_per_hour_all_games_playing": 295646,
+   "network_evaluations": 7334097,
+   "network_evaluations_per_wall_clock_second": 3615,
+   "network_evaluations_per_decision": 51.74,
+   "states_per_inference_batch": 44.8,
+   "answering_microseconds_per_state": 251.0
+  }
+ ],
+ "alternating_whole_run": {
+  "decisions": 275454,
+  "seconds": 3765.9,
+  "decisions_per_wall_clock_hour": 263318,
+  "network_evaluations_per_wall_clock_second": 3759,
+  "network_evaluations_per_decision": 51.4,
+  "network_update_seconds_total": 71.0
+ },
+ "load": {
+  "never-stops": {
+   "game_processes_cpu_cores": 6.86,
+   "training_process_cpu_cores": 0.69,
+   "run_median_half_minute_cores": 7.59,
+   "other_work_median_half_minute_cores": 1.73,
+   "game_processes_wait_for_a_core_per_cpu_second": 1.1,
+   "training_process_largest_physical_footprint_gb": 12.1
+  },
+  "alternating": {
+   "game_processes_cpu_cores": 6.33,
+   "training_process_cpu_cores": 0.69,
+   "run_median_half_minute_cores": 7.52,
+   "other_work_median_half_minute_cores": 0.71,
+   "game_processes_wait_for_a_core_per_cpu_second": 0.904,
+   "training_process_largest_physical_footprint_gb": 8.0
+  }
+ },
+ "supervisor_peak_memory_bytes": {
+  "never-stops": 19955966000,
+  "alternating": 15215296496
+ },
+ "memory_metric": "sum of per-process max(RSS, macOS physical footprint including compressed pages)"
+}

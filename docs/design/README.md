@@ -2041,9 +2041,19 @@ evaluations a second, which costs about 3% of the decisions an hour (worked out;
 [record](../archive/records/self_play_never_stops_2026_11_17.md#the-inference-server-while-a-network-update-runs)).
 
 With the inference server on the GPU, the network update trains on the GPU too,
-beside it. Two things then wait until the network update has ended, because on
-the Mac's GPU, with PyTorch 2.14, each stopped the process in a test on
-18 November when a training thread worked beside it. The first is releasing the
+beside it. At 256×8, with 126 concurrent games in 6 game processes of 21 and the
+compiled layers, self-play that never stops answered 8.7% more network
+evaluations per wall-clock second than alternating training iterations at the
+same layout, 4,085 against 3,759, about 286,000 decisions an hour against
+263,000; the alternating training iterations differed from each other by 8%
+([record](../archive/records/never_stops_gpu_2026_11_18.md)). Its network
+updates took about 115 seconds beside self-play against 35 alone, and while one
+ran, the inference server answered about 36% fewer network evaluations a second.
+Two things wait until the network update has ended, because on the Mac's GPU,
+with PyTorch 2.14, each stopped the process in a test on 18 November when a
+training thread worked beside it
+([record](../archive/records/never_stops_gpu_2026_11_18.md#training-beside-the-inference-server-on-the-macs-gpu)).
+The first is releasing the
 GPU's caches, which the training process does after every 2,048 forward passes
 and training steps: it starts by waiting for all the GPU's work, and that wait,
 made while the other thread was handing work to the GPU, aborted the process
@@ -2381,7 +2391,7 @@ server limits instead, with the CPU cores an eighth to a fifth behind:
 | Setup | What limits | The CPU cores could feed | What pays |
 | --- | --- | --- | --- |
 | 64×2 on one CPU core, 24 concurrent games (the Mac profile) | the inference server, busy 98% | about a fifth more | a cheaper inference server; a cheaper engine little |
-| 256×8 on the GPU, 126 concurrent games, compiled layers | the inference server, busy 98% | about an eighth more | a cheaper inference server; self-play that never stops, about a tenth; a cheaper engine little by itself |
+| 256×8 on the GPU, 126 concurrent games, compiled layers | the inference server, busy 98% | about an eighth more | a cheaper inference server; self-play that never stops, about 9% measured; a cheaper engine little by itself |
 | 512×16 on the GPU, not trained yet | the GPU's forward pass, about 2,000 states a second as written and 2,700 compiled, in inference batches of about 60 | about twice as much | a cheaper forward pass on the GPU; the engine not at all |
 
 The CPU cores' rates are inferred: the 9 CPU cores of the allowance, less the
@@ -2404,8 +2414,10 @@ GPU cache clears took about 1 ms more. The remaining 3.6 ms as written, and
 [compiled](../archive/records/compiled_layers_126_games_2026_11_18.md#results)).
 Self-play that never stops does not make the inference server cheaper but keeps
 its inference batches full: in a training iteration, fewer games are left to fill
-them as games end, which cost the 126-game run 9.7% of its decisions an hour
-(section 9.2).
+them as games end, which cost the 126-game run 9.7% of its decisions an hour.
+On the GPU at 256×8 it did 8.7% more self-play per wall-clock hour than
+alternating training iterations, though its network updates ran three times as
+long beside self-play (section 9.2).
 
 A cheaper engine pays little by itself while the inference server limits. Its
 game threads would come back from the engine sooner, but at 256×8 on the GPU they
