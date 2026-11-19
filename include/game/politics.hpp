@@ -39,15 +39,19 @@ bool alliancePossible(const Id& nation, const std::optional<Id>& alliance);
 bool controllerPossible(const Id& nation, const std::optional<Id>& controller);
 // Only the KMT, which loses its last land, and Japan, which loses Tokyo, surrender.
 bool canSurrender(const Id& nation);
-// The invader recorded when Chinese land is attacked is not Chinese.
+// The invader recorded when Chinese land is attacked is not Chinese, and the
+// attack puts it at war with the CCP: Japan, never Mongolia (RCL-022).
 bool canInvadeChina(const Id& nation);
 // Whether the two can ever be at war. One side of every war is Japan, the KMT,
-// the CCP, Dadao or Mongolia, and Japan and Dadao share an alliance for good.
+// the CCP or Dadao. Japan and Dadao share the Axis for good, and the CCP and
+// Mongolia the Comintern. A warlord fights only Japan, the CCP and Dadao, and
+// Mongolia only Japan and the KMT.
 bool warPossible(const Id& first, const Id& second);
 // Whether the two can ever be allies: only the KMT and the CCP, under their truce.
 bool alliesPossible(const Id& first, const Id& second);
-// Whether `attacker` can be recorded as having attacked this warlord. A warlord
-// attacks nobody, and one the KMT attacks joins the CCP at once instead.
+// Whether `attacker` can be recorded as having attacked this warlord: Japan,
+// the CCP or Dadao. The KMT's attack makes the warlord join the CCP at once
+// instead, and Mongolia never attacks a warlord.
 bool warlordAttackPossible(const Id& warlord, const Id& attacker);
 // Facts that never change during a game. A nation of this campaign other than
 // Dadao is in every position, and the KMT and the CCP are always at war.

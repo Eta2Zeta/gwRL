@@ -380,10 +380,10 @@ something new possible for a nation must change its function too.
 | `alliancePossible` | A nation keeps its alliance and its player for good. Only a warlord's change, to those of the nation that incorporates it. |
 | `controllerPossible` | A warlord is under nobody, or under the nation that incorporated it: the KMT, the CCP, Dadao, or Japan once Dadao has joined Japan. Dadao is under Japan, or under nobody if Japan surrenders first. |
 | `canSurrender` | Only the KMT and Japan surrender. |
-| `canInvadeChina` | Only a nation that is not Chinese, so Japan or Mongolia, is recorded as invading China. |
-| `warPossible` | No warlord is at war with a warlord, and Japan and Dadao are never at war. |
+| `canInvadeChina` | Only Japan is recorded as invading China. The invader is a nation that is not Chinese, and its attack on land that was Chinese at the start puts it at war with the CCP, which Mongolia, in the Comintern with the CCP, may never be ([invading China](#invading-china)). |
+| `warPossible` | Japan and Dadao, both in the Axis for good, are never at war, nor are the CCP and Mongolia, both in the Comintern. A warlord is at war only with Japan, the CCP or Dadao: it declares no war, and one the KMT attacks joins the CCP at once. Mongolia is at war only with Japan or the KMT, the only nations that may declare war on it. |
 | `alliesPossible` | Only the KMT and the CCP are ever allies. |
-| `warlordAttackPossible` | A warlord is recorded as attacked by the CCP, Japan, Dadao or Mongolia, never by the KMT or by a warlord. |
+| `warlordAttackPossible` | A warlord is recorded as attacked by Japan, the CCP or Dadao, the nations that can be at war with it. The KMT's attack makes the warlord join the CCP at once and is not recorded. |
 | `alwaysInGame` | Every nation but Dadao is in the game from setup to the end: setup creates them, and no code removes a nation, not even one incorporated. Dadao is created when Japan first wins over a warlord (`ensureDadao`). |
 | `alwaysAtWar` | The KMT and the CCP are always at war: setup puts them at war, and only `incorporateNation` ends a war, never for either of them. Under the Chinese Truce they are friends while the war stays recorded. |
 

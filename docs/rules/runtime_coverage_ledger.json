@@ -5,7 +5,7 @@
   "evidence_file_sha256": {
     "src/air.cpp": "df3e7003cb7d3ae622abac90928e1ce2eab9dcf14683764c872c595b77aed477",
     "src/campaign_objective.cpp": "9e0e01963a6d78558a5df71f9b116f9c8405ceac63d90db4e664785af950b0b5",
-    "src/campaign_runtime.cpp": "7f98c8fc00e404803c09e9f7454dccc30c3108c718c8ed3eae3875de2c6a35b6",
+    "src/campaign_runtime.cpp": "efb36e43c925e0bcab837f12c7f7b666ae786172cafe967583ee015db7804d27",
     "src/campaign_setup.cpp": "1a7db3e6958d657e4bed2a39dd765b782a76e4c26fadc721f188b9cbe9fd3502",
     "src/catalog.cpp": "31300d35fa95af67c13b7d61909c5dc6d84c35d34094036feb3f811f534697e4",
     "src/economy.cpp": "1e67f1044592a63393237be5fe79462e0cde70e068055d99518bf32cd0cb1d93",
@@ -15,7 +15,7 @@
     "src/naval_combat.cpp": "febf83872c98152c43500d76596a551f78b52be3076d74a3b126336ab84b4bfb",
     "src/naval_movement.cpp": "624a6aff6bc5e0a661e64b6f357c02e1681c7ac2c69fd8312817ff248a0e5e5d",
     "src/naval_operations.cpp": "0342f2d127a49b500856ff8d28ff197612599b3e9ba1b96e883fd74c37fdd35d",
-    "src/politics.cpp": "9775d40c3a75833a093c748bd1385e648014ad90a1576ed480bc6d75e282c24f",
+    "src/politics.cpp": "8ec2755f27e403bced80b564161275a131f4ae8a4ea80f540954c5ddea8d3751",
     "src/politics_influence.cpp": "6c1e591c1aadd0ee709b9e367ee52e3e1cadbef9a031a9eadd254847ef001d24",
     "src/politics_warlords.cpp": "ad77f9a0a1905187c32c08e05f39467f0752c3a3a6831b916120d2afc0a7d9fb",
     "tests/air_integration_tests.cpp": "8f5b94cdd6192cfd3e68907a2085376a32a5f7f633021d91359ad7030ad8c448",
@@ -50,17 +50,17 @@
         {
           "file": "src/politics.cpp",
           "symbol": "originalNation",
-          "line": 288
+          "line": 306
         },
         {
           "file": "src/politics.cpp",
           "symbol": "politicallyFriendly",
-          "line": 325
+          "line": 343
         },
         {
           "file": "src/politics.cpp",
           "symbol": "atWarWithMajor",
-          "line": 321
+          "line": 339
         }
       ],
       "fixtures": [
@@ -94,17 +94,17 @@
         {
           "file": "src/politics.cpp",
           "symbol": "originalNation",
-          "line": 288
+          "line": 306
         },
         {
           "file": "src/politics.cpp",
           "symbol": "politicallyFriendly",
-          "line": 325
+          "line": 343
         },
         {
           "file": "src/politics.cpp",
           "symbol": "atWarWithMajor",
-          "line": 321
+          "line": 339
         }
       ],
       "fixtures": [
@@ -143,7 +143,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "politicallyFriendly",
-          "line": 325
+          "line": 343
         }
       ],
       "fixtures": [
@@ -196,7 +196,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 514
+          "line": 532
         },
         {
           "file": "src/land_combat.cpp",
@@ -923,7 +923,7 @@
         {
           "file": "src/campaign_runtime.cpp",
           "symbol": "Engine::endPhase",
-          "line": 580
+          "line": 585
         },
         {
           "file": "src/campaign_objective.cpp",
@@ -966,7 +966,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "refreshPoliticalState",
-          "line": 443
+          "line": 461
         }
       ],
       "fixtures": [
@@ -1037,17 +1037,17 @@
         {
           "file": "src/politics.cpp",
           "symbol": "originalNation",
-          "line": 288
+          "line": 306
         },
         {
           "file": "src/politics.cpp",
           "symbol": "politicallyFriendly",
-          "line": 325
+          "line": 343
         },
         {
           "file": "src/politics.cpp",
           "symbol": "atWarWithMajor",
-          "line": 321
+          "line": 339
         }
       ],
       "fixtures": [
@@ -1081,7 +1081,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 597
+          "line": 615
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1116,7 +1116,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "incorporateNation",
-          "line": 389
+          "line": 407
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1158,12 +1158,12 @@
         {
           "file": "src/campaign_runtime.cpp",
           "symbol": "Engine::endPhase",
-          "line": 580
+          "line": 585
         },
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::finishTurn",
-          "line": 767
+          "line": 785
         }
       ],
       "fixtures": [
@@ -1222,7 +1222,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "incorporateNation",
-          "line": 389
+          "line": 407
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1277,7 +1277,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 597
+          "line": 615
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1360,7 +1360,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 597
+          "line": 615
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1443,7 +1443,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 597
+          "line": 615
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1539,12 +1539,12 @@
         {
           "file": "src/politics.cpp",
           "symbol": "mayDeclareWar",
-          "line": 545
+          "line": 563
         },
         {
           "file": "src/politics.cpp",
           "symbol": "declareWar",
-          "line": 572
+          "line": 590
         }
       ],
       "fixtures": [
@@ -1597,12 +1597,12 @@
         {
           "file": "src/politics.cpp",
           "symbol": "mayDeclareWar",
-          "line": 545
+          "line": 563
         },
         {
           "file": "src/politics.cpp",
           "symbol": "declareWar",
-          "line": 572
+          "line": 590
         }
       ],
       "fixtures": [
@@ -1668,12 +1668,12 @@
         {
           "file": "src/politics.cpp",
           "symbol": "surrenderNation",
-          "line": 630
+          "line": 648
         },
         {
           "file": "src/politics.cpp",
           "symbol": "refreshPoliticalState",
-          "line": 443
+          "line": 461
         }
       ],
       "fixtures": [
@@ -1729,12 +1729,12 @@
         {
           "file": "src/politics.cpp",
           "symbol": "surrenderNation",
-          "line": 630
+          "line": 648
         },
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::applyChance",
-          "line": 740
+          "line": 758
         }
       ],
       "fixtures": [
@@ -1924,12 +1924,12 @@
         {
           "file": "src/campaign_runtime.cpp",
           "symbol": "Engine::endPhase",
-          "line": 580
+          "line": 585
         },
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::finishTurn",
-          "line": 767
+          "line": 785
         }
       ],
       "fixtures": [
@@ -1993,7 +1993,7 @@
         {
           "file": "src/campaign_runtime.cpp",
           "symbol": "Engine::replay",
-          "line": 675
+          "line": 686
         }
       ],
       "fixtures": [
@@ -2910,7 +2910,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 514
+          "line": 532
         }
       ],
       "fixtures": [
@@ -4790,7 +4790,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 514
+          "line": 532
         },
         {
           "file": "src/air.cpp",
@@ -4874,7 +4874,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 514
+          "line": 532
         }
       ],
       "fixtures": [
@@ -5543,7 +5543,7 @@
         {
           "file": "src/campaign_runtime.cpp",
           "symbol": "Engine::endPhase",
-          "line": 580
+          "line": 585
         }
       ],
       "fixtures": [
@@ -6079,7 +6079,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "captureLand",
-          "line": 514
+          "line": 532
         },
         {
           "file": "src/economy.cpp",
@@ -6436,12 +6436,12 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 597
+          "line": 615
         },
         {
           "file": "src/politics.cpp",
           "symbol": "refreshPoliticalState",
-          "line": 443
+          "line": 461
         }
       ],
       "fixtures": [
@@ -6479,7 +6479,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "refreshPoliticalState",
-          "line": 443
+          "line": 461
         }
       ],
       "fixtures": [
@@ -6749,7 +6749,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "declareWar",
-          "line": 572
+          "line": 590
         },
         {
           "file": "src/land_combat.cpp",

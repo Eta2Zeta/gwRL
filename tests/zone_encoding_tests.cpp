@@ -385,7 +385,7 @@ void nationQuestionsFollowTheRules() {
         ++warlords;
         for (const std::string side : {"allies", "axis", "comintern", "~none"}) sides.insert("alliance:" + nation + ":" + side);
         for (const std::string by : {"ccp", "dadao", "japan", "kmt", "~none"}) controllers.insert("controller:" + nation + ":" + by);
-        for (const std::string by : {"ccp", "dadao", "japan", "mongolia"}) attacks.insert("attacked_warlord:" + nation + ":" + by);
+        for (const std::string by : {"ccp", "dadao", "japan"}) attacks.insert("attacked_warlord:" + nation + ":" + by);
         queue.insert("alignment_queue:" + nation);
     }
     require(warlords == 8 && questionsOf(*spec, "power_status") == statuses && questionsOf(*spec, "alliance") == sides &&
@@ -400,7 +400,7 @@ void nationQuestionsFollowTheRules() {
                 questionsOf(*spec, "evolution_awarded") ==
                     std::set<std::string>{"evolution_awarded:ccp", "evolution_awarded:kmt", "evolution_awarded:~impossible"} &&
                 questionsOf(*spec, "china_invader") ==
-                    std::set<std::string>{"china_invader:japan", "china_invader:mongolia", "china_invader:~impossible"} &&
+                    std::set<std::string>{"china_invader:japan", "china_invader:~impossible"} &&
                 questionsOf(*spec, "state_flag_nation") ==
                     std::set<std::string>{"state_flag_nation:evolution_pending:ccp", "state_flag_nation:evolution_pending:kmt",
                                           "state_flag_nation:~impossible"},
@@ -414,11 +414,20 @@ void nationQuestionsFollowTheRules() {
                 !questionsOf(*spec, "technology_stage").contains("technology_stage:japan:other"),
             "Only nations that can become major powers have technology questions");
     const auto wars = questionsOf(*spec, "at_war");
-    require(wars.size() == 13 * 13 - 13 - 8 * 7 - 2 - 2 + 1 && wars.contains("at_war:ccp:mongolia") &&
-                !wars.contains("at_war:kmt:ccp") && !wars.contains("at_war:ccp:kmt") &&
-                wars.contains("at_war:dadao:warlord_tibet") && !wars.contains("at_war:japan:japan") &&
-                !wars.contains("at_war:japan:dadao") && !wars.contains("at_war:warlord_tibet:warlord_yunnan"),
-            "No nation fights itself, no warlord a warlord, Japan never Dadao, and the KMT and the CCP always fight");
+    // Of the 13 x 13 ordered pairs, none of a nation with itself or of two
+    // warlords; none of Japan with Dadao, the KMT with the CCP, the CCP with
+    // Mongolia or Dadao with Mongolia, either way round; none of a warlord with
+    // the KMT or with Mongolia; and one shared ~impossible question.
+    require(wars.size() == 13 * 13 - 13 - 8 * 7 - 2 * 4 - 2 * 2 * 8 + 1 && wars.contains("at_war:kmt:mongolia") &&
+                wars.contains("at_war:mongolia:japan") && wars.contains("at_war:ccp:warlord_tibet") &&
+                wars.contains("at_war:dadao:warlord_tibet") && !wars.contains("at_war:kmt:ccp") &&
+                !wars.contains("at_war:ccp:kmt") && !wars.contains("at_war:japan:japan") &&
+                !wars.contains("at_war:japan:dadao") && !wars.contains("at_war:warlord_tibet:warlord_yunnan") &&
+                !wars.contains("at_war:ccp:mongolia") && !wars.contains("at_war:mongolia:dadao") &&
+                !wars.contains("at_war:mongolia:warlord_tibet") && !wars.contains("at_war:kmt:warlord_tibet") &&
+                !wars.contains("at_war:warlord_tibet:kmt"),
+            "No nation fights itself, a warlord fights only Japan, the CCP and Dadao, Mongolia only Japan and the "
+            "KMT, Japan never Dadao, and the KMT and the CCP always fight");
 
     // The opening answers only kept questions.
     auto s = env.engine().state().clone();
@@ -439,12 +448,12 @@ void nationQuestionsFollowTheRules() {
     s.nations.at(nationNumber(s, "ccp")).powerStatus = "major";
     s.nations.at(nationNumber(s, "ccp")).technologyStages[technologyNumber(s, "radar")] = 1;
     s.nations.at(nationNumber(s, "ccp")).gameFlags[MarkKey(mark::economy_researched_round, "radar")] = 1;
-    s.nations.at(nationNumber(s, "ccp")).atWarWith.insert(nationNumber(s, "mongolia"));
+    s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "mongolia"));
     s.nations.at(nationNumber(s, "ccp")).allies.insert(nationNumber(s, "kmt"));
     s.nations.at(nationNumber(s, "dadao")).atWarWith.insert(nationNumber(s, "warlord_yunnan"));
     s.politics.surrendered.insert(nationNumber(s, "kmt"));
     s.politics.evolutionAwarded.insert(nationNumber(s, "ccp"));
-    s.politics.chinaInvader = nationNumber(s, "mongolia");
+    s.politics.chinaInvader = nationNumber(s, "japan");
     s.politics.attackedWarlords[nationNumber(s, "warlord_yunnan")].insert(nationNumber(s, "dadao"));
     s.politics.alignmentQueue.push_back(nationNumber(s, "warlord_yunnan"));
     s.flags[MarkKey(mark::evolution_pending, "ccp")] = 1;
@@ -453,8 +462,8 @@ void nationQuestionsFollowTheRules() {
     for (const std::string expected :
          {"nation_present:dadao", "power_status:dadao:minor", "alliance:dadao:axis", "controller:dadao:japan",
           "controller:warlord_tibet:japan", "alliance:warlord_tibet:axis", "power_status:ccp:major", "technology_stage:ccp:radar", "researched_round:ccp:radar",
-          "at_war:ccp:mongolia", "allied:ccp:kmt", "at_war:dadao:warlord_yunnan", "surrendered:kmt", "evolution_awarded:ccp",
-          "china_invader:mongolia", "attacked_warlord:warlord_yunnan:dadao", "alignment_queue:warlord_yunnan",
+          "at_war:kmt:mongolia", "allied:ccp:kmt", "at_war:dadao:warlord_yunnan", "surrendered:kmt", "evolution_awarded:ccp",
+          "china_invader:japan", "attacked_warlord:warlord_yunnan:dadao", "alignment_queue:warlord_yunnan",
           "state_flag_nation:evolution_pending:ccp"})
         require(answers.contains(expected), "A rare answer has its question: " + expected);
 
@@ -478,11 +487,14 @@ void nationQuestionsFollowTheRules() {
     mongolia.allies.insert(nationNumber(s, "ccp"));
     broken.nations.at(nationNumber(broken, "japan")).treasury.reset();
     broken.nations.at(nationNumber(broken, "warlord_tibet")).atWarWith.insert(nationNumber(broken, "warlord_yunnan"));
+    kmt.atWarWith.insert(nationNumber(broken, "warlord_yunnan"));
+    mongolia.atWarWith.insert(nationNumber(broken, "ccp"));
     broken.completedTurns[nationNumber(broken, "dadao")] = 1;
     broken.politics.surrendered.insert(nationNumber(broken, "ccp"));
     broken.politics.evolutionAwarded.insert(nationNumber(broken, "japan"));
-    broken.politics.chinaInvader = nationNumber(broken, "kmt");
+    broken.politics.chinaInvader = nationNumber(broken, "mongolia");
     broken.politics.attackedWarlords[nationNumber(broken, "warlord_tibet")].insert(nationNumber(broken, "kmt"));
+    broken.politics.attackedWarlords[nationNumber(broken, "warlord_tibet")].insert(nationNumber(broken, "mongolia"));
     broken.politics.alignmentQueue.push_back(nationNumber(broken, "japan"));
     broken.flags[MarkKey(mark::evolution_pending, "japan")] = 1;
     answers = positionAnswers(*spec, encodeZoneInput(broken, scheduleOf(env), {}));
@@ -500,8 +512,10 @@ void nationQuestionsFollowTheRules() {
           "war_ended:kmt:ccp", "campaign_not_started:state",
           "impossible_technology_stage:mongolia:radar", "impossible_researched_round:mongolia:radar",
           "impossible_allied:mongolia:ccp", "impossible_at_war:warlord_tibet:warlord_yunnan",
+          "impossible_at_war:kmt:warlord_yunnan", "impossible_at_war:mongolia:ccp",
           "impossible_completed_turns:dadao", "impossible_surrendered:ccp", "impossible_evolution_awarded:japan",
-          "impossible_china_invader:kmt", "impossible_attacked_warlord:warlord_tibet:kmt",
+          "impossible_china_invader:mongolia", "impossible_attacked_warlord:warlord_tibet:kmt",
+          "impossible_attacked_warlord:warlord_tibet:mongolia",
           "impossible_alignment_queue:japan", "impossible_state_flag_nation:evolution_pending:japan"})
         require(unknown.contains(report), "A ruled-out answer is reported: " + report);
     require(!answers.contains("treasury:japan"), "A missing treasury is reported, not read as empty");

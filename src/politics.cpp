@@ -243,19 +243,36 @@ bool controllerPossible(const Id& nation,const std::optional<Id>& controller) {
 // (refreshPoliticalState) and for Japan when an enemy holds its capital
 // (PoliticsRules::finishTurn), and it refuses the CCP.
 bool canSurrender(const Id& nation) {return nation=="kmt"||nation=="japan";}
-// recordLandAttack records the invader only when the attacker is not Chinese.
-bool canInvadeChina(const Id& nation) {return !chinese(nation);}
-// A war starts in one of three ways. A nation declares it: mayDeclareWar lets
-// only Japan, the KMT, the CCP and Dadao declare, and never on their own
-// alliance. A nation that is not Chinese attacks Chinese land: recordLandAttack
-// puts it at war with the KMT, the CCP and the warlords. Or a nation is
-// incorporated: incorporateNation hands its wars to the recipient, except
-// those with the recipient's own alliance. Setup has one war, between the KMT
-// and the CCP. So no warlord fights a warlord, and Japan and Dadao, both in
-// the Axis for good, never fight.
+// recordLandAttack records the invader only when the attacker is not Chinese,
+// and puts the invader at war with the CCP, which is never incorporated and
+// never surrenders. So only a nation that can be at war with the CCP invades
+// China: Japan, never Mongolia.
+bool canInvadeChina(const Id& nation) {return !chinese(nation)&&warPossible(nation,"ccp");}
+// A war starts in one of four ways. Setup has one war, between the KMT and the
+// CCP. A nation declares it: mayDeclareWar lets only Japan, the KMT, the CCP
+// and Dadao declare, never on their own alliance, and Dadao only on a Chinese
+// nation. A nation that is not Chinese attacks Chinese land: recordLandAttack
+// puts it at war with the KMT, the CCP and the warlords, and mayInvadeChina
+// allows that attack only if the attacker may declare each of those wars,
+// which Mongolia, in the Comintern with the CCP, never may (RCL-022). Or a
+// nation is incorporated: incorporateNation hands its wars to the recipient,
+// the KMT, the CCP, Dadao or Japan, except those with the recipient's own
+// alliance. So:
+// - Japan and Dadao, in the Axis for good, never fight, nor do the CCP and
+//   Mongolia, in the Comintern for good.
+// - A warlord fights only Japan, the CCP and Dadao. It declares no war, and
+//   one the KMT attacks joins the CCP there and then (recordLandAttack), which
+//   ends that war at once.
+// - Mongolia fights only Japan and the KMT. It declares no war and may not
+//   invade China, Dadao declares war only on a Chinese nation, and no warlord
+//   is at war with Mongolia to hand that war on by incorporation.
 bool warPossible(const Id& first,const Id& second) {
-    if(first==second||(isWarlord(first)&&isWarlord(second)))return false;
-    return !((first=="japan"&&second=="dadao")||(first=="dadao"&&second=="japan"));
+    const auto fights=[](const Id& a,const Id& b) {
+        if(a=="mongolia")return b=="japan"||b=="kmt";
+        if(isWarlord(a))return b=="japan"||b=="ccp"||b=="dadao";
+        return !((a=="japan"&&b=="dadao")||(a=="dadao"&&b=="japan"));
+    };
+    return first!=second&&fights(first,second)&&fights(second,first);
 }
 // refreshAlliances lists as a nation's allies those politicallyFriendly to it:
 // the KMT and the CCP under the Chinese Truce, or two major powers of one
@@ -278,11 +295,12 @@ bool alwaysAtWar(const Id& first,const Id& second) {
     return (first=="kmt"&&second=="ccp")||(first=="ccp"&&second=="kmt");
 }
 // recordLandAttack records who attacked a warlord's land, unless it is the
-// KMT, whose attack makes the warlord join the CCP there and then. Only the
-// nation whose turn it is, or Dadao on Japan's turn, moves units
-// (movementController), and a warlord is never either.
+// KMT, whose attack makes the warlord join the CCP there and then. Before it
+// records the attacker, it declares the attacker's war on the warlord if they
+// are not at war yet. So the attacker is a nation that can be at war with a
+// warlord (warPossible): Japan, the CCP or Dadao.
 bool warlordAttackPossible(const Id& warlord,const Id& attacker) {
-    return isWarlord(warlord)&&!isWarlord(attacker)&&attacker!="kmt";
+    return isWarlord(warlord)&&warPossible(attacker,warlord);
 }
 
 NationId originalNation(const State& s,ZoneId zone) {

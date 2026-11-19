@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="480" viewBox="0 0 960 480" role="img" aria-labelledby="title desc">
   <title id="title">What a network computes for one decision</title>
-  <desc id="desc">For decision 612 at width 64: the 37 zone feature vectors, one per zone, with 840 non-zero feature values in all, go through the zone embedding table of 35,329 embeddings, the embedding layer, each on its own, to 37 zone vectors; the global feature vector, with 131 non-zero feature values, through the global embedding table of 2,784 embeddings to one global vector; the 5 action feature vectors, with 80 non-zero feature values in all, through the action embedding table of 11,046 embeddings to 5 action vectors, one per legal action. Two message-passing layers update every zone vector from its neighbours along the 160 directed borders and from the global vector, and the global vector from the average zone. A linear layer turns the global vector and the zones' mean and maximum into a summary vector, and the value head turns that into three values, one per alliance. Each action vector is joined with the vectors of its source zone, its target zone and its path zones; with the summary vector, the policy head turns it into the action's logit, giving 5 logits and 5 probabilities, built by a hierarchical softmax.</desc>
+  <desc id="desc">For decision 612 at width 64: the 37 zone feature vectors, one per zone, with 840 non-zero feature values in all, go through the zone embedding table of 35,329 embeddings, the embedding layer, each on its own, to 37 zone vectors; the global feature vector, with 131 non-zero feature values, through the global embedding table of 2,739 embeddings to one global vector; the 5 action feature vectors, with 80 non-zero feature values in all, through the action embedding table of 11,046 embeddings to 5 action vectors, one per legal action. Two message-passing layers update every zone vector from its neighbours along the 160 directed borders and from the global vector, and the global vector from the average zone. A linear layer turns the global vector and the zones' mean and maximum into a summary vector, and the value head turns that into three values, one per alliance. Each action vector is joined with the vectors of its source zone, its target zone and its path zones; with the summary vector, the policy head turns it into the action's logit, giving 5 logits and 5 probabilities, built by a hierarchical softmax.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -38,7 +38,7 @@
   <text class="small" x="38" y="182">1 row, 131 non-zero values</text>
   <rect x="262" y="136" width="190" height="60" rx="8" fill="#fff8c5" stroke="#d4a72c"/>
   <text class="name" x="276" y="160">Global embedding table</text>
-  <text class="small" x="276" y="182">2,784 embeddings</text>
+  <text class="small" x="276" y="182">2,739 embeddings</text>
   <rect x="500" y="136" width="180" height="60" rx="8" fill="#ddf4ff" stroke="#54aeff"/>
   <text class="name" x="514" y="171">1 global vector</text>
 
