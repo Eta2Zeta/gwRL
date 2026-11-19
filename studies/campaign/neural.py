@@ -487,8 +487,16 @@ def _readout(models: Sequence[Any], states: Tensor, latent: Tensor, scores: Tens
     pass, and an option's log-probability is the sum along its branch.
     """
     groups = batch.groups
-    means = latent.new_zeros((groups, latent.shape[1])).index_add_(
-        0, t["readout_owners"], latent.repeat(GROUP_LEVELS, 1)) / t["readout_counts"]
+    # Each option's vector added to its group at every level, one level at a time:
+    # readout_owners lists the options' groups level by level. A repeat of the
+    # options' vectors, one copy per level, would make the Mac's GPU compile a graph
+    # for every new number of options, which is nearly every inference batch
+    # (docs/archive/records/inference_server_profile_gpu_2026_11_18.md).
+    owners = t["readout_owners"].view(GROUP_LEVELS, -1)
+    means = latent.new_zeros((groups, latent.shape[1]))
+    for level in range(GROUP_LEVELS):
+        means.index_add_(0, owners[level], latent)
+    means = means / t["readout_counts"]
     heads = [model.factor_heads[level] for level in range(GROUP_LEVELS) for model in models]
     group_scores = _by_network(torch.cat((states.index_select(0, t["readout_rows"]), means), dim=1),
                                batch.readout_sizes, heads, _apply_head).squeeze(1)
