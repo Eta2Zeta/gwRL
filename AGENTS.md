@@ -54,10 +54,12 @@
 - Respect the current user allowance of at most 9 CPU cores and 30,000,000,000
   bytes of memory, including worker/coordinator overhead, until the user changes
   it. The Mac's M4 Max has 10 performance cores, and one stays free for
-  everything else. Efficient code does not by itself establish that
-  AlphaZero-style search is the best learning method or that this campaign can
-  train to useful strength on the available hardware; keep those claims subject
-  to measured evaluation.
+  everything else. A run that goes a little over 9 CPU cores, such as a median
+  of 9.5 in its half-minute windows, is acceptable (the user, 19 November
+  2026). Efficient code does not by itself establish that AlphaZero-style
+  search is the best learning method or that this campaign can train to useful
+  strength on the available hardware; keep those claims subject to measured
+  evaluation.
 
 ## Documentation
 

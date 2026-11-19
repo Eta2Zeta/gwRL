@@ -2937,10 +2937,10 @@ measured and what would settle it.
   would fill them further, which is untested. With the network on the GPU at
   256×8 and 126 concurrent games the inference server is busy 97% of the time,
   and since the policy readout stopped making the GPU compile, the run's CPU
-  cores go over the allowance: a median of 9.5 busy with 6 or 7 game processes
-  ([record](../archive/records/readout_without_repeat_2026_11_18.md)). A layout
-  that stays within it is not chosen yet, and the supervisor's count of cores
-  accepts these layouts (Q-005 in `docs/questions.md`). The
+  cores go a little over the allowance: a median of 9.5 busy with 6 or 7 game
+  processes ([record](../archive/records/readout_without_repeat_2026_11_18.md)).
+  The owner accepts that small excess (19 November), and the supervisor's count
+  of cores accepts these layouts (Q-005 in `docs/questions.md`). The
   inference server's levers are listed in section 9.3: fewer PyTorch calls came
   with one network, compiling and more concurrent games are settings, and the
   others are not built. In

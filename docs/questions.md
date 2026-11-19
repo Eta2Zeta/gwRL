@@ -270,7 +270,10 @@ the same layout kept a median of 9.46 busy, and six processes of 21 games, which
 count 9 with self-play that never stops, 9.5: the game processes did more
 engine work each second because the inference server answered them sooner
 ([record](archive/records/readout_without_repeat_2026_11_18.md)). The supervisor
-accepted both; two runs were stopped by hand.
+accepted both; two runs were stopped by hand. On 19 November the owner said that
+going a little over the allowance, as these runs did, is fine, so this layout
+stays and no smaller one is being sought. How far over is still a little is not
+set, and a stop under choice A below would need that number.
 
 **Why it matters.** The allowance is there to keep one performance core free
 for everything else. The count does not show whether it is free, and even a
