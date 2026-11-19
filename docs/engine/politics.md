@@ -224,23 +224,87 @@ and influence, and the KMT loses its Low Morale
 ## 5. Capturing land
 
 A battle that leaves a land unit of the attacker in the zone captures it
-(`captureLand`).
+(rulebook 10.10, page 73; `captureLand`).
 
-- **Who gets it.** The attacker, with one exception: if the zone originally
-  belonged to a major power of the attacker's own alliance that has not
-  surrendered, that nation gets it back.
-- **A capital.** If the zone was its holder's capital, the holder's treasury
-  falls to zero.
 - **What is removed.** Fortifications and coastal artillery in the zone, and
-  anything under construction there.
-- **Chinese land taken by an outside major power.** Japan may keep it
-  (`politics_keep_capture`) or give it to the KMT or the CCP
-  (`politics_give_capture`). If it gives the zone to a nation it is not
-  friendly with, its units there must leave in Noncombat Movement. The KMT and
-  the CCP themselves always keep what they take.
+  anything under construction there (10.10, page 73).
+- **A capital.** If the zone was its holder's capital, the holder's treasury
+  falls to zero (10.10.2, page 73).
 - **Units of a third nation** that were in the zone as friends of the old
   holder must move to friendly land (`politics_relocate_neutral`), and are
   removed if there is none (RCL-015).
+
+### Who gets the captured zone
+
+Rule 10.10.1 (page 73) decides who holds the captured zone. It looks at the
+attacker and at the zone's original owner, the nation whose roundel is printed
+on the zone (glossary, page 7). The first row that fits applies:
+
+| The attacker | The captured zone | Who holds the captured zone |
+| --- | --- | --- |
+| Any nation | Originally belonged to another major power of the attacker's alliance, which has not surrendered | That major power: the attacker must return the zone at once |
+| A major power | Lies in the Chinese Home Country, and the attacker did not originally own it | The attacker decides at once: it keeps the zone (`politics_keep_capture`) or gives it to the KMT or the CCP (`politics_give_capture`) |
+| Any nation | Any other zone | The attacker |
+
+The Chinese Home Country is every land zone originally with a warlord's, the
+KMT's, the CCP's, Manchukuo's or Mongolia's roundel, with Formosa and Hong Kong
+(glossary, page 6). In this campaign it is 25 zones
+([scenario](scenario.md#2-nations-and-alliances)): 10 of the warlords, 5 of the
+KMT, 1 of the CCP, 4 of Mongolia, and 5 of Japan, which are Formosa and the
+four Manchukuo zones. The campaign's map data (`map.json`) records Japan as the
+original owner of those five, in line with the glossary's entry for Japan
+(page 7), which takes in every zone marked with a Manchukuo roundel. Hong Kong
+is not on the campaign's map.
+
+**When the attacker may give the zone away.** Rule 10.10.1 allows the gift of
+the table's second row only if the attacker and the receiving nation are
+aligned, or if the attacker's units in the captured zone can move to friendly
+land or aboard a naval transport in the Noncombat Movement Phase that follows.
+Rule 11.1 (page 74) lets the attacker's units move in that Noncombat Movement
+Phase although they moved in Combat Movement. Two nations of one alliance are aligned when they are at war
+with the same major power (4.6, page 27), and the KMT and the CCP align with
+nobody until they become major powers (14.3.1, page 101). The engine offers no
+gift to a nation that has surrendered, since 10.10.1 lets no surrendered
+nation have land liberated.
+
+**In this campaign:**
+
+- **Japan** is the only major power that is not Chinese
+  ([scenario](scenario.md#2-nations-and-alliances)). Japan makes the second
+  row's decision whenever it captures one of the 20 zones of the Chinese Home
+  Country that it did not originally own, Mongolia's four included. Japan is
+  never aligned with the KMT or the CCP, so a Japanese gift always needs the
+  Japanese land units in the captured zone to leave it: `captureLand` offers
+  `politics_give_capture` only when every one of those units can leave in that
+  turn's Noncombat Movement, on foot or aboard a transport, and the Noncombat
+  Movement Phase cannot end until they have left
+  ([movement](movement.md#6-leaving-land-that-was-given-away)).
+- **Dadao**, a minor power of Japan's alliance (4.3, page 26), must return to
+  Japan any zone that was originally Japan's, such as Formosa or a Manchukuo
+  zone, that Dadao captures: the table's first row.
+- **A minor power** (the KMT or the CCP before it becomes a major power,
+  Mongolia, Dadao) keeps every zone it captures that the table's first row
+  does not return to a major power: the table's third row. During a Truce, the
+  KMT or the CCP that retakes a zone of the Chinese Home Country from a foreign
+  nation keeps that zone, even one that was originally the other's (6.6,
+  page 42). In the engine that is the third row too, as the KMT and the CCP are
+  both minor powers while a Truce lasts ([section 3](#3-the-chinese-truce)).
+
+A Japanese gift can end a Truce. In the engine's test
+`japaneseCaptureGiftCanEndAnExistingTruce` (`tests/land_truce_tests.cpp`),
+Japanese armor in Beiping takes Hopeh from the CCP during a Truce and gives
+Hopeh to the KMT, whose land was worth 12 IPP. With Hopeh the KMT's land is
+worth 13 IPP, so the KMT becomes a major power (14.3.1, page 101), which ends
+the Truce (6.6, page 42): a battle starts in Nanking, where KMT and CCP units
+had stood together. In Noncombat Movement the armor goes back to Beiping.
+
+**The KMT and the CCP as major powers keep what they capture.** Read
+literally, the table's second row would also let a KMT or a CCP that has
+become a major power give away Chinese Home Country land it captured, for
+example the KMT giving a captured zone to the CCP, which it is at war with. On
+the project owner's ruling of 28 October 2026, `captureLand` offers the
+decision only to a major power that is neither the KMT nor the CCP, so neither
+can hand its conquests to the other.
 
 ## 6. Surrender
 

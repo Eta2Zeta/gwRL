@@ -118,12 +118,15 @@ Asking whether a zone is in supply moves nothing and uses up no capacity.
 
 ## 6. Leaving land that was given away
 
-When Japan gives a captured Chinese zone to a Chinese nation it is not friendly
-with ([politics](politics.md#5-capturing-land)), its units must leave that zone
-in the same turn's Noncombat Movement. The gift is offered only if every unit
-can leave, on foot or aboard a transport. Until they have left, the list of
-legal actions holds only their moves and aircraft landings, and the phase
-cannot end.
+When Japan gives a captured zone of the Chinese Home Country to the KMT or the
+CCP, which Japan is never aligned with
+([politics](politics.md#who-gets-the-captured-zone)), Japan's land units in
+that zone must leave it in the same turn's Noncombat Movement (rulebook
+10.10.1, page 73). Rule 11.1 (page 74) lets them move then although they moved
+in Combat Movement. The gift is offered only if every one of those units can
+leave, on foot or aboard a transport (`withdrawalEligibleRecipients`). Until
+they have left, the list of legal actions holds only their moves and aircraft
+landings, and the phase cannot end.
 
 ## 7. The kinds of action
 
