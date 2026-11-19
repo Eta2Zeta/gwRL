@@ -391,12 +391,23 @@ processes kept about 6.8 cores busy, the inference server setting the pace
 ([record](archive/records/engine_speed_in_training_2026_11_16.md)). A count sees neither. A command line that adds
 `--episode-workers 7` overrides the profile, and the supervisor would accept it.
 
+**A second case** (18 November 2026, the 256×8 network on the GPU, 126
+concurrent games). Seven game processes of 18 games count 9 cores and kept a
+median of about 7.7 busy in their half-minute windows. Once the inference server
+had stopped making the GPU compile a graph for nearly every inference batch,
+the same layout kept a median of 9.46 busy, and six processes of 21 games, which
+count 9 with self-play that never stops, 9.5: the game processes did more
+engine work each second because the inference server answered them sooner
+([record](archive/records/readout_without_repeat_2026_11_18.md)). The supervisor
+accepted both; two runs were stopped by hand.
+
 **Why it matters.** The allowance is there to keep one performance core free
 for everything else. The count does not show whether it is free, and even a
 layout chosen by measuring it goes over when the Mac is quiet. A different network, device,
 number of games per process or search would change the load without the
-supervisor noticing. The count can also be too strict: with the network on the
-GPU, game threads wait more and use less than they count.
+supervisor noticing, and so would a faster inference server, as in the second
+case. The count can also be too strict: with the network on the GPU and a slow
+inference server, game threads wait more and use less than they count.
 
 **The choices.**
 

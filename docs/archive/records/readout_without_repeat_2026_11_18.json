@@ -1,0 +1,319 @@
+{
+ "record": "readout_without_repeat_2026_11_18.md",
+ "date": "2026-11-18",
+ "change": "fa45792: _readout adds the options' vectors to their groups with one index_add_ per level instead of latent.repeat(GROUP_LEVELS, 1)",
+ "old_code": "9fd0fc6 (tmp/server-profile-2026-11-18/runtime)",
+ "new_code": "fa45792 (tmp/readout-fix-2026-11-18/new)",
+ "torch": "2.14.0",
+ "machine": "Apple M4 Max: 14 CPU cores (10 performance, 4 efficiency), 36 GB memory, 32-core GPU",
+ "replies": {
+  "cpu_60_inference_batches": {
+   "replies": 3681,
+   "identical": 3681
+  },
+  "gpu_375_inference_batches_compiled": {
+   "replies": 17025,
+   "identical": 9928,
+   "max_prior_difference": 1.6092111015941768e-07,
+   "max_value_difference": 0.0,
+   "most_likely_action_changed": 0
+  },
+  "replayed_best_microseconds_per_inference_batch": {
+   "old": 6948,
+   "new": 6891
+  }
+ },
+ "profiled_training": {
+  "old_19_06": {
+   "decisions_per_hour_while_playing": 276582,
+   "games": 126,
+   "decisions": 132411,
+   "playing_seconds": 1723.5,
+   "inference_batches": 150320,
+   "states_per_inference_batch": 44.87,
+   "serve_wall_seconds": 1722.1,
+   "serve_thread_cpu_seconds": 1061.5,
+   "milliseconds_per_inference_batch": {
+    "waiting": 0.255,
+    "receiving": 0.292,
+    "reading": 0.222,
+    "packing": 1.129,
+    "forward": 4.777,
+    "collecting": 4.061,
+    "replying": 0.321,
+    "other": 0.301
+   },
+   "serving_milliseconds_per_inference_batch": 11.202,
+   "busy_share": 0.9778
+  },
+  "new_21_39": {
+   "decisions_per_hour_while_playing": 357981,
+   "games": 126,
+   "decisions": 131859,
+   "playing_seconds": 1326.0,
+   "inference_batches": 150694,
+   "states_per_inference_batch": 44.65,
+   "serve_wall_seconds": 1325.3,
+   "serve_thread_cpu_seconds": 759.8,
+   "milliseconds_per_inference_batch": {
+    "waiting": 0.225,
+    "receiving": 0.274,
+    "reading": 0.204,
+    "packing": 1.111,
+    "forward": 2.679,
+    "collecting": 3.765,
+    "replying": 0.304,
+    "other": 0.107
+   },
+   "serving_milliseconds_per_inference_batch": 8.57,
+   "busy_share": 0.9744
+  }
+ },
+ "same_size_change_percent_new_against_old": {
+  "1-16 states": -22.2,
+  "17-32 states": -28.8,
+  "33-48 states": -26.8,
+  "49-64 states": -22.5,
+  "65-80 states": -21.5,
+  "40-80 states": -22.9
+ },
+ "by_size_microseconds": {
+  "1": {
+   "old": [
+    7356,
+    3144
+   ],
+   "new": [
+    9199,
+    2717
+   ]
+  },
+  "8": {
+   "old": [
+    993,
+    6695
+   ],
+   "new": [
+    1355,
+    4266
+   ]
+  },
+  "16": {
+   "old": [
+    893,
+    8242
+   ],
+   "new": [
+    672,
+    5790
+   ]
+  },
+  "24": {
+   "old": [
+    638,
+    9459
+   ],
+   "new": [
+    651,
+    6849
+   ]
+  },
+  "32": {
+   "old": [
+    965,
+    10650
+   ],
+   "new": [
+    1015,
+    7649
+   ]
+  },
+  "40": {
+   "old": [
+    1535,
+    11633
+   ],
+   "new": [
+    1724,
+    8416
+   ]
+  },
+  "48": {
+   "old": [
+    2590,
+    12074
+   ],
+   "new": [
+    2912,
+    8992
+   ]
+  },
+  "56": {
+   "old": [
+    3641,
+    12601
+   ],
+   "new": [
+    4057,
+    9815
+   ]
+  },
+  "64": {
+   "old": [
+    3068,
+    12726
+   ],
+   "new": [
+    3323,
+    10135
+   ]
+  },
+  "72": {
+   "old": [
+    1614,
+    13838
+   ],
+   "new": [
+    1170,
+    11066
+   ]
+  },
+  "80": {
+   "old": [
+    530,
+    14361
+   ],
+   "new": [
+    117,
+    14617
+   ]
+  }
+ },
+ "native_samples_new": {
+  "700_seconds": {
+   "thread_and_markers": [
+    "thread 5504056: 12123 samples",
+    "marker 'mlir::': 699 samples, 5.8%",
+    "marker 'MPSGraph': 1437 samples, 11.9%",
+    "marker 'commonPreInitWithDescriptor': 6 samples, 0.0%",
+    "marker 'waitUntilCompleted': 4366 samples, 36.0%"
+   ],
+   "compile_triggers": [
+    "compile samples: 703",
+    "     390  55.5%  at::native::structured_mm_out_mps::impl",
+    "     172  24.5%  at::native::structured_bmm_out_mps::impl",
+    "     140  19.9%  at::native::structured_addmm_out_mps::impl",
+    "       1   0.1%  at::native::mps::make_mps_graph",
+    "by Python binding:",
+    "     390  55.5%  torch::autograd::THPVariable_mm",
+    "     172  24.5%  torch::autograd::THPVariable_bmm",
+    "     141  20.1%  torch::autograd::THPVariable_addmm"
+   ]
+  },
+  "1000_seconds": {
+   "thread_and_markers": [
+    "thread 5504056: 12017 samples",
+    "marker 'mlir::': 764 samples, 6.4%",
+    "marker 'MPSGraph': 1505 samples, 12.5%",
+    "marker 'commonPreInitWithDescriptor': 27 samples, 0.2%",
+    "marker 'waitUntilCompleted': 4259 samples, 35.4%"
+   ],
+   "compile_triggers": [
+    "compile samples: 783",
+    "     439  56.1%  at::native::structured_mm_out_mps::impl",
+    "     166  21.2%  at::native::structured_addmm_out_mps::impl",
+    "     156  19.9%  at::native::structured_bmm_out_mps::impl",
+    "      12   1.5%  at::native::mps::make_mps_graph",
+    "       7   0.9%  at::native::mps::MPSBinaryCachedGraph::~MPSBinaryCachedGraph",
+    "       3   0.4%  at::native::mps::addmm_out_mps_impl",
+    "by Python binding:",
+    "     446  57.0%  torch::autograd::THPVariable_mm",
+    "     171  21.8%  torch::autograd::THPVariable_addmm",
+    "     156  19.9%  torch::autograd::THPVariable_bmm",
+    "      10   1.3%  ?"
+   ]
+  }
+ },
+ "load": {
+  "old_profiled": {
+   "seconds_with_game_processes": 1711.2,
+   "game_processes_cpu_cores": 6.45,
+   "training_process_cpu_cores": 0.66,
+   "run_half_minute_windows": {
+    "median_window": 7.74,
+    "mean_window": 7.12,
+    "highest_window": 9.54
+   },
+   "other_work_median_half_minute_cores": 0.79,
+   "game_processes_wait_for_a_core_per_cpu_second": 1.213
+  },
+  "new_profiled": {
+   "seconds_with_game_processes": 1321.8,
+   "game_processes_cpu_cores": 8.2,
+   "training_process_cpu_cores": 0.63,
+   "run_half_minute_windows": {
+    "median_window": 9.46,
+    "mean_window": 8.84,
+    "highest_window": 10.97
+   },
+   "other_work_median_half_minute_cores": 0.58,
+   "game_processes_wait_for_a_core_per_cpu_second": 1.174
+  },
+  "old_unprofiled_21_10": {
+   "seconds_with_game_processes": 1671.5,
+   "game_processes_cpu_cores": 6.47,
+   "training_process_cpu_cores": 0.68,
+   "run_half_minute_windows": {
+    "median_window": 7.61,
+    "mean_window": 7.22,
+    "highest_window": 9.49
+   },
+   "other_work_median_half_minute_cores": 1.16,
+   "game_processes_wait_for_a_core_per_cpu_second": 1.25
+  },
+  "new_six_processes_first_nine_minutes": {
+   "seconds_with_game_processes": 590.9,
+   "game_processes_cpu_cores": 8.93,
+   "training_process_cpu_cores": 0.62,
+   "run_half_minute_windows": {
+    "median_window": 9.51,
+    "mean_window": 9.55,
+    "highest_window": 11.13
+   },
+   "other_work_median_half_minute_cores": 0.47,
+   "game_processes_wait_for_a_core_per_cpu_second": 1.22
+  }
+ },
+ "old_unprofiled_21_10": {
+  "decisions_per_hour_playing": 278505,
+  "decisions_per_hour_all_games_playing": 314518,
+  "decisions": 130972,
+  "playing_seconds": 1693.0,
+  "evaluations_per_decision": 50.94,
+  "inference_server": {
+   "inference_batches": 150445,
+   "states_per_inference_batch": 44.3,
+   "median_state_in_an_inference_batch_of": 59,
+   "largest_inference_batch": 126,
+   "answering_seconds": 1541.6,
+   "serving_seconds": 1650.2,
+   "reading_and_replying_seconds": 108.6,
+   "idle_seconds": 39.7,
+   "busy_share": 0.9765,
+   "microseconds_per_inference_batch": 10247.0,
+   "microseconds_per_state": 231.1,
+   "serving_microseconds_per_state": 247.3,
+   "gpu_cache_clears": 75,
+   "gpu_cache_clear_seconds": 33.4,
+   "line_microseconds": {
+    "per_inference_batch": 4545,
+    "per_state": 144.8,
+    "over_sizes_with_100_or_more": 89
+   }
+  }
+ },
+ "stopped_runs": [
+  "new code, 7 processes of 18, unprofiled, stopped after 52 s: the profiled run of the same layout had kept a median of 9.46 CPU cores busy",
+  "new code, 6 processes of 21, unprofiled, stopped after about 10 minutes at a median of 9.5 CPU cores; the old code's run of that layout that was to follow was not started"
+ ]
+}

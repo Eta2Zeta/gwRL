@@ -2396,7 +2396,12 @@ feed only about a fifth more network evaluations a second (inferred). With the
 compiled layers (below) the same layout played about 286,000 decisions an hour
 while playing and 326,000 while all the games played, and the CPU cores were
 about an eighth behind
-([record](../archive/records/compiled_layers_126_games_2026_11_18.md)).
+([record](../archive/records/compiled_layers_126_games_2026_11_18.md)). Once the
+policy readout stopped making the GPU compile a graph for nearly every
+inference batch (below, fewer graph compiles), a profiled run of that layout
+played about 358,000 decisions an hour while playing, and the CPU cores were no
+longer behind: the run kept a median of 9.5 of them busy, over the allowance of
+9 ([record](../archive/records/readout_without_repeat_2026_11_18.md)).
 
 **Where an inference batch's states come from.** An inference batch holds the
 inference requests waiting when it starts, and a game asks for one network
@@ -2453,13 +2458,14 @@ the network's rate. Each change pays only while its own part limits, and only
 until the other part limits instead. Where the CPU cores limit, a cheaper engine
 pays directly, until the CPU cores' line in the figure reaches the network's line
 above it: with the GPU in inference batches of 64, up to about 1.8 times at 64×2
-and 1.5 times at 128×4 (worked out). In the setups trained so far the inference
-server limits instead, with the CPU cores an eighth to a fifth behind:
+and 1.5 times at 128×4 (worked out). In the Mac profile the inference server
+limits instead, with the CPU cores about a fifth behind, and at 256×8 on the GPU
+both limit:
 
 | Setup | What limits | The CPU cores could feed | What pays |
 | --- | --- | --- | --- |
 | 64×2 on one CPU core, 24 concurrent games (the Mac profile) | the inference server, busy 98% | about a fifth more | a cheaper inference server; a cheaper engine little |
-| 256×8 on the GPU, 126 concurrent games, compiled layers | the inference server, busy 98% | about an eighth more | a cheaper inference server; self-play that never stops, about 9% measured; a cheaper engine little by itself |
+| 256×8 on the GPU, 126 concurrent games, compiled layers | the inference server, busy 97%, and the CPU cores, a median of 9.5 busy, over the allowance | nothing more: the run already went over the allowance | a cheaper engine; self-play that never stops, about 9% measured before the CPU cores limited |
 | 512×16 on the GPU, not trained yet | the GPU's forward pass, about 2,000 states a second as written and 2,700 compiled, in inference batches of about 60 | about twice as much | a cheaper forward pass on the GPU; the engine not at all |
 
 The CPU cores' rates are inferred: the 9 CPU cores of the allowance, less the
@@ -2467,12 +2473,12 @@ inference server's process, divided by the game processes' CPU time per network
 evaluation, against the network evaluations a second measured in training or,
 at 512×16, in replayed forward passes
 ([64×2](../archive/records/one_network_comparison_2026_11_17.md#speed),
-[256×8](../archive/records/compiled_layers_126_games_2026_11_18.md#what-this-does-and-does-not-show),
+[256×8](../archive/records/readout_without_repeat_2026_11_18.md#results),
 [512×16](../archive/records/compiled_forward_2026_11_18.md#speed)).
 
 A cheaper inference server pays until the CPU cores limit. At 256×8 the compiled
 layers made it about a tenth cheaper in the inference batches of steady play
-(below), and it has room in its own work beyond them: in training an inference
+(below), and it had room in its own work beyond them: in training an inference
 batch of 60 states took it about 14.0 ms as written and 12.5 ms compiled, while
 the forward pass alone, replayed from saved inference batches, takes 9.4 ms as
 written and 7.4 ms compiled, and reading the inference requests, replying and the
@@ -2483,8 +2489,11 @@ Most of the remaining 3.6 ms as written, and 4.1 ms compiled, is the GPU's graph
 framework compiling: in a profiled training iteration with the compiled layers,
 compiling graphs took about 23% of the inference server's time, about 2.6 ms of
 an inference batch of 45 states, and the rest of the gap was slower work beside
-the busy game processes (below, fewer graph compiles;
-[record](../archive/records/inference_server_profile_gpu_2026_11_18.md)).
+the busy game processes
+([record](../archive/records/inference_server_profile_gpu_2026_11_18.md)).
+Without the operation that caused most of that compiling, an inference batch of
+steady play took about 23% less time in training, and then the CPU cores
+limited (below, fewer graph compiles).
 Self-play that never stops does not make the inference server cheaper but keeps
 its inference batches full: in a training iteration, fewer games are left to fill
 them as games end, which cost the 126-game run 9.7% of its decisions an hour.
@@ -2505,9 +2514,10 @@ decisions per hour by 26% when inference batches held about 5 states of a
 possible 12, far below the most they can hold (section 9.2). A cheaper engine
 still pays in two ways. The CPU cores it frees can run more concurrent games,
 which fill larger inference batches on the GPU. And once the inference server is
-about a fifth cheaper, the CPU cores limit, and from there each cheaper
-simulation pays in full. On a faster GPU the engine's cost sets how many CPU
-cores keep it busy (below).
+cheap enough, the CPU cores limit, and from there each cheaper simulation pays
+in full: at 256×8 on the GPU that point has come, since the game processes keep
+about 8 to 9 CPU cores busy with 126 concurrent games. On a faster GPU the
+engine's cost sets how many CPU cores keep it busy (below).
 
 **The inference server's levers.** The inference server has three levers, which
 weigh differently on the two devices. Larger inference batches gain little on one
@@ -2623,10 +2633,16 @@ as it stands; which of the others pay, and how much, is open:
   (`_readout` in `studies/campaign/neural.py`, section 6.8), and about a fifth
   the matrix products of the layers that read the actions' vectors
   ([record](../archive/records/inference_server_profile_gpu_2026_11_18.md)).
-  Taking those copies with an index prepared beside the inference batch's other
-  indices, and padding the actions' arrays to fixed lengths as the compiled
-  layers pad the states, would avoid most of the compiling (inferred); neither is
-  built. On one CPU core these operations compile nothing.
+  Since 18 November the readout adds the actions' vectors to their groups one
+  level at a time, with no copies, which gives the same priors, up to float
+  rounding on the GPU. In profiled training iterations an inference batch of
+  steady play then took about 23% less time, compiling fell to about 6% of the
+  inference server's time, all of it the matrix products, and the run played
+  about 29% more decisions an hour while playing
+  ([record](../archive/records/readout_without_repeat_2026_11_18.md)). Padding
+  the actions' arrays to fixed lengths, as the compiled layers pad the states,
+  would avoid most of the rest; it is not built. On one CPU core these
+  operations compile nothing.
 - **Cheaper arithmetic: half precision.** The network computes with numbers of
   32 bits, which keep about 7 significant digits; that is the float rounding of
   section 6.3. *Half-precision* numbers take 16 bits and keep about 3. A forward
@@ -2917,10 +2933,12 @@ measured and what would settle it.
   faster engine plays more decisions an hour only as far as it fills the
   inference server's inference batches (section 9.2). A seventh game process
   would fill them further, which is untested. With the network on the GPU at
-  256×8 the inference server limits too, busy 98% of the time even when 126
-  concurrent games fill its inference batches with 48 states on average, and the
-  CPU cores come close behind
-  ([record](../archive/records/concurrent_games_gpu_2026_11_18.md)). The
+  256×8 and 126 concurrent games the inference server is busy 97% of the time,
+  and since the policy readout stopped making the GPU compile, the run's CPU
+  cores go over the allowance: a median of 9.5 busy with 6 or 7 game processes
+  ([record](../archive/records/readout_without_repeat_2026_11_18.md)). A layout
+  that stays within it is not chosen yet, and the supervisor's count of cores
+  accepts these layouts (Q-005 in `docs/questions.md`). The
   inference server's levers are listed in section 9.3: fewer PyTorch calls came
   with one network, compiling and more concurrent games are settings, and the
   others are not built. In
