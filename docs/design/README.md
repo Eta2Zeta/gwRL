@@ -2476,10 +2476,15 @@ layers made it about a tenth cheaper in the inference batches of steady play
 batch of 60 states took it about 14.0 ms as written and 12.5 ms compiled, while
 the forward pass alone, replayed from saved inference batches, takes 9.4 ms as
 written and 7.4 ms compiled, and reading the inference requests, replying and the
-GPU cache clears took about 1 ms more. The remaining 3.6 ms as written, and
-4.1 ms compiled, are not broken down
+GPU cache clears took about 1 ms more
 ([as written](../archive/records/concurrent_games_gpu_2026_11_18.md#the-inference-servers-time-by-inference-batch-size),
 [compiled](../archive/records/compiled_layers_126_games_2026_11_18.md#results)).
+Most of the remaining 3.6 ms as written, and 4.1 ms compiled, is the GPU's graph
+framework compiling: in a profiled training iteration with the compiled layers,
+compiling graphs took about 23% of the inference server's time, about 2.6 ms of
+an inference batch of 45 states, and the rest of the gap was slower work beside
+the busy game processes (below, fewer graph compiles;
+[record](../archive/records/inference_server_profile_gpu_2026_11_18.md)).
 Self-play that never stops does not make the inference server cheaper but keeps
 its inference batches full: in a training iteration, fewer games are left to fill
 them as games end, which cost the 126-game run 9.7% of its decisions an hour.
@@ -2605,6 +2610,23 @@ as it stands; which of the others pay, and how much, is open:
   PyTorch records a forward pass's PyTorch calls on the GPU once, and each later
   forward pass of the same inference batch size replays the record with a single
   call overhead; it has not been tried.
+- **Fewer graph compiles on the Mac's GPU.** On the Mac's GPU PyTorch runs many
+  operations as graphs of Apple's MPSGraph framework, which compiles a graph
+  once for each shape of an operation's arrays and keeps it until the GPU's
+  caches are released, every 2,048 forward passes and training steps
+  (section 9.2). Some arrays of a forward pass have a row for each legal action
+  of the inference batch, a number that changes with nearly every inference
+  batch, so their operations compile again and again. In a profiled training
+  iteration at 256×8 with 126 concurrent games, compiling took about 23% of the
+  inference server's time; 71% to 79% of that was one `Tensor.repeat`, which
+  copies the actions' vectors once for each level of the hierarchical softmax
+  (`_readout` in `studies/campaign/neural.py`, section 6.8), and about a fifth
+  the matrix products of the layers that read the actions' vectors
+  ([record](../archive/records/inference_server_profile_gpu_2026_11_18.md)).
+  Taking those copies with an index prepared beside the inference batch's other
+  indices, and padding the actions' arrays to fixed lengths as the compiled
+  layers pad the states, would avoid most of the compiling (inferred); neither is
+  built. On one CPU core these operations compile nothing.
 - **Cheaper arithmetic: half precision.** The network computes with numbers of
   32 bits, which keep about 7 significant digits; that is the float rounding of
   section 6.3. *Half-precision* numbers take 16 bits and keep about 3. A forward

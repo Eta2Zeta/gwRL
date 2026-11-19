@@ -1,0 +1,832 @@
+{
+ "record": "inference_server_profile_gpu_2026_11_18.md",
+ "date": "2026-11-18",
+ "code": "9fd0fc6 (the code of c2b1d20), run from a copy of that commit with its compiled engine module (tmp/server-profile-2026-11-18/runtime)",
+ "torch": "2.14.0",
+ "machine": "Apple M4 Max: 14 CPU cores (10 performance, 4 efficiency), 36 GB memory, 32-core GPU",
+ "malloc_nano_zone": "unset in the training process and its game processes",
+ "command": ".venv/bin/python tools/profile_coordinator.py --output OUT/profile.json --profile mac --control-dir OUT/run-control --run-dir OUT/run --seconds 3600 --save-every 400 --sample-at 700,1000 --sample-seconds 20 -- --calendar-rounds 11 --complete-episodes --batches 1 --transitions-per-batch 20000 --simulations 64 --max-depth 16 --hidden-dim 256 --message-layers 8 --batch-size 32 --epochs 525 --replay-capacity 8000 --sample-fraction 0.05 --seed 20261118 --neural-device mps --no-continuous --compiled-forward --episode-workers 7 --games-per-process 18 --parallel-envs 126",
+ "run": {
+  "from": "19:06:44",
+  "to": "19:36:10",
+  "batch": {
+   "playing_seconds": 1723.466328917013,
+   "games": 126,
+   "decisions": 132411,
+   "games_per_hour": 263.19052040026327,
+   "decisions_per_hour": 276581.90473586717,
+   "coordinator_busy": 0.9149208203753253,
+   "evaluator": {
+    "evaluations": 6744959,
+    "forward_seconds": 1576.8352275420038,
+    "idle_seconds": 38.26287999167107,
+    "inference_batches": {
+     "1": [
+      7356,
+      23.12763886252651
+     ],
+     "10": [
+      1139,
+      7.707085034780903
+     ],
+     "100": [
+      40,
+      0.7289084989752155
+     ],
+     "101": [
+      33,
+      0.6208273330121301
+     ],
+     "102": [
+      23,
+      0.3924683760269545
+     ],
+     "103": [
+      28,
+      0.47655608391505666
+     ],
+     "104": [
+      18,
+      0.3147781229636166
+     ],
+     "105": [
+      14,
+      0.241661167005077
+     ],
+     "106": [
+      30,
+      0.5526690831757151
+     ],
+     "107": [
+      11,
+      0.18880750105017796
+     ],
+     "108": [
+      4,
+      0.07413387598353438
+     ],
+     "109": [
+      6,
+      0.1055304590263404
+     ],
+     "11": [
+      860,
+      5.965720073552802
+     ],
+     "110": [
+      5,
+      0.09072808298515156
+     ],
+     "111": [
+      21,
+      0.33698574689333327
+     ],
+     "112": [
+      7,
+      0.12335912403068505
+     ],
+     "113": [
+      6,
+      0.11849816495669074
+     ],
+     "114": [
+      20,
+      0.3548507080995478
+     ],
+     "115": [
+      11,
+      0.19773508294019848
+     ],
+     "116": [
+      8,
+      0.695469207043061
+     ],
+     "117": [
+      11,
+      0.20545046098413877
+     ],
+     "118": [
+      3,
+      0.052770208014408126
+     ],
+     "119": [
+      4,
+      0.07824387503205799
+     ],
+     "12": [
+      910,
+      7.063573437742889
+     ],
+     "120": [
+      6,
+      0.10388779203640297
+     ],
+     "121": [
+      6,
+      0.13627095901756547
+     ],
+     "122": [
+      8,
+      0.1583405819546897
+     ],
+     "123": [
+      6,
+      0.12082783298683353
+     ],
+     "124": [
+      12,
+      0.2593906239781063
+     ],
+     "125": [
+      14,
+      0.6801857110403944
+     ],
+     "126": [
+      41,
+      1.6750422070617788
+     ],
+     "13": [
+      1071,
+      8.362174458772643
+     ],
+     "14": [
+      992,
+      7.988091412291396
+     ],
+     "15": [
+      1053,
+      8.619298642734066
+     ],
+     "16": [
+      893,
+      7.359928250341909
+     ],
+     "17": [
+      744,
+      6.214599911560072
+     ],
+     "18": [
+      819,
+      7.200077874207636
+     ],
+     "19": [
+      773,
+      6.5386306740983855
+     ],
+     "2": [
+      4274,
+      16.47971531676012
+     ],
+     "20": [
+      887,
+      7.707486709288787
+     ],
+     "21": [
+      677,
+      6.315407440793933
+     ],
+     "22": [
+      635,
+      5.824536489817547
+     ],
+     "23": [
+      653,
+      6.233208668651059
+     ],
+     "24": [
+      638,
+      6.0350628621235956
+     ],
+     "25": [
+      758,
+      7.853336499741999
+     ],
+     "26": [
+      722,
+      7.370685084635625
+     ],
+     "27": [
+      695,
+      7.253897002025042
+     ],
+     "28": [
+      704,
+      7.494786961004138
+     ],
+     "29": [
+      776,
+      7.788419238757342
+     ],
+     "3": [
+      2805,
+      12.150651593139628
+     ],
+     "30": [
+      777,
+      9.309324819245376
+     ],
+     "31": [
+      872,
+      9.450791042792844
+     ],
+     "32": [
+      965,
+      10.277645130176097
+     ],
+     "33": [
+      974,
+      10.965397228399524
+     ],
+     "34": [
+      1096,
+      12.252129995438736
+     ],
+     "35": [
+      1102,
+      12.068213046877645
+     ],
+     "36": [
+      1234,
+      13.80375727606588
+     ],
+     "37": [
+      1375,
+      16.148047751223203
+     ],
+     "38": [
+      1362,
+      16.185477104358142
+     ],
+     "39": [
+      1468,
+      17.385043566086097
+     ],
+     "4": [
+      1663,
+      8.6126894527697
+     ],
+     "40": [
+      1535,
+      17.85670562062296
+     ],
+     "41": [
+      1648,
+      18.95704508543713
+     ],
+     "42": [
+      1892,
+      23.01080953257042
+     ],
+     "43": [
+      1943,
+      23.39804813254159
+     ],
+     "44": [
+      1995,
+      23.680476773908595
+     ],
+     "45": [
+      2075,
+      24.908760136459023
+     ],
+     "46": [
+      2188,
+      25.699353871139465
+     ],
+     "47": [
+      2428,
+      28.879988980974304
+     ],
+     "48": [
+      2590,
+      31.271468473918503
+     ],
+     "49": [
+      2687,
+      33.01649892757996
+     ],
+     "5": [
+      1355,
+      7.360220734990435
+     ],
+     "50": [
+      3001,
+      37.7876593589026
+     ],
+     "51": [
+      2980,
+      37.2852150015533
+     ],
+     "52": [
+      3117,
+      40.35687405086355
+     ],
+     "53": [
+      3355,
+      42.48206331420806
+     ],
+     "54": [
+      3258,
+      40.652214747533435
+     ],
+     "55": [
+      3456,
+      43.65779609861784
+     ],
+     "56": [
+      3641,
+      45.88195344325504
+     ],
+     "57": [
+      3628,
+      46.05627849121811
+     ],
+     "58": [
+      3614,
+      46.76192359733977
+     ],
+     "59": [
+      3508,
+      45.109348527068505
+     ],
+     "6": [
+      1128,
+      6.618312570644775
+     ],
+     "60": [
+      3725,
+      47.244998569600284
+     ],
+     "61": [
+      3526,
+      45.051114532892825
+     ],
+     "62": [
+      3268,
+      42.8772303359292
+     ],
+     "63": [
+      3051,
+      38.304649543832056
+     ],
+     "64": [
+      3068,
+      39.04489445310901
+     ],
+     "65": [
+      3091,
+      42.826320554479025
+     ],
+     "66": [
+      2951,
+      39.92235579181579
+     ],
+     "67": [
+      2600,
+      34.87463163866778
+     ],
+     "68": [
+      2471,
+      34.27857760421466
+     ],
+     "69": [
+      2271,
+      31.59492321871221
+     ],
+     "7": [
+      1006,
+      6.833320537349209
+     ],
+     "70": [
+      2131,
+      29.75527149354457
+     ],
+     "71": [
+      1900,
+      26.509396807698067
+     ],
+     "72": [
+      1614,
+      22.335301243001595
+     ],
+     "73": [
+      1452,
+      20.20078833118896
+     ],
+     "74": [
+      1287,
+      19.091693936410593
+     ],
+     "75": [
+      1094,
+      15.353985969064524
+     ],
+     "76": [
+      1114,
+      15.905177716049366
+     ],
+     "77": [
+      843,
+      12.414029122213833
+     ],
+     "78": [
+      697,
+      10.517427450162359
+     ],
+     "79": [
+      599,
+      8.774613206944196
+     ],
+     "8": [
+      993,
+      6.647933707776247
+     ],
+     "80": [
+      530,
+      7.611139583197655
+     ],
+     "81": [
+      439,
+      6.990019452874549
+     ],
+     "82": [
+      342,
+      5.249779824691359
+     ],
+     "83": [
+      373,
+      5.664037509297486
+     ],
+     "84": [
+      263,
+      4.034561540087452
+     ],
+     "85": [
+      249,
+      3.84472787429695
+     ],
+     "86": [
+      185,
+      2.867322047939524
+     ],
+     "87": [
+      159,
+      2.47660699399421
+     ],
+     "88": [
+      147,
+      2.2699443251185585
+     ],
+     "89": [
+      137,
+      2.1733624161279295
+     ],
+     "9": [
+      970,
+      6.392347373941448
+     ],
+     "90": [
+      85,
+      1.3431845410377719
+     ],
+     "91": [
+      113,
+      1.7394855399033986
+     ],
+     "92": [
+      80,
+      1.3214420820004307
+     ],
+     "93": [
+      79,
+      1.327973462146474
+     ],
+     "94": [
+      58,
+      1.0293941237905528
+     ],
+     "95": [
+      48,
+      0.8618277500499971
+     ],
+     "96": [
+      52,
+      0.8307832049904391
+     ],
+     "97": [
+      52,
+      0.9276977929403074
+     ],
+     "98": [
+      34,
+      0.5955768318672199
+     ],
+     "99": [
+      33,
+      0.6123955029179342
+     ]
+    },
+    "network_passes": 150320,
+    "serving_rounds": 150320
+   }
+  },
+  "peak_rss_bytes": 12895974000,
+  "device_runtime": {
+   "checkpoint_scope": "Derived process-local cache state; counters reset on fresh construction and pending count resets after restore",
+   "clear_every_actor_forwards": 2048,
+   "clear_seconds": 30.50389016000554,
+   "clears": 75,
+   "device": "mps",
+   "pending_actor_forwards": 0,
+   "resets": 2,
+   "schema": "campaign-mps-graph-cache-policy-v1",
+   "torch": "2.14.0",
+   "total_actor_forwards": 150845
+  }
+ },
+ "inference_server": {
+  "serve_wall_seconds": 1722.0834254999936,
+  "serve_thread_cpu_seconds": 1061.5456299999998,
+  "inference_batches": 150320,
+  "states_per_inference_batch": 44.87,
+  "seconds": {
+   "waiting": 38.26287999167107,
+   "receiving": 43.95288758139941,
+   "reading": 33.34758362386492,
+   "packing": 169.76121835238882,
+   "forward": 718.1349347680807,
+   "collecting": 610.4166122252354,
+   "replying": 48.19829365066835,
+   "other": 45.174878572433954
+  },
+  "share_of_serving": {
+   "waiting": 0.0222,
+   "receiving": 0.0255,
+   "reading": 0.0194,
+   "packing": 0.0986,
+   "forward": 0.417,
+   "collecting": 0.3545,
+   "replying": 0.028,
+   "other": 0.0262
+  },
+  "milliseconds_per_inference_batch": {
+   "waiting": 0.255,
+   "receiving": 0.292,
+   "reading": 0.222,
+   "packing": 1.129,
+   "forward": 4.777,
+   "collecting": 4.061,
+   "replying": 0.321,
+   "other": 0.301
+  }
+ },
+ "replays_of_the_saved_inference_batches": {
+  "replay-compiled": {
+   "rounds": 375,
+   "positions_per_round": 45.4,
+   "warm_up_seconds": 10.87836433298071,
+   "pass_seconds": [
+    2.5428954634116963,
+    2.5068941139033996,
+    2.5020593312510755
+   ],
+   "best_us_per_round": 6672.158216669535,
+   "median_round_us": 7248.9580197725445,
+   "steps_us_per_round": {
+    "reading": 170.7068399215738,
+    "laying_out": 835.9184560055534,
+    "making_calls": 2030.1183476888887,
+    "collecting": 3524.8617560137063,
+    "rest": 110.55281703981261
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 2968.5254028630347,
+     "per_position": 81.57781528208149
+    },
+    "making_calls": {
+     "fixed": 1958.260579489269,
+     "per_position": 1.5827702246612185
+    }
+   },
+   "compiled": true,
+   "networks": "one"
+  },
+  "replay-compiled-logged": {
+   "rounds": 375,
+   "positions_per_round": 45.4,
+   "warm_up_seconds": 10.274643416982144,
+   "pass_seconds": [
+    2.506014034472173,
+    2.403183127345983,
+    2.4010466281324625,
+    2.586647282791091,
+    2.435864370141644,
+    2.4276872442569584,
+    2.4128982827533036,
+    2.4268112910795026,
+    2.441824580717366,
+    2.481408535997616,
+    2.6466983358259313,
+    2.4683881207893137
+   ],
+   "best_us_per_round": 6402.791008353233,
+   "median_round_us": 7066.33401568979,
+   "steps_us_per_round": {
+    "reading": 156.54564532451332,
+    "laying_out": 709.277540910989,
+    "making_calls": 1757.0192615967244,
+    "collecting": 3702.499479909117,
+    "rest": 77.44908061188956
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 2783.0184815734656,
+     "per_position": 79.73067239603013
+    },
+    "making_calls": {
+     "fixed": 1680.7462237942689,
+     "per_position": 1.6800228590849224
+    }
+   },
+   "compiled": true,
+   "networks": "one"
+  },
+  "replay-written": {
+   "rounds": 375,
+   "positions_per_round": 45.4,
+   "warm_up_seconds": 3.5047928749991115,
+   "pass_seconds": [
+    3.0369498830405064,
+    3.085182875627652
+   ],
+   "best_us_per_round": 8098.53302144135,
+   "median_round_us": 8736.084011616185,
+   "steps_us_per_round": {
+    "reading": 153.7491891067475,
+    "laying_out": 758.7154561188072,
+    "making_calls": 2027.05278658929,
+    "collecting": 5074.356567580253,
+    "rest": 84.65902204625309
+   },
+   "fit_us": {
+    "round": {
+     "fixed": 3596.863580012385,
+     "per_position": 99.15571456891996
+    },
+    "making_calls": {
+     "fixed": 2369.284883646557,
+     "per_position": -7.538151917560949
+    }
+   },
+   "compiled": false,
+   "networks": "one"
+  }
+ },
+ "replay_process_performance_cores": {
+  "instructions_per_cycle": 3.23,
+  "gigahertz": 4.17,
+  "note": "replay-compiled-logged, from tools/log_process_load.py's per-process counters"
+ },
+ "native_samples_of_the_serving_thread": {
+  "700_seconds": {
+   "thread_and_markers": [
+    "thread 5222792: 13071 samples",
+    "marker 'mlir::': 2580 samples, 19.7%",
+    "marker 'MPSGraph': 3736 samples, 28.6%",
+    "marker 'commonPreInitWithDescriptor': 659 samples, 5.0%",
+    "marker 'waitUntilCompleted': 4013 samples, 30.7%",
+    "marker 'THPVariable': 9211 samples, 70.5%"
+   ],
+   "compile_triggers": [
+    "compile samples: 2935",
+    "    1600  54.5%  at::native::repeat_mps",
+    "     634  21.6%  at::native::mps::make_mps_graph",
+    "     351  12.0%  at::native::structured_mm_out_mps::impl",
+    "     145   4.9%  at::native::structured_bmm_out_mps::impl",
+    "     126   4.3%  at::native::structured_addmm_out_mps::impl",
+    "      79   2.7%  std::__function::__func<at::native::repeat_mps",
+    "by Python binding:",
+    "    2304  78.5%  torch::autograd::THPVariable_repeat",
+    "     356  12.1%  torch::autograd::THPVariable_mm",
+    "     145   4.9%  torch::autograd::THPVariable_bmm",
+    "     130   4.4%  torch::autograd::THPVariable_addmm"
+   ]
+  },
+  "1000_seconds": {
+   "thread_and_markers": [
+    "thread 5222792: 13326 samples",
+    "marker 'mlir::': 2782 samples, 20.9%",
+    "marker 'MPSGraph': 4110 samples, 30.8%",
+    "marker 'commonPreInitWithDescriptor': 686 samples, 5.1%",
+    "marker 'waitUntilCompleted': 3925 samples, 29.5%",
+    "marker 'THPVariable': 9040 samples, 67.8%"
+   ],
+   "compile_triggers": [
+    "compile samples: 3142",
+    "    1590  50.6%  at::native::repeat_mps",
+    "     633  20.1%  at::native::mps::make_mps_graph",
+    "     360  11.5%  at::native::structured_mm_out_mps::impl",
+    "     219   7.0%  at::native::mps::MPSUnaryCachedGraph::~MPSUnaryCachedGraph",
+    "     142   4.5%  at::native::structured_bmm_out_mps::impl",
+    "     128   4.1%  at::native::structured_addmm_out_mps::impl",
+    "      60   1.9%  std::__function::__func<at::native::repeat_mps",
+    "       5   0.2%  at::native::mps::MPSBinaryCachedGraph::~MPSBinaryCachedGraph",
+    "       3   0.1%  at::native::mps::addmm_out_mps_impl",
+    "       1   0.0%  at::native::mps::",
+    "       1   0.0%  std::__function::__func<at::native::mps::addmm_out_mps_impl",
+    "by Python binding:",
+    "    2243  71.4%  torch::autograd::THPVariable_repeat",
+    "     389  12.4%  torch::autograd::THPVariable_mm",
+    "     227   7.2%  ?",
+    "     142   4.5%  torch::autograd::THPVariable_bmm",
+    "     141   4.5%  torch::autograd::THPVariable_addmm"
+   ]
+  }
+ },
+ "load": {
+  "seconds_with_game_processes": 1711.2,
+  "batch_cores": {
+   "mean_window": 7.12,
+   "median_window": 7.74,
+   "highest_window": 9.54
+  },
+  "other_work_cores": {
+   "mean_window": 1.06,
+   "median_window": 0.79
+  },
+  "processes": {
+   "rest of the tree": {
+    "processes": 5,
+    "cpu_seconds": 14.6,
+    "performance_core_share": 0.973,
+    "waiting_for_a_core_seconds": 1.3,
+    "waiting_per_cpu_second": 0.09,
+    "instructions": 147767302947,
+    "cycles": 55697337546,
+    "instructions_per_cycle": {
+     "performance": 2.68,
+     "efficiency": 1.24
+    },
+    "gigahertz": {
+     "performance": 3.84,
+     "efficiency": 2.58
+    },
+    "efficiency_second_vs_performance_second": 0.311,
+    "performance_core_equivalent_cpu_seconds": 14.4,
+    "cpu_seconds_by_qos": {
+     "default": 9.6,
+     "legacy": 5.1
+    }
+   },
+   "coordinator": {
+    "processes": 1,
+    "cpu_seconds": 1137.9,
+    "performance_core_share": 0.965,
+    "waiting_for_a_core_seconds": 140.0,
+    "waiting_per_cpu_second": 0.123,
+    "instructions": 9877066917412,
+    "cycles": 4350831631749,
+    "instructions_per_cycle": {
+     "performance": 2.3,
+     "efficiency": 1.08
+    },
+    "gigahertz": {
+     "performance": 3.87,
+     "efficiency": 2.58
+    },
+    "efficiency_second_vs_performance_second": 0.314,
+    "performance_core_equivalent_cpu_seconds": 1110.7,
+    "cpu_seconds_by_qos": {
+     "legacy": 1137.9
+    }
+   },
+   "game processes": {
+    "processes": 7,
+    "cpu_seconds": 11033.0,
+    "performance_core_share": 0.817,
+    "waiting_for_a_core_seconds": 13386.5,
+    "waiting_per_cpu_second": 1.213,
+    "instructions": 91716785808599,
+    "cycles": 39709869321523,
+    "instructions_per_cycle": {
+     "performance": 2.43,
+     "efficiency": 1.53
+    },
+    "gigahertz": {
+     "performance": 3.83,
+     "efficiency": 2.58
+    },
+    "efficiency_second_vs_performance_second": 0.423,
+    "performance_core_equivalent_cpu_seconds": 9866.3,
+    "cpu_seconds_by_qos": {
+     "legacy": 11033.0
+    }
+   }
+  }
+ },
+ "scripts": {
+  "thread_tree.py": "\"\"\"Summarize one thread of a macOS `sample` call graph.\n\nUsage: thread_tree.py SAMPLE.txt THREAD_ID [MARKER ...]\nPrints the thread's samples, its self samples by function (top 40), and for each\nmarker substring the samples of the outermost frames whose names contain it.\n\"\"\"\nimport re\nimport sys\nfrom collections import Counter\n\npath, thread = sys.argv[1], sys.argv[2]\nmarkers = sys.argv[3:]\nlines = open(path, errors=\"replace\").read().splitlines()\nstart = next(i for i, line in enumerate(lines) if f\"Thread_{thread}\" in line and re.match(r\"\\s+\\d+ Thread_\", line))\nindent = len(lines[start]) - len(lines[start].lstrip())\nend = next((i for i in range(start + 1, len(lines))\n            if re.match(r\"\\s{%d}\\d+ Thread_\" % indent, lines[i]) or not lines[i].strip()), len(lines))\nentry = re.compile(r\"^([\\s+!:|]*)(\\d+) (.*)$\")\nnodes = []  # (depth, count, name)\nfor line in lines[start + 1:end]:\n    matched = entry.match(line)\n    if matched:\n        nodes.append((len(matched.group(1)), int(matched.group(2)), matched.group(3)))\ntotal = int(entry.match(lines[start]).group(2))\nprint(f\"thread {thread}: {total} samples\")\n\n\ndef short(name: str) -> str:\n    name = re.sub(r\"\\s+\\[0x[0-9a-f,]+\\]$\", \"\", name)\n    name = re.sub(r\"\\s+\\+ \\d+(,\\d+)*$\", \"\", name)\n    return name[:150]\n\n\nself_counts = Counter()\nfor index, (depth, count, name) in enumerate(nodes):\n    children = 0\n    for later in nodes[index + 1:]:\n        if later[0] <= depth:\n            break\n        if later[0] == min(n[0] for n in nodes[index + 1:index + 2]) and later[0] > depth:\n            pass\n    # Children are the following nodes at the next deeper depth before returning to this depth.\n    child_depth = None\n    for later in nodes[index + 1:]:\n        if later[0] <= depth:\n            break\n        if child_depth is None:\n            child_depth = later[0]\n        if later[0] == child_depth:\n            children += later[1]\n    self_counts[short(name)] += count - children\nprint(\"self samples by function:\")\nfor name, count in self_counts.most_common(40):\n    print(f\"  {count:6d} {count / total:6.1%}  {name}\")\nfor marker in markers:\n    outermost, inside_depth = 0, None\n    for depth, count, name in nodes:\n        if inside_depth is not None and depth <= inside_depth:\n            inside_depth = None\n        if inside_depth is None and marker in name:\n            outermost += count\n            inside_depth = depth\n    print(f\"marker {marker!r}: {outermost} samples, {outermost / total:.1%}\")\n",
+  "compile_ops.py": "\"\"\"Which PyTorch operations lead to MPSGraph compiling, in one thread of a `sample` call graph.\n\nUsage: compile_ops.py SAMPLE.txt THREAD_ID\nFor every outermost frame containing 'mlir::' or 'commonPreInitWithDescriptor', it\ncounts the samples under the nearest enclosing frame naming an at::native or\nat::_ops operation, and the nearest enclosing Python-level PyTorch binding.\n\"\"\"\nimport re\nimport sys\nfrom collections import Counter\n\npath, thread = sys.argv[1], sys.argv[2]\nlines = open(path, errors=\"replace\").read().splitlines()\nstart = next(i for i, line in enumerate(lines) if f\"Thread_{thread}\" in line and re.match(r\"\\s+\\d+ Thread_\", line))\nindent = len(lines[start]) - len(lines[start].lstrip())\nend = next((i for i in range(start + 1, len(lines))\n            if re.match(r\"\\s{%d}\\d+ Thread_\" % indent, lines[i]) or not lines[i].strip()), len(lines))\nentry = re.compile(r\"^([\\s+!:|]*)(\\d+) (.*)$\")\nstack: list[tuple[int, str]] = []\nby_op, by_binding = Counter(), Counter()\ninside = None\nfor line in lines[start + 1:end]:\n    matched = entry.match(line)\n    if not matched:\n        continue\n    depth, count, name = len(matched.group(1)), int(matched.group(2)), matched.group(3)\n    while stack and stack[-1][0] >= depth:\n        stack.pop()\n    if inside is not None and depth <= inside:\n        inside = None\n    if inside is None and (\"mlir::\" in name or \"commonPreInitWithDescriptor\" in name):\n        inside = depth\n        op = next((frame for _, frame in reversed(stack) if \"at::native::\" in frame or \"at::_ops::\" in frame), \"?\")\n        binding = next((frame for _, frame in reversed(stack) if \"THPVariable_\" in frame or \"torch::autograd::\" in frame\n                        or \"THPModule\" in frame), \"?\")\n        by_op[re.sub(r\"\\(.*\", \"\", op.split(\"  (in\")[0])[:110]] += count\n        by_binding[re.sub(r\"\\(.*\", \"\", binding.split(\"  (in\")[0])[:110]] += count\n    stack.append((depth, name))\ntotal = sum(by_op.values())\nprint(f\"compile samples: {total}\")\nfor name, count in by_op.most_common(25):\n    print(f\"  {count:6d} {count / total:6.1%}  {name}\")\nprint(\"by Python binding:\")\nfor name, count in by_binding.most_common(15):\n    print(f\"  {count:6d} {count / total:6.1%}  {name}\")\n"
+ }
+}
