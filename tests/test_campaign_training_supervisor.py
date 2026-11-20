@@ -7,6 +7,7 @@ import errno
 import json
 import os
 from pathlib import Path
+import re
 import signal
 import struct
 import subprocess
@@ -17,8 +18,8 @@ from unittest.mock import Mock, patch
 
 from tools.supervise_campaign_training import (
     KILL, PROFILE_SCHEMA, SupervisorConfig, aggregate_rss, exclusive_lock, keep_awake, load_profile, main,
-    profile_arguments, supervise, training_command, validate_training_arguments, process_group_alive,
-    process_memory_charge, _darwin_physical_footprint, monitor_error_details,
+    machine_memory, profile_arguments, supervise, training_command, validate_training_arguments,
+    process_group_alive, process_memory_charge, _darwin_physical_footprint, monitor_error_details,
 )
 
 
@@ -51,8 +52,24 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
         return command
 
     def run_supervisor(self, body, **kwargs):
+        # The whole machine's memory is not watched unless a test gives its samples.
+        kwargs.setdefault("machine_sampler", lambda: None)
         return supervise(self.control, self.run, self.config, ARGUMENTS,
                          command_factory=self.factory(body), rss_sampler=lambda _pid: 1_000_000, **kwargs)
+
+    def saving_worker(self):
+        """A worker that writes `ready`, then saves a checkpoint and exits when asked to stop."""
+        return self.factory("def stop(number, frame):\n"
+                            "    (run / 'checkpoint.pt').write_text('safe')\n"
+                            "    (run / 'manifest.json').write_text(json.dumps({'status':'interrupted'}))\n"
+                            "    sys.exit(130)\n"
+                            f"for number in {STOP_SIGNALS}: signal.signal(number, stop)\n"
+                            "(run / 'ready').write_text('ready')\n"
+                            "while True: time.sleep(0.01)\n")
+
+    def supervise_machine(self, factory, machine_sampler):
+        return supervise(self.control, self.run, self.config, ARGUMENTS, command_factory=factory,
+                         rss_sampler=lambda _pid: 1_000_000, machine_sampler=machine_sampler)
 
     def test_completion_is_durable_and_does_not_launch_again(self):
         state = self.run_supervisor("(run / 'manifest.json').write_text(json.dumps({'status':'completed'}))\n")
@@ -208,6 +225,83 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
         self.assertEqual(state["status"], "memory_limit")
         self.assertTrue(state["attempts"][0]["forced_kill"])
         self.assertEqual(state["attempts"][0]["returncode"], KILLED)
+
+    def test_critical_machine_memory_pressure_that_lasts_requests_a_safe_stop(self):
+        def machine():
+            ready = (self.run / "ready").exists()
+            return {"pressure_level": 4 if ready else 1, "swap_used_bytes": 5_000_000_000}
+        with patch("tools.supervise_campaign_training.CRITICAL_PRESSURE_SECONDS", 0.1):
+            state = self.supervise_machine(self.saving_worker(), machine)
+        self.assertEqual(state["status"], "machine_memory_short")
+        self.assertTrue((self.run / "checkpoint.pt").exists())
+        self.assertNotIn("forced_kill", state["attempts"][0])
+        stop = next(event for event in state["events"] if event["kind"] == "graceful_stop_requested")
+        self.assertEqual((stop["reason"], stop["cause"], stop["pressure"], stop["swap_growth_bytes"]),
+                         ("machine_memory_short", "critical_pressure", "critical", 0))
+
+    def test_swap_that_grows_four_gb_during_the_attempt_requests_a_safe_stop(self):
+        def machine():
+            ready = (self.run / "ready").exists()
+            return {"pressure_level": 2, "swap_used_bytes": 9_000_000_000 if ready else 5_000_000_000}
+        state = self.supervise_machine(self.saving_worker(), machine)
+        self.assertEqual(state["status"], "machine_memory_short")
+        self.assertTrue((self.run / "checkpoint.pt").exists())
+        stop = next(event for event in state["events"] if event["kind"] == "graceful_stop_requested")
+        self.assertEqual((stop["cause"], stop["pressure"], stop["swap_used_bytes"], stop["swap_growth_bytes"]),
+                         ("swap_growth", "warning", 9_000_000_000, 4_000_000_000))
+        self.assertEqual((state["attempts"][0]["swap_at_start_bytes"], state["attempts"][0]["peak_swap_growth_bytes"]),
+                         (5_000_000_000, 4_000_000_000))
+
+    def test_brief_critical_pressure_and_smaller_swap_growth_let_the_run_finish(self):
+        samples = []
+
+        def machine():
+            ready = (self.run / "ready").exists()
+            samples.extend([None] if ready else [])
+            return {"pressure_level": 4 if len(samples) == 1 else 1,
+                    "swap_used_bytes": 8_900_000_000 if ready else 5_000_000_000}
+        body = ("(run / 'ready').write_text('ready')\n"
+                "time.sleep(0.5)\n"
+                "(run / 'manifest.json').write_text(json.dumps({'status':'completed'}))\n")
+        with patch("tools.supervise_campaign_training.CRITICAL_PRESSURE_SECONDS", 0.1):
+            state = self.supervise_machine(self.factory(body), machine)
+        self.assertEqual(state["status"], "completed")
+        self.assertGreater(len(samples), 2)
+        self.assertEqual(state["attempts"][0]["peak_swap_growth_bytes"], 3_900_000_000)
+        self.assertEqual(state["machine_memory"]["pressure"], "normal")
+
+    def test_a_failed_machine_memory_sample_stops_the_run_safely(self):
+        def machine():
+            if (self.run / "ready").exists():
+                raise OSError(errno.EIO, "Cannot read macOS vm.swapusage")
+            return {"pressure_level": 1, "swap_used_bytes": 0}
+        state = self.supervise_machine(self.saving_worker(), machine)
+        self.assertEqual(state["status"], "memory_monitor_failure")
+        self.assertTrue((self.run / "checkpoint.pt").exists())
+        event = next(value for value in state["events"] if value["kind"] == "memory_monitor_error")
+        self.assertEqual((event["phase"], event["operation"], event["errno"]),
+                         ("machine", "machine_memory_sample", errno.EIO))
+
+    def test_machine_memory_is_not_watched_off_macos(self):
+        with patch("tools.supervise_campaign_training.sys.platform", "linux"):
+            self.assertIsNone(machine_memory())
+        state = self.run_supervisor("(run / 'manifest.json').write_text(json.dumps({'status':'completed'}))\n")
+        self.assertEqual(state["status"], "completed")
+        self.assertNotIn("swap_at_start_bytes", state["attempts"][0])
+        self.assertNotIn("machine_memory", state)
+
+    @unittest.skipUnless(sys.platform == "darwin", "macOS system values")
+    def test_machine_memory_reads_the_values_sysctl_prints(self):
+        def printed():
+            lines = subprocess.run(["sysctl", "-n", "kern.memorystatus_vm_pressure_level", "vm.swapusage"],
+                                   capture_output=True, text=True, check=True, timeout=5).stdout.splitlines()
+            return int(lines[0]), float(re.search(r"used = ([0-9.]+)M", lines[1]).group(1)) * 2**20
+        before = printed()
+        value = machine_memory()
+        after = printed()
+        self.assertIn(value["pressure_level"], {before[0], after[0]})
+        self.assertIn(value["pressure_level"], (1, 2, 4))
+        self.assertLess(abs(value["swap_used_bytes"] - before[1]), 512 * 2**20)
 
     def test_checkpoint_adoption_is_explicit_and_still_resumes_that_checkpoint(self):
         self.run.mkdir()

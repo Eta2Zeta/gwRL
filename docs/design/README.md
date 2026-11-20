@@ -2919,8 +2919,14 @@ macOS reported warning-level memory pressure nearly throughout, swap grew by
 252 (inferred); together with another program's workers, the same layout
 filled the Mac's memory
 ([record](../archive/records/concurrent_games_cpp_search_2026_11_19.md#the-378-game-runs)).
-The supervisor watches only the run's own memory (Q-011 in
-`docs/questions.md`). Besides the replay buffer, the learner keeps the events of
+So on macOS the supervisor watches the memory of the whole Mac as well as the
+run's own: it asks the run to stop safely when macOS's memory pressure stays
+critical for 10 seconds or when the swap in use grows by 4 GB above its level
+when the training process started (`machine_memory` and `supervise` in
+`tools/supervise_campaign_training.py`;
+[long unattended runs](../../studies/campaign/README.md#long-unattended-runs)).
+A run within its 30 GB can then be stopped because of other programs, and the
+supervisor's status file says so. Besides the replay buffer, the learner keeps the events of
 the current training iteration's games, which its progress report reads
 (`action_history` in `studies/campaign/learning.py`, cleared by `train` in
 `studies/campaign/run.py`); kept for every game, at about 2 MB a game, they

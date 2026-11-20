@@ -7,6 +7,14 @@ each short execution lease the supervisor atomically charges that lease, so a
 crash cannot reset the budget. This conservatively overcounts a final partial
 lease by at most one polling interval. It never treats unfinished games as done.
 
+It asks the run to stop safely when the run's processes come within 1 GB of
+the memory allowance, and kills it at the allowance. On macOS it also asks the
+run to stop safely when the whole Mac runs short of memory, whatever program
+uses it: when the memory pressure stays critical for CRITICAL_PRESSURE_SECONDS,
+or when the swap in use grows SWAP_GROWTH_BYTES above its level when the attempt
+started. The status is then machine_memory_short, and the stop's event in
+state.json gives the cause, the pressure and the swap.
+
 Example (run from the repository root)::
 
     .venv/bin/python tools/supervise_campaign_training.py \
@@ -64,6 +72,14 @@ SCHEMA = "campaign-training-supervisor-v1"
 PROFILES = ROOT / "studies/campaign/profiles"
 PROFILE_SCHEMA = "campaign-machine-profile-v1"
 MEMORY_MARGIN_BYTES = 1_000_000_000
+# The run shares the Mac's memory with every other program. On macOS a run also
+# stops safely when the memory pressure stays critical this long, or when the
+# swap in use grows this much above its level when the attempt started.
+CRITICAL_PRESSURE_SECONDS = 10.0
+SWAP_GROWTH_BYTES = 4_000_000_000
+# kern.memorystatus_vm_pressure_level reports 1 (normal), 2 (warning) or 4 (critical).
+CRITICAL_PRESSURE_LEVEL = 4
+PRESSURE_LEVELS = {1: "normal", 2: "warning", 4: "critical"}
 # The owner's allowance: 9 cores, since the Mac's M4 Max has 10 performance
 # cores and one stays free for everything else. --all-cores passes it.
 CORE_ALLOWANCE = 9
@@ -184,6 +200,38 @@ def process_memory_charge(pid: int, resident_bytes: int) -> int:
             if error.errno not in (errno.EPERM, errno.ESRCH) or attempt == 2:
                 raise
             time.sleep(0.02)
+
+
+@lru_cache(maxsize=1)
+def _darwin_sysctl_function():
+    try:
+        library = ctypes.CDLL("/usr/lib/libc.dylib", use_errno=True)
+        function = library.sysctlbyname
+    except (OSError, AttributeError) as error:
+        raise OSError("macOS system values are unavailable") from error
+    function.argtypes = [ctypes.c_char_p, ctypes.c_void_p, ctypes.POINTER(ctypes.c_size_t), ctypes.c_void_p,
+                         ctypes.c_size_t]
+    function.restype = ctypes.c_int
+    return function
+
+
+def _darwin_sysctl(name: str, size: int) -> bytes:
+    buffer, length = ctypes.create_string_buffer(size), ctypes.c_size_t(size)
+    ctypes.set_errno(0)
+    if _darwin_sysctl_function()(name.encode(), buffer, ctypes.byref(length), None, 0) != 0 or length.value != size:
+        number = ctypes.get_errno() or errno.EIO
+        raise OSError(number, f"Cannot read macOS {name}")
+    return buffer.raw
+
+
+def machine_memory() -> dict | None:
+    """The whole Mac's memory pressure level and swap in use; None on systems where they are not watched."""
+    if sys.platform != "darwin":
+        return None
+    level, = struct.unpack("=i", _darwin_sysctl("kern.memorystatus_vm_pressure_level", 4))
+    # struct xsw_usage: total, available and used bytes, page size, encryption.
+    _total, _available, used, _page, _encrypted = struct.unpack("=QQQIi", _darwin_sysctl("vm.swapusage", 32))
+    return {"pressure_level": level, "swap_used_bytes": used}
 
 
 @dataclass(frozen=True)
@@ -421,8 +469,9 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
               adopt_checkpoint: bool = False,
               working_directory: Path = ROOT,
               profile: str | None = None, unset_environment: tuple[str, ...] = (),
-              command_factory=training_command, rss_sampler=aggregate_rss) -> dict:
-    """Run/restart the same job. Injectable child construction supports tiny tests."""
+              command_factory=training_command, rss_sampler=aggregate_rss,
+              machine_sampler=machine_memory) -> dict:
+    """Run/restart the same job. Injectable child construction and samplers support tiny tests."""
     control_dir, run_dir, working_directory = control_dir.resolve(), run_dir.resolve(), working_directory.resolve()
     if control_dir == run_dir or control_dir.is_relative_to(run_dir):
         raise ValueError("Control directory must be outside the runner's output directory")
@@ -463,6 +512,10 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                      "memory_scope": "Supervisor and complete child process tree; " + memory_metric()
                                      + "; 1 GB safety margin, not a kernel allocation cap"}
             _event(state, "supervisor_initialized")
+        state["machine_memory_scope"] = (
+            "The whole machine's memory pressure and swap in use, on macOS only; a safe stop when the pressure stays "
+            f"critical for {CRITICAL_PRESSURE_SECONDS:g} s or swap in use grows {SWAP_GROWTH_BYTES / 1e9:g} GB above "
+            "its level when the attempt started")
         if extension is not None:
             _event(state, "explicit_episode_budget_extension", new_limit=extension)
         if resume_previous:
@@ -513,6 +566,11 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                 stdout_path, stderr_path = control_dir / f"attempt-{attempt:03d}.stdout.log", control_dir / f"attempt-{attempt:03d}.stderr.log"
                 record = {"number": attempt, "command": command, "resume": str(resume) if resume else None,
                           "stdout": stdout_path.name, "stderr": stderr_path.name}
+                # The swap in use before this attempt's child allocates anything.
+                machine = machine_sampler()
+                swap_at_start = None if machine is None else machine["swap_used_bytes"]
+                if swap_at_start is not None:
+                    record.update(swap_at_start_bytes=swap_at_start, peak_swap_growth_bytes=0)
                 state["attempts"].append(record)
                 state["status"] = "starting"
                 persist()  # Charge a lease before launching any child compute.
@@ -532,6 +590,7 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                     persist()
                     stop_reason = None
                     stopping_at = None
+                    critical_since = None
                     while process.poll() is None:
                         now = time.monotonic()
                         # Keep monitoring while safe shutdown is pending: a
@@ -547,6 +606,34 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                                 stop_reason = "memory_monitor_failure"
                                 stopping_at = now
                                 _send(process, signal.SIGTERM)
+                        # The whole Mac's memory: other programs count as much as the run.
+                        shortage = None
+                        if swap_at_start is not None:
+                            try:
+                                machine = machine_sampler()
+                            except (OSError, ValueError) as error:
+                                machine = None
+                                _event(state, "memory_monitor_error", phase="machine",
+                                       **monitor_error_details(error, "machine_memory_sample", root_pid=process.pid))
+                                if process.poll() is None and stop_reason is None:
+                                    stop_reason = "memory_monitor_failure"
+                                    stopping_at = now
+                                    _send(process, signal.SIGTERM)
+                            if machine is not None:
+                                level = machine["pressure_level"]
+                                growth = machine["swap_used_bytes"] - swap_at_start
+                                if level < CRITICAL_PRESSURE_LEVEL:
+                                    critical_since = None
+                                elif critical_since is None:
+                                    critical_since = now
+                                record["peak_swap_growth_bytes"] = max(record["peak_swap_growth_bytes"], growth)
+                                state["machine_memory"] = {"pressure": PRESSURE_LEVELS.get(level, str(level)),
+                                                           "swap_used_bytes": machine["swap_used_bytes"],
+                                                           "swap_growth_bytes": growth}
+                                if critical_since is not None and now - critical_since >= CRITICAL_PRESSURE_SECONDS:
+                                    shortage = "critical_pressure"
+                                elif growth >= SWAP_GROWTH_BYTES:
+                                    shortage = "swap_growth"
                         if resident is not None and resident >= config.memory_bytes:
                             stop_reason = "memory_limit"
                             _event(state, "forced_stop", reason=stop_reason, resident_bytes=resident)
@@ -560,10 +647,15 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                                 stop_reason = "time_budget_exhausted"
                             if resident is not None and resident >= config.memory_bytes - MEMORY_MARGIN_BYTES:
                                 stop_reason = "memory_limit"
+                            elif stop_reason is None and shortage:
+                                stop_reason = "machine_memory_short"
                             if stop_reason:
                                 stopping_at = now
                                 state["status"] = "stopping"
-                                _event(state, "graceful_stop_requested", reason=stop_reason, signal=requested_stop)
+                                details = ({"cause": shortage, **state["machine_memory"]}
+                                           if stop_reason == "machine_memory_short" else {})
+                                _event(state, "graceful_stop_requested", reason=stop_reason, signal=requested_stop,
+                                       **details)
                                 _send(process, signal.SIGTERM)
                         elif now >= min(deadline, stopping_at + config.shutdown_seconds):
                             _event(state, "forced_stop", reason=stop_reason)

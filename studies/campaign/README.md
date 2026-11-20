@@ -160,6 +160,24 @@ its own core within the owner's allowance of nine cores (`CORE_ALLOWANCE`): the
 Mac has ten performance cores, and one stays free for everything else.
 `--all-cores` uses every core when the owner allows it.
 
+Every second the supervisor adds up the memory of the run's processes
+(`aggregate_rss`). It asks the run to stop safely when that sum comes within
+1 GB of the run's allowance of 30 GB, and kills the run at 30 GB. On macOS it
+also watches the memory of the whole Mac, which the run shares with every other
+program (`machine_memory`). It asks the run to stop safely when macOS's memory
+pressure stays critical for 10 seconds, or when the swap in use grows by 4 GB
+above its level when the supervisor started the training process. The 4 GB are
+the limit of the watchdog script that stopped the second 378-game run of 19
+November 2026, whose swap had grown by 4.1 GB in 38 minutes; while all its games
+played, that run played about 10% fewer decisions an hour than 252 games
+(inferred;
+[record](../../docs/archive/records/concurrent_games_cpp_search_2026_11_19.md#the-378-game-runs)).
+A run stopped for the Mac's memory, whichever program used it, has the status
+`machine_memory_short` in the supervisor's `state.json`. The stop's
+`graceful_stop_requested` event there gives the cause (`critical_pressure` or
+`swap_growth`), the pressure and the swap, and the same command resumes the run
+from its checkpoint.
+
 A game process that dies, for example in a crash of the engine or the search,
 costs only its own games. The games it had not finished become failed games in
 `manifest.json` (`failed_games`), each naming the dead process and the signal or

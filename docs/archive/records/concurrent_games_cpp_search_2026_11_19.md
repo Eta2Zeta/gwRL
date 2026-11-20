@@ -180,8 +180,8 @@ inference batches of that size:
   from their instructions, and they show that the Mac's memory, not the
   supervisor's allowance, ends the gains here: whether 378 games would play
   more than 252 on a Mac with nothing else open is not known. That the
-  supervisor watches only the run's own memory is
-  [Q-011 in the questions page](../../questions.md#q-011-the-memory-the-rest-of-the-mac-uses).
+  supervisor watched only the run's own memory was
+  [Q-011 in the questions page](../../questions.md#answered), since answered.
 - **Not shown:** self-play that never stops, which has no uneven ends and so
   would play near the rate while all the games played; and learning. More
   concurrent games give each training iteration more games, and in self-play
