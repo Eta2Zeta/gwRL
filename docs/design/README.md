@@ -2234,9 +2234,12 @@ pipes; each game the dead process was given and had not reported becomes a
 failed game, which names that process and the signal or exit code that ended it
 (`_lost_game` in `studies/campaign/episode_workers.py`); and a new game process
 takes the same game slots while the others play on. In the long run's layout of
-six processes of 42 games, a crash costs the games in play in one process. A
+six processes of 42 games, a crash costs the games in play in one process: when
+a second process aborted the same way later that day, the run lost 44 games,
+about 7 minutes of its play (inferred), and went on
+([record](../archive/records/second_game_process_crash_2026_11_20.md)). A
 process that dies before it has reported any game stops the run, since a new
-one would most likely die the same way. The defect behind the crash of 20
+one would most likely die the same way. The defect behind the crashes of 20
 November is not found ([Q-012](../questions.md#q-012-a-game-process-that-crashes)).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
@@ -3112,15 +3115,20 @@ measured and what would settle it.
   railroad was damaged this turn, is counted for the whole state, and a battle
   note's numbers are added into one feature value. See
   [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
-- **Heap corruption.** On the night of 2 November a game process crashed twice
-  early in training iteration 3: the engine freed memory and kept using it. About
-  4.5 hours of replays in builds with memory checks did not reproduce it. Two
-  crashes close together and none under changed timing suggest a race between
-  game threads in one process, but that is unproven. A ThreadSanitizer run is the
-  suggested next check. Since the search runs in C++, a process's game threads
-  run side by side without taking turns at Python's lock, and the 378 games of
-  its three training iterations of 19 November all finished
-  ([record](../archive/records/search_in_cpp_2026_11_19.md#the-matched-runs)).
+- **Heap corruption.** A defect in a game process's native code damages memory,
+  and it is not found
+  ([Q-012](../questions.md#q-012-a-game-process-that-crashes)). On 20 November,
+  in 16.6 hours of play of 252 concurrent games with the search in C++, two game
+  processes aborted on memory being freed that had not been allocated, both in
+  the game copy of a search tree node. Before the second abort, two games of
+  that process failed the engine's state check with a zone number that names no
+  zone ([first record](../archive/records/game_process_crash_2026_11_20.md),
+  [second record](../archive/records/second_game_process_crash_2026_11_20.md)).
+  On the night of 2 November, before the search ran in C++, a game process
+  crashed twice early in training iteration 3, and about 4.5 hours of replays in
+  builds with memory checks did not reproduce it. A race between the game
+  threads of one process, which run side by side without taking turns at
+  Python's lock, is one possible cause, but that is unproven.
 - **Two searches.** Self-play runs the C++ search (section 4.7). Held-out
   evaluation with fixed opponents, the batching of several searches' network
   evaluations in one process (`studies/campaign/batching.py`) and tools still

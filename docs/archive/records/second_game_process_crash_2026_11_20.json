@@ -1,0 +1,436 @@
+{
+ "schema": "game-process-crash-record-v2",
+ "what": "A game process of a long training run aborted on a damaged heap while the search freed the nodes of a game's tree that it did not keep; two games of that process had failed the engine's state check just before; the run replaced the process and lost only that process's games.",
+ "run": {
+  "commit": "7adac20",
+  "engine_and_search_sources_same_as": "999c90c (no change under src/, include/ or setup.py)",
+  "attempt_1_started_local": "2026-11-20 06:54:33",
+  "profile": "mac",
+  "network": "256x8 (hidden size 256, 8 message layers)",
+  "device": "mps",
+  "continuous": true,
+  "compiled_forward": true,
+  "game_processes": 6,
+  "games_per_process": 42,
+  "concurrent_games": 252,
+  "simulations": 64,
+  "max_depth": 16,
+  "seed": 20261121,
+  "initial_models": "generation 13 of the run of 19 November (commit 999c90c)",
+  "game_slots_of_a_process": "group g plays slots 42g to 42g+41 (_GameProcess.group in studies/campaign/shared_evaluator.py); the six processes were started in group order, PIDs 7796 to 7801"
+ },
+ "failed_games_before_crash": [
+  {
+   "batch_index": 3,
+   "game_number": 934,
+   "seed": 6375254581929260675,
+   "slot": 182,
+   "seconds_played": 3162.1,
+   "failure": "RuntimeError: A zone number names no zone"
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1042,
+   "seed": 677031553320551247,
+   "slot": 206,
+   "seconds_played": 890.6,
+   "failure": "RuntimeError: A zone number names no zone"
+  }
+ ],
+ "failed_games_order_note": "manifest.json lists failed games in the order the training process read them; both state-check failures come before the 42 games lost with the process, and batch index 3 runs from network update 3 (10:08:12) to update 4 (11:32:04), so both happened in process 7800 between 10:08:12 and 10:46:18",
+ "state_check": {
+  "message": "A zone number names no zone",
+  "raised_by": "State::validate in src/campaign_state.cpp, for anything in the state that names a zone: a unit's zone, turn origin or route, a territory, a facility, a railroad's ends, a capital, a battle, or the record of the turn's start",
+  "runs": "after every move, through RecordedHistory::validate in src/campaign_runtime.cpp"
+ },
+ "crash": {
+  "report": "~/Library/Logs/DiagnosticReports/python3.13-2026-11-20-104620.ips",
+  "local_time": "2026-11-20 10:46:18.8625 -0600",
+  "process_launched_local": "2026-11-20 06:54:37.5588 -0600",
+  "pid": 7800,
+  "parent_pid": 7776,
+  "parent_is": "the training process (studies.campaign.run train), which runs the inference server",
+  "exception": {
+   "codes": "0x0000000000000000, 0x0000000000000000",
+   "rawCodes": [
+    0,
+    0
+   ],
+   "type": "EXC_CRASH",
+   "signal": "SIGABRT"
+  },
+  "termination": {
+   "flags": 0,
+   "code": 6,
+   "namespace": "SIGNAL",
+   "indicator": "Abort trap: 6",
+   "byProc": "python3.13",
+   "byPid": 7800
+  },
+  "asi": {
+   "libsystem_c.dylib": [
+    "abort() called"
+   ]
+  },
+  "faulting_thread": 38,
+  "threads": 43,
+  "faulting_thread_frames": [
+   "libsystem_kernel.dylib: __pthread_kill",
+   "libsystem_pthread.dylib: pthread_kill",
+   "libsystem_c.dylib: abort",
+   "libsystem_malloc.dylib: malloc_vreport",
+   "libsystem_malloc.dylib: malloc_report",
+   "libsystem_malloc.dylib: ___BUG_IN_CLIENT_OF_LIBMALLOC_POINTER_BEING_FREED_WAS_NOT_ALLOCATED",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::UnitState::~UnitState()",
+   "gwrl_cpp.cpython-313-darwin.so: std::__1::deque<std::__1::optional<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const, game::campaign::UnitState>>, std::__1::allocator<std::__1::optional<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const, game::campaign::UnitState>>>>::clear()",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::SlotMap<game::campaign::UnitKind, game::campaign::UnitState>::~SlotMap()",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::State::~State()",
+   "gwrl_cpp.cpython-313-darwin.so: void std::__1::__destroy_at[abi:nqe220106]<game::campaign::searching::Node>(game::campaign::searching::Node*)",
+   "gwrl_cpp.cpython-313-darwin.so: std::__1::deque<game::campaign::searching::Node, std::__1::allocator<game::campaign::searching::Node>>::__move_assign(std::__1::deque<game::campaign::searching::Node, std::__1::allocator<game::campaign::searching::Node>>&, std::__1::integral_constant<bool, true>)",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::searching::Searcher::retain(int)",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::searching::Searcher::run(std::__1::shared_ptr<game::campaign::Engine const>, unsigned char)",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::searchDecision(std::__1::shared_ptr<game::campaign::Engine const>, game::campaign::SearchSchedule const&, game::campaign::SearchEvaluator&, game::campaign::SearchSettings const&, game::campaign::SearchTree*)",
+   "gwrl_cpp.cpython-313-darwin.so: std::__1::enable_if<!std::is_void<pybind11::dict>::value, pybind11::dict>::type pybind11::detail::argument_loader<(anonymous namespace)::NativeCampaignEnv const&, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>> const&, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>> const&, pybind11::object, int, double, int, unsigned long long, bool, double, double, bool, pybind11::object>::call<pybind11::dict, pybind11::detail::void_type, pybind11_init_gwrl_cpp(pybind11::module_&)::$_29&>(pybind11_init_gwrl_cpp(pybind11::module_&)::$_29&) &&",
+   "gwrl_cpp.cpython-313-darwin.so: void pybind11::cpp_function::initialize<pybind11_init_gwrl_cpp(pybind11::module_&)::$_29, pybind11::dict, (anonymous namespace)::NativeCampaignEnv const&, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>> const&, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>> const&, pybind11::object, int, double, int, unsigned long long, bool, double, double, bool, pybind11::object, pybind11::name, pybind11::scope, pybind11::sibling, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg_v, char [304]>(pybind11_init_gwrl_cpp(pybind11::module_&)::$_29&&, pybind11::dict (*)((anonymous namespace)::NativeCampaignEnv const&, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>> const&, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>> const&, pybind11::object, int, double, int, unsigned long long, bool, double, double, bool, pybind11::object), pybind11::name const&, pybind11::scope const&, pybind11::sibling const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg_v const&, char const (&) [304])::'lambda'(pybind11::detail::function_call&)::__invoke(pybind11::detail::function_call&)",
+   "gwrl_cpp.cpython-313-darwin.so: pybind11::cpp_function::dispatcher(_object*, _object* const*, unsigned long, _object*)",
+   "python3.13: cfunction_vectorcall_FASTCALL_KEYWORDS",
+   "python3.13: _PyEval_EvalFrameDefault",
+   "python3.13: partial_vectorcall",
+   "python3.13: _PyEval_EvalFrameDefault",
+   "python3.13: method_vectorcall",
+   "python3.13: thread_run",
+   "python3.13: pythread_wrapper",
+   "libsystem_pthread.dylib: _pthread_start",
+   "libsystem_pthread.dylib: thread_start"
+  ]
+ },
+ "replacement": {
+  "message": "GameProcessEnded: game process 7800 ended with signal SIGABRT; 42 unfinished games failed; game process 68542 took its 42 game slots",
+  "new_pid": 68542,
+  "new_process_started_local": "2026-11-20 10:46:18",
+  "games_lost_with_process": 42,
+  "seconds_played_by_lost_games": {
+   "sum": 102149.7,
+   "mean": 2432.1,
+   "min": 3.4,
+   "max": 4359.0
+  }
+ },
+ "lost_games": [
+  {
+   "batch_index": 3,
+   "game_number": 797,
+   "seed": 8928410764683950349,
+   "seconds_played": 4359.0
+  },
+  {
+   "batch_index": 3,
+   "game_number": 855,
+   "seed": 7855307408831269,
+   "seconds_played": 3699.1
+  },
+  {
+   "batch_index": 3,
+   "game_number": 856,
+   "seed": 4007173001297978102,
+   "seconds_played": 3695.1
+  },
+  {
+   "batch_index": 3,
+   "game_number": 858,
+   "seed": 5039107098263357064,
+   "seconds_played": 3672.2
+  },
+  {
+   "batch_index": 3,
+   "game_number": 864,
+   "seed": 5381470639646388527,
+   "seconds_played": 3641.8
+  },
+  {
+   "batch_index": 3,
+   "game_number": 873,
+   "seed": 8010352992374703284,
+   "seconds_played": 3583.0
+  },
+  {
+   "batch_index": 3,
+   "game_number": 878,
+   "seed": 3460417935836296304,
+   "seconds_played": 3553.9
+  },
+  {
+   "batch_index": 3,
+   "game_number": 882,
+   "seed": 2670480663674574992,
+   "seconds_played": 3522.3
+  },
+  {
+   "batch_index": 3,
+   "game_number": 884,
+   "seed": 2741948842495882079,
+   "seconds_played": 3516.5
+  },
+  {
+   "batch_index": 3,
+   "game_number": 890,
+   "seed": 1697162620928258550,
+   "seconds_played": 3493.9
+  },
+  {
+   "batch_index": 3,
+   "game_number": 894,
+   "seed": 5426419953513278723,
+   "seconds_played": 3460.1
+  },
+  {
+   "batch_index": 3,
+   "game_number": 912,
+   "seed": 576570103647149856,
+   "seconds_played": 3293.7
+  },
+  {
+   "batch_index": 3,
+   "game_number": 913,
+   "seed": 8430540001277794659,
+   "seconds_played": 3292.5
+  },
+  {
+   "batch_index": 3,
+   "game_number": 915,
+   "seed": 1407795175814924853,
+   "seconds_played": 3281.1
+  },
+  {
+   "batch_index": 3,
+   "game_number": 920,
+   "seed": 8937395993001073063,
+   "seconds_played": 3253.5
+  },
+  {
+   "batch_index": 3,
+   "game_number": 925,
+   "seed": 9217984723011078618,
+   "seconds_played": 3235.1
+  },
+  {
+   "batch_index": 3,
+   "game_number": 929,
+   "seed": 8257478308067375217,
+   "seconds_played": 3188.2
+  },
+  {
+   "batch_index": 3,
+   "game_number": 933,
+   "seed": 2905438541458630029,
+   "seconds_played": 3172.6
+  },
+  {
+   "batch_index": 3,
+   "game_number": 936,
+   "seed": 8919225372852638390,
+   "seconds_played": 3132.0
+  },
+  {
+   "batch_index": 3,
+   "game_number": 940,
+   "seed": 161619304180957332,
+   "seconds_played": 3103.4
+  },
+  {
+   "batch_index": 3,
+   "game_number": 946,
+   "seed": 4738051343849614996,
+   "seconds_played": 3067.3
+  },
+  {
+   "batch_index": 3,
+   "game_number": 949,
+   "seed": 7136266925945776897,
+   "seconds_played": 3025.6
+  },
+  {
+   "batch_index": 3,
+   "game_number": 965,
+   "seed": 5755369813384673405,
+   "seconds_played": 2913.1
+  },
+  {
+   "batch_index": 3,
+   "game_number": 967,
+   "seed": 4335063101437511997,
+   "seconds_played": 2899.6
+  },
+  {
+   "batch_index": 3,
+   "game_number": 972,
+   "seed": 8606850761932320187,
+   "seconds_played": 2867.1
+  },
+  {
+   "batch_index": 3,
+   "game_number": 980,
+   "seed": 871124077738064468,
+   "seconds_played": 2798.6
+  },
+  {
+   "batch_index": 3,
+   "game_number": 993,
+   "seed": 8084603678065154575,
+   "seconds_played": 2674.9
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1007,
+   "seed": 8565650931619584026,
+   "seconds_played": 2463.9
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1009,
+   "seed": 5877862337242708647,
+   "seconds_played": 2377.7
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1011,
+   "seed": 2753991633670116654,
+   "seconds_played": 2295.0
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1016,
+   "seed": 8930113490951681143,
+   "seconds_played": 2061.5
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1040,
+   "seed": 7127572010043694843,
+   "seconds_played": 983.5
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1045,
+   "seed": 5843950634527275056,
+   "seconds_played": 830.8
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1053,
+   "seed": 7925689573785733298,
+   "seconds_played": 714.5
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1067,
+   "seed": 9123596027580473050,
+   "seconds_played": 463.8
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1075,
+   "seed": 4662090641277830901,
+   "seconds_played": 393.0
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1096,
+   "seed": 3336269075117509194,
+   "seconds_played": 86.2
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1100,
+   "seed": 6087914478508857948,
+   "seconds_played": 58.5
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1108,
+   "seed": 5080516392664738621,
+   "seconds_played": 9.2
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1109,
+   "seed": 7727302076720787797,
+   "seconds_played": 9.1
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1111,
+   "seed": 3703440560053384895,
+   "seconds_played": 4.3
+  },
+  {
+   "batch_index": 3,
+   "game_number": 1112,
+   "seed": 3666046739052613322,
+   "seconds_played": 3.4
+  }
+ ],
+ "network_updates": [
+  {
+   "network_update": 1,
+   "seconds_into_attempt": 4887.0,
+   "local_time": "2026-11-20 08:16:00",
+   "games_finished": 252,
+   "decisions_finished": 371533
+  },
+  {
+   "network_update": 2,
+   "seconds_into_attempt": 8146.8,
+   "local_time": "2026-11-20 09:10:19",
+   "games_finished": 508,
+   "decisions_finished": 755504
+  },
+  {
+   "network_update": 3,
+   "seconds_into_attempt": 11619.5,
+   "local_time": "2026-11-20 10:08:12",
+   "games_finished": 760,
+   "decisions_finished": 1127941
+  },
+  {
+   "network_update": 4,
+   "seconds_into_attempt": 16651.3,
+   "local_time": "2026-11-20 11:32:04",
+   "games_finished": 1019,
+   "decisions_finished": 1499134
+  },
+  {
+   "network_update": 5,
+   "seconds_into_attempt": 19910.7,
+   "local_time": "2026-11-20 12:26:23",
+   "games_finished": 1270,
+   "decisions_finished": 1873515
+  }
+ ],
+ "machine_during_update_4_interval": {
+  "measured_local": "2026-11-20 10:40",
+  "run_cores_over_45_s": 6.95,
+  "cores_of_three_next_dev_servers_of_another_project": 1.87,
+  "swap_used_gb": 11.7,
+  "pressure": "warning",
+  "note": "the run had about 8.8 cores in the run of 19 November; at 12:36 it had 8.0 cores over 30 s, with two of the servers stopped"
+ },
+ "derived": {
+  "game_slot_seconds_lost": 106202.4,
+  "run_minutes_lost_inferred": 7.0,
+  "how": "seconds played by the 44 failed games, divided by the 252 game slots that play at once",
+  "update_intervals_minutes": [
+   54.3,
+   57.9,
+   83.9,
+   54.3
+  ],
+  "hours_of_play_of_252_games_from_the_c++_search": {
+   "run_of_19_november_before_its_crash": 5.13,
+   "run_of_19_november_after_its_restart": 5.75,
+   "this_run_to_12:35": 5.69,
+   "total": 16.57
+  },
+  "crashes_in_those_hours": 2
+ }
+}

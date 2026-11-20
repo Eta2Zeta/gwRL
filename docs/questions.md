@@ -46,7 +46,9 @@ numbers are in the
 Q-012 was raised on 20 November 2026, when a game process of the long training
 run started the day before crashed; its first part, whether training should
 lose only that process's games, was answered the same day. Its numbers are in
-the [record of that crash](archive/records/game_process_crash_2026_11_20.md).
+the [record of that crash](archive/records/game_process_crash_2026_11_20.md)
+and the
+[record of a second crash the same day](archive/records/second_game_process_crash_2026_11_20.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -212,20 +214,36 @@ next network update came about 51 minutes later than it would have without the
 crash ([record](archive/records/game_process_crash_2026_11_20.md)). Two crashes
 of the same kind were noted on 2 November 2026, before the search ran in C++.
 
-**Why it matters.** The defect damages memory before anything notices it: a
-game's state could be wrong without any crash, and its training samples with
-it. And each crash still costs the games in play in one game process, 42 games
-in the long run's layout of six processes.
+**A second case** (the same day, the run of 252 concurrent games from commit
+`7adac20`, whose engine and search are the same code). After 3.86 hours of
+play, at 10:46, a game process aborted with the same allocator message. This
+time the bad memory was in the state of a unit, in the game copy of a search
+tree node, and the search was freeing the nodes of a game's tree that it did
+not keep. Between the network update at 10:08 and the crash, two games of that
+process had failed the check that the engine runs on the state after every
+move (`State::validate` in `src/campaign_state.cpp`): something in each game's
+state held a zone number that no zone has. A new game process took the dead
+one's game slots, and the run lost 44 games, about 7 minutes of its play
+(inferred), instead of stopping
+([record](archive/records/second_game_process_crash_2026_11_20.md)).
+
+**Why it matters.** The defect most likely damages game states before anything
+notices it (inferred): the only two games of the run to fail the engine's check
+were in the process that later aborted, in the 38 minutes before it did. A
+damaged value that the check does not catch, such as a zone number that names a
+real zone, would go into the game's training samples. And each crash still costs the games in
+play in one game process: 42 games in the long run's layout of six processes,
+about 7 minutes of its play in the second case.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and one crash in 5.13 hours of 252 games suggests that may take many hours. |
-| B. Leave it | Training goes on, and each crash costs one game process's games in play. The defect stays, with whatever it does to games that do not crash. |
+| A. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and two crashes in 16.6 hours of 252 games, about one every 8 hours, suggest that may take many hours. |
+| B. Leave it | Training goes on, and each crash costs one game process's games in play, about 7 minutes of the run's play the second time. The defect stays, with whatever it does to games that neither fail the check nor crash. |
 
 **Recommendation: A, when the Mac can spare some hours.** Only A can find the
-defect, which may damage games without crashing them.
+defect, which has most likely damaged the states of two games already.
 
 **If answered.** What was found, and the fix, belong in the engine page of the
 code that held the defect, and in
