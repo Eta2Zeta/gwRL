@@ -83,6 +83,26 @@ struct SearchOutcome {
     std::string layout;  // The zone encoding's version (ZoneEncodingSpec::version).
     std::size_t evaluations{0};  // Network evaluations the search asked for.
     std::size_t positions{0};    // Nodes of its tree.
+    bool reused{false};          // Whether the tree already held the root's state.
+};
+
+// A game's search tree, kept from one decision to the next. A search given one
+// starts from the node of the state it is asked about, keeps everything below
+// it and drops the rest; a state the tree never reached starts a new tree
+// (VectorMCTS.search with reuse_root in studies/shared/multiplayer_mcts.py).
+class SearchTree {
+  public:
+    SearchTree();
+    ~SearchTree();
+    SearchTree(const SearchTree&) = delete;
+    SearchTree& operator=(const SearchTree&) = delete;
+    void clear();
+    std::size_t size() const;
+    struct Storage;
+    Storage& storage() { return *storage_; }
+
+  private:
+    std::unique_ptr<Storage> storage_;
 };
 
 // A nonterminal decision without legal actions, which is a rules defect. Its
@@ -92,12 +112,13 @@ class NoLegalSearchAction : public std::runtime_error {
     using std::runtime_error::runtime_error;
 };
 
-// Search `game` (not changed) at the given scheduling state.
+// Search `game` (not changed) at the given scheduling state, in `tree` when one
+// is given and in a tree of its own otherwise.
 SearchOutcome searchDecision(const Engine& game, const SearchSchedule& schedule, SearchEvaluator& evaluator,
-                             const SearchSettings& settings);
+                             const SearchSettings& settings, SearchTree* tree = nullptr);
 // The same on a search copy of the game (Engine::cloneForSearch), which the
-// search keeps as its root position instead of copying the game again.
+// search keeps as its root position, unless the tree already holds that state.
 SearchOutcome searchDecision(std::shared_ptr<const Engine> root, const SearchSchedule& schedule,
-                             SearchEvaluator& evaluator, const SearchSettings& settings);
+                             SearchEvaluator& evaluator, const SearchSettings& settings, SearchTree* tree = nullptr);
 
 }  // namespace game::campaign

@@ -59,19 +59,24 @@ class ForcedMoveGameTests(unittest.TestCase):
                                   rules_version="forced-move-test", batch_version="frozen", environment_seed=SEED, max_transitions=2000)
         return played, env.serialize(), evaluator
 
-    def test_training_games_keep_every_move_sample_and_random_stream(self):
-        (skipped, skipped_state, skipping), (searched, searched_state, searching) = self.episode(False), self.episode(True)
+    def test_training_games_keep_every_move_sample(self):
+        (skipped, _, _), (searched, _, _) = self.episode(False), self.episode(True)
         self.assertTrue(skipped["terminal"])
-        self.assertEqual(skipped["events"], searched["events"])
-        self.assertEqual(skipped["counts"], searched["counts"])
-        self.assertEqual(skipped["returns"], searched["returns"])
-        self.assertEqual(skipped_state, searched_state)
         # Forced decisions stay in the data: they still teach the value head.
         self.assertEqual(len(skipped["records"]), skipped["counts"]["decisions"])
-        self.assertEqual(skipped["records"], searched["records"])
-        forced = sum(len(record["policy"]) == 1 for record in skipped["records"])
-        self.assertGreater(forced, 0)
-        self.assertLess(skipping.stats.requests, searching.stats.requests)
+        forced = [index for index, record in enumerate(skipped["records"]) if len(record["policy"]) == 1]
+        self.assertTrue(forced)
+        # Up to and including the first forced decision the games are the same. After
+        # it they may part: a game keeps its search tree, and a search of a forced
+        # root adds simulations below its one action, which the next search starts
+        # from. (Without a kept tree, shared_game below, they stay the same.)
+        decisions = [index for index, event in enumerate(skipped["events"]) if event["owner"] is not None]
+        first = decisions[forced[0]]
+        self.assertEqual(skipped["events"][:first + 1], searched["events"][:first + 1])
+        # The samples too, but for their label, each game's own final scores.
+        def unlabelled(records):
+            return [{name: value for name, value in record.items() if name != "values"} for record in records]
+        self.assertEqual(unlabelled(skipped["records"][:forced[0] + 1]), unlabelled(searched["records"][:forced[0] + 1]))
 
     def shared_game(self, searched):
         created = []

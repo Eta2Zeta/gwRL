@@ -21,7 +21,8 @@
 #endif
 
 namespace game::campaign {
-namespace {
+// The search's parts. A named namespace, since a SearchTree holds them between searches.
+namespace searching {
 
 using V = json::Value;
 using O = V::Object;
@@ -122,9 +123,13 @@ struct Node {
     Scheduled decision;
     bool expanded{false};
     std::vector<Edge> edges;
+    std::vector<int> chanceSuccessors;  // The outcomes its dice have reached.
     int visits{0};
     SearchValues valueSum{0.0, 0.0, 0.0};
     SearchValues evaluation{0.0, 0.0, 0.0};
+    // Whether evaluation holds the network's value or a terminal state's
+    // returns: a state with one legal action is expanded without one.
+    bool evaluated{false};
 };
 
 struct Bounds {
@@ -145,17 +150,37 @@ SearchValues finite(const SearchValues& values) {
     return values;
 }
 
+}  // namespace searching
+
+struct SearchTree::Storage {
+    std::deque<searching::Node> nodes;
+    std::unordered_map<std::string, int> index;
+};
+
+SearchTree::SearchTree() : storage_(std::make_unique<Storage>()) {}
+SearchTree::~SearchTree() = default;
+void SearchTree::clear() {
+    storage_->nodes.clear();
+    storage_->index.clear();
+}
+std::size_t SearchTree::size() const { return storage_->nodes.size(); }
+
+namespace searching {
+
 class Searcher {
   public:
-    Searcher(SearchEvaluator& evaluator, const SearchSettings& settings, const std::array<int, 3>& order)
-        : evaluator_(evaluator), settings_(settings), order_(order), random_(settings.seed) {}
+    Searcher(SearchEvaluator& evaluator, const SearchSettings& settings, const std::array<int, 3>& order,
+             SearchTree::Storage& tree)
+        : evaluator_(evaluator), settings_(settings), order_(order), random_(settings.seed),
+          nodes_(tree.nodes), index_(tree.index) {}
 
     SearchOutcome run(std::shared_ptr<const Engine> root, std::uint8_t passed);
 
   private:
     int reach(std::shared_ptr<const Engine> game, std::uint8_t passed);
+    void retain(int root);
     std::vector<Option> options(Node& node);
-    SearchValues expand(int index);
+    std::optional<SearchValues> expand(int index, bool root);
     SearchValues bootstrap(int index);
     SearchValues chanceValue(const Node& node);
     std::shared_ptr<const ZoneInput> encode(const Node& node, const std::vector<Option>& options) const;
@@ -169,8 +194,8 @@ class Searcher {
     const SearchSettings& settings_;
     std::array<int, 3> order_;
     PythonRandom random_;
-    std::deque<Node> nodes_;
-    std::unordered_map<std::string, int> index_;
+    std::deque<Node>& nodes_;
+    std::unordered_map<std::string, int>& index_;
     std::array<Bounds, 3> bounds_{};
     std::string layout_;
     std::shared_ptr<const ZoneInput> rootInput_;
@@ -189,6 +214,37 @@ int Searcher::reach(std::shared_ptr<const Engine> game, std::uint8_t passed) {
     node.game = std::move(game);
     node.passed = passed;
     return found->second;
+}
+
+void Searcher::retain(int root) {
+    // The root and every node below it, by edges and dice outcomes; the root
+    // becomes node 0. VectorMCTS._retain.
+    std::vector<int> renumbered(nodes_.size(), -1), order;
+    std::vector<int> stack{root};
+    while (!stack.empty()) {
+        const int index = stack.back();
+        stack.pop_back();
+        if (renumbered[static_cast<std::size_t>(index)] >= 0) continue;
+        renumbered[static_cast<std::size_t>(index)] = static_cast<int>(order.size());
+        order.push_back(index);
+        const Node& node = nodes_[static_cast<std::size_t>(index)];
+        for (const auto& edge : node.edges)
+            if (edge.successor >= 0) stack.push_back(edge.successor);
+        for (const int successor : node.chanceSuccessors) stack.push_back(successor);
+    }
+    std::deque<Node> kept;
+    for (const int index : order) {
+        Node node = std::move(nodes_[static_cast<std::size_t>(index)]);
+        for (auto& edge : node.edges)
+            if (edge.successor >= 0) edge.successor = renumbered[static_cast<std::size_t>(edge.successor)];
+        for (auto& successor : node.chanceSuccessors) successor = renumbered[static_cast<std::size_t>(successor)];
+        kept.push_back(std::move(node));
+    }
+    std::unordered_map<std::string, int> index;
+    for (auto& [key, number] : index_)
+        if (renumbered[static_cast<std::size_t>(number)] >= 0) index.emplace(key, renumbered[static_cast<std::size_t>(number)]);
+    nodes_ = std::move(kept);
+    index_ = std::move(index);
 }
 
 std::vector<Option> Searcher::options(Node& node) {
@@ -256,22 +312,31 @@ std::string Searcher::position(const Node& node) const {
                              {"anchor", V(node.game->planningKey())}}));
 }
 
-SearchValues Searcher::expand(int index) {
+std::optional<SearchValues> Searcher::expand(int index, bool root) {
+    // Ask the network about a new state. A state with one legal action, other
+    // than the root, gets its one edge without an evaluation: a simulation
+    // plays the action and goes on (VectorMCTS._expand).
     Node& node = nodes_[static_cast<std::size_t>(index)];
     if (node.decision.kind == DecisionKind::Terminal) {
         node.evaluation = finite(terminalReturns(node.game->state()));
+        node.evaluated = true;
     } else if (node.decision.kind == DecisionKind::Chance) {
         node.evaluation = {0.0, 0.0, 0.0};
     } else {
         const auto choices = options(node);
         if (choices.empty()) throw NoLegalSearchAction(position(node));
+        if (choices.size() == 1 && !root) {
+            node.edges.push_back(Edge{choices.front().action, choices.front().kind, 1.0, 1.0});
+            node.expanded = true;
+            return std::nullopt;
+        }
         std::shared_ptr<const ZoneInput> input;
         if (evaluator_.readsInput()) input = encode(node, choices);
         SearchValues values{};
         priors_.clear();
         evaluator_.evaluate(input, layout_, node.decision.owner, choices.size(), priors_, values);
         ++evaluations_;
-        if (index == 0) rootInput_ = input;
+        if (root) rootInput_ = input;
         // probabilities() in studies/shared/multiplayer_mcts.py.
         if (priors_.size() != choices.size())
             throw std::invalid_argument("Policy must provide one finite nonnegative weight per legal action");
@@ -281,6 +346,7 @@ SearchValues Searcher::expand(int index) {
         const double total = pythonSum(priors_.data(), priors_.size());
         if (!std::isfinite(total) || total <= 0) throw std::invalid_argument("Policy must have positive finite total weight");
         node.evaluation = finite(values);
+        node.evaluated = true;
         node.edges.reserve(choices.size());
         for (std::size_t i = 0; i < choices.size(); ++i) {
             const double prior = priors_[i] / total;
@@ -304,16 +370,42 @@ SearchValues Searcher::chanceValue(const Node& node) {
 }
 
 SearchValues Searcher::bootstrap(int index) {
-    const Node& node = nodes_[static_cast<std::size_t>(index)];
-    if (node.decision.kind == DecisionKind::Chance) return chanceValue(node);
-    return node.expanded ? node.evaluation : expand(index);
+    if (nodes_[static_cast<std::size_t>(index)].decision.kind == DecisionKind::Chance)
+        return chanceValue(nodes_[static_cast<std::size_t>(index)]);
+    if (!nodes_[static_cast<std::size_t>(index)].expanded)
+        if (const auto value = expand(index, false)) return *value;
+    Node& node = nodes_[static_cast<std::size_t>(index)];
+    if (!node.evaluated) {
+        // A forced state, rated only now that a simulation stops at it.
+        const std::vector<Option> only{Option{node.edges.front().action, node.edges.front().kind}};
+        std::shared_ptr<const ZoneInput> input;
+        if (evaluator_.readsInput()) input = encode(node, only);
+        SearchValues values{};
+        priors_.clear();
+        evaluator_.evaluate(input, layout_, node.decision.owner, 1, priors_, values);
+        ++evaluations_;
+        if (priors_.size() != 1) throw std::invalid_argument("Policy must provide one finite nonnegative weight per legal action");
+        node.evaluation = finite(values);
+        node.evaluated = true;
+    }
+    return node.evaluation;
 }
 
 SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t passed) {
     layout_ = zoneEncodingSpec(rootGame->state())->version;
-    const int root = reach(std::move(rootGame), passed);
     SearchOutcome outcome;
     outcome.layout = layout_;
+    // Keep the subtree of the root's state from earlier searches, or start anew.
+    std::string rootKey = rootGame->stateKey();
+    rootKey.push_back(static_cast<char>('0' + passed));
+    if (const auto found = index_.find(rootKey); found != index_.end()) {
+        outcome.reused = true;
+        retain(found->second);
+    } else {
+        nodes_.clear();
+        index_.clear();
+    }
+    const int root = reach(std::move(rootGame), passed);  // Node 0, kept or new.
     {
         Node& node = nodes_[static_cast<std::size_t>(root)];
         const bool policy = node.decision.kind == DecisionKind::Offer || node.decision.kind == DecisionKind::Play;
@@ -332,7 +424,15 @@ SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t
             }
         }
     }
-    expand(root);
+    if (!nodes_[static_cast<std::size_t>(root)].expanded) expand(root, true);
+    // Noise belongs to this search's root alone, and the value bounds start
+    // from the kept tree's actions, as the searches that made them left them.
+    for (auto& node : nodes_)
+        for (auto& edge : node.edges) {
+            edge.selectionPrior = edge.prior;
+            if (edge.visits)
+                for (std::size_t c = 0; c < 3; ++c) bounds_[c].update(edge.valueSum[c] / edge.visits);
+        }
     Node& rootNode = nodes_[static_cast<std::size_t>(root)];
     if (settings_.rootNoise && !rootNode.edges.empty()) {
         // Dirichlet noise over the root's options in action id order.
@@ -395,11 +495,16 @@ SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t
                 stream = copy.searchStream();
                 const auto passedNow = passedAfter(node, copy);
                 successor = reach(std::make_shared<const Engine>(std::move(copy)), passedNow);
+                auto& reached = nodes_[static_cast<std::size_t>(current)].chanceSuccessors;
+                if (std::find(reached.begin(), reached.end(), successor) == reached.end()) reached.push_back(successor);
             } else {
                 if (!node.expanded) {
-                    values = expand(current);
-                    finished = true;
-                    break;
+                    if (const auto value = expand(current, false)) {
+                        values = *value;
+                        finished = true;
+                        break;
+                    }
+                    // A forced state: its one action is played below, unasked.
                 }
                 const int component = node.decision.owner;
                 const bool rootStep = depth == 0;
@@ -497,16 +602,16 @@ SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t
     return outcome;
 }
 
-}  // namespace
+}  // namespace searching
 
 SearchOutcome searchDecision(const Engine& game, const SearchSchedule& schedule, SearchEvaluator& evaluator,
-                             const SearchSettings& settings) {
+                             const SearchSettings& settings, SearchTree* tree) {
     // The root keeps a copy, never the game itself: it moves on after the search.
-    return searchDecision(std::make_shared<const Engine>(game.cloneForSearch(0)), schedule, evaluator, settings);
+    return searchDecision(std::make_shared<const Engine>(game.cloneForSearch(0)), schedule, evaluator, settings, tree);
 }
 
 SearchOutcome searchDecision(std::shared_ptr<const Engine> root, const SearchSchedule& schedule,
-                             SearchEvaluator& evaluator, const SearchSettings& settings) {
+                             SearchEvaluator& evaluator, const SearchSettings& settings, SearchTree* tree) {
     if (!root) throw std::invalid_argument("The search needs a root position");
     if (settings.simulations <= 0 || settings.maxDepth <= 0)
         throw std::invalid_argument("Simulation budget and maximum depth must be positive");
@@ -519,7 +624,8 @@ SearchOutcome searchDecision(std::shared_ptr<const Engine> root, const SearchSch
     std::sort(order.begin(), order.end());
     if (order != std::array<int, 3>{0, 1, 2}) throw std::invalid_argument("Interrupt order must contain each alliance exactly once");
     if (schedule.passed > 7) throw std::invalid_argument("Passes name an unknown alliance");
-    Searcher searcher(evaluator, settings, schedule.order);
+    SearchTree own;
+    searching::Searcher searcher(evaluator, settings, schedule.order, (tree ? *tree : own).storage());
     return searcher.run(std::move(root), schedule.passed);
 }
 

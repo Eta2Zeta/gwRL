@@ -226,7 +226,9 @@ promising.
 next simulation reads. Each state the search has met is a *node* of the tree. For
 every node, the tree holds the actions tried there, each with its *visit count*,
 how many simulations played it, and the total of the values those simulations
-found.
+found. A game keeps its tree from one decision to the next
+([section 4.7](#47-more-detail-on-the-search)), so the next search starts with
+what these simulations found below the action played.
 
 **One simulation, in order:**
 
@@ -238,7 +240,10 @@ found.
 4. At a decision no simulation has asked the network about yet, ask the
    network, told which alliance decides there, for the state's values for all
    three alliances and a prior for each legal action, and stop. With a network
-   for each alliance, the deciding alliance's network is asked.
+   for each alliance, the deciding alliance's network is asked. A new decision
+   with only one legal action is not asked about: the simulation plays that
+   action and goes on. The network rates such a state only when a simulation
+   has to stop there, at the depth limit or on returning to it.
 5. Stop also at the end of the game, using the true final scores; on returning to
    a state already on this simulation's path; or after 16 actions and dice
    rolls, the depth limit. The last two use an estimate of the state reached
@@ -529,7 +534,7 @@ depth 1.
 
 **What the copies cost and save.** Every state the search reaches still comes
 from the real rules, played by the engine. A saved copy takes about 144 KB, so
-that tree held about 11 MB; each tree is dropped after its decision. Until
+that tree held about 11 MB. Until
 4 November the tree kept no states, and every simulation copied the root and
 played its whole path again: 123 actions instead of 57 in the example, and about
 half of the time the game threads (section 9.2) spent not waiting for the network
@@ -538,6 +543,35 @@ gave identical search results on 151 real states and played 59% fewer actions.
 In a matched training iteration it raised games per hour while playing from 152
 to 184, for 0.5 GB more peak memory
 ([record](../archive/records/search_copies_2026_11_04.md)).
+
+**The tree from one decision to the next.** A game keeps its search tree from
+decision to decision (`SearchTree` in `studies/campaign/native_search.py`). The
+next search starts from the node of the state the game has reached, with every
+node below it, their visit counts, values and saved copies, and drops the rest
+of the tree; AlphaZero does the same. The kept visits count in the new root's
+visit counts, so a search's visit shares rest on its new simulations and on the
+earlier ones that passed through that state. The dice rolled in the real game
+between two decisions pick one of the outcomes the simulations rolled, if they
+rolled it; a state the tree never reached starts a new tree. The exploration
+noise goes on the new root's actions alone, and the value bounds of the PUCT
+score (section 4.3) start from the kept actions' values. A tree also starts
+anew when other networks answer: its nodes hold network outputs, so in
+self-play that never stops it is dropped once the inference server names a new
+network version (section 9.1).
+
+**States with one legal action inside a search.** A new state with one legal
+action, such as a battle whose only move is to go on, tells the search nothing
+to choose. A simulation that reaches one plays the action and goes on, without
+asking the network, and stops at the next new state that has a choice. The
+network rates the forced state only if a simulation stops there, at the depth
+limit or on returning to it, and the tree keeps that value. In the profile of
+19 November, before this change, 15.6% of the network evaluations were of such
+states ([record](../archive/records/game_processes_gpu_2026_11_19.md#a-game-threads-cpu-per-network-evaluation));
+they now go to states with a choice, deeper along the same simulations. The
+root with one legal action is still played at once, without a search (section
+4.5). Keeping the tree and passing over forced states are the usual practice of
+AlphaZero-style programs; whether they make the learned play stronger here has
+not been measured.
 
 **The search in C++.** Self-play runs a decision's whole search in one call into
 the engine (`search_decision` in `studies/campaign/native_search.py`, which calls
@@ -555,7 +589,8 @@ and the draws that break ties. It multiplies and adds in the Python search's
 order, without fusing a multiplication and an addition into one rounding, and it
 sums the priors as Python's `sum` does. So given the same network outputs, the
 two searches make the same choices and return the same visit counts, priors and
-values, which `tests/test_campaign_native_search.py` checks along real games.
+values, which `tests/test_campaign_native_search.py` checks along real games,
+with fresh trees and with trees kept from decision to decision.
 The Python search still serves held-out evaluation, whose fixed opponents
 (section 10) the C++ search does not play, the batching of several searches'
 network evaluations in one process (`studies/campaign/batching.py`), and tools.
@@ -2863,8 +2898,13 @@ macOS reported warning-level memory pressure nearly throughout, swap grew by
 filled the Mac's memory
 ([record](../archive/records/concurrent_games_cpp_search_2026_11_19.md#the-378-game-runs)).
 The supervisor watches only the run's own memory (Q-011 in
-`docs/questions.md`). With the search trees measured above, the 30 GB hold
-(inferred):
+`docs/questions.md`). Besides the replay buffer, the learner keeps the events of
+the current training iteration's games, which its progress report reads
+(`action_history` in `studies/campaign/learning.py`, cleared by `train` in
+`studies/campaign/run.py`); kept for every game, at about 2 MB a game, they
+would fill the allowance within days
+([record](../archive/records/memory_in_training_2026_11_18.md)). With the search
+trees measured above, the 30 GB hold (inferred):
 
 | Simulations per decision | Search tree | Memory per concurrent game | Concurrent games in 30 GB | States per inference batch |
 | ---: | ---: | ---: | ---: | ---: |
@@ -3076,18 +3116,6 @@ measured and what would settle it.
   as many, and the comparison was one run of each. The same comparison at a
   larger network size would show whether size closes the gap; every run records
   the fit by alliance (`fresh_games` in `manifest.json`).
-- **The learner keeps every game's events.** Besides the replay buffer, the
-  learner keeps an event for every transition of every game it has played
-  (`action_history` in `studies/campaign/learning.py`), in memory and in every
-  checkpoint, and never drops one, though the training loop reads only the
-  current training iteration's events, for its progress report (`train` in
-  `studies/campaign/run.py`). After the 997 games of the night of 17 November
-  they took about 2.0 GB of the main training process's memory and 626 MB of its
-  checkpoint, about 2.0 MB and 0.63 MB a game
-  ([record](../archive/records/memory_in_training_2026_11_18.md)). A run resumed
-  night after night would fill the 30 GB of the allowance with them within about
-  five nights, and every checkpoint save would write them all (inferred).
-  Keeping only the current training iteration's events would end that.
 - **Input pruning left out two rules** it could not prove for the whole game:
   warlords never owning ships or planes, and which unit classes carry each unit
   mark. A mark is asked about on every kind of thing the rules put it on, for
@@ -3439,7 +3467,8 @@ the dated records use instead.
 - **Search (MCTS):** the simulations that pick an action at a decision.
 - **Simulation:** one imagined walk forward from the root, on a copy of the game.
 - **Root:** the current state, where every simulation of a search starts.
-- **Search tree:** what a search remembers between simulations.
+- **Search tree:** what a search remembers between simulations; a game keeps it
+  from one decision to the next, below the state reached.
 - **Node:** a state the search tree holds, with its planning key, the statistics
   of the actions tried there and a saved copy of the game at that state.
 - **Visit count:** how many simulations played an action.

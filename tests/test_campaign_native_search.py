@@ -13,7 +13,7 @@ import gwrl_cpp
 
 from studies.campaign.curriculum import make_env
 from studies.campaign.features import make_zone_input
-from studies.campaign.native_search import search_decision
+from studies.campaign.native_search import SearchTree, search_decision
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
 from studies.campaign.shared_evaluator import BUFFER_BYTES, RemoteEvaluator, SharedEvaluatorServer
 from studies.shared.multiplayer_mcts import (PLAYERS, Evaluation, MctsConfig, NoLegalActionError, UniformEvaluator,
@@ -104,6 +104,57 @@ class SameChoicesTests(unittest.TestCase):
 
     def test_uniform_priors_break_ties_with_the_same_draws(self):
         self.assertSameSearches(UniformEvaluator(), rounds=2, decisions=60, simulations=48, seed=12)
+
+    def test_kept_trees_give_the_same_choices(self):
+        """Both searches keep their trees from decision to decision along a game."""
+        evaluator = HashEvaluator()
+        env = make_env(13, calendar_rounds=1)
+        rng = random.Random(13)
+        python = VectorMCTS(evaluator, MctsConfig(simulations=32, max_depth=16))
+        tree = SearchTree()
+        checked = reused = 0
+        while not env.is_terminal() and checked < 40:
+            if env.decision_kind() == "chance":
+                env.resolve_chance()
+                continue
+            seed = rng.getrandbits(64)
+            expected = python.search(env, add_root_noise=True, reuse_root=True, seed=seed)
+            actual = search_decision(env, evaluator, MctsConfig(simulations=32, max_depth=16, seed=seed),
+                                     add_root_noise=True, tree=tree)
+            for name in ("visit_counts", "policy", "priors", "values", "action_values", "reused_root"):
+                self.assertEqual(getattr(actual, name), getattr(expected, name), f"{name} at decision {checked}")
+            self.assertEqual(tree.size, len(python.nodes))
+            reused += actual.reused_root
+            checked += 1
+            env.apply_action(expected.best_action() if rng.random() < 0.5 else rng.choice(expected.actions))
+        self.assertGreater(reused, checked * 3 // 4)
+
+    def test_a_tree_starts_anew_when_other_networks_answer(self):
+        class Versioned(HashEvaluator):
+            network_version = "v1"
+            switch_after = None
+
+            def evaluate_zone(self, zone, actor):
+                if self.switch_after is not None and self.requests >= self.switch_after:
+                    self.network_version = "v3"
+                return super().evaluate_zone(zone, actor)
+
+        env = make_env(SEED, calendar_rounds=1)
+        while env.decision_kind() == "chance" or len(env.legal_actions()) < 3:
+            env.resolve_chance() if env.decision_kind() == "chance" else env.apply_action(env.legal_actions()[0])
+        evaluator, tree = Versioned(), SearchTree()
+        first = search_decision(env, evaluator, MctsConfig(simulations=16, seed=1), add_root_noise=False, tree=tree)
+        self.assertFalse(first.reused_root)
+        self.assertGreater(tree.size, 1)
+        again = search_decision(env, evaluator, MctsConfig(simulations=16, seed=2), add_root_noise=False, tree=tree)
+        self.assertTrue(again.reused_root)
+        evaluator.network_version = "v2"  # Another network answers: the old outputs go.
+        other = search_decision(env, evaluator, MctsConfig(simulations=16, seed=3), add_root_noise=False, tree=tree)
+        self.assertFalse(other.reused_root)
+        # A version change during a search leaves a tree built partly by each: dropped.
+        evaluator.switch_after = evaluator.requests + 5
+        search_decision(env, evaluator, MctsConfig(simulations=16, seed=4), add_root_noise=False, tree=tree)
+        self.assertEqual(tree.size, 0)
 
     def test_a_forced_root_is_returned_or_searched_as_asked(self):
         env = make_env(SEED, calendar_rounds=1)

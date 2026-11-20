@@ -326,6 +326,13 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         return game::campaign::pythonSum(values.data(), values.size());
     }, py::arg("values"), "The search's copy of Python's sum() of floats, exposed for tests.");
 
+    py::class_<game::campaign::SearchTree>(module, "CampaignSearchTree",
+        "A game's search tree, kept from one decision to the next (include/game/search.hpp): a search "
+        "given it starts from the node of its state, keeps everything below it and drops the rest.")
+        .def(py::init<>())
+        .def("clear", &game::campaign::SearchTree::clear)
+        .def_property_readonly("size", &game::campaign::SearchTree::size, "The tree's nodes.");
+
     py::class_<game::campaign::InferenceClient>(module, "InferenceClient",
         "One game thread's client of the inference server: it writes a zone input into the thread's "
         "shared-memory buffer and exchanges binary messages through the thread's pipe "
@@ -573,7 +580,9 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     module.def("search_campaign", [](const NativeCampaignEnv& env, const std::vector<std::string>& passed,
                                      const std::vector<std::string>& order, py::object evaluator, int simulations,
                                      double cPuct, int maxDepth, std::uint64_t seed, bool rootNoise,
-                                     double dirichletAlpha, double dirichletEpsilon, bool searchForcedRoot) {
+                                     double dirichletAlpha, double dirichletEpsilon, bool searchForcedRoot,
+                                     py::object tree) {
+        game::campaign::SearchTree* kept = tree.is_none() ? nullptr : &tree.cast<game::campaign::SearchTree&>();
         game::campaign::SearchSchedule schedule;
         for (const auto& player : passed) schedule.passed |= static_cast<std::uint8_t>(1U << allianceNumber(player));
         if (order.size() != 3) throw std::invalid_argument("Interrupt order must contain each alliance exactly once");
@@ -594,7 +603,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         game::campaign::SearchOutcome outcome;
         {
             py::gil_scoped_release release;
-            outcome = game::campaign::searchDecision(std::move(root), schedule, *chosen, settings);
+            outcome = game::campaign::searchDecision(std::move(root), schedule, *chosen, settings, kept);
         }
         py::list actionValues;
         for (const auto& values : outcome.actionValues)
@@ -610,10 +619,11 @@ PYBIND11_MODULE(gwrl_cpp, module) {
                                                  : py::object(py::none());
         result["evaluations"] = outcome.evaluations;
         result["positions"] = outcome.positions;
+        result["reused"] = outcome.reused;
         return result;
     }, py::arg("env"), py::arg("passed"), py::arg("order"), py::arg("evaluator"), py::arg("simulations"),
        py::arg("c_puct"), py::arg("max_depth"), py::arg("seed"), py::arg("root_noise"), py::arg("dirichlet_alpha"),
-       py::arg("dirichlet_epsilon"), py::arg("search_forced_root"),
+       py::arg("dirichlet_epsilon"), py::arg("search_forced_root"), py::arg("tree") = py::none(),
        "Search one decision of `env` (include/game/search.hpp) without Python's lock. The evaluator is an "
        "InferenceClient, None for uniform priors and zero values, or an object whose evaluate_zone(zone_input, "
        "actor) the search calls with Python's lock. Studies call it through studies/campaign/native_search.py.");

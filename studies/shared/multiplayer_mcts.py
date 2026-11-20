@@ -9,7 +9,14 @@ once: no evaluation, no simulations and no value estimate. The caller's random
 draws are outside the search, so a game evaluated one position at a time plays
 exactly as if it had searched. With batched evaluation the skipped positions
 leave their batches, which can change other positions' network outputs in the
-last digits.
+last digits. Inside a search, a new state with one legal action is not asked
+about either: the simulation plays its action and goes on, and the network
+rates such a state only when a simulation has to stop there.
+
+A search object kept from one decision to the next keeps its tree: the next
+search starts from the node of the state it is asked about, with everything
+below it, and drops the rest; a state the tree never reached starts a new tree.
+The C++ search (src/search.cpp) is the same search, checked against this one.
 """
 from __future__ import annotations
 
@@ -203,6 +210,9 @@ class Node:
     visits: int = 0
     value_sum: list[float] = field(default_factory=lambda: [0.0] * 3)
     evaluation: Vector = ZERO
+    # Whether evaluation holds the network's value (or a terminal state's
+    # returns): a state with one legal action is expanded without one.
+    evaluated: bool = False
     # A copy of the game at this position. Simulations only copy it again, to
     # play one move or roll dice there; nothing plays on it.
     game: Any = None
@@ -350,16 +360,25 @@ class VectorMCTS:
             raise ValueError("Legal actions need unique stable identities")
         return actions, keys
 
-    def _expand(self, node: Node, env: SearchEnv) -> Vector:
+    def _expand(self, node: Node, env: SearchEnv, *, root: bool = False) -> Vector | None:
+        """Ask the network about a new state; None for a forced state inside the tree.
+
+        A state with one legal action, other than the root, gets its one edge
+        without an evaluation: a simulation plays the action and goes on.
+        """
         if env.is_terminal():
-            node.evaluation = vector(env.returns())
+            node.evaluation, node.evaluated = vector(env.returns()), True
         elif node.kind == "chance":
             node.evaluation = ZERO
         else:
             actions, keys = self._legal(node, env)
+            if len(actions) == 1 and not root:
+                node.edges = [Edge(actions[0], keys[0], 1.0, 1.0)]
+                node.expanded = True
+                return None
             evaluation = self.evaluator.evaluate(env, actions)
             priors = probabilities(evaluation.priors, len(actions))
-            node.evaluation = vector(evaluation.values)
+            node.evaluation, node.evaluated = vector(evaluation.values), True
             node.edges = [Edge(action, key, p, p) for action, key, p in zip(actions, keys, priors)]
         node.expanded = True
         return node.evaluation
@@ -385,21 +404,58 @@ class VectorMCTS:
         """
         if node.kind == "chance":
             return vector(self.evaluator.evaluate(env, []).values)
-        return node.evaluation if node.expanded else self._expand(node, env)
+        if not node.expanded:
+            value = self._expand(node, env)
+            if value is not None:
+                return value
+        if not node.evaluated:
+            # A forced state, rated only now that a simulation stops at it.
+            node.evaluation = vector(self.evaluator.evaluate(env, [edge.action for edge in node.edges]).values)
+            node.evaluated = True
+        return node.evaluation
 
-    def search(self, env: SearchEnv, *, add_root_noise: bool = False, reuse_root: bool = True) -> SearchResult:
-        if not reuse_root:
-            self.nodes.clear()
-            self._bounds.clear()
+    def _retain(self, root: Node) -> None:
+        """Keep root and every node below it; drop the rest of the tree."""
+        kept, stack = set(), [root]
+        while stack:
+            node = stack.pop()
+            if id(node) in kept:
+                continue
+            kept.add(id(node))
+            for edge in node.edges:
+                stack.extend(edge.successors.values())
+            stack.extend(node.chance_successors.values())
+        self.nodes = {identity: node for identity, node in self.nodes.items() if id(node) in kept}
+
+    def search(self, env: SearchEnv, *, add_root_noise: bool = False, reuse_root: bool = True,
+               seed: int | None = None) -> SearchResult:
+        """Search env's decision. With reuse_root the tree keeps the subtree of
+        env's state from earlier searches and drops the rest; `seed`, when
+        given, starts this search's random stream instead of the next draws of
+        the config's seed."""
+        if seed is not None:
+            self._random = random.Random(seed)
         identity = self.cache_identity(env)
+        if reuse_root and identity in self.nodes:
+            self._retain(self.nodes[identity])
+        else:
+            self.nodes.clear()
+        self._bounds.clear()
         root, reused = self._node(env)
         if root.kind not in {"chance", "terminal"} and not self.config.search_forced_root:
             actions, _ = self._legal(root, env)
             if len(actions) == 1:
                 return SearchResult(actions, [0], [1.0], [1.0], None, [None], root, identity, reused, [])
         if not root.expanded:
-            self._expand(root, env)
+            self._expand(root, env, root=True)
+        # The value bounds start from the kept tree's actions, as the search
+        # that made them left them, and widen as this search backs up values.
         bounds = self._bounds.setdefault(identity[:-1], [Bounds() for _ in PLAYERS])
+        for cached in self.nodes.values():
+            for edge in cached.edges:
+                if edge.visits:
+                    for component in range(3):
+                        bounds[component].update(edge.value_sum[component] / edge.visits)
         # A previously noised root may now be an internal transposition. Noise
         # is local to this search's root opportunity, never cached as a policy.
         for cached in self.nodes.values():
@@ -440,7 +496,7 @@ class VectorMCTS:
                     stream = self._copy(node, seed, stream)
                     stream.resolve_chance()
                     successor = self._reach(stream)
-                    node.chance_successors[successor.state_key] = successor
+                    node.chance_successors.setdefault(successor.state_key, successor)
                     outcomes.append((node.state_key, successor.state_key))
                     if successor.state_key in path_keys:
                         values, source = self._bootstrap_value(successor, successor.game), "cycle_cutoff"
@@ -450,8 +506,11 @@ class VectorMCTS:
                     path_keys.add(node.state_key)
                     continue
                 if not node.expanded:
-                    values, source = self._expand(node, node.game), "evaluator"
-                    break
+                    value = self._expand(node, node.game)
+                    if value is not None:
+                        values, source = value, "evaluator"
+                        break
+                    # A forced state: its one action is played below, unasked.
                 fixed = self.config.mode == "fixed_opponents" and node.player != self.config.target_player
                 if fixed:
                     assert self.opponent_policy is not None

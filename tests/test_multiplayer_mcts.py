@@ -681,14 +681,52 @@ class ForcedRootTests(unittest.TestCase):
             VectorMCTS().search(env)
         self.assertEqual(json.loads(raised.exception.state)["node"], "dead")
 
-    def test_a_reused_tree_keeps_its_statistics_across_a_forced_root(self):
+    def test_a_kept_tree_follows_the_game_through_a_forced_root(self):
         search = VectorMCTS(self.Evaluator(), MctsConfig(simulations=32, seed=3))
-        first = search.search(TreeEnv(self.GAME, "choice"))
+        search.search(TreeEnv(self.GAME, "choice"))
         forced = search.search(TreeEnv(self.GAME, "forced"))
         self.assertEqual((forced.visit_counts, forced.values), ([0], None))
         self.assertTrue(forced.reused_root)
+        # Only the forced state's subtree is kept: the choice before it is gone.
+        self.assertEqual({node.state_key for node in search.nodes.values()},
+                         {TreeEnv(self.GAME, "forced").planning_key(), TreeEnv(self.GAME, "end").planning_key()})
         again = search.search(TreeEnv(self.GAME, "choice"))
-        self.assertEqual(sum(again.visit_counts), sum(first.visit_counts) + 32)
+        self.assertFalse(again.reused_root)
+        self.assertEqual(sum(again.visit_counts), 32)
+
+    class Recording(Evaluator):
+        def __init__(self):
+            super().__init__()
+            self.asked = []
+
+        def evaluate(self, env, actions):
+            self.asked.append(env.node)
+            return super().evaluate(env, actions)
+
+    def test_a_forced_state_inside_a_search_is_asked_about_only_where_a_simulation_stops(self):
+        evaluator = self.Recording()
+        result = VectorMCTS(evaluator, MctsConfig(simulations=32, seed=3)).search(TreeEnv(self.GAME, "choice"))
+        # Every simulation through the forced state plays its one action and goes on.
+        self.assertNotIn("forced", evaluator.asked)
+        self.assertEqual(sum(result.visit_counts), 32)
+        # At the depth limit a simulation stops there and needs its value, asked once.
+        evaluator = self.Recording()
+        VectorMCTS(evaluator, MctsConfig(simulations=32, max_depth=1, seed=3)).search(TreeEnv(self.GAME, "choice"))
+        self.assertEqual(evaluator.asked.count("forced"), 1)
+
+    def test_a_kept_tree_carries_its_visits_into_the_next_search(self):
+        search = VectorMCTS(self.Evaluator(), MctsConfig(simulations=32, seed=3))
+        search.search(TreeEnv(self.GAME, "choice"), seed=5)
+        env = TreeEnv(self.GAME, "choice")
+        env.apply_action("right")
+        # Reached by the right action and by the coin's outcome alike.
+        node = search.nodes[search.cache_identity(env)]
+        visits, value_sum = node.visits, list(node.value_sum)
+        self.assertGreater(visits, 0)
+        kept = search.search(env, seed=6)  # The forced state: no search, the tree kept.
+        self.assertTrue(kept.reused_root)
+        self.assertIs(search.nodes[search.cache_identity(env)], node)
+        self.assertEqual((node.visits, node.value_sum), (visits, value_sum))
 
     def test_fixed_opponent_search_does_not_ask_the_opponent_policy(self):
         def refuse(env, actions):

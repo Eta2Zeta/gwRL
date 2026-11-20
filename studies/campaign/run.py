@@ -279,7 +279,7 @@ def train(args) -> int:
         "config": asdict(config), "runtime_source_sha256": source_hashes(),
         "batch_index": 0, "wave_index": 0, "training_environment_seeds": [],
         "task": task_manifest(template), "updates": [], "batch_sizes": [],
-        "batch_start_history": 0, "active_episode_seeds": [], "total_waves": 0,
+        "active_episode_seeds": [], "total_waves": 0,
         "episode_wave_limit": config.transitions_per_batch, "budget_extensions": []}
     if loaded:
         learner.restore(loaded["learner"], env_template=template)
@@ -454,6 +454,7 @@ def train(args) -> int:
 
         def start_update(server):
             episodes, state["finished"], state["failed"] = state["finished"], [], 0
+            learner.action_history.clear()  # Only the events of games since this update began.
             trainer.update(result=None, error=None, episodes=episodes, started=serving_mark(server),
                            before=state["mark"])
 
@@ -606,7 +607,9 @@ def train(args) -> int:
                 count = config.parallel_envs
                 if config.max_episodes is not None:
                     count = min(count, config.max_episodes - learner.counters["episodes"])
-                runner["batch_start_history"] = len(learner.action_history)
+                # The learner keeps only this training iteration's events, which the
+                # progress report reads; all of a run's would fill memory within days.
+                learner.action_history.clear()
                 with measure("collection"):
                     collection = learner.collect_episodes(workers, count, runner["episode_wave_limit"],
                                                           stop=lambda: stopped)
@@ -645,7 +648,7 @@ def train(args) -> int:
                 continue
             if learner.frozen_models is None:
                 with measure("collection"):
-                    runner["batch_start_history"] = len(learner.action_history)
+                    learner.action_history.clear()  # Only this training iteration's events.
                     if config.complete_episodes or not learner.parallel_envs:
                         root_count = config.parallel_envs
                         if config.max_episodes is not None:
@@ -675,7 +678,7 @@ def train(args) -> int:
                     exhausted = True
                     break
                 with measure("progress_reporting"):
-                    history = learner.action_history[runner["batch_start_history"]:]
+                    history = learner.action_history
                     episodes = []
                     for index, env in enumerate(learner.parallel_envs):
                         events = [event for event in history if event["root"] == index]

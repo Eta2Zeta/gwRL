@@ -126,7 +126,10 @@ class CampaignRunTests(unittest.TestCase):
         self.assertEqual(records[-1]["status"], "completed")
         self.assertEqual(records[0]["verification"], "initial_serialized_sha256_then_planning_keys_and_seed")
         transitions = [record for record in records if record["type"] == "transition"]
-        self.assertEqual([record["event"] for record in transitions], actual["learner"]["action_history"])
+        # The learner keeps only the last training iteration's events: the log's last ones.
+        history = actual["learner"]["action_history"]
+        self.assertTrue(0 < len(history) < len(transitions))
+        self.assertEqual([record["event"] for record in transitions][-len(history):], history)
         self.assertEqual(len(transitions), actual["learner"]["counters"]["transitions"])
         starts = [record for record in records if record["type"] == "episode_start"]
         self.assertEqual([record["seed"] for record in starts], actual["runner"]["training_environment_seeds"])
