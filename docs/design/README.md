@@ -1467,6 +1467,10 @@ On decision 612's training sample, for the Comintern's network:
 | Comintern | −1.024 | −1.062 | 0.038 | 0.001 |
 | **Value loss, the average** | | | | **0.035** |
 
+A hundred times the square root of a value loss is the typical size of the
+network's miss, in points of final score: here about 19 points, the root mean
+square of the three misses of 23.9, 21.4 and 3.8 points.
+
 | Action | Visit share $\pi_m$ | Probability $p_m$ | Visit share × (−ln probability) |
 | --- | ---: | ---: | ---: |
 | Shensi → Hopeh | 0.5625 | 0.102 | 1.282 |
@@ -3096,14 +3100,24 @@ controls, not expert play.
 **Losses on fresh games.** Between held-out evaluations, a run shows how well
 its network learns by how well it predicts each game before training on it. In
 self-play that never stops, each game that ends is first scored by the network
-serving self-play, with section 8.1's value loss and the KL divergence of the
-action probabilities from the visit shares, by alliance (`fresh_game_losses` in
-`studies/campaign/learning.py`). Two runs play different games, whose final
-scores can be predicted more or less well, so a run's value loss is compared
-beside the variance of its games' final scores, which is the value loss of
-always predicting their mean. The *explained variance* is one minus the value
-loss divided by that variance. On 17 November one network's value loss was 18%
-higher than three networks', but its games' final scores varied 21% more, and
+serving self-play, on the game's training samples, grouped by the alliance that
+chose at each training sample (`fresh_game_losses` in
+`studies/campaign/learning.py`). Two numbers are kept, both defined in section
+8.1 and both lower when the network predicts better:
+
+- **the value loss**, how far the network's values are from the game's final
+  scores divided by 100; a hundred times its square root is the typical miss in
+  points of final score;
+- **the KL divergence** of the network's action probabilities from the visit
+  shares, zero only when the network already gives the search's split.
+
+Two runs play different games, whose final scores can be predicted more or less
+well, so a run's value loss is compared beside the variance of its games' final
+scores, which is the value loss of always predicting their mean. The *explained
+variance* is one minus the value loss divided by that variance: the share of
+the final scores' spread that the network's values account for. On 17 November
+one network's value loss was 18% higher than three networks', but its games'
+final scores varied 21% more, and
 the two explained 15.4% and 13.1% of that variance
 ([record](../archive/records/one_network_comparison_2026_11_17.md#learning-on-each-game-before-training-on-it)).
 `tools/compare_training_runs.py` reports both for each hour of a run.
@@ -3757,6 +3771,9 @@ the dated records use instead.
 - **Held-out evaluation:** games of fixed networks, without exploration noise,
   against scripted opponents on seeds training never used; it measures playing
   strength.
+- **Losses on fresh games:** the value loss and the KL divergence of a game's
+  training samples, measured when the game ends, before it trains the network;
+  `fresh_games` in a run's `manifest.json`.
 - **Explained variance:** one minus a value loss divided by the variance of the
   same games' final scores: the share of the final scores' spread that the
   network's values account for, 0 for always predicting the mean and 1 for
