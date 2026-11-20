@@ -664,7 +664,7 @@ def play_shared_game(config, seed, evaluator, deadline_epoch):
 
 
 def _shared_game_process(values, slots, connections, buffer_names, tasks, results, deadline_epoch, version):
-    """A game process: one thread per game slot, each taking seeds until its stop marker."""
+    """A game process: one thread per game slot, each taking seeds until its task pipe ends."""
     from studies.campaign.shared_evaluator import game_process
     config = Config(**values)
     def play(seed, evaluator):
@@ -687,8 +687,9 @@ def shared_selfplay(config, device, models, weights, deadline, persist, runtime_
     """Game processes keep rules, search and input preparation; this process
     evaluates every waiting position in shared device batches.
 
-    Each process plays `games_per_process` games at once, one per thread, taking
-    seeds from one queue, so a finished game's slot starts the next game. See
+    Each process plays `games_per_process` games at once, one per thread, and is
+    given the next seed whenever one of its game slots has none, so a finished
+    game's slot starts the next game. See
     studies/campaign/shared_evaluator.py for the request protocol. Returns the
     report and, as parallel_selfplay does, the traffic as network passes and
     evaluator calls.

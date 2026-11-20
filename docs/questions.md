@@ -35,7 +35,7 @@ Other open things stay in the pages that own them, and
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
 | [Q-011](#q-011-the-memory-the-rest-of-the-mac-uses) | Should the supervisor also stop a run when the whole Mac runs short of memory, not only when the run itself nears 30 GB? | Running training | Yes: watch the Mac's memory pressure and swap too |
-| [Q-012](#q-012-a-game-process-that-crashes) | When a game process crashes, should training lose only that process's games, and should it pause for some hours to find the defect behind the crash? | Running training | Lose only that process's games now; look for the defect when the Mac can spare the hours |
+| [Q-012](#q-012-a-game-process-that-crashes) | Should training pause for some hours to look for the defect behind a game process's crash? | Running training | Yes, when the Mac can spare the hours |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
@@ -48,9 +48,9 @@ Q-011 was raised on 19 November 2026, when a training run with 378 concurrent
 games filled the Mac's memory. Its numbers are in the
 [record of concurrent games with the C++ search](archive/records/concurrent_games_cpp_search_2026_11_19.md).
 Q-012 was raised on 20 November 2026, when a game process of the long training
-run started the day before crashed. Its numbers are in the
-[record of that crash](archive/records/game_process_crash_2026_11_20.md) and
-the [record of the training process's memory](archive/records/training_process_memory_2026_11_20.md).
+run started the day before crashed; its first part, whether training should
+lose only that process's games, was answered the same day. Its numbers are in
+the [record of that crash](archive/records/game_process_crash_2026_11_20.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -248,20 +248,16 @@ and in [section 9.2 of the design document](design/README.md#92-running-training
 
 ## Q-012: A game process that crashes
 
-**The question.** When a game process crashes, should the run lose only that
-process's games instead of stopping? And should training pause for some hours
-so that the defect behind the crash can be looked for?
+**The question.** Should training pause for some hours so that the defect
+behind a game process's crash can be looked for?
 
 **What the program does now.** A game process plays its games in threads, and
-each game thread sends its states to the inference server through a pipe of
-its own. The inference server runs in the training process (`game_process` and
-`SharedEvaluatorServer` in `studies/campaign/shared_evaluator.py`). When a game
-process dies, the inference server's next reply to it fails, and the training
-process exits with code 1. The supervisor does not retry a run after that exit
-(`RETRYABLE_RETURNCODES` in `tools/supervise_campaign_training.py`), so the run
-stops. Started again, the supervisor resumes the run from its checkpoint, which
-is written at each network update. The games in play and all the play since
-that update are lost.
+its native code, the engine and the search, can crash it. When a game process
+dies, the run loses only the games that process had not finished: they are
+recorded as failed games, and a new game process takes its game slots while the
+others play on (`play_shared_games` in `studies/campaign/shared_evaluator.py`;
+[running training on the Mac](design/README.md#92-running-training-on-the-mac)).
+The defect that made a game process crash is not found.
 
 **A real case** (20 November 2026, the long run of 252 concurrent games from
 commit `999c90c`). After 5.13 hours of play, at 01:06, a game process aborted.
@@ -270,42 +266,30 @@ The process was freeing a game's kept search tree
 ([section 4.7 of the design document](design/README.md#47-more-detail-on-the-search)),
 and the bad memory was in the state of a nation, in the game copy of one of
 the tree's nodes. The game had just raised an error, and the record of that
-error died with the process. A shell loop outside the repository started the
-supervisor again two minutes later. The next network update came about 51
-minutes later than it would have without the crash
-([record](archive/records/game_process_crash_2026_11_20.md)). Two crashes of
-the same kind were noted on 2 November 2026, before the search ran in C++.
+error died with the process. That run then stopped with the process, and the
+next network update came about 51 minutes later than it would have without the
+crash ([record](archive/records/game_process_crash_2026_11_20.md)). Two crashes
+of the same kind were noted on 2 November 2026, before the search ran in C++.
 
-**Why it matters.** At one crash in about five hours of play, a run would lose
-about 14% of its time (inferred from this one crash). And the defect damages
-memory before anything notices it: a game's state could be wrong without any
-crash, and its training samples with it.
-
-**A second fix waits for a new run.** The same run's training process kept
-every finished game's result, about 1.25 GB more an hour
-([record](archive/records/training_process_memory_2026_11_20.md)). The fix is in
-the repository since 20 November, but the current run plays its own copy of the
-code. Until a new run, the supervisor will stop the current run when its memory
-reaches 29 GB, during a network update, about every eight to nine hours (the
-first at about 09:00 to 10:00 on 20 November), and the shell loop will start it
-again; each stop loses the games in play, about 25 minutes of play (inferred).
-A new run for choice A would take up this fix too.
+**Why it matters.** The defect damages memory before anything notices it: a
+game's state could be wrong without any crash, and its training samples with
+it. And each crash still costs the games in play in one game process, 42 games
+in the long run's layout of six processes.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. Survive a crash | The inference server takes a closed pipe as the end of its game process, records that process's games in play as failed games, and starts a new game process for the same game slots; the run goes on. A crash then costs one process's games in play, 42 of the 252 in this run, instead of all the play since the last network update. It is a code change, so the running run would go on as a new run from its newest networks (`--initial-models`), with a new replay buffer. |
-| B. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and one crash in 5.13 hours of 252 games suggests that may take many hours. |
-| C. Leave it | The shell loop restarts the run after each crash, at a cost of about 51 minutes each time, and after each memory stop (above). |
+| A. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and one crash in 5.13 hours of 252 games suggests that may take many hours. |
+| B. Leave it | Training goes on, and each crash costs one game process's games in play. The defect stays, with whatever it does to games that do not crash. |
 
-**Recommendation: A now, and B when the Mac can spare some hours.** A removes
-most of the cost at once. Only B can find the defect, which may damage games
-without crashing them.
+**Recommendation: A, when the Mac can spare some hours.** Only A can find the
+defect, which may damage games without crashing them.
 
-**If answered.** What happens when a game process dies belongs in the
-[campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
-and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
+**If answered.** What was found, and the fix, belong in the engine page of the
+code that held the defect, and in
+[section 4.7 of the design document](design/README.md#47-more-detail-on-the-search)
+if it was in the search.
 
 ## Open elsewhere
 
@@ -372,3 +356,9 @@ the page that now states it.
   Stated in
   [one training step](design/README.md#84-one-training-step-and-one-network-update)
   and [known gaps](design/README.md#known-gaps).
+- **Q-012, first part**, a game process that crashes. Answered on 20 November
+  2026: training loses only the games that process had not finished and goes
+  on, with a new game process in its game slots; whether to pause training to
+  look for the defect stays open as Q-012. Stated in
+  [running training on the Mac](design/README.md#92-running-training-on-the-mac)
+  and [long unattended runs](../studies/campaign/README.md#long-unattended-runs).

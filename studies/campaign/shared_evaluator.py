@@ -14,6 +14,14 @@ its buffer is never overwritten while the server reads it. When the server
 stops, it closes the pipes still open, and a thread waiting for a reply raises
 EvaluatorClosed instead of waiting forever.
 
+Each game process also has a task pipe of its own, which brings its game
+threads their games one at a time, numbered, and a result pipe of its own, which
+takes each finished game's record back with its number. So the coordinator
+knows which games each process holds, and a process that dies cannot leave a
+shared pipe locked or half written. play_shared_games can then record the games
+that process had not finished as failed and start a new process for its game
+slots, while the other processes play on.
+
 The server lays the waiting positions out with features.pack_zone_arrays and
 runs neural.NetworkStack, whose pass is the one NeuralEvaluator's networks
 run, so results match NeuralEvaluator's up to floating-point rounding. A pass
@@ -22,11 +30,13 @@ than one per alliance, saves most of that cost.
 """
 from __future__ import annotations
 
+from collections import deque
 from dataclasses import dataclass, field
+import itertools
 import multiprocessing
 from multiprocessing import shared_memory
 from multiprocessing.connection import Connection, wait
-import queue
+from multiprocessing.reduction import ForkingPickler
 try:
     import resource
 except ImportError:  # Windows has no open-file limit for these pipes and buffers.
@@ -263,15 +273,38 @@ class SharedEvaluatorServer:
         self.as_written = False
         # MPS graph-cache housekeeping after completed forwards (device_runtime).
         self.runtime_policy = runtime_policy
-        self.connections = list(connections)
-        self.memories = {connection: shared_memory.SharedMemory(name=name)
-                         for connection, name in zip(connections, buffer_names, strict=True)}
+        # The game threads' pipes still open, and the buffer each thread writes its
+        # zone inputs into. A new game process for the same game slots reuses them.
+        self.connections: list[Connection] = []
+        self.memories: dict[Connection, shared_memory.SharedMemory] = {}
+        self._buffers: dict[str, shared_memory.SharedMemory] = {}
         self._stack = None
         self.stats = ServerStats()
         # The version of `models`, named in a game thread's next reply whenever it
         # differs from the last one sent there. None names no version.
         self.network_version: str | None = None
         self._named: dict[Connection, str] = {}
+        self.add(connections, buffer_names)
+
+    def add(self, connections: Sequence[Connection], buffer_names: Sequence[str]) -> None:
+        """Serve these game threads too, each writing its zone inputs into the named buffer."""
+        for connection, name in zip(connections, buffer_names, strict=True):
+            if name not in self._buffers:
+                self._buffers[name] = shared_memory.SharedMemory(name=name)
+            self.memories[connection] = self._buffers[name]
+            self.connections.append(connection)
+
+    def drop(self, connections: Sequence[Connection]) -> None:
+        """Stop serving these game threads and close their pipes: their game process has ended."""
+        for connection in connections:
+            self._forget(connection)
+            connection.close()
+
+    def _forget(self, connection: Connection) -> None:
+        if connection in self.connections:
+            self.connections.remove(connection)
+        self.memories.pop(connection, None)
+        self._named.pop(connection, None)
 
     def take_up(self, weights: dict[str, Any], version: str) -> None:
         """Answer every later request with these weights: between two inference batches."""
@@ -302,27 +335,36 @@ class SharedEvaluatorServer:
             self._stack = NetworkStack(networks, compiled=self.compiled_forward and not self.as_written)
         return self._stack
 
-    def serve(self, keep_running: Callable[[], bool]) -> None:
-        """Answer requests until every client closes its pipe or keep_running() is false.
+    def serve(self, keep_running: Callable[[], bool], *, until_closed: bool = True) -> None:
+        """Answer requests until keep_running() is false or, with until_closed, every
+        game thread has closed its pipe. Without until_closed, serving goes on while
+        keep_running() holds, for the game threads that `add` brings.
 
-        Stopping closes the pipes still open, so a thread still sending or waiting
-        for its reply gets EvaluatorClosed rather than waiting forever."""
-        open_connections = list(self.connections)
-        while open_connections:
+        A pipe that ends, or whose reply cannot be sent, is no longer served: its
+        game process has ended. Stopping closes the pipes still open, so a thread
+        still sending or waiting for its reply gets EvaluatorClosed rather than
+        waiting forever."""
+        while self.connections or not until_closed:
             if not keep_running():
-                for connection in open_connections:
+                for connection in self.connections:
                     connection.close()
+                self.connections = []
                 return
             before = time.perf_counter()
-            ready = wait(open_connections, timeout=0.05)
+            if not self.connections:  # Until a new game process's threads are added.
+                time.sleep(0.05)
+                self.stats.idle_seconds += time.perf_counter() - before
+                continue
+            ready = wait(self.connections, timeout=0.05)
             received = time.perf_counter()
             self.stats.idle_seconds += received - before
             requests = []
             for connection in ready:
                 try:
                     message = connection.recv_bytes()
-                except EOFError:
-                    open_connections.remove(connection)
+                except (EOFError, OSError):  # OSError: the pipe ended within a message.
+                    self._forget(connection)
+                    connection.close()
                     continue
                 requests.append((connection, read_request(self.memories[connection].buf, message)))
             self.stats.receive_seconds += time.perf_counter() - received
@@ -366,11 +408,15 @@ class SharedEvaluatorServer:
         sending = time.perf_counter()
         version = self.network_version
         for (connection, _), row_priors, value in zip(requests, priors, values, strict=True):
-            if version is not None and self._named.get(connection) != version:
-                connection.send_bytes(reply_bytes(row_priors, value, version))
+            naming = version is not None and self._named.get(connection) != version
+            try:
+                connection.send_bytes(reply_bytes(row_priors, value, version if naming else None))
+            except OSError:  # Its game process ended after sending the request.
+                self._forget(connection)
+                connection.close()
+                continue
+            if naming:
                 self._named[connection] = version
-            else:
-                connection.send_bytes(reply_bytes(row_priors, value, None))
         sent = time.perf_counter()
         if self.runtime_policy is not None:
             self.runtime_policy.completed(1)
@@ -385,7 +431,7 @@ class SharedEvaluatorServer:
         stats.forward_seconds += (sending - started) + (time.perf_counter() - sent)
 
     def close(self) -> None:
-        for memory in self.memories.values():
+        for memory in self._buffers.values():
             memory.close()
 
 
@@ -399,31 +445,36 @@ def raise_descriptor_limit(wanted: int) -> None:
         resource.setrlimit(resource.RLIMIT_NOFILE, (wanted, hard))
 
 
-def _next_task(tasks: Any) -> Any:
-    """A blocking get, since get_nowait can report an empty queue before queued
-    tasks reach this process. A process orphaned by its coordinator's death stops."""
-    while True:
-        try:
-            return tasks.get(timeout=5)
-        except queue.Empty:
-            parent = multiprocessing.parent_process()
-            if parent is not None and not parent.is_alive():
-                return None
-
-
 def game_process(play: Callable[[Any, RemoteEvaluator], dict[str, Any]], version: str,
                  slots: Sequence[int], connections: Sequence[Connection], buffer_names: Sequence[str],
-                 tasks: Any, results: Any) -> None:
-    """A game process: one thread per game slot, each taking tasks until its stop marker.
+                 tasks: Connection, results: Connection) -> None:
+    """A game process: one thread per game slot, each taking games until the task pipe ends.
 
-    `play(task, evaluator)` returns a game's record and handles its own failures.
+    `tasks` brings numbered tasks, (number, task), to one game slot at a time,
+    and ends when the coordinator closes it or dies. Each game's record goes back
+    through `results` with its task's number. `play(task, evaluator)` returns a
+    game's record and handles its own failures.
     """
+    taking, sending = threading.Lock(), threading.Lock()
+
+    def next_task() -> Any:
+        with taking:
+            try:
+                return tasks.recv()
+            except (EOFError, OSError):  # No more games, or the coordinator has gone.
+                return None
 
     def slot(index: int, connection: Connection, name: str) -> None:
         evaluator = RemoteEvaluator(connection, name, version)
         try:
-            while (task := _next_task(tasks)) is not None:
-                results.put({**play(task, evaluator), "slot": index})
+            while (item := next_task()) is not None:
+                number, task = item
+                message = ForkingPickler.dumps((number, {**play(task, evaluator), "slot": index}))
+                with sending:
+                    try:
+                        results.send_bytes(message)
+                    except OSError:  # The coordinator has gone, and the task pipe ends with it.
+                        pass
         finally:
             evaluator.close()
 
@@ -433,9 +484,6 @@ def game_process(play: Callable[[Any, RemoteEvaluator], dict[str, Any]], version
         thread.start()
     for thread in threads:
         thread.join()
-    parent = multiprocessing.parent_process()
-    if parent is not None and not parent.is_alive():
-        results.cancel_join_thread()  # Exit must not wait for a reader that has gone.
 
 
 def _game_process_main(target: Callable[..., None], *arguments: Any) -> None:
@@ -446,145 +494,258 @@ def _game_process_main(target: Callable[..., None], *arguments: Any) -> None:
     target(*arguments)
 
 
+@dataclass(eq=False)
+class _GameProcess:
+    """The coordinator's side of one game process: its game threads' pipes to the
+    inference server, its task and result pipes, and the games it was given and has
+    not reported, by number, each with its task and the time it was given."""
+    group: int  # Which game slots it plays: games_per_process of them from group * games_per_process.
+    process: Any
+    connections: list[Connection]
+    tasks: Connection | None  # None once closed: it gets no more games.
+    results: Connection
+    playing: dict[int, tuple[Any, float]] = field(default_factory=dict)
+    reported: int = 0
+    results_ended: bool = False  # Everything it sent has been read.
+    seen_ended: float | None = None  # When its exit was first seen, before its results ended.
+
+
 def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, processes: int, games_per_process: int,
                       models: dict[str, Any], device: Any, runtime_policy: Any = None,
                       keep_playing: Callable[[SharedEvaluatorServer, list[Any]], bool] = lambda *_: True,
                       exit_seconds: float = 20.0, stop_seconds: float = 20.0,
                       feed: Callable[[], Any] | None = None,
+                      lost_game: Callable[[Any, str, float], Any] | None = None,
                       compiled_forward: bool = False) -> tuple[list[Any], ServerStats]:
     """Play tasks in game processes, evaluating every waiting position here.
 
     `target(slots, connections, buffer_names, tasks, results)` is the game process,
     normally game_process with its first arguments bound. Each process plays
-    `games_per_process` games at once, one per thread, taking tasks from one queue,
-    so a finished game's slot starts the next. `keep_playing(server, records)` runs
-    between serving rounds, with the records that arrived and were not taken: it
-    may take records off the front of `records` once it has used them, because
-    the games that reported are counted apart from the list. Returning false
-    closes every pipe, ending the running games. Processes get `exit_seconds` to
-    exit after the last game and `stop_seconds` after a stop. Returns the records
-    not taken and the server's statistics.
+    `games_per_process` games at once, one per thread, and is given a game whenever
+    one of its game slots has none, so a finished game's slot starts the next.
+    `keep_playing(server, records)` runs between serving rounds, with the records
+    that arrived and were not taken: it may take records off the front of
+    `records` once it has used them, because each process's games are counted
+    apart from the list. Returning false closes every pipe, ending the running
+    games. Processes get `exit_seconds` to exit after the last game and
+    `stop_seconds` after a stop. Returns the records not taken and the server's
+    statistics.
 
     With `feed`, games keep coming instead: `tasks` must be empty, and `feed()`
-    returns the next game's task, or None once no more games should start. A few
-    tasks wait queued beyond the game slots, so a slot that finishes a game starts
-    the next at once, and serving goes on until `keep_playing` returns false or
-    every game fed has reported. A `keep_playing` that runs games without end
-    must take each record it has used, or `records` would keep every game played.
+    returns the next game's task, or None once no more games should start; serving
+    goes on until `keep_playing` returns false or every game fed has reported. A
+    `keep_playing` that runs games without end must take each record it has used,
+    or `records` would keep every game played.
+
+    With `lost_game`, a game process that dies is replaced: each game it was given
+    and had not reported gets the record `lost_game(task, reason, seconds)`, where
+    `seconds` have passed since that game was given, and a new process takes its
+    game slots while the other processes play on. A process that dies before
+    reporting any game ends the play with ValueError, as any death does without
+    `lost_game`: a new process would most likely die the same way.
     """
     if feed is not None and tasks:
         raise ValueError("Give either a list of tasks or a feed, not both")
     context = multiprocessing.get_context("spawn")
     slots = processes * games_per_process
-    # A slot holds two pipe ends and its buffer mapped twice, and a shell's default
-    # limit of 256 stops at eight processes of six games.
-    raise_descriptor_limit(6 * slots + 64)
-    pipes = [context.Pipe() for _ in range(slots)]
+    # A game slot holds two pipe ends and its buffer mapped twice, a process four
+    # more pipe ends, and a shell's default limit of 256 stops at eight processes of six games.
+    raise_descriptor_limit(6 * slots + 8 * processes + 64)
     memories = [shared_memory.SharedMemory(create=True, size=BUFFER_BYTES) for _ in range(slots)]
-    waiting, results = context.Queue(), context.Queue()
-    # Games fed, and games whose record arrived, whether or not keep_playing took it.
-    fed, arrived, fed_out = 0, 0, feed is None
+    names = [memory.name for memory in memories]
+    listed, unsent, numbers = iter(tasks), [], itertools.count()
+    games: list[_GameProcess] = []  # The process now playing each group of game slots.
+    received: deque = deque()  # (process, (number, record)) as read, until collected.
+    records, unread, abandoned = [], [], []
+    fed_out, stopping, server = False, False, None
+    finished = threading.Event()
+
+    def start(group: int) -> _GameProcess:
+        members = range(group * games_per_process, (group + 1) * games_per_process)
+        pipes = [context.Pipe() for _ in members]
+        task_reader, task_writer = context.Pipe(duplex=False)
+        result_reader, result_writer = context.Pipe(duplex=False)
+        process = context.Process(target=_game_process_main, daemon=True, args=(
+            target, list(members), [child for _, child in pipes], [names[member] for member in members],
+            task_reader, result_writer))
+        try:
+            process.start()
+        except BaseException:
+            for connection in (*(parent for parent, _ in pipes), task_writer, result_reader):
+                connection.close()
+            raise
+        finally:
+            # Only the process holds these ends now, so its pipes end when it does.
+            for connection in (*(child for _, child in pipes), task_reader, result_writer):
+                connection.close()
+        return _GameProcess(group, process, [parent for parent, _ in pipes], task_writer, result_reader)
+
+    def next_task() -> Any:
+        if unsent:
+            return unsent.pop(0)
+        return feed() if feed is not None else next(listed, None)
+
+    def close_tasks(game: _GameProcess) -> None:
+        if game.tasks is not None:
+            game.tasks.close()  # Its game slots end once their games are done.
+            game.tasks = None
 
     def top_up() -> None:
-        # Fed games beyond those already reported: the slots' games and a few queued.
-        nonlocal fed, fed_out
-        while not fed_out and fed - arrived < slots + max(2, slots // 4):
-            task = feed()
+        # A game for each free game slot, to the process with the fewest games first.
+        nonlocal fed_out
+        while not fed_out:
+            game = min((game for game in games if game.tasks is not None), key=lambda game: len(game.playing),
+                       default=None)
+            if game is None or len(game.playing) >= games_per_process:
+                return
+            task = next_task()
             if task is None:
                 fed_out = True
-                for _ in range(slots):  # One stop marker per game slot.
-                    waiting.put(None)
+                for each in games:
+                    close_tasks(each)
                 return
-            waiting.put(task)
-            fed += 1
-
-    if feed is None:
-        for task in [*tasks, *[None] * slots]:  # One stop marker per game slot.
-            waiting.put(task)
-    spawned, records, unread, server = [], [], [], None
-    finished, stopping = threading.Event(), False
+            number = next(numbers)
+            try:
+                game.tasks.send((number, task))
+            except OSError:  # The process has died; check_processes handles that.
+                close_tasks(game)
+                unsent.append(task)
+                continue
+            game.playing[number] = (task, time.monotonic())
 
     def receive() -> None:
-        # A record far outgrows a pipe's buffer, and a process that dies sending one
-        # leaves half a message. Reading it would wait forever, because this process
-        # also holds the pipe's write end, so only this thread reads.
-        nonlocal arrived
+        # Only this thread reads results. A record far outgrows a pipe's buffer, and a
+        # process that dies while sending one leaves half a message, which ends its
+        # pipe as its exit does.
         while not finished.is_set():
+            reading = {game.results: game for game in games if not game.results_ended}
+            if not reading:
+                finished.wait(0.05)
+                continue
             try:
-                records.append(results.get(timeout=0.2))
-                arrived += 1
-            except queue.Empty:
-                pass
-            except Exception as error:
-                unread.append(error)
-                return
+                ready = wait(list(reading), timeout=0.2)
+            except (OSError, ValueError):  # A pipe was closed meanwhile.
+                continue
+            for connection in ready:
+                game = reading[connection]
+                try:
+                    received.append((game, connection.recv()))
+                except (EOFError, OSError):
+                    game.results_ended = True
+                except Exception as error:
+                    unread.append(error)
+                    return
+
+    def collect() -> None:
+        while received:
+            game, (number, record) = received.popleft()
+            if game.playing.pop(number, None) is None:
+                continue  # Its process was taken for dead, and the game counted as lost.
+            game.reported += 1
+            records.append(record)
+
+    def replace(game: _GameProcess, code: int) -> None:
+        try:
+            how = f"signal {signal.Signals(-code).name}" if code < 0 else f"exit code {code}"
+        except ValueError:
+            how = f"exit code {code}"
+        reason = f"GameProcessEnded: game process {game.process.pid} ended with {how}"
+        server.drop(game.connections)
+        close_tasks(game)
+        if game.results_ended:
+            game.results.close()
+        else:  # The receiver may still be reading it; it is closed at the end.
+            abandoned.append(game.results)
+        lost, game.playing = list(game.playing.values()), {}
+        if lost_game is None or not game.reported:
+            raise ValueError(f"A game process exited abnormally: {reason}")
+        now = time.monotonic()
+        records.extend(lost_game(task, reason, now - given) for task, given in lost)
+        failed = f"{reason}; {len(lost)} unfinished {'game' if len(lost) == 1 else 'games'} failed"
+        if fed_out:  # No more games for its game slots.
+            games.remove(game)
+            print(failed, file=sys.stderr, flush=True)
+            return
+        new = start(game.group)
+        games[games.index(game)] = new
+        server.add(new.connections, [names[member] for member in range(
+            new.group * games_per_process, (new.group + 1) * games_per_process)])
+        print(f"{failed}; game process {new.process.pid} took its {games_per_process} game slots",
+              file=sys.stderr, flush=True)
+
+    def check_processes(ended: list[_GameProcess]) -> None:
+        # A process that exited while it had games, or while games were still to come.
+        now = time.monotonic()
+        for game in list(games):
+            code = game.process.exitcode
+            if code is None or (code == 0 and fed_out and not game.playing):
+                continue  # Playing, or done.
+            if game not in ended:
+                game.seen_ended = now if game.seen_ended is None else game.seen_ended
+                if now - game.seen_ended < 10:
+                    continue  # What it sent before it ended may still be on the way.
+            replace(game, code)
+
+    def keep_running() -> bool:
+        nonlocal stopping, fed_out
+        if unread:
+            raise unread[0]
+        ended = [game for game in games if game.results_ended]  # All they sent is collected next.
+        collect()
+        if fed_out and not any(game.playing for game in games):
+            return False  # Every game has reported, whatever else still holds a pipe open.
+        # A stop comes first: its signal may have killed processes still starting.
+        stopping = not keep_playing(server, records)
+        if stopping:
+            fed_out = True  # Running games end as their pipes close, and none start.
+            for game in games:
+                close_tasks(game)
+            return False
+        check_processes(ended)
+        top_up()
+        return True
 
     receiver = threading.Thread(target=receive, name="campaign-game-records", daemon=True)
     try:
+        for group in range(processes):
+            games.append(start(group))
+        server = SharedEvaluatorServer(models, device, [connection for game in games for connection in game.connections],
+                                       names, runtime_policy, compiled_forward=compiled_forward)
         receiver.start()
-        if feed is not None:
-            top_up()
-        for index in range(processes):
-            members = range(index * games_per_process, (index + 1) * games_per_process)
-            process = context.Process(target=_game_process_main, daemon=True, args=(
-                target, list(members), [pipes[member][1] for member in members],
-                [memories[member].name for member in members], waiting, results))
-            process.start()
-            spawned.append(process)
-        for _, child in pipes:
-            child.close()
-        server = SharedEvaluatorServer(models, device, [parent for parent, _ in pipes],
-                                       [memory.name for memory in memories], runtime_policy,
-                                       compiled_forward=compiled_forward)
-
-        def keep_running() -> bool:
-            nonlocal stopping, fed_out
-            if unread:
-                raise unread[0]
-            # Every game has reported, whatever else still holds a pipe open.
-            if fed_out and arrived >= (len(tasks) if feed is None else fed):
-                return False
-            # A stop comes first: its signal may have killed processes still starting.
-            stopping = not keep_playing(server, records)
-            if stopping:
-                if not fed_out:  # Queued games end at once, then each slot's marker stops it.
-                    fed_out = True
-                    for _ in range(slots):
-                        waiting.put(None)
-                return False
-            if not all(process.is_alive() or process.exitcode == 0 for process in spawned):
-                raise ValueError("A game process exited abnormally")
-            if feed is not None:
-                top_up()
-            return True
-
-        server.serve(keep_running)
+        top_up()
+        server.serve(keep_running, until_closed=False)
         # The server closed every pipe still open, so a thread still waiting for
-        # an evaluation ends its game. A process exits only once its queued
-        # results reach the pipe, which the receiver reads meanwhile.
+        # an evaluation ends its game. A process exits once it has sent its
+        # records, which the receiver reads meanwhile.
         stop = time.monotonic() + (stop_seconds if stopping else exit_seconds)
-        while time.monotonic() < stop and any(process.is_alive() for process in spawned):
+        while time.monotonic() < stop and any(game.process.is_alive() for game in games):
             time.sleep(0.05)
-        stragglers = [process for process in spawned if process.is_alive()]
+        stragglers = [game.process for game in games if game.process.is_alive()]
         for process in stragglers:
             process.kill()
         for process in stragglers:
             process.join(timeout=1)  # Reaped, so their CPU time is counted.
-        # What a clean exit flushed may still be in the pipe.
-        clean = all(process.exitcode == 0 for process in spawned)
+        # What the processes sent before they ended may still be in their pipes.
         stop = time.monotonic() + 5
-        while clean and arrived < (len(tasks) if feed is None else fed) and time.monotonic() < stop:
+        while not all(game.results_ended for game in games) and not unread and time.monotonic() < stop:
             time.sleep(0.05)
+        collect()
     finally:
         finished.set()
-        for process in spawned:
-            if process.is_alive():
-                process.kill()
+        for game in games:
+            if game.process.is_alive():
+                game.process.kill()
+        if receiver.ident is not None:
+            receiver.join(timeout=2)
         if server is not None:
             server.close()
         for memory in memories:
             memory.close()
             memory.unlink()
-        for parent, _ in pipes:
-            parent.close()
+        for game in games:
+            for connection in (*game.connections, game.tasks, game.results):
+                if connection is not None:
+                    connection.close()
+        for connection in abandoned:
+            connection.close()
     return records, server.stats

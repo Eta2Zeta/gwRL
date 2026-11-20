@@ -2217,6 +2217,28 @@ to finish, so neither went on. While a network update runs, the inference server
 therefore answers with the layers as written (`answer_as_written` in
 `studies/campaign/shared_evaluator.py`).
 
+**When a game process dies.** A game process runs native code, the engine and
+the search, and a defect there can end it: on 20 November 2026 one aborted after
+5.13 hours of a long training run, on memory being freed that had not been
+allocated. That run's code stopped the whole run with it, and the next network
+update came about 51 minutes late
+([record](../archive/records/game_process_crash_2026_11_20.md)). A run loses
+only the games of the process that died. Each game process is given its games
+through a pipe of its own, numbered, and sends each finished game's record back
+through another pipe of its own, with its game's number. So the training
+process knows which games each game process holds, and a process that dies
+leaves no pipe half written that the others need (`play_shared_games` in
+`studies/campaign/shared_evaluator.py`). When a game process dies, the
+inference server stops answering that process's game threads and closes their
+pipes; each game the dead process was given and had not reported becomes a
+failed game, which names that process and the signal or exit code that ended it
+(`_lost_game` in `studies/campaign/episode_workers.py`); and a new game process
+takes the same game slots while the others play on. In the long run's layout of
+six processes of 42 games, a crash costs the games in play in one process. A
+process that dies before it has reported any game stops the run, since a new
+one would most likely die the same way. The defect behind the crash of 20
+November is not found ([Q-012](../questions.md#q-012-a-game-process-that-crashes)).
+
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept training sample was drawn 8 to 12 times
 ([section 8.7](#87-how-often-a-training-sample-is-drawn)). Decisions per hour is

@@ -160,6 +160,17 @@ its own core within the owner's allowance of nine cores (`CORE_ALLOWANCE`): the
 Mac has ten performance cores, and one stays free for everything else.
 `--all-cores` uses every core when the owner allows it.
 
+A game process that dies, for example in a crash of the engine or the search,
+costs only its own games. The games it had not finished become failed games in
+`manifest.json` (`failed_games`), each naming the dead process and the signal or
+exit code that ended it, and a new game process takes its game slots while the
+others play on; the training process's log says which process died and which
+took its place. A game process that dies before it has finished any game stops
+the run instead, since a new one would most likely die the same way
+([running training on the Mac](../../docs/design/README.md#92-running-training-on-the-mac)).
+The defect behind the game process crash of 20 November 2026 is not found
+([Q-012](../../docs/questions.md#q-012-a-game-process-that-crashes)).
+
 ### Training on the Mac
 
 `--profile mac` gives the supervisor the setup measured on this Mac, kept in

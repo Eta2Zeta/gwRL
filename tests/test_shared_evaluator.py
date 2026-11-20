@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from multiprocessing import Pipe, shared_memory
-import queue
 import random
 import threading
 import time
@@ -289,6 +288,27 @@ class SharedEvaluatorTests(unittest.TestCase):
             memory.close()
             memory.unlink()
 
+    def test_a_reply_to_a_game_process_that_ended_is_dropped(self):
+        # A game process that dies after sending a request leaves a pipe that
+        # cannot take the reply: the server stops serving it and answers the rest.
+        memory = shared_memory.SharedMemory(create=True, size=BUFFER_BYTES)
+        server_end, client_end = Pipe()
+        try:
+            env = restore(self.decisions[0])
+            layout, arrays = prepared(env, tuple(env.legal_actions()))
+            server = SharedEvaluatorServer(self.models, torch.device("cpu"), [server_end], [memory.name])
+            client_end.close()  # The game process has gone.
+            server.answer([(server_end, (env.current_decision_player(), len(arrays["action_source"]), layout, arrays))])
+            self.assertEqual(server.connections, [])
+            self.assertTrue(server_end.closed)
+            self.assertEqual(server.stats.requests, 1)
+            server.close()
+        finally:
+            server_end.close()
+            client_end.close()
+            memory.close()
+            memory.unlink()
+
     def test_a_closed_pipe_raises_evaluator_closed(self):
         memory = shared_memory.SharedMemory(create=True, size=BUFFER_BYTES)
         env = restore(self.decisions[0])
@@ -337,9 +357,11 @@ class SharedGameSlotTests(unittest.TestCase):
                         games_per_process=2, seeds=(1, 2, 3, 4), cpu_budget=CPU_BUDGET)
         memory = shared_memory.SharedMemory(create=True, size=1 << 20)
         parent, child = Pipe()
-        tasks, results = queue.Queue(), queue.Queue()
-        for seed in (1, 2, None):
-            tasks.put(seed)
+        tasks, task_writer = Pipe(duplex=False)
+        result_reader, results = Pipe(duplex=False)
+        for number, seed in enumerate((1, 2)):
+            task_writer.send((number, seed))
+        task_writer.close()  # The task pipe ends after the two games.
         def play(config, seed, evaluator, deadline_epoch):
             if seed == 1:
                 raise KeyError("boom")
@@ -348,12 +370,14 @@ class SharedGameSlotTests(unittest.TestCase):
             with patch("tools.benchmark_campaign_devices.play_shared_game", side_effect=play):
                 _shared_game_process(asdict(config), [5], [child], [memory.name], tasks, results, time.time() + 60,
                                      "test")
+            (first, failed), (second, played) = result_reader.recv(), result_reader.recv()
+            self.assertFalse(result_reader.poll())
         finally:
-            parent.close()
+            for connection in (parent, tasks, results, result_reader):
+                connection.close()
             memory.close()
             memory.unlink()
-        failed, played = results.get_nowait(), results.get_nowait()
-        self.assertTrue(results.empty())
+        self.assertEqual((first, second), (0, 1))  # Each record comes back with its task's number.
         self.assertEqual((failed["seed"], failed["terminal"], failed["stop_reason"], failed["slot"]),
                          (1, False, "game_exception", 5))
         self.assertEqual(failed["failure"]["error"], "KeyError: 'boom'")

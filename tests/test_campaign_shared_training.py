@@ -2,12 +2,12 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from functools import partial
 import json
 import multiprocessing
 from multiprocessing.shared_memory import SharedMemory
 import os
 from pathlib import Path
-import queue
 import signal
 import struct
 import subprocess
@@ -15,7 +15,7 @@ import sys
 import tempfile
 import time
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import torch
 
@@ -59,7 +59,7 @@ def weights(seed):
 def dies_sending_a_record(slots, _connections, _names, _tasks, results):
     """The other process plays on, so the coordinator keeps serving."""
     if slots == [0]:
-        os.write(results._writer.fileno(), struct.pack("!i", 1 << 20) + b"half a message")
+        os.write(results.fileno(), struct.pack("!i", 1 << 20) + b"half a message")
         os._exit(9)
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
     time.sleep(60)
@@ -70,9 +70,34 @@ def killed_while_starting(*_):
 
 
 def reports_each_task(_slots, _connections, _names, tasks, results):
-    """Plays a task by reporting it at once, until a stop marker."""
-    while (task := tasks.get()) is not None:
-        results.put({"root": task})
+    """Plays a task by reporting it at once, until the task pipe ends."""
+    while True:
+        try:
+            number, task = tasks.recv()
+        except EOFError:
+            return
+        results.send((number, {"root": task}))
+
+
+def dies_in_its_second_game(marker, slots, connections, names, tasks, results):
+    """The first process to start reports one game and dies in its second; the
+    processes after it play on. With `marker` already there, every process dies in
+    its first game."""
+    try:
+        open(marker, "x").close()
+    except FileExistsError:
+        if os.path.getsize(marker):
+            tasks.recv()
+            os.kill(os.getpid(), signal.SIGKILL)
+        return reports_each_task(slots, connections, names, tasks, results)
+    number, task = tasks.recv()
+    results.send((number, {"root": task}))
+    tasks.recv()
+    os.kill(os.getpid(), signal.SIGKILL)
+
+
+def lost(task, reason, seconds):
+    return {"root": task, "failure": reason, "seconds": seconds}
 
 
 def stuck_in_a_game(*_):
@@ -92,9 +117,57 @@ class GameProcessEndingTests(unittest.TestCase):
             self.play(dies_sending_a_record, processes=2)
 
     def test_a_stop_outranks_a_process_it_killed_while_starting(self):
-        checks = iter([True] * 80)  # Long enough for the process to die first.
-        records, _ = self.play(killed_while_starting, keep_playing=lambda *_: next(checks, False), stop_seconds=1.0)
+        def stopped_after_the_process_died(*_):
+            deadline = time.monotonic() + 30
+            while multiprocessing.active_children() and time.monotonic() < deadline:
+                time.sleep(0.05)
+            return False
+        records, _ = self.play(killed_while_starting, keep_playing=stopped_after_the_process_died,
+                               stop_seconds=1.0, lost_game=lost)
         self.assertEqual(records, [])
+
+    def test_a_process_that_dies_is_replaced_and_its_games_fail(self):
+        # One process of two game slots: the first dies in its second game, after
+        # reporting one, and the process that takes its slots plays the rest.
+        games, taken = iter(range(40)), []
+
+        def keep_playing(_server, records):
+            while records:
+                taken.append(records.pop(0))
+            return True
+        with tempfile.TemporaryDirectory() as directory:
+            target = partial(dies_in_its_second_game, os.path.join(directory, "marker"))
+            records, _ = play_shared_games(target, [], processes=1, games_per_process=2, models=self.MODELS,
+                                           device=torch.device("cpu"), keep_playing=keep_playing,
+                                           feed=lambda: next(games, None), lost_game=lost)
+        taken += records
+        self.assertEqual(sorted(record["root"] for record in taken), list(range(40)))  # Each game once.
+        failed = [record for record in taken if "failure" in record]
+        # Its second game, and perhaps one more given to it while it was dying.
+        self.assertIn([record["root"] for record in failed], ([1], [1, 2]))
+        self.assertRegex(failed[0]["failure"], r"^GameProcessEnded: game process \d+ ended with signal SIGKILL$")
+        self.assertEqual(multiprocessing.active_children(), [])
+
+    def test_a_process_that_dies_before_reporting_a_game_ends_the_play(self):
+        # The process that takes the dead one's game slots dies in its first game.
+        with tempfile.TemporaryDirectory() as directory:
+            marker = os.path.join(directory, "marker")
+            target = partial(dies_in_its_second_game, marker)
+
+            games, taken = iter(range(40)), []
+
+            def keep_playing(_server, records):
+                while records:
+                    taken.append(records.pop(0))
+                    with open(marker, "a") as file:  # Every later process dies in its first game.
+                        file.write("x")
+                return True
+            with self.assertRaisesRegex(ValueError, "exited abnormally: GameProcessEnded"):
+                play_shared_games(target, [], processes=1, games_per_process=2, models=self.MODELS,
+                                  device=torch.device("cpu"), keep_playing=keep_playing,
+                                  feed=lambda: next(games, None), lost_game=lost)
+            self.assertEqual(taken[0], {"root": 0})  # The first process reported a game before it died.
+        self.assertEqual(multiprocessing.active_children(), [])
 
     def test_fed_games_go_on_when_their_records_are_taken(self):
         # Games are fed by how many reported, not by how many records the list
@@ -118,21 +191,27 @@ class GameProcessEndingTests(unittest.TestCase):
         self.assertLess(time.monotonic() - started, 30)
         self.assertEqual(multiprocessing.active_children(), [])
 
-    def test_an_orphan_does_not_wait_to_flush_its_records(self):
+    def test_a_game_process_ends_when_its_coordinator_has_gone(self):
+        # The coordinator's ends are closed: the game's record cannot be sent, and
+        # the task pipe ends after the one game it held.
         parent, child = multiprocessing.Pipe()
+        task_reader, task_writer = multiprocessing.Pipe(duplex=False)
+        result_reader, result_writer = multiprocessing.Pipe(duplex=False)
         memory = SharedMemory(create=True, size=1 << 16)
-        tasks, results = queue.Queue(), Mock()
-        tasks.put(None)
-        gone = Mock(is_alive=Mock(return_value=False))
-        handler = signal.getsignal(signal.SIGTERM)
+        task_writer.send((0, "a game"))
+        task_writer.close()
+        result_reader.close()
+        played, handler = [], signal.getsignal(signal.SIGTERM)
         try:
-            with patch("multiprocessing.parent_process", return_value=gone):
-                game_process(lambda *_: {}, "v", [0], [child], [memory.name], tasks, results)
+            game_process(lambda task, _: played.append(task) or {}, "v", [0], [child], [memory.name],
+                         task_reader, result_writer)
         finally:
             parent.close()
+            task_reader.close()
+            result_writer.close()
             memory.close()
             memory.unlink()
-        results.cancel_join_thread.assert_called_once_with()
+        self.assertEqual(played, ["a game"])
         # Only a real game process ignores stop signals, and children inherit that.
         self.assertIs(signal.getsignal(signal.SIGTERM), handler)
 

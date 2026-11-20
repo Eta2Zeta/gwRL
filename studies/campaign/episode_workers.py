@@ -69,6 +69,12 @@ def _play_shared(settings: Mapping[str, Any], task: Mapping[str, Any], evaluator
     return _play_game(settings, evaluator, task)
 
 
+def _lost_game(task: Mapping[str, Any], reason: str, seconds: float) -> dict[str, Any]:
+    """The record of a game whose process died before reporting it: a failed game,
+    as _play_game reports one. Its position died with the process."""
+    return {"root": task["root"], "seed": task["seed"], "failure": reason, "seconds": seconds}
+
+
 def _shared_process(settings: Mapping[str, Any], batch_version: str, *arguments: Any) -> None:
     from .shared_evaluator import game_process
     game_process(partial(_play_shared, settings), batch_version, *arguments)
@@ -127,7 +133,8 @@ class SharedEpisodeWorkers:
 
     Several games share each process, one per thread, so the evaluator's batches
     fill. Processes last one batch, which is long enough that starting them
-    costs little.
+    costs little. A game process that dies after reporting a game is replaced, and
+    the games it had not finished come back as failed games (_lost_game).
     """
 
     def __init__(self, processes: int, games_per_process: int, *, device: Any, runtime_policy: Any = None,
@@ -164,7 +171,7 @@ class SharedEpisodeWorkers:
                                                   processes=self.processes, games_per_process=self.games_per_process,
                                                   models=self.models, device=self.device,
                                                   runtime_policy=self.runtime_policy, keep_playing=keep_playing,
-                                                  exit_seconds=120.0, stop_seconds=15.0,
+                                                  exit_seconds=120.0, stop_seconds=15.0, lost_game=_lost_game,
                                                   compiled_forward=self.compiled_forward)
         if stopped or stop():
             return None
@@ -183,8 +190,10 @@ class SharedEpisodeWorkers:
         `version`, the version at the start, which the search needs to stay fixed
         within a decision; each reply names the version of the networks that
         answered. `keep_playing` must take each record off the front of `records`
-        once it has used it, or the list would keep every game played. Returns the
-        records it did not take, games stopped by a stop included as failures.
+        once it has used it, or the list would keep every game played. A game
+        process that dies is replaced, as in play(), and its unfinished games reach
+        `keep_playing` as failed games. Returns the records it did not take, games
+        stopped by a stop included as failures.
         """
         from .neural import load_alliance_weights
         from .shared_evaluator import play_shared_games
@@ -200,7 +209,7 @@ class SharedEpisodeWorkers:
                                                   models=self.models, device=self.device,
                                                   runtime_policy=self.runtime_policy, keep_playing=keep,
                                                   exit_seconds=120.0, stop_seconds=15.0, feed=feed,
-                                                  compiled_forward=self.compiled_forward)
+                                                  lost_game=_lost_game, compiled_forward=self.compiled_forward)
         return records
 
     def report(self, server: Any = None) -> dict[str, Any]:
