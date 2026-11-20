@@ -2903,8 +2903,18 @@ the current training iteration's games, which its progress report reads
 (`action_history` in `studies/campaign/learning.py`, cleared by `train` in
 `studies/campaign/run.py`); kept for every game, at about 2 MB a game, they
 would fill the allowance within days
-([record](../archive/records/memory_in_training_2026_11_18.md)). With the search
-trees measured above, the 30 GB hold (inferred):
+([record](../archive/records/memory_in_training_2026_11_18.md)). In self-play
+that never stops, a game process sends each finished game's result, its
+training samples, events and counts, to the training process, and the
+training process takes each result off the list of arrived results as it reads
+it (`keep_playing` in `studies/campaign/run.py`; `play_shared_games` in
+`studies/campaign/shared_evaluator.py` counts the games that reported apart from
+that list). Kept, the results of every game played grew the training process by
+about 1.25 GB an hour in the long training run of 19 and 20 November
+([record](../archive/records/training_process_memory_2026_11_20.md)). It still
+holds the results of the games the latest network update trained on and of the
+games finished since that update began. With the search trees measured above,
+the 30 GB hold (inferred):
 
 | Simulations per decision | Search tree | Memory per concurrent game | Concurrent games in 30 GB | States per inference batch |
 | ---: | ---: | ---: | ---: | ---: |
@@ -2928,8 +2938,10 @@ replay buffer's 8,000 training samples take about 17 KB each as saved, about
 512×16 has about 55 million parameters with its embedding tables, about 0.9 GB with
 their gradients and Adam's two running averages (section 8.3). On the Windows
 PC, which allows 12 GB, memory limits about two and a half times sooner. One part
-grows with every game played, the learner's record of the games' events, a
-known gap (section 11).
+grows with every game played: the run's manifest keeps a summary of every game
+(`runner` in `studies/campaign/run.py`), about 5 KB a game in `manifest.json`,
+12.7 MB after 2,533 games
+([record](../archive/records/training_process_memory_2026_11_20.md)).
 
 Three things follow, inferred:
 

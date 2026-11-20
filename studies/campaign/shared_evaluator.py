@@ -458,16 +458,19 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
     normally game_process with its first arguments bound. Each process plays
     `games_per_process` games at once, one per thread, taking tasks from one queue,
     so a finished game's slot starts the next. `keep_playing(server, records)` runs
-    between serving rounds; returning false closes every pipe, ending the running
-    games. Processes get `exit_seconds` to exit after the last game and
-    `stop_seconds` after a stop. Returns the records that arrived and the server's
-    statistics.
+    between serving rounds, with the records that arrived and were not taken: it
+    may take records off the front of `records` once it has used them, because
+    the games that reported are counted apart from the list. Returning false
+    closes every pipe, ending the running games. Processes get `exit_seconds` to
+    exit after the last game and `stop_seconds` after a stop. Returns the records
+    not taken and the server's statistics.
 
     With `feed`, games keep coming instead: `tasks` must be empty, and `feed()`
     returns the next game's task, or None once no more games should start. A few
     tasks wait queued beyond the game slots, so a slot that finishes a game starts
     the next at once, and serving goes on until `keep_playing` returns false or
-    every game fed has reported.
+    every game fed has reported. A `keep_playing` that runs games without end
+    must take each record it has used, or `records` would keep every game played.
     """
     if feed is not None and tasks:
         raise ValueError("Give either a list of tasks or a feed, not both")
@@ -479,12 +482,13 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
     pipes = [context.Pipe() for _ in range(slots)]
     memories = [shared_memory.SharedMemory(create=True, size=BUFFER_BYTES) for _ in range(slots)]
     waiting, results = context.Queue(), context.Queue()
-    fed, fed_out = 0, feed is None
+    # Games fed, and games whose record arrived, whether or not keep_playing took it.
+    fed, arrived, fed_out = 0, 0, feed is None
 
     def top_up() -> None:
         # Fed games beyond those already reported: the slots' games and a few queued.
         nonlocal fed, fed_out
-        while not fed_out and fed - len(records) < slots + max(2, slots // 4):
+        while not fed_out and fed - arrived < slots + max(2, slots // 4):
             task = feed()
             if task is None:
                 fed_out = True
@@ -504,9 +508,11 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
         # A record far outgrows a pipe's buffer, and a process that dies sending one
         # leaves half a message. Reading it would wait forever, because this process
         # also holds the pipe's write end, so only this thread reads.
+        nonlocal arrived
         while not finished.is_set():
             try:
                 records.append(results.get(timeout=0.2))
+                arrived += 1
             except queue.Empty:
                 pass
             except Exception as error:
@@ -536,7 +542,7 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
             if unread:
                 raise unread[0]
             # Every game has reported, whatever else still holds a pipe open.
-            if fed_out and len(records) >= (len(tasks) if feed is None else fed):
+            if fed_out and arrived >= (len(tasks) if feed is None else fed):
                 return False
             # A stop comes first: its signal may have killed processes still starting.
             stopping = not keep_playing(server, records)
@@ -567,7 +573,7 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
         # What a clean exit flushed may still be in the pipe.
         clean = all(process.exitcode == 0 for process in spawned)
         stop = time.monotonic() + 5
-        while clean and len(records) < (len(tasks) if feed is None else fed) and time.monotonic() < stop:
+        while clean and arrived < (len(tasks) if feed is None else fed) and time.monotonic() < stop:
             time.sleep(0.05)
     finally:
         finished.set()

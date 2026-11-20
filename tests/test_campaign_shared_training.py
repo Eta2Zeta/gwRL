@@ -19,7 +19,7 @@ from unittest.mock import Mock, patch
 
 import torch
 
-from studies.campaign import run
+from studies.campaign import run, shared_evaluator
 from studies.campaign.curriculum import make_env
 from studies.campaign.episode_workers import EpisodeWorkers, SharedEpisodeWorkers, _play_game
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet
@@ -69,6 +69,12 @@ def killed_while_starting(*_):
     os.kill(os.getpid(), signal.SIGKILL)
 
 
+def reports_each_task(_slots, _connections, _names, tasks, results):
+    """Plays a task by reporting it at once, until a stop marker."""
+    while (task := tasks.get()) is not None:
+        results.put({"root": task})
+
+
 def stuck_in_a_game(*_):
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
     time.sleep(60)
@@ -89,6 +95,22 @@ class GameProcessEndingTests(unittest.TestCase):
         checks = iter([True] * 80)  # Long enough for the process to die first.
         records, _ = self.play(killed_while_starting, keep_playing=lambda *_: next(checks, False), stop_seconds=1.0)
         self.assertEqual(records, [])
+
+    def test_fed_games_go_on_when_their_records_are_taken(self):
+        # Games are fed by how many reported, not by how many records the list
+        # holds, so a caller that takes each record keeps getting games.
+        games, taken, deadline = iter(range(40)), [], time.monotonic() + 30
+
+        def keep_playing(_server, records):
+            while records:
+                taken.append(records.pop(0)["root"])
+            return time.monotonic() < deadline
+        records, _ = play_shared_games(reports_each_task, [], processes=1, games_per_process=2, models=self.MODELS,
+                                       device=torch.device("cpu"), keep_playing=keep_playing,
+                                       feed=lambda: next(games, None))
+        self.assertLess(time.monotonic(), deadline)  # Every game reported; no stop was needed.
+        self.assertTrue(taken)
+        self.assertEqual(sorted(taken + [record["root"] for record in records]), list(range(40)))
 
     def test_a_stop_kills_a_stuck_process_without_the_long_wait(self):
         started = time.monotonic()
@@ -214,8 +236,23 @@ class SharedTrainingRunTests(unittest.TestCase):
         def recorded(server, value):
             as_written.append(value)
             answer_as_written(server, value)
-        with patch.object(SharedEvaluatorServer, "answer_as_written", recorded):
+        # The records each call of the run's keep_playing saw, and those it left in the list.
+        seen_records, left, play = [], [], shared_evaluator.play_shared_games
+
+        def watched(*arguments, keep_playing, **options):
+            def keep(server, records):
+                seen = list(records)
+                going = keep_playing(server, records)
+                seen_records.extend(seen)
+                left.extend(record for record in seen if any(record is kept for kept in records))
+                return going
+            return play(*arguments, keep_playing=keep, **options)
+        with patch.object(SharedEvaluatorServer, "answer_as_written", recorded), \
+                patch.object(shared_evaluator, "play_shared_games", watched):
             self.assertEqual(self.train(*ARGUMENTS, "--continuous", "--stop-after-waves", "1"), 130)
+        # The run took each finished game's record as it read it: the list kept none.
+        self.assertGreaterEqual(len(seen_records), 4)
+        self.assertEqual(left, [])
         self.assertEqual(self.train("--resume", str(self.run_dir / "checkpoint.pt")), 0)
         manifest = json.loads((self.run_dir / "manifest.json").read_text())
         self.assertEqual(manifest["status"], "completed")

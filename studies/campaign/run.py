@@ -529,8 +529,10 @@ def train(args) -> int:
                 stopped, signal_name = True, "bounded_smoke_stop"
 
         def keep_playing(server, records):
-            while state["accepted"] < len(records):
-                result = records[state["accepted"]]
+            # Each finished game's record leaves the list as it is read: kept, the
+            # records of every game played would grow memory without end.
+            while records:
+                result = records.pop(0)
                 state["accepted"] += 1
                 if "failure" in result:
                     _record_failed_games(output, runner, [result])

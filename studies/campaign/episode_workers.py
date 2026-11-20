@@ -182,8 +182,9 @@ class SharedEpisodeWorkers:
         request is answered with them. A game thread labels its search's cache with
         `version`, the version at the start, which the search needs to stay fixed
         within a decision; each reply names the version of the networks that
-        answered. Returns every record that arrived, games stopped by a stop
-        included as failures.
+        answered. `keep_playing` must take each record off the front of `records`
+        once it has used it, or the list would keep every game played. Returns the
+        records it did not take, games stopped by a stop included as failures.
         """
         from .neural import load_alliance_weights
         from .shared_evaluator import play_shared_games

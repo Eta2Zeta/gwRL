@@ -49,7 +49,8 @@ games filled the Mac's memory. Its numbers are in the
 [record of concurrent games with the C++ search](archive/records/concurrent_games_cpp_search_2026_11_19.md).
 Q-012 was raised on 20 November 2026, when a game process of the long training
 run started the day before crashed. Its numbers are in the
-[record of that crash](archive/records/game_process_crash_2026_11_20.md).
+[record of that crash](archive/records/game_process_crash_2026_11_20.md) and
+the [record of the training process's memory](archive/records/training_process_memory_2026_11_20.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -280,13 +281,23 @@ about 14% of its time (inferred from this one crash). And the defect damages
 memory before anything notices it: a game's state could be wrong without any
 crash, and its training samples with it.
 
+**A second fix waits for a new run.** The same run's training process kept
+every finished game's result, about 1.25 GB more an hour
+([record](archive/records/training_process_memory_2026_11_20.md)). The fix is in
+the repository since 20 November, but the current run plays its own copy of the
+code. Until a new run, the supervisor will stop the current run when its memory
+reaches 29 GB, during a network update, about every eight to nine hours (the
+first at about 09:00 to 10:00 on 20 November), and the shell loop will start it
+again; each stop loses the games in play, about 25 minutes of play (inferred).
+A new run for choice A would take up this fix too.
+
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
 | A. Survive a crash | The inference server takes a closed pipe as the end of its game process, records that process's games in play as failed games, and starts a new game process for the same game slots; the run goes on. A crash then costs one process's games in play, 42 of the 252 in this run, instead of all the play since the last network update. It is a code change, so the running run would go on as a new run from its newest networks (`--initial-models`), with a new replay buffer. |
 | B. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and one crash in 5.13 hours of 252 games suggests that may take many hours. |
-| C. Leave it | The shell loop restarts the run after each crash, at a cost of about 51 minutes each time. |
+| C. Leave it | The shell loop restarts the run after each crash, at a cost of about 51 minutes each time, and after each memory stop (above). |
 
 **Recommendation: A now, and B when the Mac can spare some hours.** A removes
 most of the cost at once. Only B can find the defect, which may damage games

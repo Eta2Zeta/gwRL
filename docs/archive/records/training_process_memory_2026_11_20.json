@@ -1,0 +1,361 @@
+{
+ "what": "Memory of the training process (the inference server, the learner and the replay buffer) in the long training run of 19-20 November 2026, before and after the cause was found",
+ "run": {
+  "directory": "tmp/training-2026-11-19 (outside the repository)",
+  "commit": "999c90c",
+  "options": "supervisor --profile mac; 256x8 on mps; --continuous; --compiled-forward; 6 game processes x 42 games = 252 concurrent games; 64 simulations; depth 16; --replay-capacity 8000",
+  "restarted_at": "2026-11-20 01:08:16 after the game process crash (game_process_crash_2026_11_20)",
+  "resumed_from": "the checkpoint of network update 6 (1,521 games)"
+ },
+ "how_measured": {
+  "memory_log": "tmp/training-2026-11-19/memlog.py: every 2 s the run's processes charged as the supervisor charges them (larger of resident size and physical footprint, process_memory_charge in tools/supervise_campaign_training.py); one line a minute with that minute's highest total and its split",
+  "vmmap": "vmmap -summary <training process> (macOS); columns: virtual, resident, dirty, swapped (compressed or on disk), volatile, nonvolatile, empty, region count; footprint counts dirty plus swapped"
+ },
+ "training_process_lowest_minute_per_20_minutes_gb": {
+  "01:00": 2.23,
+  "01:20": 2.23,
+  "01:40": 2.26,
+  "02:00": 3.04,
+  "02:20": 4.74,
+  "02:40": 5.2,
+  "03:00": 5.79,
+  "03:20": 5.91,
+  "03:40": 6.63,
+  "04:00": 6.91,
+  "04:20": 7.49,
+  "04:40": 7.88
+ },
+ "every_10_minutes": [
+  {
+   "minute": "2026-11-20 01:10",
+   "run_gb": 19.06,
+   "training_process_gb": 3.3,
+   "game_processes_gb": 15.76,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 01:20",
+   "run_gb": 16.24,
+   "training_process_gb": 2.23,
+   "game_processes_gb": 14.01,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 01:30",
+   "run_gb": 16.78,
+   "training_process_gb": 2.23,
+   "game_processes_gb": 14.55,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 01:40",
+   "run_gb": 17.67,
+   "training_process_gb": 2.26,
+   "game_processes_gb": 15.41,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 01:50",
+   "run_gb": 17.72,
+   "training_process_gb": 2.45,
+   "game_processes_gb": 15.27,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 02:00",
+   "run_gb": 18.32,
+   "training_process_gb": 3.04,
+   "game_processes_gb": 15.28,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 02:10",
+   "run_gb": 15.54,
+   "training_process_gb": 4.73,
+   "game_processes_gb": 10.81,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 02:20",
+   "run_gb": 16.7,
+   "training_process_gb": 4.75,
+   "game_processes_gb": 11.95,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 02:30",
+   "run_gb": 18.14,
+   "training_process_gb": 4.77,
+   "game_processes_gb": 13.37,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 02:40",
+   "run_gb": 18.99,
+   "training_process_gb": 5.2,
+   "game_processes_gb": 13.79,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 02:50",
+   "run_gb": 18.62,
+   "training_process_gb": 5.58,
+   "game_processes_gb": 13.04,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 03:00",
+   "run_gb": 16.76,
+   "training_process_gb": 5.79,
+   "game_processes_gb": 10.97,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 03:10",
+   "run_gb": 18.55,
+   "training_process_gb": 5.79,
+   "game_processes_gb": 12.75,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 03:20",
+   "run_gb": 19.31,
+   "training_process_gb": 5.91,
+   "game_processes_gb": 13.41,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 03:30",
+   "run_gb": 19.52,
+   "training_process_gb": 6.32,
+   "game_processes_gb": 13.2,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 03:40",
+   "run_gb": 19.31,
+   "training_process_gb": 6.63,
+   "game_processes_gb": 12.68,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 03:50",
+   "run_gb": 18.66,
+   "training_process_gb": 6.89,
+   "game_processes_gb": 11.78,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 04:00",
+   "run_gb": 19.95,
+   "training_process_gb": 6.91,
+   "game_processes_gb": 13.04,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 04:10",
+   "run_gb": 20.19,
+   "training_process_gb": 7.18,
+   "game_processes_gb": 13.01,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 04:20",
+   "run_gb": 20.55,
+   "training_process_gb": 7.49,
+   "game_processes_gb": 13.06,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 04:30",
+   "run_gb": 19.06,
+   "training_process_gb": 7.89,
+   "game_processes_gb": 11.17,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 04:40",
+   "run_gb": 20.5,
+   "training_process_gb": 7.89,
+   "game_processes_gb": 12.61,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 04:50",
+   "run_gb": 21.32,
+   "training_process_gb": 8.03,
+   "game_processes_gb": 13.29,
+   "processes": 8
+  }
+ ],
+ "highest_minutes": [
+  {
+   "minute": "2026-11-20 04:29",
+   "run_gb": 23.18,
+   "training_process_gb": 12.41,
+   "game_processes_gb": 10.76,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 04:28",
+   "run_gb": 21.55,
+   "training_process_gb": 10.96,
+   "game_processes_gb": 10.6,
+   "processes": 8
+  },
+  {
+   "minute": "2026-11-20 04:56",
+   "run_gb": 21.42,
+   "training_process_gb": 8.17,
+   "game_processes_gb": 13.25,
+   "processes": 8
+  }
+ ],
+ "vmmap_training_process": [
+  {
+   "time": "04:43:29",
+   "lines": [
+    "Physical footprint:         7.3G",
+    "Physical footprint (peak):  11.6G",
+    "IOAccelerator (graphics)           2.1G     2.1G     2.1G    8192K       0K     2.1G    1632K      125",
+    "Untagged                           2.5G   174.3M   174.3M     2.3G       0K       0K       0K     2542",
+    "TOTAL                            412.1G     3.8G     3.0G     4.3G       0K     2.1G    1632K     6519",
+    "DefaultMallocZone_0x1047ac000      12.0G     143.0M     118.0M     497.5M    2414575     144.1M     471.3M     77%      24",
+    "MallocHelperZone_0x104764000        5.1G     725.5M     516.4M       1.4G     798618       1.6G     339.5M     18%     752",
+    "TOTAL                              17.1G     868.6M     634.5M       1.9G    3214039       1.7G     811.2M     32%     785"
+   ]
+  },
+  {
+   "time": "04:44:57",
+   "lines": [
+    "Physical footprint:         7.4G",
+    "Physical footprint (peak):  11.6G",
+    "IOAccelerator (graphics)           2.1G     2.1G     2.1G    8192K       0K     2.1G    1008K      125",
+    "Untagged                           2.5G   190.0M   190.0M     2.3G       0K       0K       0K     2567",
+    "TOTAL                            412.1G     3.8G     3.0G     4.3G       0K     2.1G    1008K     6539",
+    "DefaultMallocZone_0x1047ac000      12.0G     149.4M     122.7M     493.2M    2371523     142.1M     473.8M     77%      24",
+    "MallocHelperZone_0x104764000        5.1G     735.3M     510.1M       1.4G     803186       1.6G     323.9M     17%     750",
+    "TOTAL                              17.1G     884.8M     632.9M       1.9G    3175555       1.7G     797.9M     32%     783"
+   ]
+  },
+  {
+   "time": "04:56:55",
+   "lines": [
+    "Physical footprint:         7.6G",
+    "Physical footprint (peak):  11.6G",
+    "IOAccelerator (graphics)           2.1G     2.1G     2.1G    8192K       0K     2.1G    1008K      125",
+    "Untagged                           2.7G   204.5M   204.5M     2.5G       0K       0K       0K     2779",
+    "TOTAL                            412.3G     3.9G     3.0G     4.5G       0K     2.1G    1008K     6751",
+    "DefaultMallocZone_0x1047ac000      12.0G     146.5M     118.1M     504.1M    2373041     142.7M     479.6M     78%      24",
+    "MallocHelperZone_0x104764000        5.1G     749.6M     534.5M       1.4G     853167       1.7G     254.0M     13%     749",
+    "TOTAL                              17.1G     896.1M     652.8M       1.9G    3227054       1.8G     733.8M     29%     782"
+   ]
+  }
+ ],
+ "network_updates": [
+  {
+   "update": 1,
+   "elapsed_seconds_this_invocation": 3379,
+   "clock_after_restart": null,
+   "games": 252,
+   "decisions": 252986,
+   "transitions": 287298,
+   "update_seconds": 159
+  },
+  {
+   "update": 2,
+   "elapsed_seconds_this_invocation": 5385,
+   "clock_after_restart": null,
+   "games": 508,
+   "decisions": 534909,
+   "transitions": 608532,
+   "update_seconds": 171
+  },
+  {
+   "update": 3,
+   "elapsed_seconds_this_invocation": 7855,
+   "clock_after_restart": null,
+   "games": 760,
+   "decisions": 852873,
+   "transitions": 970200,
+   "update_seconds": 162
+  },
+  {
+   "update": 4,
+   "elapsed_seconds_this_invocation": 10385,
+   "clock_after_restart": null,
+   "games": 1013,
+   "decisions": 1185885,
+   "transitions": 1347085,
+   "update_seconds": 156
+  },
+  {
+   "update": 5,
+   "elapsed_seconds_this_invocation": 13346,
+   "clock_after_restart": null,
+   "games": 1267,
+   "decisions": 1557275,
+   "transitions": 1767738,
+   "update_seconds": 147
+  },
+  {
+   "update": 6,
+   "elapsed_seconds_this_invocation": 16148,
+   "clock_after_restart": null,
+   "games": 1521,
+   "decisions": 1934379,
+   "transitions": 2195906,
+   "update_seconds": 150
+  },
+  {
+   "update": 7,
+   "elapsed_seconds_this_invocation": 3477,
+   "clock_after_restart": "02:06:13",
+   "games": 1773,
+   "decisions": 2313653,
+   "transitions": 2630007,
+   "update_seconds": 135
+  },
+  {
+   "update": 8,
+   "elapsed_seconds_this_invocation": 6411,
+   "clock_after_restart": "02:55:07",
+   "games": 2027,
+   "decisions": 2702810,
+   "transitions": 3072957,
+   "update_seconds": 145
+  },
+  {
+   "update": 9,
+   "elapsed_seconds_this_invocation": 9369,
+   "clock_after_restart": "03:44:25",
+   "games": 2282,
+   "decisions": 3092265,
+   "transitions": 3514612,
+   "update_seconds": 148
+  },
+  {
+   "update": 10,
+   "elapsed_seconds_this_invocation": 12094,
+   "clock_after_restart": "04:29:50",
+   "games": 2533,
+   "decisions": 3457196,
+   "transitions": 3926752,
+   "update_seconds": 151
+  }
+ ],
+ "manifest_json_bytes_after_update_10": 12727904,
+ "derived": {
+  "training_process_growth_03_00_to_04_40_gb_per_hour": 1.25,
+  "games_per_hour_after_restart": 317.5,
+  "gb_per_game_inferred": 0.0039,
+  "untagged_regions_04_43_29_to_04_56_55": [
+   2542,
+   2779
+  ],
+  "untagged_growth_gb_per_hour": 1.03,
+  "transitions_per_game_after_update_10": 1550,
+  "fresh_samples_update_10": 18348
+ },
+ "cause": "play_shared_games (studies/campaign/shared_evaluator.py) appended every finished game's result (its training samples and events) to a list for the life of the call, and self-play that never stops read the list by index (keep_playing in studies/campaign/run.py) without removing anything."
+}
