@@ -1,0 +1,192 @@
+{
+ "schema": "game-process-crash-record-v1",
+ "what": "A game process of a long training run aborted on a damaged heap while freeing a game's kept search tree; the run's training process then exited and was restarted from its checkpoint.",
+ "run": {
+  "commit": "999c90c",
+  "attempt_1_started_local": "2026-11-19 19:58:55",
+  "profile": "mac",
+  "network": "256x8 (hidden size 256, 8 message layers)",
+  "device": "mps",
+  "continuous": true,
+  "compiled_forward": true,
+  "game_processes": 6,
+  "games_per_process": 42,
+  "concurrent_games": 252,
+  "simulations": 64,
+  "max_depth": 16,
+  "seed": 20261120,
+  "restart_loop": "a shell loop outside the repository that starts the supervisor again whenever it exits"
+ },
+ "crash": {
+  "report": "~/Library/Logs/DiagnosticReports/python3.13-2026-11-20-010628.ips",
+  "local_time": "2026-11-20 01:06:28",
+  "pid": 24917,
+  "parent_pid": 24892,
+  "parent_is": "the training process (studies.campaign.run train), which runs the inference server",
+  "exception": {
+   "codes": "0x0000000000000000, 0x0000000000000000",
+   "rawCodes": [
+    0,
+    0
+   ],
+   "type": "EXC_CRASH",
+   "signal": "SIGABRT"
+  },
+  "termination": {
+   "flags": 0,
+   "code": 6,
+   "namespace": "SIGNAL",
+   "indicator": "Abort trap: 6",
+   "byProc": "python3.13",
+   "byPid": 24917
+  },
+  "asi": {
+   "libsystem_c.dylib": [
+    "abort() called"
+   ]
+  },
+  "faulting_thread": 21,
+  "threads": 44,
+  "faulting_thread_frames": [
+   "libsystem_kernel.dylib: __pthread_kill",
+   "libsystem_pthread.dylib: pthread_kill",
+   "libsystem_c.dylib: abort",
+   "libsystem_malloc.dylib: malloc_vreport",
+   "libsystem_malloc.dylib: malloc_report",
+   "libsystem_malloc.dylib: ___BUG_IN_CLIENT_OF_LIBMALLOC_POINTER_BEING_FREED_WAS_NOT_ALLOCATED",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::NationState::~NationState()",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::State::~State()",
+   "gwrl_cpp.cpython-313-darwin.so: void std::__1::__destroy_at[abi:nqe220106]<game::campaign::searching::Node>(game::campaign::searching::Node*)",
+   "gwrl_cpp.cpython-313-darwin.so: std::__1::deque<game::campaign::searching::Node, std::__1::allocator<game::campaign::searching::Node>>::~deque[abi:nqe220106]()",
+   "gwrl_cpp.cpython-313-darwin.so: std::__1::unique_ptr<game::campaign::SearchTree::Storage, std::__1::default_delete<game::campaign::SearchTree::Storage>>::reset[abi:nqe220106](game::campaign::SearchTree::Storage*)",
+   "gwrl_cpp.cpython-313-darwin.so: <deduplicated_symbol>",
+   "gwrl_cpp.cpython-313-darwin.so: pybind11::class_<game::campaign::SearchTree>::dealloc_impl(pybind11::detail::value_and_holder&)",
+   "gwrl_cpp.cpython-313-darwin.so: pybind11::class_<game::campaign::SearchTree>::dealloc_without_manipulating_gil(pybind11::detail::value_and_holder&)",
+   "gwrl_cpp.cpython-313-darwin.so: pybind11::detail::clear_instance(_object*)",
+   "gwrl_cpp.cpython-313-darwin.so: pybind11_object_dealloc",
+   "python3.13: subtype_dealloc",
+   "python3.13: frame_dealloc",
+   "python3.13: tb_dealloc",
+   "python3.13: tb_dealloc",
+   "python3.13: BaseException_dealloc",
+   "python3.13: _PyEval_EvalFrameDefault",
+   "python3.13: partial_vectorcall",
+   "python3.13: _PyEval_EvalFrameDefault",
+   "python3.13: method_vectorcall",
+   "python3.13: thread_run",
+   "python3.13: pythread_wrapper",
+   "libsystem_pthread.dylib: _pthread_start",
+   "libsystem_pthread.dylib: thread_start"
+  ]
+ },
+ "training_process_exit": {
+  "local_time": "2026-11-20 01:06:31",
+  "returncode": 1,
+  "error": "BrokenPipeError: [Errno 32] Broken pipe",
+  "where": "SharedEvaluatorServer.answer, connection.send_bytes (studies/campaign/shared_evaluator.py at 999c90c)",
+  "stderr": "run-control/attempt-001.stderr.log"
+ },
+ "supervisor_events": [
+  {
+   "kind": "supervisor_initialized",
+   "utc": "2026-11-20T01:58:55Z"
+  },
+  {
+   "attempt": 1,
+   "kind": "child_started",
+   "pid": 24892,
+   "resume": false,
+   "utc": "2026-11-20T01:58:55Z"
+  },
+  {
+   "attempt": 1,
+   "kind": "child_exited",
+   "returncode": 1,
+   "runner_status": "running",
+   "stop_reason": null,
+   "utc": "2026-11-20T07:06:31Z"
+  },
+  {
+   "kind": "supervisor_resumed",
+   "prior_status": "worker_error",
+   "utc": "2026-11-20T07:08:16Z"
+  },
+  {
+   "attempt": 2,
+   "kind": "child_started",
+   "pid": 60343,
+   "resume": true,
+   "utc": "2026-11-20T07:08:16Z"
+  }
+ ],
+ "supervisor_retry_rule": "tools/supervise_campaign_training.py RETRYABLE_RETURNCODES: -SIGKILL, -SIGSEGV, -SIGBUS and 75 outside Windows; exit code 1 ends in status worker_error",
+ "restart": {
+  "supervisor_started_again_local": "2026-11-20 01:08:15",
+  "child_started_local": "2026-11-20 01:08:16",
+  "resumed_from": "run/checkpoint.pt, written at network update 6"
+ },
+ "network_updates": [
+  {
+   "network_update": 1,
+   "seconds_into_attempt": 3380.1,
+   "local_time": "2026-11-19 20:55:15",
+   "games_finished": 252,
+   "decisions_finished": 252986
+  },
+  {
+   "network_update": 2,
+   "seconds_into_attempt": 5387.2,
+   "local_time": "2026-11-19 21:28:42",
+   "games_finished": 508,
+   "decisions_finished": 534909
+  },
+  {
+   "network_update": 3,
+   "seconds_into_attempt": 7856.9,
+   "local_time": "2026-11-19 22:09:51",
+   "games_finished": 760,
+   "decisions_finished": 852873
+  },
+  {
+   "network_update": 4,
+   "seconds_into_attempt": 10386.1,
+   "local_time": "2026-11-19 22:52:01",
+   "games_finished": 1013,
+   "decisions_finished": 1185885
+  },
+  {
+   "network_update": 5,
+   "seconds_into_attempt": 13348.0,
+   "local_time": "2026-11-19 23:41:23",
+   "games_finished": 1267,
+   "decisions_finished": 1557275
+  },
+  {
+   "network_update": 6,
+   "seconds_into_attempt": 16149.7,
+   "local_time": "2026-11-20 00:28:04",
+   "games_finished": 1521,
+   "decisions_finished": 1934379
+  },
+  {
+   "network_update": 7,
+   "seconds_into_attempt": 3479.0,
+   "local_time": "2026-11-20 02:06:14",
+   "games_finished": 1773,
+   "decisions_finished": 2313653
+  }
+ ],
+ "derived": {
+  "hours_of_play_before_crash": 5.13,
+  "update_intervals_minutes_before_crash": [
+   33.5,
+   41.1,
+   42.2,
+   49.4,
+   46.7
+  ],
+  "update_7_expected_local_without_crash": "about 2026-11-20 01:15 (update 6 plus the 47-minute interval before it, inferred)",
+  "update_7_actual_local": "2026-11-20 02:06:14",
+  "minutes_lost_inferred": 51
+ }
+}
