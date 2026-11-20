@@ -7,6 +7,7 @@
 #include <cmath>
 #include <deque>
 #include <limits>
+#include <new>
 #include <numeric>
 #include <string_view>
 #include <unordered_map>
@@ -468,6 +469,22 @@ SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t
         const auto copyOf = [&](const Node& node) {
             return node.game->cloneForSearchFrom(stream ? *stream : Engine::searchStreamFor(seed));
         };
+        // A move that fails on a copy leaves no position behind, so the error
+        // names the node's position, the move and where the dice stood.
+        const auto moveFailed = [&](const Node& node, const std::exception& error, const char* kind,
+                                    const Id& action) {
+            const auto dice = stream ? *stream : Engine::searchStreamFor(seed);
+            O move{{"kind", V(std::string(kind))}, {"search_stream", V(std::to_string(dice))}};
+            if (!action.empty()) move.emplace("id", V(action));
+            O failure{{"error", V(std::string(error.what()))}, {"move", V(std::move(move))}};
+            try {
+                failure.emplace("position", V(position(node)));
+            } catch (const std::exception& unwritable) {
+                // A damaged position may not serialize; the rest still says what failed.
+                failure.emplace("position_error", V(std::string(unwritable.what())));
+            }
+            return SearchMoveFailed(canonicalJson(V(std::move(failure))));
+        };
         const auto mark = [&](int index) {
             if (onPath.size() <= static_cast<std::size_t>(index)) onPath.resize(nodes_.size(), -1);
             onPath[static_cast<std::size_t>(index)] = simulation;
@@ -491,7 +508,13 @@ SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t
             int successor;
             if (node.decision.kind == DecisionKind::Chance) {
                 auto copy = copyOf(node);
-                copy.resolveChance();
+                try {
+                    copy.resolveChance();
+                } catch (const std::bad_alloc&) {
+                    throw;
+                } catch (const std::exception& error) {
+                    throw moveFailed(node, error, "chance", Id{});
+                }
                 stream = copy.searchStream();
                 const auto passedNow = passedAfter(node, copy);
                 successor = reach(std::make_shared<const Engine>(std::move(copy)), passedNow);
@@ -537,8 +560,15 @@ SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t
                     successor = reach(node.game, static_cast<std::uint8_t>(node.passed | (1U << node.decision.offered)));
                 } else {
                     auto copy = copyOf(node);
-                    if (edge.kind == OptionKind::Interrupt) copy.interrupt(*edge.action);
-                    else copy.step(*edge.action);
+                    try {
+                        if (edge.kind == OptionKind::Interrupt) copy.interrupt(*edge.action);
+                        else copy.step(*edge.action);
+                    } catch (const std::bad_alloc&) {
+                        throw;
+                    } catch (const std::exception& error) {
+                        throw moveFailed(node, error, edge.kind == OptionKind::Interrupt ? "interrupt" : "action",
+                                         edge.action->id);
+                    }
                     stream = copy.searchStream();
                     const auto passedNow = passedAfter(node, copy);
                     successor = reach(std::make_shared<const Engine>(std::move(copy)), passedNow);

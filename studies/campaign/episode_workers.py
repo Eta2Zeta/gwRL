@@ -15,6 +15,7 @@ import os
 import time
 from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from functools import partial
+from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 _WORKER: dict[str, Any] = {}
@@ -41,16 +42,45 @@ def _play_game(settings: Mapping[str, Any], evaluator: Any, task: Mapping[str, A
                               environment_seed=task["seed"], max_transitions=task["max_transitions"])
     except Exception as error:
         # Its seed and weights reproduce it in EpisodeWorkers. A shared evaluator
-        # need not repeat a game, so a dead end also keeps its position, which
-        # may be one that search imagined.
+        # need not repeat a game, so an error that carries a position keeps it:
+        # a dead end's (NoLegalActionError) or a failed move's (FailedMoveError),
+        # which may be one that search imagined.
         failure = {"root": task["root"], "seed": task["seed"], "failure": f"{type(error).__name__}: {error}",
                    "seconds": time.perf_counter() - started}
-        if getattr(error, "state", None) is not None:
-            failure["state"] = error.state
+        state = getattr(error, "state", None)
+        if state is not None:
+            failure.update(_keep_failed_position(settings.get("failed_positions"), task, state))
         return failure
     result.update(root=task["root"], seed=task["seed"], process=os.getpid(),
                   seconds=time.perf_counter() - started)
     return result
+
+
+def failed_position_name(game: Mapping[str, Any]) -> str:
+    """The file a failed game's position is kept in, in its run's failed-positions/."""
+    return f"game-{game['root']}-seed-{game['seed']}.json"
+
+
+def _keep_failed_position(folder: str | None, task: Mapping[str, Any], state: str) -> dict[str, Any]:
+    """Write a failed game's position into `folder` now, or hand it to the caller.
+
+    A game process can abort while it frees a failed game, before the training
+    process hears of the failure, as one did on 20 November 2026; a position
+    written here survives that. Without a folder, or if writing fails, the
+    position goes back with the failure for the training process to save.
+    """
+    if folder is None:
+        return {"state": state}
+    path = Path(folder) / failed_position_name(task)
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # UTF-8 with bare newlines: Windows would otherwise write its code page.
+        temporary.write_text(state, encoding="utf-8", newline="\n")
+        os.replace(temporary, path)
+    except OSError:
+        return {"state": state}
+    return {"position": f"{path.parent.name}/{path.name}"}
 
 
 def _play(task: Mapping[str, Any]) -> dict[str, Any]:
@@ -88,12 +118,13 @@ class EpisodeWorkers:
     """
 
     def __init__(self, processes: int, *, calendar_rounds: int | None, model_config: Mapping[str, Any],
-                 learning_config: Mapping[str, Any], rules_version: str):
+                 learning_config: Mapping[str, Any], rules_version: str, failed_positions: str | None = None):
         if type(processes) is not int or processes <= 0:
             raise ValueError("Episode workers must be a positive integer")
         self.processes = processes
         settings = {"calendar_rounds": calendar_rounds, "model_config": dict(model_config),
-                    "learning_config": dict(learning_config), "rules_version": rules_version}
+                    "learning_config": dict(learning_config), "rules_version": rules_version,
+                    "failed_positions": failed_positions}
         self._executor = ProcessPoolExecutor(processes, mp_context=multiprocessing.get_context("spawn"),
                                              initializer=_initialize, initargs=(settings,))
 
@@ -139,14 +170,15 @@ class SharedEpisodeWorkers:
 
     def __init__(self, processes: int, games_per_process: int, *, device: Any, runtime_policy: Any = None,
                  calendar_rounds: int | None, model_config: Mapping[str, Any], learning_config: Mapping[str, Any],
-                 rules_version: str, compiled_forward: bool = False):
+                 rules_version: str, compiled_forward: bool = False, failed_positions: str | None = None):
         from .neural import CampaignModelConfig, alliance_networks
         if type(processes) is not int or processes <= 0 or type(games_per_process) is not int or games_per_process <= 0:
             raise ValueError("Shared episode workers need positive process and game counts")
         self.processes, self.games_per_process = processes, games_per_process
         self.device, self.runtime_policy, self.compiled_forward = device, runtime_policy, compiled_forward
         self.settings = {"calendar_rounds": calendar_rounds, "model_config": dict(model_config),
-                         "learning_config": dict(learning_config), "rules_version": rules_version}
+                         "learning_config": dict(learning_config), "rules_version": rules_version,
+                         "failed_positions": failed_positions}
         # The networks the inference server evaluates: one for all three alliances, or one for each.
         self.models = alliance_networks(CampaignModelConfig(**model_config),
                                         learning_config.get("networks", "one"), device=device)

@@ -112,6 +112,16 @@ class NoLegalSearchAction : public std::runtime_error {
     using std::runtime_error::runtime_error;
 };
 
+// A move of a simulation that the engine accepted and then failed on, such as
+// one whose state fails State::validate. Its message is a JSON object: the
+// engine's error, the position before the move as CampaignAdapter.serialize
+// writes it, and the move (its kind, the action's id and where the search dice
+// stood), so that another process can replay it (tools/replay_failed_move.py).
+class SearchMoveFailed : public std::runtime_error {
+  public:
+    using std::runtime_error::runtime_error;
+};
+
 // Search `game` (not changed) at the given scheduling state, in `tree` when one
 // is given and in a tree of its own otherwise.
 SearchOutcome searchDecision(const Engine& game, const SearchSchedule& schedule, SearchEvaluator& evaluator,

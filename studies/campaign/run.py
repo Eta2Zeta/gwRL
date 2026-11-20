@@ -29,7 +29,7 @@ from studies.shared.file_replace import replace_file
 from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import ROOT, compatibility, make_env, task_manifest
 from .device_runtime import runtime_policy_for_device
-from .episode_workers import EpisodeWorkers, SharedEpisodeWorkers
+from .episode_workers import EpisodeWorkers, SharedEpisodeWorkers, failed_position_name
 from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter, add_fresh_losses, fresh_game_losses
 from .model_export import load_evaluation_models, load_initial_weights, save_model_export, validate_model_export
 from .neural import (CampaignModelConfig, NeuralEvaluator, alliance_networks, alliance_weights,
@@ -164,11 +164,14 @@ def _json(path: Path, value):
 
 
 def _record_failed_games(output: Path, runner: dict, failed: list[dict]) -> None:
-    """Note each failed game; a failed position is saved beside the run, not in its checkpoint."""
+    """Note each failed game; a failed position is saved beside the run, not in its checkpoint.
+
+    A game process writes it there itself and names the file in the failure;
+    a position that comes back with the failure is written here."""
     for failure in failed:
         state = failure.pop("state", None)
         if state is not None:
-            position = Path("failed-positions") / f"batch-{runner['batch_index']}-seed-{failure['seed']}.json"
+            position = Path("failed-positions") / failed_position_name(failure)
             (output / position).parent.mkdir(exist_ok=True)
             # UTF-8 with bare newlines: Windows would otherwise write its code page.
             (output / position).write_text(state, encoding="utf-8", newline="\n")
@@ -574,8 +577,10 @@ def train(args) -> int:
         if config.episode_workers:
             if learner.env is None:
                 learner.env = template  # Reference context only; workers play from their own seeds.
+            # Game processes write a failed game's position here themselves (_keep_failed_position).
             settings = dict(calendar_rounds=config.calendar_rounds, model_config=learner.model_config,
-                            learning_config=asdict(learner.config), rules_version=learner.compatibility["rules"])
+                            learning_config=asdict(learner.config), rules_version=learner.compatibility["rules"],
+                            failed_positions=str(output / "failed-positions"))
             workers = (SharedEpisodeWorkers(config.episode_workers, config.games_per_process,
                                             device=resolve_neural_device(config.neural_device),
                                             runtime_policy=learner._device_runtime,

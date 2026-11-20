@@ -120,6 +120,9 @@ CampaignEnv CampaignEnv::cloneForSearch(std::uint64_t seed) const { return Campa
 CampaignEnv CampaignEnv::cloneForSearchContinuing(const CampaignEnv& source) const {
     return CampaignEnv(engine_.cloneForSearchContinuing(source.engine_), *this);
 }
+CampaignEnv CampaignEnv::cloneForSearchFrom(std::uint64_t searchStream) const {
+    return CampaignEnv(engine_.cloneForSearchFrom(searchStream), *this);
+}
 std::string CampaignEnv::planningKey() const {
     engine_.requireIntact();
     std::lock_guard lock(decisionCache_->mutex);

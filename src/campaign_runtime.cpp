@@ -433,12 +433,14 @@ template <class Change> void Engine::transition(Change&& change) {
         unfinished_ = true;
         invalidateDecisionCache();
         change(*this);
+        if (failTransitionsForTesting_) throw std::runtime_error("A transition failed, as a test asked");
         unfinished_ = false;
         return;
     }
     Engine next = clone();
     next.invalidateDecisionCache();
     change(next);
+    if (failTransitionsForTesting_) throw std::runtime_error("A transition failed, as a test asked");
     *this = std::move(next);
 }
 

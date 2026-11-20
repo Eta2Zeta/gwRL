@@ -21,7 +21,38 @@ from .immutable_json import FrozenDict, freeze_json
 from .multiplayer_mcts import PLAYERS, action_key
 
 SCHEMA = "campaign-interrupt-scheduler-v1"
+FAILED_MOVE_SCHEMA = "campaign-failed-move-v1"
 PHASES = {"production", "combat_movement", "combat", "non_combat_movement", "place_units"}
+
+
+class FailedMoveError(RuntimeError):
+    """A move that the engine accepted and then failed on, such as one after
+    which the state fails the engine's check (State::validate in
+    src/campaign_state.cpp).
+
+    Its message is the engine's. `state`, as for NoLegalActionError, is what the
+    failed game keeps beside its run: a JSON document with that error, where the
+    move was played ("game", "search" for a simulation of a search, or
+    "unknown" when no position could be kept), the position before the move as
+    CampaignAdapter.serialize writes it, and the move, so that another process
+    can replay it (tools/replay_failed_move.py).
+    """
+
+    def __init__(self, error: str, *, where: str, move: dict[str, Any], position: str | None,
+                 position_error: str | None = None):
+        super().__init__(error)
+        document = {"schema": FAILED_MOVE_SCHEMA, "error": error, "where": where, "move": move,
+                    "position": position}
+        if position_error is not None:
+            document["position_error"] = position_error
+        self.state = json.dumps(document, sort_keys=True, separators=(",", ":"))
+
+    @classmethod
+    def from_search(cls, message: str) -> FailedMoveError:
+        """From the C++ search's SearchMoveFailed, whose message holds the parts."""
+        value = json.loads(message)
+        return cls(value["error"], where="search", move=value["move"], position=value.get("position"),
+                   position_error=value.get("position_error"))
 
 
 def _field(action: Any, name: str) -> Any:
@@ -196,9 +227,31 @@ class CampaignAdapter:
             return False
         return True
 
+    def _failed_move(self, error: RuntimeError, move: dict[str, Any]) -> FailedMoveError:
+        # An ordinary engine changes a copy and keeps it only when the whole
+        # move succeeds (Engine::transition), so this is the position before it.
+        try:
+            position, problem = self.serialize(), None
+        except Exception as unwritable:  # A damaged position may not serialize.
+            position, problem = None, f"{type(unwritable).__name__}: {unwritable}"
+        # The real game rolls the actual dice, a search copy the search's. The
+        # Python search's copies change in place and keep no position after a
+        # failed move (Engine::cloneForSearch), so where it was is then unknown.
+        where = "unknown" if position is None else "game"
+        try:
+            if json.loads(json.loads(position)["raw"])["random"]["active"] == "search":
+                where = "search"
+        except (TypeError, ValueError, KeyError):
+            pass  # No position, or one without the native engine's dice.
+        return FailedMoveError(str(error), where=where, move=move, position=position, position_error=problem)
+
     def apply_action(self, action: ScheduledAction) -> None:
         decision = self._decision_cache()
-        if self._apply_native_play(action, decision):
+        try:
+            native = self._apply_native_play(action, decision)
+        except RuntimeError as error:
+            raise self._failed_move(error, {"kind": action.kind, "id": action.id}) from None
+        if native:
             self._invalidate_raw()
             self._sync()
             return
@@ -216,17 +269,23 @@ class CampaignAdapter:
             self._decision = None
         else:
             assert decision.raw_actions is not None
-            if chosen.kind == "interrupt":
-                self.raw.apply_interrupt(decision.raw_actions[index])
-            else:
-                self.raw.apply_action(decision.raw_actions[index])
+            try:
+                if chosen.kind == "interrupt":
+                    self.raw.apply_interrupt(decision.raw_actions[index])
+                else:
+                    self.raw.apply_action(decision.raw_actions[index])
+            except RuntimeError as error:
+                raise self._failed_move(error, {"kind": chosen.kind, "id": chosen.id}) from None
             self._invalidate_raw()
             self._sync()
 
     def resolve_chance(self) -> None:
         if self.decision_kind() != "chance":
             raise ValueError("No scheduled chance event is pending")
-        self.raw.resolve_chance()
+        try:
+            self.raw.resolve_chance()
+        except RuntimeError as error:
+            raise self._failed_move(error, {"kind": "chance"}) from None
         self._invalidate_raw()
         self._sync()
 

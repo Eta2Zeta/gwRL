@@ -585,6 +585,11 @@ class Engine {
     // Where cloneForSearch(seed) starts the search dice.
     static std::uint64_t searchStreamFor(std::uint64_t seed) { return RandomStreams::seeded(seed).search; }
     void setDiceTapeForTesting(std::vector<int> tape);
+    // From now on every transition of this engine, and of the copies made from
+    // it, fails after its change, as a move whose state fails State::validate
+    // does, so that tests reach the code that keeps a failed move's position.
+    // A serialized engine does not carry it.
+    void failTransitionsForTesting() { failTransitionsForTesting_ = true; }
     std::string serialize() const;
     static Engine restore(std::shared_ptr<const Definition>, std::shared_ptr<const Rules>, const std::string&);
     static Engine replay(std::shared_ptr<const Definition>, std::shared_ptr<const Rules>,
@@ -617,6 +622,7 @@ class Engine {
     std::shared_ptr<MenuTable> menuTable_;
     bool disposable_ {false};
     bool unfinished_ {false};  // Stays set if a transition in place throws.
+    bool failTransitionsForTesting_ {false};
     std::shared_ptr<const ActionMenu> actionMenu() const;
     std::shared_ptr<const ActionMenu> interruptMenu() const;
     void invalidateDecisionCache();

@@ -268,6 +268,11 @@ does.
   `tools/fuzz_campaign_dead_ends.py` plays random games looking for dead ends,
   states where the game has not ended and no legal action exists, and for
   actions that leave the state unchanged.
+- **A move that fails in training** after the engine accepted it, such as one
+  whose state fails `State::validate`, keeps the position before it and the
+  move beside the training run; `tools/replay_failed_move.py` plays it again
+  in a fresh process, to tell a defect of the rules from damaged memory
+  ([failures in training](../design/README.md#92-running-training-on-the-mac)).
 - **A change meant only for speed** must leave play the same.
   `tools/compare_engine_builds.py` plays the same games on two builds and
   compares them: seeded random games at every action, by the legal actions,

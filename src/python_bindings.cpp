@@ -313,6 +313,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
                "Names counted in an \"other\" column of the zone encoding since the last reset.");
 
     py::register_exception<game::campaign::NoLegalSearchAction>(module, "NoLegalSearchAction", PyExc_ValueError);
+    py::register_exception<game::campaign::SearchMoveFailed>(module, "SearchMoveFailed", PyExc_RuntimeError);
     py::register_exception<game::campaign::InferenceClosed>(module, "InferenceClosed", PyExc_RuntimeError);
 
     py::class_<game::campaign::PythonRandom>(module, "PythonRandom",
@@ -544,6 +545,16 @@ PYBIND11_MODULE(gwrl_cpp, module) {
             });
         }, py::arg("source"),
            "A search copy of this position whose dice continue source's search stream.")
+        .def("clone_for_search_from", [](const NativeCampaignEnv& self, std::uint64_t searchStream) {
+            return self.call([&](const CampaignEnv& env) {
+                return std::make_unique<NativeCampaignEnv>(env.cloneForSearchFrom(searchStream));
+            });
+        }, py::arg("search_stream"),
+           "A search copy of this position whose dice start at the given point of the search stream, "
+           "as the copy of a failed search move did (SearchMoveFailed).")
+        .def("fail_transitions_for_testing", [](NativeCampaignEnv& self) {
+            self.call([](CampaignEnv& env) { env.failTransitionsForTesting(); });
+        }, "Make every later move of this position and its copies fail after its change; tests only.")
         .def("planning_key", [](const NativeCampaignEnv& self) {
             return self.call([](const CampaignEnv& env) { return env.planningKey(); });
         }, "The decision state's identity, which the search uses.")

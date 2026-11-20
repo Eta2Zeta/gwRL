@@ -2330,19 +2330,36 @@ games per hour from 222 to 288; the game processes used 43% less CPU per decisio
 ([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
 
 **Failures.** A game that fails costs only that game. The run records its seed,
-its play time and its error's text. A rules dead end (a decision with no legal
-action) also saves its state in the training run's `failed-positions/` folder,
-even when only the search imagined it, since its error carries the position
-(`NoLegalActionError` in `studies/shared/multiplayer_mcts.py`). Any other
-failure, such as a state that fails the engine's check after a move, leaves
-nothing that can rebuild its state: with the shared inference server the seed
-need not replay the game, since the network's outputs for a position change in
-their last digits with the inference batch it shares, and every game takes up
-each new network as it comes (`studies/campaign/episode_workers.py`;
-[Q-012](../questions.md#q-012-a-game-process-that-crashes)). Two random-play checks run before long training
-runs: the fuzzer (`tools/fuzz_campaign_dead_ends.py`) looks for dead ends and for
-actions that leave the game unchanged, and `tools/check_zone_names.py` for names
-the network's input does not list.
+its play time and its error's text. The seed alone cannot rebuild the failure:
+with the shared inference server it need not replay the game, since the
+network's outputs for a position change in their last digits with the inference
+batch it shares, and every game takes up each new network as it comes
+(`studies/campaign/episode_workers.py`). So two kinds of failure keep their
+position, in a file named after the game in the training run's
+`failed-positions/` folder, even when only the search imagined that position:
+
+- a rules dead end, a decision with no legal action, keeps its state
+  (`NoLegalActionError` in `studies/shared/multiplayer_mcts.py`);
+- a move that the engine accepted and then failed on, such as a move after
+  which the state fails the engine's check (`State::validate` in
+  `src/campaign_state.cpp`), keeps the position before the move and the move,
+  and in the search also where its dice stood (`FailedMoveError` in
+  `studies/shared/campaign_adapter.py`, `SearchMoveFailed` in `src/search.cpp`).
+
+The game process writes the file itself at once, since it can abort while it
+frees the failed game, before the training process hears of the failure, as one
+did on 20 November 2026 (`_keep_failed_position` in
+`studies/campaign/episode_workers.py`). `tools/replay_failed_move.py` loads a
+kept move's position in a fresh process and plays the move again. If the move
+fails the same way, the failure follows from the position and the move, a
+defect of the rules. If the position already fails the check as it loads, it
+was damaged before the move; if the move succeeds, the failure did not follow
+from the position and the move. Either points outside the rules, most likely
+to damaged memory ([Q-012](../questions.md#q-012-a-game-process-that-crashes)). Two random-play
+checks run before long training runs: the fuzzer
+(`tools/fuzz_campaign_dead_ends.py`) looks for dead ends and for actions that
+leave the game unchanged, and `tools/check_zone_names.py` for names the
+network's input does not list.
 
 ### 9.3 What a larger network and a longer search cost
 

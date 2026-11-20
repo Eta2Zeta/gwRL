@@ -107,7 +107,11 @@ main process evaluates all their states together on `--neural-device` (`mps` for
 the Apple GPU, `cuda` for an NVIDIA GPU). The inference batch a state lands in
 changes its outputs in the last digits, so unlike one-state evaluation a game
 need not repeat exactly from its seed. In either mode a game that fails
-costs only that game, recorded with its seed in `failed_games`.
+costs only that game, recorded with its seed in `failed_games`. A dead end or a
+move that the engine accepted and then failed on also keeps its position in the
+run's `failed-positions/` folder, and `tools/replay_failed_move.py` replays a
+kept move in a fresh process
+([running training on the Mac](../../docs/design/README.md#92-running-training-on-the-mac)).
 
 An inference batch holds at most one state for each concurrent game, the
 processes times the games in each, and on the GPU a larger inference batch costs

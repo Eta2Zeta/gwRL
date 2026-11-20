@@ -98,10 +98,10 @@ class EpisodeWorkerTests(unittest.TestCase):
         runner = {"batch_index": 2}
         with tempfile.TemporaryDirectory() as directory:
             run._record_failed_games(Path(directory), runner, [failure, {"root": 4, "seed": 8, "failure": "E: x"}])
-            saved = (Path(directory) / "failed-positions" / "batch-2-seed-7.json").read_text()
+            saved = (Path(directory) / "failed-positions" / "game-3-seed-7.json").read_text()
         self.assertEqual(saved, imagined.serialize())
         self.assertEqual([(game["seed"], game.get("position")) for game in runner["failed_games"]],
-                         [(7, "failed-positions/batch-2-seed-7.json"), (8, None)])
+                         [(7, "failed-positions/game-3-seed-7.json"), (8, None)])
         self.assertTrue(all("state" not in game and game["batch"] == 2 for game in runner["failed_games"]))
 
     def test_configuration_requires_complete_episodes_and_enough_games(self):

@@ -36,6 +36,10 @@ class CampaignEnv {
     CampaignEnv clone() const;
     CampaignEnv cloneForSearch(std::uint64_t seed) const;
     CampaignEnv cloneForSearchContinuing(const CampaignEnv& source) const;
+    // A search copy whose dice start at the given point of the search stream,
+    // as the search's copy that played a failed move (SearchMoveFailed).
+    CampaignEnv cloneForSearchFrom(std::uint64_t searchStream) const;
+    void failTransitionsForTesting() { engine_.failTransitionsForTesting(); }
     std::string planningKey() const;
     std::string canonicalKey() const { return engine_.canonicalKey(); }
     std::string serialize() const { return engine_.serialize(); }

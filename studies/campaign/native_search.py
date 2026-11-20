@@ -24,7 +24,7 @@ from typing import Any
 
 import gwrl_cpp
 
-from studies.shared.campaign_adapter import CampaignAdapter
+from studies.shared.campaign_adapter import CampaignAdapter, FailedMoveError
 from studies.shared.multiplayer_mcts import MctsConfig, NoLegalActionError, SearchResult, UniformEvaluator
 
 
@@ -100,6 +100,8 @@ def search_decision(env: CampaignAdapter, evaluator: Any, config: MctsConfig, *,
             search_forced_root=config.search_forced_root, tree=None if tree is None else tree.native)
     except gwrl_cpp.NoLegalSearchAction as error:
         raise NoLegalActionError(_Position(str(error))) from None
+    except gwrl_cpp.SearchMoveFailed as error:
+        raise FailedMoveError.from_search(str(error)) from None
     if tree is not None:
         after = network_version(evaluator)
         if before is not None and after != before:
