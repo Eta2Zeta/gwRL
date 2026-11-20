@@ -34,7 +34,7 @@ Other open things stay in the pages that own them, and
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
-| [Q-012](#q-012-a-game-process-that-crashes) | Should training pause for some hours to look for the defect behind a game process's crash? | Running training | Yes, when the Mac can spare the hours |
+| [Q-012](#q-012-a-game-process-that-crashes) | Should the defect behind a game process's crash be looked for, and how? | Running training | Keep the next failed position now; pause training for a sanitizer search when the Mac can spare the hours |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
@@ -191,8 +191,8 @@ the game's developers.
 
 ## Q-012: A game process that crashes
 
-**The question.** Should training pause for some hours so that the defect
-behind a game process's crash can be looked for?
+**The question.** Should the defect behind a game process's crash be looked
+for, and how?
 
 **What the program does now.** A game process plays its games in threads, and
 its native code, the engine and the search, can crash it. When a game process
@@ -227,6 +227,21 @@ one's game slots, and the run lost 44 games, about 7 minutes of its play
 (inferred), instead of stopping
 ([record](archive/records/second_game_process_crash_2026_11_20.md)).
 
+**What the two failed games left.** Nothing that can rebuild their states. For
+a failed game the run records its seed, its play time and its error's text, and
+it saves a position only when the error carries one, which today only a rules
+dead end's error does (`_play_game` in `studies/campaign/episode_workers.py`,
+`_record_failed_games` in `studies/campaign/run.py`). Nor can a game's seed be
+relied on to replay it. The inference server evaluates the waiting positions of all games
+together on the GPU, and the network's outputs for a position change in their
+last digits with the inference batch it shares, so the same seed and network
+need not give the same game (`studies/campaign/episode_workers.py`); and every
+game takes up each new network as soon as it is trained. The state that failed
+the check may also not have been a position of the real game: the search plays
+its imagined moves on copies of the game through the same engine calls, which
+run the same check, and an error there fails the game (`Searcher::run` in
+`src/search.cpp`).
+
 **Why it matters.** The defect most likely damages game states before anything
 notices it (inferred): the only two games of the run to fail the engine's check
 were in the process that later aborted, in the 38 minutes before it did. A
@@ -241,9 +256,13 @@ about 7 minutes of its play in the second case.
 | --- | --- |
 | A. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and two crashes in 16.6 hours of 252 games, about one every 8 hours, suggest that may take many hours. |
 | B. Leave it | Training goes on, and each crash costs one game process's games in play, about 7 minutes of the run's play the second time. The defect stays, with whatever it does to games that neither fail the check nor crash. |
+| C. Keep the failed position | When the engine's check fails, its error carries the position before the failing move, and the move, and the run saves both in its `failed-positions/` folder, as it saves a dead end's position now. If the move, applied again to that position in a fresh process, fails the same way, it is a rules bug, found at that move; any other result would mean that the bad zone number came not from the rules but from damage in the game process's memory. Training goes on, but the change needs a new run from the newest network, which costs the games in play: about 40 minutes of the run's play (inferred: the 42 games lost in the second crash had played 40.5 minutes on average). It shows nothing until a check fails again, and in 16.6 hours of play of 252 games the only two failures came before the second crash. |
 
-**Recommendation: A, when the Mac can spare some hours.** Only A can find the
-defect, which has most likely damaged the states of two games already.
+**Recommendation: C now, and A when the Mac can spare some hours.** C needs no
+pause, and the next failed check would then show whether the bad zone numbers
+come from the rules or from memory damage; a failure during A could be replayed
+the same way. Only A can find the memory defect behind the crashes, which has
+most likely damaged the states of two games already.
 
 **If answered.** What was found, and the fix, belong in the engine page of the
 code that held the defect, and in
@@ -324,7 +343,7 @@ the page that now states it.
   and [running training on the Mac](design/README.md#92-running-training-on-the-mac).
 - **Q-012, first part**, a game process that crashes. Answered on 20 November
   2026: training loses only the games that process had not finished and goes
-  on, with a new game process in its game slots; whether to pause training to
-  look for the defect stays open as Q-012. Stated in
+  on, with a new game process in its game slots; whether and how to look for
+  the defect stays open as Q-012. Stated in
   [running training on the Mac](design/README.md#92-running-training-on-the-mac)
   and [long unattended runs](../studies/campaign/README.md#long-unattended-runs).

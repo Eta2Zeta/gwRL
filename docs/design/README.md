@@ -2323,9 +2323,17 @@ decisions per hour while playing rose 26%, from about 239,000 to 301,000, and
 games per hour from 222 to 288; the game processes used 43% less CPU per decision
 ([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
 
-**Failures.** A game that fails costs only that game. Its seed is recorded, and a
-rules dead end (a decision with no legal action) saves its state in the training
-run's `failed-positions/` folder. Two random-play checks run before long training
+**Failures.** A game that fails costs only that game. The run records its seed,
+its play time and its error's text. A rules dead end (a decision with no legal
+action) also saves its state in the training run's `failed-positions/` folder,
+even when only the search imagined it, since its error carries the position
+(`NoLegalActionError` in `studies/shared/multiplayer_mcts.py`). Any other
+failure, such as a state that fails the engine's check after a move, leaves
+nothing that can rebuild its state: with the shared inference server the seed
+need not replay the game, since the network's outputs for a position change in
+their last digits with the inference batch it shares, and every game takes up
+each new network as it comes (`studies/campaign/episode_workers.py`;
+[Q-012](../questions.md#q-012-a-game-process-that-crashes)). Two random-play checks run before long training
 runs: the fuzzer (`tools/fuzz_campaign_dead_ends.py`) looks for dead ends and for
 actions that leave the game unchanged, and `tools/check_zone_names.py` for names
 the network's input does not list.
