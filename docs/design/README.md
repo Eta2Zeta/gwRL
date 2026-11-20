@@ -2723,7 +2723,8 @@ as it stands; which of the others pay, and how much, is open:
 - **Leaner request handling.** Outside the forward pass, the inference server
   reads the inference requests' notes from the pipes, collates the inference batch
   in Python, turns the outputs into priors one state at a time and sends the
-  replies through the pipes as lists: its request handling (section 9.2). In a
+  replies through the pipes as short binary messages: its request handling
+  (section 9.2). In a
   training iteration timed with the profiler on 17 November collating took 13%
   of the inference server's time, and the rest of the request handling 6%
   ([record](../archive/records/coordinator_rounds_2026_11_17.md#the-training-batch)).
