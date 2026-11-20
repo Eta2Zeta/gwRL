@@ -2458,7 +2458,14 @@ busy about 97% of the time before and after, now sets the pace alone. It
 answered more network evaluations a second because each cost it less: its
 inference batches grew from about 43 states to about 47, and its process ran
 more of its time on performance cores
-([record](../archive/records/search_in_cpp_2026_11_19.md)).
+([record](../archive/records/search_in_cpp_2026_11_19.md)). More concurrent
+games make the inference batches larger still and each state cheaper: with 189
+and 252 concurrent games the same setup played 527,401 and 556,581 decisions an
+hour while all the games played, against about 470,000 with 126, and kept a
+median of 7.4 and 7.85 CPU cores busy. With 378 the Mac ran short of memory
+beside its other programs, and the games played more slowly
+([record](../archive/records/concurrent_games_cpp_search_2026_11_19.md); below,
+when memory would limit).
 
 **Where an inference batch's states come from.** An inference batch holds the
 inference requests waiting when it starts, and a game asks for one network
@@ -2523,7 +2530,7 @@ since the search runs in C++:
 | Setup | What limits | The CPU cores could feed | What pays |
 | --- | --- | --- | --- |
 | 64×2 on one CPU core, 24 concurrent games (the Mac profile) | the inference server, busy 98% | about a fifth more with the Python search; not measured with the C++ search | a cheaper inference server; a cheaper engine little |
-| 256×8 on the GPU, 126 concurrent games, compiled layers | the inference server, busy 97%; the CPU cores a median of 6.5 busy | about 1.5 times as much | a cheaper inference server; more concurrent games, for larger inference batches; self-play that never stops, about 9% measured with the Python search |
+| 256×8 on the GPU, 126 concurrent games, compiled layers | the inference server, busy 97%; the CPU cores a median of 6.5 busy | about 1.5 times as much | a cheaper inference server; more concurrent games, for larger inference batches, 18% more decisions an hour with 252 while all the games played (measured); self-play that never stops, about 9% measured with the Python search |
 | 512×16 on the GPU, not trained yet | the GPU's forward pass, about 2,000 states a second as written and 2,700 compiled, in inference batches of about 60 | three to four times as much | a cheaper forward pass on the GPU; the engine not at all |
 
 The CPU cores' rates are inferred: the 9 CPU cores of the allowance, less the
@@ -2825,8 +2832,10 @@ would pay nothing there: they would only lower the CPU cores' load. More
 concurrent games fill larger inference batches, which the GPU answers more
 cheaply a state, until the CPU cores limit again: at 0.98 ms a network
 evaluation the allowance feeds about 8,600 network evaluations a second, about
-1.5 times the 5,800 measured (inferred), and memory holds about 330 concurrent
-games at 64 simulations (below). So at 256×8 the engine's levers pay again only
+1.5 times the 5,800 measured (inferred). Measured, 252 concurrent games played
+18% more decisions an hour than 126 while all the games played, with the CPU
+cores at a median of 7.85, and 378 did not fit beside the Mac's other programs
+(below). So at 256×8 the engine's levers pay again only
 with more concurrent games; at 512×16, where the GPU's forward pass limits
 (above), they pay nothing; on a faster GPU the engine's cost sets how many CPU
 cores keep it busy.
@@ -2841,7 +2850,20 @@ Python search. In the matched runs of the C++ search, 126 concurrent games held
 9.5 and 11.0 GB, against 11.0 and 12.0 GB with the Python search
 ([record](../archive/records/search_in_cpp_2026_11_19.md#the-matched-runs)), so
 the table below, worked out with the Python search, may count about 10 MB a
-game too many. With the search trees measured above, the 30 GB hold (inferred):
+game too many. With 189, 252 and 378 concurrent games the runs of the C++ search
+held 12.2, 13.5 and about 15 GB
+([record](../archive/records/concurrent_games_cpp_search_2026_11_19.md#results)).
+The 30 GB are the run's alone: the rest of the Mac, with a browser, a web
+development server and Claude's apps open, held 11 to 17 GB of its 36 GB during
+those runs, and the operating system keeps 5 to 6 GB. With 378 concurrent games
+macOS reported warning-level memory pressure nearly throughout, swap grew by
+4 GB in 38 minutes and the games played about 10% fewer decisions an hour than
+252 (inferred); together with another program's workers, the same layout
+filled the Mac's memory
+([record](../archive/records/concurrent_games_cpp_search_2026_11_19.md#the-378-game-runs)).
+The supervisor watches only the run's own memory (Q-011 in
+`docs/questions.md`). With the search trees measured above, the 30 GB hold
+(inferred):
 
 | Simulations per decision | Search tree | Memory per concurrent game | Concurrent games in 30 GB | States per inference batch |
 | ---: | ---: | ---: | ---: | ---: |
@@ -2850,8 +2872,10 @@ game too many. With the search trees measured above, the 30 GB hold (inferred):
 | 800 | about 190 MB | about 260 MB | about 105 | about 50 |
 | 1,600 | about 390 MB | about 460 MB | about 60 | about 30 |
 
-At 64 simulations memory is far from the limit: the CPU cores limit long before
-330 concurrent games (above). With longer searches it limits how full the
+At 64 simulations the allowance is far from the limit, but the Mac's memory is
+not: beside the Mac's usual programs, 252 concurrent games play the most
+decisions an hour, and 378 already push the Mac into swap (above). With longer
+searches memory limits how full the
 inference batches can be. At 1,600 simulations, the search of AlphaGo Zero,
 inference batches of about 30 states would give the GPU less than its rate in
 inference batches of 64 (above, where an inference batch's states come from). A

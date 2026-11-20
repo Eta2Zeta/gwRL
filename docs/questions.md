@@ -34,6 +34,7 @@ Other open things stay in the pages that own them, and
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
+| [Q-011](#q-011-the-memory-the-rest-of-the-mac-uses) | Should the supervisor also stop a run when the whole Mac runs short of memory, not only when the run itself nears 30 GB? | Running training | Yes: watch the Mac's memory pressure and swap too |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
@@ -42,6 +43,9 @@ Q-006 was raised on 15 November 2026, while the printed rules on Mongolia's
 attacks on Chinese land (Q-001, since answered) were being looked up. Its
 numbers are in the
 [record of which features random games give values to](archive/records/answer_census_2026_11_15.md).
+Q-011 was raised on 19 November 2026, when a training run with 378 concurrent
+games filled the Mac's memory. Its numbers are in the
+[record of concurrent games with the C++ search](archive/records/concurrent_games_cpp_search_2026_11_19.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -181,6 +185,61 @@ the game's developers.
 
 **If answered.** A ruling becomes the next rule clarification, with
 `mayDeclareWar`, its test and the politics page changed in the same commit.
+
+## Q-011: The memory the rest of the Mac uses
+
+**The question.** Should the supervisor also stop a training run when the Mac
+as a whole runs short of memory, not only when the run's own processes come
+near the owner's allowance of 30 GB?
+
+**What the supervisor does now.** Every second it adds up the memory of the
+run's processes, for each process its resident memory or macOS's physical
+footprint with its compressed pages, whichever is larger
+(`process_memory_charge` in `tools/supervise_campaign_training.py`). It asks the
+run to stop when that sum comes within 1 GB of 30 GB, and kills the run at
+30 GB. The Mac has 36 GB, so the allowance leaves about 6 GB for everything
+else, and nothing checks what everything else uses.
+
+**A real case** (19 November 2026, the 256×8 network on the GPU, 378 concurrent
+games in 7 game processes of 54). The run held about 15 GB at its sampled
+peak, half the allowance. The Mac's other programs, a browser, a web
+development server and Claude's apps among them, held 11 to 17 GB of resident
+memory, and the operating system kept 5 to 6 GB for itself. At 15:43 another
+program started 12 worker processes of about 1.1 GB each. By 15:49 the Mac's
+memory was full: 17 GB in the memory compressor, 10.2 GB of the 11.3 GB of
+swap in use and the kernel taking 48% of the CPU, compressing and swapping
+pages, against about 9% when the Mac is quiet. The run's own CPU use had
+fallen from about 7.5 cores to under 4 from about 15:40, as its pages were
+compressed. The supervisor saw nothing wrong, since the run stayed far under
+30 GB, and the run was stopped by hand at 15:50. The same layout run again at
+17:19, with nothing else large running, kept macOS's memory pressure at
+"warning", grew swap by 4.1 GB in 38 minutes and played about 10% fewer
+decisions an hour than 252 games
+([record](archive/records/concurrent_games_cpp_search_2026_11_19.md#the-378-game-runs)).
+
+**Why it matters.** A run within its allowance can still make the whole Mac
+unusable, for the owner's other work as much as for training, and its
+measurements are then worthless. The 30 GB fit only while the rest of the Mac
+uses about 6 GB, and with a browser and other sessions open it uses more than
+twice that.
+
+**The choices.**
+
+| Choice | What it changes |
+| --- | --- |
+| A. Watch the Mac's memory too | The supervisor also reads macOS's memory pressure level (the `kern.memorystatus_vm_pressure_level` system value) and the swap in use, and stops the run safely, as a requested stop, when the pressure turns critical or swap grows by a few GB during the run. It protects the Mac whatever else runs; a run may stop because of other programs, which the status file would say. |
+| B. A smaller allowance | Lower the run's limit to what fits beside the usual programs, such as 18 GB. Simple, but the right number changes with what else is open, and a quiet Mac would leave memory unused. |
+| C. Leave it | Keep the 30 GB and keep other large programs closed while training runs. |
+
+**Recommendation: A, with the 30 GB check kept.** It guards against what went
+wrong, whatever its cause, and the supervisor already samples memory every
+second. The 19 November rerun of the 378-game layout ran with such a check in
+a separate script: the pressure never turned critical, and the growth of swap
+was what stopped it.
+
+**If answered.** What the supervisor watches and when it stops a run belong in
+the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
+and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
 
 ## Open elsewhere
 
