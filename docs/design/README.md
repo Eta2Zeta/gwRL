@@ -2241,7 +2241,9 @@ takes the same game slots while the others play on. In the long run's layout of
 six processes of 42 games, a crash costs the games in play in one process: when
 a second process aborted the same way later that day, the run lost 44 games,
 about 7 minutes of its play (inferred), and went on
-([record](../archive/records/second_game_process_crash_2026_11_20.md)). A
+([record](../archive/records/second_game_process_crash_2026_11_20.md)), and
+when a third did, it lost 42 games, about 6 minutes
+([record](../archive/records/third_game_process_crash_2026_11_20.md)). A
 process that dies before it has reported any game stops the run, since a new
 one would most likely die the same way. The defect behind the crashes of 20
 November is not found ([Q-012](../questions.md#q-012-a-game-process-that-crashes)).
@@ -3139,13 +3141,15 @@ measured and what would settle it.
   [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
 - **Heap corruption.** A defect in a game process's native code damages memory,
   and it is not found
-  ([Q-012](../questions.md#q-012-a-game-process-that-crashes)). On 20 November,
-  in 16.6 hours of play of 252 concurrent games with the search in C++, two game
-  processes aborted on memory being freed that had not been allocated, both in
-  the game copy of a search tree node. Before the second abort, two games of
-  that process failed the engine's state check with a zone number that names no
-  zone ([first record](../archive/records/game_process_crash_2026_11_20.md),
-  [second record](../archive/records/second_game_process_crash_2026_11_20.md)).
+  ([Q-012](../questions.md#q-012-a-game-process-that-crashes)). In 18.4 hours of
+  play of 252 concurrent games with the search in C++, on 19 and 20 November,
+  three game processes aborted on memory being freed that had not been
+  allocated, all while freeing the game copies of search tree nodes. Before the
+  second abort, two games of that process failed the engine's state check with a
+  zone number that names no zone; before the third, none had failed
+  ([first record](../archive/records/game_process_crash_2026_11_20.md),
+  [second record](../archive/records/second_game_process_crash_2026_11_20.md),
+  [third record](../archive/records/third_game_process_crash_2026_11_20.md)).
   On the night of 2 November, before the search ran in C++, a game process
   crashed twice early in training iteration 3, and about 4.5 hours of replays in
   builds with memory checks did not reproduce it. A race between the game

@@ -46,9 +46,11 @@ numbers are in the
 Q-012 was raised on 20 November 2026, when a game process of the long training
 run started the day before crashed; its first part, whether training should
 lose only that process's games, was answered the same day. Its numbers are in
-the [record of that crash](archive/records/game_process_crash_2026_11_20.md)
+the [record of that crash](archive/records/game_process_crash_2026_11_20.md),
+the
+[record of a second crash the same day](archive/records/second_game_process_crash_2026_11_20.md)
 and the
-[record of a second crash the same day](archive/records/second_game_process_crash_2026_11_20.md).
+[record of a third](archive/records/third_game_process_crash_2026_11_20.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -227,6 +229,14 @@ one's game slots, and the run lost 44 games, about 7 minutes of its play
 (inferred), instead of stopping
 ([record](archive/records/second_game_process_crash_2026_11_20.md)).
 
+**A third case** (the same run, at 14:28, after 7.56 hours of play). Another
+game process aborted with the same allocator message, again while the search
+freed the nodes of a game's tree that it did not keep, this time in the
+destructor of a whole game state. No game of that process had failed the
+engine's check. A new game process took its game slots, and the run lost 42
+games, about 6 minutes of its play (inferred)
+([record](archive/records/third_game_process_crash_2026_11_20.md)).
+
 **What the two failed games left.** Nothing that can rebuild their states. For
 a failed game the run records its seed, its play time and its error's text, and
 it saves a position only when the error carries one, which today only a rules
@@ -244,19 +254,20 @@ run the same check, and an error there fails the game (`Searcher::run` in
 
 **Why it matters.** The defect most likely damages game states before anything
 notices it (inferred): the only two games of the run to fail the engine's check
-were in the process that later aborted, in the 38 minutes before it did. A
-damaged value that the check does not catch, such as a zone number that names a
-real zone, would go into the game's training samples. And each crash still costs the games in
-play in one game process: 42 games in the long run's layout of six processes,
-about 7 minutes of its play in the second case.
+were in the process that aborted at 10:46, in the 38 minutes before it did,
+although the process that aborted at 14:28 had no failed game. A damaged value
+that the check does not catch, such as a zone number that names a real zone,
+would go into the game's training samples. And each crash still costs the games
+in play in one game process: 42 games in the long run's layout of six
+processes, about 7 and 6 minutes of its play in the second and third cases.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and two crashes in 16.6 hours of 252 games, about one every 8 hours, suggest that may take many hours. |
-| B. Leave it | Training goes on, and each crash costs one game process's games in play, about 7 minutes of the run's play the second time. The defect stays, with whatever it does to games that neither fail the check nor crash. |
-| C. Keep the failed position | When the engine's check fails, its error carries the position before the failing move, and the move, and the run saves both in its `failed-positions/` folder, as it saves a dead end's position now. If the move, applied again to that position in a fresh process, fails the same way, it is a rules bug, found at that move; any other result would mean that the bad zone number came not from the rules but from damage in the game process's memory. Training goes on, but the change needs a new run from the newest network, which costs the games in play: about 40 minutes of the run's play (inferred: the 42 games lost in the second crash had played 40.5 minutes on average). It shows nothing until a check fails again, and in 16.6 hours of play of 252 games the only two failures came before the second crash. |
+| A. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and three crashes in 18.4 hours of play of 252 games, about one every 6 hours, suggest that may take many hours. |
+| B. Leave it | Training goes on, and each crash costs one game process's games in play, about 6 to 7 minutes of the run's play in the second and third cases. The defect stays, with whatever it does to games that neither fail the check nor crash. |
+| C. Keep the failed position | When the engine's check fails, its error carries the position before the failing move, and the move, and the run saves both in its `failed-positions/` folder, as it saves a dead end's position now. If the move, applied again to that position in a fresh process, fails the same way, it is a rules bug, found at that move; any other result would mean that the bad zone number came not from the rules but from damage in the game process's memory. Training goes on, but the change needs a new run from the newest network, which costs the games in play: about 35 to 40 minutes of the run's play (inferred: the 42 games lost in the second and in the third crash had played 40.5 and 36.5 minutes on average). It shows nothing until a check fails again, and in 18.4 hours of play of 252 games the only two failures came before the second crash, and none before the third. |
 
 **Recommendation: C now, and A when the Mac can spare some hours.** C needs no
 pause, and the next failed check would then show whether the bad zone numbers
