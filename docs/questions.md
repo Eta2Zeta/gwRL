@@ -52,8 +52,10 @@ the
 [record of a second crash the same day](archive/records/second_game_process_crash_2026_11_20.md),
 the
 [record of a third](archive/records/third_game_process_crash_2026_11_20.md)
+the
+[record of a fourth, on 21 November](archive/records/fourth_game_process_crash_2026_11_21.md)
 and the
-[record of a fourth, on 21 November](archive/records/fourth_game_process_crash_2026_11_21.md).
+[record of a fifth](archive/records/fifth_game_process_crash_2026_11_21.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -255,6 +257,14 @@ A new game process took its game slots, and the run lost 42 games, about 5
 minutes of its play (inferred)
 ([record](archive/records/fourth_game_process_crash_2026_11_21.md)).
 
+**A fifth case** (the same run, at 04:49 on 21 November, after 6.11 hours of
+play). Another game process aborted with the same allocator message, while the
+search freed the nodes of a game's tree that it did not keep, in a unit's state
+as in the second case. No game had failed the engine's check. A new game
+process took its game slots, and the run lost 42 games, about 4 minutes of its
+play (inferred)
+([record](archive/records/fifth_game_process_crash_2026_11_21.md)).
+
 The two games that failed the check between 10:08 and 10:46 left only their seeds
 and their error's text, which cannot rebuild their states: the run did not yet
 keep a failed move's position, and with the shared inference server a game's
@@ -268,22 +278,22 @@ although the process that aborted at 14:28 had no failed game. A damaged value
 that the check does not catch, such as a zone number that names a real zone,
 would go into the game's training samples. And each crash still costs the games
 in play in one game process: 42 games in the long run's layout of six
-processes, about 7, 6 and 5 minutes of its play in the second, third and fourth
+processes, about 7, 6, 5 and 4 minutes of its play in the second to fifth
 cases.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and four crashes in 28.1 hours of play of 252 games, about one every 7 hours, suggest that may take many hours. |
-| B. Leave it | Training goes on, and each crash costs one game process's games in play, about 5 to 7 minutes of the run's play in the second, third and fourth cases. The defect stays, with whatever it does to games that neither fail the check nor crash. |
+| A. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and five crashes in 32.6 hours of play of 252 games, about one every 6.5 hours, suggest that may take many hours. |
+| B. Leave it | Training goes on, and each crash costs one game process's games in play, about 4 to 7 minutes of the run's play in the second to fifth cases. The defect stays, with whatever it does to games that neither fail the check nor crash. |
 
 **Recommendation: A, when the Mac can spare some hours.** Only A can find the
 memory defect behind the crashes, which has most likely damaged the states of
 two games already. A kept failed move only shows whether a bad zone number came
-from the rules or from damage, and only when a check fails: in 28.1 hours of
+from the rules or from damage, and only when a check fails: in 32.6 hours of
 play of 252 games the only two failures came before the second crash, and none
-before the third or the fourth.
+before the third, the fourth or the fifth.
 
 **If answered.** What was found, and the fix, belong in the engine page of the
 code that held the defect, and in
