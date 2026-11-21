@@ -2296,7 +2296,11 @@ fourth and a fifth on 21 November, about 5 and 4 minutes
 ([fourth record](../archive/records/fourth_game_process_crash_2026_11_21.md),
 [fifth record](../archive/records/fifth_game_process_crash_2026_11_21.md)). A
 process that dies before it has reported any game stops the run, since a new
-one would most likely die the same way. The defect behind these crashes is not
+one would most likely die the same way, as a sixth did that day, 3.6 minutes
+after its run started
+([sixth record](../archive/records/sixth_game_process_crash_2026_11_21.md));
+the training process then waits for the crash report's copy before it exits.
+The defect behind these crashes is not
 found, also not by the sanitizer runs of 21 November 2026
 ([record](../archive/records/crash_diagnosis_2026_11_21.md)); the training build
 keeps two checks that would stop it where it happens if it is an out-of-bounds
@@ -3213,9 +3217,9 @@ measured and what would settle it.
   [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
 - **Heap corruption.** A defect in a game process's native code damages memory,
   and it is not found (Q-012 in [the answered questions](../questions.md#answered)).
-  In 32.6 hours of
+  In about 35.8 hours of
   play of 252 concurrent games with the search in C++, from 19 to 21 November,
-  five game processes aborted on memory being freed that had not been
+  six game processes aborted on memory being freed that had not been
   allocated, all while freeing the game copies of search tree nodes. Before the
   second abort, two games of that process failed the engine's state check with a
   zone number that names no zone; before the others, none had failed
@@ -3223,7 +3227,8 @@ measured and what would settle it.
   [second record](../archive/records/second_game_process_crash_2026_11_20.md),
   [third record](../archive/records/third_game_process_crash_2026_11_20.md),
   [fourth record](../archive/records/fourth_game_process_crash_2026_11_21.md),
-  [fifth record](../archive/records/fifth_game_process_crash_2026_11_21.md)).
+  [fifth record](../archive/records/fifth_game_process_crash_2026_11_21.md),
+  [sixth record](../archive/records/sixth_game_process_crash_2026_11_21.md)).
   On 21 November training stopped for it to be looked for: about 8,000
   decisions under ThreadSanitizer and 21,000 under AddressSanitizer, with every
   position encoded and with the network choosing moves, found no data race and
@@ -3232,7 +3237,10 @@ measured and what would settle it.
   ([record](../archive/records/crash_diagnosis_2026_11_21.md)). Since then the
   training build keeps libc++'s fast hardening and the SlotMap check, for 2.2%
   of a game thread's time, and a run keeps what the next crash leaves
-  (section 9.2). On the night of 2 November, before the search ran in C++, a game process
+  (section 9.2). The sixth crash came in such a build, with neither check
+  firing; its 42 games, rebuilt from their move logs and searched again under
+  AddressSanitizer with the network on the CPU, did not reproduce it. On the
+  night of 2 November, before the search ran in C++, a game process
   crashed twice early in training iteration 3, and about 4.5 hours of replays in
   builds with memory checks did not reproduce it. A race between the game
   threads of one process, which run side by side without taking turns at

@@ -169,6 +169,25 @@ class GameProcessEndingTests(unittest.TestCase):
             self.assertEqual(taken[0], {"root": 0})  # The first process reported a game before it died.
         self.assertEqual(multiprocessing.active_children(), [])
 
+    def test_a_crash_that_ends_the_play_waits_for_its_crash_report(self):
+        # A game process that a crash signal ends before reporting a game ends the
+        # play; its crash report, which macOS writes seconds later, is copied first.
+        copied = []
+
+        def keep(pid, folder):
+            def copy():
+                time.sleep(0.5)
+                copied.append((pid, folder))
+            thread = shared_evaluator.threading.Thread(target=copy)
+            thread.start()
+            return thread
+        with patch.object(shared_evaluator, "keep_crash_report", keep), \
+                patch.object(shared_evaluator, "CRASH_SIGNALS", {signal.SIGKILL}):  # No real crash report is made.
+            with self.assertRaisesRegex(ValueError, "exited abnormally: GameProcessEnded"):
+                self.play(killed_while_starting, crash_reports="crash-reports")
+        self.assertEqual(len(copied), 1)
+        self.assertEqual(copied[0][1], "crash-reports")
+
     def test_fed_games_go_on_when_their_records_are_taken(self):
         # Games are fed by how many reported, not by how many records the list
         # holds, so a caller that takes each record keeps getting games.

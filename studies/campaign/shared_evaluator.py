@@ -501,6 +501,11 @@ def _game_process_main(target: Callable[..., None], *arguments: Any) -> None:
     target(*arguments)
 
 
+# The signals after which macOS writes a crash report: an abort, a bad memory access, a bad instruction.
+CRASH_SIGNALS = {getattr(signal, name) for name in ("SIGABRT", "SIGSEGV", "SIGBUS", "SIGILL", "SIGFPE", "SIGTRAP")
+                 if hasattr(signal, name)}
+
+
 def keep_crash_report(pid: int, folder: str, *, wait_seconds: float = 120.0,
                       reports: Path | None = None) -> threading.Thread | None:
     """Copy macOS's crash report of the process `pid` into `folder`, as
@@ -591,8 +596,9 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
     reporting any game ends the play with ValueError, as any death does without
     `lost_game`: a new process would most likely die the same way.
 
-    With `crash_reports`, a game process that a signal ends has its crash report
-    copied into that folder (keep_crash_report).
+    With `crash_reports`, a game process that a crash signal ends has its crash
+    report copied into that folder (keep_crash_report), before the play ends if
+    the death ends it.
     """
     if feed is not None and tasks:
         raise ValueError("Give either a list of tasks or a feed, not both")
@@ -700,8 +706,9 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
         except ValueError:
             how = f"exit code {code}"
         reason = f"GameProcessEnded: game process {game.process.pid} ended with {how}"
-        if crash_reports is not None and code < 0:
-            keep_crash_report(game.process.pid, crash_reports)
+        report = None
+        if crash_reports is not None and code < 0 and -code in CRASH_SIGNALS:
+            report = keep_crash_report(game.process.pid, crash_reports)
         server.drop(game.connections)
         close_tasks(game)
         if game.results_ended:
@@ -710,6 +717,10 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
             abandoned.append(game.results)
         lost, game.playing = list(game.playing.values()), {}
         if lost_game is None or not game.reported:
+            if report is not None:
+                # The play, and the training process with it, ends here: the crash
+                # report, which appears seconds after the death, is copied first.
+                report.join()
             raise ValueError(f"A game process exited abnormally: {reason}")
         now = time.monotonic()
         records.extend(lost_game(task, reason, now - given) for task, given in lost)

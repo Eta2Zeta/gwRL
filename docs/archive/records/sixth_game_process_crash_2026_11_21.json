@@ -1,0 +1,844 @@
+{
+ "schema": "game-process-crash-record-v2",
+ "what": "A game process of the run started at 08:39 on 21 November 2026 (tmp/training-2026-11-21, commit 6f04943, whose build keeps libc++'s fast hardening and the SlotMap check) aborted 3.6 minutes after it started, on a damaged heap while the search freed the nodes of a game's tree that it did not keep, in a unit's state; no game had yet finished, so the run stopped, the third stop in 25 minutes after two stops by the swap rule, and the keeper gave up.",
+ "crash": {
+  "report": "tmp/training-2026-11-21/run/crash-reports/game-process-23464.ips (copied from ~/Library/Logs/DiagnosticReports/python3.13-2026-11-21-090412.ips)",
+  "local_time": "2026-11-21 09:04:12.00 -0600",
+  "process_launched_local": "2026-11-21 09:00:33.9319 -0600",
+  "pid": 23464,
+  "parent_pid": 23421,
+  "game_slots": "168 to 209 (the move logs' thread names, campaign-game-168 to campaign-game-209)",
+  "faulting_thread_frames": [
+   "libsystem_kernel.dylib: __pthread_kill",
+   "libsystem_pthread.dylib: pthread_kill",
+   "libsystem_c.dylib: raise",
+   "python3.13: faulthandler_fatal_error",
+   "libsystem_platform.dylib: _sigtramp",
+   "libsystem_pthread.dylib: pthread_kill",
+   "libsystem_c.dylib: abort",
+   "libsystem_malloc.dylib: malloc_vreport",
+   "libsystem_malloc.dylib: malloc_report",
+   "libsystem_malloc.dylib: ___BUG_IN_CLIENT_OF_LIBMALLOC_POINTER_BEING_FREED_WAS_NOT_ALLOCATED",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::UnitState::~UnitState()",
+   "gwrl_cpp.cpython-313-darwin.so: std::__1::deque<std::__1::optional<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const, game::campaign::UnitState>>, std::__1::allocator<std::__1::optional<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const, game::campaign::UnitState>>>>::clear()",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::SlotMap<game::campaign::UnitKind, game::campaign::UnitState>::~SlotMap()",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::State::~State()",
+   "gwrl_cpp.cpython-313-darwin.so: void std::__1::__destroy_at[abi:fqe220106]<game::campaign::searching::Node>(game::campaign::searching::Node*)",
+   "gwrl_cpp.cpython-313-darwin.so: std::__1::deque<game::campaign::searching::Node, std::__1::allocator<game::campaign::searching::Node>>::__move_assign(std::__1::deque<game::campaign::searching::Node, std::__1::allocator<game::campaign::searching::Node>>&, std::__1::integral_constant<bool, true>)",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::searching::Searcher::retain(int)",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::searching::Searcher::run(std::__1::shared_ptr<game::campaign::Engine const>, unsigned char)",
+   "gwrl_cpp.cpython-313-darwin.so: game::campaign::searchDecision(std::__1::shared_ptr<game::campaign::Engine const>, game::campaign::SearchSchedule const&, game::campaign::SearchEvaluator&, game::campaign::SearchSettings const&, game::campaign::SearchTree*)",
+   "gwrl_cpp.cpython-313-darwin.so: std::__1::enable_if<!std::is_void<pybind11::dict>::value, pybind11::dict>::type pybind11::detail::argument_loader<(anonymous namespace)::NativeCampaignEnv const&, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>> const&, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>> const&, pybind11::object, int, double, int, unsigned long long, bool, double, double, bool, pybind11::object>::call<pybind11::dict, pybind11::detail::void_type, pybind11_init_gwrl_cpp(pybind11::module_&)::$_31&>(pybind11_init_gwrl_cpp(pybind11::module_&)::$_31&) &&",
+   "gwrl_cpp.cpython-313-darwin.so: void pybind11::cpp_function::initialize<pybind11_init_gwrl_cpp(pybind11::module_&)::$_31, pybind11::dict, (anonymous namespace)::NativeCampaignEnv const&, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>> const&, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>> const&, pybind11::object, int, double, int, unsigned long long, bool, double, double, bool, pybind11::object, pybind11::name, pybind11::scope, pybind11::sibling, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg, pybind11::arg_v, char [304]>(pybind11_init_gwrl_cpp(pybind11::module_&)::$_31&&, pybind11::dict (*)((anonymous namespace)::NativeCampaignEnv const&, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>> const&, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>> const&, pybind11::object, int, double, int, unsigned long long, bool, double, double, bool, pybind11::object), pybind11::name const&, pybind11::scope const&, pybind11::sibling const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg const&, pybind11::arg_v const&, char const (&) [304])::'lambda'(pybind11::detail::function_call&)::__invoke(pybind11::detail::function_call&)",
+   "gwrl_cpp.cpython-313-darwin.so: pybind11::cpp_function::dispatcher(_object*, _object* const*, unsigned long, _object*)"
+  ],
+  "other_threads_innermost_gwrl_frame": {
+   "game::campaign::InferenceClient::readAll(unsigned char*, unsigned long)": 40,
+   "outside gwrl_cpp": 1,
+   "game::campaign::SlotMap<game::campaign::UnitKind, game::campaign::UnitState>::Iterator<true>::operator*() const": 1
+  },
+  "allocator_message": [
+   "python(23464,0x7011007000) malloc: *** error for object 0x60000a0abff0: pointer being freed was not allocated",
+   "python(23464,0x7011007000) malloc: *** set a breakpoint in malloc_error_break to debug"
+  ],
+  "python_stack_of_the_crashing_thread": [
+   "Current thread 0x0000007011007000 (most recent call first):",
+   "  File \"/Users/home/Projects/gwRL/tmp/training-2026-11-21/code/studies/campaign/native_search.py\", line 96 in search_decision",
+   "  File \"/Users/home/Projects/gwRL/tmp/training-2026-11-21/code/studies/campaign/learning.py\", line 185 in play_episode",
+   "  File \"/Users/home/Projects/gwRL/tmp/training-2026-11-21/code/studies/campaign/episode_workers.py\", line 44 in _play_game",
+   "  File \"/Users/home/Projects/gwRL/tmp/training-2026-11-21/code/studies/campaign/episode_workers.py\", line 141 in _play_shared",
+   "  File \"/Users/home/Projects/gwRL/tmp/training-2026-11-21/code/studies/campaign/shared_evaluator.py\", line 476 in slot",
+   "  File \"/opt/anaconda3/lib/python3.13/threading.py\", line 994 in run",
+   "  File \"/opt/anaconda3/lib/python3.13/threading.py\", line 1043 in _bootstrap_inner",
+   "  File \"/opt/anaconda3/lib/python3.13/threading.py\", line 1014 in _bootstrap"
+  ]
+ },
+ "run_attempts": [
+  {
+   "attempt": 1,
+   "from": "08:39:33",
+   "to": "08:55:26",
+   "stopped_by": "swap rule: swap 14.39 GB, 4.19 GB above the attempt's start"
+  },
+  {
+   "attempt": 2,
+   "from": "08:57:13",
+   "to": "08:58:42",
+   "stopped_by": "swap rule: swap 17.69 GB, 4.00 GB above the attempt's start"
+  },
+  {
+   "attempt": 3,
+   "from": "09:00:29",
+   "to": "09:04:12",
+   "stopped_by": "this crash: a game process died before any game was reported"
+  }
+ ],
+ "the_dead_process_games": [
+  {
+   "log": "game-508-seed-6470229630687103117.jsonl",
+   "thread": "campaign-game-168",
+   "seed": 6470229630687103117,
+   "decisions_played": 44,
+   "last_line": {
+    "kind": "search",
+    "move": 48,
+    "search_seed": 2857996042593748427,
+    "tree": 67
+   }
+  },
+  {
+   "log": "game-514-seed-55063639539438018.jsonl",
+   "thread": "campaign-game-169",
+   "seed": 55063639539438018,
+   "decisions_played": 46,
+   "last_line": {
+    "kind": "search",
+    "move": 50,
+    "search_seed": 1897075317782462593,
+    "tree": 70
+   }
+  },
+  {
+   "log": "game-520-seed-8797629892665860035.jsonl",
+   "thread": "campaign-game-170",
+   "seed": 8797629892665860035,
+   "decisions_played": 46,
+   "last_line": {
+    "kind": "search",
+    "move": 52,
+    "search_seed": 350834333292810594,
+    "tree": 73
+   }
+  },
+  {
+   "log": "game-526-seed-2716215135965902119.jsonl",
+   "thread": "campaign-game-171",
+   "seed": 2716215135965902119,
+   "decisions_played": 46,
+   "last_line": {
+    "kind": "search",
+    "move": 50,
+    "search_seed": 8043352712654266227,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-532-seed-5694797688092892161.jsonl",
+   "thread": "campaign-game-172",
+   "seed": 5694797688092892161,
+   "decisions_played": 42,
+   "last_line": {
+    "kind": "search",
+    "move": 45,
+    "search_seed": 8754861951763492498,
+    "tree": 67
+   }
+  },
+  {
+   "log": "game-538-seed-2477047863432164753.jsonl",
+   "thread": "campaign-game-173",
+   "seed": 2477047863432164753,
+   "decisions_played": 44,
+   "last_line": {
+    "kind": "search",
+    "move": 47,
+    "search_seed": 7282570743172294903,
+    "tree": 91
+   }
+  },
+  {
+   "log": "game-544-seed-2711857792571638179.jsonl",
+   "thread": "campaign-game-174",
+   "seed": 2711857792571638179,
+   "decisions_played": 48,
+   "last_line": {
+    "kind": "search",
+    "move": 56,
+    "search_seed": 18389183371898604888,
+    "tree": 70
+   }
+  },
+  {
+   "log": "game-550-seed-3572614338630068420.jsonl",
+   "thread": "campaign-game-175",
+   "seed": 3572614338630068420,
+   "decisions_played": 48,
+   "last_line": {
+    "kind": "search",
+    "move": 52,
+    "search_seed": 2794172459168059310,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-556-seed-8245103996881357884.jsonl",
+   "thread": "campaign-game-176",
+   "seed": 8245103996881357884,
+   "decisions_played": 49,
+   "last_line": {
+    "kind": "search",
+    "move": 59,
+    "search_seed": 7457978346952306171,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-562-seed-6035521382576184921.jsonl",
+   "thread": "campaign-game-177",
+   "seed": 6035521382576184921,
+   "decisions_played": 45,
+   "last_line": {
+    "kind": "search",
+    "move": 49,
+    "search_seed": 3183644924862224361,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-568-seed-8274228648750327203.jsonl",
+   "thread": "campaign-game-178",
+   "seed": 8274228648750327203,
+   "decisions_played": 42,
+   "last_line": {
+    "kind": "search",
+    "move": 45,
+    "search_seed": 4624020721329642556,
+    "tree": 84
+   }
+  },
+  {
+   "log": "game-574-seed-2499575313093628458.jsonl",
+   "thread": "campaign-game-179",
+   "seed": 2499575313093628458,
+   "decisions_played": 43,
+   "last_line": {
+    "kind": "search",
+    "move": 47,
+    "search_seed": 17654653603647955852,
+    "tree": 70
+   }
+  },
+  {
+   "log": "game-580-seed-7416561098965289279.jsonl",
+   "thread": "campaign-game-180",
+   "seed": 7416561098965289279,
+   "decisions_played": 44,
+   "last_line": {
+    "kind": "search",
+    "move": 48,
+    "search_seed": 1178810251093232457,
+    "tree": 75
+   }
+  },
+  {
+   "log": "game-586-seed-8867940912426064080.jsonl",
+   "thread": "campaign-game-181",
+   "seed": 8867940912426064080,
+   "decisions_played": 45,
+   "last_line": {
+    "kind": "search",
+    "move": 49,
+    "search_seed": 3828428751267445964,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-592-seed-3573133806190719303.jsonl",
+   "thread": "campaign-game-182",
+   "seed": 3573133806190719303,
+   "decisions_played": 44,
+   "last_line": {
+    "kind": "search",
+    "move": 48,
+    "search_seed": 16557045728347634007,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-598-seed-4992190598157985469.jsonl",
+   "thread": "campaign-game-183",
+   "seed": 4992190598157985469,
+   "decisions_played": 42,
+   "last_line": {
+    "kind": "search",
+    "move": 45,
+    "search_seed": 327156646804380201,
+    "tree": 72
+   }
+  },
+  {
+   "log": "game-604-seed-8613597804049317683.jsonl",
+   "thread": "campaign-game-184",
+   "seed": 8613597804049317683,
+   "decisions_played": 44,
+   "last_line": {
+    "kind": "search",
+    "move": 47,
+    "search_seed": 2824338108297721767,
+    "tree": 74
+   }
+  },
+  {
+   "log": "game-610-seed-7768751837819715490.jsonl",
+   "thread": "campaign-game-185",
+   "seed": 7768751837819715490,
+   "decisions_played": 43,
+   "last_line": {
+    "kind": "search",
+    "move": 45,
+    "search_seed": 6725469831686634281,
+    "tree": 81
+   }
+  },
+  {
+   "log": "game-616-seed-3537683175123502405.jsonl",
+   "thread": "campaign-game-186",
+   "seed": 3537683175123502405,
+   "decisions_played": 47,
+   "last_line": {
+    "kind": "search",
+    "move": 50,
+    "search_seed": 16400704122099493969,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-622-seed-1120211162660845941.jsonl",
+   "thread": "campaign-game-187",
+   "seed": 1120211162660845941,
+   "decisions_played": 47,
+   "last_line": {
+    "kind": "search",
+    "move": 50,
+    "search_seed": 2137662009969798457,
+    "tree": 67
+   }
+  },
+  {
+   "log": "game-628-seed-588451717468186313.jsonl",
+   "thread": "campaign-game-188",
+   "seed": 588451717468186313,
+   "decisions_played": 47,
+   "last_line": {
+    "kind": "search",
+    "move": 56,
+    "search_seed": 1218798331209696230,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-634-seed-851397185475918630.jsonl",
+   "thread": "campaign-game-189",
+   "seed": 851397185475918630,
+   "decisions_played": 44,
+   "last_line": {
+    "kind": "search",
+    "move": 48,
+    "search_seed": 11713685760635641896,
+    "tree": 70
+   }
+  },
+  {
+   "log": "game-640-seed-9099414458509582328.jsonl",
+   "thread": "campaign-game-190",
+   "seed": 9099414458509582328,
+   "decisions_played": 43,
+   "last_line": {
+    "kind": "search",
+    "move": 45,
+    "search_seed": 7199746947291543071,
+    "tree": 71
+   }
+  },
+  {
+   "log": "game-646-seed-8300874878530600553.jsonl",
+   "thread": "campaign-game-191",
+   "seed": 8300874878530600553,
+   "decisions_played": 44,
+   "last_line": {
+    "kind": "search",
+    "move": 47,
+    "search_seed": 18052093627253472997,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-652-seed-4784012078318413345.jsonl",
+   "thread": "campaign-game-192",
+   "seed": 4784012078318413345,
+   "decisions_played": 46,
+   "last_line": {
+    "kind": "search",
+    "move": 51,
+    "search_seed": 7738389863684148831,
+    "tree": 69
+   }
+  },
+  {
+   "log": "game-658-seed-2920757003355459084.jsonl",
+   "thread": "campaign-game-193",
+   "seed": 2920757003355459084,
+   "decisions_played": 43,
+   "last_line": {
+    "kind": "search",
+    "move": 47,
+    "search_seed": 1801830009362263977,
+    "tree": 76
+   }
+  },
+  {
+   "log": "game-664-seed-7841165707903850999.jsonl",
+   "thread": "campaign-game-194",
+   "seed": 7841165707903850999,
+   "decisions_played": 44,
+   "last_line": {
+    "kind": "search",
+    "move": 48,
+    "search_seed": 14358833406398870158,
+    "tree": 70
+   }
+  },
+  {
+   "log": "game-670-seed-2092810622044502611.jsonl",
+   "thread": "campaign-game-195",
+   "seed": 2092810622044502611,
+   "decisions_played": 43,
+   "last_line": {
+    "kind": "search",
+    "move": 44,
+    "search_seed": 6248139525015784154,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-676-seed-7997461443186960692.jsonl",
+   "thread": "campaign-game-196",
+   "seed": 7997461443186960692,
+   "decisions_played": 41,
+   "last_line": {
+    "kind": "search",
+    "move": 43,
+    "search_seed": 13297937071112886034,
+    "tree": 66
+   }
+  },
+  {
+   "log": "game-682-seed-879232630644951759.jsonl",
+   "thread": "campaign-game-197",
+   "seed": 879232630644951759,
+   "decisions_played": 48,
+   "last_line": {
+    "kind": "search",
+    "move": 56,
+    "search_seed": 477673517193560882,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-688-seed-9088874555544745414.jsonl",
+   "thread": "campaign-game-198",
+   "seed": 9088874555544745414,
+   "decisions_played": 46,
+   "last_line": {
+    "kind": "search",
+    "move": 52,
+    "search_seed": 12591484947937690454,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-694-seed-8884679737716083492.jsonl",
+   "thread": "campaign-game-199",
+   "seed": 8884679737716083492,
+   "decisions_played": 44,
+   "last_line": {
+    "kind": "search",
+    "move": 47,
+    "search_seed": 17840140177896868597,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-700-seed-2900101616536892867.jsonl",
+   "thread": "campaign-game-200",
+   "seed": 2900101616536892867,
+   "decisions_played": 45,
+   "last_line": {
+    "kind": "search",
+    "move": 49,
+    "search_seed": 6237328140257472331,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-706-seed-3799757521119375025.jsonl",
+   "thread": "campaign-game-201",
+   "seed": 3799757521119375025,
+   "decisions_played": 47,
+   "last_line": {
+    "kind": "search",
+    "move": 51,
+    "search_seed": 10860972303205480539,
+    "tree": 99
+   }
+  },
+  {
+   "log": "game-712-seed-8332177681137340662.jsonl",
+   "thread": "campaign-game-202",
+   "seed": 8332177681137340662,
+   "decisions_played": 44,
+   "last_line": {
+    "kind": "search",
+    "move": 48,
+    "search_seed": 3431384527864852250,
+    "tree": 81
+   }
+  },
+  {
+   "log": "game-718-seed-4748417549443132579.jsonl",
+   "thread": "campaign-game-203",
+   "seed": 4748417549443132579,
+   "decisions_played": 42,
+   "last_line": {
+    "kind": "search",
+    "move": 45,
+    "search_seed": 15911099921059405315,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-724-seed-6860260296863318724.jsonl",
+   "thread": "campaign-game-204",
+   "seed": 6860260296863318724,
+   "decisions_played": 44,
+   "last_line": {
+    "kind": "search",
+    "move": 48,
+    "search_seed": 8916291468874567295,
+    "tree": 66
+   }
+  },
+  {
+   "log": "game-730-seed-6468461125738544581.jsonl",
+   "thread": "campaign-game-205",
+   "seed": 6468461125738544581,
+   "decisions_played": 42,
+   "last_line": {
+    "kind": "search",
+    "move": 44,
+    "search_seed": 12554140243496518514,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-736-seed-8730824008001510531.jsonl",
+   "thread": "campaign-game-206",
+   "seed": 8730824008001510531,
+   "decisions_played": 43,
+   "last_line": {
+    "kind": "search",
+    "move": 47,
+    "search_seed": 6423687680816025628,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-742-seed-193254425635856443.jsonl",
+   "thread": "campaign-game-207",
+   "seed": 193254425635856443,
+   "decisions_played": 47,
+   "last_line": {
+    "kind": "search",
+    "move": 54,
+    "search_seed": 3623756030167250710,
+    "tree": 65
+   }
+  },
+  {
+   "log": "game-748-seed-2825965617285319699.jsonl",
+   "thread": "campaign-game-208",
+   "seed": 2825965617285319699,
+   "decisions_played": 48,
+   "last_line": {
+    "kind": "search",
+    "move": 54,
+    "search_seed": 15561466609140081973,
+    "tree": 66
+   }
+  },
+  {
+   "log": "game-754-seed-3342200098513363986.jsonl",
+   "thread": "campaign-game-209",
+   "seed": 3342200098513363986,
+   "decisions_played": 48,
+   "last_line": {
+    "kind": "search",
+    "move": 52,
+    "search_seed": 13548454857606896698,
+    "tree": 23
+   }
+  }
+ ],
+ "asan_replay": {
+  "how": "tools/replay_game_moves.py --search 3 --model generation 10 of tmp/training-2026-11-20c (the run's starting network), on the CPU, built with AddressSanitizer, UBSan, libc++ debug hardening and the SlotMap check: each game rebuilt from its seed and moves, its last three decisions and the one under way searched again with their logged seeds, in a kept tree",
+  "games": 42,
+  "outcomes": {
+   "replayed": 42
+  },
+  "sanitizer_reports": 0,
+  "replays": [
+   {
+    "log": "game-508-seed-6470229630687103117.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 48
+   },
+   {
+    "log": "game-514-seed-55063639539438018.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 50
+   },
+   {
+    "log": "game-520-seed-8797629892665860035.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 52
+   },
+   {
+    "log": "game-526-seed-2716215135965902119.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 50
+   },
+   {
+    "log": "game-532-seed-5694797688092892161.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 45
+   },
+   {
+    "log": "game-538-seed-2477047863432164753.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 47
+   },
+   {
+    "log": "game-544-seed-2711857792571638179.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 56
+   },
+   {
+    "log": "game-550-seed-3572614338630068420.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 52
+   },
+   {
+    "log": "game-556-seed-8245103996881357884.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 59
+   },
+   {
+    "log": "game-562-seed-6035521382576184921.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 49
+   },
+   {
+    "log": "game-568-seed-8274228648750327203.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 45
+   },
+   {
+    "log": "game-574-seed-2499575313093628458.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 47
+   },
+   {
+    "log": "game-580-seed-7416561098965289279.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 48
+   },
+   {
+    "log": "game-586-seed-8867940912426064080.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 49
+   },
+   {
+    "log": "game-592-seed-3573133806190719303.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 48
+   },
+   {
+    "log": "game-598-seed-4992190598157985469.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 45
+   },
+   {
+    "log": "game-604-seed-8613597804049317683.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 47
+   },
+   {
+    "log": "game-610-seed-7768751837819715490.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 45
+   },
+   {
+    "log": "game-616-seed-3537683175123502405.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 50
+   },
+   {
+    "log": "game-622-seed-1120211162660845941.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 50
+   },
+   {
+    "log": "game-628-seed-588451717468186313.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 56
+   },
+   {
+    "log": "game-634-seed-851397185475918630.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 48
+   },
+   {
+    "log": "game-640-seed-9099414458509582328.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 45
+   },
+   {
+    "log": "game-646-seed-8300874878530600553.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 47
+   },
+   {
+    "log": "game-652-seed-4784012078318413345.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 51
+   },
+   {
+    "log": "game-658-seed-2920757003355459084.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 47
+   },
+   {
+    "log": "game-664-seed-7841165707903850999.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 48
+   },
+   {
+    "log": "game-670-seed-2092810622044502611.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 44
+   },
+   {
+    "log": "game-676-seed-7997461443186960692.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 43
+   },
+   {
+    "log": "game-682-seed-879232630644951759.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 56
+   },
+   {
+    "log": "game-688-seed-9088874555544745414.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 52
+   },
+   {
+    "log": "game-694-seed-8884679737716083492.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 47
+   },
+   {
+    "log": "game-700-seed-2900101616536892867.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 49
+   },
+   {
+    "log": "game-706-seed-3799757521119375025.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 51
+   },
+   {
+    "log": "game-712-seed-8332177681137340662.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 48
+   },
+   {
+    "log": "game-718-seed-4748417549443132579.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 45
+   },
+   {
+    "log": "game-724-seed-6860260296863318724.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 48
+   },
+   {
+    "log": "game-730-seed-6468461125738544581.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 44
+   },
+   {
+    "log": "game-736-seed-8730824008001510531.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 47
+   },
+   {
+    "log": "game-742-seed-193254425635856443.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 54
+   },
+   {
+    "log": "game-748-seed-2825965617285319699.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 54
+   },
+   {
+    "log": "game-754-seed-3342200098513363986.jsonl",
+    "outcome": "replayed",
+    "searches": 4,
+    "played": 52
+   }
+  ]
+ }
+}

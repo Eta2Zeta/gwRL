@@ -201,7 +201,7 @@ For looking into a crash the run keeps, in its run folder:
   crash, and macOS's allocator message with the address, which the supervisor
   has macOS write there (`MallocDebugReport=stderr`).
 
-The defect behind the five game process crashes of 20 and 21 November 2026 is not found,
+The defect behind the six game process crashes of 20 and 21 November 2026 is not found,
 also not by the sanitizer runs of 21 November
 ([record](../../docs/archive/records/crash_diagnosis_2026_11_21.md)).
 
