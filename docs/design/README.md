@@ -1787,16 +1787,28 @@ before. A training iteration of 24 games kept 1,354 training samples on
 on 5 November.
 
 The replay buffer's size cancels only while the replay buffer holds more than
-one training iteration's training samples. With 252 concurrent games, as in the
-long run on the Mac's GPU since 19 November 2026, a network update follows 252
-games, which keep about 18,300 training samples, more than twice the replay
-buffer's 8,000. More than half of those training samples then leave the replay
-buffer before a training step can draw them; the network update's 16,800 draws
-come to about 67 for each of its 252 games instead of 700; and they fall on the
-training samples of only the latest 110 games or so, which the network then
-fits about 3.3 times better, by value loss, than the games it plays next
-([record](../archive/records/replay_buffer_fit_2026_11_20.md);
-[Q-013](../questions.md#q-013-how-many-games-a-network-update-learns-from)).
+one training iteration's training samples. The long run on the Mac's GPU plays
+252 concurrent games, and a network update follows 252 games. Keeping 5% of
+their decisions, those games kept about 18,300 training samples, more than twice
+a replay buffer of 8,000: more than half of those training samples left the
+replay buffer before a training step could draw them, and a network update's
+16,800 draws fell on the training samples of only the latest 110 games or so,
+which the network then fit about 3.3 times better, by value loss, than the games
+it played next ([record](../archive/records/replay_buffer_fit_2026_11_20.md)).
+A game's training samples all share its final scores, so a network can fit a
+few games by learning which game a position comes from rather than how
+positions lead to final scores. AlphaGo's value network was trained on 30
+million positions, each from a different self-play game, to avoid overfitting
+to the strong correlations between the positions of self-play (Sutton and
+Barto, *Reinforcement Learning: An Introduction*, 2nd edition, section 16.6.1,
+page 446). So since the evening of 20 November 2026 the long run keeps 1% of
+each game's decisions and 25,000 training samples
+(`--sample-fraction 0.01 --replay-capacity 25000`; Q-013 in
+[the questions page](../questions.md#answered)): a network update's 252 games
+keep about 3,700 training samples, the replay
+buffer holds those of about seven network updates, some 1,700 games, and each
+training sample is drawn about 4.6 times while it stays. Whether the network
+then fits new games better is not yet measured.
 
 ## 9. The whole loop, and running it
 
@@ -3203,11 +3215,13 @@ measured and what would settle it.
   - The Axis scored +51 against the scripted opponents with the untrained,
     nearly passive network, and between +6.7 and +16.8 at four later
     generations, on six held-out seeds each.
-  - Within each network update the network fits the latest 110 or so games in
-    its replay buffer about 3.3 times better, by value loss, than the games it
-    plays next ([record](../archive/records/replay_buffer_fit_2026_11_20.md));
-    [Q-013](../questions.md#q-013-how-many-games-a-network-update-learns-from)
-    asks whether to train on many more games at a time.
+  - Keeping 5% of each game's decisions in a replay buffer of 8,000 training
+    samples, the network fit the latest 110 or so games in its replay buffer
+    about 3.3 times better, by value loss, than the games it played next
+    ([record](../archive/records/replay_buffer_fit_2026_11_20.md)). Since the
+    evening of 20 November the long run keeps 1% and 25,000, about 1,700 games
+    ([section 8.7](#87-how-often-a-training-sample-is-drawn)); whether that
+    helps is not yet measured.
 
   Before the long run, the most games a training run had played was 792
   three-round games, on the PC on the night of 14 November, in which no trained

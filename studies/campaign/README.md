@@ -229,10 +229,13 @@ iteration plays the 24 games the profile plays at once (`--batches` counts
 training iterations); with 525 training steps a network update draws each kept
 training sample as often as the 700 training steps did with the 32 games of the
 eight game processes before 15 November 2026. With more games at once, as the
-252 of the long run on the GPU since 19 November 2026, a network update follows
-that many games with the same 525 training steps, which then draw from the
-training samples of only the latest 110 games or so
-([Q-013](../../docs/questions.md#q-013-how-many-games-a-network-update-learns-from)). `--batch-size` is the minibatch
+252 of the long run on the GPU, a network update follows that many games. With
+5% of decisions and 8,000 training samples its training steps then drew from
+only the latest 110 games or so, which the network fit much better than new
+games, so since 20 November 2026 the long run keeps 1% of each game's decisions
+and 25,000 training samples, those of about 1,700 games
+(`--sample-fraction 0.01 --replay-capacity 25000`;
+[how often a training sample is drawn](../../docs/design/README.md#87-how-often-a-training-sample-is-drawn)). `--batch-size` is the minibatch
 size and `--epochs` the number of training steps per network update. Repeat the same command to resume. Another
 machine gets its own file beside `mac.json`.
 
