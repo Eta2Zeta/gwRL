@@ -35,6 +35,7 @@ Other open things stay in the pages that own them, and
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
 | [Q-012](#q-012-a-game-process-that-crashes) | Should training pause for some hours to look for the defect behind a game process's crash? | Running training | Yes, when the Mac can spare the hours |
+| [Q-013](#q-013-how-many-games-a-network-update-learns-from) | Should the long run keep fewer training samples from each game and many more games in its replay buffer? | Training the network | Yes: 1% of decisions and 25,000 training samples, about 1,700 games |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
@@ -52,6 +53,9 @@ the
 [record of a second crash the same day](archive/records/second_game_process_crash_2026_11_20.md)
 and the
 [record of a third](archive/records/third_game_process_crash_2026_11_20.md).
+Q-013 was raised on 20 November 2026, when the owner asked how many more days
+the long training run needs to improve. Its numbers are in the
+[record of how the network fits its replay buffer and new games](archive/records/replay_buffer_fit_2026_11_20.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -276,6 +280,80 @@ before the third.
 code that held the defect, and in
 [section 4.7 of the design document](design/README.md#47-more-detail-on-the-search)
 if it was in the search.
+
+## Q-013: How many games a network update learns from
+
+**The question.** Should the long training run keep fewer training samples from
+each game and many more games in its replay buffer, so that a network update
+learns from about 1,700 games instead of about 110?
+
+**What the program does now.** The long run plays 252 games at once, and after
+every 252 games that end a network update runs 525 training steps, each on a
+minibatch of 32 training samples drawn at random from the replay buffer
+(`self_play_never_stops` in `studies/campaign/run.py`, `CampaignLearner.update`
+in `studies/campaign/learning.py`). Each game keeps a random 5% of its
+decisions as training samples (`--sample-fraction 0.05`), about 73 a game, and
+they join the replay buffer when the game ends; the replay buffer keeps the
+latest 8,000 training samples (`--replay-capacity 8000`, `accept_episode` in
+`studies/campaign/learning.py`), those of about the latest 110 games. So the
+252 games before a network update keep about 18,300 training samples, more than
+twice what the replay buffer holds, and more than half of them leave it before a
+training step can draw them. The 525 training steps were sized for training
+iterations of 24 games
+([section 8.7 of the design document](design/README.md#87-how-often-a-training-sample-is-drawn)).
+
+**A real case** (the current run, 20 November 2026). Network update 3, at
+19:15, ended with a value loss of 0.0045 on the minibatches of its last 50
+training steps: a typical miss of 6.7 points of final score on the games in its
+replay buffer. The 252 games that ended before network update 4, at 20:07, were
+missed by 12.5 points (value loss 0.0156) by the networks that played them,
+which had not trained on them. Over the long run's 22 such pairs, the games
+played next were missed 1.9 to 4.8 times as much, by value loss, as the games
+in the replay buffer, a median of 3.3 times
+([record](archive/records/replay_buffer_fit_2026_11_20.md)).
+
+**Why it matters.** The network's value on new games has not improved since
+about 05:00 on 20 November, 15 network updates: pooled over three network
+updates, its value loss explains 17% to 30% of the final scores' variance, the
+policy's KL divergence from the search's visit shares stays near 0.24, and the
+Axis's held-out scores against the scripted opponents have not risen
+([record](archive/records/replay_buffer_fit_2026_11_20.md)). A game's training
+samples all share its final scores, so a network can fit the latest 110 games
+by learning which game a position comes from rather than how positions lead to
+final scores. AlphaGo's designers avoided this for its value network by taking
+each of 30 million training positions from a different self-play game (Sutton
+and Barto, *Reinforcement Learning: An Introduction*, 2nd edition, section
+16.6.1, page 446), and AlphaGo Zero drew its minibatches from all the positions
+of its latest 500,000 games, with regularization (section 16.6.2, page 449).
+That this keeps the network from improving is inferred, not measured, and so is
+the expectation that more days of the same settings would not change it. And
+the run plays twice as many games as its network updates can draw from.
+
+**The choices.**
+
+| Choice | What it changes |
+| --- | --- |
+| A. Leave it | The run goes on as it is. |
+| B. Fewer training samples from each game, many more games | Keep 1% of each game's decisions, about 15 a game, and 25,000 training samples in the replay buffer: those of the latest 1,700 games or so, about seven network updates' worth. A network update's 16,800 draws then spread over about 1,700 games instead of 110, and each training sample is drawn about 4.6 times while it stays, against about 2.1 times now for the 8,000 in the replay buffer at a network update and never for the rest. The policy learns from a fifth as many decisions of each game. The replay buffer's memory roughly triples, about 1 GB more in the training process (inferred: a checkpoint's 180 MB of pickled Python data hold the 8,000 training samples and the rest of the run's state, and Python objects take a few times their pickled size), which the run's first hour would measure. |
+| C. A larger replay buffer only | Keep 5% of decisions and 40,000 training samples: the latest 550 games or so, about two network updates' worth. Each game's 73 training samples still share one final score, and the replay buffer's memory grows about five times, about 2 GB more (inferred). |
+| D. Weight decay as well | Add regularization to Adam's training steps, as AlphaGo Zero had. The code does not offer it, so it is a code change, to be tested before a run. It can join B or C. |
+
+B, C and D change the run's settings, so each needs a new run from the newest
+network: the games in play are lost, about 26 minutes of the run's play (inferred), and the
+new run's replay buffer starts empty, so its first network updates learn from
+fewer games until it fills.
+
+**Recommendation: B.** It follows AlphaGo's remedy, changes two settings and no
+code, uses the games the run already plays, and costs the least memory of the
+ways to hold many more games. Judge it once its replay buffer is full, after
+about 7 to 10 network updates: by how much better the network fits its replay
+buffer than the games it plays next (now a median of 3.3 times), by the share
+of the final scores' variance explained on fresh games (now 17% to 30%), and by
+the held-out evaluation. If the gap stays, D is the next step.
+
+**If answered.** The new settings belong in the long run's command, in
+[section 8.7 of the design document](design/README.md#87-how-often-a-training-sample-is-drawn)
+and in the [campaign learning guide](../studies/campaign/README.md#training-on-the-mac).
 
 ## Open elsewhere
 

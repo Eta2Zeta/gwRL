@@ -1786,6 +1786,18 @@ before. A training iteration of 24 games kept 1,354 training samples on
 15 November, so each would be drawn about 12 times; those games were longer than
 on 5 November.
 
+The replay buffer's size cancels only while the replay buffer holds more than
+one training iteration's training samples. With 252 concurrent games, as in the
+long run on the Mac's GPU since 19 November 2026, a network update follows 252
+games, which keep about 18,300 training samples, more than twice the replay
+buffer's 8,000. More than half of those training samples then leave the replay
+buffer before a training step can draw them; the network update's 16,800 draws
+come to about 67 for each of its 252 games instead of 700; and they fall on the
+training samples of only the latest 110 games or so, which the network then
+fits about 3.3 times better, by value loss, than the games it plays next
+([record](../archive/records/replay_buffer_fit_2026_11_20.md);
+[Q-013](../questions.md#q-013-how-many-games-a-network-update-learns-from)).
+
 ## 9. The whole loop, and running it
 
 ### 9.1 The training loop
@@ -3178,22 +3190,30 @@ measured and what would settle it.
   run the Python search, which is also what the C++ search is checked against
   (`tests/test_campaign_native_search.py`). A change to the search must be made
   in both, or that check fails.
-- **No training run has yet made the agents stronger.** The most games a training
-  run has played is 792 three-round games, on the PC on the night of 14 November
-  ([record](../archive/records/three_round_training_2026_11_14.md)). Earlier runs
-  played at most about 500. Both are far fewer than published systems needed
-  ([how big](#how-big-should-the-network-and-the-search-be)). In that run:
-  - The value heads learned each alliance's average final score.
-  - On 24 held-out seeds, no trained network beat the scripted policy in its seat
-    by a clear margin.
-  - Training made the Axis more active, away from the passive play that scores
-    best over three game rounds.
-  - Its settings could not test the main question. Within three game rounds a
-    passive Axis wins whatever is learned, and a 64×2 network relates each zone
-    to about a third of the map
-    ([how big](#how-big-should-the-network-and-the-search-be)).
+- **No training run has yet made the agents stronger.** The long run of 19 and
+  20 November 2026, 252 concurrent eleven-round games at 256×8 on the Mac's GPU
+  in three runs, had played 6,552 games in 26 network updates by 20:07 on
+  20 November, far fewer games than published systems needed
+  ([how big](#how-big-should-the-network-and-the-search-be)). In that long run:
+  - The value head learned during the first night to predict final scores better
+    than always predicting their average. Since about 05:00 on 20 November its value loss on new
+    games has explained 17% to 30% of the final scores' variance, pooled over
+    three network updates, with no trend, and the policy's KL divergence from
+    the search's visit shares has stayed near 0.24.
+  - The Axis scored +51 against the scripted opponents with the untrained,
+    nearly passive network, and between +6.7 and +16.8 at four later
+    generations, on six held-out seeds each.
+  - Within each network update the network fits the latest 110 or so games in
+    its replay buffer about 3.3 times better, by value loss, than the games it
+    plays next ([record](../archive/records/replay_buffer_fit_2026_11_20.md));
+    [Q-013](../questions.md#q-013-how-many-games-a-network-update-learns-from)
+    asks whether to train on many more games at a time.
 
-  Two design questions below may also be part of the reason: the
+  Before the long run, the most games a training run had played was 792
+  three-round games, on the PC on the night of 14 November, in which no trained
+  network beat the scripted policy in its seat by a clear margin
+  ([record](../archive/records/three_round_training_2026_11_14.md)). Two design
+  questions below may also be part of the reason: the
   [objective](#is-the-final-wealth-gap-the-right-goal) and
   [flat search targets](#are-64-simulations-enough-when-there-are-many-legal-actions).
 - **One network's action probabilities fit its searches less well** than a
@@ -3375,7 +3395,7 @@ more games:
 | DORA, two-player Diplomacy | an equilibrium search each turn | not stated | 192 GPUs, about a week per training stage |
 | AlphaZero.jl, Connect Four | 600 | 75,000 | one GPU, about a day |
 | TD-Gammon 2.1 | none; a 2-ply lookahead in play | 1.5 million | not stated |
-| This project | 64 | at most about 500 per training run | the Mac |
+| This project, the long run of 19 and 20 November 2026 | 64 | 6,552 | the Mac, about 24 hours |
 
 A game here has about 1,000 decisions, many more than a game of chess or Go has
 moves, so it holds more decisions to learn from, but its final score comes much

@@ -228,7 +228,11 @@ These learning settings are the speed test's, not tuned values. A training
 iteration plays the 24 games the profile plays at once (`--batches` counts
 training iterations); with 525 training steps a network update draws each kept
 training sample as often as the 700 training steps did with the 32 games of the
-eight game processes before 15 November 2026. `--batch-size` is the minibatch
+eight game processes before 15 November 2026. With more games at once, as the
+252 of the long run on the GPU since 19 November 2026, a network update follows
+that many games with the same 525 training steps, which then draw from the
+training samples of only the latest 110 games or so
+([Q-013](../../docs/questions.md#q-013-how-many-games-a-network-update-learns-from)). `--batch-size` is the minibatch
 size and `--epochs` the number of training steps per network update. Repeat the same command to resume. Another
 machine gets its own file beside `mac.json`.
 
