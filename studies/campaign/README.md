@@ -190,7 +190,7 @@ others play on; the training process's log says which process died and which
 took its place. A game process that dies before it has finished any game stops
 the run instead, since a new one would most likely die the same way
 ([running training on the Mac](../../docs/design/README.md#92-running-training-on-the-mac)).
-The defect behind the three game process crashes of 20 November 2026 is not found
+The defect behind the four game process crashes of 20 and 21 November 2026 is not found
 ([Q-012](../../docs/questions.md#q-012-a-game-process-that-crashes)).
 
 ### Training on the Mac

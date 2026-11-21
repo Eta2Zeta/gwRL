@@ -2267,10 +2267,12 @@ a second process aborted the same way later that day, the run lost 44 games,
 about 7 minutes of its play (inferred), and went on
 ([record](../archive/records/second_game_process_crash_2026_11_20.md)), and
 when a third did, it lost 42 games, about 6 minutes
-([record](../archive/records/third_game_process_crash_2026_11_20.md)). A
+([record](../archive/records/third_game_process_crash_2026_11_20.md)), as did a
+fourth on 21 November, about 5 minutes
+([record](../archive/records/fourth_game_process_crash_2026_11_21.md)). A
 process that dies before it has reported any game stops the run, since a new
-one would most likely die the same way. The defect behind the crashes of 20
-November is not found ([Q-012](../questions.md#q-012-a-game-process-that-crashes)).
+one would most likely die the same way. The defect behind these crashes is not
+found ([Q-012](../questions.md#q-012-a-game-process-that-crashes)).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept training sample was drawn 8 to 12 times
@@ -3182,15 +3184,17 @@ measured and what would settle it.
   [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
 - **Heap corruption.** A defect in a game process's native code damages memory,
   and it is not found
-  ([Q-012](../questions.md#q-012-a-game-process-that-crashes)). In 18.4 hours of
-  play of 252 concurrent games with the search in C++, on 19 and 20 November,
-  three game processes aborted on memory being freed that had not been
+  ([Q-012](../questions.md#q-012-a-game-process-that-crashes)). In 28.1 hours of
+  play of 252 concurrent games with the search in C++, from 19 to 21 November,
+  four game processes aborted on memory being freed that had not been
   allocated, all while freeing the game copies of search tree nodes. Before the
   second abort, two games of that process failed the engine's state check with a
-  zone number that names no zone; before the third, none had failed
+  zone number that names no zone; before the third and the fourth, none had
+  failed
   ([first record](../archive/records/game_process_crash_2026_11_20.md),
   [second record](../archive/records/second_game_process_crash_2026_11_20.md),
-  [third record](../archive/records/third_game_process_crash_2026_11_20.md)).
+  [third record](../archive/records/third_game_process_crash_2026_11_20.md),
+  [fourth record](../archive/records/fourth_game_process_crash_2026_11_21.md)).
   On the night of 2 November, before the search ran in C++, a game process
   crashed twice early in training iteration 3, and about 4.5 hours of replays in
   builds with memory checks did not reproduce it. A race between the game

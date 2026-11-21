@@ -49,9 +49,11 @@ lose only that process's games, and its choice of keeping the position of a
 game that fails the engine's check were answered the same day. Its numbers are in
 the [record of that crash](archive/records/game_process_crash_2026_11_20.md),
 the
-[record of a second crash the same day](archive/records/second_game_process_crash_2026_11_20.md)
+[record of a second crash the same day](archive/records/second_game_process_crash_2026_11_20.md),
+the
+[record of a third](archive/records/third_game_process_crash_2026_11_20.md)
 and the
-[record of a third](archive/records/third_game_process_crash_2026_11_20.md).
+[record of a fourth, on 21 November](archive/records/fourth_game_process_crash_2026_11_21.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -243,6 +245,16 @@ engine's check. A new game process took its game slots, and the run lost 42
 games, about 6 minutes of its play (inferred)
 ([record](archive/records/third_game_process_crash_2026_11_20.md)).
 
+**A fourth case** (21 November 2026, at 00:18, the run started at 22:43 the evening
+before with the same engine and search and new learning settings, after 1.59
+hours of play). A game process aborted with the same allocator message, again
+while the search freed the nodes of a game's tree that it did not keep, this
+time in an entry of the game state's build projects (`State::construction` in
+`include/game/campaign.hpp`). No game of the run had failed the engine's check.
+A new game process took its game slots, and the run lost 42 games, about 5
+minutes of its play (inferred)
+([record](archive/records/fourth_game_process_crash_2026_11_21.md)).
+
 The two games that failed the check between 10:08 and 10:46 left only their seeds
 and their error's text, which cannot rebuild their states: the run did not yet
 keep a failed move's position, and with the shared inference server a game's
@@ -256,21 +268,22 @@ although the process that aborted at 14:28 had no failed game. A damaged value
 that the check does not catch, such as a zone number that names a real zone,
 would go into the game's training samples. And each crash still costs the games
 in play in one game process: 42 games in the long run's layout of six
-processes, about 7 and 6 minutes of its play in the second and third cases.
+processes, about 7, 6 and 5 minutes of its play in the second, third and fourth
+cases.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and three crashes in 18.4 hours of play of 252 games, about one every 6 hours, suggest that may take many hours. |
-| B. Leave it | Training goes on, and each crash costs one game process's games in play, about 6 to 7 minutes of the run's play in the second and third cases. The defect stays, with whatever it does to games that neither fail the check nor crash. |
+| A. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and four crashes in 28.1 hours of play of 252 games, about one every 7 hours, suggest that may take many hours. |
+| B. Leave it | Training goes on, and each crash costs one game process's games in play, about 5 to 7 minutes of the run's play in the second, third and fourth cases. The defect stays, with whatever it does to games that neither fail the check nor crash. |
 
 **Recommendation: A, when the Mac can spare some hours.** Only A can find the
 memory defect behind the crashes, which has most likely damaged the states of
 two games already. A kept failed move only shows whether a bad zone number came
-from the rules or from damage, and only when a check fails: in 18.4 hours of
+from the rules or from damage, and only when a check fails: in 28.1 hours of
 play of 252 games the only two failures came before the second crash, and none
-before the third.
+before the third or the fourth.
 
 **If answered.** What was found, and the fix, belong in the engine page of the
 code that held the defect, and in
