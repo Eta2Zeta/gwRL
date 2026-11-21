@@ -209,9 +209,10 @@
    "priors": "network, every position encoded",
    "threads": 3,
    "from": "08:07",
-   "to": "still running when written",
-   "decisions": 1554,
-   "reports": 0
+   "to": "08:38",
+   "decisions": 5337,
+   "reports": 0,
+   "games_finished": 3
   }
  ],
  "malloc_report_test": {

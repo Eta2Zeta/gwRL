@@ -53,7 +53,7 @@ and libc++'s debug hardening, and in the last run also with the SlotMap check
 | ThreadSanitizer | uniform, every position encoded | 3 | 3,281 | 0 |
 | AddressSanitizer | uniform, no encoding | 5, then 3 | 13,925 | 0 |
 | AddressSanitizer | the network, every position encoded | 3 | 1,344 | 0 |
-| AddressSanitizer with the SlotMap check | the network, every position encoded | 3 | 1,554 | 0 |
+| AddressSanitizer with the SlotMap check | the network, every position encoded | 3 | 5,337 | 0 |
 
 ## The allocator's message
 
@@ -77,11 +77,11 @@ complete games, of 1,443, 1,446, 1,594 and 1,422 decisions, and no check fired.
 
 It shows no data race and no memory error, out-of-bounds index or stale SlotMap
 iterator on the code that about 8,000 decisions under ThreadSanitizer and about
-17,000 under AddressSanitizer reach, the zone encoder and the network-guided
+21,000 under AddressSanitizer reach, the zone encoder and the network-guided
 search among it. The defect is therefore not on a path that every game reaches
 (inferred). It does not rule out a rarer one: the crashes came about once every
 2.9 million decisions (32.6 hours at about 450,000 decisions an hour, five
-crashes), about 170 times the decisions checked here, and the inference
+crashes), about 140 times the decisions checked here, and the inference
 client's own path was not exercised. The defect is not found.
 
 What the next crash will leave is described in

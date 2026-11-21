@@ -3225,7 +3225,7 @@ measured and what would settle it.
   [fourth record](../archive/records/fourth_game_process_crash_2026_11_21.md),
   [fifth record](../archive/records/fifth_game_process_crash_2026_11_21.md)).
   On 21 November training stopped for it to be looked for: about 8,000
-  decisions under ThreadSanitizer and 17,000 under AddressSanitizer, with every
+  decisions under ThreadSanitizer and 21,000 under AddressSanitizer, with every
   position encoded and with the network choosing moves, found no data race and
   no memory error, so the defect is not on a path that every game reaches
   (inferred), while the crashes came about once every 2.9 million decisions
@@ -3243,26 +3243,32 @@ measured and what would settle it.
   run the Python search, which is also what the C++ search is checked against
   (`tests/test_campaign_native_search.py`). A change to the search must be made
   in both, or that check fails.
-- **No training run has yet made the agents stronger.** The long run of 19 and
-  20 November 2026, 252 concurrent eleven-round games at 256×8 on the Mac's GPU
-  in three runs, had played 6,552 games in 26 network updates by 20:07 on
-  20 November, far fewer games than published systems needed
-  ([how big](#how-big-should-the-network-and-the-search-be)). In that long run:
-  - The value head learned during the first night to predict final scores better
-    than always predicting their average. Since about 05:00 on 20 November its value loss on new
-    games has explained 17% to 30% of the final scores' variance, pooled over
-    three network updates, with no trend, and the policy's KL divergence from
-    the search's visit shares has stayed near 0.24.
-  - The Axis scored +51 against the scripted opponents with the untrained,
-    nearly passive network, and between +6.7 and +16.8 at four later
-    generations, on six held-out seeds each.
-  - Keeping 5% of each game's decisions in a replay buffer of 8,000 training
-    samples, the network fit the latest 110 or so games in its replay buffer
-    about 3.3 times better, by value loss, than the games it played next
-    ([record](../archive/records/replay_buffer_fit_2026_11_20.md)). Since the
-    evening of 20 November the long run keeps 1% and 25,000, about 1,700 games
-    ([section 8.7](#87-how-often-a-training-sample-is-drawn)); whether that
-    helps is not yet measured.
+- **No training run has yet made the agents stronger.** The long run of 19 to
+  21 November 2026, 252 concurrent eleven-round games at 256×8 on the Mac's GPU
+  in four runs, trained on 9,576 games in 38 network updates by 07:40 on
+  21 November, far fewer games than published systems needed
+  ([how big](#how-big-should-the-network-and-the-search-be);
+  [record](../archive/records/long_run_progress_2026_11_21.md)). In that long
+  run:
+  - The value head learned during the first night to predict final scores
+    better than always predicting their average, and then, for about a day,
+    explained 17% to 30% of the final scores' variance on new games, pooled over
+    three network updates. Keeping 5% of each game's decisions in a replay
+    buffer of 8,000 training samples, the network fit the latest 110 or so games
+    in its replay buffer about 3.3 times better, by value loss, than the games
+    it played next ([record](../archive/records/replay_buffer_fit_2026_11_20.md)).
+    With 1% and 25,000 since the evening of 20 November
+    ([section 8.7](#87-how-often-a-training-sample-is-drawn)) the ratio fell to
+    about 1.3 once the replay buffer was full, and the value loss explained 36%
+    in those four network updates, one block that may yet fall back. The
+    policy's KL divergence from the search's visit shares stayed near 0.24.
+  - Against the scripted balanced opponents, on six held-out seeds, the network
+    after 38 network updates played no alliance better than the scripted
+    balanced policy in the same seat: as the Allies 36.6 points worse (standard
+    error 8.2), though some 10 to 16 points better than the untrained network;
+    as the Axis 6.8 worse (7.3), and 36.5 below the untrained network, which
+    plays almost passively; as the Comintern the same, near −92 whoever plays
+    it. The long run's evaluations test all three alliances since 21 November.
 
   Before the long run, the most games a training run had played was 792
   three-round games, on the PC on the night of 14 November, in which no trained
@@ -3450,7 +3456,7 @@ more games:
 | DORA, two-player Diplomacy | an equilibrium search each turn | not stated | 192 GPUs, about a week per training stage |
 | AlphaZero.jl, Connect Four | 600 | 75,000 | one GPU, about a day |
 | TD-Gammon 2.1 | none; a 2-ply lookahead in play | 1.5 million | not stated |
-| This project, the long run of 19 and 20 November 2026 | 64 | 6,552 | the Mac, about 24 hours |
+| This project, the long run of 19 to 21 November 2026 | 64 | 9,576 | the Mac, about 36 hours |
 
 A game here has about 1,000 decisions, many more than a game of chess or Go has
 moves, so it holds more decisions to learn from, but its final score comes much

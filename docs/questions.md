@@ -325,7 +325,7 @@ the page that now states it.
   [running training on the Mac](design/README.md#92-running-training-on-the-mac).
 - **Q-012**, looking for the defect behind the game process crashes. Answered on
   21 November 2026: yes. Training stopped from 07:40 that day; the five crash
-  reports, the code and about 25,000 decisions under ThreadSanitizer and
+  reports, the code and about 29,000 decisions under ThreadSanitizer and
   AddressSanitizer found no defect
   ([record](archive/records/crash_diagnosis_2026_11_21.md)). The training build
   now keeps two checks that stop an out-of-bounds index or a stale SlotMap
