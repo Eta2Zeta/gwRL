@@ -48,6 +48,18 @@ rounds.
 The battle ends when one side has no units left, or the attacker retreats. If
 an attacking land unit is left alone in the zone, the zone is captured.
 
+**A battle no unit can end.** If neither side can roll and the attacker has no
+choice, the engine goes on to the next combat round unasked; after three such
+rounds within one move it stops the game with the error "cannot end: rounds
+pass with no dice and no choice" (`retreatDecision` in `src/land_combat.cpp`).
+It happened once in the long training run of 19 to 21 November 2026: two
+Anti-aircraft Artillery units, Japan's having landed from the sea, were left
+facing each other
+([record](../archive/records/land_battle_without_end_2026_11_20.md)). The
+printed rules give such a battle no end;
+[Q-014](../questions.md#q-014-a-land-battle-that-no-unit-can-end) asks how it
+should end.
+
 **Who chooses.** Each decision goes to the alliance entitled to it, also during
 another alliance's turn. Two nations defending one zone together agree on their
 casualties (`land_casualty_accept`) or settle it by the rulebook's dice-off

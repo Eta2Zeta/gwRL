@@ -1,0 +1,242 @@
+{
+ "description": "The look for the defect behind the five game process crashes of 20 and 21 November 2026, after the long training run was stopped at 07:40 on 21 November: the crash reports, the sanitizer runs and the cost of the checks the training build keeps.",
+ "crash_reports": [
+  {
+   "report": "~/Library/Logs/DiagnosticReports/Retired/python3.13-2026-11-20-010628.ips",
+   "time": "2026-11-20 01:06:28.00 -0600",
+   "pid": 24917,
+   "launched": "2026-11-19 19:59:00.2464 -0600",
+   "signal": "SIGABRT",
+   "threads": 44,
+   "faulting_thread_frames": [
+    "malloc_vreport",
+    "malloc_report",
+    "___BUG_IN_CLIENT_OF_LIBMALLOC_POINTER_BEING_FREED_WAS_NOT_ALLOCATED",
+    "game::campaign::NationState::~NationState()",
+    "game::campaign::State::~State()",
+    "void __destroy_at[abi:nqe220106]<game::campaign::searching::Node>(game::campaign::searching::Node*)",
+    "deque<game::campaign::searching::Node, allocator<game::campaign::searching::Node>>::~deque[abi:nqe220106]()",
+    "unique_ptr<game::campaign::SearchTree::Storage, default_delete<game::campaign::SearchTree::Storage>>::reset[abi:nqe220106](game::campaign::SearchTree::Storage*)",
+    "<deduplicated_symbol>",
+    "pybind11::class_<game::campaign::SearchTree>::dealloc_impl(pybind11::detail::value_and_holder&)",
+    "pybind11::class_<game::campaign::SearchTree>::dealloc_without_manipulating_gil(pybind11::detail::value_and_holder&)",
+    "pybind11::detail::clear_instance(_object*)",
+    "pybind11_object_dealloc"
+   ],
+   "other_threads_innermost_gwrl_frame": {
+    "game::campaign::InferenceClient::readAll(unsigned char*, unsigned long)": 41,
+    "outside gwrl_cpp": 2
+   }
+  },
+  {
+   "report": "~/Library/Logs/DiagnosticReports/Retired/python3.13-2026-11-20-104620.ips",
+   "time": "2026-11-20 10:46:20.00 -0600",
+   "pid": 7800,
+   "launched": "2026-11-20 06:54:37.5588 -0600",
+   "signal": "SIGABRT",
+   "threads": 43,
+   "faulting_thread_frames": [
+    "malloc_vreport",
+    "malloc_report",
+    "___BUG_IN_CLIENT_OF_LIBMALLOC_POINTER_BEING_FREED_WAS_NOT_ALLOCATED",
+    "game::campaign::UnitState::~UnitState()",
+    "deque<optional<pair<string const, game::campaign::UnitState>>, allocator<optional<pair<string const, game::campaign::UnitState>>>>::clear()",
+    "game::campaign::SlotMap<game::campaign::UnitKind, game::campaign::UnitState>::~SlotMap()",
+    "game::campaign::State::~State()",
+    "void __destroy_at[abi:nqe220106]<game::campaign::searching::Node>(game::campaign::searching::Node*)",
+    "deque<game::campaign::searching::Node, allocator<game::campaign::searching::Node>>::__move_assign(deque<game::campaign::searching::Node, allocator<game::campaign::searching::Node>>&, integral_constant",
+    "game::campaign::searching::Searcher::retain(int)",
+    "game::campaign::searching::Searcher::run(shared_ptr<game::campaign::Engine const>, unsigned char)",
+    "game::campaign::searchDecision(shared_ptr<game::campaign::Engine const>, game::campaign::SearchSchedule const&, game::campaign::SearchEvaluator&, game::campaign::SearchSettings const&, game::campaign:",
+    "enable_if<!std::is_void<pybind11::dict>::value, pybind11::dict>::type pybind11::detail::argument_loader<(anonymous namespace)::NativeCampaignEnv const&, vector<string, allocator<string>> const&, vecto",
+    "void pybind11::cpp_function::initialize<pybind11_init_gwrl_cpp(pybind11::module_&)::$_29, pybind11::dict, (anonymous namespace)::NativeCampaignEnv const&, vector<string, allocator<string>> const&, vec",
+    "pybind11::cpp_function::dispatcher(_object*, _object* const*, unsigned long, _object*)"
+   ],
+   "other_threads_innermost_gwrl_frame": {
+    "game::campaign::InferenceClient::readAll(unsigned char*, unsigned long)": 40,
+    "outside gwrl_cpp": 1,
+    "<deduplicated_symbol>": 1
+   }
+  },
+  {
+   "report": "~/Library/Logs/DiagnosticReports/Retired/python3.13-2026-11-20-142826.ips",
+   "time": "2026-11-20 14:28:26.00 -0600",
+   "pid": 7799,
+   "launched": "2026-11-20 06:54:37.5564 -0600",
+   "signal": "SIGABRT",
+   "threads": 43,
+   "faulting_thread_frames": [
+    "malloc_vreport",
+    "malloc_report",
+    "___BUG_IN_CLIENT_OF_LIBMALLOC_POINTER_BEING_FREED_WAS_NOT_ALLOCATED",
+    "game::campaign::State::~State()",
+    "void __destroy_at[abi:nqe220106]<game::campaign::searching::Node>(game::campaign::searching::Node*)",
+    "deque<game::campaign::searching::Node, allocator<game::campaign::searching::Node>>::__move_assign(deque<game::campaign::searching::Node, allocator<game::campaign::searching::Node>>&, integral_constant",
+    "game::campaign::searching::Searcher::retain(int)",
+    "game::campaign::searching::Searcher::run(shared_ptr<game::campaign::Engine const>, unsigned char)",
+    "game::campaign::searchDecision(shared_ptr<game::campaign::Engine const>, game::campaign::SearchSchedule const&, game::campaign::SearchEvaluator&, game::campaign::SearchSettings const&, game::campaign:",
+    "enable_if<!std::is_void<pybind11::dict>::value, pybind11::dict>::type pybind11::detail::argument_loader<(anonymous namespace)::NativeCampaignEnv const&, vector<string, allocator<string>> const&, vecto",
+    "void pybind11::cpp_function::initialize<pybind11_init_gwrl_cpp(pybind11::module_&)::$_29, pybind11::dict, (anonymous namespace)::NativeCampaignEnv const&, vector<string, allocator<string>> const&, vec",
+    "pybind11::cpp_function::dispatcher(_object*, _object* const*, unsigned long, _object*)"
+   ],
+   "other_threads_innermost_gwrl_frame": {
+    "game::campaign::InferenceClient::readAll(unsigned char*, unsigned long)": 41,
+    "outside gwrl_cpp": 1
+   }
+  },
+  {
+   "report": "~/Library/Logs/DiagnosticReports/python3.13-2026-11-21-001820.ips",
+   "time": "2026-11-21 00:18:20.00 -0600",
+   "pid": 23525,
+   "launched": "2026-11-20 22:43:11.1840 -0600",
+   "signal": "SIGABRT",
+   "threads": 43,
+   "faulting_thread_frames": [
+    "malloc_vreport",
+    "malloc_report",
+    "___BUG_IN_CLIENT_OF_LIBMALLOC_POINTER_BEING_FREED_WAS_NOT_ALLOCATED",
+    "void __destroy_at[abi:nqe220106]<pair<string const, game::campaign::BuildProject>>(pair<string const, game::campaign::BuildProject>*)",
+    "__tree<__value_type<string, game::campaign::BuildProject>, __map_value_compare<string, pair<string const, game::campaign::BuildProject>, less<string>>, allocator<pair<string const, game::campaign::Bui",
+    "__tree<__value_type<string, game::campaign::BuildProject>, __map_value_compare<string, pair<string const, game::campaign::BuildProject>, less<string>>, allocator<pair<string const, game::campaign::Bui",
+    "game::campaign::State::~State()",
+    "void __destroy_at[abi:nqe220106]<game::campaign::searching::Node>(game::campaign::searching::Node*)",
+    "deque<game::campaign::searching::Node, allocator<game::campaign::searching::Node>>::__move_assign(deque<game::campaign::searching::Node, allocator<game::campaign::searching::Node>>&, integral_constant",
+    "game::campaign::searching::Searcher::retain(int)",
+    "game::campaign::searching::Searcher::run(shared_ptr<game::campaign::Engine const>, unsigned char)",
+    "game::campaign::searchDecision(shared_ptr<game::campaign::Engine const>, game::campaign::SearchSchedule const&, game::campaign::SearchEvaluator&, game::campaign::SearchSettings const&, game::campaign:",
+    "enable_if<!std::is_void<pybind11::dict>::value, pybind11::dict>::type pybind11::detail::argument_loader<(anonymous namespace)::NativeCampaignEnv const&, vector<string, allocator<string>> const&, vecto",
+    "void pybind11::cpp_function::initialize<pybind11_init_gwrl_cpp(pybind11::module_&)::$_31, pybind11::dict, (anonymous namespace)::NativeCampaignEnv const&, vector<string, allocator<string>> const&, vec",
+    "pybind11::cpp_function::dispatcher(_object*, _object* const*, unsigned long, _object*)"
+   ],
+   "other_threads_innermost_gwrl_frame": {
+    "game::campaign::InferenceClient::readAll(unsigned char*, unsigned long)": 36,
+    "outside gwrl_cpp": 1,
+    "string::__init_copy_ctor_external(char const*, unsigned long)": 1,
+    "game::json::Value::find(string const&) const": 1,
+    "pair<array<int, 3ul>*, bool> __partition_with_equals_on_right[abi:nqe220106]<_ClassicAlgPolicy, array<int, 3ul>*, __less<void, void>&>(array<int, 3ul>*, array<i": 1,
+    "DYLD-STUB$$operator delete(void*)": 1,
+    "game::campaign::(anonymous namespace)::hostile(game::campaign::State const&, game::campaign::Number<game::campaign::NationKind>, game::campaign::Number<game::ca": 1
+   }
+  },
+  {
+   "report": "~/Library/Logs/DiagnosticReports/python3.13-2026-11-21-044939.ips",
+   "time": "2026-11-21 04:49:39.00 -0600",
+   "pid": 23524,
+   "launched": "2026-11-20 22:43:11.1794 -0600",
+   "signal": "SIGABRT",
+   "threads": 43,
+   "faulting_thread_frames": [
+    "malloc_vreport",
+    "malloc_report",
+    "___BUG_IN_CLIENT_OF_LIBMALLOC_POINTER_BEING_FREED_WAS_NOT_ALLOCATED",
+    "game::campaign::UnitState::~UnitState()",
+    "deque<optional<pair<string const, game::campaign::UnitState>>, allocator<optional<pair<string const, game::campaign::UnitState>>>>::clear()",
+    "game::campaign::SlotMap<game::campaign::UnitKind, game::campaign::UnitState>::~SlotMap()",
+    "game::campaign::State::~State()",
+    "void __destroy_at[abi:nqe220106]<game::campaign::searching::Node>(game::campaign::searching::Node*)",
+    "deque<game::campaign::searching::Node, allocator<game::campaign::searching::Node>>::__move_assign(deque<game::campaign::searching::Node, allocator<game::campaign::searching::Node>>&, integral_constant",
+    "game::campaign::searching::Searcher::retain(int)",
+    "game::campaign::searching::Searcher::run(shared_ptr<game::campaign::Engine const>, unsigned char)",
+    "game::campaign::searchDecision(shared_ptr<game::campaign::Engine const>, game::campaign::SearchSchedule const&, game::campaign::SearchEvaluator&, game::campaign::SearchSettings const&, game::campaign:",
+    "enable_if<!std::is_void<pybind11::dict>::value, pybind11::dict>::type pybind11::detail::argument_loader<(anonymous namespace)::NativeCampaignEnv const&, vector<string, allocator<string>> const&, vecto",
+    "void pybind11::cpp_function::initialize<pybind11_init_gwrl_cpp(pybind11::module_&)::$_31, pybind11::dict, (anonymous namespace)::NativeCampaignEnv const&, vector<string, allocator<string>> const&, vec",
+    "pybind11::cpp_function::dispatcher(_object*, _object* const*, unsigned long, _object*)"
+   ],
+   "other_threads_innermost_gwrl_frame": {
+    "game::campaign::InferenceClient::readAll(unsigned char*, unsigned long)": 39,
+    "outside gwrl_cpp": 1,
+    "game::campaign::(anonymous namespace)::appendEscaped(string&, basic_string_view<char, char_traits<char>>)": 1,
+    "game::campaign::Number<game::campaign::ZoneKind>* __uninitialized_allocator_copy_impl[abi:nqe220106]<allocator<game::campaign::Number<game::campaign::ZoneKind>>": 1
+   }
+  }
+ ],
+ "harness": "A script in the session's scratchpad (stress.py, stress_net.py): several game threads in one process, each playing eleven-round games one after another, every decision searched by the C++ search (native_search.search_decision) without Python's lock, 64 simulations to depth 16 with root noise, in a search tree kept from decision to decision, the move drawn from the visit shares. Priors and values: uniform from the C++ search itself (no position encoded); uniform through evaluate_zone (every evaluated position encoded by the zone encoder); or the network of generation 10 of the run of 20 November 22:43, on the CPU, through evaluate_zone.",
+ "builds": {
+  "source": "commit b38ee9a (the engine and search of 1463ff4)",
+  "thread_sanitizer": "-fsanitize=thread -O1 -g",
+  "address_sanitizer": "-fsanitize=address,undefined -O1 -g, libc++ hardening mode debug",
+  "address_sanitizer_with_slot_map_checks": "as address_sanitizer, with -DGWRL_CHECK_SLOT_MAPS"
+ },
+ "sanitizer_runs": [
+  {
+   "tool": "ThreadSanitizer",
+   "priors": "uniform, no encoding",
+   "threads": 4,
+   "from": "07:44:49",
+   "to": "07:58",
+   "decisions": 4887,
+   "reports": 0
+  },
+  {
+   "tool": "ThreadSanitizer",
+   "priors": "uniform, every position encoded",
+   "threads": 3,
+   "from": "08:00:24",
+   "to": "08:16",
+   "decisions": 3281,
+   "reports": 0
+  },
+  {
+   "tool": "AddressSanitizer",
+   "priors": "uniform, no encoding",
+   "threads": 5,
+   "from": "07:44:49",
+   "to": "07:58",
+   "decisions": 12943,
+   "games_finished": 5,
+   "reports": 0
+  },
+  {
+   "tool": "AddressSanitizer",
+   "priors": "uniform, no encoding",
+   "threads": 3,
+   "from": "07:58",
+   "to": "08:00:20",
+   "decisions": 982,
+   "reports": 0
+  },
+  {
+   "tool": "AddressSanitizer",
+   "priors": "network, every position encoded",
+   "threads": 3,
+   "from": "07:58",
+   "to": "08:07",
+   "decisions": 1344,
+   "reports": 0
+  },
+  {
+   "tool": "AddressSanitizer with SlotMap checks",
+   "priors": "network, every position encoded",
+   "threads": 3,
+   "from": "08:07",
+   "to": "still running when written",
+   "decisions": 1554,
+   "reports": 0
+  }
+ ],
+ "malloc_report_test": {
+  "what": "a double free in a Python process with standard error sent to a file",
+  "without_MallocDebugReport": "exit 134 (SIGABRT), nothing written, no crash report",
+  "with_MallocDebugReport_stderr": "malloc: *** error for object 0x...: pointer being freed was not allocated, and where to break"
+ },
+ "check_cost": {
+  "plain": "the training build's flags",
+  "hardened": "plus -D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_FAST -DGWRL_CHECK_SLOT_MAPS",
+  "setup": "one game thread each, side by side on the busy Mac, seed 77, uniform priors through evaluate_zone, 300 s",
+  "games_finished": {
+   "plain": 4,
+   "hardened": 4,
+   "same_decisions_per_game": [
+    1443,
+    1446,
+    1594,
+    1422
+   ]
+  },
+  "decisions_in_300_s": {
+   "plain": 6724,
+   "hardened": 6576
+  },
+  "hardened_slower_by": 0.022
+ }
+}

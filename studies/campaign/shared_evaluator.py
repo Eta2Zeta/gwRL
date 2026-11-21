@@ -41,6 +41,10 @@ try:
     import resource
 except ImportError:  # Windows has no open-file limit for these pipes and buffers.
     resource = None
+import faulthandler
+import json
+from pathlib import Path
+import shutil
 import signal
 import struct
 import sys
@@ -491,7 +495,49 @@ def _game_process_main(target: Callable[..., None], *arguments: Any) -> None:
     # group (Ctrl+Break on Windows) must reach it, not end games under it.
     for number in (signal.SIGINT, signal.SIGTERM, *([signal.SIGBREAK] if hasattr(signal, "SIGBREAK") else [])):
         signal.signal(number, signal.SIG_IGN)
+    # A crash in native code (an abort, a bad memory access) writes every game
+    # thread's Python stack to standard error, which the training process shares.
+    faulthandler.enable(all_threads=True)
     target(*arguments)
+
+
+def keep_crash_report(pid: int, folder: str, *, wait_seconds: float = 120.0,
+                      reports: Path | None = None) -> threading.Thread | None:
+    """Copy macOS's crash report of the process `pid` into `folder`, as
+    game-process-PID.ips, from a thread of its own. macOS writes the report
+    to ~/Library/Logs/DiagnosticReports a few seconds after the process dies,
+    under the program's name and the time, and keeps it there for a while; the
+    report holds every thread's native stack. Elsewhere it does nothing.
+    Returns the thread, or None."""
+    if sys.platform != "darwin" and reports is None:
+        return None
+    reports = reports if reports is not None else Path.home() / "Library" / "Logs" / "DiagnosticReports"
+    target = Path(folder) / f"game-process-{pid}.ips"
+
+    def find() -> None:
+        deadline = time.monotonic() + wait_seconds
+        while time.monotonic() < deadline:
+            try:
+                candidates = sorted(reports.glob("*.ips"), key=lambda path: path.stat().st_mtime, reverse=True)[:20]
+            except OSError:
+                candidates = []
+            for path in candidates:
+                try:
+                    _, body = path.read_text(encoding="utf-8").split("\n", 1)
+                    if json.loads(body).get("pid") != pid:
+                        continue
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(path, target)
+                except (OSError, ValueError):
+                    continue
+                print(f"Crash report of game process {pid}: {target}", file=sys.stderr, flush=True)
+                return
+            time.sleep(2.0)
+        print(f"No crash report of game process {pid} appeared in {reports}", file=sys.stderr, flush=True)
+
+    thread = threading.Thread(target=find, name=f"crash-report-{pid}", daemon=True)
+    thread.start()
+    return thread
 
 
 @dataclass(eq=False)
@@ -516,7 +562,8 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
                       exit_seconds: float = 20.0, stop_seconds: float = 20.0,
                       feed: Callable[[], Any] | None = None,
                       lost_game: Callable[[Any, str, float], Any] | None = None,
-                      compiled_forward: bool = False) -> tuple[list[Any], ServerStats]:
+                      compiled_forward: bool = False,
+                      crash_reports: str | None = None) -> tuple[list[Any], ServerStats]:
     """Play tasks in game processes, evaluating every waiting position here.
 
     `target(slots, connections, buffer_names, tasks, results)` is the game process,
@@ -543,6 +590,9 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
     game slots while the other processes play on. A process that dies before
     reporting any game ends the play with ValueError, as any death does without
     `lost_game`: a new process would most likely die the same way.
+
+    With `crash_reports`, a game process that a signal ends has its crash report
+    copied into that folder (keep_crash_report).
     """
     if feed is not None and tasks:
         raise ValueError("Give either a list of tasks or a feed, not both")
@@ -650,6 +700,8 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
         except ValueError:
             how = f"exit code {code}"
         reason = f"GameProcessEnded: game process {game.process.pid} ended with {how}"
+        if crash_reports is not None and code < 0:
+            keep_crash_report(game.process.pid, crash_reports)
         server.drop(game.connections)
         close_tasks(game)
         if game.results_ended:

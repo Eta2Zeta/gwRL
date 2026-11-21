@@ -77,6 +77,13 @@ After editing C++ headers, rebuild the Python bindings before training:
 ./.venv/bin/python setup.py build_ext --inplace --force
 ```
 
+On the Mac the bindings keep two checks that stop a memory error where it
+happens: libc++'s fast hardening, which checks indexes into vectors, strings,
+spans and arrays, and the SlotMap check (`GWRL_CHECK_SLOT_MAPS`), which throws
+when an iterator is used after its map changed. They cost about 2% of a game
+thread's time ([record](docs/archive/records/crash_diagnosis_2026_11_21.md)).
+`--force` rebuilds every file, which a change of compiler flags needs.
+
 Training entry point, from the repository root:
 
 ```sh

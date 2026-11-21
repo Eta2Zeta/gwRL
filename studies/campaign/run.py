@@ -577,14 +577,18 @@ def train(args) -> int:
         if config.episode_workers:
             if learner.env is None:
                 learner.env = template  # Reference context only; workers play from their own seeds.
-            # Game processes write a failed game's position here themselves (_keep_failed_position).
+            # Game processes write a failed game's position here themselves
+            # (_keep_failed_position), and each game's moves as it plays them
+            # (_open_move_log); the training process copies a crashed game
+            # process's crash report (keep_crash_report).
             settings = dict(calendar_rounds=config.calendar_rounds, model_config=learner.model_config,
                             learning_config=asdict(learner.config), rules_version=learner.compatibility["rules"],
-                            failed_positions=str(output / "failed-positions"))
+                            failed_positions=str(output / "failed-positions"), game_moves=str(output / "game-moves"))
             workers = (SharedEpisodeWorkers(config.episode_workers, config.games_per_process,
                                             device=resolve_neural_device(config.neural_device),
                                             runtime_policy=learner._device_runtime,
-                                            compiled_forward=config.compiled_forward, **settings)
+                                            compiled_forward=config.compiled_forward,
+                                            crash_reports=str(output / "crash-reports"), **settings)
                        if config.games_per_process else EpisodeWorkers(config.episode_workers, **settings))
         if getattr(args, "record_replay", False):
             replay_writer = ReplayTraceWriter(output / "replay.jsonl", {

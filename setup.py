@@ -12,7 +12,16 @@ ROOT = Path(__file__).resolve().parent
 # and link flags to the other in place, so one shared list would pass each set
 # to both the compiler and the linker.
 if sys.platform == "darwin":
-    COMPILE_ARGS, LINK_ARGS = ["-mmacosx-version-min=13.3"], ["-mmacosx-version-min=13.3"]
+    # Two checks that turn a silent memory error into a stop where it happens:
+    # libc++'s fast hardening checks indexes into vectors, strings, spans and
+    # arrays and the access to optionals, and aborts on a wrong one; with
+    # GWRL_CHECK_SLOT_MAPS a SlotMap iterator used after its map gained or lost
+    # a thing throws (include/game/slot_map.hpp). On 21 November 2026 they cost
+    # 2.2% of a game thread's time and changed no move (record
+    # docs/archive/records/crash_diagnosis_2026_11_21.md).
+    COMPILE_ARGS = ["-mmacosx-version-min=13.3", "-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_FAST",
+                    "-DGWRL_CHECK_SLOT_MAPS"]
+    LINK_ARGS = ["-mmacosx-version-min=13.3"]
 elif sys.platform == "win32":
     # MSVC otherwise reads the UTF-8 sources in the system code page, which
     # changes the bytes of non-ASCII names in string literals.

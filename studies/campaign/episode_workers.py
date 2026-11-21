@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import multiprocessing
 import os
+import threading
 import time
 from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from functools import partial
@@ -34,26 +35,67 @@ def _play_game(settings: Mapping[str, Any], evaluator: Any, task: Mapping[str, A
     """One complete game from its seed; a failure costs this game, not its batch."""
     from .curriculum import make_env
     from .learning import LearningConfig, play_episode
+    import gwrl_cpp
     started = time.perf_counter()
+    moves, moves_path = _open_move_log(settings, task)
+    failure, keep_moves = None, False
     try:
         env = make_env(task["seed"], calendar_rounds=settings["calendar_rounds"])
         result = play_episode(env, evaluator, config=LearningConfig(**settings["learning_config"]),
                               rules_version=settings["rules_version"], batch_version=task["batch_version"],
-                              environment_seed=task["seed"], max_transitions=task["max_transitions"])
+                              environment_seed=task["seed"], max_transitions=task["max_transitions"], moves=moves)
     except Exception as error:
         # Its seed and weights reproduce it in EpisodeWorkers. A shared evaluator
         # need not repeat a game, so an error that carries a position keeps it:
         # a dead end's (NoLegalActionError) or a failed move's (FailedMoveError),
-        # which may be one that search imagined.
+        # which may be one that search imagined. Its move log stays too, unless
+        # the game ended because the inference server closed its pipe, as a stop does.
         failure = {"root": task["root"], "seed": task["seed"], "failure": f"{type(error).__name__}: {error}",
                    "seconds": time.perf_counter() - started}
         state = getattr(error, "state", None)
         if state is not None:
             failure.update(_keep_failed_position(settings.get("failed_positions"), task, state))
+        keep_moves = not isinstance(error, gwrl_cpp.InferenceClosed)
+    finally:
+        if moves is not None:
+            moves.close()
+    if moves_path is not None:
+        if keep_moves:
+            failure["moves"] = f"{moves_path.parent.name}/{moves_path.name}"
+        else:
+            moves_path.unlink(missing_ok=True)  # A finished or stopped game needs no replay.
+    if failure is not None:
         return failure
     result.update(root=task["root"], seed=task["seed"], process=os.getpid(),
                   seconds=time.perf_counter() - started)
     return result
+
+
+def game_moves_name(game: Mapping[str, Any]) -> str:
+    """The file a game's move log is written to, in its run's game-moves/."""
+    return f"game-{game['root']}-seed-{game['seed']}.jsonl"
+
+
+def _open_move_log(settings: Mapping[str, Any], task: Mapping[str, Any]) -> tuple[Any, Path | None]:
+    """The game's move log, opened in the run's game-moves/ with its first line,
+    or (None, None) without that folder or if it cannot be written. The log
+    outlives a game process that dies, and a failed game keeps it; a finished
+    game removes it."""
+    from .learning import MOVES_SCHEMA, write_move
+    folder = settings.get("game_moves")
+    if folder is None:
+        return None, None
+    path = Path(folder) / game_moves_name(task)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # Line-buffered UTF-8 with bare newlines: each move reaches the file as it is written.
+        moves = open(path, "w", encoding="utf-8", newline="\n", buffering=1)
+        write_move(moves, {"schema": MOVES_SCHEMA, "root": task["root"], "seed": task["seed"],
+                           "calendar_rounds": settings["calendar_rounds"], "rules_version": settings["rules_version"],
+                           "process": os.getpid(), "thread": threading.current_thread().name})
+    except OSError:
+        return None, None
+    return moves, path
 
 
 def failed_position_name(game: Mapping[str, Any]) -> str:
@@ -99,10 +141,15 @@ def _play_shared(settings: Mapping[str, Any], task: Mapping[str, Any], evaluator
     return _play_game(settings, evaluator, task)
 
 
-def _lost_game(task: Mapping[str, Any], reason: str, seconds: float) -> dict[str, Any]:
+def _lost_game(settings: Mapping[str, Any], task: Mapping[str, Any], reason: str, seconds: float) -> dict[str, Any]:
     """The record of a game whose process died before reporting it: a failed game,
-    as _play_game reports one. Its position died with the process."""
-    return {"root": task["root"], "seed": task["seed"], "failure": reason, "seconds": seconds}
+    as _play_game reports one. Its position died with the process, but its move
+    log, when the run keeps them, rebuilds it (tools/replay_game_moves.py)."""
+    record = {"root": task["root"], "seed": task["seed"], "failure": reason, "seconds": seconds}
+    folder = settings.get("game_moves")
+    if folder is not None and (Path(folder) / game_moves_name(task)).exists():
+        record["moves"] = f"{Path(folder).name}/{game_moves_name(task)}"
+    return record
 
 
 def _shared_process(settings: Mapping[str, Any], batch_version: str, *arguments: Any) -> None:
@@ -118,13 +165,14 @@ class EpisodeWorkers:
     """
 
     def __init__(self, processes: int, *, calendar_rounds: int | None, model_config: Mapping[str, Any],
-                 learning_config: Mapping[str, Any], rules_version: str, failed_positions: str | None = None):
+                 learning_config: Mapping[str, Any], rules_version: str, failed_positions: str | None = None,
+                 game_moves: str | None = None):
         if type(processes) is not int or processes <= 0:
             raise ValueError("Episode workers must be a positive integer")
         self.processes = processes
         settings = {"calendar_rounds": calendar_rounds, "model_config": dict(model_config),
                     "learning_config": dict(learning_config), "rules_version": rules_version,
-                    "failed_positions": failed_positions}
+                    "failed_positions": failed_positions, "game_moves": game_moves}
         self._executor = ProcessPoolExecutor(processes, mp_context=multiprocessing.get_context("spawn"),
                                              initializer=_initialize, initargs=(settings,))
 
@@ -170,7 +218,8 @@ class SharedEpisodeWorkers:
 
     def __init__(self, processes: int, games_per_process: int, *, device: Any, runtime_policy: Any = None,
                  calendar_rounds: int | None, model_config: Mapping[str, Any], learning_config: Mapping[str, Any],
-                 rules_version: str, compiled_forward: bool = False, failed_positions: str | None = None):
+                 rules_version: str, compiled_forward: bool = False, failed_positions: str | None = None,
+                 game_moves: str | None = None, crash_reports: str | None = None):
         from .neural import CampaignModelConfig, alliance_networks
         if type(processes) is not int or processes <= 0 or type(games_per_process) is not int or games_per_process <= 0:
             raise ValueError("Shared episode workers need positive process and game counts")
@@ -178,7 +227,8 @@ class SharedEpisodeWorkers:
         self.device, self.runtime_policy, self.compiled_forward = device, runtime_policy, compiled_forward
         self.settings = {"calendar_rounds": calendar_rounds, "model_config": dict(model_config),
                          "learning_config": dict(learning_config), "rules_version": rules_version,
-                         "failed_positions": failed_positions}
+                         "failed_positions": failed_positions, "game_moves": game_moves}
+        self.crash_reports = crash_reports
         # The networks the inference server evaluates: one for all three alliances, or one for each.
         self.models = alliance_networks(CampaignModelConfig(**model_config),
                                         learning_config.get("networks", "one"), device=device)
@@ -203,8 +253,10 @@ class SharedEpisodeWorkers:
                                                   processes=self.processes, games_per_process=self.games_per_process,
                                                   models=self.models, device=self.device,
                                                   runtime_policy=self.runtime_policy, keep_playing=keep_playing,
-                                                  exit_seconds=120.0, stop_seconds=15.0, lost_game=_lost_game,
-                                                  compiled_forward=self.compiled_forward)
+                                                  exit_seconds=120.0, stop_seconds=15.0,
+                                                  lost_game=partial(_lost_game, self.settings),
+                                                  compiled_forward=self.compiled_forward,
+                                                  crash_reports=self.crash_reports)
         if stopped or stop():
             return None
         if sorted(record["root"] for record in records) != sorted(root for root, _ in games):
@@ -241,7 +293,9 @@ class SharedEpisodeWorkers:
                                                   models=self.models, device=self.device,
                                                   runtime_policy=self.runtime_policy, keep_playing=keep,
                                                   exit_seconds=120.0, stop_seconds=15.0, feed=feed,
-                                                  lost_game=_lost_game, compiled_forward=self.compiled_forward)
+                                                  lost_game=partial(_lost_game, self.settings),
+                                                  compiled_forward=self.compiled_forward,
+                                                  crash_reports=self.crash_reports)
         return records
 
     def report(self, server: Any = None) -> dict[str, Any]:

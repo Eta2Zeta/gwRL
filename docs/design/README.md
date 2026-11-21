@@ -2261,7 +2261,31 @@ inference server stops answering that process's game threads and closes their
 pipes; each game the dead process was given and had not reported becomes a
 failed game, which names that process and the signal or exit code that ended it
 (`_lost_game` in `studies/campaign/episode_workers.py`); and a new game process
-takes the same game slots while the others play on. In the long run's layout of
+takes the same game slots while the others play on. A crash leaves these behind
+for its diagnosis:
+
+- **Each game's moves.** A game writes its moves to the run's `game-moves/`
+  folder as it plays them, one line each, and before each search the search's
+  seed and the size of the search tree the game kept (`write_move` in
+  `studies/campaign/learning.py`). It removes the log when it finishes or a stop
+  ends it, so a log that stays belongs to a failed game or to a game whose
+  process died, and the failed game's record names it. With the game's seed the
+  log rebuilds the game's position exactly, since the game's own random stream
+  rolls its dice; `tools/replay_game_moves.py` replays it, and can search the
+  last decisions again with their logged seeds, in a build with memory checks
+  for example.
+- **The crash report.** The training process copies macOS's crash report of a
+  game process that a signal ended, every thread's native stack, into the run's
+  `crash-reports/` folder (`keep_crash_report` in
+  `studies/campaign/shared_evaluator.py`).
+- **The Python stacks and the allocator's message.** A game process that
+  crashes writes every game thread's Python stack to standard error
+  (`faulthandler`), which the supervisor keeps in the attempt's log. The
+  supervisor also sets `MallocDebugReport=stderr`, without which macOS's
+  allocator writes its report of a damaged heap, such as "pointer being freed
+  was not allocated" with the address, nowhere the run keeps.
+
+In the long run's layout of
 six processes of 42 games, a crash costs the games in play in one process: when
 a second process aborted the same way later that day, the run lost 44 games,
 about 7 minutes of its play (inferred), and went on
@@ -2273,7 +2297,10 @@ fourth and a fifth on 21 November, about 5 and 4 minutes
 [fifth record](../archive/records/fifth_game_process_crash_2026_11_21.md)). A
 process that dies before it has reported any game stops the run, since a new
 one would most likely die the same way. The defect behind these crashes is not
-found ([Q-012](../questions.md#q-012-a-game-process-that-crashes)).
+found, also not by the sanitizer runs of 21 November 2026
+([record](../archive/records/crash_diagnosis_2026_11_21.md)); the training build
+keeps two checks that would stop it where it happens if it is an out-of-bounds
+index or a stale SlotMap iterator (`setup.py`).
 
 **Throughput** is counted as decisions searched per hour, with learning settings
 under which each kept training sample was drawn 8 to 12 times
@@ -2376,13 +2403,14 @@ position, in a file named after the game in the training run's
 The game process writes the file itself at once, since it can abort while it
 frees the failed game, before the training process hears of the failure, as one
 did on 20 November 2026 (`_keep_failed_position` in
-`studies/campaign/episode_workers.py`). `tools/replay_failed_move.py` loads a
+`studies/campaign/episode_workers.py`). A failed game also keeps its move log
+(above). `tools/replay_failed_move.py` loads a
 kept move's position in a fresh process and plays the move again. If the move
 fails the same way, the failure follows from the position and the move, a
 defect of the rules. If the position already fails the check as it loads, it
 was damaged before the move; if the move succeeds, the failure did not follow
 from the position and the move. Either points outside the rules, most likely
-to damaged memory ([Q-012](../questions.md#q-012-a-game-process-that-crashes)). Two random-play
+to damaged memory ([crash search](../archive/records/crash_diagnosis_2026_11_21.md)). Two random-play
 checks run before long training runs: the fuzzer
 (`tools/fuzz_campaign_dead_ends.py`) looks for dead ends and for actions that
 leave the game unchanged, and `tools/check_zone_names.py` for names the
@@ -3184,8 +3212,8 @@ measured and what would settle it.
   note's numbers are added into one feature value. See
   [names the encoder doesn't know](network_input.md#keeping-the-lists-complete).
 - **Heap corruption.** A defect in a game process's native code damages memory,
-  and it is not found
-  ([Q-012](../questions.md#q-012-a-game-process-that-crashes)). In 32.6 hours of
+  and it is not found (Q-012 in [the answered questions](../questions.md#answered)).
+  In 32.6 hours of
   play of 252 concurrent games with the search in C++, from 19 to 21 November,
   five game processes aborted on memory being freed that had not been
   allocated, all while freeing the game copies of search tree nodes. Before the
@@ -3196,7 +3224,15 @@ measured and what would settle it.
   [third record](../archive/records/third_game_process_crash_2026_11_20.md),
   [fourth record](../archive/records/fourth_game_process_crash_2026_11_21.md),
   [fifth record](../archive/records/fifth_game_process_crash_2026_11_21.md)).
-  On the night of 2 November, before the search ran in C++, a game process
+  On 21 November training stopped for it to be looked for: about 8,000
+  decisions under ThreadSanitizer and 17,000 under AddressSanitizer, with every
+  position encoded and with the network choosing moves, found no data race and
+  no memory error, so the defect is not on a path that every game reaches
+  (inferred), while the crashes came about once every 2.9 million decisions
+  ([record](../archive/records/crash_diagnosis_2026_11_21.md)). Since then the
+  training build keeps libc++'s fast hardening and the SlotMap check, for 2.2%
+  of a game thread's time, and a run keeps what the next crash leaves
+  (section 9.2). On the night of 2 November, before the search ran in C++, a game process
   crashed twice early in training iteration 3, and about 4.5 hours of replays in
   builds with memory checks did not reproduce it. A race between the game
   threads of one process, which run side by side without taking turns at

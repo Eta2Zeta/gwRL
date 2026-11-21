@@ -190,8 +190,20 @@ others play on; the training process's log says which process died and which
 took its place. A game process that dies before it has finished any game stops
 the run instead, since a new one would most likely die the same way
 ([running training on the Mac](../../docs/design/README.md#92-running-training-on-the-mac)).
-The defect behind the five game process crashes of 20 and 21 November 2026 is not found
-([Q-012](../../docs/questions.md#q-012-a-game-process-that-crashes)).
+For looking into a crash the run keeps, in its run folder:
+
+- `game-moves/`: the move log of each game the dead process had in play, named
+  in its failed game's record, which `tools/replay_game_moves.py` replays to the
+  game's position and whose last searches it can run again;
+- `crash-reports/`: macOS's crash report of the dead process, with every
+  thread's native stack, as `game-process-PID.ips`;
+- the attempt's standard error log: every game thread's Python stack at the
+  crash, and macOS's allocator message with the address, which the supervisor
+  has macOS write there (`MallocDebugReport=stderr`).
+
+The defect behind the five game process crashes of 20 and 21 November 2026 is not found,
+also not by the sanitizer runs of 21 November
+([record](../../docs/archive/records/crash_diagnosis_2026_11_21.md)).
 
 ### Training on the Mac
 

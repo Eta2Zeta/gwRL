@@ -1,0 +1,182 @@
+{
+ "what": "A game of the run of 20 November 2026 from 16:22 (tmp/training-2026-11-20b, commit 1463ff4) failed when a search copy retreated Japan's Self-propelled Artillery from land_battle_42 in Manchuria-Rehe, leaving two Anti-aircraft Artillery units that no rule lets fire or leave; the engine's guard stopped the game.",
+ "failed_game": {
+  "batch": 4,
+  "failure": "FailedMoveError: Land battle land_battle_42 in land_manchuria_rehe cannot end: rounds pass with no dice and no choice",
+  "position": "failed-positions/game-1414-seed-7083393789849635443.json",
+  "root": 1414,
+  "seconds": 2004.198709584016,
+  "seed": 7083393789849635443,
+  "slot": 13
+ },
+ "kept_position_file": "tmp/training-2026-11-20b/run/failed-positions/game-1414-seed-7083393789849635443.json",
+ "kept_position_sha256": "dbb34587b8e6257298e2b0842c8fa05f5121aa722019b2e767b21a0ab3f598d2",
+ "where": "search",
+ "error": "Land battle land_battle_42 in land_manchuria_rehe cannot end: rounds pass with no dice and no choice",
+ "move": {
+  "id": "land_retreat_unit_4b45184de51039e36f37",
+  "kind": "action",
+  "search_stream": "15519649621586467721"
+ },
+ "replay": {
+  "tool": "tools/replay_failed_move.py, run from the run's frozen code",
+  "outcome": "same_failure",
+  "replay_error": "RuntimeError: Land battle land_battle_42 in land_manchuria_rehe cannot end: rounds pass with no dice and no choice"
+ },
+ "clock": {
+  "completed_rounds": 7,
+  "income_collected": false,
+  "nation_index": 2,
+  "phase": "combat",
+  "player_turn_serial": "30",
+  "round_index": 7
+ },
+ "battle": {
+  "attacker": "japan",
+  "attackers": [
+   "economy_unit_21",
+   "economy_unit_58"
+  ],
+  "data": {
+   "after_hits": "air_fire",
+   "after_pairing": "air_fire",
+   "after_roll": "air_fire",
+   "air_defence_ready": true,
+   "airborne_return_fire": [],
+   "amphibious_sea": "sea_p14",
+   "amphibious_waiting": [],
+   "attack_pairs": {},
+   "defense_pairs": {},
+   "exited_aircraft": {},
+   "forced_retreat": false,
+   "grounded": {},
+   "hit_index": 0,
+   "hits": [],
+   "land_entry_origins": [
+    "land_korea"
+   ],
+   "origins": {
+    "economy_unit_21": "land_korea",
+    "economy_unit_58": "sea_p14"
+   },
+   "pending_dead": [],
+   "rolling_phase": "first_strike",
+   "round": 1,
+   "shots": [
+    {
+     "nation": "japan",
+     "target": 0,
+     "target_classes": [],
+     "threshold": 2,
+     "unit": "economy_unit_21",
+     "victim_attacker": false
+    }
+   ]
+  },
+  "defender": "kmt",
+  "defenders": [
+   "economy_unit_83"
+  ],
+  "flags": {
+   "amphibious_assault": 1,
+   "attack_rolled": 1,
+   "carpet_return_started": 1,
+   "port_crew_prepared": 1
+  },
+  "id": "land_battle_42",
+  "pending_hits": {},
+  "stage": "retreat_assign",
+  "zone": "land_manchuria_rehe"
+ },
+ "units": {
+  "economy_unit_21": {
+   "cargo": [],
+   "carried_by": null,
+   "commitments": [
+    "combat_move"
+   ],
+   "damage": 0,
+   "game_flags": {
+    "naval_loaded_completed_turns": 6
+   },
+   "id": "economy_unit_21",
+   "movement_allowance": 2,
+   "movement_remaining": 1,
+   "owner": "japan",
+   "route": [
+    "land_manchuria_rehe"
+   ],
+   "turn_flags": {},
+   "turn_origin": "land_korea",
+   "type": "self_propelled_artillery",
+   "zone": "land_manchuria_rehe"
+  },
+  "economy_unit_58": {
+   "cargo": [],
+   "carried_by": null,
+   "commitments": [
+    "amphibious_assault",
+    "assault_declared",
+    "combat_move"
+   ],
+   "damage": 0,
+   "game_flags": {
+    "amphibious_transport:setup_japan_sea_p15_naval_transport_1": 1,
+    "naval_loaded_completed_turns": 6
+   },
+   "id": "economy_unit_58",
+   "movement_allowance": 1,
+   "movement_remaining": 0,
+   "owner": "japan",
+   "route": [],
+   "turn_flags": {},
+   "turn_origin": "sea_p14",
+   "type": "anti_aircraft_artillery",
+   "zone": "land_manchuria_rehe"
+  },
+  "economy_unit_83": {
+   "cargo": [],
+   "carried_by": null,
+   "commitments": [
+    "combat_move",
+    "retreated"
+   ],
+   "damage": 0,
+   "game_flags": {},
+   "id": "economy_unit_83",
+   "movement_allowance": 1,
+   "movement_remaining": 0,
+   "owner": "kmt",
+   "route": [
+    "land_korea"
+   ],
+   "turn_flags": {
+    "land_retreating": 1
+   },
+   "turn_origin": "land_manchuria_rehe",
+   "type": "anti_aircraft_artillery",
+   "zone": "land_manchuria_rehe"
+  }
+ },
+ "decision": {
+  "continuation": "land_battle_42",
+  "id": "land_battle_42_land_retreat_destination_87",
+  "kind": "land_retreat_destination",
+  "nation": "japan",
+  "options": [
+   {
+    "decision": "land_battle_42_land_retreat_destination_87",
+    "id": "land_retreat_unit_4b45184de51039e36f37",
+    "kind": "land_retreat_unit",
+    "nation": "japan",
+    "parameters": {
+     "battle": "land_battle_42",
+     "unit": "economy_unit_21",
+     "zone": "land_korea"
+    },
+    "player": "axis"
+   }
+  ],
+  "reaction": false
+ }
+}

@@ -559,10 +559,14 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                 resume = (run_dir / "checkpoint.pt.previous") if resume_previous else checkpoint if checkpoint.exists() else False
                 attempt = len(state["attempts"]) + 1
                 command = command_factory(python, run_dir, arguments, resume, extension)
+                # MallocDebugReport: macOS's allocator otherwise writes its report of a
+                # damaged heap (such as "pointer being freed was not allocated", with the
+                # address) nowhere the run keeps; with it, the report reaches the attempt's
+                # standard error log, which game processes share.
                 environment = {**{key: value for key, value in os.environ.items() if key not in unset_environment},
                                "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": "1",
                                "OPENBLAS_NUM_THREADS": "1", "VECLIB_MAXIMUM_THREADS": "1",
-                               "NUMEXPR_NUM_THREADS": "1", "PYTHONHASHSEED": "0"}
+                               "NUMEXPR_NUM_THREADS": "1", "PYTHONHASHSEED": "0", "MallocDebugReport": "stderr"}
                 stdout_path, stderr_path = control_dir / f"attempt-{attempt:03d}.stdout.log", control_dir / f"attempt-{attempt:03d}.stderr.log"
                 record = {"number": attempt, "command": command, "resume": str(resume) if resume else None,
                           "stdout": stdout_path.name, "stderr": stderr_path.name}

@@ -85,6 +85,20 @@ def _sample_index(actions: Any, policy: list[float], rng: random.Random) -> int:
     return order[-1]
 
 
+MOVES_SCHEMA = "campaign-game-moves-v1"
+
+
+def write_move(moves: Any, line: Mapping[str, Any]) -> None:
+    """One line of a game's move log, written through at once, so that a game
+    process that dies leaves what its games had played. A decision writes a
+    "search" line, with the search's seed and the size of the tree it kept,
+    before its search, and an "action" line, with the move played, after it;
+    dice write a "chance" line: the game's own seed decides them."""
+    if moves is not None:
+        moves.write(json.dumps(line, sort_keys=True, separators=(",", ":")) + "\n")
+        moves.flush()
+
+
 def _decide(env: Any, result: Any, pending: list[dict[str, Any]], *, config: LearningConfig,
             rng: random.Random, batch_version: str, replay: dict[str, Any] | None = None) -> dict[str, Any]:
     """Sample the played move from a search result, record its sample and apply it."""
@@ -129,13 +143,19 @@ def episode_streams(learner_seed: int, environment_seed: int) -> tuple[random.Ra
 
 
 def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_version: str,
-                 batch_version: str, environment_seed: int, max_transitions: int) -> dict[str, Any]:
+                 batch_version: str, environment_seed: int, max_transitions: int,
+                 moves: Any = None) -> dict[str, Any]:
     """Play one game to its end, or to the transition guard, with frozen policies.
 
     Each decision is searched in C++ (native_search.search_decision), in a
     search tree the game keeps from decision to decision. A finished game
     returns terminal-labelled samples. A game stopped by the guard returns no
     samples: complete-episode batches never bootstrap.
+
+    `moves`, a text file or None, gets one JSON line per move as it is played
+    (`write_move`): with the game's seed they rebuild its position, so a game
+    whose process dies can be replayed to where it was
+    (tools/replay_game_moves.py).
     """
     search_random, policy_random = episode_streams(config.seed, environment_seed)
     # Its own stream, so the game plays the same whatever share is kept.
@@ -154,16 +174,21 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
             env.resolve_chance()
             counts["chance_events"] += 1
             event = {"kind": "chance", "owner": None, "action": None}
+            write_move(moves, {"move": counts["transitions"], "kind": "chance"})
         else:
             search = MctsConfig(
                 simulations=config.simulations, max_depth=config.max_depth, c_puct=config.c_puct,
                 seed=search_random.getrandbits(64), rules_version=rules_version, mode=config.mode,
                 root_dirichlet_alpha=config.root_dirichlet_alpha, root_dirichlet_epsilon=config.root_dirichlet_epsilon)
+            write_move(moves, {"move": counts["transitions"], "kind": "search", "search_seed": search.seed,
+                               "tree": tree.size})
             result = search_decision(env, evaluator, search, add_root_noise=config.root_noise, tree=tree)
             version = getattr(evaluator, "network_version", None) or batch_version
             if not network_versions or network_versions[-1][1] != version:
                 network_versions.append([counts["decisions"], version])
             event = _decide(env, result, pending, config=config, rng=policy_random, batch_version=version)
+            write_move(moves, {"move": counts["transitions"], "kind": "action", "action": event["action"],
+                               "network": version})
             if sample_random.random() >= config.sample_fraction:
                 pending.pop()
             counts["decisions"] += 1

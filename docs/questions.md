@@ -34,7 +34,7 @@ Other open things stay in the pages that own them, and
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
-| [Q-012](#q-012-a-game-process-that-crashes) | Should training pause for some hours to look for the defect behind a game process's crash? | Running training | Yes, when the Mac can spare the hours |
+| [Q-014](#q-014-a-land-battle-that-no-unit-can-end) | How does a land battle end when the attacker's remaining units can neither fire nor retreat and the defender's cannot fire? | A printed rule | The attacking units that can neither fire nor retreat are eliminated |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
@@ -43,19 +43,9 @@ Q-006 was raised on 15 November 2026, while the printed rules on Mongolia's
 attacks on Chinese land (Q-001, since answered) were being looked up. Its
 numbers are in the
 [record of which features random games give values to](archive/records/answer_census_2026_11_15.md).
-Q-012 was raised on 20 November 2026, when a game process of the long training
-run started the day before crashed; its first part, whether training should
-lose only that process's games, and its choice of keeping the position of a
-game that fails the engine's check were answered the same day. Its numbers are in
-the [record of that crash](archive/records/game_process_crash_2026_11_20.md),
-the
-[record of a second crash the same day](archive/records/second_game_process_crash_2026_11_20.md),
-the
-[record of a third](archive/records/third_game_process_crash_2026_11_20.md)
-the
-[record of a fourth, on 21 November](archive/records/fourth_game_process_crash_2026_11_21.md)
-and the
-[record of a fifth](archive/records/fifth_game_process_crash_2026_11_21.md).
+Q-014 was raised on 21 November 2026, when the one failed move the long run had kept
+was replayed. Its case is in the
+[record of a land battle that no unit could end](archive/records/land_battle_without_end_2026_11_20.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -196,109 +186,59 @@ the game's developers.
 **If answered.** A ruling becomes the next rule clarification, with
 `mayDeclareWar`, its test and the politics page changed in the same commit.
 
-## Q-012: A game process that crashes
+## Q-014: A land battle that no unit can end
 
-**The question.** Should training pause for some hours so that the defect
-behind a game process's crash can be looked for?
+**The question.** How does a land battle end when the attacker's remaining units
+can neither fire nor retreat, and the defender's units cannot fire either?
 
-**What the program does now.** A game process plays its games in threads, and
-its native code, the engine and the search, can crash it. When a game process
-dies, the run loses only the games that process had not finished: they are
-recorded as failed games, and a new game process takes its game slots while the
-others play on (`play_shared_games` in `studies/campaign/shared_evaluator.py`;
-[running training on the Mac](design/README.md#92-running-training-on-the-mac)).
-A move that the engine accepted and then failed on, such as one after which the
-state fails the check that the engine runs after every move (`State::validate`
-in `src/campaign_state.cpp`), keeps the position before it and the move, and
-`tools/replay_failed_move.py` replays it in a fresh process to tell a defect of
-the rules from damaged memory. The defect that made a game process crash is not
-found.
+**What the printed rules say.** Land combat repeats its rounds "until the
+battle is over" (Global War 1936 v4.3 rulebook, section 10.5, page 64, step 10).
+Amphibiously assaulting land units can neither retreat nor blitz, and must
+continue the attack until combat is resolved (section 10.8.3, page 71).
+Anti-aircraft Artillery fires only in the first round of combat, and only at
+aircraft, though it may be taken as a casualty in any round (section 10.2,
+page 61). Nothing printed says how a battle ends when no unit left in it can
+fire and none can leave.
 
-**A real case** (20 November 2026, the long run of 252 concurrent games from
-commit `999c90c`). After 5.13 hours of play, at 01:06, a game process aborted.
-macOS's memory allocator found that memory being freed had not been allocated.
-The process was freeing a game's kept search tree
-([section 4.7 of the design document](design/README.md#47-more-detail-on-the-search)),
-and the bad memory was in the state of a nation, in the game copy of one of
-the tree's nodes. The game had just raised an error, and the record of that
-error died with the process. That run then stopped with the process, and the
-next network update came about 51 minutes later than it would have without the
-crash ([record](archive/records/game_process_crash_2026_11_20.md)). Two crashes
-of the same kind were noted on 2 November 2026, before the search ran in C++.
+**What the program does now.** When a land battle reaches a round in which no
+unit rolls and neither side has a choice, the engine goes on to the next round
+without asking. After three such rounds within one move it stops the game with
+the error "cannot end: rounds pass with no dice and no choice"
+(`retreatDecision` in `src/land_combat.cpp`), and the game fails.
 
-**A second case** (the same day, the run of 252 concurrent games from commit
-`7adac20`, whose engine and search are the same code). After 3.86 hours of
-play, at 10:46, a game process aborted with the same allocator message. This
-time the bad memory was in the state of a unit, in the game copy of a search
-tree node, and the search was freeing the nodes of a game's tree that it did
-not keep. Between the network update at 10:08 and the crash, two games of that
-process had failed the check that the engine runs on the state after every
-move (`State::validate` in `src/campaign_state.cpp`): something in each game's
-state held a zone number that no zone has. A new game process took the dead
-one's game slots, and the run lost 44 games, about 7 minutes of its play
-(inferred), instead of stopping
-([record](archive/records/second_game_process_crash_2026_11_20.md)).
+**A real case** (20 November 2026, game 1414 of the run started at 16:22, in
+Japan's combat phase of game round 8). Japan attacked the KMT in Manchuria-Rehe
+with a Self-propelled Artillery from Korea and an Anti-aircraft Artillery landed
+from sea zone P14; the KMT defended with one Anti-aircraft Artillery. After the
+first round, in a copy of the game that the search played, Japan retreated the
+Self-propelled Artillery to Korea. That left Japan's Anti-aircraft Artillery,
+which cannot fire at land units and cannot retreat, against the KMT's, which
+cannot fire at land units either, and the engine stopped the game. Replayed in
+a fresh process from the position the game kept, the move fails the same way
+([record](archive/records/land_battle_without_end_2026_11_20.md)).
 
-**A third case** (the same run, at 14:28, after 7.56 hours of play). Another
-game process aborted with the same allocator message, again while the search
-freed the nodes of a game's tree that it did not keep, this time in the
-destructor of a whole game state. No game of that process had failed the
-engine's check. A new game process took its game slots, and the run lost 42
-games, about 6 minutes of its play (inferred)
-([record](archive/records/third_game_process_crash_2026_11_20.md)).
-
-**A fourth case** (21 November 2026, at 00:18, the run started at 22:43 the evening
-before with the same engine and search and new learning settings, after 1.59
-hours of play). A game process aborted with the same allocator message, again
-while the search freed the nodes of a game's tree that it did not keep, this
-time in an entry of the game state's build projects (`State::construction` in
-`include/game/campaign.hpp`). No game of the run had failed the engine's check.
-A new game process took its game slots, and the run lost 42 games, about 5
-minutes of its play (inferred)
-([record](archive/records/fourth_game_process_crash_2026_11_21.md)).
-
-**A fifth case** (the same run, at 04:49 on 21 November, after 6.11 hours of
-play). Another game process aborted with the same allocator message, while the
-search freed the nodes of a game's tree that it did not keep, in a unit's state
-as in the second case. No game had failed the engine's check. A new game
-process took its game slots, and the run lost 42 games, about 4 minutes of its
-play (inferred)
-([record](archive/records/fifth_game_process_crash_2026_11_21.md)).
-
-The two games that failed the check between 10:08 and 10:46 left only their seeds
-and their error's text, which cannot rebuild their states: the run did not yet
-keep a failed move's position, and with the shared inference server a game's
-seed need not replay it
-([failures in training](design/README.md#92-running-training-on-the-mac)).
-
-**Why it matters.** The defect most likely damages game states before anything
-notices it (inferred): the only two games of the run to fail the engine's check
-were in the process that aborted at 10:46, in the 38 minutes before it did,
-although the process that aborted at 14:28 had no failed game. A damaged value
-that the check does not catch, such as a zone number that names a real zone,
-would go into the game's training samples. And each crash still costs the games
-in play in one game process: 42 games in the long run's layout of six
-processes, about 7, 6, 5 and 4 minutes of its play in the second to fifth
-cases.
+**Why it matters.** Each such game is lost from training, after the time it
+played: 33 minutes for this one. It is rare, one game of 9,576 in the long
+run, but the search can reach the position whenever a retreat leaves only units
+that cannot fire, so a rule is needed rather than a guard.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. Look for the defect | Build the engine with AddressSanitizer, which stops a process at the first write to freed memory and names the code that made it, and play training games with the newest networks for some hours. The sanitized games need the cores, so training pauses meanwhile. It finds the defect only if the defect strikes during those hours, and five crashes in 32.6 hours of play of 252 games, about one every 6.5 hours, suggest that may take many hours. |
-| B. Leave it | Training goes on, and each crash costs one game process's games in play, about 4 to 7 minutes of the run's play in the second to fifth cases. The defect stays, with whatever it does to games that neither fail the check nor crash. |
+| A. The attacking units that can neither fire nor retreat are eliminated | The battle ends as the defender's win. The printed rules eliminate units that cannot fight when they are alone in a zone with enemy land units (Strategic Rockets, page 50), and the project already eliminates units that have no legal retreat (RCL-016). The attacker keeps the choice to retreat its other units, knowing the cost. |
+| B. The battle ends with neither side winning | The attacking units stay in a zone the defender still holds, which the rules nowhere allow after combat, or would have to go back aboard their transport, which section 10.8.3 forbids. The engine ends a naval battle this way when a round has no shots, but at sea both sides may stay. |
+| C. A retreat that would leave such a battle is not offered | The Self-propelled Artillery would have to stay and fight. Nothing printed restricts a retreat this way, and it would take a choice away from the attacker. |
+| D. Leave it | The game fails, as now, whenever play or the search reaches such a position. |
 
-**Recommendation: A, when the Mac can spare some hours.** Only A can find the
-memory defect behind the crashes, which has most likely damaged the states of
-two games already. A kept failed move only shows whether a bad zone number came
-from the rules or from damage, and only when a check fails: in 32.6 hours of
-play of 252 games the only two failures came before the second crash, and none
-before the third, the fourth or the fifth.
+**Recommendation: A.** It follows the printed rules' treatment of units that
+cannot fight, and the project's own ruling on units that cannot retreat, and it
+ends the battle with the rules' usual outcome of an attack that cannot be won.
 
-**If answered.** What was found, and the fix, belong in the engine page of the
-code that held the defect, and in
-[section 4.7 of the design document](design/README.md#47-more-detail-on-the-search)
-if it was in the search.
+**If answered.** The ruling goes into
+[the rule clarifications](../game_content/rules/clarifications.md) as an RCL
+entry and into the engine page of land combat, and the engine's guard then
+stays only for positions the ruling does not cover.
 
 ## Open elsewhere
 
@@ -383,6 +323,16 @@ the page that now states it.
   keeps the position before it and the move, which the game process writes at
   once, and `tools/replay_failed_move.py` replays it. Stated in
   [running training on the Mac](design/README.md#92-running-training-on-the-mac).
+- **Q-012**, looking for the defect behind the game process crashes. Answered on
+  21 November 2026: yes. Training stopped from 07:40 that day; the five crash
+  reports, the code and about 25,000 decisions under ThreadSanitizer and
+  AddressSanitizer found no defect
+  ([record](archive/records/crash_diagnosis_2026_11_21.md)). The training build
+  now keeps two checks that stop an out-of-bounds index or a stale SlotMap
+  iterator where it happens, and a run keeps each game's move log, the crash
+  report and the allocator's message for the next crash. Stated in
+  [running training on the Mac](design/README.md#92-running-training-on-the-mac)
+  and [known gaps](design/README.md#known-gaps).
 - **Q-013**, how many games a network update learns from. Answered on 20
   November 2026: choice B, so the long run keeps 1% of each game's decisions as
   training samples and 25,000 in its replay buffer, those of about 1,700 games,

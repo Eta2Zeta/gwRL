@@ -625,6 +625,8 @@ class MachineProfileTests(unittest.TestCase):
         environment = json.loads((run / "environment.json").read_text())
         self.assertNotIn("MallocNanoZone", environment)
         self.assertEqual(environment["OMP_NUM_THREADS"], "1")
+        # macOS's allocator reports a damaged heap where the attempt's log keeps it.
+        self.assertEqual(environment["MallocDebugReport"], "stderr")
         self.assertEqual(state["identity"]["profile"], "mac")
         with self.assertRaisesRegex(ValueError, "identity"):
             supervise(control, run, config, ARGUMENTS, rss_sampler=lambda _pid: 1_000_000)
