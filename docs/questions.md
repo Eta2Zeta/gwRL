@@ -191,14 +191,35 @@ the game's developers.
 **The question.** How does a land battle end when the attacker's remaining units
 can neither fire nor retreat, and the defender's units cannot fire either?
 
-**What the printed rules say.** Land combat repeats its rounds "until the
-battle is over" (Global War 1936 v4.3 rulebook, section 10.5, page 64, step 10).
-Amphibiously assaulting land units can neither retreat nor blitz, and must
-continue the attack until combat is resolved (section 10.8.3, page 71).
-Anti-aircraft Artillery fires only in the first round of combat, and only at
-aircraft, though it may be taken as a casualty in any round (section 10.2,
-page 61). Nothing printed says how a battle ends when no unit left in it can
-fire and none can leave.
+**What the printed rules say** (Global War 1936 v4.3 rulebook):
+
+- **A battle goes on until it is over.** Land combat repeats its rounds "until
+  the battle is over" (section 10.5, page 64, step 10).
+- **Whether a unit may retreat depends on how it entered the battle, not on its
+  type.** An attacker who retreats must take all its units out of the battle,
+  with one exception: its units that came from the sea (an amphibious assault)
+  or by air drop (an airborne assault) must stay, while its aircraft and its
+  land units that attacked from neighbouring land zones leave (section 10.3,
+  page 62). Section 10.8.3 (page 71) says the same of land units that came from
+  the sea: they can neither retreat nor blitz, and must continue the attack
+  until combat is resolved. The example in section 10.8.3 has the shape of the
+  case below: Japan attacks British Malaya from the sea and from Siam, rolls
+  poorly, and can retreat only its aircraft and its land units that came from
+  Siam.
+- **Anti-aircraft Artillery fires only at aircraft, and only in the first round
+  of combat,** though it may be taken as a casualty in any round (section 10.2,
+  page 61).
+- **Where a battle has a set number of rounds, attacking units that cannot
+  leave are eliminated.** Combat in a city zone lasts at most three rounds in a
+  player turn (section 1.7.7, page 13), and on tundra or ice one (section
+  1.7.5, page 12). If the battle is not resolved by then, the surviving
+  attacking units must retreat, and those that cannot retreat, such as units
+  that came from the sea or by air drop, are eliminated. The engine already
+  eliminates such units in cities and on tundra
+  ([land combat, section 4](engine/land_combat.md#4-retreat)).
+
+Nothing printed says how a battle in any other zone ends when no unit left in it
+can fire and none can leave.
 
 **What the program does now.** When a land battle reaches a round in which no
 unit rolls and neither side has a choice, the engine goes on to the next round
@@ -207,14 +228,23 @@ the error "cannot end: rounds pass with no dice and no choice"
 (`retreatDecision` in `src/land_combat.cpp`), and the game fails.
 
 **A real case** (20 November 2026, game 1414 of the run started at 16:22, in
-Japan's combat phase of game round 8). Japan attacked the KMT in Manchuria-Rehe
-with a Self-propelled Artillery from Korea and an Anti-aircraft Artillery landed
-from sea zone P14; the KMT defended with one Anti-aircraft Artillery. After the
-first round, in a copy of the game that the search played, Japan retreated the
-Self-propelled Artillery to Korea. That left Japan's Anti-aircraft Artillery,
-which cannot fire at land units and cannot retreat, against the KMT's, which
-cannot fire at land units either, and the engine stopped the game. Replayed in
-a fresh process from the position the game kept, the move fails the same way
+Japan's combat phase of game round 8). Japan attacked the KMT in Manchuria-Rehe,
+a zone of normal terrain with no city
+(`game_content/scenarios/japan_china_1936/map.json`), with two units: a
+Self-propelled Artillery that moved in overland from Korea, and an
+Anti-aircraft Artillery that a Naval Transport landed from sea zone P14. The KMT
+defended with one Anti-aircraft Artillery. After the first round, in a copy of
+the game that the search played, Japan chose to retreat. Japan's
+Self-propelled Artillery went back to Korea, because it had attacked from a
+neighbouring land zone; Japan's Anti-aircraft Artillery had to stay, because it
+had come from the sea. Which of Japan's two units stayed depended only on how
+each had entered the battle: an Anti-aircraft Artillery that had come from
+Korea could have retreated too, and a Self-propelled Artillery landed from the
+sea would have had to stay. The units' types mattered for what followed: the
+two units left in the battle were Japan's Anti-aircraft Artillery and the
+KMT's, neither of which fires at land units, so in every later round no unit
+could roll a die, and the engine stopped the game. Replayed in a fresh process
+from the position the game kept, the move fails the same way
 ([record](archive/records/land_battle_without_end_2026_11_20.md)).
 
 **Why it matters.** Each such game is lost from training, after the time it
@@ -226,14 +256,16 @@ that cannot fire, so a rule is needed rather than a guard.
 
 | Choice | What it changes |
 | --- | --- |
-| A. The attacking units that can neither fire nor retreat are eliminated | The battle ends as the defender's win. The printed rules eliminate units that cannot fight when they are alone in a zone with enemy land units (Strategic Rockets, page 50), and the project already eliminates units that have no legal retreat (RCL-016). The attacker keeps the choice to retreat its other units, knowing the cost. |
+| A. The attacking units that can neither fire nor retreat are eliminated | The battle ends as the defender's win. Eliminating those units is what the printed rules do in a city or on tundra when a battle runs out of rounds: the attacking units that cannot retreat are eliminated (sections 1.7.7 and 1.7.5, pages 13 and 12). The printed rules also eliminate units that cannot fight when they are alone in a zone with enemy land units (Strategic Rockets, page 50), and the project already eliminates units that have no legal retreat (RCL-016). The attacker keeps the choice to retreat its other units, knowing the cost. |
 | B. The battle ends with neither side winning | The attacking units stay in a zone the defender still holds, which the rules nowhere allow after combat, or would have to go back aboard their transport, which section 10.8.3 forbids. The engine ends a naval battle this way when a round has no shots, but at sea both sides may stay. |
 | C. A retreat that would leave such a battle is not offered | The Self-propelled Artillery would have to stay and fight. Nothing printed restricts a retreat this way, and it would take a choice away from the attacker. |
 | D. Leave it | The game fails, as now, whenever play or the search reaches such a position. |
 
-**Recommendation: A.** It follows the printed rules' treatment of units that
-cannot fight, and the project's own ruling on units that cannot retreat, and it
-ends the battle with the rules' usual outcome of an attack that cannot be won.
+**Recommendation: A.** Choice A gives a battle that cannot end the outcome the
+printed rules give a city or tundra battle that has run out of rounds: the
+attacking units that cannot retreat are eliminated. Choice A also agrees with
+the printed rules' treatment of units that cannot fight and with the project's
+own ruling on units that cannot retreat.
 
 **If answered.** The ruling goes into
 [the rule clarifications](../game_content/rules/clarifications.md) as an RCL

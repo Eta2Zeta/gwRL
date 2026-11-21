@@ -52,11 +52,16 @@ an attacking land unit is left alone in the zone, the zone is captured.
 choice, the engine goes on to the next combat round unasked; after three such
 rounds within one move it stops the game with the error "cannot end: rounds
 pass with no dice and no choice" (`retreatDecision` in `src/land_combat.cpp`).
-It happened once in the long training run of 19 to 21 November 2026: two
-Anti-aircraft Artillery units, Japan's having landed from the sea, were left
-facing each other
-([record](../archive/records/land_battle_without_end_2026_11_20.md)). The
-printed rules give such a battle no end;
+It happened once in the long training run of 19 to 21 November 2026. Japan
+attacked with a Self-propelled Artillery from Korea and an Anti-aircraft
+Artillery from the sea, and retreated after the first combat round: the
+Self-propelled Artillery left, and the Anti-aircraft Artillery, having come from
+the sea, had to stay (who may leave is in [section 4](#4-retreat)). Japan's
+Anti-aircraft Artillery was left facing the KMT's, and neither fires at land
+units
+([record](../archive/records/land_battle_without_end_2026_11_20.md)). Except in
+a city or on tundra, where attacking units that must retreat and cannot are
+eliminated, the printed rules give such a battle no end;
 [Q-014](../questions.md#q-014-a-land-battle-that-no-unit-can-end) asks how it
 should end.
 
@@ -82,16 +87,24 @@ An attack or defence value never falls below 1.
 
 ## 4. Retreat
 
-Only the attacker retreats.
+Only the attacker retreats, before a combat round begins (rulebook section
+10.3, page 62).
 
+- **Who leaves.** A retreat takes all of the attacker's units out of the
+  battle, except its units that came from the sea (an amphibious assault) or by
+  air drop (an airborne assault): those must stay and fight on (section 10.3,
+  page 62; section 10.8.3, page 71). How a unit entered the battle decides
+  whether it leaves, not the unit's type (`amphibious` and `airborne` in
+  `src/land_combat.cpp`): a
+  Self-propelled Artillery that came overland leaves, and an Anti-aircraft
+  Artillery that came from the sea stays.
 - **Where to.** Each retreating unit goes back to a zone it or another attacker
   came from, if that zone is still friendly (`land_retreat_unit`). Units may
-  retreat to different zones.
-- **Who cannot.** Units that arrived by air drop or from the sea cannot
-  retreat.
+  retreat to different zones (section 10.3, page 62).
 - **Forced retreat.** In a city the attacker must retreat after three combat
   rounds, except in Japan's Surprise Attack, and in tundra or ice after one.
-  Units that then cannot retreat are eliminated.
+  Units that then cannot retreat are eliminated (section 1.7.7, page 13;
+  section 1.7.5, page 12).
 
 ## 5. Special cases
 
