@@ -2284,6 +2284,13 @@ for its diagnosis:
   supervisor also sets `MallocDebugReport=stderr`, without which macOS's
   allocator writes its report of a damaged heap, such as "pointer being freed
   was not allocated" with the address, nowhere the run keeps.
+- **A run with memory checks in the game processes alone.** `GWRL_GAME_PYTHON`
+  names the interpreter that the game processes start with
+  (`play_shared_games`), such as a script that loads AddressSanitizer's runtime
+  and an engine built with it, while the inference server keeps the ordinary
+  build: AddressSanitizer in the inference server's process stalls PyTorch's
+  work on the Mac's GPU. AddressSanitizer stops a game process at the first
+  write to freed memory and names the code that made it.
 
 In the long run's layout of
 six processes of 42 games, a crash costs the games in play in one process: when

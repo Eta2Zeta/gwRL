@@ -169,6 +169,23 @@ class GameProcessEndingTests(unittest.TestCase):
             self.assertEqual(taken[0], {"root": 0})  # The first process reported a game before it died.
         self.assertEqual(multiprocessing.active_children(), [])
 
+    @unittest.skipIf(sys.platform == "win32", "a POSIX shell script starts the game processes")
+    def test_game_processes_can_start_with_another_interpreter(self):
+        # GWRL_GAME_PYTHON names what the game processes start with; the coordinator is unchanged.
+        with tempfile.TemporaryDirectory() as directory:
+            marker, script = Path(directory) / "started", Path(directory) / "game-python"
+            script.write_text(f'#!/bin/sh\necho x >> "{marker}"\nexec "{sys.executable}" "$@"\n')
+            script.chmod(0o755)
+            previous = multiprocessing.get_context("spawn").get_executable() if hasattr(
+                multiprocessing.get_context("spawn"), "get_executable") else sys.executable
+            try:
+                with patch.dict(os.environ, {"GWRL_GAME_PYTHON": str(script)}):
+                    records, _ = self.play(reports_each_task, processes=2)
+            finally:
+                multiprocessing.set_executable(previous)
+            self.assertEqual(sorted(record["root"] for record in records), [1, 2])
+            self.assertEqual(marker.read_text(), "x\nx\n")  # Both game processes started through it.
+
     def test_a_crash_that_ends_the_play_waits_for_its_crash_report(self):
         # A game process that a crash signal ends before reporting a game ends the
         # play; its crash report, which macOS writes seconds later, is copied first.

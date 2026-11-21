@@ -35,6 +35,7 @@ from dataclasses import dataclass, field
 import itertools
 import multiprocessing
 from multiprocessing import shared_memory
+import os
 from multiprocessing.connection import Connection, wait
 from multiprocessing.reduction import ForkingPickler
 try:
@@ -603,6 +604,11 @@ def play_shared_games(target: Callable[..., None], tasks: Sequence[Any], *, proc
     if feed is not None and tasks:
         raise ValueError("Give either a list of tasks or a feed, not both")
     context = multiprocessing.get_context("spawn")
+    if os.environ.get("GWRL_GAME_PYTHON"):
+        # Another interpreter, or a script that starts one, for the game processes
+        # alone: one that loads an engine built with memory checks, for example,
+        # while the inference server here keeps the ordinary build.
+        context.set_executable(os.environ["GWRL_GAME_PYTHON"])
     slots = processes * games_per_process
     # A game slot holds two pipe ends and its buffer mapped twice, a process four
     # more pipe ends, and a shell's default limit of 256 stops at eight processes of six games.
