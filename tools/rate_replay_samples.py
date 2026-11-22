@@ -108,21 +108,24 @@ def ridge_fit_predict(train_x: np.ndarray, train_y: np.ndarray, test_x: np.ndarr
     return (test_x - mean_x) @ (centred.T @ weights) + mean_y
 
 
+def choose_penalty(x: np.ndarray, y: np.ndarray, fold: np.ndarray) -> float:
+    """The ridge penalty whose models, each fitted on all folds but one, predict the left-out folds best."""
+    errors = []
+    for penalty in PENALTIES:
+        error = 0.0
+        for part in sorted(set(fold.tolist())):
+            fit, check = fold != part, fold == part
+            error += float(((ridge_fit_predict(x[fit], y[fit], x[check], penalty) - y[check]) ** 2).sum())
+        errors.append(error)
+    return PENALTIES[int(np.argmin(errors))]
+
+
 def linear_predictions(x: np.ndarray, y: np.ndarray, fold: np.ndarray) -> tuple[np.ndarray, list[float]]:
     """Each fold predicted by a ridge model fitted on the other folds, its penalty chosen within them."""
     predicted, chosen = np.zeros_like(y), []
     for held in sorted(set(fold.tolist())):
         train, test = fold != held, fold == held
-        inner = fold[train]
-        errors = []
-        for penalty in PENALTIES:
-            error = 0.0
-            for part in sorted(set(inner.tolist())):
-                fit, check = inner != part, inner == part
-                error += float(((ridge_fit_predict(x[train][fit], y[train][fit], x[train][check], penalty)
-                                 - y[train][check]) ** 2).sum())
-            errors.append(error)
-        penalty = PENALTIES[int(np.argmin(errors))]
+        penalty = choose_penalty(x[train], y[train], fold[train])
         chosen.append(penalty)
         predicted[test] = ridge_fit_predict(x[train], y[train], x[test], penalty)
     return predicted, chosen
@@ -180,9 +183,13 @@ def summarize(rows: list[dict[str, Any]], linear: dict[int, np.ndarray] | None =
     return out
 
 
-def load_rated_rows(run: Path) -> tuple[list[dict[str, Any]], list[Any], dict[str, Any]]:
-    """Every replay sample's facts and the network's outputs for it, from the run's own code and exports,
-    and the sizes of the two losses' gradients in the newest exported network."""
+def open_run(run: Path) -> dict[str, Any]:
+    """The run's replay buffer and its exports, read with the run's own copy of the code (RUN/code).
+
+    Returns the replay buffer's samples, the learner's metadata, each exported generation keyed by the
+    version string its samples record, the input's `round` and `kind:` columns, and the run code's
+    model loader and the log-softmax its training step uses.
+    """
     code = run / "code"
     if "studies" in sys.modules:
         raise RuntimeError("Run this tool in a fresh process: it imports the run's own copy of the code")
@@ -193,12 +200,10 @@ def load_rated_rows(run: Path) -> tuple[list[dict[str, Any]], list[Any], dict[st
     from studies.campaign.curriculum import make_env
     from studies.campaign.learning import _fingerprint
     from studies.campaign.model_export import load_evaluation_models
+    from studies.campaign.neural import _conditional_log_softmax
 
     env = make_env(1, calendar_rounds=1)
     spec = getattr(env, "raw", env).zone_encoding_spec()
-    round_column = spec["global_column_names"].index("round")
-    kind_columns = {index: name.split(":", 1)[1] for index, name in enumerate(spec["action_column_names"])
-                    if name.startswith("kind:")}
     learner = torch.load(run / "run" / "checkpoint.pt", map_location="cpu", weights_only=False)["learner"]
     replay, metadata = learner["replay"], learner["metadata"]
     del learner
@@ -210,20 +215,37 @@ def load_rated_rows(run: Path) -> tuple[list[dict[str, Any]], list[Any], dict[st
                                 "model_config": metadata["model_config"],
                                 "compatibility": metadata["compatibility"]})
         exports[version] = (export["generation"], path)
-    rows, inputs = [], []
-    for sample in replay:
-        arrays = sample["input"].arrays()
-        columns = list(arrays["global_column"])
-        game_round = int(arrays["global_value"][columns.index(round_column)]) if round_column in columns else 0
-        offsets, action_columns = arrays["action_offsets"], arrays["action_column"]
-        kinds = [next((kind_columns[int(c)] for c in action_columns[offsets[i]:offsets[i + 1]]
-                       if int(c) in kind_columns), "unknown") for i in range(len(offsets) - 1)]
-        kind = decision_kind(Counter(kinds))
-        rows.append({"owner": sample["owner"], "round": game_round, "options": len(kinds), "kind": kind,
-                     "family": family(kind), "bucket": option_bucket(len(kinds)),
-                     "visits": [float(share) for share in sample["policy"]], "targets": list(sample["values"]),
-                     "generation": exports.get(sample["rollout_version"], (None, None))[0]})
-        inputs.append(sample["input"])
+    return {"torch": torch, "replay": replay, "metadata": metadata, "exports": exports,
+            "round_column": spec["global_column_names"].index("round"),
+            "kind_columns": {index: name.split(":", 1)[1] for index, name in enumerate(spec["action_column_names"])
+                             if name.startswith("kind:")},
+            "load_models": load_evaluation_models, "log_softmax": _conditional_log_softmax}
+
+
+def sample_facts(sample: dict[str, Any], opened: dict[str, Any]) -> dict[str, Any]:
+    """A training sample's alliance, game round, legal actions, kind, visit shares, final scores and generation."""
+    arrays = sample["input"].arrays()
+    columns = list(arrays["global_column"])
+    round_column, kind_columns = opened["round_column"], opened["kind_columns"]
+    game_round = int(arrays["global_value"][columns.index(round_column)]) if round_column in columns else 0
+    offsets, action_columns = arrays["action_offsets"], arrays["action_column"]
+    kinds = [next((kind_columns[int(c)] for c in action_columns[offsets[i]:offsets[i + 1]]
+                   if int(c) in kind_columns), "unknown") for i in range(len(offsets) - 1)]
+    kind = decision_kind(Counter(kinds))
+    return {"owner": sample["owner"], "round": game_round, "options": len(kinds), "kind": kind,
+            "family": family(kind), "bucket": option_bucket(len(kinds)),
+            "visits": [float(share) for share in sample["policy"]], "targets": list(sample["values"]),
+            "generation": opened["exports"].get(sample["rollout_version"], (None, None))[0]}
+
+
+def load_rated_rows(run: Path) -> tuple[list[dict[str, Any]], list[Any], dict[str, Any]]:
+    """Every replay sample's facts and the network's outputs for it, from the run's own code and exports,
+    and the sizes of the two losses' gradients in the newest exported network."""
+    opened = open_run(run)
+    torch, replay, metadata, exports = opened["torch"], opened["replay"], opened["metadata"], opened["exports"]
+    load_evaluation_models = opened["load_models"]
+    rows = [sample_facts(sample, opened) for sample in replay]
+    inputs = [sample["input"] for sample in replay]
     scale = metadata["config"]["value_scale"]
     for generation, path in sorted(exports.values()):
         if not any(row["generation"] == generation for row in rows):
@@ -246,8 +268,7 @@ def load_rated_rows(run: Path) -> tuple[list[dict[str, Any]], list[Any], dict[st
         raise ValueError(f"{len(unrated)} samples name no generation exported in RUN/run/models")
     newest_generation, newest = max(exports.values())
     models = load_evaluation_models(newest, device="cpu")["models"]
-    from studies.campaign.neural import _conditional_log_softmax
-    gradients = gradient_sizes(models, replay, scale, _conditional_log_softmax)
+    gradients = gradient_sizes(models, replay, scale, opened["log_softmax"])
     gradients["generation"] = newest_generation
     return rows, inputs, gradients
 

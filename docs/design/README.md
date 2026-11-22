@@ -1497,8 +1497,11 @@ its own alliance chose (section 8.4). The training step lowers their sum.
 In the long run of 19 to 21 November the value loss on the minibatches was about
 0.005 to 0.02 and the policy loss about 2.1
 ([record](../archive/records/replay_buffer_fit_2026_11_20.md)), so the value
-loss was under 1% of the sum; whether it should count for more is
-[Q-015](../questions.md#q-015-values-that-read-less-than-a-linear-model).
+loss was under 1% of the sum. Weighting it 10, 50 or 200 times as much did not
+help: trained on 1,324 of the long run's saved games, a network predicted 330
+others no better at any of those weights than at 1, and fit its training games
+faster ([record](../archive/records/value_loss_weights_2026_11_21.md)). So the
+two losses count equally (Q-015, [answered](../questions.md#answered)).
 
 ### 8.2 The gradient
 
@@ -3325,9 +3328,14 @@ measured and what would settle it.
     game round a linear model of the same input, fitted on other games, explained
     more of the Axis's and the Allies' final scores than the network's values:
     for the Axis 83% against 68% in the last game round, and 20% against
-    nothing in the third. In the layers both heads read, the value loss's
-    gradient is a sixth to a ninth the size of the policy loss's
-    ([Q-015](../questions.md#q-015-values-that-read-less-than-a-linear-model)).
+    nothing in the third. Weighting the value loss more did not close the gap:
+    trained on 1,324 of the saved games, a network predicted 330 others best
+    after drawing each training sample once or twice, about as well as the
+    linear model over all game rounds but worse in the last ones, and then fit
+    its training games instead, whatever the weight
+    ([record](../archive/records/value_loss_weights_2026_11_21.md)). The values
+    are limited by the number of games
+    ([the open question on what the values read](#should-the-values-read-what-the-zones-hold-in-total)).
   - **Most policy targets say which actions were tried:** at 41% of the kept
     decisions the 64 simulations visited 31 to 69 legal actions, mostly once
     each ([the open question](#are-64-simulations-enough-when-there-are-many-legal-actions)).
@@ -3562,6 +3570,30 @@ $\operatorname{sign}(a)\ln(1 + |a|)$
 **Alternatives:** counts in proportion, or separate features for count ranges
 (1, 2 to 3, 4 to 7, more), so each range learns its own effect. **Would settle
 it:** held-out value error on fixed data first, which is cheap, then games.
+
+#### Should the values read what the zones hold in total?
+
+**Now.** Every zone's vector is layer-normalized when it is built
+([section 6.4](#64-a-zones-vector)), and the values read the zones only through
+the summary vector, made from the zone vectors' average and largest values and
+the global vector ([section 6.7](#67-the-values)). Layer normalization keeps a
+busy zone from dominating, but it also takes away the overall size of a zone's
+vector, so how much a zone holds reaches the values only through the direction
+of its vector.
+
+**Measured** on 21 November, on the long run's saved training samples: a linear
+model that adds up each zone feature's values over all the zones predicted the
+final scores of the last game rounds better than any network trained on the same
+games. In game round 11 it explained 80% of the variance of the Axis's final
+scores on held-out games, the networks at most 71%; over all game rounds the two
+did about as well
+([record](../archive/records/value_loss_weights_2026_11_21.md#by-game-round)).
+That layer normalization is part of the reason is inferred, not tested.
+
+**Alternatives:** a summary vector that also holds the sum of the zones' vectors
+before layer normalization, or global features that count each nation's units.
+**Would settle it:** held-out value error on the saved training samples
+(`tools/train_on_saved_samples.py`) for each variant, then games.
 
 #### Is the final wealth gap the right goal?
 

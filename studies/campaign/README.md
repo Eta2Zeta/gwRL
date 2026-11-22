@@ -298,7 +298,10 @@ runs' decisions per hour and their held-out evaluation games.
 checkpoint the same way, one by one, with the run's own copy of the code: each
 alliance's values by game round, beside a linear model of the same input
 fitted on other games, and the search's visit shares by number of legal actions
-and kind of decision.
+and kind of decision. `tools/train_on_saved_samples.py RUN --start N --weights
+...` trains copies of generation N on four fifths of those games, at each weight
+of the value loss, and rates the other fifth as it goes: a cheap test of a
+training change on fixed data before a run.
 
 `--sample-fraction F` keeps that share of a worker game's decisions as training
 samples, from its own random stream, so the games play the same.

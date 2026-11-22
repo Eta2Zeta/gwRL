@@ -224,7 +224,9 @@ It does not show:
   layers is what holds the values back is inferred, not tested. Two other
   causes are possible: too few training steps per training sample, and the
   restarts with new Adam averages. Training on these saved samples with the
-  value loss weighted more would tell.
+  value loss weighted more would tell; it was done the same day, and no weight
+  above 1 predicted held-out games better
+  ([record](value_loss_weights_2026_11_21.md)).
 - **How much of a final score is predictable at all.** The linear model shows
   what the input holds at least, not at most.
 - **Whether fleets matter less than armies** for the final scores, or whether
