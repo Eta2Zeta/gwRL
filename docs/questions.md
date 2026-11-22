@@ -34,7 +34,7 @@ Other open things stay in the pages that own them, and
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-014](#q-014-a-land-battle-that-no-unit-can-end) | How does a land battle end when the attacker's remaining units can neither fire nor retreat and the defender's cannot fire? | A printed rule | The attacking units that can neither fire nor retreat are eliminated |
-| [Q-016](#q-016-how-self-play-spends-its-searches-and-plays-its-moves) | Should self-play search less where it keeps no training sample, more where it keeps one, and play the search's choice after the first game round? | Training | Yes, both, in the next run |
+| [Q-016](#q-016-how-self-play-spends-its-searches-and-plays-its-moves) | Should self-play search less where it keeps no training sample, more where it keeps one, and play the most visited action after the first game round? | Training | Yes, both, in the next run |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
@@ -212,13 +212,16 @@ one drawn at random from the visit shares?
 
 **What self-play does now.** At every decision with more than one legal action
 the alliance to act searches with 64 simulations, with exploration noise mixed
-into the network's probabilities at the root. The move played is drawn at random
-in proportion to the visit counts
-([temperature 1](design/README.md#45-after-the-simulations-visit-counts-and-visit-shares);
-`_decide` in `studies/campaign/learning.py`). After the search, 1% of the
-decisions are kept as training samples (`play_episode`, same file). Held-out
-evaluation instead plays the most visited action, without exploration noise
-(`best_action` in `studies/shared/multiplayer_mcts.py`).
+into the network's probabilities at the root. The move played is then drawn at
+random, each legal action with a chance equal to its visit share, so it is often
+not the action the search visited most (temperature 1, `_decide` in
+`studies/campaign/learning.py`). Why self-play draws, and how AlphaGo Zero did
+it, is in
+[section 4.5 of the design document](design/README.md#45-after-the-simulations-visit-shares-and-the-move-played).
+After the search, 1% of the decisions are kept as training samples
+(`play_episode`, same file). Held-out evaluation instead plays the most visited
+action, without exploration noise (`best_action` in
+`studies/shared/multiplayer_mcts.py`).
 
 **A real case,** from the long run's games and the 25,000 training samples its
 last run saved ([record](archive/records/long_run_samples_2026_11_21.md)):
@@ -228,7 +231,7 @@ last run saved ([record](archive/records/long_run_samples_2026_11_21.md)):
   85% to 88% of its time, so it set the run's speed. With 1% kept, 99 of every
   100 searches only chose a move, and a training sample cost about 5,300 network
   evaluations.
-- **Moves that are not the search's choice.** At 63% of the searched decisions
+- **Moves other than the most visited action.** At 63% of the searched decisions
   the move played was not a most visited action: about 800 of a game's 1,260
   searched decisions. With two to four legal actions it was 36%. When deciding
   whether a battle goes on, the move played was the less visited one 27% of the
@@ -242,14 +245,14 @@ last run saved ([record](archive/records/long_run_samples_2026_11_21.md)):
 
 **Why it matters.** The values learn from final scores, one set per game, and
 the number of games is what limits them. Trained on 1,324 of the saved games,
-the network predicted 330 others best after drawing each training sample once
-or twice, and worse the more it trained on the same games, whatever the weight
-of the value loss (Q-015's test,
+the network predicted 330 others best after drawing each training sample once or
+twice, and worse the more it trained on the same games, whatever the weight of
+the value loss (Q-015's test,
 [record](archive/records/value_loss_weights_2026_11_21.md)). Searches that only
-choose a move spend most of the inference server's time. Final scores from play
-closer to the search's choices would be less noisy value targets, and searches
-with more simulations would give policy targets that say more than which actions
-were tried.
+choose a move spend most of the inference server's time. Final scores from games
+that play the most visited action more often would be less noisy value targets,
+and searches with more simulations would give policy targets that say more than
+which actions were tried.
 
 **The choices.**
 

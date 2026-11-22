@@ -32,7 +32,7 @@ numbers.
    - [4.1 Why search](#41-why-search) · [4.2 One simulation](#42-one-simulation) ·
      [4.3 The PUCT score](#43-the-puct-score-of-an-action) ·
      [4.4 A toy search](#44-a-toy-search) ·
-     [4.5 After the simulations](#45-after-the-simulations-visit-counts-and-visit-shares) ·
+     [4.5 After the simulations](#45-after-the-simulations-visit-shares-and-the-move-played) ·
      [4.6 A real search](#46-a-real-search-decision-612) ·
      [4.7 More detail](#47-more-detail-on-the-search)
 5. [How a decision becomes numbers](#5-how-a-decision-becomes-numbers)
@@ -319,18 +319,16 @@ state it passes. It does not look for the deepest branch: it goes deep only
 where the scores keep sending it. Each simulation adds one new node to the tree,
 so the continuations the scores keep choosing are explored deeper and deeper.
 
-### 4.5 After the simulations: visit counts and visit shares
+### 4.5 After the simulations: visit shares and the move played
 
 **Visit counts and visit shares.** After all 64 simulations, the number of times
 each action at the root was tried, its visit count, shows the search's
 preference. An action's *visit share* is its visit count divided by the number of
 simulations; AlphaZero names the visit shares the *search probabilities*. The
-action actually played is drawn at random in proportion to the visit counts, at
-every decision of self-play (*temperature* 1), and the visit shares become part
-of a training sample (section 7). Held-out evaluation plays the most visited
-action instead (section 10). Whether self-play should too after the first game
-round is
-[Q-016](../questions.md#q-016-how-self-play-spends-its-searches-and-plays-its-moves).
+visit shares become part of a training sample, as the target for the network's
+action probabilities (section 7). In the toy search of section 4.4, after its
+four simulations, A has 2 visits and B and C one each: visit shares of 0.5, 0.25
+and 0.25.
 
 **How the visit shares come to differ from the priors.** An action whose
 simulations keep scoring better than the others' is chosen again and again,
@@ -345,6 +343,56 @@ gives up simulations in proportion to its prior.
 mixed in at 25%) is added to the network's priors at the root, so the search
 sometimes tries actions the network dislikes. Held-out evaluation, which
 measures playing strength (section 10), turns it off.
+
+**The move played.** Self-play and held-out evaluation choose the move played
+from the same visit counts in two different ways:
+
+| Games | How the move played is chosen from the visit counts | At the toy search's root R |
+| --- | --- | --- |
+| Self-play, whose decisions become the training samples (section 7) | Drawn at random: each legal action's chance of being played is its visit share (`_decide` in `studies/campaign/learning.py`) | A with chance 0.5, B with 0.25 and C with 0.25 |
+| Held-out evaluation, which measures playing strength (section 10) | The most visited action; a tie goes to the first of the tied actions in a fixed order (`best_action` in `studies/shared/multiplayer_mcts.py`) | A, every time |
+
+So at R self-play would play B one time in four, although B's one simulation
+ended worst. AlphaGo Zero calls the setting that decides
+between these two ways the *temperature*: at temperature 1 each legal action's
+chance of being played is its visit share; as the temperature falls toward 0,
+the most visited action becomes certain. Self-play here draws at temperature 1
+at every decision of the game (`temperature` in `LearningConfig`,
+`studies/campaign/learning.py`). Temperature 1 has not been tuned: no run has
+tried another temperature.
+
+**Why self-play draws.** Self-play draws to spread its games over more states.
+AlphaGo Zero drew its moves in proportion to the visit counts for the first 30
+moves of each game of Go, so that its games met a varied set of positions, and played the most visited
+move for the rest of each game and in all its evaluation games (Silver et al.
+2017,
+[*Mastering the game of Go without human knowledge*](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf),
+Methods, "Self-Play" and "Evaluator"). Go has no dice, so two games that play
+the same moves reach the same positions. Here every game rolls its own dice,
+and its searches' exploration noise and simulations' dice differ from other
+games' too, so games would differ without the draw; by how much has not been
+measured. The draw does not change the training sample of the decision where it
+is made: the policy target of that training sample is the decision's visit
+shares, whichever action is played. The draw changes what comes after the
+decision: the states the game goes on to, where its later training samples are
+kept, and the game's final scores, from which every training sample of the game
+takes its value target (section 7.2).
+
+**How often self-play plays an action other than the most visited one.** Where
+64 simulations spread over many legal actions, the most visited action often has
+a small visit share, and the draw then usually plays another action. At the
+KMT's Combat Movement with 28 legal actions, in the
+[open question on many legal actions](#are-64-simulations-enough-when-there-are-many-legal-actions)
+(section 11), the most visited attack had 16 of the 64 visits, so the draw had
+a chance of 0.25 to play it, and a chance of 0.27 to play one of the 17 attacks
+that the search tried once and not again. In the long run's last run, the chance
+that the draw played none of the most visited actions was 63% on average over
+the searched decisions, about 800 of a game's 1,260 searched decisions, and 36%
+at decisions with two to four legal actions
+([record](../archive/records/long_run_samples_2026_11_21.md#what-the-search-leaves-as-policy-targets)).
+Whether self-play should play the most visited action after the first game
+round, as AlphaGo Zero did after its first 30 moves, is
+[Q-016](../questions.md#q-016-how-self-play-spends-its-searches-and-plays-its-moves).
 
 **A decision with only one legal action** is played at once, with no search and
 without asking the network.
@@ -450,8 +498,9 @@ back near the network's numbers; Suiyuan's fell to a third, but only from 0.10
 to 0.03. Their agreement is a coincidence of small numbers, not the search
 confirming the network: it found no difference among them.
 
-The attack on Hopeh ended with a visit share of 0.56. The action played was drawn
-from the visit shares, and it was the attack.
+The attack on Hopeh ended with a visit share of 0.56. So the draw of section 4.5
+played it with chance 0.56, and one of the other four actions with chance 0.44;
+it played the attack.
 
 ### 4.7 More detail on the search
 
@@ -1361,13 +1410,13 @@ network update trains the network on their training samples and older ones
 (section 8.4), beside the games, which go on; when it is done, every game takes
 up the new network at once ([section 9.1](#91-the-training-loop)). A training
 iteration is those 24 games and their network update. At every decision the
-alliance to act searches (section 4) and plays the action drawn from the visit
-shares. Training can also alternate between playing and learning, as the Windows
-profile does: a training iteration's 24 games then start together with the
-network held fixed, and the network update runs when the last of them has
-ended. The code and the dated records name a training iteration's games a
-*batch* (as in the flag `--transitions-per-batch`); this document keeps "batch"
-for the inference batches of section 9.2.
+alliance to act searches (section 4) and plays an action drawn at random from
+the visit shares (section 4.5). Training can also alternate between playing and
+learning, as the Windows profile does: a training iteration's 24 games then
+start together with the network held fixed, and the network update runs when the
+last of them has ended. The code and the dated records name a training
+iteration's games a *batch* (as in the flag `--transitions-per-batch`); this
+document keeps "batch" for the inference batches of section 9.2.
 
 The settings in sections 7 and 8 are those of the Mac training command in the
 [campaign learning guide](../../studies/campaign/README.md#training-on-the-mac),
@@ -1475,7 +1524,7 @@ training sample as the example:
 - $\pi_m$ is the visit share of legal action $m$: the number of the search's
   simulations at that decision that tried action $m$ at the root, divided by
   the number of simulations
-  ([section 4.5](#45-after-the-simulations-visit-counts-and-visit-shares)). The
+  ([section 4.5](#45-after-the-simulations-visit-shares-and-the-move-played)). The
   visit shares of a decision add up to 1.
 - $p_m$ is the network's probability for legal action $m$ at that decision
   ([section 6.8](#68-the-action-probabilities)). The probabilities of a decision
@@ -3230,10 +3279,11 @@ forward. [Replay example and checks](../../tools/verify_campaign_replay_viewer.m
 ## 10. Measuring strength
 
 **Held-out evaluation** (`studies/campaign/evaluation.py`) fixes the networks
-being tested, turns exploration noise off and plays them against simple scripted
-opponents (`balanced` and `cautious`), one side at a time, on seeds that training
-never used. It measures playing strength; it is not a network evaluation
-(section 9.2).
+being tested and plays them against simple scripted opponents (`balanced` and
+`cautious`), one side at a time, on seeds that training never used. Its searches
+have no exploration noise, and it plays the most visited action at every
+decision (section 4.5). It measures playing strength; it is not a network
+evaluation (section 9.2).
 
 **Repeated-state guard.** Held-out evaluation stops a game after 20 visits to the
 same full state and reports it as unfinished, with no final score.
@@ -3395,9 +3445,10 @@ measured and what would settle it.
     kept decisions, the 64 simulations visited 31 to 69 legal actions, most of
     them once
     ([the open question](#are-64-simulations-enough-when-there-are-many-legal-actions)).
-  - **Self-play mostly plays other moves than the search's choice,** at 63% of
-    its searched decisions, while 99 of every 100 of its searches keep no
-    training sample
+  - **Self-play mostly plays an action other than the most visited one,** at
+    63% of its searched decisions
+    ([section 4.5](#45-after-the-simulations-visit-shares-and-the-move-played)),
+    while 99 of every 100 of its searches keep no training sample
     ([Q-016](../questions.md#q-016-how-self-play-spends-its-searches-and-plays-its-moves)).
 - **One network's action probabilities fit its searches less well** than a
   network for each alliance did. In the matched runs of 17 November, at 64×2,
