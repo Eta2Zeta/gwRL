@@ -325,9 +325,12 @@ so the continuations the scores keep choosing are explored deeper and deeper.
 each action at the root was tried, its visit count, shows the search's
 preference. An action's *visit share* is its visit count divided by the number of
 simulations; AlphaZero names the visit shares the *search probabilities*. The
-action actually played is drawn at random in proportion to the visit counts
-(temperature 1), and the visit shares become part of a training sample
-(section 7).
+action actually played is drawn at random in proportion to the visit counts, at
+every decision of self-play (*temperature* 1), and the visit shares become part
+of a training sample (section 7). Held-out evaluation plays the most visited
+action instead (section 10). Whether self-play should too after the first game
+round is
+[Q-016](../questions.md#q-016-how-self-play-spends-its-searches-and-plays-its-moves).
 
 **How the visit shares come to differ from the priors.** An action whose
 simulations keep scoring better than the others' is chosen again and again,
@@ -1491,6 +1494,11 @@ training step's minibatch: the value loss over all of them, and the policy loss
 over all of them too, since the network serves all three alliances; with a
 network for each alliance, a network's policy loss is averaged over those where
 its own alliance chose (section 8.4). The training step lowers their sum.
+In the long run of 19 to 21 November the value loss on the minibatches was about
+0.005 to 0.02 and the policy loss about 2.1
+([record](../archive/records/replay_buffer_fit_2026_11_20.md)), so the value
+loss was under 1% of the sum; whether it should count for more is
+[Q-015](../questions.md#q-015-values-that-read-less-than-a-linear-model).
 
 ### 8.2 The gradient
 
@@ -3309,6 +3317,24 @@ measured and what would settle it.
   questions below may also be part of the reason: the
   [objective](#is-the-final-wealth-gap-the-right-goal) and
   [flat search targets](#are-64-simulations-enough-when-there-are-many-legal-actions).
+
+  The 25,000 training samples that the long run's last run kept, each rated by
+  the network that played its decision, point to three more parts of the reason
+  ([record](../archive/records/long_run_samples_2026_11_21.md)):
+  - **The values read less from the input than a linear model does.** In every
+    game round a linear model of the same input, fitted on other games, explained
+    more of the Axis's and the Allies' final scores than the network's values:
+    for the Axis 83% against 68% in the last game round, and 20% against
+    nothing in the third. In the layers both heads read, the value loss's
+    gradient is a sixth to a ninth the size of the policy loss's
+    ([Q-015](../questions.md#q-015-values-that-read-less-than-a-linear-model)).
+  - **Most policy targets say which actions were tried:** at 41% of the kept
+    decisions the 64 simulations visited 31 to 69 legal actions, mostly once
+    each ([the open question](#are-64-simulations-enough-when-there-are-many-legal-actions)).
+  - **Self-play mostly plays other moves than the search's choice,** at 63% of
+    its searched decisions, while 99 of every 100 of its searches keep no
+    training sample
+    ([Q-016](../questions.md#q-016-how-self-play-spends-its-searches-and-plays-its-moves)).
 - **One network's action probabilities fit its searches less well** than a
   network for each alliance did. In the matched runs of 17 November, at 64×2,
   the one network's KL divergence from its searches' visit shares was 0.273,
@@ -3576,14 +3602,22 @@ Japan's Combat Movement decisions had at least 64 legal actions
 ([decision review](../archive/records/decision_review_2026_10_31.md#training-findings)).
 Such targets say little more than which actions were tried. Since then Combat
 Movement decisions have shrunk to about a third as many legal actions
-([record](../archive/records/combat_movement_combats_only_2026_11_01.md)); the
-spread of policy targets has not been measured again.
+([record](../archive/records/combat_movement_combats_only_2026_11_01.md)).
+
+**Measured** on 21 November, on the 25,000 training samples of the long run's
+last run: 41% of the kept decisions had 17 or more legal actions. At those with
+17 to 63 the search visited 31 of them on average and gave the most visited
+action 23% of the visits; at those with 64 or more, a median of 128, it visited
+69, mostly once each, and the most visited action had 3%. Naval decisions were
+half of the searched training samples
+([record](../archive/records/long_run_samples_2026_11_21.md#what-the-search-leaves-as-policy-targets)).
 
 **Alternatives:** more simulations where there are many legal actions, fewer legal
 actions per decision, or Gumbel root search, which the review suggests because it
-was designed for fewer simulations than legal actions. **Would settle it:**
-measuring the policy targets on today's decisions, then comparing learning at
-equal compute.
+was designed for fewer simulations than legal actions. Since only 1% of the
+decisions are kept, more simulations at those cost little if the others get
+fewer ([Q-016](../questions.md#q-016-how-self-play-spends-its-searches-and-plays-its-moves)).
+**Would settle it:** comparing learning at equal compute.
 
 #### Search-guided self-play or direct policy learning, and which opponents?
 
@@ -3594,6 +3628,16 @@ with their latest network.
 keeps masked PPO, a policy trained without a search at every decision, as a
 competing method, and older networks as extra opponents for when held-out
 evaluation shows overfitting to the current ones. Neither has been tried.
+
+**Measured** on 21 November: as the Allies against the scripted policy on the
+six held-out seeds, the network of the long run's last network update made 249
+decisions a game against the scripted Allies' 483, and the KMT ended with 8.5
+land territories against 18.5
+([record](../archive/records/long_run_samples_2026_11_21.md#the-network-as-the-allies-against-the-scripted-policy)).
+Playing only itself, the network had not met a Japan that attacks as the
+scripted one does (inferred). Scripted opponents in some self-play games are a
+third kind of opponent.
+
 **Would settle it:** the equal-compute comparison the plan describes.
 
 #### Should the engine leave out actions that are never better?
@@ -3681,6 +3725,9 @@ the dated records use instead.
   that shrinks each time the action is tried.
 - **Visit share:** an action's visit count divided by the number of simulations;
   AlphaZero's search probability.
+- **Temperature:** how closely the move played follows the visit counts: at
+  temperature 1 it is drawn in proportion to them, as in self-play; near 0 it is
+  the most visited action, as in held-out evaluation.
 - **Exploration noise:** random noise mixed into the priors at the root, during
   training.
 - **Simulation depth:** how many actions and dice rolls a simulation played from
@@ -3912,6 +3959,11 @@ the dated records use instead.
   same games' final scores: the share of the final scores' spread that the
   network's values account for, 0 for always predicting the mean and 1 for
   exact values.
+- **Linear model:** a prediction of the final scores that multiplies each
+  feature value, after feature scaling, by a learned number, the same for a zone
+  feature in every zone, and adds them up; fitted by ridge regression, which
+  keeps those numbers small, on other games than those it predicts. It is a
+  yardstick for the values (`tools/rate_replay_samples.py`; section 11).
 - **Residual block:** two convolutions whose result is added to their input;
   AlphaZero's networks are stacks of them, as this one is a stack of
   message-passing layers.

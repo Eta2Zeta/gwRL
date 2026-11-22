@@ -34,6 +34,8 @@ Other open things stay in the pages that own them, and
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-014](#q-014-a-land-battle-that-no-unit-can-end) | How does a land battle end when the attacker's remaining units can neither fire nor retreat and the defender's cannot fire? | A printed rule | The attacking units that can neither fire nor retreat are eliminated |
+| [Q-015](#q-015-values-that-read-less-than-a-linear-model) | Should the value loss count for more in a training step, at a weight found first by training on the long run's saved training samples? | Training | Yes: test the weight on the saved training samples first |
+| [Q-016](#q-016-how-self-play-spends-its-searches-and-plays-its-moves) | Should self-play search less where it keeps no training sample, more where it keeps one, and play the search's choice after the first game round? | Training | Yes, both, in the next run |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
@@ -41,6 +43,10 @@ Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 Q-014 was raised on 21 November 2026, when the one failed move the long run had kept
 was replayed. Its case is in the
 [record of a land battle that no unit could end](archive/records/land_battle_without_end_2026_11_20.md).
+Q-015 and Q-016 were raised on 21 November 2026, when the training samples and
+games that the long run had saved were read for what limits its learning. Their
+numbers are in the
+[record of the long run's training samples](archive/records/long_run_samples_2026_11_21.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -197,6 +203,134 @@ own ruling on units that cannot retreat.
 [the rule clarifications](../game_content/rules/clarifications.md) as an RCL
 entry and into the engine page of land combat, and the engine's guard then
 stays only for positions the ruling does not cover.
+
+## Q-015: Values that read less than a linear model
+
+**The question.** Should the value loss count for more in each training step?
+And first, may a test train networks on the training samples the long run
+saved, to find the weight?
+
+**What training does now.** A training step lowers the sum of two losses
+([the loss](design/README.md#81-the-loss); `CampaignLearner.update` in
+`studies/campaign/learning.py`). The value loss is the squared error of the
+network's three values against the final scores divided by 100. The policy loss
+is the cross-entropy of the network's action probabilities against the search's
+visit shares. An alliance's final score varies from game to game with a
+standard deviation of about 14 points, 0.14 once divided by 100, so the value
+loss is small: about 0.005 to 0.02 on the
+long run's minibatches, against a policy loss of about 2.1
+([record](archive/records/replay_buffer_fit_2026_11_20.md)). The value loss is
+under 1% of the sum. The value head and the policy head read the same layers
+below them, and a training step moves those layers against the gradient of the
+sum. Measured on the saved training samples with the network of the long run's
+last network update, the value loss's gradient on the embedding tables and the
+message-passing layers was a sixth to a ninth the size of the policy loss's, and
+almost at right angles to it, so a training step moves those layers almost only
+where the policy loss points
+([record](archive/records/long_run_samples_2026_11_21.md#the-two-losses-gradients)).
+
+**A real case.** The long run's last run (`tmp/training-2026-11-20c`) saved
+25,000 training samples from its latest 1,654 games. Each was rated by the
+network that played the decision, which had not trained on that game
+([record](archive/records/long_run_samples_2026_11_21.md#the-values-game-round-by-game-round-beside-a-linear-model)).
+At decisions in the eleventh and last game round the network's values explained
+68% of the variance of the Axis's final scores. A linear model of the same
+input, each feature value times a learned number, added up, fitted on other
+games of the same 1,654 and tested on games it had not seen, explained 83%. In
+the third game round the network's values explained nothing (−0.6%), the linear
+model 20%. The linear model did
+better in every game round for the Axis and for the Allies, by 6 to 20
+percentage points. So the input holds more about the final scores than the
+network's values use.
+
+**Why it matters.** The search judges an action by the values of the states it
+leads to ([one simulation](design/README.md#42-one-simulation)). Where the
+values explain nothing, as at the Axis's decisions in the first three game
+rounds, the search splits its simulations by the network's own probabilities and
+the exploration noise, and the policy then learns that split. Better values would
+improve every search and every policy target.
+
+**The choices.**
+
+| Choice | What it changes |
+| --- | --- |
+| A. Leave the loss as it is | Nothing. |
+| B. Weigh the value loss more, at a weight tested first on the saved training samples | A test starts from the network of the run's third network update and uses only the games that ended after it, which it had not trained on. It trains copies of that network on four fifths of those games' training samples with the value loss times 1, as now, 10 and 50, then checks their values on the other fifth, game round by game round, against the linear model. The test plays no games: a few hours of one CPU core (estimate). The next run uses the best weight. |
+| C. Weigh it more without the test | The next run uses one weight, such as 50, which gives the value loss about the weight it has in AlphaGo Zero: there the value targets, −1 and +1, vary about 50 times as much as these, whose variance is about 0.02. Quicker, but a wrong weight costs a run. |
+
+AlphaGo Zero weighted its two losses equally, with game results of −1 and +1
+(Silver et al. 2017, *Mastering the game of Go without human knowledge*,
+Methods, "Optimisation"). The same paper weighted the value loss low for a
+network trained on a fixed set of games, to keep its values from fitting those
+games too closely (Methods, "Supervised Learning"). The long run's first
+settings did fit them too closely
+([record](archive/records/replay_buffer_fit_2026_11_20.md)). So a higher weight
+can help or hurt, and only held-out games tell which.
+
+**Recommendation: B.** It needs only saved data and a few hours of one core, and
+it shows whether the weight is what holds the values back before a run is
+spent on it.
+
+## Q-016: How self-play spends its searches and plays its moves
+
+**The question.** Should self-play search the decisions it will not keep as
+training samples with fewer simulations and the ones it keeps with more, and,
+after the first game round, play the action the search visited most instead of
+one drawn at random from the visit shares?
+
+**What self-play does now.** At every decision with more than one legal action
+the alliance to act searches with 64 simulations, with exploration noise mixed
+into the network's probabilities at the root. The move played is drawn at random
+in proportion to the visit counts
+([temperature 1](design/README.md#45-after-the-simulations-visit-counts-and-visit-shares);
+`_decide` in `studies/campaign/learning.py`). After the search, 1% of the
+decisions are kept as training samples (`play_episode`, same file). Held-out
+evaluation instead plays the most visited action, without exploration noise
+(`best_action` in `studies/shared/multiplayer_mcts.py`).
+
+**A real case,** from the long run's games and the 25,000 training samples its
+last run saved ([record](archive/records/long_run_samples_2026_11_21.md)):
+
+- **Searches that train nothing.** A game took about 80,000 network
+  evaluations, 52 a decision, from the inference server. Its forward passes took
+  85% to 88% of its time, so it set the run's speed. With 1% kept, 99 of every
+  100 searches only chose a move, and a training sample cost about 5,300 network
+  evaluations.
+- **Moves that are not the search's choice.** At 63% of the searched decisions
+  the move played was not a most visited action: about 800 of a game's 1,260
+  searched decisions. With two to four legal actions it was 36%. When deciding
+  whether a battle goes on, the move played was the less visited one 27% of the
+  time. Every training sample of a game learns its values from the game's final
+  scores, which these moves help decide.
+- **Targets that say which actions were tried.** At 41% of the kept decisions
+  there were 17 or more legal actions. There the 64 simulations visited 31 to 69
+  actions, mostly once each, and the most visited action had 3% to 23% of the
+  visits.
+
+**Why it matters.** The values learn from final scores, one set per game, and
+the number of games is what limits them
+([record](archive/records/replay_buffer_fit_2026_11_20.md)). Searches that only
+choose a move spend most of the inference server's time. Final scores from play
+closer to the search's choices would be less noisy value targets, and searches
+with more simulations would give policy targets that say more than which actions
+were tried.
+
+**The choices.**
+
+| Choice | What it changes |
+| --- | --- |
+| A. As now | Nothing. |
+| B. Fewer simulations where nothing is kept, more where something is | Whether a decision is kept is drawn before its search. Kept decisions are searched with 256 simulations and exploration noise, the others with 16 and no noise. A game's network evaluations would fall to under a third (estimate), so the inference server could serve about three times as many games an hour; the game processes' own work would then set the limit, by how much is not measured. KataGo searched fully only a quarter of its decisions and kept only those as training samples; a run without this needed about 1.37 times as much compute for the same strength (Wu 2019, *Accelerating Self-Play Learning in Go*, sections 3.1 and 5.2, table 2). |
+| C. Play the most visited action after the first game round | Moves are drawn from the visit shares in game round 1 only, and then the most visited action is played, with the exploration noise still at the root. AlphaGo Zero drew moves this way for the first 30 moves of a game and then played the most visited move (Silver et al. 2017, Methods, "Self-Play"). Here the dice keep games apart without random moves. |
+| D. B and C together | Both, in one run. If the run learns, a later run can tell which of the two mattered. |
+
+A search built for few simulations among many legal actions, Gumbel root search,
+would change the targets more, but it is a larger change to both searches; it
+stays an [open design question](design/README.md#are-64-simulations-enough-when-there-are-many-legal-actions).
+
+**Recommendation: D,** in the next run, with the weight of Q-015 if its test
+finds one. Held-out evaluation should then use 24 seeds instead of 6, which
+halves the standard error of a network's mean final score, now 3 to 10 points.
 
 ## Open elsewhere
 

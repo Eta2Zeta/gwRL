@@ -1,0 +1,3174 @@
+{
+ "sources": {
+  "games": "runner.updates[].episodes[] of tmp/training-2026-11-{19,20,20b,20c}/run/manifest.json",
+  "samples": "tools/rate_replay_samples.py tmp/training-2026-11-20c (replay buffer of run/checkpoint.pt, 07:40 on 21 November 2026)",
+  "held_out": "tmp/training-2026-11-20c/evaluations-alliances/{current-gen10,script}-{axis,allies,comintern}.json"
+ },
+ "games": 9576,
+ "decisions_per_game": {
+  "choice_b": 1531.6984126984128,
+  "first_update": 1003.9126984126984
+ },
+ "kind_families": {
+  "choice_b": {
+   "naval": 0.3844811237655057,
+   "movement": 0.17344477030374,
+   "end_phase": 0.14428142843818978,
+   "economy": 0.13091235996974002,
+   "land combat": 0.1147064157434946,
+   "air": 0.033440935987647295,
+   "recruitment": 0.014771702747235665,
+   "politics": 0.0026026715856451495,
+   "influence_roll": 0.0006842181622226598,
+   "pass_interrupt": 0.0006743732965791683
+  },
+  "first_update": {
+   "naval": 0.2960242859288657,
+   "end_phase": 0.2201188998600713,
+   "economy": 0.15185820559240434,
+   "movement": 0.13075427098732736,
+   "land combat": 0.12358786652225814,
+   "air": 0.05515720237483496,
+   "recruitment": 0.01634873075980489,
+   "politics": 0.0038104875368597468,
+   "pass_interrupt": 0.001537634493608342,
+   "influence_roll": 0.0008024159439652787
+  }
+ },
+ "kinds_choice_b": {
+  "movement_route": {
+   "per_game": 265.66507936507935,
+   "share_of_decisions": 0.17344477030374
+  },
+  "end_phase": {
+   "per_game": 220.99563492063493,
+   "share_of_decisions": 0.14428142843818978
+  },
+  "naval_start_move": {
+   "per_game": 212.5797619047619,
+   "share_of_decisions": 0.13878695710747485
+  },
+  "naval_route": {
+   "per_game": 212.55357142857142,
+   "share_of_decisions": 0.13876985813030457
+  },
+  "chance": {
+   "per_game": 199.33928571428572,
+   "share_of_decisions": null
+  },
+  "economy_purchase": {
+   "per_game": 94.93849206349206,
+   "share_of_decisions": 0.06198249686518752
+  },
+  "economy_place": {
+   "per_game": 71.36944444444444,
+   "share_of_decisions": 0.046594971864410285
+  },
+  "land_take_casualty": {
+   "per_game": 57.74801587301587,
+   "share_of_decisions": 0.03770194928339741
+  },
+  "land_begin_battle": {
+   "per_game": 54.06507936507936,
+   "share_of_decisions": 0.03529747038768044
+  },
+  "naval_enter_port": {
+   "per_game": 53.36071428571429,
+   "share_of_decisions": 0.03483761153196473
+  },
+  "naval_force_add": {
+   "per_game": 28.106349206349208,
+   "share_of_decisions": 0.018349793257821486
+  },
+  "land_continue_fighting": {
+   "per_game": 22.884126984126983,
+   "share_of_decisions": 0.014940360840233374
+  },
+  "land_retreat_unit": {
+   "per_game": 18.921031746031748,
+   "share_of_decisions": 0.012352974703876805
+  },
+  "recruitment_roll": {
+   "per_game": 17.37063492063492,
+   "share_of_decisions": 0.011340767070478874
+  },
+  "naval_load": {
+   "per_game": 16.646031746031746,
+   "share_of_decisions": 0.01086769536876794
+  },
+  "land_retreat_begin": {
+   "per_game": 15.25952380952381,
+   "share_of_decisions": 0.009962485880390063
+  },
+  "naval_declare_assault": {
+   "per_game": 13.338492063492064,
+   "share_of_decisions": 0.008708301812491579
+  },
+  "economy_research": {
+   "per_game": 13.24047619047619,
+   "share_of_decisions": 0.008644310185808884
+  },
+  "naval_begin_assault": {
+   "per_game": 11.693253968253968,
+   "share_of_decisions": 0.007634175155704322
+  },
+  "naval_finish_shore_selection": {
+   "per_game": 11.693253968253968,
+   "share_of_decisions": 0.007634175155704322
+  },
+  "economy_finish_research": {
+   "per_game": 11.627777777777778,
+   "share_of_decisions": 0.007591427712778635
+  },
+  "air_ground_attack": {
+   "per_game": 11.10873015873016,
+   "share_of_decisions": 0.007252557074313191
+  },
+  "air_start_patrol": {
+   "per_game": 8.692063492063491,
+   "share_of_decisions": 0.0056747878172378405
+  },
+  "naval_designate_raider": {
+   "per_game": 8.545238095238096,
+   "share_of_decisions": 0.005578929914919635
+  },
+  "air_land": {
+   "per_game": 7.746825396825397,
+   "share_of_decisions": 0.005057670186637927
+  },
+  "air_end_patrol": {
+   "per_game": 6.9182539682539685,
+   "share_of_decisions": 0.004516720727069236
+  },
+  "economy_advance": {
+   "per_game": 6.26031746031746,
+   "share_of_decisions": 0.004087173694519
+  },
+  "naval_remove_raider": {
+   "per_game": 5.872619047619048,
+   "share_of_decisions": 0.0038340570173166005
+  },
+  "naval_select_bombardment": {
+   "per_game": 5.323015873015873,
+   "share_of_decisions": 0.003475237572152502
+  },
+  "land_progress_battle": {
+   "per_game": 5.088095238095238,
+   "share_of_decisions": 0.003321864928443371
+  },
+  "air_fly": {
+   "per_game": 5.000396825396826,
+   "share_of_decisions": 0.003264609262464118
+  },
+  "air_land_noncombat": {
+   "per_game": 4.965873015873016,
+   "share_of_decisions": 0.003242069701648756
+  },
+  "recruitment_place_militia": {
+   "per_game": 4.405555555555556,
+   "share_of_decisions": 0.0028762552203695454
+  },
+  "naval_unload": {
+   "per_game": 3.594047619047619,
+   "share_of_decisions": 0.0023464460035026997
+  },
+  "air_support": {
+   "per_game": 1.7857142857142858,
+   "share_of_decisions": 0.0011658393525187311
+  },
+  "land_pair_artillery": {
+   "per_game": 1.7265873015873017,
+   "share_of_decisions": 0.0011272371161797777
+  },
+  "politics_declare_war": {
+   "per_game": 1.6031746031746033,
+   "share_of_decisions": 0.0010466646631501497
+  },
+  "naval_shore_casualty": {
+   "per_game": 1.2007936507936507,
+   "share_of_decisions": 0.000783962195715929
+  },
+  "air_defend": {
+   "per_game": 1.1734126984126985,
+   "share_of_decisions": 0.0007660859923106418
+  },
+  "naval_roll_capture": {
+   "per_game": 1.075,
+   "share_of_decisions": 0.0007018352902162761
+  },
+  "influence_roll": {
+   "per_game": 1.048015873015873,
+   "share_of_decisions": 0.0006842181622226598
+  },
+  "pass_interrupt": {
+   "per_game": 1.032936507936508,
+   "share_of_decisions": 0.0006743732965791683
+  },
+  "economy_lease_declare": {
+   "per_game": 1.0226190476190475,
+   "share_of_decisions": 0.0006676373358757267
+  },
+  "politics_priority_decline": {
+   "per_game": 1.0,
+   "share_of_decisions": 0.0006528700374104894
+  },
+  "air_bomb": {
+   "per_game": 0.9801587301587301,
+   "share_of_decisions": 0.0006399162668269479
+  },
+  "air_begin_bombing": {
+   "per_game": 0.9777777777777777,
+   "share_of_decisions": 0.000638361814356923
+  },
+  "recruitment_place_infantry": {
+   "per_game": 0.8496031746031746,
+   "share_of_decisions": 0.0005546804563872452
+  },
+  "air_ground": {
+   "per_game": 0.7277777777777777,
+   "share_of_decisions": 0.0004751443050043006
+  },
+  "politics_choose_capital": {
+   "per_game": 0.6476190476190476,
+   "share_of_decisions": 0.00042281107184679315
+  },
+  "economy_request_rail": {
+   "per_game": 0.5972222222222222,
+   "share_of_decisions": 0.00038990849456459783
+  },
+  "naval_strategic_pickup": {
+   "per_game": 0.5511904761904762,
+   "share_of_decisions": 0.0003598557468107817
+  },
+  "naval_begin_battle": {
+   "per_game": 0.4797619047619048,
+   "share_of_decisions": 0.0003132221727100324
+  },
+  "air_choose_rail_border": {
+   "per_game": 0.46150793650793653,
+   "share_of_decisions": 0.0003013047037731743
+  },
+  "naval_take_casualty": {
+   "per_game": 0.4599206349206349,
+   "share_of_decisions": 0.0003002684021264909
+  },
+  "politics_priority_declare": {
+   "per_game": 0.3968253968253968,
+   "share_of_decisions": 0.0002590754116708291
+  },
+  "economy_repair": {
+   "per_game": 0.3472222222222222,
+   "share_of_decisions": 0.0002266909852119755
+  },
+  "economy_approve_rail": {
+   "per_game": 0.3325396825396825,
+   "share_of_decisions": 0.0002171051949801548
+  },
+  "naval_strategic_continue": {
+   "per_game": 0.2992063492063492,
+   "share_of_decisions": 0.00019534286039980516
+  },
+  "economy_decline_rail": {
+   "per_game": 0.2646825396825397,
+   "share_of_decisions": 0.00017280329958444305
+  },
+  "economy_lease_deliver": {
+   "per_game": 0.25595238095238093,
+   "share_of_decisions": 0.00016710364052768478
+  },
+  "politics_keep_capture": {
+   "per_game": 0.24166666666666667,
+   "share_of_decisions": 0.00015777692570753495
+  },
+  "economy_lease_upgrade": {
+   "per_game": 0.21706349206349207,
+   "share_of_decisions": 0.00014171425018394353
+  },
+  "naval_progress_battle": {
+   "per_game": 0.20595238095238094,
+   "share_of_decisions": 0.0001344601386571603
+  },
+  "naval_port_attack": {
+   "per_game": 0.1976190476190476,
+   "share_of_decisions": 0.00012901955501207291
+  },
+  "naval_decline_scramble": {
+   "per_game": 0.1738095238095238,
+   "share_of_decisions": 0.00011347503031182315
+  },
+  "naval_screen_add": {
+   "per_game": 0.16587301587301587,
+   "share_of_decisions": 0.00010829352207840658
+  },
+  "naval_screen_confirm": {
+   "per_game": 0.16507936507936508,
+   "share_of_decisions": 0.00010777537125506492
+  },
+  "air_failed_landing": {
+   "per_game": 0.16507936507936508,
+   "share_of_decisions": 0.00010777537125506492
+  },
+  "air_scramble": {
+   "per_game": 0.15436507936507937,
+   "share_of_decisions": 0.00010078033513995254
+  },
+  "air_load": {
+   "per_game": 0.12698412698412698,
+   "share_of_decisions": 8.290413173466532e-05
+  },
+  "naval_air_attack": {
+   "per_game": 0.11150793650793651,
+   "share_of_decisions": 7.2800190679503e-05
+  },
+  "naval_scramble": {
+   "per_game": 0.0992063492063492,
+   "share_of_decisions": 6.476885291770727e-05
+  },
+  "politics_give_capture": {
+   "per_game": 0.09722222222222222,
+   "share_of_decisions": 6.347347585935314e-05
+  },
+  "naval_reaction_engage": {
+   "per_game": 0.054365079365079366,
+   "share_of_decisions": 3.549333139890359e-05
+  },
+  "air_unload": {
+   "per_game": 0.05396825396825397,
+   "share_of_decisions": 3.523425598723276e-05
+  },
+  "naval_reaction_decline": {
+   "per_game": 0.051587301587301584,
+   "share_of_decisions": 3.367980351720779e-05
+  },
+  "air_decline_scramble": {
+   "per_game": 0.05,
+   "share_of_decisions": 3.2643501870524474e-05
+  },
+  "naval_retreat_begin": {
+   "per_game": 0.04801587301587302,
+   "share_of_decisions": 3.134812481217033e-05
+  },
+  "economy_lease_place": {
+   "per_game": 0.04404761904761905,
+   "share_of_decisions": 2.8757370695462037e-05
+  },
+  "naval_sub_decline": {
+   "per_game": 0.039285714285714285,
+   "share_of_decisions": 2.5648465755412085e-05
+  },
+  "air_choose_casualty": {
+   "per_game": 0.03888888888888889,
+   "share_of_decisions": 2.5389390343741254e-05
+  },
+  "air_assault": {
+   "per_game": 0.037698412698412696,
+   "share_of_decisions": 2.4612164108728767e-05
+  },
+  "naval_sub_protected": {
+   "per_game": 0.03134920634920635,
+   "share_of_decisions": 2.04669575219955e-05
+  },
+  "air_escort": {
+   "per_game": 0.030952380952380953,
+   "share_of_decisions": 2.0207882110324673e-05
+  },
+  "naval_sub_unprotected": {
+   "per_game": 0.030952380952380953,
+   "share_of_decisions": 2.0207882110324673e-05
+  },
+  "naval_continue_fighting": {
+   "per_game": 0.02857142857142857,
+   "share_of_decisions": 1.8653429640299695e-05
+  },
+  "naval_engage_force": {
+   "per_game": 0.02619047619047619,
+   "share_of_decisions": 1.7098977170274724e-05
+  },
+  "naval_patrol_attack": {
+   "per_game": 0.023015873015873017,
+   "share_of_decisions": 1.502637387690809e-05
+  },
+  "naval_retreat_unit": {
+   "per_game": 0.019444444444444445,
+   "share_of_decisions": 1.2694695171870627e-05
+  },
+  "naval_patrol_decline": {
+   "per_game": 0.01507936507936508,
+   "share_of_decisions": 9.844865643491506e-06
+  },
+  "naval_patrol_engage": {
+   "per_game": 0.014682539682539682,
+   "share_of_decisions": 9.585790231820678e-06
+  },
+  "air_resume_bombing": {
+   "per_game": 0.011507936507936509,
+   "share_of_decisions": 7.513186938454045e-06
+  },
+  "air_screen_continue": {
+   "per_game": 0.009523809523809525,
+   "share_of_decisions": 6.2178098800999e-06
+  },
+  "naval_decline_evacuation": {
+   "per_game": 0.007142857142857143,
+   "share_of_decisions": 4.663357410074924e-06
+  },
+  "naval_ignore_raider": {
+   "per_game": 0.006746031746031746,
+   "share_of_decisions": 4.404281998404095e-06
+  },
+  "naval_evacuate_port": {
+   "per_game": 0.006746031746031746,
+   "share_of_decisions": 4.404281998404095e-06
+  },
+  "naval_discover_raider": {
+   "per_game": 0.006349206349206349,
+   "share_of_decisions": 4.145206586733266e-06
+  },
+  "air_intercept": {
+   "per_game": 0.001984126984126984,
+   "share_of_decisions": 1.2953770583541457e-06
+  },
+  "naval_finish_evacuation": {
+   "per_game": 0.001984126984126984,
+   "share_of_decisions": 1.2953770583541457e-06
+  },
+  "naval_raider_stay": {
+   "per_game": 0.001984126984126984,
+   "share_of_decisions": 1.2953770583541457e-06
+  },
+  "air_decline_intercept": {
+   "per_game": 0.001984126984126984,
+   "share_of_decisions": 1.2953770583541457e-06
+  },
+  "naval_raider_slip": {
+   "per_game": 0.0011904761904761906,
+   "share_of_decisions": 7.772262350124875e-07
+  },
+  "naval_decline_pair": {
+   "per_game": 0.0011904761904761906,
+   "share_of_decisions": 7.772262350124875e-07
+  },
+  "land_finish_blitz_pairing": {
+   "per_game": 0.0007936507936507937,
+   "share_of_decisions": 5.181508233416582e-07
+  },
+  "land_pair_blitz": {
+   "per_game": 0.0007936507936507937,
+   "share_of_decisions": 5.181508233416582e-07
+  },
+  "land_casualty_dispute": {
+   "per_game": 0.0007936507936507937,
+   "share_of_decisions": 5.181508233416582e-07
+  },
+  "land_casualty_accept": {
+   "per_game": 0.0007936507936507937,
+   "share_of_decisions": 5.181508233416582e-07
+  },
+  "naval_pair_destroyer": {
+   "per_game": 0.0007936507936507937,
+   "share_of_decisions": 5.181508233416582e-07
+  },
+  "naval_screen_continue_route": {
+   "per_game": 0.0003968253968253968,
+   "share_of_decisions": 2.590754116708291e-07
+  },
+  "naval_screen_stop_route": {
+   "per_game": 0.0003968253968253968,
+   "share_of_decisions": 2.590754116708291e-07
+  },
+  "economy_lease_repair": {
+   "per_game": 0.0003968253968253968,
+   "share_of_decisions": 2.590754116708291e-07
+  },
+  "naval_carrier_land": {
+   "per_game": 0.0003968253968253968,
+   "share_of_decisions": 2.590754116708291e-07
+  }
+ },
+ "final_scores": {
+  "choice_b": {
+   "scores": {
+    "axis": {
+     "mean": 31.04472222222222,
+     "sd": 13.985895035593105,
+     "min": -4.5,
+     "max": 99.3,
+     "p10": 13.700000000000003,
+     "p90": 49.3
+    },
+    "allies": {
+     "mean": -54.51710317460318,
+     "sd": 15.05237373581462,
+     "min": -113.10000000000001,
+     "max": -1.0999999999999943,
+     "p10": -73.1,
+     "p90": -35.2
+    },
+    "comintern": {
+     "mean": -89.24738095238095,
+     "sd": 13.69267229574869,
+     "min": -124.7,
+     "max": -34.89999999999999,
+     "p10": -106.0,
+     "p90": -69.90000000000002
+    }
+   },
+   "correlations": {
+    "axis~allies": -0.674563929193344,
+    "axis~comintern": -0.21417950963935106,
+    "allies~comintern": -0.5140397936385201
+   },
+   "score_formula_max_error": 2.842170943040401e-14,
+   "wealth": {
+    "axis": {
+     "mean": 71.88224206349206,
+     "sd": 7.109300302206655
+    },
+    "allies": {
+     "mean": 29.101329365079366,
+     "sd": 8.675568425961945
+    },
+    "comintern": {
+     "mean": 11.736190476190476,
+     "sd": 5.877065132587543
+    }
+   },
+   "total_wealth": {
+    "mean": 112.7197619047619,
+    "sd": 5.632196895056629
+   }
+  },
+  "first_update": {
+   "scores": {
+    "axis": {
+     "mean": 35.536904761904765,
+     "sd": 11.503809655782351,
+     "min": 2.0999999999999943,
+     "max": 77.7,
+     "p10": 23.200000000000003,
+     "p90": 52.0
+    },
+    "allies": {
+     "mean": -55.65396825396826,
+     "sd": 12.503543088577434,
+     "min": -88.29999999999998,
+     "max": -17.10000000000001,
+     "p10": -72.3,
+     "p90": -40.39999999999999
+    },
+    "comintern": {
+     "mean": -98.18769841269841,
+     "sd": 11.112433699662729,
+     "min": -120.60000000000001,
+     "max": -65.30000000000001,
+     "p10": -111.30000000000001,
+     "p90": -82.80000000000001
+    }
+   },
+   "correlations": {
+    "axis~allies": -0.7084217691130952,
+    "axis~comintern": -0.20158792552387877,
+    "allies~comintern": -0.46193911265074933
+   },
+   "score_formula_max_error": 2.842170943040401e-14,
+   "wealth": {
+    "axis": {
+     "mean": 76.92083333333333,
+     "sd": 6.15338734331041
+    },
+    "allies": {
+     "mean": 31.325396825396826,
+     "sd": 7.146392526073764
+    },
+    "comintern": {
+     "mean": 10.058531746031745,
+     "sd": 4.606510271286309
+    }
+   },
+   "total_wealth": {
+    "mean": 118.30476190476192,
+    "sd": 5.334580223243836
+   }
+  }
+ },
+ "per_update": [
+  {
+   "run": "First night",
+   "update": 1,
+   "cumulative": 1,
+   "games": 252,
+   "axis_score_mean": 35.536904761904765,
+   "axis_score_sd": 11.503809655782351,
+   "allies_score_mean": -55.65396825396826,
+   "allies_score_sd": 12.503543088577434,
+   "comintern_score_mean": -98.18769841269841,
+   "comintern_score_sd": 11.112433699662729,
+   "axis_decisions": 575.7420634920635,
+   "allies_decisions": 214.68253968253967,
+   "comintern_decisions": 213.48809523809524,
+   "land_begin_battle": 42.06349206349206,
+   "economy_purchase": 69.11111111111111,
+   "end_phase": 220.98015873015873,
+   "movement_route": 131.265873015873,
+   "naval_route": 91.4484126984127,
+   "chance": 136.15873015873015,
+   "game_minutes": 36.655865310716834
+  },
+  {
+   "run": "First night",
+   "update": 2,
+   "cumulative": 2,
+   "games": 252,
+   "axis_score_mean": 35.493253968253974,
+   "axis_score_sd": 10.6437192320458,
+   "allies_score_mean": -57.89166666666667,
+   "allies_score_sd": 13.628276863891651,
+   "comintern_score_mean": -94.47301587301588,
+   "comintern_score_sd": 14.146892512516777,
+   "axis_decisions": 585.4880952380952,
+   "allies_decisions": 266.33730158730157,
+   "comintern_decisions": 248.46031746031747,
+   "land_begin_battle": 46.33730158730159,
+   "economy_purchase": 76.37698412698413,
+   "end_phase": 220.98809523809524,
+   "movement_route": 189.23015873015873,
+   "naval_route": 96.96031746031746,
+   "chance": 153.27777777777777,
+   "game_minutes": 37.99153672968227
+  },
+  {
+   "run": "First night",
+   "update": 3,
+   "cumulative": 3,
+   "games": 252,
+   "axis_score_mean": 34.31269841269842,
+   "axis_score_sd": 12.522114201842337,
+   "allies_score_mean": -60.16388888888889,
+   "allies_score_sd": 14.778524500433592,
+   "comintern_score_mean": -88.9202380952381,
+   "comintern_score_sd": 15.533765661947394,
+   "axis_decisions": 683.9126984126984,
+   "allies_decisions": 304.8531746031746,
+   "comintern_decisions": 269.7738095238095,
+   "land_begin_battle": 52.857142857142854,
+   "economy_purchase": 83.68650793650794,
+   "end_phase": 220.9920634920635,
+   "movement_route": 229.40079365079364,
+   "naval_route": 129.60714285714286,
+   "chance": 172.96031746031747,
+   "game_minutes": 39.86070429236488
+  },
+  {
+   "run": "First night",
+   "update": 4,
+   "cumulative": 4,
+   "games": 252,
+   "axis_score_mean": 33.09007936507937,
+   "axis_score_sd": 11.346976921305526,
+   "allies_score_mean": -56.72976190476191,
+   "allies_score_sd": 12.999204202690416,
+   "comintern_score_mean": -90.22976190476192,
+   "comintern_score_sd": 12.124488207166284,
+   "axis_decisions": 753.0039682539683,
+   "allies_decisions": 325.54761904761904,
+   "comintern_decisions": 235.69444444444446,
+   "land_begin_battle": 52.49603174603175,
+   "economy_purchase": 81.98015873015873,
+   "end_phase": 220.96825396825398,
+   "movement_route": 225.26984126984127,
+   "naval_route": 154.36904761904762,
+   "chance": 173.6904761904762,
+   "game_minutes": 41.490164696313016
+  },
+  {
+   "run": "First night",
+   "update": 5,
+   "cumulative": 5,
+   "games": 252,
+   "axis_score_mean": 30.684126984126987,
+   "axis_score_sd": 12.8091097606471,
+   "allies_score_mean": -55.81785714285714,
+   "allies_score_sd": 16.61967461277418,
+   "comintern_score_mean": -86.00515873015873,
+   "comintern_score_sd": 14.137264381690397,
+   "axis_decisions": 859.6746031746031,
+   "allies_decisions": 350.1984126984127,
+   "comintern_decisions": 250.22619047619048,
+   "land_begin_battle": 57.68650793650794,
+   "economy_purchase": 84.72619047619048,
+   "end_phase": 221.0,
+   "movement_route": 237.484126984127,
+   "naval_route": 200.59920634920636,
+   "chance": 193.29761904761904,
+   "game_minutes": 46.30914857580717
+  },
+  {
+   "run": "First night",
+   "update": 6,
+   "cumulative": 6,
+   "games": 252,
+   "axis_score_mean": 29.192063492063493,
+   "axis_score_sd": 14.186164648635085,
+   "allies_score_mean": -54.12619047619048,
+   "allies_score_sd": 19.26678366413001,
+   "comintern_score_mean": -85.5,
+   "comintern_score_sd": 13.668304569360343,
+   "axis_decisions": 860.218253968254,
+   "allies_decisions": 361.8452380952381,
+   "comintern_decisions": 262.73809523809524,
+   "land_begin_battle": 59.94444444444444,
+   "economy_purchase": 88.48412698412699,
+   "end_phase": 221.0,
+   "movement_route": 237.4404761904762,
+   "naval_route": 206.71031746031747,
+   "chance": 200.88888888888889,
+   "game_minutes": 46.07453333519465
+  },
+  {
+   "run": "First night",
+   "update": 7,
+   "cumulative": 7,
+   "games": 252,
+   "axis_score_mean": 27.243650793650797,
+   "axis_score_sd": 14.709316212229377,
+   "allies_score_mean": -50.49404761904762,
+   "allies_score_sd": 20.49011238289968,
+   "comintern_score_mean": -85.83690476190476,
+   "comintern_score_sd": 14.97018907359757,
+   "axis_decisions": 840.015873015873,
+   "allies_decisions": 399.43650793650795,
+   "comintern_decisions": 265.6031746031746,
+   "land_begin_battle": 62.273809523809526,
+   "economy_purchase": 89.56349206349206,
+   "end_phase": 221.0,
+   "movement_route": 255.45238095238096,
+   "naval_route": 205.03571428571428,
+   "chance": 217.56746031746033,
+   "game_minutes": 44.173174930814554
+  },
+  {
+   "run": "First night",
+   "update": 8,
+   "cumulative": 8,
+   "games": 252,
+   "axis_score_mean": 29.441666666666666,
+   "axis_score_sd": 13.234774383722897,
+   "allies_score_mean": -54.390079365079366,
+   "allies_score_sd": 17.053116596418576,
+   "comintern_score_mean": -84.64285714285714,
+   "comintern_score_sd": 13.84217199968103,
+   "axis_decisions": 869.1984126984127,
+   "allies_decisions": 393.12301587301585,
+   "comintern_decisions": 268.0,
+   "land_begin_battle": 61.02777777777778,
+   "economy_purchase": 90.30555555555556,
+   "end_phase": 220.9920634920635,
+   "movement_route": 257.66269841269843,
+   "naval_route": 216.8015873015873,
+   "chance": 211.73809523809524,
+   "game_minutes": 45.661278188183275
+  },
+  {
+   "run": "First night",
+   "update": 9,
+   "cumulative": 9,
+   "games": 252,
+   "axis_score_mean": 29.046825396825398,
+   "axis_score_sd": 13.073550358085908,
+   "allies_score_mean": -53.54642857142857,
+   "allies_score_sd": 15.899122577924409,
+   "comintern_score_mean": -87.00119047619047,
+   "comintern_score_sd": 12.988819838930548,
+   "axis_decisions": 865.8253968253969,
+   "allies_decisions": 396.515873015873,
+   "comintern_decisions": 263.53968253968253,
+   "land_begin_battle": 59.13095238095238,
+   "economy_purchase": 94.73809523809524,
+   "end_phase": 221.0,
+   "movement_route": 263.12698412698415,
+   "naval_route": 210.71825396825398,
+   "chance": 204.4047619047619,
+   "game_minutes": 46.169998718725175
+  },
+  {
+   "run": "First night",
+   "update": 10,
+   "cumulative": 10,
+   "games": 252,
+   "axis_score_mean": 29.898809523809526,
+   "axis_score_sd": 13.715648091183436,
+   "allies_score_mean": -54.74246031746032,
+   "allies_score_sd": 14.93789476127133,
+   "comintern_score_mean": -88.02698412698412,
+   "comintern_score_sd": 12.206479976556459,
+   "axis_decisions": 814.8968253968254,
+   "allies_decisions": 391.718253968254,
+   "comintern_decisions": 251.25396825396825,
+   "land_begin_battle": 53.97222222222222,
+   "economy_purchase": 94.94444444444444,
+   "end_phase": 221.0,
+   "movement_route": 268.4047619047619,
+   "naval_route": 186.46825396825398,
+   "chance": 189.13492063492063,
+   "game_minutes": 44.82623809534615
+  },
+  {
+   "run": "First night",
+   "update": 11,
+   "cumulative": 11,
+   "games": 252,
+   "axis_score_mean": 29.65039682539683,
+   "axis_score_sd": 11.564833692187623,
+   "allies_score_mean": -55.035714285714285,
+   "allies_score_sd": 12.37519987708172,
+   "comintern_score_mean": -89.86785714285715,
+   "comintern_score_sd": 12.35083261590909,
+   "axis_decisions": 813.8571428571429,
+   "allies_decisions": 387.468253968254,
+   "comintern_decisions": 253.4047619047619,
+   "land_begin_battle": 49.96825396825397,
+   "economy_purchase": 96.40873015873017,
+   "end_phase": 221.0,
+   "movement_route": 275.75,
+   "naval_route": 188.35714285714286,
+   "chance": 184.1626984126984,
+   "game_minutes": 45.41329769816146
+  },
+  {
+   "run": "First night",
+   "update": 12,
+   "cumulative": 12,
+   "games": 252,
+   "axis_score_mean": 29.13650793650794,
+   "axis_score_sd": 12.933720732257074,
+   "allies_score_mean": -55.574603174603176,
+   "allies_score_sd": 14.432863873911456,
+   "comintern_score_mean": -86.87738095238096,
+   "comintern_score_sd": 14.165740765662573,
+   "axis_decisions": 804.9206349206349,
+   "allies_decisions": 370.17857142857144,
+   "comintern_decisions": 266.57936507936506,
+   "land_begin_battle": 51.535714285714285,
+   "economy_purchase": 93.38095238095238,
+   "end_phase": 220.9920634920635,
+   "movement_route": 264.9642857142857,
+   "naval_route": 186.97619047619048,
+   "chance": 190.9047619047619,
+   "game_minutes": 44.46714205230638
+  },
+  {
+   "run": "First night",
+   "update": 13,
+   "cumulative": 13,
+   "games": 252,
+   "axis_score_mean": 29.33650793650794,
+   "axis_score_sd": 15.397868653539357,
+   "allies_score_mean": -56.715476190476195,
+   "allies_score_sd": 16.48092579049434,
+   "comintern_score_mean": -85.11190476190477,
+   "comintern_score_sd": 14.158680173161397,
+   "axis_decisions": 812.984126984127,
+   "allies_decisions": 365.35714285714283,
+   "comintern_decisions": 268.7857142857143,
+   "land_begin_battle": 54.666666666666664,
+   "economy_purchase": 95.63888888888889,
+   "end_phase": 220.99603174603175,
+   "movement_route": 255.12698412698413,
+   "naval_route": 186.8293650793651,
+   "chance": 200.47619047619048,
+   "game_minutes": 45.16284903526784
+  },
+  {
+   "run": "Morning",
+   "update": 1,
+   "cumulative": 14,
+   "games": 252,
+   "axis_score_mean": 27.743650793650797,
+   "axis_score_sd": 14.455997230952768,
+   "allies_score_mean": -54.38174603174603,
+   "allies_score_sd": 17.839987765497256,
+   "comintern_score_mean": -84.52182539682539,
+   "comintern_score_sd": 14.942254047405333,
+   "axis_decisions": 823.7222222222222,
+   "allies_decisions": 385.218253968254,
+   "comintern_decisions": 265.3968253968254,
+   "land_begin_battle": 56.8531746031746,
+   "economy_purchase": 94.66666666666667,
+   "end_phase": 221.0,
+   "movement_route": 259.1031746031746,
+   "naval_route": 195.68253968253967,
+   "chance": 204.69444444444446,
+   "game_minutes": 57.61365992713842
+  },
+  {
+   "run": "Morning",
+   "update": 2,
+   "cumulative": 15,
+   "games": 252,
+   "axis_score_mean": 28.047222222222224,
+   "axis_score_sd": 14.929458039487267,
+   "allies_score_mean": -55.11468253968255,
+   "allies_score_sd": 17.74656643459637,
+   "comintern_score_mean": -83.61111111111111,
+   "comintern_score_sd": 13.865438831123846,
+   "axis_decisions": 845.2103174603175,
+   "allies_decisions": 386.7936507936508,
+   "comintern_decisions": 265.6507936507937,
+   "land_begin_battle": 54.20634920634921,
+   "economy_purchase": 93.51984126984127,
+   "end_phase": 221.0,
+   "movement_route": 272.41269841269843,
+   "naval_route": 204.76190476190476,
+   "chance": 199.31746031746033,
+   "game_minutes": 57.29873082115025
+  },
+  {
+   "run": "Morning",
+   "update": 3,
+   "cumulative": 16,
+   "games": 252,
+   "axis_score_mean": 24.854761904761908,
+   "axis_score_sd": 14.460291043909141,
+   "allies_score_mean": -52.23849206349207,
+   "allies_score_sd": 18.627899290580686,
+   "comintern_score_mean": -86.14325396825397,
+   "comintern_score_sd": 13.646851939387409,
+   "axis_decisions": 808.047619047619,
+   "allies_decisions": 411.20238095238096,
+   "comintern_decisions": 259.26190476190476,
+   "land_begin_battle": 52.73412698412698,
+   "economy_purchase": 96.56349206349206,
+   "end_phase": 220.99603174603175,
+   "movement_route": 287.07936507936506,
+   "naval_route": 194.1984126984127,
+   "chance": 189.7579365079365,
+   "game_minutes": 55.899598926727975
+  },
+  {
+   "run": "Morning",
+   "update": 4,
+   "cumulative": 17,
+   "games": 252,
+   "axis_score_mean": 28.262698412698416,
+   "axis_score_sd": 13.014954525281174,
+   "allies_score_mean": -54.13055555555556,
+   "allies_score_sd": 15.924550031760168,
+   "comintern_score_mean": -88.80634920634921,
+   "comintern_score_sd": 12.09432546820845,
+   "axis_decisions": 806.7936507936508,
+   "allies_decisions": 386.2261904761905,
+   "comintern_decisions": 242.92460317460316,
+   "land_begin_battle": 50.54365079365079,
+   "economy_purchase": 92.77777777777777,
+   "end_phase": 220.99603174603175,
+   "movement_route": 265.3968253968254,
+   "naval_route": 188.38095238095238,
+   "chance": 181.34920634920636,
+   "game_minutes": 61.219266236874304
+  },
+  {
+   "run": "Morning",
+   "update": 5,
+   "cumulative": 18,
+   "games": 252,
+   "axis_score_mean": 28.215476190476192,
+   "axis_score_sd": 14.025700605017285,
+   "allies_score_mean": -54.046031746031744,
+   "allies_score_sd": 15.458543200942401,
+   "comintern_score_mean": -88.00357142857143,
+   "comintern_score_sd": 13.054563212157513,
+   "axis_decisions": 864.6349206349206,
+   "allies_decisions": 373.45238095238096,
+   "comintern_decisions": 250.49603174603175,
+   "land_begin_battle": 52.40079365079365,
+   "economy_purchase": 95.01190476190476,
+   "end_phase": 220.99603174603175,
+   "movement_route": 254.83333333333334,
+   "naval_route": 208.57539682539684,
+   "chance": 187.28571428571428,
+   "game_minutes": 57.715425530155905
+  },
+  {
+   "run": "Morning",
+   "update": 6,
+   "cumulative": 19,
+   "games": 252,
+   "axis_score_mean": 29.96666666666667,
+   "axis_score_sd": 15.595844272296933,
+   "allies_score_mean": -56.90357142857143,
+   "allies_score_sd": 17.233464479060874,
+   "comintern_score_mean": -85.09087301587302,
+   "comintern_score_sd": 13.880668004628854,
+   "axis_decisions": 844.2539682539683,
+   "allies_decisions": 377.5674603174603,
+   "comintern_decisions": 267.32142857142856,
+   "land_begin_battle": 56.13492063492063,
+   "economy_purchase": 94.3452380952381,
+   "end_phase": 220.9920634920635,
+   "movement_route": 266.25396825396825,
+   "naval_route": 198.12698412698413,
+   "chance": 204.41666666666666,
+   "game_minutes": 56.79511418722132
+  },
+  {
+   "run": "Morning",
+   "update": 7,
+   "cumulative": 20,
+   "games": 252,
+   "axis_score_mean": 31.856349206349208,
+   "axis_score_sd": 16.592985586757734,
+   "allies_score_mean": -55.17817460317461,
+   "allies_score_sd": 18.305337427317696,
+   "comintern_score_mean": -89.2936507936508,
+   "comintern_score_sd": 15.839980411834171,
+   "axis_decisions": 866.3492063492064,
+   "allies_decisions": 379.8690476190476,
+   "comintern_decisions": 264.0515873015873,
+   "land_begin_battle": 56.22222222222222,
+   "economy_purchase": 91.73412698412699,
+   "end_phase": 220.99603174603175,
+   "movement_route": 269.30555555555554,
+   "naval_route": 206.1904761904762,
+   "chance": 204.73809523809524,
+   "game_minutes": 54.62997072266575
+  },
+  {
+   "run": "Morning",
+   "update": 8,
+   "cumulative": 21,
+   "games": 252,
+   "axis_score_mean": 31.515079365079366,
+   "axis_score_sd": 16.29169645250147,
+   "allies_score_mean": -53.89603174603175,
+   "allies_score_sd": 19.085896842794916,
+   "comintern_score_mean": -89.23134920634921,
+   "comintern_score_sd": 14.52340360782061,
+   "axis_decisions": 872.047619047619,
+   "allies_decisions": 395.12698412698415,
+   "comintern_decisions": 254.47222222222223,
+   "land_begin_battle": 56.66269841269841,
+   "economy_purchase": 89.9484126984127,
+   "end_phase": 220.99603174603175,
+   "movement_route": 276.89285714285717,
+   "naval_route": 208.59920634920636,
+   "chance": 207.05555555555554,
+   "game_minutes": 54.36755506464124
+  },
+  {
+   "run": "Morning",
+   "update": 9,
+   "cumulative": 22,
+   "games": 252,
+   "axis_score_mean": 31.7202380952381,
+   "axis_score_sd": 15.121809108041832,
+   "allies_score_mean": -53.087698412698415,
+   "allies_score_sd": 17.721292015469057,
+   "comintern_score_mean": -90.66031746031747,
+   "comintern_score_sd": 14.356777648227688,
+   "axis_decisions": 855.3611111111111,
+   "allies_decisions": 398.31349206349205,
+   "comintern_decisions": 248.36111111111111,
+   "land_begin_battle": 56.80555555555556,
+   "economy_purchase": 91.4484126984127,
+   "end_phase": 220.99603174603175,
+   "movement_route": 270.07936507936506,
+   "naval_route": 200.38095238095238,
+   "chance": 205.97619047619048,
+   "game_minutes": 55.675388122698386
+  },
+  {
+   "run": "Afternoon",
+   "update": 1,
+   "cumulative": 23,
+   "games": 252,
+   "axis_score_mean": 27.665476190476195,
+   "axis_score_sd": 13.99572069528066,
+   "allies_score_mean": -52.840476190476195,
+   "allies_score_sd": 18.64192968557229,
+   "comintern_score_mean": -88.63174603174603,
+   "comintern_score_sd": 14.423664435364824,
+   "axis_decisions": 824.4880952380952,
+   "allies_decisions": 377.41269841269843,
+   "comintern_decisions": 259.16269841269843,
+   "land_begin_battle": 51.76984126984127,
+   "economy_purchase": 92.01984126984127,
+   "end_phase": 220.9920634920635,
+   "movement_route": 267.4404761904762,
+   "naval_route": 187.5952380952381,
+   "chance": 189.61111111111111,
+   "game_minutes": 51.42458731151415
+  },
+  {
+   "run": "Afternoon",
+   "update": 2,
+   "cumulative": 24,
+   "games": 252,
+   "axis_score_mean": 28.77777777777778,
+   "axis_score_sd": 14.262666217495783,
+   "allies_score_mean": -54.07817460317461,
+   "allies_score_sd": 16.973678939296942,
+   "comintern_score_mean": -87.57222222222222,
+   "comintern_score_sd": 14.65205009322874,
+   "axis_decisions": 810.4642857142857,
+   "allies_decisions": 392.42857142857144,
+   "comintern_decisions": 252.53571428571428,
+   "land_begin_battle": 53.09920634920635,
+   "economy_purchase": 92.74603174603175,
+   "end_phase": 221.0,
+   "movement_route": 267.6507936507937,
+   "naval_route": 182.84920634920636,
+   "chance": 190.65873015873015,
+   "game_minutes": 50.64555409284113
+  },
+  {
+   "run": "Afternoon",
+   "update": 3,
+   "cumulative": 25,
+   "games": 252,
+   "axis_score_mean": 31.153968253968255,
+   "axis_score_sd": 13.67376964198592,
+   "allies_score_mean": -53.66150793650794,
+   "allies_score_sd": 15.417206797800695,
+   "comintern_score_mean": -89.69761904761904,
+   "comintern_score_sd": 13.223111267750756,
+   "axis_decisions": 828.3333333333334,
+   "allies_decisions": 406.06349206349205,
+   "comintern_decisions": 239.86507936507937,
+   "land_begin_battle": 52.801587301587304,
+   "economy_purchase": 93.32142857142857,
+   "end_phase": 220.9920634920635,
+   "movement_route": 277.4761904761905,
+   "naval_route": 187.97222222222223,
+   "chance": 189.15079365079364,
+   "game_minutes": 51.38847223645835
+  },
+  {
+   "run": "Afternoon",
+   "update": 4,
+   "cumulative": 26,
+   "games": 252,
+   "axis_score_mean": 30.294444444444448,
+   "axis_score_sd": 14.045635953261876,
+   "allies_score_mean": -53.67896825396826,
+   "allies_score_sd": 16.40708700868445,
+   "comintern_score_mean": -89.68730158730159,
+   "comintern_score_sd": 13.471134754504588,
+   "axis_decisions": 832.8888888888889,
+   "allies_decisions": 409.1468253968254,
+   "comintern_decisions": 241.40873015873015,
+   "land_begin_battle": 53.36904761904762,
+   "economy_purchase": 93.87301587301587,
+   "end_phase": 221.0,
+   "movement_route": 277.0238095238095,
+   "naval_route": 193.13888888888889,
+   "chance": 192.71031746031747,
+   "game_minutes": 50.191156270238395
+  },
+  {
+   "run": "Afternoon",
+   "update": 5,
+   "cumulative": 27,
+   "games": 252,
+   "axis_score_mean": 28.885714285714286,
+   "axis_score_sd": 11.63921941418017,
+   "allies_score_mean": -52.360714285714295,
+   "allies_score_sd": 13.832293911938443,
+   "comintern_score_mean": -89.2404761904762,
+   "comintern_score_sd": 14.275734732852717,
+   "axis_decisions": 806.8730158730159,
+   "allies_decisions": 405.0595238095238,
+   "comintern_decisions": 248.49603174603175,
+   "land_begin_battle": 56.07936507936508,
+   "economy_purchase": 92.90873015873017,
+   "end_phase": 220.99603174603175,
+   "movement_route": 274.31349206349205,
+   "naval_route": 180.1706349206349,
+   "chance": 197.0079365079365,
+   "game_minutes": 50.088618986467154
+  },
+  {
+   "run": "Afternoon",
+   "update": 6,
+   "cumulative": 28,
+   "games": 252,
+   "axis_score_mean": 30.529761904761905,
+   "axis_score_sd": 13.179627340540213,
+   "allies_score_mean": -54.215476190476195,
+   "allies_score_sd": 14.112099530501952,
+   "comintern_score_mean": -88.85079365079366,
+   "comintern_score_sd": 13.425766070758584,
+   "axis_decisions": 855.0595238095239,
+   "allies_decisions": 395.3253968253968,
+   "comintern_decisions": 244.50396825396825,
+   "land_begin_battle": 54.801587301587304,
+   "economy_purchase": 93.66666666666667,
+   "end_phase": 220.9920634920635,
+   "movement_route": 265.781746031746,
+   "naval_route": 203.14285714285714,
+   "chance": 196.72619047619048,
+   "game_minutes": 54.57569259870544
+  },
+  {
+   "run": "Choice B",
+   "update": 1,
+   "cumulative": 29,
+   "games": 252,
+   "axis_score_mean": 32.48571428571429,
+   "axis_score_sd": 13.830321871649286,
+   "allies_score_mean": -54.40992063492064,
+   "allies_score_sd": 15.009089569817073,
+   "comintern_score_mean": -90.97539682539683,
+   "comintern_score_sd": 13.599336089419142,
+   "axis_decisions": 869.5198412698413,
+   "allies_decisions": 388.5515873015873,
+   "comintern_decisions": 248.12301587301587,
+   "land_begin_battle": 51.95238095238095,
+   "economy_purchase": 95.22222222222223,
+   "end_phase": 220.9920634920635,
+   "movement_route": 266.7420634920635,
+   "naval_route": 206.93253968253967,
+   "chance": 193.20238095238096,
+   "game_minutes": 47.566700853386536
+  },
+  {
+   "run": "Choice B",
+   "update": 2,
+   "cumulative": 30,
+   "games": 252,
+   "axis_score_mean": 31.53968253968254,
+   "axis_score_sd": 14.179585681465472,
+   "allies_score_mean": -54.97539682539683,
+   "allies_score_sd": 14.954257939436284,
+   "comintern_score_mean": -89.98373015873017,
+   "comintern_score_sd": 13.200933097173811,
+   "axis_decisions": 899.734126984127,
+   "allies_decisions": 391.968253968254,
+   "comintern_decisions": 253.10714285714286,
+   "land_begin_battle": 51.198412698412696,
+   "economy_purchase": 96.47222222222223,
+   "end_phase": 220.98809523809524,
+   "movement_route": 277.0674603174603,
+   "naval_route": 219.33333333333334,
+   "chance": 190.515873015873,
+   "game_minutes": 48.486014301915034
+  },
+  {
+   "run": "Choice B",
+   "update": 3,
+   "cumulative": 31,
+   "games": 252,
+   "axis_score_mean": 31.908333333333335,
+   "axis_score_sd": 15.004216206922097,
+   "allies_score_mean": -54.86309523809524,
+   "allies_score_sd": 15.930867427572098,
+   "comintern_score_mean": -88.91626984126985,
+   "comintern_score_sd": 13.797641592696959,
+   "axis_decisions": 962.4801587301587,
+   "allies_decisions": 404.9484126984127,
+   "comintern_decisions": 255.75396825396825,
+   "land_begin_battle": 53.67460317460318,
+   "economy_purchase": 97.11904761904762,
+   "end_phase": 221.0,
+   "movement_route": 284.5238095238095,
+   "naval_route": 242.53174603174602,
+   "chance": 199.0873015873016,
+   "game_minutes": 52.68892495203651
+  },
+  {
+   "run": "Choice B",
+   "update": 4,
+   "cumulative": 32,
+   "games": 252,
+   "axis_score_mean": 30.404365079365082,
+   "axis_score_sd": 13.503619877442972,
+   "allies_score_mean": -53.98095238095238,
+   "allies_score_sd": 13.586645155423643,
+   "comintern_score_mean": -88.83650793650793,
+   "comintern_score_sd": 12.686376940185193,
+   "axis_decisions": 967.234126984127,
+   "allies_decisions": 399.6547619047619,
+   "comintern_decisions": 256.25396825396825,
+   "land_begin_battle": 55.34920634920635,
+   "economy_purchase": 96.85714285714286,
+   "end_phase": 220.98809523809524,
+   "movement_route": 276.281746031746,
+   "naval_route": 240.98015873015873,
+   "chance": 204.67460317460316,
+   "game_minutes": 52.25882644882875
+  },
+  {
+   "run": "Choice B",
+   "update": 5,
+   "cumulative": 33,
+   "games": 252,
+   "axis_score_mean": 28.677380952380954,
+   "axis_score_sd": 12.107059129394868,
+   "allies_score_mean": -52.382936507936506,
+   "allies_score_sd": 14.469062561971578,
+   "comintern_score_mean": -89.62896825396825,
+   "comintern_score_sd": 13.381416401388709,
+   "axis_decisions": 917.0952380952381,
+   "allies_decisions": 380.88492063492066,
+   "comintern_decisions": 255.47222222222223,
+   "land_begin_battle": 53.95238095238095,
+   "economy_purchase": 94.92857142857143,
+   "end_phase": 221.0,
+   "movement_route": 263.4563492063492,
+   "naval_route": 222.03571428571428,
+   "chance": 197.8015873015873,
+   "game_minutes": 50.380532992973144
+  },
+  {
+   "run": "Choice B",
+   "update": 6,
+   "cumulative": 34,
+   "games": 252,
+   "axis_score_mean": 31.48293650793651,
+   "axis_score_sd": 14.761214472296917,
+   "allies_score_mean": -53.3936507936508,
+   "allies_score_sd": 16.584347951522567,
+   "comintern_score_mean": -90.63333333333334,
+   "comintern_score_sd": 12.57662728178189,
+   "axis_decisions": 901.063492063492,
+   "allies_decisions": 378.3095238095238,
+   "comintern_decisions": 251.88095238095238,
+   "land_begin_battle": 54.73809523809524,
+   "economy_purchase": 94.32539682539682,
+   "end_phase": 220.99603174603175,
+   "movement_route": 257.0238095238095,
+   "naval_route": 214.71825396825398,
+   "chance": 201.87301587301587,
+   "game_minutes": 49.61515530158145
+  },
+  {
+   "run": "Choice B",
+   "update": 7,
+   "cumulative": 35,
+   "games": 252,
+   "axis_score_mean": 29.97698412698413,
+   "axis_score_sd": 14.808405401985315,
+   "allies_score_mean": -54.25238095238095,
+   "allies_score_sd": 15.364107883035322,
+   "comintern_score_mean": -88.42896825396826,
+   "comintern_score_sd": 13.174102104581412,
+   "axis_decisions": 846.9444444444445,
+   "allies_decisions": 375.1111111111111,
+   "comintern_decisions": 258.83730158730157,
+   "land_begin_battle": 54.888888888888886,
+   "economy_purchase": 95.73412698412699,
+   "end_phase": 221.0,
+   "movement_route": 248.28571428571428,
+   "naval_route": 193.9484126984127,
+   "chance": 201.18650793650792,
+   "game_minutes": 47.27934408926636
+  },
+  {
+   "run": "Choice B",
+   "update": 8,
+   "cumulative": 36,
+   "games": 252,
+   "axis_score_mean": 32.05912698412698,
+   "axis_score_sd": 14.837933110637849,
+   "allies_score_mean": -56.20912698412699,
+   "allies_score_sd": 15.475204303620385,
+   "comintern_score_mean": -88.0452380952381,
+   "comintern_score_sd": 15.329723268243736,
+   "axis_decisions": 853.702380952381,
+   "allies_decisions": 376.8452380952381,
+   "comintern_decisions": 258.3412698412698,
+   "land_begin_battle": 54.154761904761905,
+   "economy_purchase": 93.69444444444444,
+   "end_phase": 221.0,
+   "movement_route": 263.17063492063494,
+   "naval_route": 196.0595238095238,
+   "chance": 199.66666666666666,
+   "game_minutes": 47.94268239233062
+  },
+  {
+   "run": "Choice B",
+   "update": 9,
+   "cumulative": 37,
+   "games": 252,
+   "axis_score_mean": 30.742063492063497,
+   "axis_score_sd": 12.907913834145996,
+   "allies_score_mean": -54.88492063492063,
+   "allies_score_sd": 14.494582405753608,
+   "comintern_score_mean": -88.99246031746033,
+   "comintern_score_sd": 15.173101550302416,
+   "axis_decisions": 852.2420634920635,
+   "allies_decisions": 375.734126984127,
+   "comintern_decisions": 256.67063492063494,
+   "land_begin_battle": 54.79365079365079,
+   "economy_purchase": 91.08730158730158,
+   "end_phase": 220.9920634920635,
+   "movement_route": 264.1666666666667,
+   "naval_route": 195.84126984126985,
+   "chance": 200.92460317460316,
+   "game_minutes": 47.70003717983145
+  },
+  {
+   "run": "Choice B",
+   "update": 10,
+   "cumulative": 38,
+   "games": 252,
+   "axis_score_mean": 31.17063492063492,
+   "axis_score_sd": 13.457923612571278,
+   "allies_score_mean": -55.8186507936508,
+   "allies_score_sd": 14.328088250475904,
+   "comintern_score_mean": -88.03293650793651,
+   "comintern_score_sd": 13.620191922140917,
+   "axis_decisions": 843.4166666666666,
+   "allies_decisions": 374.9007936507937,
+   "comintern_decisions": 262.20238095238096,
+   "land_begin_battle": 55.948412698412696,
+   "economy_purchase": 93.94444444444444,
+   "end_phase": 221.0,
+   "movement_route": 255.93253968253967,
+   "naval_route": 193.1547619047619,
+   "chance": 204.46031746031747,
+   "game_minutes": 48.03486841803359
+  }
+ ],
+ "training_samples": {
+  "samples": 25000,
+  "forced": 4445,
+  "searched": {
+   "samples": 20555,
+   "mean_options": 36.800145949890535,
+   "median_options": 16,
+   "top_share": 0.3177269979522461,
+   "visited": 24.727706154220385,
+   "not_top": 0.6332971802623505,
+   "kl": 0.2849207876978275,
+   "agree": 0.40627584529311606,
+   "kl_total": 5856.546791128845
+  },
+  "by_options": {
+   "1": {
+    "samples": 4445,
+    "mean_options": 1.0,
+    "median_options": 1,
+    "top_share": 1.0,
+    "visited": 1.0,
+    "not_top": 0.0,
+    "kl": 0.0,
+    "agree": 1.0,
+    "kl_total": 0.0
+   },
+   "2-4": {
+    "samples": 3971,
+    "mean_options": 2.646688491563838,
+    "median_options": 2,
+    "top_share": 0.6367543416184615,
+    "visited": 2.646688491563838,
+    "not_top": 0.3564862958713037,
+    "kl": 0.09783759339484217,
+    "agree": 0.7015865021405188,
+    "kl_total": 388.51308337091825
+   },
+   "5-16": {
+    "samples": 6399,
+    "mean_options": 10.418815439912485,
+    "median_options": 10,
+    "top_share": 0.35155805547114366,
+    "visited": 10.418815439912485,
+    "not_top": 0.6345018506955762,
+    "kl": 0.2707576706455459,
+    "agree": 0.3891233005157056,
+    "kl_total": 1732.5783344608483
+   },
+   "17-63": {
+    "samples": 7197,
+    "mean_options": 31.41586772266222,
+    "median_options": 28,
+    "top_share": 0.22971135512041052,
+    "visited": 31.397943587605948,
+    "not_top": 0.755122748753924,
+    "kl": 0.3598448955075718,
+    "agree": 0.2621925802417674,
+    "kl_total": 2589.803712967994
+   },
+   "64 or more": {
+    "samples": 2988,
+    "mean_options": 151.65562248995985,
+    "median_options": 128.0,
+    "top_share": 0.033291275963877424,
+    "visited": 68.65026773761714,
+    "not_top": 0.7051608748342314,
+    "kl": 0.383417557004379,
+    "agree": 0.39759036144578314,
+    "kl_total": 1145.6516603290845
+   }
+  },
+  "by_family": {
+   "naval": {
+    "samples": 10055,
+    "mean_options": 22.084932869219294,
+    "median_options": 17,
+    "top_share": 0.29105310685824193,
+    "visited": 21.634709099950275,
+    "not_top": 0.6910854688094348,
+    "kl": 0.2973387731805005,
+    "agree": 0.33664843361511687,
+    "kl_total": 2989.741364329933
+   },
+   "movement": {
+    "samples": 4546,
+    "mean_options": 54.10910690717114,
+    "median_options": 29.0,
+    "top_share": 0.2403812904275497,
+    "visited": 35.56797184337879,
+    "not_top": 0.6737079669411211,
+    "kl": 0.31023148934842937,
+    "agree": 0.3952925648922129,
+    "kl_total": 1410.31235057796
+   },
+   "economy": {
+    "samples": 3257,
+    "mean_options": 75.64967761743937,
+    "median_options": 16,
+    "top_share": 0.3064198894189431,
+    "visited": 30.4995394534848,
+    "not_top": 0.5825527069393514,
+    "kl": 0.330995064700144,
+    "agree": 0.4448879336813018,
+    "kl_total": 1078.050925728369
+   },
+   "land combat": {
+    "samples": 1774,
+    "mean_options": 2.617249154453213,
+    "median_options": 2.0,
+    "top_share": 0.6420167034255478,
+    "visited": 2.617249154453213,
+    "not_top": 0.34997998603773633,
+    "kl": 0.09987535525130614,
+    "agree": 0.6612175873731679,
+    "kl_total": 177.1788802158171
+   },
+   "air": {
+    "samples": 483,
+    "mean_options": 72.15527950310559,
+    "median_options": 78,
+    "top_share": 0.21550819844363608,
+    "visited": 46.73084886128365,
+    "not_top": 0.661764292136582,
+    "kl": 0.3165019886685471,
+    "agree": 0.4078674948240166,
+    "kl_total": 152.87046052690826
+   },
+   "recruitment": {
+    "samples": 358,
+    "mean_options": 5.578212290502793,
+    "median_options": 2.0,
+    "top_share": 0.6348384272889037,
+    "visited": 5.578212290502793,
+    "not_top": 0.3616898902649322,
+    "kl": 0.10708700180570865,
+    "agree": 0.8379888268156425,
+    "kl_total": 38.3371466464437
+   },
+   "politics": {
+    "samples": 58,
+    "mean_options": 6.413793103448276,
+    "median_options": 2.0,
+    "top_share": 0.6042987447248962,
+    "visited": 6.413793103448276,
+    "not_top": 0.3957012552751037,
+    "kl": 0.1313143222762629,
+    "agree": 0.7241379310344828,
+    "kl_total": 7.616230692023249
+   },
+   "influence_roll": {
+    "samples": 24,
+    "mean_options": 5.375,
+    "median_options": 5.0,
+    "top_share": 0.3419563099578693,
+    "visited": 5.375,
+    "not_top": 0.6490110560094967,
+    "kl": 0.10164301714129102,
+    "agree": 0.3333333333333333,
+    "kl_total": 2.4394324113909844
+   }
+  },
+  "by_kind": {
+   "naval_start_move": {
+    "samples": 4800,
+    "mean_options": 28.94729166666667,
+    "median_options": 26.0,
+    "top_share": 0.24271155155119212,
+    "visited": 28.499375,
+    "not_top": 0.7400628823160974,
+    "kl": 0.339415950416613,
+    "agree": 0.2835416666666667,
+    "kl_total": 1629.1965619997425
+   },
+   "movement_route": {
+    "samples": 4546,
+    "mean_options": 54.10910690717114,
+    "median_options": 29.0,
+    "top_share": 0.2403812904275497,
+    "visited": 35.56797184337879,
+    "not_top": 0.6737079669411211,
+    "kl": 0.31023148934842937,
+    "agree": 0.3952925648922129,
+    "kl_total": 1410.31235057796
+   },
+   "naval_route": {
+    "samples": 3609,
+    "mean_options": 11.910778609032974,
+    "median_options": 13,
+    "top_share": 0.3351065305243833,
+    "visited": 11.85840953172624,
+    "not_top": 0.6473470162256267,
+    "kl": 0.24866163415471293,
+    "agree": 0.3881961762261014,
+    "kl_total": 897.419837664359
+   },
+   "economy_purchase": {
+    "samples": 1887,
+    "mean_options": 118.39745627980922,
+    "median_options": 129,
+    "top_share": 0.25409750501470957,
+    "visited": 40.98463169051404,
+    "not_top": 0.568412487229858,
+    "kl": 0.40021270065320586,
+    "agree": 0.4112347641759406,
+    "kl_total": 755.2013661325994
+   },
+   "naval_enter_port": {
+    "samples": 1160,
+    "mean_options": 32.77068965517241,
+    "median_options": 27.0,
+    "top_share": 0.24580978106314674,
+    "visited": 30.88448275862069,
+    "not_top": 0.7288418581631199,
+    "kl": 0.3407788664318638,
+    "agree": 0.2689655172413793,
+    "kl_total": 395.303485060962
+   },
+   "economy_place": {
+    "samples": 1103,
+    "mean_options": 16.924750679963736,
+    "median_options": 9,
+    "top_share": 0.38708697997488933,
+    "visited": 16.039891205802356,
+    "not_top": 0.5894941336923747,
+    "kl": 0.22241890251257304,
+    "agree": 0.5222121486854034,
+    "kl_total": 245.32804947136808
+   },
+   "land_continue_fighting": {
+    "samples": 631,
+    "mean_options": 2.0,
+    "median_options": 2,
+    "top_share": 0.7316987855724664,
+    "visited": 2.0,
+    "not_top": 0.26592403534670955,
+    "kl": 0.08075188110089204,
+    "agree": 0.7606973058637084,
+    "kl_total": 50.954436974662876
+   },
+   "land_begin_battle": {
+    "samples": 555,
+    "mean_options": 3.091891891891892,
+    "median_options": 3,
+    "top_share": 0.6175980309853436,
+    "visited": 3.091891891891892,
+    "not_top": 0.3739509942865167,
+    "kl": 0.13858694859812712,
+    "agree": 0.6666666666666666,
+    "kl_total": 76.91575647196055
+   },
+   "land_take_casualty": {
+    "samples": 445,
+    "mean_options": 2.9280898876404495,
+    "median_options": 2,
+    "top_share": 0.5515049617264838,
+    "visited": 2.9280898876404495,
+    "not_top": 0.43306534642992683,
+    "kl": 0.07774629664011397,
+    "agree": 0.5415730337078651,
+    "kl_total": 34.59710200485072
+   },
+   "recruitment_roll": {
+    "samples": 258,
+    "mean_options": 2.0,
+    "median_options": 2.0,
+    "top_share": 0.7453533252672709,
+    "visited": 2.0,
+    "not_top": 0.254646674732729,
+    "kl": 0.03395751919414347,
+    "agree": 0.9806201550387597,
+    "kl_total": 8.761039952089016
+   },
+   "naval_force_add": {
+    "samples": 205,
+    "mean_options": 5.058536585365854,
+    "median_options": 4,
+    "top_share": 0.5013770604637092,
+    "visited": 5.058536585365854,
+    "not_top": 0.4916012974042812,
+    "kl": 0.14719771543277269,
+    "agree": 0.5951219512195122,
+    "kl_total": 30.1755316637184
+   },
+   "economy_research": {
+    "samples": 203,
+    "mean_options": 20.064039408866996,
+    "median_options": 17,
+    "top_share": 0.2616940182938964,
+    "visited": 20.064039408866996,
+    "not_top": 0.7350213895547678,
+    "kl": 0.3296540663417964,
+    "agree": 0.3054187192118227,
+    "kl_total": 66.91977546738467
+   },
+   "air_fly": {
+    "samples": 162,
+    "mean_options": 115.89506172839506,
+    "median_options": 100.5,
+    "top_share": 0.08119654336684619,
+    "visited": 62.95061728395062,
+    "not_top": 0.7658136212981409,
+    "kl": 0.42903353366405456,
+    "agree": 0.345679012345679,
+    "kl_total": 69.50343245357683
+   },
+   "land_retreat_unit": {
+    "samples": 131,
+    "mean_options": 2.50381679389313,
+    "median_options": 2,
+    "top_share": 0.6297082267437547,
+    "visited": 2.50381679389313,
+    "not_top": 0.36385093356158876,
+    "kl": 0.10853401665170938,
+    "agree": 0.5725190839694656,
+    "kl_total": 14.217956181373928
+   },
+   "air_ground_attack": {
+    "samples": 123,
+    "mean_options": 93.10569105691057,
+    "median_options": 95,
+    "top_share": 0.04288261007064625,
+    "visited": 66.869918699187,
+    "not_top": 0.7441477821490105,
+    "kl": 0.2833428085421147,
+    "agree": 0.36585365853658536,
+    "kl_total": 34.85116545068011
+   },
+   "recruitment_place_militia": {
+    "samples": 97,
+    "mean_options": 15.206185567010309,
+    "median_options": 14,
+    "top_share": 0.3365959152935061,
+    "visited": 15.206185567010309,
+    "not_top": 0.6505910711423005,
+    "kl": 0.2997870252272375,
+    "agree": 0.4639175257731959,
+    "kl_total": 29.079341447042037
+   },
+   "naval_begin_assault": {
+    "samples": 80,
+    "mean_options": 3.575,
+    "median_options": 3.0,
+    "top_share": 0.5878293743166958,
+    "visited": 3.575,
+    "not_top": 0.39440509075961205,
+    "kl": 0.22077914880414898,
+    "agree": 0.6,
+    "kl_total": 17.662331904331918
+   },
+   "naval_finish_shore_selection": {
+    "samples": 69,
+    "mean_options": 2.0,
+    "median_options": 2,
+    "top_share": 0.7290498920331812,
+    "visited": 2.0,
+    "not_top": 0.27095010796681884,
+    "kl": 0.03727981018611781,
+    "agree": 0.9565217391304348,
+    "kl_total": 2.572306902842129
+   },
+   "air_land": {
+    "samples": 68,
+    "mean_options": 4.985294117647059,
+    "median_options": 4.0,
+    "top_share": 0.5374243846497619,
+    "visited": 4.985294117647059,
+    "not_top": 0.4507931915373393,
+    "kl": 0.2521780275739777,
+    "agree": 0.4411764705882353,
+    "kl_total": 17.148105875030485
+   },
+   "naval_select_bombardment": {
+    "samples": 60,
+    "mean_options": 3.45,
+    "median_options": 3.0,
+    "top_share": 0.46996100859080003,
+    "visited": 3.45,
+    "not_top": 0.5127672366771683,
+    "kl": 0.09020449186671303,
+    "agree": 0.5333333333333333,
+    "kl_total": 5.412269512002782
+   },
+   "air_end_patrol": {
+    "samples": 51,
+    "mean_options": 49.1764705882353,
+    "median_options": 53,
+    "top_share": 0.17611672070742448,
+    "visited": 46.78431372549019,
+    "not_top": 0.8022650610675107,
+    "kl": 0.3891503479593233,
+    "agree": 0.2549019607843137,
+    "kl_total": 19.846667745925487
+   },
+   "economy_lease_declare": {
+    "samples": 42,
+    "mean_options": 3.0476190476190474,
+    "median_options": 3.0,
+    "top_share": 0.6111232950971158,
+    "visited": 3.0476190476190474,
+    "not_top": 0.3888767049028842,
+    "kl": 0.12756712390875954,
+    "agree": 0.6190476190476191,
+    "kl_total": 5.3578192041679005
+   },
+   "politics_declare_war": {
+    "samples": 34,
+    "mean_options": 2.0,
+    "median_options": 2.0,
+    "top_share": 0.6671232400027981,
+    "visited": 2.0,
+    "not_top": 0.33287675999720195,
+    "kl": 0.040053270151952966,
+    "agree": 0.8823529411764706,
+    "kl_total": 1.3618111851664008
+   },
+   "influence_roll": {
+    "samples": 24,
+    "mean_options": 5.375,
+    "median_options": 5.0,
+    "top_share": 0.3419563099578693,
+    "visited": 5.375,
+    "not_top": 0.6490110560094967,
+    "kl": 0.10164301714129102,
+    "agree": 0.3333333333333333,
+    "kl_total": 2.4394324113909844
+   },
+   "air_defend": {
+    "samples": 21,
+    "mean_options": 2.0,
+    "median_options": 2,
+    "top_share": 0.8172842604962524,
+    "visited": 2.0,
+    "not_top": 0.18271573950374767,
+    "kl": 0.04531712561566218,
+    "agree": 1.0,
+    "kl_total": 0.9516596379289058
+   },
+   "naval_shore_casualty": {
+    "samples": 20,
+    "mean_options": 3.85,
+    "median_options": 3.5,
+    "top_share": 0.5234409667500983,
+    "visited": 3.85,
+    "not_top": 0.4621754716060661,
+    "kl": 0.09102313280325264,
+    "agree": 0.75,
+    "kl_total": 1.8204626560650528
+   },
+   "air_begin_bombing": {
+    "samples": 18,
+    "mean_options": 2.4444444444444446,
+    "median_options": 2.0,
+    "top_share": 0.5972768989078286,
+    "visited": 2.4444444444444446,
+    "not_top": 0.40272310109217124,
+    "kl": 0.09433472665387128,
+    "agree": 0.7222222222222222,
+    "kl_total": 1.6980250797696832
+   },
+   "air_land_noncombat": {
+    "samples": 17,
+    "mean_options": 25.352941176470587,
+    "median_options": 4,
+    "top_share": 0.45442274895739915,
+    "visited": 18.705882352941178,
+    "not_top": 0.4858346039837773,
+    "kl": 0.20347562842923916,
+    "agree": 0.47058823529411764,
+    "kl_total": 3.4590856832970656
+   },
+   "naval_declare_assault": {
+    "samples": 11,
+    "mean_options": 12.727272727272727,
+    "median_options": 9,
+    "top_share": 0.36729664576615284,
+    "visited": 12.727272727272727,
+    "not_top": 0.6327033542338472,
+    "kl": 0.28754176636333334,
+    "agree": 0.36363636363636365,
+    "kl_total": 3.1629594299966666
+   },
+   "politics_choose_capital": {
+    "samples": 10,
+    "mean_options": 27.2,
+    "median_options": 28.0,
+    "top_share": 0.38526032451925907,
+    "visited": 27.2,
+    "not_top": 0.6147396754807409,
+    "kl": 0.5568465169946728,
+    "agree": 0.3,
+    "kl_total": 5.5684651699467285
+   },
+   "land_pair_artillery": {
+    "samples": 10,
+    "mean_options": 3.0,
+    "median_options": 3.0,
+    "top_share": 0.48590260003881103,
+    "visited": 3.0,
+    "not_top": 0.48433549519928426,
+    "kl": 0.044178639943338656,
+    "agree": 0.5,
+    "kl_total": 0.44178639943338655
+   },
+   "politics_priority_declare": {
+    "samples": 10,
+    "mean_options": 2.0,
+    "median_options": 2.0,
+    "top_share": 0.5782755666754074,
+    "visited": 2.0,
+    "not_top": 0.4217244333245927,
+    "kl": 0.014153913975886634,
+    "agree": 0.5,
+    "kl_total": 0.14153913975886634
+   },
+   "air_bomb": {
+    "samples": 9,
+    "mean_options": 61.55555555555556,
+    "median_options": 65,
+    "top_share": 0.09757779925457914,
+    "visited": 53.888888888888886,
+    "not_top": 0.7892453371729877,
+    "kl": 0.36578458449442136,
+    "agree": 0.3333333333333333,
+    "kl_total": 3.2920612604497923
+   },
+   "naval_roll_capture": {
+    "samples": 9,
+    "mean_options": 3.6666666666666665,
+    "median_options": 3,
+    "top_share": 0.6122677806795623,
+    "visited": 3.6666666666666665,
+    "not_top": 0.3877322193204378,
+    "kl": 0.14555509596423694,
+    "agree": 0.5555555555555556,
+    "kl_total": 1.3099958636781324
+   },
+   "economy_repair": {
+    "samples": 9,
+    "mean_options": 7.777777777777778,
+    "median_options": 8,
+    "top_share": 0.5242600758228387,
+    "visited": 7.777777777777778,
+    "not_top": 0.47573992417716127,
+    "kl": 0.30839351810683335,
+    "agree": 0.5555555555555556,
+    "kl_total": 2.7755416629615004
+   },
+   "air_start_patrol": {
+    "samples": 8,
+    "mean_options": 86.25,
+    "median_options": 86.0,
+    "top_share": 0.02288673735684605,
+    "visited": 64.75,
+    "not_top": 0.4810486501722915,
+    "kl": 0.21366220453963972,
+    "agree": 0.5,
+    "kl_total": 1.7092976363171177
+   },
+   "economy_approve_rail": {
+    "samples": 8,
+    "mean_options": 2.0,
+    "median_options": 2.0,
+    "top_share": 0.6432692307692307,
+    "visited": 2.0,
+    "not_top": 0.35673076923076924,
+    "kl": 0.07091522995726718,
+    "agree": 0.25,
+    "kl_total": 0.5673218396581374
+   },
+   "naval_strategic_continue": {
+    "samples": 6,
+    "mean_options": 2.0,
+    "median_options": 2.0,
+    "top_share": 0.7060152508568903,
+    "visited": 2.0,
+    "not_top": 0.2939847491431096,
+    "kl": 0.004032305826332071,
+    "agree": 0.8333333333333334,
+    "kl_total": 0.02419383495799243
+   },
+   "naval_decline_scramble": {
+    "samples": 6,
+    "mean_options": 2.0,
+    "median_options": 2.0,
+    "top_share": 0.7061746958869434,
+    "visited": 2.0,
+    "not_top": 0.2938253041130567,
+    "kl": 0.04259972529110103,
+    "agree": 1.0,
+    "kl_total": 0.25559835174660617
+   },
+   "naval_unload": {
+    "samples": 5,
+    "mean_options": 19.8,
+    "median_options": 24,
+    "top_share": 0.3843646891376075,
+    "visited": 19.8,
+    "not_top": 0.6156353108623925,
+    "kl": 0.4167966455065928,
+    "agree": 0.2,
+    "kl_total": 2.083983227532964
+   },
+   "naval_load": {
+    "samples": 4,
+    "mean_options": 4.5,
+    "median_options": 4.0,
+    "top_share": 0.4919781216866487,
+    "visited": 4.5,
+    "not_top": 0.5080218783133513,
+    "kl": 0.31749128888382483,
+    "agree": 0.5,
+    "kl_total": 1.2699651555352993
+   },
+   "economy_lease_deliver": {
+    "samples": 4,
+    "mean_options": 4.25,
+    "median_options": 3.5,
+    "top_share": 0.5477380987760196,
+    "visited": 4.25,
+    "not_top": 0.40356060252268167,
+    "kl": 0.4507901200768645,
+    "agree": 0.25,
+    "kl_total": 1.803160480307458
+   },
+   "politics_give_capture": {
+    "samples": 4,
+    "mean_options": 3.0,
+    "median_options": 3.0,
+    "top_share": 0.6829445305005467,
+    "visited": 3.0,
+    "not_top": 0.3170554694994533,
+    "kl": 0.13610379928781358,
+    "agree": 1.0,
+    "kl_total": 0.5444151971512543
+   },
+   "recruitment_place_infantry": {
+    "samples": 3,
+    "mean_options": 2.0,
+    "median_options": 2,
+    "top_share": 0.77373175566717,
+    "visited": 2.0,
+    "not_top": 0.22626824433283002,
+    "kl": 0.16558841577088249,
+    "agree": 0.6666666666666666,
+    "kl_total": 0.49676524731264743
+   },
+   "air_choose_rail_border": {
+    "samples": 3,
+    "mean_options": 3.0,
+    "median_options": 3,
+    "top_share": 0.44993105126541205,
+    "visited": 3.0,
+    "not_top": 0.41963416612589227,
+    "kl": 0.07327359005524192,
+    "agree": 0.3333333333333333,
+    "kl_total": 0.21982077016572577
+   },
+   "naval_take_casualty": {
+    "samples": 3,
+    "mean_options": 3.0,
+    "median_options": 2,
+    "top_share": 0.499556481160091,
+    "visited": 3.0,
+    "not_top": 0.500443518839909,
+    "kl": 0.03965062532862941,
+    "agree": 0.3333333333333333,
+    "kl_total": 0.11895187598588823
+   },
+   "naval_strategic_pickup": {
+    "samples": 2,
+    "mean_options": 5.0,
+    "median_options": 5.0,
+    "top_share": 0.5012378426171529,
+    "visited": 5.0,
+    "not_top": 0.4987621573828471,
+    "kl": 0.34833359135133485,
+    "agree": 0.5,
+    "kl_total": 0.6966671827026697
+   },
+   "land_progress_battle": {
+    "samples": 2,
+    "mean_options": 2.0,
+    "median_options": 2.0,
+    "top_share": 0.849139655862345,
+    "visited": 2.0,
+    "not_top": 0.15086034413765503,
+    "kl": 0.025921091767816384,
+    "agree": 1.0,
+    "kl_total": 0.05184218353563277
+   },
+   "naval_continue_fighting": {
+    "samples": 1,
+    "mean_options": 2.0,
+    "median_options": 2,
+    "top_share": 0.5595238095238095,
+    "visited": 2.0,
+    "not_top": 0.44047619047619047,
+    "kl": 0.0036196522670560796,
+    "agree": 1.0,
+    "kl_total": 0.0036196522670560796
+   },
+   "air_unload": {
+    "samples": 1,
+    "mean_options": 2.0,
+    "median_options": 2,
+    "top_share": 0.8157894736842105,
+    "visited": 2.0,
+    "not_top": 0.1842105263157895,
+    "kl": 0.08759112045365781,
+    "agree": 1.0,
+    "kl_total": 0.08759112045365781
+   },
+   "air_decline_scramble": {
+    "samples": 1,
+    "mean_options": 2.0,
+    "median_options": 2,
+    "top_share": 0.6538461538461539,
+    "visited": 2.0,
+    "not_top": 0.34615384615384615,
+    "kl": 0.0979845044422161,
+    "agree": 1.0,
+    "kl_total": 0.0979845044422161
+   },
+   "naval_air_attack": {
+    "samples": 1,
+    "mean_options": 27.0,
+    "median_options": 27,
+    "top_share": 0.4605263157894736,
+    "visited": 27.0,
+    "not_top": 0.5394736842105263,
+    "kl": 0.5790019059247246,
+    "agree": 0.0,
+    "kl_total": 0.5790019059247246
+   },
+   "economy_lease_place": {
+    "samples": 1,
+    "mean_options": 3.0,
+    "median_options": 3,
+    "top_share": 0.7241379310344828,
+    "visited": 3.0,
+    "not_top": 0.27586206896551724,
+    "kl": 0.09789146992195258,
+    "agree": 1.0,
+    "kl_total": 0.09789146992195258
+   },
+   "naval_patrol_decline": {
+    "samples": 1,
+    "mean_options": 2.0,
+    "median_options": 2,
+    "top_share": 0.7048458149779736,
+    "visited": 2.0,
+    "not_top": 0.2951541850220264,
+    "kl": 0.14064084278602706,
+    "agree": 0.0,
+    "kl_total": 0.14064084278602706
+   },
+   "naval_reaction_decline": {
+    "samples": 1,
+    "mean_options": 2.0,
+    "median_options": 2,
+    "top_share": 0.7142857142857143,
+    "visited": 2.0,
+    "not_top": 0.2857142857142857,
+    "kl": 0.03278149890895632,
+    "agree": 1.0,
+    "kl_total": 0.03278149890895632
+   },
+   "naval_begin_battle": {
+    "samples": 1,
+    "mean_options": 3.0,
+    "median_options": 3,
+    "top_share": 0.6666666666666666,
+    "visited": 3.0,
+    "not_top": 0.33333333333333337,
+    "kl": 0.45421054920567955,
+    "agree": 0.0,
+    "kl_total": 0.45421054920567955
+   },
+   "naval_sub_decline": {
+    "samples": 1,
+    "mean_options": 3.0,
+    "median_options": 3,
+    "top_share": 0.6846153846153846,
+    "visited": 3.0,
+    "not_top": 0.3153846153846154,
+    "kl": 0.04600759468035697,
+    "agree": 1.0,
+    "kl_total": 0.04600759468035697
+   },
+   "air_load": {
+    "samples": 1,
+    "mean_options": 3.0,
+    "median_options": 3,
+    "top_share": 0.6153846153846154,
+    "visited": 3.0,
+    "not_top": 0.3846153846153846,
+    "kl": 0.005563308871190994,
+    "agree": 1.0,
+    "kl_total": 0.005563308871190994
+   }
+  },
+  "by_owner": {
+   "axis": {
+    "samples": 12782,
+    "mean_options": 33.90752620873103,
+    "median_options": 17.0,
+    "top_share": 0.29577941441449845,
+    "visited": 23.750039117508997,
+    "not_top": 0.6644557033881854,
+    "kl": 0.2983878652323404,
+    "agree": 0.3633234235643874,
+    "kl_total": 3813.9936933997747
+   },
+   "allies": {
+    "samples": 5322,
+    "mean_options": 56.65313791807591,
+    "median_options": 28.0,
+    "top_share": 0.2754620917411962,
+    "visited": 34.48835024426907,
+    "not_top": 0.6341706118956417,
+    "kl": 0.29327323358493446,
+    "agree": 0.41394212701991734,
+    "kl_total": 1560.8001491390212
+   },
+   "comintern": {
+    "samples": 2451,
+    "mean_options": 8.777233782129743,
+    "median_options": 5,
+    "top_share": 0.5239562283213605,
+    "visited": 8.632394940840474,
+    "not_top": 0.4689085039070677,
+    "kl": 0.19655363059569525,
+    "agree": 0.6136270909832722,
+    "kl_total": 481.7529485900491
+   }
+  },
+  "kl_share_by_family": {
+   "naval": 0.5104955993621734,
+   "movement": 0.24080954201786942,
+   "recruitment": 0.006546032673129936,
+   "economy": 0.18407620807560823,
+   "land combat": 0.03025313150134774,
+   "air": 0.0261024911059308,
+   "politics": 0.0013004644142107548,
+   "influence_roll": 0.00041653084972975783
+  },
+  "samples_by_generation": {
+   "10": 22,
+   "2": 866,
+   "3": 3358,
+   "4": 3798,
+   "5": 3553,
+   "6": 3658,
+   "7": 3755,
+   "8": 3699,
+   "9": 2291
+  },
+  "games": 1654,
+  "values_by_round": {
+   "1": {
+    "samples": 3063,
+    "axis": {
+     "network": -0.06095341947495969,
+     "typical_miss": 14.406029870194722,
+     "spread": 13.986084651101487,
+     "linear": 0.013090484628387133,
+     "earlier_generations": -0.10819212534413092,
+     "later_generations": -0.006835588398912185
+    },
+    "allies": {
+     "network": -0.04073598979949877,
+     "typical_miss": 15.359771159725929,
+     "spread": 15.056168231088586,
+     "linear": 0.030187536992831054,
+     "earlier_generations": -0.04754886090747168,
+     "later_generations": -0.03858679615350247
+    },
+    "comintern": {
+     "network": 0.0354189338848091,
+     "typical_miss": 13.581419822212817,
+     "spread": 13.828523360885299,
+     "linear": 0.06718016583531528,
+     "earlier_generations": -0.004364203735174987,
+     "later_generations": 0.05544180667713294
+    }
+   },
+   "2": {
+    "samples": 2549,
+    "axis": {
+     "network": -0.0940138858288262,
+     "typical_miss": 14.509207091494229,
+     "spread": 13.871782230587694,
+     "linear": 0.08437112846424533,
+     "earlier_generations": -0.19320014264807872,
+     "later_generations": -0.005212642253761501
+    },
+    "allies": {
+     "network": -0.007886412818405741,
+     "typical_miss": 15.435269940877154,
+     "spread": 15.374763137460759,
+     "linear": 0.11459478236485465,
+     "earlier_generations": -0.04143155091442452,
+     "later_generations": 0.006010844233128698
+    },
+    "comintern": {
+     "network": 0.3232512704331123,
+     "typical_miss": 11.656278496088056,
+     "spread": 14.169228063742024,
+     "linear": 0.32413535419139683,
+     "earlier_generations": 0.29526969914779966,
+     "later_generations": 0.34330261233029724
+    }
+   },
+   "3": {
+    "samples": 2401,
+    "axis": {
+     "network": -0.006081859141751078,
+     "typical_miss": 14.518337466777703,
+     "spread": 14.47438859191102,
+     "linear": 0.1947618771817865,
+     "earlier_generations": -0.07809920064816622,
+     "later_generations": 0.08092831976396353
+    },
+    "allies": {
+     "network": 0.09303917010971108,
+     "typical_miss": 15.162230144888463,
+     "spread": 15.92094415222808,
+     "linear": 0.2460021404701166,
+     "earlier_generations": 0.04775845083824981,
+     "later_generations": 0.137949539714055
+    },
+    "comintern": {
+     "network": 0.4023090413580803,
+     "typical_miss": 10.985167416266505,
+     "spread": 14.209157786123395,
+     "linear": 0.4081510137049221,
+     "earlier_generations": 0.32669689242728495,
+     "later_generations": 0.45127617640589923
+    }
+   },
+   "4": {
+    "samples": 2231,
+    "axis": {
+     "network": 0.08729462662358278,
+     "typical_miss": 13.255931476033977,
+     "spread": 13.875381946083683,
+     "linear": 0.19371568270745854,
+     "earlier_generations": 0.04229091586103928,
+     "later_generations": 0.13013581418326625
+    },
+    "allies": {
+     "network": 0.1816284466703718,
+     "typical_miss": 13.831557250661842,
+     "spread": 15.289589175183522,
+     "linear": 0.2644062609782145,
+     "earlier_generations": 0.14382474201917572,
+     "later_generations": 0.22247748581805749
+    },
+    "comintern": {
+     "network": 0.41584200928109316,
+     "typical_miss": 10.638826053518667,
+     "spread": 13.919657432294743,
+     "linear": 0.45092474317633846,
+     "earlier_generations": 0.32905031423493947,
+     "later_generations": 0.47313472195423933
+    }
+   },
+   "5": {
+    "samples": 2164,
+    "axis": {
+     "network": 0.06078652101383164,
+     "typical_miss": 13.52897084240429,
+     "spread": 13.959909488086353,
+     "linear": 0.1810474391249719,
+     "earlier_generations": -0.05487268057305439,
+     "later_generations": 0.1503171893598565
+    },
+    "allies": {
+     "network": 0.17642994275897583,
+     "typical_miss": 13.875694490199825,
+     "spread": 15.289893306835687,
+     "linear": 0.2649089440763144,
+     "earlier_generations": 0.10531709623280938,
+     "later_generations": 0.22985556235911975
+    },
+    "comintern": {
+     "network": 0.49493527550606764,
+     "typical_miss": 9.697193610650412,
+     "spread": 13.644968838964266,
+     "linear": 0.4855143044061795,
+     "earlier_generations": 0.4704206150562359,
+     "later_generations": 0.5106811481076114
+    }
+   },
+   "6": {
+    "samples": 2169,
+    "axis": {
+     "network": 0.18941432653175017,
+     "typical_miss": 12.495339058520182,
+     "spread": 13.878693451599377,
+     "linear": 0.3335328694404084,
+     "earlier_generations": 0.1210202483695706,
+     "later_generations": 0.2429923668062477
+    },
+    "allies": {
+     "network": 0.2793010641286128,
+     "typical_miss": 12.731175221483882,
+     "spread": 14.996556740877402,
+     "linear": 0.374941406363697,
+     "earlier_generations": 0.1883028079333241,
+     "later_generations": 0.35021064667356383
+    },
+    "comintern": {
+     "network": 0.5665958223073453,
+     "typical_miss": 9.056174022423455,
+     "spread": 13.756191488336341,
+     "linear": 0.5774941960079725,
+     "earlier_generations": 0.5580327372592687,
+     "later_generations": 0.5709109909496775
+    }
+   },
+   "7": {
+    "samples": 2119,
+    "axis": {
+     "network": 0.2488627168984201,
+     "typical_miss": 12.213226455502259,
+     "spread": 14.091938861534285,
+     "linear": 0.37945684853586414,
+     "earlier_generations": 0.20938419578018808,
+     "later_generations": 0.2733436575838303
+    },
+    "allies": {
+     "network": 0.34894793588355955,
+     "typical_miss": 12.453052817531661,
+     "spread": 15.433625934220156,
+     "linear": 0.4575509353042382,
+     "earlier_generations": 0.26541669907556,
+     "later_generations": 0.40666183119981514
+    },
+    "comintern": {
+     "network": 0.6444744599784099,
+     "typical_miss": 8.270510268055919,
+     "spread": 13.870652859510896,
+     "linear": 0.6777406790741214,
+     "earlier_generations": 0.6167464242687222,
+     "later_generations": 0.6607503504175773
+    }
+   },
+   "8": {
+    "samples": 2115,
+    "axis": {
+     "network": 0.38832881422767684,
+     "typical_miss": 10.751058948801107,
+     "spread": 13.746503021950936,
+     "linear": 0.45566222832046466,
+     "earlier_generations": 0.4054973737303431,
+     "later_generations": 0.37413958837011974
+    },
+    "allies": {
+     "network": 0.4660245068354133,
+     "typical_miss": 11.248277530523488,
+     "spread": 15.393074116163891,
+     "linear": 0.5292834966570847,
+     "earlier_generations": 0.4497379625902177,
+     "later_generations": 0.4739245138238626
+    },
+    "comintern": {
+     "network": 0.6760499537033597,
+     "typical_miss": 7.87885457970883,
+     "spread": 13.84280373921837,
+     "linear": 0.7145358902950727,
+     "earlier_generations": 0.6360502591774952,
+     "later_generations": 0.69886296425189
+    }
+   },
+   "9": {
+    "samples": 2095,
+    "axis": {
+     "network": 0.5046474956531961,
+     "typical_miss": 9.51101718675079,
+     "spread": 13.51356033375712,
+     "linear": 0.588856606537419,
+     "earlier_generations": 0.5183357549405424,
+     "later_generations": 0.4942706852023836
+    },
+    "allies": {
+     "network": 0.5463743398155677,
+     "typical_miss": 9.704906275013991,
+     "spread": 14.409288570209968,
+     "linear": 0.6247976862801524,
+     "earlier_generations": 0.5267536246218345,
+     "later_generations": 0.5564658524793199
+    },
+    "comintern": {
+     "network": 0.7150529460893855,
+     "typical_miss": 7.28831545772574,
+     "spread": 13.653534002757807,
+     "linear": 0.7989106972521853,
+     "earlier_generations": 0.7183753604404748,
+     "later_generations": 0.7123824391457623
+    }
+   },
+   "10": {
+    "samples": 2045,
+    "axis": {
+     "network": 0.5498424964227646,
+     "typical_miss": 9.13881725957797,
+     "spread": 13.620960903822915,
+     "linear": 0.69279212279277,
+     "earlier_generations": 0.5020771482636806,
+     "later_generations": 0.5760443441903562
+    },
+    "allies": {
+     "network": 0.6008938592488727,
+     "typical_miss": 9.555835662629983,
+     "spread": 15.126012930603569,
+     "linear": 0.7250928132152274,
+     "earlier_generations": 0.5481548050295558,
+     "later_generations": 0.6278125442466331
+    },
+    "comintern": {
+     "network": 0.7648110535516286,
+     "typical_miss": 6.589247246212611,
+     "spread": 13.587118102800197,
+     "linear": 0.8414154281624779,
+     "earlier_generations": 0.7512225333952164,
+     "later_generations": 0.7689689219595145
+    }
+   },
+   "11": {
+    "samples": 2049,
+    "axis": {
+     "network": 0.6805519022821396,
+     "typical_miss": 7.598845127903718,
+     "spread": 13.444586203944288,
+     "linear": 0.8292701345219746,
+     "earlier_generations": 0.683321980486232,
+     "later_generations": 0.6783508811553769
+    },
+    "allies": {
+     "network": 0.7072496299881427,
+     "typical_miss": 7.963900383434158,
+     "spread": 14.718958902382626,
+     "linear": 0.8428350549100199,
+     "earlier_generations": 0.7079314135103609,
+     "later_generations": 0.7032591705091848
+    },
+    "comintern": {
+     "network": 0.7955222000639451,
+     "typical_miss": 5.997977302718324,
+     "spread": 13.264220600273866,
+     "linear": 0.9166536873839042,
+     "earlier_generations": 0.7692785810286955,
+     "later_generations": 0.8089656342073637
+    }
+   }
+  },
+  "generation_halves": [
+   [
+    2,
+    3,
+    4,
+    5
+   ],
+   [
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  ],
+  "linear_penalties": {
+   "1": [
+    3000,
+    3000,
+    3000,
+    3000,
+    3000
+   ],
+   "2": [
+    1000,
+    3000,
+    1000,
+    1000,
+    1000
+   ],
+   "3": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+   ],
+   "4": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+   ],
+   "5": [
+    1000,
+    1000,
+    1000,
+    1000,
+    3000
+   ],
+   "6": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+   ],
+   "7": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+   ],
+   "8": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+   ],
+   "9": [
+    300,
+    300,
+    300,
+    300,
+    300
+   ],
+   "10": [
+    300,
+    300,
+    300,
+    300,
+    300
+   ],
+   "11": [
+    100,
+    100,
+    100,
+    300,
+    100
+   ]
+  },
+  "loss_gradients": {
+   "minibatches": 20,
+   "minibatch_size": 32,
+   "value_loss": 0.009284230950288474,
+   "policy_loss": 2.088050180673599,
+   "groups": {
+    "value head": {
+     "value_gradient": 0.3666584015794673,
+     "policy_gradient": 0.0,
+     "value_over_policy": null,
+     "cosine": null
+    },
+    "policy only": {
+     "value_gradient": 0.0,
+     "policy_gradient": 1.0816393395408854,
+     "value_over_policy": 0.0,
+     "cosine": null
+    },
+    "shared: embedding tables and map facts": {
+     "value_gradient": 0.04877732517588615,
+     "policy_gradient": 0.2799049210483345,
+     "value_over_policy": 0.17426390716247248,
+     "cosine": -0.03965610856488847
+    },
+    "shared: message-passing layers": {
+     "value_gradient": 0.05039772513671082,
+     "policy_gradient": 0.45161091458671065,
+     "value_over_policy": 0.11159545420382949,
+     "cosine": -0.012199996316211856
+    },
+    "shared: state encoder": {
+     "value_gradient": 0.04670457490594225,
+     "policy_gradient": 0.07833870850616197,
+     "value_over_policy": 0.5961877058806575,
+     "cosine": -0.03109322038488494
+    }
+   },
+   "generation": 10
+  },
+  "run": "/Users/home/Projects/gwRL/tmp/training-2026-11-20c"
+ },
+ "held_out_games": {
+  "current-gen10-allies": {
+   "seat": "allies",
+   "seeds": [
+    1009,
+    1013,
+    1019,
+    1021,
+    1031,
+    1033
+   ],
+   "score_mean": -68.51666666666667,
+   "scores": [
+    -106.5,
+    -53.500000000000014,
+    -48.39999999999999,
+    -51.2,
+    -76.39999999999999,
+    -75.1
+   ],
+   "decisions": {
+    "axis": 1179.5,
+    "allies": 249.0,
+    "comintern": 311.8333333333333
+   },
+   "territories": {
+    "japan": 16.166666666666668,
+    "kmt": 8.5,
+    "ccp": 4.5,
+    "mongolia": 1.8333333333333333
+   },
+   "casualties": {
+    "japan": 45.666666666666664,
+    "kmt": 23.5,
+    "ccp": 21.666666666666668,
+    "mongolia": 2.5
+   },
+   "wealth": {
+    "axis": {
+     "wealth": 81.0,
+     "income_rate": 23.333333333333332,
+     "units": 379.8333333333333,
+     "infrastructure": 171.5,
+     "treasury": 23.666666666666668,
+     "paid_construction": 1.6666666666666667
+    },
+    "allies": {
+     "wealth": 21.8,
+     "income_rate": 7.166666666666667,
+     "units": 92.5,
+     "infrastructure": 28.666666666666668,
+     "treasury": 23.5,
+     "paid_construction": 1.6666666666666667
+    },
+    "comintern": {
+     "wealth": 9.316666666666666,
+     "income_rate": 4.333333333333333,
+     "units": 24.833333333333332,
+     "infrastructure": 13.833333333333334,
+     "treasury": 6.0,
+     "paid_construction": 5.166666666666667
+    }
+   }
+  },
+  "script-allies": {
+   "seat": "allies",
+   "seeds": [
+    1009,
+    1013,
+    1019,
+    1021,
+    1031,
+    1033
+   ],
+   "score_mean": -31.86666666666667,
+   "scores": [
+    -51.800000000000004,
+    -20.400000000000006,
+    -18.200000000000003,
+    -41.699999999999996,
+    -11.100000000000009,
+    -47.99999999999999
+   ],
+   "decisions": {
+    "axis": 1119.5,
+    "allies": 483.1666666666667,
+    "comintern": 266.3333333333333
+   },
+   "territories": {
+    "japan": 8.833333333333334,
+    "kmt": 18.5,
+    "ccp": 2.1666666666666665,
+    "mongolia": 1.5
+   },
+   "casualties": {
+    "japan": 48.0,
+    "kmt": 40.333333333333336,
+    "ccp": 20.0,
+    "mongolia": 2.6666666666666665
+   },
+   "wealth": {
+    "axis": {
+     "wealth": 62.11666666666667,
+     "income_rate": 13.333333333333334,
+     "units": 337.5,
+     "infrastructure": 133.83333333333334,
+     "treasury": 16.5,
+     "paid_construction": 0.0
+    },
+    "allies": {
+     "wealth": 35.583333333333336,
+     "income_rate": 17.166666666666668,
+     "units": 105.16666666666667,
+     "infrastructure": 61.833333333333336,
+     "treasury": 17.166666666666668,
+     "paid_construction": 0.0
+    },
+    "comintern": {
+     "wealth": 5.333333333333333,
+     "income_rate": 2.5,
+     "units": 14.666666666666666,
+     "infrastructure": 8.333333333333334,
+     "treasury": 3.1666666666666665,
+     "paid_construction": 2.1666666666666665
+    }
+   }
+  },
+  "current-gen10-axis": {
+   "seat": "axis",
+   "seeds": [
+    1009,
+    1013,
+    1019,
+    1021,
+    1031,
+    1033
+   ],
+   "score_mean": 14.433333333333337,
+   "scores": [
+    7.0,
+    38.900000000000006,
+    9.100000000000009,
+    1.7000000000000028,
+    -0.29999999999999716,
+    30.200000000000003
+   ],
+   "decisions": {
+    "axis": 846.3333333333334,
+    "allies": 571.0,
+    "comintern": 205.16666666666666
+   },
+   "territories": {
+    "japan": 7.5,
+    "kmt": 22.666666666666668,
+    "ccp": 0.3333333333333333,
+    "mongolia": 0.5
+   },
+   "casualties": {
+    "japan": 27.0,
+    "kmt": 31.666666666666668,
+    "ccp": 14.833333333333334,
+    "mongolia": 3.1666666666666665
+   },
+   "wealth": {
+    "axis": {
+     "wealth": 62.88333333333333,
+     "income_rate": 11.5,
+     "units": 345.3333333333333,
+     "infrastructure": 141.0,
+     "treasury": 12.833333333333334,
+     "paid_construction": 14.666666666666666
+    },
+    "allies": {
+     "wealth": 47.0,
+     "income_rate": 21.333333333333332,
+     "units": 161.5,
+     "infrastructure": 73.83333333333333,
+     "treasury": 21.333333333333332,
+     "paid_construction": 0.0
+    },
+    "comintern": {
+     "wealth": 1.4500000000000002,
+     "income_rate": 0.3333333333333333,
+     "units": 5.5,
+     "infrastructure": 3.1666666666666665,
+     "treasury": 1.6666666666666667,
+     "paid_construction": 0.8333333333333334
+    }
+   }
+  },
+  "script-axis": {
+   "seat": "axis",
+   "seeds": [
+    1009,
+    1013,
+    1019,
+    1021,
+    1031,
+    1033
+   ],
+   "score_mean": 21.2,
+   "scores": [
+    40.39999999999999,
+    20.0,
+    17.60000000000001,
+    13.700000000000003,
+    11.099999999999994,
+    24.400000000000006
+   ],
+   "decisions": {
+    "axis": 1119.5,
+    "allies": 483.1666666666667,
+    "comintern": 266.3333333333333
+   },
+   "territories": {
+    "japan": 8.833333333333334,
+    "kmt": 18.5,
+    "ccp": 2.1666666666666665,
+    "mongolia": 1.5
+   },
+   "casualties": {
+    "japan": 48.0,
+    "kmt": 40.333333333333336,
+    "ccp": 20.0,
+    "mongolia": 2.6666666666666665
+   },
+   "wealth": {
+    "axis": {
+     "wealth": 62.11666666666667,
+     "income_rate": 13.333333333333334,
+     "units": 337.5,
+     "infrastructure": 133.83333333333334,
+     "treasury": 16.5,
+     "paid_construction": 0.0
+    },
+    "allies": {
+     "wealth": 35.583333333333336,
+     "income_rate": 17.166666666666668,
+     "units": 105.16666666666667,
+     "infrastructure": 61.833333333333336,
+     "treasury": 17.166666666666668,
+     "paid_construction": 0.0
+    },
+    "comintern": {
+     "wealth": 5.333333333333333,
+     "income_rate": 2.5,
+     "units": 14.666666666666666,
+     "infrastructure": 8.333333333333334,
+     "treasury": 3.1666666666666665,
+     "paid_construction": 2.1666666666666665
+    }
+   }
+  },
+  "current-gen10-comintern": {
+   "seat": "comintern",
+   "seeds": [
+    1009,
+    1013,
+    1019,
+    1021,
+    1031,
+    1033
+   ],
+   "score_mean": -92.88333333333334,
+   "scores": [
+    -87.8,
+    -108.50000000000001,
+    -83.0,
+    -104.9,
+    -70.20000000000002,
+    -102.90000000000002
+   ],
+   "decisions": {
+    "axis": 1096.6666666666667,
+    "allies": 461.5,
+    "comintern": 227.0
+   },
+   "territories": {
+    "japan": 11.833333333333334,
+    "kmt": 16.166666666666668,
+    "ccp": 2.1666666666666665,
+    "mongolia": 0.8333333333333334
+   },
+   "casualties": {
+    "japan": 45.0,
+    "kmt": 35.166666666666664,
+    "ccp": 18.333333333333332,
+    "mongolia": 4.666666666666667
+   },
+   "wealth": {
+    "axis": {
+     "wealth": 67.36666666666667,
+     "income_rate": 16.0,
+     "units": 349.0,
+     "infrastructure": 146.83333333333334,
+     "treasury": 17.833333333333332,
+     "paid_construction": 0.0
+    },
+    "allies": {
+     "wealth": 32.21666666666667,
+     "income_rate": 14.333333333333334,
+     "units": 114.16666666666667,
+     "infrastructure": 50.333333333333336,
+     "treasury": 14.333333333333334,
+     "paid_construction": 0.0
+    },
+    "comintern": {
+     "wealth": 6.7,
+     "income_rate": 3.1666666666666665,
+     "units": 23.0,
+     "infrastructure": 6.833333333333333,
+     "treasury": 5.0,
+     "paid_construction": 0.5
+    }
+   }
+  },
+  "script-comintern": {
+   "seat": "comintern",
+   "seeds": [
+    1009,
+    1013,
+    1019,
+    1021,
+    1031,
+    1033
+   ],
+   "score_mean": -92.36666666666667,
+   "scores": [
+    -87.8,
+    -103.8,
+    -106.60000000000001,
+    -70.3,
+    -103.70000000000002,
+    -82.0
+   ],
+   "decisions": {
+    "axis": 1119.5,
+    "allies": 483.1666666666667,
+    "comintern": 266.3333333333333
+   },
+   "territories": {
+    "japan": 8.833333333333334,
+    "kmt": 18.5,
+    "ccp": 2.1666666666666665,
+    "mongolia": 1.5
+   },
+   "casualties": {
+    "japan": 48.0,
+    "kmt": 40.333333333333336,
+    "ccp": 20.0,
+    "mongolia": 2.6666666666666665
+   },
+   "wealth": {
+    "axis": {
+     "wealth": 62.11666666666667,
+     "income_rate": 13.333333333333334,
+     "units": 337.5,
+     "infrastructure": 133.83333333333334,
+     "treasury": 16.5,
+     "paid_construction": 0.0
+    },
+    "allies": {
+     "wealth": 35.583333333333336,
+     "income_rate": 17.166666666666668,
+     "units": 105.16666666666667,
+     "infrastructure": 61.833333333333336,
+     "treasury": 17.166666666666668,
+     "paid_construction": 0.0
+    },
+    "comintern": {
+     "wealth": 5.333333333333333,
+     "income_rate": 2.5,
+     "units": 14.666666666666666,
+     "infrastructure": 8.333333333333334,
+     "treasury": 3.1666666666666665,
+     "paid_construction": 2.1666666666666665
+    }
+   }
+  }
+ },
+ "inference_server": {
+  "First night": {
+   "intervals": 11,
+   "medians": {
+    "evaluations_per_decision": 52.936707115278544,
+    "evaluations_per_second": 6984.005244776709,
+    "forward_share": 0.8783014227701975,
+    "idle_share": 0.01649571342048704,
+    "evaluations_per_pass": 128.6827242651253
+   },
+   "timings_seconds_last_invocation": {
+    "checkpoint_save": 13.5,
+    "collection": 20697.8,
+    "learning_updates": 1045.3,
+    "model_export": 1.2,
+    "progress_reporting": 0.5
+   }
+  },
+  "Morning": {
+   "intervals": 8,
+   "medians": {
+    "evaluations_per_decision": 50.647835992816454,
+    "evaluations_per_second": 5889.838809494369,
+    "forward_share": 0.8518411412399713,
+    "idle_share": 0.022804756296008304,
+    "evaluations_per_pass": 130.3522602318463
+   },
+   "timings_seconds_last_invocation": {
+    "checkpoint_save": 16.2,
+    "collection": 33461.5,
+    "learning_updates": 1568.0,
+    "model_export": 1.6,
+    "progress_reporting": 0.3
+   }
+  },
+  "Afternoon": {
+   "intervals": 4,
+   "medians": {
+    "evaluations_per_decision": 53.68827248705761,
+    "evaluations_per_second": 6210.511869589853,
+    "forward_share": 0.8641794264274993,
+    "idle_share": 0.020971432894410502,
+    "evaluations_per_pass": 129.49676733828431
+   },
+   "timings_seconds_last_invocation": {
+    "checkpoint_save": 4.9,
+    "collection": 7609.8,
+    "learning_updates": 323.3,
+    "model_export": 0.5,
+    "progress_reporting": 0.1
+   }
+  },
+  "Choice B": {
+   "intervals": 9,
+   "medians": {
+    "evaluations_per_decision": 52.08080253753525,
+    "evaluations_per_second": 6848.039523111316,
+    "forward_share": 0.8824179774114927,
+    "idle_share": 0.017201181428798912,
+    "evaluations_per_pass": 128.6695089679506
+   },
+   "timings_seconds_last_invocation": {
+    "checkpoint_save": 32.5,
+    "collection": 32194.4,
+    "learning_updates": 1617.6,
+    "model_export": 1.6,
+    "progress_reporting": 0.4
+   }
+  }
+ }
+}

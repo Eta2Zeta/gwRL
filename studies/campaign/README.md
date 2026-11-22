@@ -294,6 +294,11 @@ not trained on. `tools/compare_training_runs.py` compares runs by them, per hour
 of active time, and puts each value loss beside the variance of the games'
 final scores, which differs between runs whose games differ; it also compares
 runs' decisions per hour and their held-out evaluation games.
+`tools/rate_replay_samples.py RUN` rates the training samples in a run's last
+checkpoint the same way, one by one, with the run's own copy of the code: each
+alliance's values by game round, beside a linear model of the same input
+fitted on other games, and the search's visit shares by number of legal actions
+and kind of decision.
 
 `--sample-fraction F` keeps that share of a worker game's decisions as training
 samples, from its own random stream, so the games play the same.
