@@ -787,10 +787,11 @@ values and good actions.
 
 ### 6.2 Linear layers
 
-A *linear layer* turns a vector of $n$ numbers into a vector of $m$ numbers: it
-multiplies it by a learned matrix of $m \times n$ numbers, its *weights*, adds a
-learned vector of $m$ numbers, its *bias*, and most linear layers are then
-followed by a fixed *activation function*, GELU, which bends each result. A toy
+A *linear layer* turns a vector of inputs into a vector of outputs: it
+multiplies the inputs by a learned matrix with one row for each output and one
+column for each input, its *weights*, adds a learned vector with one number for
+each output, its *bias*, and most linear layers are then followed by a fixed
+*activation function*, GELU, which bends each result. A toy
 layer with 3 inputs, 1, 2 and 3, and 2 outputs, $y_1$ and $y_2$, whose weights
 are 0.5, 0.2 and 0.1, with bias 0.1, for the first output, and 0.1, 0.3 and
 −0.4, with bias 0, for the second:
@@ -826,11 +827,12 @@ An input of 0 adds nothing, so a layer can skip the embeddings of its zero
 inputs. The network's embedding layer, in section 6.3, has almost only such
 inputs.
 
-**The activation function.** GELU multiplies a number by the chance that a
-standard normal variable falls below it, $\operatorname{GELU}(x) = x \Phi(x)$:
-large positive numbers pass almost unchanged and negative ones are squashed
-toward 0. Without such functions any stack of linear layers would amount to a
-single multiplication and could only add effects up.
+**The activation function.** GELU multiplies a number $r$ by $\Phi(r)$, the
+chance that a standard normal variable falls below $r$:
+$\operatorname{GELU}(r) = r \Phi(r)$. Large positive numbers pass almost
+unchanged and negative ones are squashed toward 0. Without such functions any
+stack of linear layers would amount to a single multiplication and could only add
+effects up.
 
 A layer's weights and biases are parameters, adjusted by training (section 8).
 When a layer reads several vectors, they are first joined end to end into one:
@@ -1131,23 +1133,29 @@ message-passing layer:
    that average and the global vector; then the global vector adds a *global
    correction* computed the same way from itself and the average zone vector.
 
-With $h_z$ for zone $z$'s vector, $u$ for the global vector and $f_{s \to t}$ for
-the static features of the border from $s$ to $t$, the message along that border
-is
+With $h_z$ for zone $z$'s vector, $u$ for the global vector and $f_{z \to z'}$
+for the static features of the border from zone $z$ to zone $z'$, the message
+along that border is
 
 $$
-\text{message}_{s \to t} = \operatorname{GELU}\big(\text{layer}_1(h_s) + \text{layer}_2(f_{s \to t})\big)
+\text{message}_{z \to z'} = \operatorname{GELU}\big(\text{layer}_1(h_z) + \text{layer}_2(f_{z \to z'})\big)
 $$
 
-and then every zone $t$, and after them the global vector, change by
+where $\text{layer}_1$ is the linear layer of item 1 that reads the sending
+zone's vector and $\text{layer}_2$ the one that reads the border's static
+features. Then every zone $z'$, and after them the global vector, change by
 
 $$
-h_t \leftarrow h_t + \text{layer}_3\big(h_t,\ \text{average of the messages into } t,\ u\big)
+h_{z'} \leftarrow h_{z'} + \text{layer}_3\big(h_{z'},\ \text{average of the messages into } z',\ u\big)
 $$
 
 $$
 u \leftarrow u + \text{layer}_4\big(u,\ \text{average of all } h_z\big)
 $$
+
+where $\text{layer}_3$ computes the zone correction of item 3 and
+$\text{layer}_4$ the global correction, and the arrow means that the vector on
+its left is replaced by the sum on its right.
 
 Every zone sends at the same time, so information spreads one border per layer:
 
@@ -1155,11 +1163,11 @@ Every zone sends at the same time, so information spreads one border per layer:
 
 After the first message-passing layer Shensi's vector reflects what its four
 neighbours hold; after the second, also the 12 zones two borders away, such as
-Beiping beyond Hopeh. In general, after $k$ message-passing layers a zone's
-vector reflects zones up to $k$ borders away, and through the global vector, from
-the second message-passing layer on, the average of all zones. Each
-message-passing layer has its own linear layers; a 64×2 network has 2
-message-passing layers, its *network depth*.
+Beiping beyond Hopeh. Each message-passing layer has its own linear layers, and
+the number of message-passing layers is the *network depth* $d$: a 64×2 network
+has $d = 2$. After $d$ message-passing layers a zone's vector reflects zones up
+to $d$ borders away, and through the global vector, from the second
+message-passing layer on, the average of all zones.
 
 ### 6.7 The values
 
@@ -1225,14 +1233,16 @@ Shensi's vector as its source zone, Hopeh's as its target zone, and the average
 of both as its path.
 
 **From logits to probabilities: softmax.** A list of logits becomes probabilities
-that add up to 1 by a *softmax*: each logit $s_i$ becomes
+that add up to 1 by a *softmax*. With $\ell_i$ for the logit of the list's
+$i$-th item, that item's probability is
 
 $$
-p_i = \frac{e^{s_i}}{\sum_j e^{s_j}}
+p_i = \frac{\exp(\ell_i)}{\sum_j \exp(\ell_j)}
 $$
 
-so a higher logit means a higher probability, and only differences between
-logits matter.
+where $\exp$ is the exponential function and the sum runs over every item $j$
+of the list. So a higher logit means a higher probability, and only differences
+between logits matter.
 
 **A hierarchical softmax.** The softmax is not taken over all legal actions at
 once. The legal actions are grouped four times over, in four *levels*: by kind,
@@ -1444,26 +1454,59 @@ the schedule of those changes, the *training steps* of a *network update*.
 
 ### 8.1 The loss
 
-The loss has two parts. On one training sample, with the network's values $v_k$,
-the final scores divided by 100 as $z_k$, the visit shares $\pi_m$ and the
-network's probabilities $p_m$:
+The loss has two parts, the value loss and the policy loss, and is computed on
+one training sample at a time. A training sample (section 7.2) holds one
+decision's input, the final scores of the game the decision came from, and the
+visit shares of the search at that decision. The symbols, with decision 612's
+training sample as the example:
 
-- **the value loss** is the average squared error of the three values:
+- $k$ numbers the three alliances: $k = 1$ is the Axis, $k = 2$ the Allies and
+  $k = 3$ the Comintern.
+- $v_k$ is the network's value for alliance $k$ at the sample's decision: its
+  estimate of alliance $k$'s final score, in hundreds of points
+  ([section 6.7](#67-the-values)). At decision 612 the Comintern's value is
+  $v_3 = -1.024$.
+- $s_k$ is the final score that alliance $k$ had at the end of the sample's
+  game, divided by 100 to be in hundreds of points too: the *value target*.
+  Decision 612's game ended with the Comintern at −106.2, so $s_3 = -1.062$.
+- $m$ numbers the legal actions of the sample's decision. At decision 612,
+  $m = 1$ to 4 are the attacks on Hopeh, Suiyuan, Szechwan and Tsinghai, and
+  $m = 5$ is ending Combat Movement.
+- $\pi_m$ is the visit share of legal action $m$: the number of the search's
+  simulations at that decision that tried action $m$ at the root, divided by
+  the number of simulations
+  ([section 4.5](#45-after-the-simulations-visit-counts-and-visit-shares)). The
+  visit shares of a decision add up to 1.
+- $p_m$ is the network's probability for legal action $m$ at that decision
+  ([section 6.8](#68-the-action-probabilities)). The probabilities of a decision
+  add up to 1 too.
+
+With these symbols:
+
+- **the value loss** is the average, over the three alliances, of the squared
+  difference between the network's value and the value target:
 
 $$
-L_{\text{value}} = \frac{1}{3} \sum_{k=1}^{3} \left( v_k - z_k \right)^2
+L_{\text{value}} = \frac{1}{3} \sum_{k=1}^{3} \left( v_k - s_k \right)^2
 $$
 
-- **the policy loss** is the *cross-entropy* between the visit shares and the
-  probabilities:
+- **the policy loss** is the *cross-entropy* of the network's probabilities
+  against the visit shares: each legal action's visit share times minus the
+  natural logarithm of the network's probability for that action, added up
+  over the legal actions:
 
 $$
 L_{\text{policy}} = -\sum_{m} \pi_m \ln p_m
 $$
 
+The policy loss is small when the network gives high probabilities to the
+actions the search tried most, and large when the network gives a low
+probability to an action the search tried often, since $-\ln p_m$ grows without
+bound as $p_m$ falls toward 0.
+
 On decision 612's training sample, for the Comintern's network:
 
-| Alliance | Value $v_k$ | Target $z_k$ | Error | Squared |
+| Alliance | Value $v_k$ | Target $s_k$ | Error | Squared |
 | --- | ---: | ---: | ---: | ---: |
 | Axis | 0.251 | 0.490 | −0.239 | 0.057 |
 | Allies | −0.424 | −0.638 | 0.214 | 0.046 |
@@ -1483,11 +1526,20 @@ square of the three misses of 23.9, 21.4 and 3.8 points.
 | End Combat Movement | 0.1875 | 0.531 | 0.119 |
 | **Policy loss, the sum** | | | **1.903** |
 
-The cross-entropy is lowest when the probabilities equal the visit shares, here
-1.221, the visit shares' own entropy; the gap of 0.682, the *Kullback–Leibler
-divergence* (KL divergence) of the probabilities from the visit shares, is what
-training can remove on this training sample. Most of the loss comes from the attack on Hopeh,
-to which the search gave 0.56 and the network 0.10.
+The cross-entropy is lowest when the probabilities equal the visit shares,
+$p_m = \pi_m$ for every legal action $m$. Its value then is the *entropy* of the
+visit shares,
+
+$$
+\text{entropy of the visit shares} = -\sum_{m} \pi_m \ln \pi_m
+$$
+
+which is 1.221 at decision 612. The gap between the policy loss and that lowest
+value, 1.903 − 1.221, which is 0.682, is the *Kullback–Leibler divergence* (KL
+divergence) of the probabilities from the visit shares: the part of the policy
+loss that training can remove on this training sample. Most of the policy loss,
+1.282 of 1.903, comes from the attack on Hopeh, to which the search gave a visit
+share of 0.56 and the network a probability of 0.10.
 
 In a training step the two losses are averaged over the training samples of the
 training step's minibatch: the value loss over all of them, and the policy loss
@@ -1534,28 +1586,30 @@ optimizer built for both problems (Kingma and Ba, *Adam: A Method for Stochastic
 Optimization*, 2015). For every parameter it keeps two running averages, both
 starting at zero:
 
-- $m$, the average of the parameter's recent gradients: each Adam step keeps 90%
-  of it and adds 10% of the new gradient $g$, so it mostly reflects the last ten
-  or so training steps;
-- $v$, the average of its recent squared gradients: each Adam step keeps 99.9% of
-  it and adds 0.1% of the new gradient squared, so its square root is the
-  gradient's typical size over roughly the last thousand training steps.
+- $\bar g$, the average of the parameter's recent gradients: each Adam step keeps
+  90% of it and adds 10% of the new gradient $g$, so it mostly reflects the last
+  ten or so training steps;
+- $\overline{g^2}$, the average of its recent squared gradients: each Adam step
+  keeps 99.9% of it and adds 0.1% of the new gradient squared, so its square
+  root is the gradient's typical size over roughly the last thousand training
+  steps.
 
-At Adam step number $t$, counted over the whole run, Adam moves the parameter by
+At Adam step number $t$, counted over the whole run, Adam changes the parameter
+by $\Delta$:
 
 $$
-\Delta = -\eta \times \frac{\hat m}{\sqrt{\hat v} + \epsilon},
+\Delta = -\eta \times \frac{\hat g}{\sqrt{\widehat{g^2}} + \epsilon},
 \qquad
-\hat m = \frac{m}{1 - 0.9^{t}},
+\hat g = \frac{\bar g}{1 - 0.9^{t}},
 \qquad
-\hat v = \frac{v}{1 - 0.999^{t}}
+\widehat{g^2} = \frac{\overline{g^2}}{1 - 0.999^{t}}
 $$
 
-where $\eta$ is the learning rate, 0.001. The divisions by $1 - 0.9^{t}$ and
-$1 - 0.999^{t}$ correct the averages for having started at zero, which would
-otherwise make them too small in the first Adam steps, and $\epsilon = 10^{-8}$
-only keeps the division safe. Apart from the learning rate, these are PyTorch's
-defaults.
+where $\eta$ is the learning rate, 0.001, and $\hat g$ and $\widehat{g^2}$ are
+the two averages corrected for having started at zero: without the divisions by
+$1 - 0.9^{t}$ and $1 - 0.999^{t}$ they would be too small in the first Adam
+steps. $\epsilon = 10^{-8}$ only keeps the division safe. Apart from the
+learning rate, these are PyTorch's defaults.
 
 The fraction cancels the gradient's size and keeps how steadily it points one
 way. A parameter whose gradients keep their sign moves about 0.001 per Adam step,
@@ -1578,7 +1632,7 @@ gradient moved by 0.001, to within 0.00001; the rest had gradients below about
 $10^{-6}$, where $\epsilon$ shrinks the change. The bias of section 8.2 shows how
 the Adam steps change after that:
 
-| Adam step | Gradient | Average gradient ($\hat m$) | Typical size ($\sqrt{\hat v}$) | Change |
+| Adam step $t$ | Gradient $g$ | Average gradient, corrected ($\hat g$) | Typical size, corrected ($\sqrt{\widehat{g^2}}$) | Change $\Delta$ |
 | ---: | ---: | ---: | ---: | ---: |
 | 1 | 0.728 | 0.728 | 0.728 | −0.001000 |
 | 2 | 0.322 | 0.514 | 0.563 | −0.000914 |
@@ -1637,13 +1691,13 @@ things (`CampaignLearner.update` in `studies/campaign/learning.py`):
    of its two losses.
 
 The next training step draws a new minibatch of 32. After the last, the network
-is saved as a *model export*, and every game takes it up at once
-(section 9.1). The network after $k$ network updates is *generation* $k$; a fresh
-network is generation 0. Playing takes minutes and the training steps under a
-minute: on 5 November the 32 games took 851 seconds and the 700 training steps
-49, on 15 November a training iteration of today's 24 games played in 499
-seconds, also 64×2, and on 17 November a network update's 525 training steps
-took 13.7 seconds beside the games
+is saved as a *model export*, and every game takes it up at once (section 9.1).
+The network after one network update is *generation* 1, after two network
+updates generation 2, and so on; a fresh network is generation 0. Playing takes
+minutes and the training steps under a minute: on 5 November the 32 games took
+851 seconds and the 700 training steps 49, on 15 November a training iteration
+of today's 24 games played in 499 seconds, also 64×2, and on 17 November a
+network update's 525 training steps took 13.7 seconds beside the games
 ([record](../archive/records/one_network_comparison_2026_11_17.md#speed)).
 
 ![Where a training step's minibatch of 32 training samples comes from. 1: self-play plays 24 games at a time, in 6 game processes of 4 games each, and a game that ends is replaced at once; at each decision a random draw keeps it as a training sample with chance 5%, and when a game ends its final scores are added to its training samples; on 5 November 32 games kept 1,611 training samples from 33,062 decisions. 2: when a game ends, its training samples join the replay buffer in the main training process, the latest 8,000 training samples, about five network updates' worth of games, drawn as five bars from the oldest games, whose training samples leave first, to the newest; purple dots spread over all five bars mark one training step's minibatch of 32, drawn at random. 3: one training step, 525 per network update, each with a new minibatch: draw 32 different training samples at random from the whole replay buffer; the network reads all 32 at once; it compares its values with the final scores and its action probabilities with the visit shares, on all 32; its input names who chose each; the network takes one Adam step. 4: after the last training step every game takes up the new network at once. With a 64×2 network on the CPU, 24 games finish about every 5 minutes, and a network update's 525 training steps take about 14 seconds beside the games, which go on.](figures/training_update.svg)
@@ -1699,14 +1753,14 @@ parameters change in every training step. An embedding is different: like any
 weight whose input is 0, its gradient is zero unless its feature has a non-zero
 value in one of the minibatch's training samples, because the embedding of a
 feature with value 0 was never added in. So a training step changes the
-embeddings of the features those training samples have, and Adam's average $m$,
-which loses a tenth each Adam step without a new gradient, keeps moving a
-recently used embedding for a few dozen training steps more. An embedding whose
-feature has never had a non-zero value in a trained training sample stays at
-zero. Checked with a test loss on two real decisions: the first training step
-gave a gradient to exactly the 150 embeddings its decision uses and changed only
-those; the second training step also moved the 59 embeddings that only the first
-decision used.
+embeddings of the features those training samples have, and Adam's average
+gradient $\bar g$, which loses a tenth each Adam step without a new gradient,
+keeps moving a recently used embedding for a few dozen training steps more. An
+embedding whose feature has never had a non-zero value in a trained training
+sample stays at zero. Checked with a test loss on two real decisions: the first
+training step gave a gradient to exactly the 150 embeddings its decision uses
+and changed only those; the second training step also moved the 59 embeddings
+that only the first decision used.
 
 **After the first network update of the 5 November run:**
 
@@ -1751,7 +1805,7 @@ one without the other.
 One training sample's gradient points the way that one decision would move the
 parameters. The average over a minibatch of 32 different decisions comes nearer
 to the way the game's decisions in general would: the random error of an average
-of $n$ independent training samples shrinks like $1/\sqrt{n}$. And one training
+of $b$ independent training samples shrinks like $1/\sqrt{b}$. And one training
 step on 32 decisions costs far less than 32 training steps on one: in a separate
 timing on a busy machine it took 78 ms, and a training step on a single training
 sample 21 ms (the network update's own training steps took 70 ms each)
@@ -3426,13 +3480,14 @@ compute, compared on held-out value error and in held-out evaluation games.
 
 **Now.** The Mac profile runs a 64×2 network (section 6) with 64 simulations per
 decision (section 4), and no training run has played more than about 500
-eleven-round games: the night run of 2 November played 467, with a 256×8 network.
-After $k$ message-passing layers a zone's vector reflects zones up to $k$ borders
-away (section 6.6). The map is 7 borders across, from Tokyo to Sinkiang, and two
-zones are on average 3.2 borders apart. So a 64×2 network relates each zone to
-about a third of the others, and to the average of all zones through the global
-vector; 7 message-passing layers would relate every zone to every other.
-Inferred, not measured: in China many threats are three or more borders away.
+eleven-round games: the night run of 2 November played 467, with a 256×8
+network. After $d$ message-passing layers, a network depth of $d$, a zone's
+vector reflects zones up to $d$ borders away (section 6.6). The map is 7 borders
+across, from Tokyo to Sinkiang, and two zones are on average 3.2 borders apart.
+So a 64×2 network relates each zone to about a third of the others, and to the
+average of all zones through the global vector; 7 message-passing layers would
+relate every zone to every other. Inferred, not measured: in China many threats
+are three or more borders away.
 
 **How big published networks are.** AlphaZero's networks, and most that
 followed them, are stacks of *residual blocks*. A residual block is two
@@ -3500,12 +3555,16 @@ larger network's loss caught up with the smaller one's, at 0.75, 1.75 and 7.5
 days. In a study of AlphaZero on Connect Four and Pentago
 ([Neumann and Gros 2022](https://arxiv.org/abs/2210.00849)), strength grew as a
 power of the number of parameters while compute lasted, and the number of
-parameters $N$ that did best for a compute budget $C$ grew as
+parameters that did best for a given compute budget grew as a power of that
+budget:
 
-$$N \propto C^{0.62}$$
+$$
+\text{best number of parameters} \propto \left(\text{compute budget}\right)^{0.62}
+$$
 
-so ten times the compute called for about four times the parameters. Larger
-networks also played better after the same number of games. Extrapolated, the
+where $\propto$ means "proportional to", so ten times the compute called for
+about four times the parameters. Larger networks also played better after the
+same number of games. Extrapolated, the
 trend puts AlphaGo Zero and AlphaZero well below the best size for their
 compute, by up to a hundred times, but the study's networks were small
 multilayer networks on two small games, and its authors leave open whether the
@@ -3740,8 +3799,8 @@ compute.
 ## 12. Glossary
 
 Terms in the order the document introduces them. Each means one thing only; the
-last two lists give the words that need a qualifier and the names the code and
-the dated records use instead.
+last three lists give the symbols of the formulas, the words that need a
+qualifier, and the names the code and the dated records use instead.
 
 **The game (section 2)**
 
@@ -3836,7 +3895,7 @@ the dated records use instead.
   output is a neuron, and each weight a connection from an input neuron to an
   output neuron.
 - **Activation function:** a fixed function applied to each number a linear layer
-  gives; here GELU, $x \Phi(x)$.
+  gives; here GELU, $r \Phi(r)$.
 - **Layer normalization:** rescaling a vector to an average of 0 and a spread of
   1, then a learned scale and shift for each number.
 - **Input layer:** the feature vectors as the network's input, one input neuron
@@ -3902,6 +3961,9 @@ the dated records use instead.
   loss, a cross-entropy. Training lowers it.
 - **Cross-entropy:** the policy loss, lowest when the action probabilities equal
   the visit shares.
+- **Entropy:** of a decision's visit shares, minus the sum over its legal
+  actions of each visit share times the natural logarithm of that visit share:
+  the lowest value the cross-entropy can take.
 - **Kullback–Leibler divergence (KL divergence):** the cross-entropy less the
   visit shares' own entropy: zero only when the action probabilities equal the
   visit shares.
@@ -4033,6 +4095,47 @@ the dated records use instead.
 - **Receptive field:** how many points or borders a network's layers carry
   information, divided by the largest distance on its board: 0.3 for a 64×2
   network here.
+
+**Symbols in the formulas**
+
+Each symbol means one thing in the whole document.
+
+| Symbol | What it stands for | Section |
+| --- | --- | --- |
+| $\bar v$ | an action's average result so far in a search, for the alliance choosing | 4.3 |
+| $v_{\min}$, $v_{\max}$ | the lowest and the highest such average in the search's tree so far | 4.3 |
+| $P$ | an action's prior | 4.3 |
+| $n$ | the number of simulations that have played an action at a state | 4.3 |
+| $N$ | the number of simulations that have played any action at that state | 4.3 |
+| $c_{\text{puct}}$ | the weight of the exploration term, 1.5 | 4.3 |
+| $y_1$, $y_2$ | the outputs of the toy linear layer | 6.2 |
+| $r$, $\Phi(r)$ | a number GELU acts on, and the chance that a standard normal variable falls below it | 6.2 |
+| $q$ | a feature's number | 6.3 |
+| $z$, $z'$ | zones | 6.3, 6.6 |
+| $a$, $x$ | a feature value, and the input it becomes by feature scaling | 6.3 |
+| $x_{zq}$ | zone $z$'s input for feature $q$ | 6.3 |
+| $e_q$ | the embedding of feature $q$ | 6.3 |
+| $y_z$ | zone $z$'s output of the embedding layer | 6.3 |
+| $h_z$ | zone $z$'s vector | 6.6 |
+| $u$ | the global vector | 6.6 |
+| $f_{z \to z'}$ | the static features of the border from zone $z$ to zone $z'$ | 6.6 |
+| $d$ | the network depth: the number of message-passing layers | 6.6 |
+| $\ell_i$, $p_i$ | the logit and the probability of the $i$-th item of a list that a softmax turns into probabilities | 6.8 |
+| $k$ | an alliance: 1 the Axis, 2 the Allies, 3 the Comintern | 8.1 |
+| $v_k$ | the network's value for alliance $k$ | 8.1 |
+| $s_k$ | the value target: alliance $k$'s final score divided by 100 | 8.1 |
+| $m$ | a legal action of a decision | 8.1 |
+| $\pi_m$ | the visit share of legal action $m$ | 8.1 |
+| $p_m$ | the network's probability for legal action $m$ | 8.1 |
+| $L_{\text{value}}$, $L_{\text{policy}}$ | the value loss and the policy loss | 8.1 |
+| $g$ | a parameter's gradient in one training step | 8.3 |
+| $\bar g$, $\overline{g^2}$ | Adam's running averages of a parameter's gradient and of its squared gradient | 8.3 |
+| $\hat g$, $\widehat{g^2}$ | the same two averages, corrected for having started at zero | 8.3 |
+| $t$ | the number of an Adam step, counted over the whole run | 8.3 |
+| $\eta$ | the learning rate, 0.001 | 8.3 |
+| $\epsilon$ | $10^{-8}$, which keeps Adam's division safe | 8.3 |
+| $\Delta$ | the change an Adam step makes to a parameter | 8.3 |
+| $b$ | a number of independent training samples whose gradients are averaged | 8.6 |
 
 **Words that always carry a qualifier**
 
