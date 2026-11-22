@@ -311,21 +311,21 @@
     },
     {
       "id": "RCL-022",
-      "category": "project",
+      "category": "clarification",
       "title": "An attack on land that was Chinese at the start",
-      "body": "Project ruling: an attack by a nation that is not Chinese on a land zone that was originally a warlord's, the CCP's or the KMT's declares war on all of China whoever holds the zone now, or if nobody does; a zone the Dadao Government holds is the one exception. The attack is allowed only if the attacker may start every war it starts: none with a nation of its own alliance (5.1) and none at all for a controlled minor power (4.5). So Mongolia may never attack such a zone, and in the full game neither may the USSR, whose alliance holds the CCP, nor a nation of the Allies, whose alliance holds the KMT. Mongolia may still retake its own land and attack land that was never Chinese.",
+      "body": "Developer clarification reported by the user: an attack by a nation that is not Chinese on a land zone that was originally a warlord's, the CCP's or the KMT's declares war on all of China whoever holds the zone now, or if nobody does; a zone the Dadao Government holds is the one exception. The attack puts the attacker at war with the KMT, the CCP and every warlord not yet aligned, except a nation of its own alliance, and any nation that is not Chinese may make it, Mongolia too. So Mongolia's attack puts it at war with the KMT and those warlords, never with the CCP, and in the full game an attack by a nation of the Allies never puts it at war with the KMT. Read here: Mongolia still attacks only a zone whose holder it is already at war with, or one nobody holds (4.5).",
       "section_ids": [
         "rb-4-9",
         "rb-4-5",
         "rb-5-1",
         "rb-14-3"
       ],
-      "date": "2026-11-19",
-      "authority": "User-adopted interpretation",
+      "date": "2026-11-22",
+      "authority": "Developer clarification reported by user",
       "scope": "prior_register_outside_pilot",
       "reference_url": "../clarifications.md#rcl-022-an-attack-on-land-that-was-chinese-at-the-start",
       "reference_label": "Rule register",
-      "authority_detail": "The user adopted this for now on 19 November 2026, answering the project's questions Q-001 and Q-002. Rule 4.9 names the zones by their printed owner, and rules 4.5 and 5.1 forbid the wars such an attack would start for Mongolia; the engine had let Mongolia make the attack and put it at war with the CCP of its own alliance."
+      "authority_detail": "The user reported the developers' answer on 22 November 2026, answering the project's questions Q-001 and Q-002. It replaces the user's reading of 19 November 2026, under which rules 4.5 and 5.1 forbade the attack to Mongolia."
     }
   ]
 }

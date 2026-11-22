@@ -284,9 +284,10 @@ bool landAccess(const State &s, NationId nation, ZoneId zone, bool combat) {
       (controlledBy(s, nation, s.currentNation()) ||
        !mayDeclareWar(s, nation, *owner, DeclarationMode::LandAttack).allowed))
     return false;
-  // An attack on land that was Chinese at the start declares war on all of
-  // China, whoever holds the land or if nobody does (RB 4.9).
-  return mayInvadeChina(s, nation, zone).allowed;
+  // An attack on land that was Chinese at the start also declares war on all
+  // of China outside the attacker's alliance, whoever holds the land or if
+  // nobody does (RB 4.9, RCL-022); every attacker may make it.
+  return true;
 }
 bool aircraftFlightAccess(const State &s, NationId nation, ZoneId zone,
                           bool combat) {

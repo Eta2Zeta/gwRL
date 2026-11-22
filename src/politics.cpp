@@ -21,11 +21,13 @@ bool chinese(const Id& nation) {return nation=="ccp"||nation=="kmt"||nation=="da
 bool chinese(const State& s,NationId nation) {return chinese(nationName(s,nation));}
 bool warlord(const State& s,NationId nation) {return isWarlord(nationName(s,nation));}
 // The nations an invasion of China (RB 4.9) puts at war with the invader: the
-// KMT, the CCP and every warlord, while each is still in the game.
-bool chinaInvasionTarget(const State& s,NationId id,const NationState& n) {
+// KMT, the CCP and every warlord, while each is still in the game, except a
+// nation of the invader's own alliance (RCL-022, the developers' answer).
+bool chinaInvasionTarget(const State& s,NationId invader,NationId id,const NationState& n) {
     const auto& known=knownNations(s);
+    const auto& alliance=s.nations.at(invader).alliance;
     return !marked(n.gameFlags,mark::incorporated)&&!s.politics.surrendered.contains(id)&&
-           (id==known.ccp||id==known.kmt||warlord(s,id));
+           (id==known.ccp||id==known.kmt||warlord(s,id))&&!(alliance&&n.alliance==alliance);
 }
 bool hasUnits(const State& s,NationId nation) {
     return std::any_of(s.units.begin(),s.units.end(),[&](const auto& item){return item.second.owner==nation;});
@@ -243,33 +245,31 @@ bool controllerPossible(const Id& nation,const std::optional<Id>& controller) {
 // (refreshPoliticalState) and for Japan when an enemy holds its capital
 // (PoliticsRules::finishTurn), and it refuses the CCP.
 bool canSurrender(const Id& nation) {return nation=="kmt"||nation=="japan";}
-// recordLandAttack records the invader only when the attacker is not Chinese,
-// and puts the invader at war with the CCP, which is never incorporated and
-// never surrenders. So only a nation that can be at war with the CCP invades
-// China: Japan, never Mongolia.
-bool canInvadeChina(const Id& nation) {return !chinese(nation)&&warPossible(nation,"ccp");}
+// recordLandAttack records the invader of China only when the attacker is not
+// Chinese: Japan or Mongolia, the nations that are not, may each attack land
+// that was Chinese at the start.
+bool canInvadeChina(const Id& nation) {return !chinese(nation);}
 // A war starts in one of four ways. Setup has one war, between the KMT and the
 // CCP. A nation declares it: mayDeclareWar lets only Japan, the KMT, the CCP
 // and Dadao declare, never on their own alliance, and Dadao only on a Chinese
-// nation. A nation that is not Chinese attacks Chinese land: recordLandAttack
-// puts it at war with the KMT, the CCP and the warlords, and mayInvadeChina
-// allows that attack only if the attacker may declare each of those wars,
-// which Mongolia, in the Comintern with the CCP, never may (RCL-022). Or a
-// nation is incorporated: incorporateNation hands its wars to the recipient,
-// the KMT, the CCP, Dadao or Japan, except those with the recipient's own
-// alliance. So:
+// nation. A nation that is not Chinese, Japan or Mongolia, attacks Chinese
+// land: recordLandAttack puts it at war with the KMT, the CCP and the
+// warlords, except those of its own alliance (RCL-022). Or a nation is
+// incorporated: incorporateNation hands its wars to the recipient, the KMT,
+// the CCP, Dadao or Japan, except those with the recipient's own alliance.
+// So:
 // - Japan and Dadao, in the Axis for good, never fight, nor do the CCP and
 //   Mongolia, in the Comintern for good.
-// - A warlord fights only Japan, the CCP and Dadao. It declares no war, and
-//   one the KMT attacks joins the CCP there and then (recordLandAttack), which
-//   ends that war at once.
-// - Mongolia fights only Japan and the KMT. It declares no war and may not
-//   invade China, Dadao declares war only on a Chinese nation, and no warlord
-//   is at war with Mongolia to hand that war on by incorporation.
+// - A warlord fights only Japan, the CCP, Dadao and Mongolia. It declares no
+//   war, and one the KMT attacks joins the CCP there and then
+//   (recordLandAttack), which ends that war at once.
+// - Mongolia fights Japan and the KMT, the nations that may declare war on it,
+//   the warlords, by invading China, and Dadao, when Dadao wins over a warlord
+//   at war with Mongolia and takes over that war by incorporation.
 bool warPossible(const Id& first,const Id& second) {
     const auto fights=[](const Id& a,const Id& b) {
-        if(a=="mongolia")return b=="japan"||b=="kmt";
-        if(isWarlord(a))return b=="japan"||b=="ccp"||b=="dadao";
+        if(a=="mongolia")return b=="japan"||b=="kmt"||b=="dadao"||isWarlord(b);
+        if(isWarlord(a))return b=="japan"||b=="ccp"||b=="dadao"||b=="mongolia";
         return !((a=="japan"&&b=="dadao")||(a=="dadao"&&b=="japan"));
     };
     return first!=second&&fights(first,second)&&fights(second,first);
@@ -298,7 +298,7 @@ bool alwaysAtWar(const Id& first,const Id& second) {
 // KMT, whose attack makes the warlord join the CCP there and then. Before it
 // records the attacker, it declares the attacker's war on the warlord if they
 // are not at war yet. So the attacker is a nation that can be at war with a
-// warlord (warPossible): Japan, the CCP or Dadao.
+// warlord (warPossible): Japan, the CCP, Dadao or Mongolia.
 bool warlordAttackPossible(const Id& warlord,const Id& attacker) {
     return isWarlord(warlord)&&warPossible(attacker,warlord);
 }
@@ -618,33 +618,22 @@ bool invadesChina(const State& s,NationId attacker,ZoneId zone) {
     return (original==known.ccp||original==known.kmt||warlord(s,original))&&
            !isNation(s,s.territories.at(zone).possessor,"dadao");
 }
-PoliticalPermission mayInvadeChina(const State& s,NationId attacker,ZoneId zone) {
-    if(chinese(s,attacker))return {true,{}};
-    // The wars come first: they are cheap to check, and an attacker already at
-    // war with all of China needs no look at the zone's printed owner.
-    const auto& wars=s.nations.at(attacker).atWarWith;
-    const auto starts=[&](NationId id,const NationState& n){return id!=attacker&&!wars.contains(id)&&chinaInvasionTarget(s,id,n);};
-    if(std::none_of(s.nations.begin(),s.nations.end(),[&](const auto& item){return starts(item.first,item.second);})||
-       !invadesChina(s,attacker,zone))return {true,{}};
-    for(const auto& [id,n]:s.nations)
-        if(starts(id,n))
-            if(const auto permission=mayDeclareWar(s,attacker,id,DeclarationMode::ChinaInvasion);!permission.allowed)
-                return {false,"Invading China would start a war with "+nationName(s,id)+": "+permission.reason};
-    return {true,{}};
-}
 void recordLandAttack(State& s,NationId attacker,ZoneId zone) {
     require(s.territories.contains(zone),"Land attack target is not land");
     const auto defender=s.territories.at(zone).possessor;
     require(defender!=attacker,"Cannot attack one's own possession");
     if(defender&&s.politics.chineseTruce&&((attacker== knownNations(s).ccp&&*defender== knownNations(s).kmt)||(attacker== knownNations(s).kmt&&*defender== knownNations(s).ccp)))
         throw std::runtime_error("Chinese Truce prevents attacking the other faction");
-    if(const auto permission=mayInvadeChina(s,attacker,zone);!permission.allowed)
-        throw std::runtime_error("Illegal land attack: "+permission.reason);
     const bool invasion=invadesChina(s,attacker,zone);
+    // Whether this attack starts a war with the KMT or the CCP: by invading
+    // China, it starts one with each of them that is not of the attacker's
+    // alliance and not yet at war with it.
     bool newChinaDeclaration=false;
     if(!chinese(s,attacker))for(const char* name:{"ccp","kmt"}) {
-        const auto china=findNation(s,name);  // Empty if absent: then neither set holds it.
-        if(!s.politics.surrendered.contains(china)&&!s.nations.at(attacker).atWarWith.contains(china))newChinaDeclaration=true;
+        const auto china=findNation(s,name);  // Empty if absent.
+        if(china&&chinaInvasionTarget(s,attacker,*china,s.nations.at(*china))&&
+           !s.nations.at(attacker).atWarWith.contains(*china))
+            newChinaDeclaration=true;
     }
     if(defender&&*defender!=attacker&&!s.nations.at(attacker).atWarWith.contains(*defender))declareWar(s,attacker,*defender,DeclarationMode::LandAttack);
     if(defender&&warlord(s,*defender)) {
@@ -662,7 +651,7 @@ void recordLandAttack(State& s,NationId attacker,ZoneId zone) {
     if(invasion) {
         s.politics.foreignChinaWarPending=true;s.politics.chinaInvader=attacker;
         if(newChinaDeclaration)s.politics.pending["truce_foreign_declaration"]=V(true);
-        for(auto& [id,n]:s.nations)if(chinaInvasionTarget(s,id,n))warPair(s,attacker,id);
+        for(auto& [id,n]:s.nations)if(chinaInvasionTarget(s,attacker,id,n))warPair(s,attacker,id);
     }
 }
 void surrenderNation(State& s,NationId nation,NationId attacker) {

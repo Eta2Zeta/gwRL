@@ -3,7 +3,7 @@
   "scope": "Evidence index for all rows of the core rules ledger. A listed focused fixture exercises the named mechanic; it is not a claim that every clause or legal position has exhaustive coverage. Full initial-state campaign traces are separately recorded.",
   "ledger_sha256": "f0f404611cdc70c7cbfefcf75195b4edfb333dac0ecfc7870ff757f5a953a389",
   "evidence_file_sha256": {
-    "src/air.cpp": "df3e7003cb7d3ae622abac90928e1ce2eab9dcf14683764c872c595b77aed477",
+    "src/air.cpp": "da67c67781a738fa7f0ccabc00f79bc6b75a268f6d10d8be0f6f343ac84b942f",
     "src/campaign_objective.cpp": "9e0e01963a6d78558a5df71f9b116f9c8405ceac63d90db4e664785af950b0b5",
     "src/campaign_runtime.cpp": "6700efbf18ba8dc6c30ee4700dd63721c8898631590b2e5f48650efda003a890",
     "src/campaign_setup.cpp": "1a7db3e6958d657e4bed2a39dd765b782a76e4c26fadc721f188b9cbe9fd3502",
@@ -11,11 +11,11 @@
     "src/economy.cpp": "1e67f1044592a63393237be5fe79462e0cde70e068055d99518bf32cd0cb1d93",
     "src/economy_lendlease.cpp": "072712e5c80734056353b7aa3f3af9c450a92aa21f9a7481b97c58f5ffddf15a",
     "src/land_combat.cpp": "44c6f2a0118caeac48e5526d208b4152780e3450f6c586ef96f26e7c7f7c3139",
-    "src/movement.cpp": "d896cbacef06a81d2c10da038d2e95eb11065a70411e083ff4bbf878f47a41cf",
+    "src/movement.cpp": "145cf277ac37379d3a26791ac69b1dc5a056d17360df2819c299358eabc5bf9f",
     "src/naval_combat.cpp": "febf83872c98152c43500d76596a551f78b52be3076d74a3b126336ab84b4bfb",
     "src/naval_movement.cpp": "624a6aff6bc5e0a661e64b6f357c02e1681c7ac2c69fd8312817ff248a0e5e5d",
-    "src/naval_operations.cpp": "0342f2d127a49b500856ff8d28ff197612599b3e9ba1b96e883fd74c37fdd35d",
-    "src/politics.cpp": "948d63ec0a75dd1667140f69e7f3f7defc1e6a3f0122a68afab0bc84252e024f",
+    "src/naval_operations.cpp": "a44be18906ec4632d91eaa68db33aba09e926d10592fd4066a282071b079ff89",
+    "src/politics.cpp": "62e45c4fd51928081578570b91121bc296600eba2351661f89b2cc9704a5a9c3",
     "src/politics_influence.cpp": "6c1e591c1aadd0ee709b9e367ee52e3e1cadbef9a031a9eadd254847ef001d24",
     "src/politics_warlords.cpp": "ad77f9a0a1905187c32c08e05f39467f0752c3a3a6831b916120d2afc0a7d9fb",
     "tests/air_integration_tests.cpp": "8f5b94cdd6192cfd3e68907a2085376a32a5f7f633021d91359ad7030ad8c448",
@@ -36,7 +36,7 @@
     "tests/naval_movement_tests.cpp": "cfae73a962193ece9d2a32bc81395792c44496949adf920039ffc1eec85bfe8e",
     "tests/naval_operations_tests.cpp": "9754af346578ab1e72a6551303d8147f16fcda40fc102f1853d7d7a69c348f17",
     "tests/politics_influence_tests.cpp": "69fba5d75fb4892ca40f70cf3ba10d19a31bba43dfa42aa841ea7957ea298486",
-    "tests/politics_tests.cpp": "495728729615887840db25ffcf99fcc2f276b71d1076ddb03116d9da038137d4",
+    "tests/politics_tests.cpp": "1c163691054e1e375b6349600571f32d9a11028008edd8dcfe28471f0733d16c",
     "tests/politics_warlords_tests.cpp": "3445cefcc20aa0b853d618ad0dbafeed6a6859418f8336c73985816be1e5c8ea"
   },
   "rows": [
@@ -280,7 +280,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 626
+          "line": 627
         },
         {
           "file": "src/air.cpp",
@@ -328,12 +328,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "borderApproach",
-          "line": 355
+          "line": 356
         },
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 626
+          "line": 627
         }
       ],
       "fixtures": [
@@ -456,12 +456,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "borderApproach",
-          "line": 355
+          "line": 356
         },
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 626
+          "line": 627
         }
       ],
       "fixtures": [
@@ -510,7 +510,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 626
+          "line": 627
         },
         {
           "file": "src/land_combat.cpp",
@@ -566,12 +566,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "borderApproach",
-          "line": 355
+          "line": 356
         },
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 626
+          "line": 627
         }
       ],
       "fixtures": [
@@ -666,12 +666,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "borderApproach",
-          "line": 355
+          "line": 356
         },
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 626
+          "line": 627
         }
       ],
       "fixtures": [
@@ -733,7 +733,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 626
+          "line": 627
         }
       ],
       "fixtures": [
@@ -799,12 +799,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "supplyRoute",
-          "line": 1016
+          "line": 1017
         },
         {
           "file": "src/movement.cpp",
           "symbol": "inSupply",
-          "line": 1032
+          "line": 1033
         }
       ],
       "fixtures": [
@@ -1081,7 +1081,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 635
+          "line": 621
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1163,7 +1163,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::finishTurn",
-          "line": 805
+          "line": 794
         }
       ],
       "fixtures": [
@@ -1277,7 +1277,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 635
+          "line": 621
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1360,7 +1360,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 635
+          "line": 621
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1443,7 +1443,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 635
+          "line": 621
         },
         {
           "file": "src/politics_warlords.cpp",
@@ -1668,7 +1668,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "surrenderNation",
-          "line": 668
+          "line": 657
         },
         {
           "file": "src/politics.cpp",
@@ -1729,12 +1729,12 @@
         {
           "file": "src/politics.cpp",
           "symbol": "surrenderNation",
-          "line": 668
+          "line": 657
         },
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::applyChance",
-          "line": 778
+          "line": 767
         }
       ],
       "fixtures": [
@@ -1929,7 +1929,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "PoliticsRules::finishTurn",
-          "line": 805
+          "line": 794
         }
       ],
       "fixtures": [
@@ -2139,7 +2139,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "blitzPairValid",
-          "line": 435
+          "line": 436
         },
         {
           "file": "src/land_combat.cpp",
@@ -2205,7 +2205,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2075
+          "line": 2074
         },
         {
           "file": "src/naval_combat.cpp",
@@ -2392,7 +2392,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1707
+          "line": 1706
         },
         {
           "file": "src/land_combat.cpp",
@@ -2477,7 +2477,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationAction",
-          "line": 787
+          "line": 786
         },
         {
           "file": "src/land_combat.cpp",
@@ -2696,12 +2696,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 626
+          "line": 627
         },
         {
           "file": "src/movement.cpp",
           "symbol": "validateFactoryRailRoute",
-          "line": 684
+          "line": 685
         },
         {
           "file": "src/naval_movement.cpp",
@@ -2762,12 +2762,12 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1707
+          "line": 1706
         },
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2075
+          "line": 2074
         },
         {
           "file": "src/land_combat.cpp",
@@ -3094,7 +3094,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "lendLeaseSupplyRoute",
-          "line": 1020
+          "line": 1021
         }
       ],
       "fixtures": [
@@ -3222,7 +3222,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 626
+          "line": 627
         }
       ],
       "fixtures": [
@@ -3374,7 +3374,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1707
+          "line": 1706
         },
         {
           "file": "src/land_combat.cpp",
@@ -3605,7 +3605,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationAction",
-          "line": 787
+          "line": 786
         }
       ],
       "fixtures": [
@@ -3707,12 +3707,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "seaBlockaded",
-          "line": 813
+          "line": 814
         },
         {
           "file": "src/movement.cpp",
           "symbol": "facilityBlockaded",
-          "line": 819
+          "line": 820
         }
       ],
       "fixtures": [
@@ -4107,7 +4107,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "blitzPairValid",
-          "line": 435
+          "line": 436
         }
       ],
       "fixtures": [
@@ -4172,7 +4172,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1707
+          "line": 1706
         }
       ],
       "fixtures": [
@@ -4246,7 +4246,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1707
+          "line": 1706
         },
         {
           "file": "src/land_combat.cpp",
@@ -4336,7 +4336,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2075
+          "line": 2074
         }
       ],
       "fixtures": [
@@ -4385,7 +4385,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2075
+          "line": 2074
         }
       ],
       "fixtures": [
@@ -4422,7 +4422,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2075
+          "line": 2074
         }
       ],
       "fixtures": [
@@ -4453,7 +4453,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2075
+          "line": 2074
         }
       ],
       "fixtures": [
@@ -4502,7 +4502,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationAction",
-          "line": 787
+          "line": 786
         },
         {
           "file": "src/naval_combat.cpp",
@@ -4545,7 +4545,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1707
+          "line": 1706
         },
         {
           "file": "src/air.cpp",
@@ -4663,7 +4663,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationAction",
-          "line": 787
+          "line": 786
         },
         {
           "file": "src/land_combat.cpp",
@@ -4720,7 +4720,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationAction",
-          "line": 787
+          "line": 786
         },
         {
           "file": "src/land_combat.cpp",
@@ -4902,7 +4902,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 626
+          "line": 627
         }
       ],
       "fixtures": [
@@ -4946,7 +4946,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 626
+          "line": 627
         }
       ],
       "fixtures": [
@@ -5003,7 +5003,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1707
+          "line": 1706
         },
         {
           "file": "src/air.cpp",
@@ -5134,12 +5134,12 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "queueDamagedPortEvacuation",
-          "line": 1165
+          "line": 1164
         },
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationAction",
-          "line": 787
+          "line": 786
         }
       ],
       "fixtures": [
@@ -5203,7 +5203,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "preparePortLandDefence",
-          "line": 1133
+          "line": 1132
         }
       ],
       "fixtures": [
@@ -5377,7 +5377,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "lendLeaseSupplyRoute",
-          "line": 1020
+          "line": 1021
         }
       ],
       "fixtures": [
@@ -5450,12 +5450,12 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "resolveCapturedPorts",
-          "line": 1160
+          "line": 1159
         },
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationChance",
-          "line": 997
+          "line": 996
         }
       ],
       "fixtures": [
@@ -5660,7 +5660,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 626
+          "line": 627
         },
         {
           "file": "src/land_combat.cpp",
@@ -5935,7 +5935,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1707
+          "line": 1706
         },
         {
           "file": "src/land_combat.cpp",
@@ -5999,7 +5999,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "navalFacilityUsable",
-          "line": 825
+          "line": 826
         }
       ],
       "fixtures": [
@@ -6147,7 +6147,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "navalFacilityUsable",
-          "line": 825
+          "line": 826
         }
       ],
       "fixtures": [
@@ -6218,7 +6218,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "navalFacilityUsable",
-          "line": 825
+          "line": 826
         }
       ],
       "fixtures": [
@@ -6338,7 +6338,7 @@
         {
           "file": "src/naval_operations.cpp",
           "symbol": "applyNavalOperationChance",
-          "line": 997
+          "line": 996
         }
       ],
       "fixtures": [
@@ -6369,7 +6369,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "railUndamaged",
-          "line": 377
+          "line": 378
         }
       ],
       "fixtures": [
@@ -6436,7 +6436,7 @@
         {
           "file": "src/politics.cpp",
           "symbol": "recordLandAttack",
-          "line": 635
+          "line": 621
         },
         {
           "file": "src/politics.cpp",

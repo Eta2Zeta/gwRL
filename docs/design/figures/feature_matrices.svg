@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="662" viewBox="0 0 960 662" role="img" aria-labelledby="title desc">
   <title id="title">The zone features and the global features as feature matrices</title>
-  <desc id="desc">Two feature matrices of real feature values from decision 612. The zone features: one row per zone, one column per zone feature; shown are Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and 8 of the 35,329 columns: possessor:ccp, possessor:kmt, units:ccp:militia, units:ccp:mountain_infantry, units:kmt:militia, units:kmt:infantry, rail_to:land_china_hopeh and project:kmt:fortification. Shensi has the value 1 for possessor:ccp, units:ccp:militia, units:ccp:mountain_infantry and rail_to:land_china_hopeh; Hopeh 1 for possessor:kmt and project:kmt:fortification; Suiyuan 1 for possessor:kmt and 3 for units:kmt:militia; Szechwan 1 for possessor:kmt; Tsinghai 1 for possessor:kmt, 1 for units:kmt:militia and 2 for units:kmt:infantry; every other entry shown is 0. In all, Shensi has 9 non-zero feature values, Hopeh 28, Suiyuan 12, Szechwan 2 and Tsinghai 13, and the 37 zones 840. The global features: one row of 2,739 features, with round 5, completed_rounds 4, rounds_left 7, phase:combat_movement 1, turn_nation:ccp 1, turn_nation:japan 0 and phase:noncombat_movement 0; 131 non-zero feature values in all.</desc>
+  <desc id="desc">Two feature matrices of real feature values from decision 612. The zone features: one row per zone, one column per zone feature; shown are Shensi, Hopeh, Suiyuan, Szechwan and Tsinghai, and 8 of the 35,329 columns: possessor:ccp, possessor:kmt, units:ccp:militia, units:ccp:mountain_infantry, units:kmt:militia, units:kmt:infantry, rail_to:land_china_hopeh and project:kmt:fortification. Shensi has the value 1 for possessor:ccp, units:ccp:militia, units:ccp:mountain_infantry and rail_to:land_china_hopeh; Hopeh 1 for possessor:kmt and project:kmt:fortification; Suiyuan 1 for possessor:kmt and 3 for units:kmt:militia; Szechwan 1 for possessor:kmt; Tsinghai 1 for possessor:kmt, 1 for units:kmt:militia and 2 for units:kmt:infantry; every other entry shown is 0. In all, Shensi has 9 non-zero feature values, Hopeh 28, Suiyuan 12, Szechwan 2 and Tsinghai 13, and the 37 zones 840. The global features: one row of 2,766 features, with round 5, completed_rounds 4, rounds_left 7, phase:combat_movement 1, turn_nation:ccp 1, turn_nation:japan 0 and phase:noncombat_movement 0; 131 non-zero feature values in all.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -129,7 +129,7 @@
   <text class="body" x="772" y="359" text-anchor="middle">13</text>
   <text class="label" x="30" y="386">… 32 more zones</text>
   <text class="label" x="24" y="416">In all 37 zones: 840 non-zero feature values. Every other entry of the 37 × 35,329 feature matrix is 0 and is not stored.</text>
-  <text class="body bold" x="24" y="448">The global features: one row of 2,739 features about the state as a whole</text>
+  <text class="body bold" x="24" y="448">The global features: one row of 2,766 features about the state as a whole</text>
   <text class="mono" x="193.0" y="598" transform="rotate(-40 193.0 598)">round</text>
   <text class="mono" x="239.0" y="598" transform="rotate(-40 239.0 598)">completed_rounds</text>
   <text class="mono" x="285.0" y="598" transform="rotate(-40 285.0 598)">rounds_left</text>
@@ -137,7 +137,7 @@
   <text class="mono" x="377.0" y="598" transform="rotate(-40 377.0 598)">turn_nation:ccp</text>
   <text class="mono" x="423.0" y="598" transform="rotate(-40 423.0 598)">turn_nation:japan</text>
   <text class="mono" x="469.0" y="598" transform="rotate(-40 469.0 598)">phase:noncombat_movement</text>
-  <text class="label" x="504" y="594">… 2,732 more columns</text>
+  <text class="label" x="504" y="594">… 2,759 more columns</text>
   <text class="label" x="726" y="594" text-anchor="middle">non-zero feature values</text>
   <text class="body bold" x="30" y="626">the state</text>
   <rect x="177" y="611" width="40" height="22" rx="4" fill="#ddf4ff" stroke="#54aeff"/>

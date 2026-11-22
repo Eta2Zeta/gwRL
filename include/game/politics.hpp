@@ -7,9 +7,7 @@ namespace game::campaign {
 // Rule events called by later movement/combat/economy modules. These functions
 // never stand in for resolving a battle or proving a movement/supply path.
 enum class PossessionCause { Capture, Liberation, Alignment, Influence, Transfer };
-// ChinaInvasion is the war that an invasion of China (mayInvadeChina) starts
-// with each Chinese nation; the attack that starts it keeps its own timing.
-enum class DeclarationMode { MajorPowerDeclaration, LandAttack, ChinaInvasion };
+enum class DeclarationMode { MajorPowerDeclaration, LandAttack };
 
 struct PoliticalPermission {
     bool allowed {false};
@@ -39,19 +37,18 @@ bool alliancePossible(const Id& nation, const std::optional<Id>& alliance);
 bool controllerPossible(const Id& nation, const std::optional<Id>& controller);
 // Only the KMT, which loses its last land, and Japan, which loses Tokyo, surrender.
 bool canSurrender(const Id& nation);
-// The invader recorded when Chinese land is attacked is not Chinese, and the
-// attack puts it at war with the CCP: Japan, never Mongolia (RCL-022).
+// The invader recorded when Chinese land is attacked is not Chinese: Japan or
+// Mongolia (RCL-022).
 bool canInvadeChina(const Id& nation);
-// Whether the two can ever be at war. One side of every war is Japan, the KMT,
-// the CCP or Dadao. Japan and Dadao share the Axis for good, and the CCP and
-// Mongolia the Comintern. A warlord fights only Japan, the CCP and Dadao, and
-// Mongolia only Japan and the KMT.
+// Whether the two can ever be at war. Japan and Dadao share the Axis for good,
+// and the CCP and Mongolia the Comintern. A warlord fights only Japan, the CCP,
+// Dadao and Mongolia, and Mongolia only Japan, the KMT, Dadao and the warlords.
 bool warPossible(const Id& first, const Id& second);
 // Whether the two can ever be allies: only the KMT and the CCP, under their truce.
 bool alliesPossible(const Id& first, const Id& second);
 // Whether `attacker` can be recorded as having attacked this warlord: Japan,
-// the CCP or Dadao. The KMT's attack makes the warlord join the CCP at once
-// instead, and Mongolia never attacks a warlord.
+// the CCP, Dadao or Mongolia. The KMT's attack makes the warlord join the CCP
+// at once instead.
 bool warlordAttackPossible(const Id& warlord, const Id& attacker);
 // Facts that never change during a game. A nation of this campaign other than
 // Dadao is in every position, and the KMT and the CCP are always at war.
@@ -91,16 +88,11 @@ void declareWar(State&, NationId actor, NationId target, DeclarationMode);
 // Rule 4.9 (page 30): an attack by a nation that is not Chinese on land that
 // was originally a warlord's, the CCP's or the KMT's, whoever holds it now,
 // declares war on all of China, unless Dadao holds the land (15.4, page 105).
-// invadesChina says whether this attack is one.
+// invadesChina says whether this attack is one. recordLandAttack then puts the
+// attacker at war with the KMT, the CCP and every warlord still in the game,
+// except a nation of the attacker's own alliance, and any attacker may make
+// that attack, Mongolia too (RCL-022: the developers' answer).
 bool invadesChina(const State&, NationId attacker, ZoneId zone);
-// Whether the attacker may start every war that this attack's invasion of
-// China starts: with the KMT, the CCP and each warlord still in the game that
-// it is not at war with yet. Each must be a war mayDeclareWar allows: none with
-// the attacker's own alliance (5.1, page 35) and none started by a controlled
-// minor power (4.5, page 27). So Mongolia, whose alliance holds the CCP, never
-// may (RCL-022). Every way of attacking land asks this before it offers the
-// attack, and recordLandAttack refuses an attack it denies.
-PoliticalPermission mayInvadeChina(const State&, NationId attacker, ZoneId zone);
 void recordLandAttack(State&, NationId attacker, ZoneId zone);
 void surrenderNation(State&, NationId nation, NationId attacker);
 

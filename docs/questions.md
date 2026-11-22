@@ -222,17 +222,20 @@ These are open too, and stay in the pages that own them:
 An answered question is listed here with its number, the answer, the date and
 the page that now states it.
 
-- **Q-001**, Mongolia at war with the CCP. Answered on 19 November 2026:
-  follow the printed rules for now, so Mongolia may not attack land that was
-  originally a warlord's, the CCP's or the KMT's, which would put it at war
-  with the CCP of its own alliance. Stated in
+- **Q-001**, Mongolia at war with the CCP. Answered on 22 November 2026 by the
+  game's developers, as the owner reported: Mongolia may attack land that was
+  originally a warlord's, the CCP's or the KMT's, and the attack puts it at war
+  with every Chinese nation outside its own alliance, so never with the CCP; a
+  nation of the Allies that attacks such land in the full game is never put at
+  war with the KMT. It replaces the owner's answer of 19 November 2026, to
+  follow the printed rules for now, under which Mongolia could never make the
+  attack. Stated in
   [rule clarification RCL-022](../game_content/rules/clarifications.md#rcl-022-an-attack-on-land-that-was-chinese-at-the-start)
   and [the politics page](engine/politics.md#invading-china).
-- **Q-002**, Chinese land that Japan holds. Answered on 19 November 2026: the
-  printed owner decides, so an attack on such land is an attack on China
-  whoever holds it, and no nation that may not go to war with all of China,
-  such as the USSR or a nation of the Allies in the full game, may make it.
-  Stated in the same two places.
+- **Q-002**, Chinese land that Japan holds. Answered on 19 November 2026, and
+  kept by the developers' answer of 22 November: the printed owner decides, so
+  an attack on such land is an attack on China whoever holds it. Stated in the
+  same two places.
 - **Q-003**, one list of marks for each kind of thing. Answered on 18 November
   2026: yes, with the four bombing-reduction marks added. The engine's mark
   table now says which kinds of thing the rules put each mark on, and the input

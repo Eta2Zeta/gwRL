@@ -722,8 +722,7 @@ std::vector<Action> navalOperationActions(const State &s) {
           if (!s.territories.contains(land) ||
               !s.territories.at(land).possessor ||
               !hostile(s, u.owner, *s.territories.at(land).possessor) ||
-              !chineseMovementAllowed(s, u.owner, land) ||
-              !mayInvadeChina(s, u.owner, land).allowed)
+              !chineseMovementAllowed(s, u.owner, land))
             continue;
           out.push_back(action(
               s, s.currentNation(), "naval_declare_assault",

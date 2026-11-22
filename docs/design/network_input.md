@@ -55,7 +55,7 @@ The input for one decision is one bundle with three parts:
 
 1. **The zone features:** each of the 37 zones (31 land and 6 sea) has values for
    the same list of 35,329 zone features.
-2. **The global features:** 2,739 features about the state as a whole: the game
+2. **The global features:** 2,766 features about the state as a whole: the game
    round, the phase, whose turn it is, treasuries, wars and so on.
 3. **The action features:** every legal action has values for the same list of
    11,046 action features about itself.
@@ -758,12 +758,9 @@ Each rule is a short function in the engine's politics or economy module
 layout keeps the features the rule allows, unless it allows only one. On 14
 November 2026 this took the global features from 6,477 to 4,076, and on 18
 November 2026 the facts that never change and the marks a nation is never given
-took them to 2,784. On 19 November 2026 the user ruled that Mongolia may not
-attack land that was Chinese at the start
-([RCL-022](../../game_content/rules/clarifications.md#rcl-022-an-attack-on-land-that-was-chinese-at-the-start)). Removing the features that ruling makes impossible,
-Mongolia at war with the CCP, Dadao or a warlord, Mongolia as China's invader
-and Mongolia as a warlord's attacker, together with the KMT at war with a
-warlord, a war that ends as soon as it starts, took them to 2,739.
+took them to 2,784. Removing the wars that no rule brings about, the CCP at
+war with Mongolia, its partner in the Comintern, and the KMT at war with a
+warlord, a war that ends as soon as it starts, took them to 2,766.
 
 | Features | Kept for | Why no other value can happen |
 | --- | --- | --- |
@@ -776,11 +773,11 @@ warlord, a war that ends as soon as it starts, took them to 2,739.
 | `turn_nation`, `completed_turns` | the CCP, Mongolia, Japan and the KMT | The turn passes only along the scenario's turn order. |
 | `surrendered` | Japan and the KMT | The KMT surrenders when it holds no land, Japan when an enemy holds Tokyo at the end of Japan's turn. The CCP never surrenders, and no rule makes any other nation surrender. |
 | `evolution_awarded`, `state_flag_nation` | the KMT and the CCP | Only they evolve into major powers and then choose a capital. The mark that the choice is pending is the only game-wide mark that names a nation. |
-| `china_invader` | Japan | The invader is recorded when a nation that is not Chinese attacks land that was Chinese at the start, and that attack puts it at war with the CCP. Mongolia, in the Comintern with the CCP for good, may never make such an attack ([RCL-022](../../game_content/rules/clarifications.md#rcl-022-an-attack-on-land-that-was-chinese-at-the-start)). |
-| `attacked_warlord` | each warlord, attacked by Japan, the CCP or Dadao | An attack on a warlord's land puts the attacker at war with the warlord before the attack is recorded, so the attacker is a nation that can be at war with a warlord (`at_war` below). A warlord the KMT attacks joins the CCP at once, and that attack is not recorded. |
+| `china_invader` | Japan and Mongolia | The invader is recorded when a nation that is not Chinese attacks land that was Chinese at the start. Japan and Mongolia are the nations that are not Chinese, and each may make that attack ([RCL-022](../../game_content/rules/clarifications.md#rcl-022-an-attack-on-land-that-was-chinese-at-the-start)). |
+| `attacked_warlord` | each warlord, attacked by Japan, the CCP, Dadao or Mongolia | An attack on a warlord's land puts the attacker at war with the warlord before the attack is recorded, so the attacker is a nation that can be at war with a warlord (`at_war` below). A warlord the KMT attacks joins the CCP at once, and that attack is not recorded. |
 | `alignment_queue` | the warlords | Only warlords wait to be aligned at the end of the Combat Phase. |
 | `allied` | the KMT with the CCP | Nations are allies under the Chinese Truce, or as two major powers of one alliance. The only possible major powers, Japan, the KMT and the CCP, are in three different alliances. |
-| `at_war` | Japan, the KMT, the CCP and Dadao with each other, except Japan with Dadao and the KMT with the CCP; Mongolia with Japan and the KMT; each warlord with Japan, the CCP and Dadao | Only Japan, the KMT, the CCP and Dadao declare war, never on their own alliance, and Dadao only on a Chinese nation. Of the nations that are not Chinese, only Japan may attack land that was Chinese at the start, which puts it at war with the KMT, the CCP and the warlords; Mongolia may not, since that attack would start a war with the CCP. Incorporation hands a nation's wars to the KMT, the CCP, Dadao or Japan. So Japan and Dadao, both in the Axis for good, never fight, nor do the CCP and Mongolia, both in the Comintern; Mongolia fights only Japan and the KMT; and a warlord the KMT attacks joins the CCP at once, which ends that war. The KMT and the CCP start at war, and only incorporation ends a war, so they are not asked. |
+| `at_war` | Japan, the KMT, the CCP and Dadao with each other, except Japan with Dadao and the KMT with the CCP; Mongolia with Japan, the KMT, Dadao and each warlord; each warlord with Japan, the CCP and Dadao | Only Japan, the KMT, the CCP and Dadao declare war, never on their own alliance, and Dadao only on a Chinese nation. A nation that is not Chinese, Japan or Mongolia, that attacks land that was Chinese at the start is put at war with the KMT, the CCP and the warlords, except a nation of its own alliance ([RCL-022](../../game_content/rules/clarifications.md#rcl-022-an-attack-on-land-that-was-chinese-at-the-start)). Incorporation hands a nation's wars to the KMT, the CCP, Dadao or Japan, except those with the recipient's own alliance: so Dadao takes over a war with Mongolia from a warlord it wins over. So Japan and Dadao, both in the Axis for good, never fight, nor do the CCP and Mongolia, both in the Comintern; and a warlord the KMT attacks joins the CCP at once, which ends that war. The KMT and the CCP start at war, and only incorporation ends a war, so they are not asked. |
 
 A rare value keeps its feature. Dadao is at war with a warlord only after
 attacking the warlord's land; in the 480 random games of the
@@ -808,11 +805,14 @@ features*:
 - the 160 directed borders, with 22 static features each, such as rivers, narrow
   crossings, railway connections and terrain.
 
-The layout version, now `campaign-zone-v1-db2bfac43b4d8bc8`, is a hash of every
+The layout version, now `campaign-zone-v1-cd3d5a7f9e936bb3`, is a hash of every
 feature name and every static feature. A network refuses inputs of another
 layout, and a training run cannot resume across a layout change. It last changed
-on 19 November 2026, when 45 features about wars, China's invader and attacks on
-warlords that the rules make impossible were removed
+on 22 November 2026, when the game's developers answered that Mongolia may
+attack land that was Chinese at the start
+([RCL-022](../../game_content/rules/clarifications.md#rcl-022-an-attack-on-land-that-was-chinese-at-the-start)):
+27 features came back, Mongolia at war with a warlord or Dadao, Mongolia as
+China's invader and Mongolia as a warlord's attacker
 ([section 8](#what-the-global-features-ask-about-a-nation)).
 
 ## 10. Why the encoder translates names

@@ -64,7 +64,7 @@
     {
       "id": "clarifications",
       "path": "game_content/rules/clarifications.md",
-      "sha256": "694ad6ba88351e72d9eb7858d363b03accef17b7813464218dacd4fef9f172d2",
+      "sha256": "cb5c6d6bffbf16fa732d8b0f3220ff23628b00b9c20cb67dce7dd08f7eb9e16e",
       "kind": "project_rule_register"
     },
     {
@@ -108,13 +108,14 @@
       "scope": "Low Morale consequence; developer confirmation separately covers third-party combat roles."
     },
     {
-      "id": "user_ruling_attacks_on_chinese_land_2026_11_19",
-      "kind": "user_ruling",
-      "date": "2026-11-19",
+      "id": "developer_attacks_on_chinese_land_reported_2026_11_22",
+      "kind": "developer_clarification_reported_by_user",
+      "date": "2026-11-22",
       "question": "Q-001: may Mongolia attack land that was originally a warlord's, the CCP's or the KMT's, which puts it at war with the CCP of its own alliance? Q-002: is an attack on such land an attack on China when a nation outside China holds it?",
-      "quote": "For 1 and 2 let's just follow the rules for now, ussr or allied nations cannot attack original chinese lands beccause theycannot be at war with people in their own allience",
-      "ruling": "The printed owner decides, whoever holds the land (RB 4.9). The attack is allowed only if the attacker may start every war it starts: none inside its own alliance (RB 5.1) and none at all for a controlled minor power (RB 4.5). Mongolia may never make it.",
-      "scope": "Recorded as RCL-022; for now, pending any developer clarification."
+      "quote": "I got developer confirmation that Mongolia can attack any land originally chinese and the rule will be it making mongolia at war with all of chinese except the ones in its own alliance, same for the other side if allies want to take chiense land and it will not put it at war with kmt",
+      "ruling": "The printed owner decides, whoever holds the land (RB 4.9). The attack puts the attacker at war with the KMT, the CCP and every warlord not yet aligned, except a nation of its own alliance, and any nation that is not Chinese may make it, Mongolia too. The zone's holder still decides whether Mongolia may attack at all (RB 4.5).",
+      "scope": "Recorded as RCL-022; replaces the user's reading of 19 November 2026, under which Mongolia could never make the attack.",
+      "independently_verified": false
     }
   ],
   "rules": [
@@ -375,7 +376,7 @@
         "trigger": "foreign_attack_on_original_warlord_ccp_or_kmt_land",
         "dadao_exception": true,
         "applies_whoever_holds_the_land": true,
-        "attack_requires_every_resulting_war_to_be_declarable": true,
+        "war_spares_attacker_alliance": true,
         "effect": "war_on_all_china",
         "alignment_timing": "end_of_attacker_combat",
         "scope": "each_whole_remaining_warlord",
@@ -484,7 +485,7 @@
           "section": "RCL-022 attacks on land that was Chinese at the start"
         },
         {
-          "source_id": "user_ruling_attacks_on_chinese_land_2026_11_19",
+          "source_id": "developer_attacks_on_chinese_land_reported_2026_11_22",
           "section": "Q-001 and Q-002"
         }
       ],
