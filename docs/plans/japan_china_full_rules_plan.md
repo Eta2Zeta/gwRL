@@ -290,11 +290,13 @@ Tannu Tuva is not included and its political ambiguity is deferred.
    introduced. Both ships use eligible supplied shipyards; Fleet Carrier placement
    requires a Major Shipyard. P15's Fleet Carrier carries one Fighter and one
    Tactical Bomber; the Light Carrier carries one Fighter.
-3. **Warlord foreign-war rolls, adopted RCL-003:** always resolve each whole
-   warlord once. Evaluate relevant neighbors across its territories and apply the
+3. **Warlord foreign-war rolls, RCL-003, closed by a developer clarification the
+   user reported on 22 November 2026:** the entire warlord aligns, so always
+   resolve each whole warlord once. Evaluate relevant neighbors across its territories and apply the
    existing alignment table once; the result covers all its territories and units.
-4. **Influence spending, adopted RCL-002:** pre-roll spending is capped by the
-   unmodified success threshold. Preserve the natural-12 backfire and
+4. **Influence spending, RCL-002, closed after checking on 22 November 2026:**
+   pre-roll spending is capped by the unmodified success threshold, the only
+   reading of the printed cap. Preserve the natural-12 backfire and
    beginning-of-turn influencing-zone requirement.
 5. **CCP Soviet route, closed RCL-004:** the user reported on 17 October 2026 that
    the developers fixed the wording for the next version; no publication or version
@@ -332,9 +334,9 @@ Tannu Tuva is not included and its political ambiguity is deferred.
 The campaign's specification is verified and frozen; source
 reconciliation records numeric queue payments and research thresholds. Ship values, queue
 scope and scoring, Mongolia timing, starting-cash adjustment, controlled-minor
-attribution, city/rail scoring and RCL-002–003/009 are recorded decisions;
+attribution, city/rail scoring and RCL-009 are recorded decisions;
 RCL-001 now follows the developer’s corrected airborne sequence;
-RCL-004–008 and RCL-011 are closed after source/developer checks. RCL-010
+RCL-002–008 and RCL-011 are closed after source/developer checks. RCL-010
 remains a campaign interpretation pending developer clarification. RCL-012 is closed: combat roles follow the reported developer ruling, and the
 user clarified that attacking KMT has the same elimination consequence after
 automatic termination.

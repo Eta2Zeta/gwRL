@@ -5,6 +5,33 @@ resolved source lookups or earlier audit mistakes, not missing official rules.
 Their IDs and original source conclusions are retained for traceability. No rule
 or project decision changes as a result of this cleanup.
 
+RCL-002 was moved here from the register on 22 November 2026, when the user
+judged that the printed text allows only one reading.
+
+## RCL-002: influence spending before the die roll
+
+**Status: closed after checking, 22 November 2026.** First recorded on
+5 October 2026 as an interpretation the user adopted.
+
+**Sources:** RB §15.2 p104 and §15.4 p105; CCP p3; Japan p4. The four print the
+same sentences.
+
+**Source-backed conclusion:** before rolling for influence, the CCP or Japan may
+spend IPP "up to the amount of its original influence roll", and each IPP spent
+subtracts 1 from the roll. The payment is made before the die is rolled, so the
+words cannot mean a die result: "its original influence roll" is the number the
+roll is compared with before the payment lowers it, the total number of
+qualifying adjacent land zones, which a raw roll must not exceed to succeed. So
+the nation spends any whole number of IPP from 0 up to that number, and no more
+than its treasury holds; the attempt succeeds when the raw roll minus the IPP
+spent is at most that number, except that a raw 12 always backfires to the KMT,
+as printed. Eligibility, the Influencing Zone requirement and the one attempt a
+turn are as printed.
+
+Example: with 3 qualifying adjacent land zones, the nation may spend up to
+3 IPP. Spending 2 makes raw rolls of 1 to 5 succeed, and a raw 12 still
+backfires.
+
 ## RCL-006: when does Chinese major-power evolution trigger?
 
 **Status: closed after checking, 6 October 2026.**

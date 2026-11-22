@@ -41,15 +41,14 @@ Discord messages are community evidence unless publisher authority is verified.
 A new entry requires a genuine omission or incompatible applicable rules after
 checking definitions, examples, cross-references and national exceptions.
 Source-answered questions are kept in the [archived checks](source_answered_questions.md),
-including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
+including retired IDs RCL-002, RCL-006, RCL-007, RCL-008 and RCL-011.
 
 ## Issue index
 
 | ID | Official-rule question | Status |
 | --- | --- | --- |
 | RCL-001 | Airborne assault: AAA appears in steps 4 and 5 | Closed: developer correction for v4.4; both sides fire in step 4 |
-| RCL-002 | Influence: meaning of the pre-roll spending cap | Adopted: unmodified success threshold |
-| RCL-003 | Foreign invasion: alignment of a whole warlord | Adopted: one roll per warlord |
+| RCL-003 | Foreign invasion: alignment of a whole warlord | Closed: the whole warlord aligns, one roll per warlord; developer clarification reported by user |
 | RCL-004 | CCP purchases: railroad versus supply-path wording | Closed: developer fix for next version, reported by user |
 | RCL-005 | Blockade: enemy surface warships versus any enemy units | Closed: only enemy Surface Warships prevent a blockade; developer clarification reported by user |
 | RCL-009 | Japan-Soviet border clashes: named zones or broader borders | Adopted: Japan reference-sheet target list |
@@ -90,42 +89,31 @@ In steps 3 and 4, airborne infantry and its transporting aircraft are linked:
 selecting that casualty destroys both and counts as one casualty. Destroyed cargo
 does not land or attack.
 
-## RCL-002: influence spending before the die roll
-
-**Status: adopted by the user, 5 October 2026.**
-
-**Sources:** RB §§15.2 and 15.4, pp104-105; CCP p3; Japan p4.
-
-**Problem:** both abilities require payment before rolling but describe the
-spending cap by reference to the original influence roll, which has not happened.
-
-**Adopted clarification:** the cap is the **unmodified success threshold** from
-the qualifying adjacent land zones, not the eventual die result. If that
-threshold is `t`, spend an integer `s` with `0 <= s <= t`, subject to available
-treasury, before rolling. For raw D12 result `r`, success is `r - s <= t`, except
-that **a natural 12 always backfires** to KMT. Eligibility, influencing-zone
-requirements and the one-attempt-per-turn limit are unchanged.
-
-Example: a base threshold of 3 allows spending up to 3 IPP. Spending 2 makes
-raw rolls 1-5 successful, but a raw 12 still backfires.
-
 ## RCL-003: whole-warlord alignment after foreign invasion
 
-**Status: adopted by the user, 5 October 2026.**
+**Status: closed — developer clarification reported by the user, 22 November
+2026.** The user had adopted the same reading on 5 October 2026.
 
 **Sources:** RB §4.9, pp30-31.
 
-**Adopted clarification:** resolve foreign-invasion alignment for each **whole
-warlord**, with one roll whenever the alignment table calls for a roll. Determine
-the qualifying neighboring factions across all territories belonging to that
-warlord, select the corresponding existing table category, and apply the single
-result to the entire faction and its surviving forces. Preserve the table's
-automatic KMT outcome where no qualifying CCP/Dadao neighbor exists.
+**Problem:** RB §4.9 p30 says that an attack by a foreign nation causes all
+warlords to Align, each with the CCP, the KMT or the Dadao Government according
+to the factions it borders, and then introduces the table with "For each land
+zone, roll a D12", as if each land zone of a warlord could go its own way.
+
+**Clarified rule:** the user reported on 22 November 2026 that the game's
+developers have closed this question: the entire warlord aligns. Resolve
+foreign-invasion alignment for each **whole warlord**, with one roll whenever
+the alignment table calls for a roll. Determine the qualifying neighboring
+factions across all territories belonging to that warlord, select the
+corresponding existing table category, and apply the single result to the
+entire faction and its surviving forces. Preserve the table's automatic KMT
+outcome where no qualifying CCP/Dadao neighbor exists.
 
 Beiping/Hopeh form one warlord for this procedure, as do Kwangtung/Hainan.
 Foreign-invasion alignment and ordinary CCP/Japanese influence retain their
 distinct triggers, eligibility, probabilities and timing; both keep the warlord
-intact. This is the adopted shared rule, not a campaign-only exception.
+intact. This is the shared rule, not a campaign-only exception.
 
 ## RCL-004: CCP Comintern Brothers, rail versus supply
 

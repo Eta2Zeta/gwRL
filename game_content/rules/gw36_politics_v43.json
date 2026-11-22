@@ -52,7 +52,7 @@
     {
       "id": "faction_index",
       "path": "game_content/scenarios/japan_china_1936/faction_index.json",
-      "sha256": "80133c3c9d515a2312923db21ca266822910fcdb620bbcbbf0f370eeda2ad62b",
+      "sha256": "ac0586f89d9fe420cdc2ec526714160eedb2cd102022c989ce447458861e9908",
       "kind": "frozen_identity_bridge"
     },
     {
@@ -64,7 +64,7 @@
     {
       "id": "clarifications",
       "path": "game_content/rules/clarifications.md",
-      "sha256": "853d1ff9ea076309e5cbf03cfc76027151c14abbb3adc52a39324c13ef79b14a",
+      "sha256": "558d7473a93dd6adcc919f0df3085f5316ae50ac71b612cbd1bfad29def04e8b",
       "kind": "project_rule_register"
     },
     {
@@ -115,6 +115,15 @@
       "quote": "I got developer confirmation that Mongolia can attack any land originally chinese and the rule will be it making mongolia at war with all of chinese except the ones in its own alliance, same for the other side if allies want to take chiense land and it will not put it at war with kmt",
       "ruling": "The printed owner decides, whoever holds the land (RB 4.9). The attack puts the attacker at war with the KMT, the CCP and every warlord not yet aligned, except a nation of its own alliance, and any nation that is not Chinese may make it, Mongolia too. The zone's holder still decides whether Mongolia may attack at all (RB 4.5).",
       "scope": "Recorded as RCL-022; replaces the user's reading of 19 November 2026, under which Mongolia could never make the attack.",
+      "independently_verified": false
+    },
+    {
+      "id": "developer_whole_warlord_alignment_reported_2026_11_22",
+      "kind": "developer_clarification_reported_by_user",
+      "date": "2026-11-22",
+      "question": "RCL-003: after a foreign invasion, does each warlord align as a whole, or does each of its land zones roll for itself (RB 4.9 p30: \"For each land zone, roll a D12\")?",
+      "quote": "and also 003, the entire warlord is a deverloper closing",
+      "scope": "Foreign-invasion alignment: the entire warlord aligns, one roll per whole warlord, as RCL-003 had adopted on 5 October 2026.",
       "independently_verified": false
     }
   ],
@@ -458,7 +467,11 @@
         },
         {
           "source_id": "clarifications",
-          "section": "RCL-003 adopted whole-faction roll"
+          "section": "RCL-003 whole-warlord alignment"
+        },
+        {
+          "source_id": "developer_whole_warlord_alignment_reported_2026_11_22",
+          "section": "RCL-003"
         },
         {
           "source_id": "rulebook",
@@ -489,9 +502,9 @@
           "section": "Q-001 and Q-002"
         }
       ],
-      "notes": "The printed per-land-zone wording is superseded by the approved whole-warlord clarification; no per-zone split remains.",
+      "notes": "The printed per-land-zone wording is superseded by the developers' whole-warlord clarification (RCL-003); no per-zone split remains.",
       "interpretation_notes": [
-        "The surrendered-KMT stay-neutral sentence belongs to the preceding CCP/Dadao-attack paragraph of RB4.9. The foreign-invasion paragraph and table supply automatic/die KMT outcomes without that exception, and adopted RCL-003 preserves the automatic KMT outcome. Apply that result to actual surviving warlord land and units even after KMT surrendered, ending its no-land condition; do not restore erased resources or reset one-time awards. This is a source-combination inference, not a new user ruling. Direct CCP/Dadao attacks still leave the warlord neutral when KMT has surrendered."
+        "The surrendered-KMT stay-neutral sentence belongs to the preceding CCP/Dadao-attack paragraph of RB4.9. The foreign-invasion paragraph and table supply automatic/die KMT outcomes without that exception, and RCL-003 preserves the automatic KMT outcome. Apply that result to actual surviving warlord land and units even after KMT surrendered, ending its no-land condition; do not restore erased resources or reset one-time awards. This is a source-combination inference, not a new user ruling. Direct CCP/Dadao attacks still leave the warlord neutral when KMT has surrendered."
       ]
     },
     {
@@ -553,8 +566,14 @@
           "section": "15.4"
         },
         {
-          "source_id": "clarifications",
-          "section": "RCL-002 adopted spending bound"
+          "source_id": "ccp_nrs",
+          "pdf_page": 3,
+          "section": "Spreading Influence"
+        },
+        {
+          "source_id": "japan_nrs",
+          "pdf_page": 4,
+          "section": "Dadao Government"
         },
         {
           "source_id": "rulebook",
@@ -573,7 +592,8 @@
         }
       ],
       "interpretation_notes": [
-        "RB104/105 and the adopted RCL-002 natural-12 outcome have no surrender exception. RB5.7 forbids liberation to a surrendered nation, not alignment. RB4.9 expressly leaves a warlord neutral after a CCP/Dadao attack when KMT has surrendered; that attack-only exception is not applied to an influence backfire. Alignment supplies actual land/units, ending KMT’s no-land surrender condition. Reactivation is this source-combination inference, not an expressly printed KMT revival sentence or a new user ruling."
+        "The spending cap, \"the amount of its original influence roll\" (RB104/105, CCP p3, Japan p4), is the unmodified success threshold, the number of qualifying adjacent land zones: the payment precedes the roll, so no die result exists yet. The printed text allows no other reading (RCL-002, closed after checking on 22 November 2026, in game_content/rules/source_answered_questions.md).",
+        "The natural-12 outcome of RB104/105 has no surrender exception. RB5.7 forbids liberation to a surrendered nation, not alignment. RB4.9 expressly leaves a warlord neutral after a CCP/Dadao attack when KMT has surrendered; that attack-only exception is not applied to an influence backfire. Alignment supplies actual land/units, ending KMT’s no-land surrender condition. Reactivation is this source-combination inference, not an expressly printed KMT revival sentence or a new user ruling."
       ]
     },
     {

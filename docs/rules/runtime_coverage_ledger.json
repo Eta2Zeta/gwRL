@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "scope": "Evidence index for all rows of the core rules ledger. A listed focused fixture exercises the named mechanic; it is not a claim that every clause or legal position has exhaustive coverage. Full initial-state campaign traces are separately recorded.",
-  "ledger_sha256": "f0f404611cdc70c7cbfefcf75195b4edfb333dac0ecfc7870ff757f5a953a389",
+  "ledger_sha256": "9138929bdcce38cbed03a3b8c8930806e428345905ca7eb23f260594f8322b6f",
   "evidence_file_sha256": {
     "src/air.cpp": "da67c67781a738fa7f0ccabc00f79bc6b75a268f6d10d8be0f6f343ac84b942f",
     "src/campaign_objective.cpp": "9e0e01963a6d78558a5df71f9b116f9c8405ceac63d90db4e664785af950b0b5",
@@ -1352,7 +1352,7 @@
     },
     {
       "id": "R030",
-      "source": "RB \u00a74.9 pp30-31; adopted RCL-003",
+      "source": "RB \u00a74.9 pp30-31; RCL-003, developer clarification",
       "contract": "R: foreign attack on original Chinese faction/warlord zone declares war on China; all warlords align end Cmb using the existing border/D12 table once per whole warlord; evaluate relevant neighbors across that warlord's territories",
       "acceptance_fixture": "KMT-only if no CCP/Dadao neighbor; only-one-neighbor 1-6/7-12 split; both-neighbor 1-5/6-10/11-12 split; one result transfers every territory and unit of the warlord together",
       "status": "runtime_and_executable_evidence_indexed",
@@ -6587,7 +6587,7 @@
     {
       "id": "R133",
       "source": "RB \u00a715.2 pp103-104; C p3",
-      "contract": "R/C: CCP decentralized, special recruitment D12 <= land count, influence adjacent held zone with unit since start PT; RCL-002 caps pre-roll spending at unmodified success threshold; natural 12 backfires to KMT",
+      "contract": "R/C: CCP decentralized, special recruitment D12 <= land count, influence adjacent held zone with unit since start PT; pre-roll spending capped at the unmodified success threshold, the printed \"original influence roll\" (RCL-002, closed after checking); natural 12 backfires to KMT",
       "acceptance_fixture": "One influence attempt/PT; reject spending above base threshold; pay before chance; natural 12 still backfires; align target warlord's whole group",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
@@ -6700,7 +6700,7 @@
     {
       "id": "R136",
       "source": "RB \u00a715.4 p105; J p4",
-      "contract": "R/C: Dadao influence adjacency/spending/natural 12, recruitment and Japan aid; RCL-002 uses the same adopted spending cap as R133; no automatic all-China alignment from Dadao attacks",
+      "contract": "R/C: Dadao influence adjacency/spending/natural 12, recruitment and Japan aid; the same printed spending cap as R133 (RCL-002); no automatic all-China alignment from Dadao attacks",
       "acceptance_fixture": "Japan influence creates controlled minor, not immediate Japan possession/cash collection; cap enforced before roll",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [

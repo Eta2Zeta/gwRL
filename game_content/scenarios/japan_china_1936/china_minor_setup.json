@@ -928,12 +928,14 @@
       ]
     }
   ],
-  "adopted_rule_clarifications": [
+  "adopted_rule_clarifications": [],
+  "closed_rule_clarifications": [
     {
       "id": "foreign_attack_warlord_alignment_granularity",
       "clarification_id": "RCL-003",
-      "status": "adopted",
-      "authority": "user_confirmed_2026-10-05",
+      "status": "closed",
+      "authority": "user_report_of_developer_clarification_2026-11-22",
+      "resolution": "The user reports that the developers clarified that the entire warlord aligns, the reading the user had adopted on 5 October 2026.",
       "source_refs": [
         {
           "source_id": "rulebook",
@@ -949,9 +951,7 @@
         }
       ],
       "ruling": "Resolve alignment once for each whole warlord. Evaluate qualifying neighbors across its territories, apply the existing alignment table once, and apply the single outcome to the entire faction and surviving forces. Preserve automatic KMT alignment where the table requires it. This is the shared RCL-003 rule."
-    }
-  ],
-  "closed_rule_clarifications": [
+    },
     {
       "id": "ccp_brothers_rail_vs_supply_path",
       "clarification_id": "RCL-004",

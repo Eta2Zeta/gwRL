@@ -164,8 +164,11 @@ land that was captured. A warlord joins a side in one of four ways.
 and every unaligned warlord at once, and every such warlord picks a side at the
 end of that Combat Phase. All
 the warlords' neighbours are noted first, so that one warlord's result cannot
-change another's odds. Each warlord gets one roll of a twelve-sided die for all
-its land (RCL-003):
+change another's odds. Each warlord gets one roll of a twelve-sided die for all its land, since the
+whole warlord joins one side, as the game's developers have clarified
+([RCL-003](../../game_content/rules/clarifications.md#rcl-003-whole-warlord-alignment-after-foreign-invasion),
+reported by the owner on 22 November 2026; the rulebook's table says "For each
+land zone, roll a D12", section 4.9, page 30):
 
 | The warlord's land borders | Roll | It joins |
 | --- | --- | --- |
@@ -199,12 +202,12 @@ page 4).
 - **The roll:** one twelve-sided die. Before rolling, the nation may pay IPP,
   at most the threshold and at most its treasury; each IPP lowers the roll by
   one. The action names the warlord and the amount.
-- **The cap on the payment** is the project's reading of the printed rules
-  ([RCL-002](../../game_content/rules/clarifications.md#rcl-002-influence-spending-before-the-die-roll),
-  adopted by the owner on 5 October 2026). The printed rules cap the payment at
-  "the amount of its original influence roll", a number nobody knows when the
-  payment is made, since the payment comes before the roll. The project reads
-  that cap as the threshold, the highest roll that succeeds without payment.
+- **The cap on the payment** is the threshold, the highest roll that succeeds
+  without payment. The printed rules call it "the amount of its original
+  influence roll"; the payment comes before the roll, so no die has been rolled
+  and the words can only mean the number the roll is compared with
+  ([RCL-002](../../game_content/rules/source_answered_questions.md#rcl-002-influence-spending-before-the-die-roll),
+  closed after checking on 22 November 2026).
   Paying the most the cap allows doubles the rolls that succeed: with a
   threshold of 3, rolls of 1 to 3 succeed unpaid, and rolls of 1 to 6 after
   paying 3 IPP.
