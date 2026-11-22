@@ -1,0 +1,49 @@
+{
+ "record": "fresh_network_games_2026_11_22",
+ "new_run": {
+  "folder": "studies/campaign/runs/training-2026-11-22/1-memory-checked",
+  "commit": "3153079",
+  "settings": "fresh network 256x8, choice D: 16 simulations, 256 at kept decisions (1%), moves drawn from the visit shares in game round 1 only; 16 games in one game process on the AddressSanitizer engine",
+  "network_updates_counted": 5,
+  "summary": {
+   "games": 80,
+   "decisions_per_game": {
+    "p25": 411,
+    "median": 502.5,
+    "p75": 607
+   },
+   "end_phase_share_of_actions": 0.387,
+   "movement_routes_per_game": 53.5,
+   "land_battles_begun_per_game": 7.8,
+   "purchases_per_game": 49.7,
+   "mean_final_scores_axis_allies_comintern": [
+    37.2,
+    -59.5,
+    -105.0
+   ]
+  }
+ },
+ "long_run_first_two_updates": {
+  "folder": "studies/campaign/runs/training-2026-11-19/1-first-night/run",
+  "commit": "999c90c",
+  "settings": "fresh network 256x8, 64 simulations at every decision, every move drawn from the visit shares; 252 games in 6 game processes",
+  "network_updates_counted": 2,
+  "summary": {
+   "games": 504,
+   "decisions_per_game": {
+    "p25": 968,
+    "median": 1047.5,
+    "p75": 1128
+   },
+   "end_phase_share_of_actions": 0.185,
+   "movement_routes_per_game": 160.2,
+   "land_battles_begun_per_game": 44.2,
+   "purchases_per_game": 72.7,
+   "mean_final_scores_axis_allies_comintern": [
+    35.5,
+    -56.8,
+    -96.3
+   ]
+  }
+ }
+}

@@ -33,10 +33,14 @@ Other open things stay in the pages that own them, and
 | Number | Question | About | Recommended |
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
+| [Q-017](#q-017-how-the-fresh-run-starts) | Should the run started on 22 November 2026 begin from the long run's network, now that a fresh network under choice D plays narrow games? | Training | Yes: build the converter and start from the long run's network |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
+Q-017 was raised on 22 November 2026, from the first 80 games of the run started
+that day. Its numbers are in the
+[record of a fresh network's first games under choice D](archive/records/fresh_network_games_2026_11_22.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -107,6 +111,46 @@ Stopping only a run that stays over keeps a brief peak from costing a training i
 **If answered.** What the supervisor measures and when it stops a run belong in
 the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
 and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
+
+## Q-017: How the fresh run starts
+
+**The question.** Should the training run started on 22 November 2026 begin
+from the long run's network instead of a fresh one?
+
+**What the program does now.** The run (`studies/campaign/runs/training-2026-11-22`)
+began from a fresh network, as the owner chose that day, with self-play as in
+choice D of Q-016. Its first 80 games were half as long as the long run's first
+games, which also began from a fresh network but drew every move from the
+visit shares: a median of 502 decisions against 1,048, with 39% of the actions
+ending a phase against 18%, a third of the movement routes and a sixth of the
+land battles, 7.8 a game against 44.2, for about the same final scores
+([record](archive/records/fresh_network_games_2026_11_22.md)). At 99 of every
+100 decisions the 16 simulations mostly visit 16 legal actions once each, so
+the move is the one whose child the network values best for the alliance
+choosing, and a fresh network's values are the same arbitrary function in every
+game (inferred).
+
+**Why it matters.** The run has two jobs. Its networks are to start the
+full-speed run once the game process crash is found, and its game processes
+look for that crash. Games with few moves and battles teach the network little
+about them, and the untrained Axis's near-passive play has scored best before
+([what the long run learned](archive/records/long_run_progress_2026_11_21.md)),
+so play could stay narrow (inferred). The six crashes all happened while the
+search freed game copies in the long run's longer games, so the memory check
+may meet the defect less often in these games (inferred).
+
+**The choices.**
+
+| Choice | What it changes |
+| --- | --- |
+| A. Keep the fresh network | Nothing now. The kept decisions' searches of 256 simulations may teach the network to act; whether they do is not measured. The memory check plays these games meanwhile. |
+| B. Start from the long run's network | A converter matches the network's input features by name and starts the 27 restored since 19 November at zero, so the long run's newest network, after 38 network updates, starts the run with choice D unchanged. That network's own games were active, its value predictions weak; whether it plays actively under choice D is not measured. About one to two hours of work (estimate) before the run restarts. |
+| C. Draw every move in the memory-checked part | `--sampling-game-rounds 11` until the full-speed run, with choice D's search budgets. Games as varied as the long run's first ones (inferred), no new code; but most moves are then not the search's choice, which choice D was meant to end. |
+
+**Recommendation: B.** It keeps choice D as chosen, gives both jobs active
+games, and keeps what the long run learned instead of starting from nothing.
+The owner chose a fresh start on the advice that the long run's network was not
+worth the converter's hours; these games change that advice.
 
 ## Open elsewhere
 
