@@ -1883,6 +1883,23 @@ now sets the pace ([record](../archive/records/engine_speed_in_training_2026_11_
 How to start, stop and resume a training run is in the
 [campaign learning guide](../../studies/campaign/README.md).
 
+**When the program changes.** A training run resumes from its checkpoint only
+with the program it started with: the checkpoint records a digest of every
+source file of the engine and of the campaign learner (`source_hashes` in
+`studies/campaign/run.py`), and `--resume` refuses a checkpoint whose digest
+differs from the current sources'. A
+change to the engine's rules therefore ends a run, and the next run starts with
+a new replay buffer and new Adam averages. It does not have to start from new
+networks: `--initial-models` copies the learned numbers of an earlier run's
+networks and nothing else (`load_initial_weights` in
+`studies/campaign/model_export.py`), provided the networks have the same size
+and the input the same layout (section 5.5), since each learned row of the input
+belongs to one feature. What those networks learned stays valid where the game
+is unchanged; a rule that changes only rare positions leaves most of it, and
+further training adjusts the rest. The long run of 19 to 21 November 2026 went
+through four runs this way, each starting from the previous run's newest
+networks ([record](../archive/records/long_run_progress_2026_11_21.md)).
+
 **The inference server.** Game threads do not run the network themselves; the
 inference server, which the tools and the dated records name the *coordinator*,
 does it for all of them (`SharedEvaluatorServer` in
