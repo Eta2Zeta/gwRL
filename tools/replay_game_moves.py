@@ -7,8 +7,9 @@ the game finishes or a stop ends it. A log that stays belongs to a game that
 failed or whose game process died: the failed game's record in manifest.json
 names it. With the game's seed, kept in the log's first line, the moves rebuild
 the game's position exactly, because the game's own random stream rolls its
-dice. The log's "search" lines give each decision's search seed and the size of
-the search tree the game kept; a log that ends with a "search" line belongs to a
+dice. The log's "search" lines give each decision's search seed, the size of
+the search tree the game kept, the search's simulations and whether it added
+exploration noise; a log that ends with a "search" line belongs to a
 game whose process died during that search, as all five crashes of 20 and 21
 November 2026 did.
 
@@ -76,10 +77,11 @@ def replay(header: dict[str, Any], moves: list[dict[str, Any]], *, search_last: 
         if move["kind"] == "search":
             pending = move
             if index >= first_searched:
-                # LearningConfig's search settings, which the training runs used.
-                config = MctsConfig(simulations=64, max_depth=16, c_puct=1.5, seed=int(move["search_seed"]),
-                                    mode="multiplayer", root_dirichlet_alpha=0.3, root_dirichlet_epsilon=0.25)
-                search_decision(env, evaluator, config, add_root_noise=True, tree=tree)
+                # The logged simulations and noise, and the training runs' other search settings.
+                config = MctsConfig(simulations=int(move["simulations"]), max_depth=16, c_puct=1.5,
+                                    seed=int(move["search_seed"]), mode="multiplayer", root_dirichlet_alpha=0.3,
+                                    root_dirichlet_epsilon=0.25)
+                search_decision(env, evaluator, config, add_root_noise=bool(move["root_noise"]), tree=tree)
                 searches += 1
             continue
         if move["kind"] == "chance":

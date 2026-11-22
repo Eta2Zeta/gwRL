@@ -317,6 +317,10 @@ class CampaignAdapter:
     def is_terminal(self) -> bool:
         return bool(self.raw.is_terminal())
 
+    def game_round(self) -> int:
+        """The game round being played, counted from 1."""
+        return int(self.raw.game_round())
+
     def returns(self) -> Any:
         return self.raw.returns()
 

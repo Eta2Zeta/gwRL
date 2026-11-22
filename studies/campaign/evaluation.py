@@ -18,6 +18,12 @@ from .batching import BatchStats, search_many
 EVALUATION_SCHEMA = "campaign-heldout-evaluation-v1"
 PROFILE_SCHEMA = "campaign-operation-profile-v1"
 TERRITORY_TRACKING_SCHEMA = "campaign-national-chinese-possession-tracking-v2"
+# Held-out evaluation's game seeds: the 24 primes from 1009. Training draws its
+# games' seeds at random from 2**63 numbers, and validate_heldout_seeds checks
+# that it drew none of these. 24 games give a mean final score half the
+# standard error that 6 give.
+HELDOUT_SEEDS = (1009, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061, 1063, 1069,
+                 1087, 1091, 1093, 1097, 1103, 1109, 1117, 1123, 1129, 1151, 1153, 1163)
 
 
 def _seeds(values: Sequence[int], *, unique: bool, label: str) -> list[int]:

@@ -25,7 +25,7 @@ from torch import nn
 
 from studies.shared.file_replace import replace_file
 from studies.shared.multiplayer_mcts import (
-    PLAYERS, MctsConfig, VectorMCTS, action_key, probabilities, vector,
+    PLAYERS, MctsConfig, VectorMCTS, action_key, most_visited_index, probabilities, vector,
 )
 from .native_search import SearchTree, search_decision
 from .neural import alliance_weights, distinct_networks
@@ -99,20 +99,35 @@ def write_move(moves: Any, line: Mapping[str, Any]) -> None:
         moves.flush()
 
 
-def _decide(env: Any, result: Any, pending: list[dict[str, Any]], *, config: LearningConfig,
-            rng: random.Random, batch_version: str, replay: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Sample the played move from a search result, record its sample and apply it."""
+def _decide(env: Any, result: Any, pending: list[dict[str, Any]] | None, *, config: LearningConfig,
+            rng: random.Random, batch_version: str, simulations: int,
+            replay: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Choose the move played from a search result, keep the decision as a
+    training sample in `pending` (None keeps none) and apply the move.
+
+    In the first config.sampling_game_rounds game rounds the move is drawn from
+    the visit shares at config.temperature; after them it is the most visited
+    action (most_visited_index), of tied ones one drawn with `rng`. The
+    training sample's policy target is the visit shares either way.
+    """
     from .features import make_zone_input
     owner = env.current_decision_player()
     if owner not in PLAYERS:
         raise ValueError("A policy choice must belong to one of the three actors")
-    logs = [math.log(p) / config.temperature if p > 0 else -math.inf for p in result.policy]
-    maximum = max(logs)
-    policy = probabilities([math.exp(value - maximum) for value in logs], len(logs))
-    index = _sample_index(result.actions, policy, rng)
-    # The decision's zone input, as search already evaluated it: immutable and small.
-    features = result.zone_input if result.zone_input is not None else make_zone_input(env, result.actions)
-    pending.append({"input": features, "owner": owner, "policy": policy, "rollout_version": batch_version})
+    shares = probabilities(result.policy, len(result.policy))
+    if config.sampling_game_rounds is None or env.game_round() <= config.sampling_game_rounds:
+        logs = [math.log(p) / config.temperature if p > 0 else -math.inf for p in shares]
+        maximum = max(logs)
+        sampling = probabilities([math.exp(value - maximum) for value in logs], len(logs))
+        index = _sample_index(result.actions, sampling, rng)
+    else:
+        sampling = None
+        index = most_visited_index(result.visit_counts, result.action_values, result.priors, result.actions, owner,
+                                   rng)
+    if pending is not None:
+        # The decision's zone input, as search already evaluated it: immutable and small.
+        features = result.zone_input if result.zone_input is not None else make_zone_input(env, result.actions)
+        pending.append({"input": features, "owner": owner, "policy": shares, "rollout_version": batch_version})
     action = result.actions[index]
     menu = [_selected_features(choice) for choice in result.actions] if replay is not None else None
     selected = menu[index] if menu is not None else _selected_features(action)
@@ -121,9 +136,9 @@ def _decide(env: Any, result: Any, pending: list[dict[str, Any]], *, config: Lea
     if replay is not None:
         replay.update(selected_index=index, selected_action=selected, decision_menu=menu,
             search={"visit_counts": result.visit_counts, "priors": result.priors,
-                    "policy": result.policy, "sampling_policy": policy,
+                    "policy": result.policy, "sampling_policy": sampling,
                     "values": None if result.values is None else list(result.values),
-                    "action_values": result.action_values, "simulations": config.simulations,
+                    "action_values": result.action_values, "simulations": simulations,
                     "max_depth": config.max_depth, "rollout_version": batch_version})
     event = {"kind": env.decision_kind(), "owner": owner, "action": action_key(action),
              "action_kind": raw.get("kind", "unknown"),
@@ -158,7 +173,10 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
     (tools/replay_game_moves.py).
     """
     search_random, policy_random = episode_streams(config.seed, environment_seed)
-    # Its own stream, so the game plays the same whatever share is kept.
+    # Its own stream: which decisions are kept depends only on the run seed,
+    # the game's seed and the share kept. A decision is kept or not before its
+    # search, which searches a kept decision with config.kept_simulations and
+    # exploration noise, and any other with config.simulations and none.
     sample_random = random.Random(f"campaign-episode-samples:{config.seed}:{environment_seed}")
     pending: list[dict[str, Any]] = []
     events: list[dict[str, Any]] = []
@@ -176,21 +194,23 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
             event = {"kind": "chance", "owner": None, "action": None}
             write_move(moves, {"move": counts["transitions"], "kind": "chance"})
         else:
+            kept = sample_random.random() < config.sample_fraction
+            simulations = config.search_simulations(kept)
+            noise = config.root_noise and kept
             search = MctsConfig(
-                simulations=config.simulations, max_depth=config.max_depth, c_puct=config.c_puct,
+                simulations=simulations, max_depth=config.max_depth, c_puct=config.c_puct,
                 seed=search_random.getrandbits(64), rules_version=rules_version, mode=config.mode,
                 root_dirichlet_alpha=config.root_dirichlet_alpha, root_dirichlet_epsilon=config.root_dirichlet_epsilon)
             write_move(moves, {"move": counts["transitions"], "kind": "search", "search_seed": search.seed,
-                               "tree": tree.size})
-            result = search_decision(env, evaluator, search, add_root_noise=config.root_noise, tree=tree)
+                               "tree": tree.size, "simulations": simulations, "root_noise": noise})
+            result = search_decision(env, evaluator, search, add_root_noise=noise, tree=tree)
             version = getattr(evaluator, "network_version", None) or batch_version
             if not network_versions or network_versions[-1][1] != version:
                 network_versions.append([counts["decisions"], version])
-            event = _decide(env, result, pending, config=config, rng=policy_random, batch_version=version)
+            event = _decide(env, result, pending if kept else None, config=config, rng=policy_random,
+                            batch_version=version, simulations=simulations)
             write_move(moves, {"move": counts["transitions"], "kind": "action", "action": event["action"],
                                "network": version})
-            if sample_random.random() >= config.sample_fraction:
-                pending.pop()
             counts["decisions"] += 1
         counts["transitions"] += 1
         event.update(before=before, after=env.planning_key(), terminal=env.is_terminal())
@@ -299,7 +319,11 @@ def _model_digest(model: nn.Module) -> str:
 
 @dataclass(frozen=True, slots=True)
 class LearningConfig:
+    # Simulations of a search at a decision that is not kept as a training
+    # sample; kept_simulations at one that is, None for as many. In-process
+    # collection keeps every decision.
     simulations: int = 8
+    kept_simulations: int | None = None
     max_depth: int = 16
     batch_size: int = 32
     epochs: int = 1
@@ -307,7 +331,12 @@ class LearningConfig:
     replay_capacity: int = 4096
     value_scale: float = 100.0
     c_puct: float = 1.5
+    # Self-play draws its move from the visit shares at this temperature in the
+    # first sampling_game_rounds game rounds, None for every game round, and
+    # plays the most visited action after them (_decide).
     temperature: float = 1.0
+    sampling_game_rounds: int | None = None
+    # Exploration noise at the root of a kept decision's search.
     root_noise: bool = True
     root_dirichlet_alpha: float = 0.3
     root_dirichlet_epsilon: float = 0.25
@@ -336,10 +365,19 @@ class LearningConfig:
             raise ValueError("Root noise mixture must be between zero and one")
         if not 0 < self.sample_fraction <= 1:
             raise ValueError("Sample fraction must be above zero and at most one")
+        if self.kept_simulations is not None and (type(self.kept_simulations) is not int or self.kept_simulations <= 0):
+            raise ValueError("kept_simulations must be a positive integer or None")
+        if self.sampling_game_rounds is not None and (
+                type(self.sampling_game_rounds) is not int or self.sampling_game_rounds < 0):
+            raise ValueError("sampling_game_rounds must be a nonnegative integer or None")
         if self.mode != "multiplayer":
             raise ValueError("Learning updates all three policies in multiplayer mode")
         if self.networks not in ("three", "one"):
             raise ValueError("networks must be three or one")
+
+    def search_simulations(self, kept: bool) -> int:
+        """Simulations of the search at a decision kept as a training sample, or not."""
+        return self.kept_simulations if kept and self.kept_simulations is not None else self.simulations
 
 
 class ReplayTraceCapture:
@@ -577,8 +615,9 @@ class CampaignLearner:
                                        "target_schema": TARGET_SCHEMA})
 
     def _search_config(self) -> MctsConfig:
+        # In-process collection keeps every decision as a training sample.
         return MctsConfig(
-            simulations=self.config.simulations, max_depth=self.config.max_depth,
+            simulations=self.config.search_simulations(True), max_depth=self.config.max_depth,
             c_puct=self.config.c_puct, seed=self.search_random.getrandbits(64),
             rules_version=self.compatibility["rules"], mode=self.config.mode,
             root_dirichlet_alpha=self.config.root_dirichlet_alpha,
@@ -587,7 +626,8 @@ class CampaignLearner:
     def _apply_search_result(self, env: Any, result: Any, pending: list[dict[str, Any]],
                              replay: dict[str, Any] | None = None) -> dict[str, Any]:
         event = _decide(env, result, pending, config=self.config, rng=self.policy_random,
-                        batch_version=self.batch_version, replay=replay)
+                        batch_version=self.batch_version, simulations=self.config.search_simulations(True),
+                        replay=replay)
         self.counters["decisions"] += 1
         return event
 

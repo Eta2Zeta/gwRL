@@ -11,8 +11,9 @@ from unittest.mock import patch
 
 from studies.shared.campaign_adapter import CampaignAdapter, ScheduledAction
 from studies.shared.multiplayer_mcts import (
-    PLAYERS, Bounds, Edge, Evaluation, MctsConfig, NoLegalActionError, Node, OpponentPolicy,
-    UniformEvaluator, VectorMCTS, action_key, apply_fixed_opponent, score_actions, selection_scores,
+    PLAYERS, Bounds, Edge, Evaluation, MctsConfig, NoLegalActionError, Node, OpponentPolicy, SearchResult,
+    UniformEvaluator, VectorMCTS, action_key, apply_fixed_opponent, most_visited_index, score_actions,
+    selection_scores,
 )
 
 
@@ -736,6 +737,44 @@ class ForcedRootTests(unittest.TestCase):
         config = MctsConfig(simulations=8, mode="fixed_opponents", target_player="axis")
         result = VectorMCTS(self.Evaluator(), config, opponent_policy=policy).search(TreeEnv(self.GAME))
         self.assertEqual(result.best_action(), "only")
+
+
+class MostVisitedTests(unittest.TestCase):
+    """The most visited action, which held-out evaluation and self-play after its
+    sampling game rounds play: visits, then the average result for the alliance
+    choosing, then the prior, then the action key."""
+
+    def choose(self, visits, values, priors, actions=("a", "b", "c"), player="allies"):
+        return most_visited_index(visits, values, priors, list(actions), player)
+
+    def test_visits_come_first(self):
+        self.assertEqual(self.choose([1, 5, 2], [(0, 9, 0), (0, -9, 0), (0, 9, 0)], [.8, .1, .1]), 1)
+
+    def test_equal_visits_go_to_the_better_result_for_the_alliance_choosing(self):
+        values = [(9, 0, 9), (-9, 1, -9), (0, 5, 0)]
+        self.assertEqual(self.choose([2, 2, 1], values, [.6, .3, .1]), 1)
+        self.assertEqual(self.choose([2, 2, 1], values, [.6, .3, .1], player="axis"), 0)
+
+    def test_then_the_prior_then_the_action_key(self):
+        same = [(0, 1, 0)] * 3
+        self.assertEqual(self.choose([1, 1, 1], same, [.2, .5, .3]), 1)
+        self.assertEqual(self.choose([1, 1, 1], same, [.4, .2, .4], actions=("c", "b", "a")), 2)
+
+    def test_actions_tied_on_all_three_go_by_action_key_or_at_random(self):
+        same, priors, actions = [(0, 1, 0)] * 3, [.4, .2, .4], ("c", "b", "a")
+        self.assertEqual(self.choose([1, 1, 1], same, priors, actions=actions), 2)
+        drawn = {most_visited_index([1, 1, 1], same, priors, list(actions), "allies", random.Random(seed))
+                 for seed in range(40)}
+        self.assertEqual(drawn, {0, 2})
+
+    def test_an_unvisited_action_has_no_result_and_an_unnamed_alliance_reads_none(self):
+        self.assertEqual(self.choose([0, 0], [None, (0, -5, 0)], [.9, .1], actions=("a", "b")), 1)
+        self.assertEqual(self.choose([1, 1], [(0, -5, 0), (0, 5, 0)], [.9, .1], actions=("a", "b"), player=None), 0)
+
+    def test_a_search_result_plays_it_for_the_alliance_it_names(self):
+        result = SearchResult(["a", "b"], [3, 3], [.5, .5], [.7, .3], (0., 0., 0.), [(0, -1, 0), (0, 2, 0)],
+                              None, (), False, [], None, "allies")
+        self.assertEqual(result.best_action(), "b")
 
 
 class InterruptRawEnv:

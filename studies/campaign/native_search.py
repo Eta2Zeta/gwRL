@@ -112,4 +112,5 @@ def search_decision(env: CampaignAdapter, evaluator: Any, config: MctsConfig, *,
     if [action.id for action in actions] != outcome["action_ids"]:
         raise RuntimeError("The C++ search's root options differ from the adapter's")
     return SearchResult(actions, outcome["visit_counts"], outcome["policy"], outcome["priors"], outcome["values"],
-                        outcome["action_values"], None, (), outcome["reused"], [], outcome["zone_input"])
+                        outcome["action_values"], None, (), outcome["reused"], [], outcome["zone_input"],
+                        env.current_decision_player())

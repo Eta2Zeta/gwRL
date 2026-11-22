@@ -231,10 +231,21 @@ learning settings stay there:
 ./.venv/bin/python tools/supervise_campaign_training.py --profile mac \
   --control-dir studies/campaign/runs/NAME-control --run-dir studies/campaign/runs/NAME \
   --seconds 28800 -- --calendar-rounds 11 --complete-episodes --batches 1000 \
-  --simulations 64 --max-depth 16 --hidden-dim 64 --message-layers 2 \
-  --batch-size 32 --epochs 525 --replay-capacity 8000 --sample-fraction 0.05 \
-  --transitions-per-batch 20000
+  --simulations 16 --kept-simulations 256 --sampling-game-rounds 1 --max-depth 16 \
+  --hidden-dim 64 --message-layers 2 --batch-size 32 --epochs 525 \
+  --replay-capacity 8000 --sample-fraction 0.05 --transitions-per-batch 20000
 ```
+
+A decision is kept as a training sample or not before its search: a kept
+decision is searched with `--kept-simulations` 256 and exploration noise, any
+other with `--simulations` 16 and none, only to choose the move. Self-play draws
+its move from the visit shares in the first `--sampling-game-rounds` game
+rounds, here 1, and plays the most visited action after them. This is the
+owner's answer to Q-016 of 22 November 2026; the long run before it searched
+every decision with 64 simulations and drew every move
+([the move played](../../docs/design/README.md#45-after-the-simulations-visit-shares-and-the-move-played),
+[which decisions are kept](../../docs/design/README.md#71-a-training-iterations-games)).
+No run has used these settings yet.
 
 These learning settings are the speed test's, not tuned values. A training
 iteration plays the 24 games the profile plays at once (`--batches` counts
@@ -375,7 +386,13 @@ Held-out evaluation keeps the target weights fixed, turns root noise off, and
 uses the same versioned scripted opponents both inside search and during actual
 play. The two baseline styles buy, move, attack and make reactions. They are
 simple controls, with no claim of expert play. Each side is evaluated separately.
-Seeds must differ from the base run seed and every logged training episode seed.
+Seeds must differ from the base run seed and every logged training episode seed;
+without `--seeds` the command plays the 24 held-out seeds of `HELDOUT_SEEDS` in
+`evaluation.py`, the primes from 1009 to 1163. Each search plays its most
+visited action: among actions with as many visits, the one whose simulations'
+average result is best for the alliance choosing, then the one with the higher
+prior, then the first by identifier (`most_visited_index` in
+`studies/shared/multiplayer_mcts.py`; self-play draws among actions still tied).
 Evaluation accepts small model exports directly, without constructing a learner
 or restoring its optimizer, replay and active games. Profiling retained
 states uses a full recovery checkpoint.

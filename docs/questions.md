@@ -34,7 +34,6 @@ Other open things stay in the pages that own them, and
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-014](#q-014-a-land-battle-that-no-unit-can-end) | How does a land battle end when the attacker's remaining units can neither fire nor retreat and the defender's cannot fire? | A printed rule | The attacking units that can neither fire nor retreat are eliminated |
-| [Q-016](#q-016-how-self-play-spends-its-searches-and-plays-its-moves) | Should self-play search less where it keeps no training sample, more where it keeps one, and play the most visited action after the first game round? | Training | Yes, both, in the next run |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
@@ -42,10 +41,6 @@ Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 Q-014 was raised on 21 November 2026, when the one failed move the long run had kept
 was replayed. Its case is in the
 [record of a land battle that no unit could end](archive/records/land_battle_without_end_2026_11_20.md).
-Q-016 was raised on 21 November 2026, when the training samples and games that
-the long run had saved were read for what limits its learning. Its numbers are
-in the
-[record of the long run's training samples](archive/records/long_run_samples_2026_11_21.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -203,74 +198,6 @@ own ruling on units that cannot retreat.
 entry and into the engine page of land combat, and the engine's guard then
 stays only for positions the ruling does not cover.
 
-## Q-016: How self-play spends its searches and plays its moves
-
-**The question.** Should self-play search the decisions it will not keep as
-training samples with fewer simulations and the ones it keeps with more, and,
-after the first game round, play the action the search visited most instead of
-one drawn at random from the visit shares?
-
-**What self-play does now.** At every decision with more than one legal action
-the alliance to act searches with 64 simulations, with exploration noise mixed
-into the network's probabilities at the root. The move played is then drawn at
-random, each legal action with a chance equal to its visit share, so it is often
-not the action the search visited most (temperature 1, `_decide` in
-`studies/campaign/learning.py`). Why self-play draws, and how AlphaGo Zero did
-it, is in
-[section 4.5 of the design document](design/README.md#45-after-the-simulations-visit-shares-and-the-move-played).
-After the search, 1% of the decisions are kept as training samples
-(`play_episode`, same file). Held-out evaluation instead plays the most visited
-action, without exploration noise (`best_action` in
-`studies/shared/multiplayer_mcts.py`).
-
-**A real case,** from the long run's games and the 25,000 training samples its
-last run saved ([record](archive/records/long_run_samples_2026_11_21.md)):
-
-- **Searches that train nothing.** A game took about 80,000 network
-  evaluations, 52 a decision, from the inference server. Its forward passes took
-  85% to 88% of its time, so it set the run's speed. With 1% kept, 99 of every
-  100 searches only chose a move, and a training sample cost about 5,300 network
-  evaluations.
-- **Moves other than the most visited action.** At 63% of the searched decisions
-  the move played was not a most visited action: about 800 of a game's 1,260
-  searched decisions. With two to four legal actions it was 36%. When deciding
-  whether a battle goes on, the move played was the less visited one 27% of the
-  time. Every training sample of a game learns its values from the game's final
-  scores, which these moves help decide.
-- **Targets that say which actions were tried.** At 41% of the kept decisions
-  there were 17 or more legal actions. There the 64 simulations visited 31 to 69
-  actions, mostly once each, and the most visited action had 3% to 23% of the
-  visits. A real decision of 28 legal actions, 17 of them tried once, is in
-  [the design document](design/README.md#are-64-simulations-enough-when-there-are-many-legal-actions).
-
-**Why it matters.** The values learn from final scores, one set per game, and
-the number of games is what limits them. Trained on 1,324 of the saved games,
-the network predicted 330 others best after drawing each training sample once or
-twice, and worse the more it trained on the same games, whatever the weight of
-the value loss (Q-015's test,
-[record](archive/records/value_loss_weights_2026_11_21.md)). Searches that only
-choose a move spend most of the inference server's time. Final scores from games
-that play the most visited action more often would be less noisy value targets,
-and searches with more simulations would give policy targets that say more than
-which actions were tried.
-
-**The choices.**
-
-| Choice | What it changes |
-| --- | --- |
-| A. As now | Nothing. |
-| B. Fewer simulations where nothing is kept, more where something is | Whether a decision is kept is drawn before its search. Kept decisions are searched with 256 simulations and exploration noise, the others with 16 and no noise. A game's network evaluations would fall to under a third (estimate), so the inference server could serve about three times as many games an hour; the game processes' own work would then set the limit, by how much is not measured. KataGo searched fully only a quarter of its decisions and kept only those as training samples; a run without this needed about 1.37 times as much compute for the same strength (Wu 2019, *Accelerating Self-Play Learning in Go*, sections 3.1 and 5.2, table 2). |
-| C. Play the most visited action after the first game round | Moves are drawn from the visit shares in game round 1 only, and then the most visited action is played, with the exploration noise still at the root. AlphaGo Zero drew moves this way for the first 30 moves of a game and then played the most visited move (Silver et al. 2017, Methods, "Self-Play"). Here the dice keep games apart without random moves. |
-| D. B and C together | Both, in one run. If the run learns, a later run can tell which of the two mattered. |
-
-A search built for few simulations among many legal actions, Gumbel root search,
-would change the targets more, but it is a larger change to both searches; it
-stays an [open design question](design/README.md#are-64-simulations-enough-when-there-are-many-legal-actions).
-
-**Recommendation: D,** in the next run. Held-out evaluation should then use 24
-seeds instead of 6, which halves the standard error of a network's mean final
-score, now 3 to 10 points.
-
 ## Open elsewhere
 
 These are open too, and stay in the pages that own them:
@@ -383,3 +310,16 @@ the page that now states it.
   once or twice and then fit its training games instead
   ([record](archive/records/value_loss_weights_2026_11_21.md)). So the loss stays
   as it is. Stated in [the loss](design/README.md#81-the-loss).
+- **Q-016**, how self-play spends its searches and plays its moves. Answered on
+  22 November 2026: choice D. Whether a decision is kept as a training sample is
+  drawn before its search; a kept decision is searched with 256 simulations and
+  exploration noise, any other with 16 and none; self-play draws its move from
+  the visit shares in game round 1 and plays the most visited action after it;
+  and held-out evaluation plays 24 seeds instead of 6. In the long run, which
+  drew every move, 63% of the searched decisions played an action other than
+  the most visited one, and 99 of every 100 searches kept no training sample
+  ([record](archive/records/long_run_samples_2026_11_21.md)). Stated in
+  [the move played](design/README.md#45-after-the-simulations-visit-shares-and-the-move-played),
+  [which decisions are kept](design/README.md#71-a-training-iterations-games),
+  [measuring strength](design/README.md#10-measuring-strength) and
+  [training on the Mac](../studies/campaign/README.md#training-on-the-mac).

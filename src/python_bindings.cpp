@@ -396,6 +396,9 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def("decision_kind", [](const NativeCampaignEnv& self) {
             return self.call([](const CampaignEnv& env) { return env.decisionKind(); });
         })
+        .def("game_round", [](const NativeCampaignEnv& self) {
+            return self.call([](const CampaignEnv& env) { return env.engine().state().clock.roundIndex + 1; });
+        }, "The game round being played, counted from 1.")
         .def("legal_actions", [](const NativeCampaignEnv& self) {
             return self.call([](const CampaignEnv& env) { return env.legalActions(); });
         })

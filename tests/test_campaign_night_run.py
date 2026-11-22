@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import tempfile
 import time
+from collections import Counter
 from pathlib import Path
 import unittest
 from unittest.mock import Mock, patch
@@ -12,9 +13,10 @@ import torch
 
 from studies.campaign.curriculum import compatibility, make_env
 from studies.campaign.learning import CampaignLearner, LearningConfig, play_episode
+from studies.campaign.native_search import search_decision
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
 from studies.campaign.run import RunConfig, _learner, main
-from studies.shared.multiplayer_mcts import PLAYERS
+from studies.shared.multiplayer_mcts import PLAYERS, action_key, most_visited_index
 from tools.record_campaign_games import game_arguments
 from tools.supervise_campaign_training import CORE_ALLOWANCE, SupervisorConfig, validate_training_arguments
 
@@ -27,16 +29,32 @@ def manifest(run_dir: Path) -> dict:
 
 
 class SampleFractionTests(unittest.TestCase):
-    def play(self, fraction: float) -> dict:
+    def play(self, fraction: float, rounds: int = 1, **settings) -> dict:
         config = CampaignModelConfig(hidden_dim=16, message_layers=1)
         torch.manual_seed(5)
         evaluator = NeuralEvaluator({player: CampaignPolicyValueNet(config).eval() for player in PLAYERS}, version="v")
-        env = make_env(91, calendar_rounds=1)
-        return play_episode(env, evaluator, config=LearningConfig(simulations=2, max_depth=2, sample_fraction=fraction),
-                            rules_version=compatibility(env)["rules"], batch_version="v", environment_seed=91, max_transitions=2000)
+        env = make_env(91, calendar_rounds=rounds)
+        return play_episode(env, evaluator, config=LearningConfig(simulations=2, max_depth=2, sample_fraction=fraction,
+                                                                  **settings),
+                            rules_version=compatibility(env)["rules"], batch_version="v", environment_seed=91,
+                            max_transitions=4000)
 
-    def test_keeping_fewer_samples_plays_the_same_game(self):
-        everything, some = self.play(1.0), self.play(.25)
+    def recorded(self, fraction: float, rounds: int = 1, **settings) -> tuple[dict, list]:
+        """A game, and for each search: its simulations, its noise, its result and
+        the game round and alliance it was made for."""
+        searches = []
+
+        def recording(env, evaluator, config, *, add_root_noise, tree=None):
+            result = search_decision(env, evaluator, config, add_root_noise=add_root_noise, tree=tree)
+            searches.append((config.simulations, add_root_noise, result, env.game_round(),
+                             env.current_decision_player()))
+            return result
+        with patch("studies.campaign.learning.search_decision", recording):
+            return self.play(fraction, rounds, **settings), searches
+
+    def test_keeping_fewer_samples_plays_the_same_game_when_kept_decisions_are_searched_alike(self):
+        # Without exploration noise and kept_simulations, a kept decision is searched as any other.
+        everything, some = self.play(1.0, root_noise=False), self.play(.25, root_noise=False)
         self.assertTrue(everything["terminal"])
         self.assertEqual(some["events"], everything["events"])
         self.assertEqual(some["counts"], everything["counts"])
@@ -44,6 +62,34 @@ class SampleFractionTests(unittest.TestCase):
         self.assertLess(0, len(some["records"]))
         self.assertLess(len(some["records"]), len(everything["records"]) / 2)
         self.assertEqual({tuple(record["values"]) for record in some["records"]}, {tuple(everything["returns"])})
+
+    def test_a_kept_decision_is_searched_with_its_own_simulations_and_noise(self):
+        game, searches = self.recorded(.25, kept_simulations=5)
+        settings = Counter((simulations, noise) for simulations, noise, *_ in searches)
+        self.assertEqual(set(settings), {(5, True), (2, False)})
+        self.assertEqual(settings[(5, True)], len(game["records"]))
+        self.assertLess(settings[(5, True)], len(searches) / 2)
+
+    def test_after_the_sampling_game_rounds_self_play_plays_the_most_visited_action(self):
+        game, searches = self.recorded(1.0, rounds=2, sampling_game_rounds=1)
+        played = [event["action"] for event in game["events"] if event["kind"] != "chance"]
+        self.assertEqual(len(played), len(searches))
+        rounds = [game_round for *_, game_round, _ in searches]
+        self.assertEqual((rounds[0], rounds[-1]), (1, 2))
+        def most_visited(result, player):
+            """The actions that share the most visits, the best result for the
+            alliance choosing and the highest prior: self-play draws among them."""
+            first = most_visited_index(result.visit_counts, result.action_values, result.priors, result.actions,
+                                       player)
+            column = PLAYERS.index(player)
+            rank = lambda index: (result.visit_counts[index], (result.action_values[index] or [None] * 3)[column],
+                                  result.priors[index])
+            return {action_key(action) for index, action in enumerate(result.actions) if rank(index) == rank(first)}
+        tied = [most_visited(result, player) for _, _, result, _, player in searches]
+        later = [index for index, game_round in enumerate(rounds) if game_round > 1]
+        self.assertTrue(all(played[index] in tied[index] for index in later))
+        first = [index for index, game_round in enumerate(rounds) if game_round == 1]
+        self.assertTrue(any(played[index] not in tied[index] for index in first))
 
     def test_the_share_must_make_sense(self):
         for fraction in (0, -.5, 1.5):

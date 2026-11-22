@@ -302,12 +302,46 @@ class SearchResult:
     simulations: list[Simulation]
     # The root's zone input as the network read it, when the search kept it.
     zone_input: Any = None
+    # The alliance choosing at the root, when the search's caller named it; the
+    # Python search's root node names it too.
+    player: str | None = None
 
     def best_action(self) -> Any:
+        """The most visited action (most_visited_index)."""
         if not self.actions:
             raise ValueError("Chance and terminal roots have no policy action")
-        index = min(range(len(self.actions)), key=lambda i: (-self.visit_counts[i], action_key(self.actions[i])))
-        return self.actions[index]
+        player = self.player if self.player is not None else getattr(self.root, "player", None)
+        return self.actions[most_visited_index(self.visit_counts, self.action_values, self.priors, self.actions,
+                                               player)]
+
+
+def most_visited_index(visit_counts: Sequence[int], action_values: Sequence[Vector | None],
+                       priors: Sequence[float], actions: Sequence[Any], player: str | None,
+                       rng: random.Random | None = None) -> int:
+    """The position of the most visited action among a search's root actions.
+
+    Among actions with equally many visits, the one whose simulations' average
+    result is best for the alliance choosing comes first, then the one with the
+    higher prior. With few simulations among many legal actions most visited
+    actions are often tied, at one visit each; the average result is then what
+    the search found about them. Actions tied on all three are taken in the
+    order of their action keys: the first, or with `rng` one at random, so that
+    a network whose values and priors are all equal, as a fresh one's are,
+    plays no action for its name.
+    """
+    column = PLAYERS.index(player) if player in PLAYERS else None
+
+    def result(index: int) -> float:
+        values = action_values[index]
+        return -math.inf if column is None or values is None else float(values[column])
+
+    def rank(index: int) -> tuple[float, float, float]:
+        return (-visit_counts[index], -result(index), -priors[index])
+
+    best = min(rank(index) for index in range(len(actions)))
+    tied = sorted((index for index in range(len(actions)) if rank(index) == best),
+                  key=lambda index: action_key(actions[index]))
+    return tied[0] if rng is None or len(tied) == 1 else tied[rng.randrange(len(tied))]
 
 
 class VectorMCTS:

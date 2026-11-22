@@ -30,6 +30,7 @@ from studies.shared.multiplayer_mcts import PLAYERS
 from .curriculum import ROOT, compatibility, make_env, task_manifest
 from .device_runtime import runtime_policy_for_device
 from .episode_workers import EpisodeWorkers, SharedEpisodeWorkers, failed_position_name
+from .evaluation import HELDOUT_SEEDS
 from .learning import CampaignLearner, LearningConfig, ReplayTraceWriter, add_fresh_losses, fresh_game_losses
 from .model_export import load_evaluation_models, load_initial_weights, save_model_export, validate_model_export
 from .neural import (CampaignModelConfig, NeuralEvaluator, alliance_networks, alliance_weights,
@@ -45,7 +46,14 @@ class RunConfig:
     batches: int = 1
     transitions_per_batch: int = 6
     parallel_envs: int = 2
+    # Simulations of a search at a decision not kept as a training sample, and
+    # at one that is (None: as many); LearningConfig.
     simulations: int = 2
+    kept_simulations: int | None = None
+    # Game rounds, from the first, whose moves self-play draws from the visit
+    # shares (None: every game round); after them it plays the most visited
+    # action (design document, section 4.5).
+    sampling_game_rounds: int | None = None
     max_depth: int = 4
     hidden_dim: int = 16
     message_layers: int = 1
@@ -90,6 +98,11 @@ class RunConfig:
                     "replay_capacity", "threads")
         if any(type(getattr(self, key)) is not int or getattr(self, key) <= 0 for key in positive):
             raise ValueError("Run counts and dimensions must be positive integers")
+        if self.kept_simulations is not None and (type(self.kept_simulations) is not int or self.kept_simulations <= 0):
+            raise ValueError("Kept simulations must be a positive integer")
+        if self.sampling_game_rounds is not None and (
+                type(self.sampling_game_rounds) is not int or self.sampling_game_rounds < 0):
+            raise ValueError("Sampling game rounds must be a nonnegative integer")
         if self.calendar_rounds is not None and (type(self.calendar_rounds) is not int or not 1 <= self.calendar_rounds <= 11):
             raise ValueError("Curriculum horizon must be between one and eleven rounds")
         if type(self.seed) is not int or not 0 <= self.seed < 2**64:
@@ -189,7 +202,8 @@ def _learner(config: RunConfig, template):
     model_config = CampaignModelConfig(hidden_dim=config.hidden_dim, message_layers=config.message_layers,
         value_scale=config.value_scale)
     models = alliance_networks(model_config, config.networks, device=device)
-    learning = LearningConfig(simulations=config.simulations, max_depth=config.max_depth,
+    learning = LearningConfig(simulations=config.simulations, kept_simulations=config.kept_simulations,
+        sampling_game_rounds=config.sampling_game_rounds, max_depth=config.max_depth,
         batch_size=config.batch_size, epochs=config.epochs, learning_rate=config.learning_rate,
         replay_capacity=config.replay_capacity, value_scale=config.value_scale, seed=config.seed,
         sample_fraction=config.sample_fraction, networks=config.networks)
@@ -835,7 +849,8 @@ def main(argv=None) -> int:
                             help="Explicit evaluation device; never changes a saved learning checkpoint")
     evaluation.add_argument("--output", type=Path, required=True)
     evaluation.add_argument("--target", choices=["all", *PLAYERS], default="all")
-    evaluation.add_argument("--seeds", default="1009,1013")
+    evaluation.add_argument("--seeds", default=",".join(map(str, HELDOUT_SEEDS)),
+                            help="Comma-separated game seeds; the 24 held-out seeds by default")
     evaluation.add_argument("--baseline-style", choices=["balanced", "cautious"], default="balanced")
     evaluation.add_argument("--target-script", choices=["balanced", "cautious"])
     evaluation.add_argument("--simulations", type=int, default=2)

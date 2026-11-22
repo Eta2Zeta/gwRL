@@ -205,8 +205,9 @@ The network answers in one look. A search looks ahead: it plays actions on copie
 of the game, asks the network about the states it reaches, and combines the
 network's outputs. Where looking ahead finds something the one look missed, the
 search chooses better than the network alone. The search is Monte Carlo tree
-search in AlphaZero's style, made of many *simulations*: 64 per decision in
-current runs. Self-play runs it in C++ (`searchDecision` in `src/search.cpp`).
+search in AlphaZero's style, made of many *simulations*: in the Mac training
+command, 256 at a decision kept as a training sample and 16 at any other
+([section 7.1](#71-a-training-iterations-games)). Self-play runs it in C++ (`searchDecision` in `src/search.cpp`).
 The same search in Python (`VectorMCTS` in `studies/shared/multiplayer_mcts.py`)
 serves held-out evaluation (section 10) and tools, and the C++ search is checked
 against it choice by choice
@@ -321,7 +322,7 @@ so the continuations the scores keep choosing are explored deeper and deeper.
 
 ### 4.5 After the simulations: visit shares and the move played
 
-**Visit counts and visit shares.** After all 64 simulations, the number of times
+**Visit counts and visit shares.** After all the simulations, the number of times
 each action at the root was tried, its visit count, shows the search's
 preference. An action's *visit share* is its visit count divided by the number of
 simulations; AlphaZero names the visit shares the *search probabilities*. The
@@ -339,60 +340,81 @@ So the visit shares end up far from the network's priors mainly where the search
 found an action better than the rest: that action gains, and every other action
 gives up simulations in proportion to its prior.
 
-**Exploration noise.** During training, random noise (Dirichlet, alpha 0.3,
-mixed in at 25%) is added to the network's priors at the root, so the search
-sometimes tries actions the network dislikes. Held-out evaluation, which
-measures playing strength (section 10), turns it off.
+**Exploration noise.** In self-play, random noise (Dirichlet, alpha 0.3, mixed
+in at 25%) is added to the network's priors at the root of a decision that is
+kept as a training sample (section 7.1), so the search sometimes tries actions
+the network dislikes, and the training sample's visit shares show what the
+search found about them. A decision that is not kept is searched without noise,
+only to choose the move. Held-out evaluation, which measures playing strength
+(section 10), turns the noise off.
 
 **The move played.** Self-play and held-out evaluation choose the move played
-from the same visit counts in two different ways:
+from the same visit counts, in two ways:
 
 | Games | How the move played is chosen from the visit counts | At the toy search's root R |
 | --- | --- | --- |
-| Self-play, whose decisions become the training samples (section 7) | Drawn at random: each legal action's chance of being played is its visit share (`_decide` in `studies/campaign/learning.py`) | A with chance 0.5, B with 0.25 and C with 0.25 |
-| Held-out evaluation, which measures playing strength (section 10) | The most visited action; a tie goes to the first of the tied actions in a fixed order (`best_action` in `studies/shared/multiplayer_mcts.py`) | A, every time |
+| Self-play, in game round 1 | Drawn at random: each legal action's chance of being played is its visit share (`_decide` in `studies/campaign/learning.py`) | A with chance 0.5, B with 0.25 and C with 0.25 |
+| Self-play from game round 2 on, and held-out evaluation, which measures playing strength (section 10) | The most visited action (`most_visited_index` in `studies/shared/multiplayer_mcts.py`) | A, every time |
 
-So at R self-play would play B one time in four, although B's one simulation
-ended worst. AlphaGo Zero calls the setting that decides
-between these two ways the *temperature*: at temperature 1 each legal action's
-chance of being played is its visit share; as the temperature falls toward 0,
-the most visited action becomes certain. Self-play here draws at temperature 1
-at every decision of the game (`temperature` in `LearningConfig`,
-`studies/campaign/learning.py`). Temperature 1 has not been tuned: no run has
-tried another temperature.
+So in game round 1 self-play would play B at R one time in four, although B's
+one simulation ended worst. AlphaGo Zero calls the setting that decides between
+these two ways the *temperature*: at temperature 1 each legal action's chance of
+being played is its visit share; as the temperature falls toward 0, the most
+visited action becomes certain. Self-play draws at temperature 1 in the first
+game rounds, as many as `--sampling-game-rounds` says, 1 in the Mac training
+command, and plays the most visited action after them (`temperature` and
+`sampling_game_rounds` in `LearningConfig`, `studies/campaign/learning.py`).
 
-**Why self-play draws.** Self-play draws to spread its games over more states.
-AlphaGo Zero drew its moves in proportion to the visit counts for the first 30
-moves of each game of Go, so that its games met a varied set of positions, and played the most visited
-move for the rest of each game and in all its evaluation games (Silver et al.
-2017,
+**When several actions have the most visits.** With few simulations among many
+legal actions, several actions often share the most visits, often one each. The
+most visited action is then the one of them whose simulations' average result is
+best for the alliance choosing, which is what the search found about them; if
+that ties too, the one with the higher prior. Actions still tied are taken in
+the order of their identifiers: self-play draws one of them at random, held-out
+evaluation takes the first. A fresh network gives every state the same values
+(section 6.9), so its searches split their simulations by the priors alone, and
+actions with equal priors tie; without the draw its self-play would play, after
+game round 1, whichever of them has the identifier that comes first.
+
+**Why self-play draws in the first game round.** Drawing spreads self-play's
+games over more states. AlphaGo Zero drew its moves in proportion to the visit
+counts for the first 30 moves of each game of Go, so that its games met a varied
+set of positions, and played the most visited move for the rest of each game and
+in all its evaluation games (Silver et al. 2017,
 [*Mastering the game of Go without human knowledge*](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf),
 Methods, "Self-Play" and "Evaluator"). Go has no dice, so two games that play
-the same moves reach the same positions. Here every game rolls its own dice,
-and its searches' exploration noise and simulations' dice differ from other
-games' too, so games would differ without the draw; by how much has not been
-measured. The draw does not change the training sample of the decision where it
-is made: the policy target of that training sample is the decision's visit
-shares, whichever action is played. The draw changes what comes after the
-decision: the states the game goes on to, where its later training samples are
-kept, and the game's final scores, from which every training sample of the game
-takes its value target (section 7.2).
+the same moves reach the same positions. Here every game rolls its own dice, and
+its searches' exploration noise and simulations' dice differ from other games'
+too, so games keep differing after game round 1 without the draw; by how much
+has not been measured. The draw does not change the training sample of the
+decision where it is made: the policy target of that training sample is the
+decision's visit shares, whichever action is played. The draw changes what comes
+after the decision: the states the game goes on to, where its later training
+samples are kept, and the game's final scores, from which every training sample
+of the game takes its value target (section 7.2).
 
-**How often self-play plays an action other than the most visited one.** Where
-64 simulations spread over many legal actions, the most visited action often has
-a small visit share, and the draw then usually plays another action. At the
+**Why only the first game round.** Drawing at every decision, as the long run
+did, played an action other than the most visited one at most decisions. Where
+the simulations spread over many legal actions, the most visited action often
+has a small visit share, and the draw then usually plays another action. At the
 KMT's Combat Movement with 28 legal actions, in the
-[open question on many legal actions](#are-64-simulations-enough-when-there-are-many-legal-actions)
-(section 11), the most visited attack had 16 of the 64 visits, so the draw had
-a chance of 0.25 to play it, and a chance of 0.27 to play one of the 17 attacks
+[open question on many legal actions](#are-the-simulations-enough-when-there-are-many-legal-actions)
+(section 11), the most visited attack had 16 of the 64 visits, so the draw had a
+chance of 0.25 to play it, and a chance of 0.27 to play one of the 17 attacks
 that the search tried once and not again. In the long run's last run, the chance
 that the draw played none of the most visited actions was 63% on average over
 the searched decisions, about 800 of a game's 1,260 searched decisions, and 36%
 at decisions with two to four legal actions
 ([record](../archive/records/long_run_samples_2026_11_21.md#what-the-search-leaves-as-policy-targets)).
-Whether self-play should play the most visited action after the first game
-round, as AlphaGo Zero did after its first 30 moves, is
-[Q-016](../questions.md#q-016-how-self-play-spends-its-searches-and-plays-its-moves).
+So every training sample's value target came from a game in which most moves
+were not the most visited action. Playing the most visited action from game
+round 2 on is the owner's answer to Q-016
+([answered](../questions.md#answered)); no run has used it yet. Not measured
+either: whether games still explore enough when, after game round 1, only the
+kept decisions, 1 in 100 in the long run, are searched with exploration noise,
+and the dice, the noise and game round 1 are what make one game differ from
+another. Early in a run this matters most: a fresh network's priors come from
+its random initial weights, the same in every game.
 
 **A decision with only one legal action** is played at once, with no search and
 without asking the network.
@@ -498,9 +520,11 @@ back near the network's numbers; Suiyuan's fell to a third, but only from 0.10
 to 0.03. Their agreement is a coincidence of small numbers, not the search
 confirming the network: it found no difference among them.
 
-The attack on Hopeh ended with a visit share of 0.56. So the draw of section 4.5
-played it with chance 0.56, and one of the other four actions with chance 0.44;
-it played the attack.
+The attack on Hopeh ended with a visit share of 0.56. In that run self-play drew
+its move from the visit shares at every decision, so the draw played the attack
+with chance 0.56 and one of the other four actions with chance 0.44; it played
+the attack. Self-play now plays the most visited action from game round 2 on
+(section 4.5), here the attack.
 
 ### 4.7 More detail on the search
 
@@ -1410,8 +1434,9 @@ network update trains the network on their training samples and older ones
 (section 8.4), beside the games, which go on; when it is done, every game takes
 up the new network at once ([section 9.1](#91-the-training-loop)). A training
 iteration is those 24 games and their network update. At every decision the
-alliance to act searches (section 4) and plays an action drawn at random from
-the visit shares (section 4.5). Training can also alternate between playing and
+alliance to act searches (section 4) and plays the move that section 4.5
+describes: in game round 1 one drawn at random from the visit shares, after it
+the most visited action. Training can also alternate between playing and
 learning, as the Windows profile does: a training iteration's 24 games then
 start together with the network held fixed, and the network update runs when the
 last of them has ended. The code and the dated records name a training
@@ -1427,7 +1452,24 @@ network update is 525 training steps, which draws each kept training sample as
 often from training iterations of 24 games (section 8.7).
 
 **Which decisions are kept.** A random 5% of each game's decisions, because a
-game's thousand-odd states are close to one another. A decision with only one
+game's thousand-odd states are close to one another. Whether a decision is kept
+is drawn before its search (`play_episode` in `studies/campaign/learning.py`):
+a kept decision is searched with 256 simulations (`--kept-simulations`) and
+exploration noise, so that its visit shares, the training sample's policy
+target, say more; any other is searched with 16 (`--simulations`) and no noise,
+only to choose the move. In the long run, which kept 1% of the decisions and
+searched every one with 64 simulations, 99 of every 100 searches kept no
+training sample, and the inference server's forward passes set the run's speed
+([record](../archive/records/long_run_samples_2026_11_21.md)). With 1% kept, a
+searched decision now has on average
+
+$$
+0.99 \times 16 + 0.01 \times 256 \approx 18.4
+$$
+
+simulations instead of 64, so a game asks for about 0.29 times as many network
+evaluations; with the 5% of the Mac training command, about 0.44 times as many.
+This is an estimate: no run has measured it yet. A decision with only one
 legal action, played without a search, can be kept too: its visit share is 1, so
 it teaches only the values. Every game is played to its end. A guard,
 `--transitions-per-batch`, stops a game that runs far too long, 20,000 states in
@@ -1473,7 +1515,7 @@ repeats its alliance.
 ### 7.3 Why these targets
 
 **The visit shares.** The network answers in one look. The search also asks it
-about every state its 64 simulations reach, and returns most often to the
+about every state its simulations reach, and returns most often to the
 actions whose continuations score best for the alliance choosing (section 4). At
 decision 612, the one look did not see that the attack would take Hopeh; the
 simulations that played through the battle did. Where the search finds a
@@ -3280,9 +3322,11 @@ forward. [Replay example and checks](../../tools/verify_campaign_replay_viewer.m
 
 **Held-out evaluation** (`studies/campaign/evaluation.py`) fixes the networks
 being tested and plays them against simple scripted opponents (`balanced` and
-`cautious`), one side at a time, on seeds that training never used. Its searches
-have no exploration noise, and it plays the most visited action at every
-decision (section 4.5). It measures playing strength; it is not a network
+`cautious`), one side at a time, on seeds that training never used: unless told
+otherwise, the 24 seeds of `HELDOUT_SEEDS` in the same file, the primes from
+1009 to 1163. With 24 games a network's mean final score has half the standard
+error it has with 6. Its searches have no exploration noise, and it plays the
+most visited action at every decision (section 4.5). It measures playing strength; it is not a network
 evaluation (section 9.2).
 
 **Repeated-state guard.** Held-out evaluation stops a game after 20 visits to the
@@ -3423,7 +3467,7 @@ measured and what would settle it.
   ([record](../archive/records/three_round_training_2026_11_14.md)). Two design
   questions below may also be part of the reason: the
   [objective](#is-the-final-wealth-gap-the-right-goal) and
-  [flat search targets](#are-64-simulations-enough-when-there-are-many-legal-actions).
+  [flat search targets](#are-the-simulations-enough-when-there-are-many-legal-actions).
 
   The 25,000 training samples that the long run's last run kept, each rated by
   the network that played its decision, point to three more parts of the reason
@@ -3442,14 +3486,16 @@ measured and what would settle it.
     ([the open question on what the values read](#should-the-values-read-what-the-zones-hold-in-total)).
   - **At half of the searched decisions the policy targets mostly say which
     actions were tried:** at those with 17 or more legal actions, 41% of the
-    kept decisions, the 64 simulations visited 31 to 69 legal actions, most of
-    them once
-    ([the open question](#are-64-simulations-enough-when-there-are-many-legal-actions)).
-  - **Self-play mostly plays an action other than the most visited one,** at
-    63% of its searched decisions
-    ([section 4.5](#45-after-the-simulations-visit-shares-and-the-move-played)),
-    while 99 of every 100 of its searches keep no training sample
-    ([Q-016](../questions.md#q-016-how-self-play-spends-its-searches-and-plays-its-moves)).
+    kept decisions, the long run's 64 simulations visited 31 to 69 legal
+    actions, most of them once
+    ([the open question](#are-the-simulations-enough-when-there-are-many-legal-actions)).
+  - **Self-play mostly played an action other than the most visited one,** at
+    63% of its searched decisions, and 99 of every 100 of its searches kept no
+    training sample. Self-play now draws its move only in game round 1
+    ([section 4.5](#45-after-the-simulations-visit-shares-and-the-move-played))
+    and searches with 256 simulations where it keeps a training sample and 16
+    elsewhere ([section 7.1](#71-a-training-iterations-games)); no run has used
+    this yet.
 - **One network's action probabilities fit its searches less well** than a
   network for each alliance did. In the matched runs of 17 November, at 64×2,
   the one network's KL divergence from its searches' visit shares was 0.273,
@@ -3529,8 +3575,9 @@ compute, compared on held-out value error and in held-out evaluation games.
 
 #### How big should the network and the search be?
 
-**Now.** The Mac profile runs a 64×2 network (section 6) with 64 simulations per
-decision (section 4), and no training run has played more than about 500
+**Now.** The Mac profile runs a 64×2 network (section 6) with 16 simulations per
+decision, and 256 at a decision kept as a training sample (section 7.1), and no
+training run has played more than about 500
 eleven-round games: the night run of 2 November played 467, with a 256×8
 network. After $d$ message-passing layers, a network depth of $d$, a zone's
 vector reflects zones up to $d$ borders away (section 6.6). The map is 7 borders
@@ -3663,7 +3710,7 @@ budget and the search method are one question.
 **Would settle it:** a ladder of training runs at growing sizes, each given the
 same compute and compared in held-out evaluation (section 10), with the search's
 targets checked as in
-[the question on 64 simulations](#are-64-simulations-enough-when-there-are-many-legal-actions),
+[the question on many legal actions](#are-the-simulations-enough-when-there-are-many-legal-actions),
 then repeated with more compute; or one long training run that grows its network,
 as KataGo's did. Inferred from the published networks, not measured: a first
 ladder would run from 64×2 through 256×8, the smallest of the measured sizes whose
@@ -3735,17 +3782,18 @@ and 33.9 ± 4.1 points below their untrained networks
 **Would settle it:** the owner's decision on the objective. A changed objective
 can be checked first with the same scripted comparison.
 
-#### Are 64 simulations enough when there are many legal actions?
+#### Are the simulations enough when there are many legal actions?
 
-**Now.** A search runs 64 simulations, and the visit share each action at the
-root received becomes the policy target (section 4.5), toward which training
-moves the network's probabilities (section 8.1). An action no simulation has
-tried yet gets a value term of 1 (section 4.3), so the search tries every legal
-action once before it tries any twice, as long as its simulations last. Where
-there are many legal actions, most of the 64 simulations go to these first
-tries.
+**Now.** A kept decision's search runs 256 simulations (section 7.1), and the
+visit share each action at the root received becomes the policy target (section
+4.5), toward which training moves the network's probabilities (section 8.1). An
+action no simulation has tried yet gets a value term of 1 (section 4.3), so the
+search tries every legal action once before it tries any twice, as long as its
+simulations last. Where there are many legal actions, most of the simulations go
+to these first tries.
 
-**A real case,** from the long run's last run: the KMT's Combat Movement in game
+**A real case,** from the long run's last run, which searched every decision
+with 64 simulations: the KMT's Combat Movement in game
 round 11 of a game, with 28 legal actions, 27 attacks, each moving one unit into
 an enemy zone, and ending Combat Movement
 ([record](../archive/records/long_run_samples_2026_11_21.md#at-decisions-with-many-legal-actions)):
@@ -3787,10 +3835,12 @@ of 2 visits. Naval decisions were half of the searched training samples
 
 **Alternatives:** more simulations where there are many legal actions, fewer legal
 actions per decision, or Gumbel root search, which the review suggests because it
-was designed for fewer simulations than legal actions. Since only 1% of the
-decisions are kept, more simulations at those cost little if the others get
-fewer ([Q-016](../questions.md#q-016-how-self-play-spends-its-searches-and-plays-its-moves)).
-**Would settle it:** comparing learning at equal compute.
+was designed for fewer simulations than legal actions. The owner's answer to
+Q-016 ([answered](../questions.md#answered)) took the first: a kept decision now
+gets 256 simulations, four times the long run's 64, paid for by 16 at the
+decisions that keep nothing. Inferred, not measured: at 17 to 63 legal actions,
+31 on average, that tries each action several times; at 128 still about two
+each. **Would settle it:** comparing learning at equal compute.
 
 #### Search-guided self-play or direct policy learning, and which opponents?
 
@@ -3843,7 +3893,7 @@ the search, so it needs its own check.
 
 **Measured:** the percentages above
 ([record](../archive/records/never_better_choices_2026_11_05.md)). Fewer legal
-actions would also help the 64 simulations of the question above. **Would settle
+actions would also help the simulations of the question above. **Would settle
 it:** the user's decision on the two left, then learning compared at equal
 compute.
 
@@ -3899,8 +3949,13 @@ qualifier, and the names the code and the dated records use instead.
 - **Visit share:** an action's visit count divided by the number of simulations;
   AlphaZero's search probability.
 - **Temperature:** how closely the move played follows the visit counts: at
-  temperature 1 it is drawn in proportion to them, as in self-play; near 0 it is
-  the most visited action, as in held-out evaluation.
+  temperature 1 it is drawn in proportion to them, as in self-play's first game
+  round; near 0 it is the most visited action, as in self-play after it and in
+  held-out evaluation.
+- **Most visited action:** the action at the root with the most visits; among
+  several, the one whose simulations' average result is best for the alliance
+  choosing, then the one with the higher prior; among those still tied, one at
+  random in self-play and the first by identifier in held-out evaluation.
 - **Exploration noise:** random noise mixed into the priors at the root, during
   training.
 - **Simulation depth:** how many actions and dice rolls a simulation played from
@@ -4003,6 +4058,9 @@ qualifier, and the names the code and the dated records use instead.
   up the new network at once (section 9.1; `--continuous`).
 - **Training sample:** one saved decision: what the network read, who chose, how
   the search split its simulations among the legal actions and the final scores.
+- **Kept decision:** a decision kept as a training sample. Whether it is kept is
+  drawn before its search, which then runs 256 simulations with exploration
+  noise instead of 16 without (section 7.1).
 - **Policy target:** a training sample's visit shares, the action probabilities a
   network is trained toward.
 - **Value target:** a training sample's final scores, divided by 100, the values
