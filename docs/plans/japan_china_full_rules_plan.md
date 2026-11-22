@@ -59,7 +59,7 @@ this timing does not create a Soviet participant, account, possession or unlock.
 
 ### Wealth definition and approved accounting decisions
 
-For alliance `i`, the approved income/asset weighting gives:
+For alliance $i$, the approved income/asset weighting gives its wealth $W_i$:
 
 $$
 \begin{aligned}
@@ -68,6 +68,10 @@ W_i ={}& \text{current income rate}_i \\
 &\qquad + \text{treasury}_i + \text{paid unfinished construction}_i\bigr)
 \end{aligned}
 $$
+
+Alliance $i$'s final score $R_i$ is its own wealth $W_i$ minus the wealth of the
+other two alliances combined, taken when the game ends; before the end no score
+is given (`wealthGaps` and `terminalReturns` in `src/campaign_objective.cpp`):
 
 $$
 R_i = W_i - \sum_{j \ne i} W_j \qquad \text{(the sum runs over the other two alliances)}
