@@ -31,7 +31,8 @@ No run has yet shown robust playing strength.
 - **They describe the program as it is now.** A change to the program changes
   the page that describes it, in the same commit.
 - **History is kept apart**, in git and in the [archive](archive/README.md): dated
-  records of measurements and rule changes, and the delivery reports of the
+  records of measurements and rule changes, the [list of runs](archive/runs.md),
+  whose files stay in `studies/campaign/runs/`, and the delivery reports of the
   engine's build stages. A page here may cite a record as evidence for a number.
   No page here needs the archive to be understood.
 - **Questions have their own page.** Something only the project's owner can

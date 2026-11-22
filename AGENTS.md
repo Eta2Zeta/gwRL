@@ -12,6 +12,13 @@
   user changes and personal notes.
 - Respect the existing ignore policy for local images, build products, caches
   and training scratch output. Never commit credentials or temporary files.
+- Every run of the campaign program, training or measurement, writes into its
+  own folder under `studies/campaign/runs/`, named by what the run is and the
+  date it started (`training-2026-11-22`). A run in parts keeps its parts
+  inside, named by order and what they are (`training-2026-11-19/4-choice-b`).
+  A run started by a script keeps the script, its code and its logs in its
+  folder; nothing of a run goes in `tmp/`. When a run starts, add its line to
+  [the list of runs](docs/archive/runs.md).
 - Fetch before pushing and inspect upstream divergence. Preserve remote work;
   do not force-push, rewrite shared history or discard changes without an explicit
   user request.

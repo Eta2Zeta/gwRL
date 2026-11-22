@@ -1,0 +1,219 @@
+{
+ "record": "memory_check_2026_11_21",
+ "run_folder": "studies/campaign/runs/memory-check-2026-11-21 (until 22 November 2026 tmp/diagnosis-2026-11-21)",
+ "commit": "c876716",
+ "checked_engine": {
+  "compile_flags": [
+   "-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG",
+   "-DGWRL_CHECK_SLOT_MAPS",
+   "-fsanitize=address,undefined",
+   "-fno-sanitize=vptr,function",
+   "-fno-omit-frame-pointer",
+   "-g",
+   "-O1"
+  ],
+  "asan_options": "halt_on_error=1:abort_on_error=1:detect_container_overflow=1:malloc_context_size=30:detect_leaks=0:quarantine_size_mb=1024",
+  "ubsan_options": "print_stacktrace=1:halt_on_error=1",
+  "where": "game processes only, through GWRL_GAME_PYTHON; the training process and the inference server ran the ordinary build on the GPU"
+ },
+ "learning_settings": {
+  "batch_size": 32,
+  "batches": 1000000,
+  "calendar_rounds": 11,
+  "checkpoint_every_waves": null,
+  "checkpoint_interval_seconds": 1800.0,
+  "compiled_forward": true,
+  "complete_episodes": true,
+  "continuous": true,
+  "cpu_budget": 8,
+  "episode_workers": 1,
+  "epochs": 525,
+  "games_per_process": 14,
+  "hidden_dim": 256,
+  "learning_rate": 0.001,
+  "max_depth": 16,
+  "max_episodes": null,
+  "message_layers": 8,
+  "networks": "one",
+  "neural_device": "mps",
+  "parallel_envs": 14,
+  "replay_capacity": 8000,
+  "sample_fraction": 0.01,
+  "seed": 20261125,
+  "simulations": 64,
+  "threads": 1,
+  "transitions_per_batch": 20000,
+  "value_scale": 100.0
+ },
+ "initial_models": "the long run's 4-choice-b generation 10 (38 network updates)",
+ "attempts": [
+  {
+   "run_folder": "run",
+   "game_processes": 2,
+   "games_per_process": 42,
+   "quarantine_mb": 256,
+   "watch_started": "2026-11-21 13:07:28",
+   "last_minute_sample": "2026-11-21 13:11:00",
+   "minutes_sampled": 4,
+   "median_cores": 12.55,
+   "p10_cores": 11.8,
+   "p90_cores": 13.2,
+   "median_gb": 9.73,
+   "peak_gb": 10.52
+  },
+  {
+   "run_folder": "run-one-process",
+   "game_processes": 1,
+   "games_per_process": 42,
+   "quarantine_mb": 256,
+   "watch_started": "2026-11-21 13:11:43",
+   "last_minute_sample": "2026-11-21 13:14:00",
+   "minutes_sampled": 3,
+   "median_cores": 12.7,
+   "p10_cores": 11.9,
+   "p90_cores": 12.8,
+   "median_gb": 6.61,
+   "peak_gb": 6.64
+  },
+  {
+   "run_folder": "run-seven-games",
+   "game_processes": 1,
+   "games_per_process": 7,
+   "quarantine_mb": 256,
+   "watch_started": "2026-11-21 13:14:34",
+   "last_minute_sample": "2026-11-21 13:16:01",
+   "minutes_sampled": 2,
+   "median_cores": 4.85,
+   "p10_cores": 4.8,
+   "p90_cores": 4.9,
+   "median_gb": 3.86,
+   "peak_gb": 3.9
+  },
+  {
+   "run_folder": "run-fourteen-games",
+   "game_processes": 1,
+   "games_per_process": 14,
+   "quarantine_mb": 256,
+   "watch_started": "2026-11-21 13:16:51",
+   "last_minute_sample": "2026-11-21 13:25:01",
+   "minutes_sampled": 9,
+   "median_cores": 7.8,
+   "p10_cores": 7.4,
+   "p90_cores": 12.2,
+   "median_gb": 4.56,
+   "peak_gb": 4.69
+  },
+  {
+   "run_folder": "run-large-quarantine",
+   "game_processes": 1,
+   "games_per_process": 14,
+   "quarantine_mb": 4096,
+   "watch_started": "2026-11-21 13:26:01",
+   "last_minute_sample": "2026-11-21 13:30:01",
+   "minutes_sampled": 4,
+   "median_cores": 7.7,
+   "p10_cores": 7.3,
+   "p90_cores": 8.7,
+   "median_gb": 13.31,
+   "peak_gb": 13.97
+  },
+  {
+   "run_folder": "run-quarantine-2gb",
+   "game_processes": 1,
+   "games_per_process": 14,
+   "quarantine_mb": 2048,
+   "watch_started": "2026-11-21 13:30:43",
+   "last_minute_sample": "2026-11-21 13:56:00",
+   "minutes_sampled": 26,
+   "median_cores": 7.7,
+   "p10_cores": 6.7,
+   "p90_cores": 8.5,
+   "median_gb": 9.46,
+   "peak_gb": 13.98
+  },
+  {
+   "run_folder": "run-quarantine-1gb",
+   "game_processes": 1,
+   "games_per_process": 14,
+   "quarantine_mb": 1024,
+   "watch_started": "2026-11-21 13:56:53",
+   "last_minute_sample": "2026-11-21 17:53:01",
+   "minutes_sampled": 237,
+   "median_cores": 7.7,
+   "p10_cores": 6.9,
+   "p90_cores": 8.2,
+   "median_gb": 7.87,
+   "peak_gb": 12.65,
+   "part": "before the pause"
+  },
+  {
+   "run_folder": "run-quarantine-1gb",
+   "game_processes": 1,
+   "games_per_process": 14,
+   "quarantine_mb": 1024,
+   "watch_started": "2026-11-21 18:11:16",
+   "last_minute_sample": "2026-11-22 11:24:01",
+   "minutes_sampled": 1033,
+   "median_cores": 8.0,
+   "p10_cores": 7.0,
+   "p90_cores": 8.4,
+   "median_gb": 8.87,
+   "peak_gb": 13.4,
+   "part": "after the pause"
+  }
+ ],
+ "main_run": {
+  "run_folder": "run-quarantine-1gb",
+  "started": "2026-11-21 13:56:53",
+  "paused": [
+   "2026-11-21 17:53:46",
+   "2026-11-21 18:11:16"
+  ],
+  "stopped": "2026-11-22 11:24:49",
+  "hours_of_play": 21.17,
+  "counters_at_stop": {
+   "batches": 61,
+   "chance_events": 169889,
+   "decisions": 1276928,
+   "episodes": 866,
+   "transitions": 1446817,
+   "updates": 61
+  },
+  "decisions_lost_at_pause": 11707,
+  "checker_reports": [],
+  "hardening_or_slot_map_check_fired": false
+ },
+ "long_run_crashes": {
+  "parts": {
+   "1-first-night": {
+    "decisions": 4565044,
+    "games": 3298,
+    "network_updates": 13
+   },
+   "2-morning": {
+    "decisions": 3391666,
+    "games": 2279,
+    "network_updates": 9
+   },
+   "3-afternoon": {
+    "decisions": 2341852,
+    "games": 1593,
+    "network_updates": 6
+   },
+   "4-choice-b": {
+    "decisions": 3925660,
+    "games": 2564,
+    "network_updates": 10
+   },
+   "5-restart": {
+    "decisions": 0,
+    "games": 0,
+    "network_updates": 0
+   }
+  },
+  "decisions": 14224222,
+  "crashes": 6,
+  "decisions_per_crash": 2370704,
+  "probability_of_a_report_at_that_rate": 0.416
+ }
+}

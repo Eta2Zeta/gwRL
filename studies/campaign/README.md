@@ -158,6 +158,16 @@ messages from Python.
 
 ## Long unattended runs
 
+Every run writes into its own folder under `studies/campaign/runs/`, which git
+ignores. The folder is named by what the run is and the date it started, such
+as `training-2026-11-22`; a training run that goes on in parts, each restarted
+with new code or settings, keeps its parts inside, named by their order and
+what they are, such as `training-2026-11-19/4-choice-b`. A run started by a
+script keeps the script, the commit's files it ran (`code/`) and its logs in
+that folder too, and nothing of it in `tmp/`. The
+[list of runs](../../docs/archive/runs.md) says what each folder holds and
+which record reports it, and gets a line when a run starts.
+
 `tools/supervise_campaign_training.py` runs training under a fixed active-time
 budget, with bounded retries and graceful memory and deadline stops. It reserves
 its own core within the owner's allowance of nine cores (`CORE_ALLOWANCE`): the
@@ -203,7 +213,9 @@ For looking into a crash the run keeps, in its run folder:
 
 The defect behind the six game process crashes of 20 and 21 November 2026 is not found,
 also not by the sanitizer runs of 21 November
-([record](../../docs/archive/records/crash_diagnosis_2026_11_21.md)).
+([record](../../docs/archive/records/crash_diagnosis_2026_11_21.md)) nor by 21.2
+hours of training play whose game processes ran under AddressSanitizer
+([record](../../docs/archive/records/memory_check_2026_11_21.md)).
 
 ### Training on the Mac
 

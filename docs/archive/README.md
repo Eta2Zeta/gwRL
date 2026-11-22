@@ -8,6 +8,7 @@ questions and next steps are those of that date.
 | Part | What it holds |
 | --- | --- |
 | [Dated records](#dated-records) | One page per measurement, experiment or rule change since 24 October 2026, each with its data file. |
+| [Runs](runs.md) | Every run folder in `studies/campaign/runs/`, oldest first: what each run was and the record that reports it, and where folders moved from. |
 | [Milestone pages](#milestone-pages) | The delivery reports of the engine's twelve build stages, M0 to M11, from October 2026, and the source reviews made with them. |
 | [Removed on 2 November 2026](#removed-on-2-november-2026) | What the earlier work found, for the files no longer in the tree, and where git keeps them. |
 
@@ -96,6 +97,7 @@ the first learning stage.
 | 21 Nov | [Looking for the defect behind the game process crashes](records/crash_diagnosis_2026_11_21.md) | The five crash reports, the code and about 8,000 decisions under ThreadSanitizer and 21,000 under AddressSanitizer, with every position encoded and with the network choosing moves, found no data race and no memory error; macOS's allocator keeps its message only with MallocDebugReport=stderr; libc++'s fast hardening and the SlotMap check cost 2.2% of a game thread's time and changed no move. |
 | 21 Nov | [What the long training run learned in 38 network updates](records/long_run_progress_2026_11_21.md) | 9,576 games in four runs: the value loss on new games explained 17% to 30% of the final scores' variance for about a day and 36% in the four network updates after choice B's replay buffer filled, its fit to the buffer then about 1.3 times better than to new games instead of 3.3; against the scripted balanced opponents on six seeds the network played no alliance better than the scripted policy in the same seat: the Allies 36.6 points worse, the Axis 6.8 worse and 36.5 below the passive untrained network, the Comintern the same. |
 | 21 Nov | [A sixth game process crash, the first with the new diagnostics](records/sixth_game_process_crash_2026_11_21.md) | 3.6 minutes into the run started at 08:39 with the checking build, a game process aborted freeing a unit's state in Searcher::retain; the allocator's message, the Python stacks, the crash report and the 42 games' move logs survived; neither check fired; no game had finished, so the run stopped, the keeper's third stop in 25 minutes after two swap stops; the 42 games replayed with their last searches under AddressSanitizer gave no report. |
+| 21–22 Nov | [A training run with memory-checked game processes](records/memory_check_2026_11_21.md) | 21.2 hours of training play, 1,276,928 decisions and 866 games, with the game processes on an engine built with AddressSanitizer and UndefinedBehaviorSanitizer: no report. The long run crashed once in about 2.37 million decisions; a defect as frequent per decision would have shown here with probability 0.42. One process of 14 games instead of six of 42, on a much slower engine. |
 
 ### The engine
 

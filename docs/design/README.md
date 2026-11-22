@@ -2482,7 +2482,12 @@ after its run started
 the training process then waits for the crash report's copy before it exits.
 The defect behind these crashes is not
 found, also not by the sanitizer runs of 21 November 2026
-([record](../archive/records/crash_diagnosis_2026_11_21.md)); the training build
+([record](../archive/records/crash_diagnosis_2026_11_21.md)) nor by 21.2 hours
+of training play, 1.28 million decisions, whose game processes ran under
+AddressSanitizer ([record](../archive/records/memory_check_2026_11_21.md)),
+though at the long run's rate of one crash in about 2.37 million decisions
+that run would have caught a defect as frequent with a probability of only
+0.42; the training build
 keeps two checks that would stop it where it happens if it is an out-of-bounds
 index or a stale SlotMap iterator (`setup.py`).
 

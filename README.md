@@ -47,7 +47,8 @@ earlier, removed work found.
 | `tools/` | Training supervisor, recording, checks, benchmarks and map builders |
 | `web/` | Campaign Observatory |
 
-New runs write into ignored `runs/` folders.
+Runs write into `studies/campaign/runs/`, which git ignores, one folder per run;
+the [list of runs](docs/archive/runs.md) says what each was.
 
 ## Build and run
 
