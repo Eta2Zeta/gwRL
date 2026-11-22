@@ -184,15 +184,27 @@ has surrendered.
 warlord only when the CCP has no units left, so this brings the CCP back.
 
 **Influence.** In its Place Units Phase, Japan, or the CCP while it is a minor
-power, may try once to win over an unaligned warlord (`influence_roll`).
+power, may try once to win over an unaligned warlord (`influence_roll`): the
+CCP by its Spreading Influence (rulebook section 15.2, page 104; CCP sheet,
+page 3), Japan by its Dadao Government (section 15.4, page 105; Japan sheet,
+page 4).
 
 - **Who can be targeted:** a warlord whose land borders zones the nation
   controls, at least one of them holding a unit that has stood there since the
   turn began. The number of those bordering
   zones is the *threshold*.
-- **The roll:** one twelve-sided die. The nation may first pay IPP, at most the
-  threshold and at most its treasury (RCL-002); each IPP lowers the roll by one.
-  The action names the warlord and the amount.
+- **The roll:** one twelve-sided die. Before rolling, the nation may pay IPP,
+  at most the threshold and at most its treasury; each IPP lowers the roll by
+  one. The action names the warlord and the amount.
+- **The cap on the payment** is the project's reading of the printed rules
+  ([RCL-002](../../game_content/rules/clarifications.md#rcl-002-influence-spending-before-the-die-roll),
+  adopted by the owner on 5 October 2026). The printed rules cap the payment at
+  "the amount of its original influence roll", a number nobody knows when the
+  payment is made, since the payment comes before the roll. The project reads
+  that cap as the threshold, the highest roll that succeeds without payment.
+  Paying the most the cap allows doubles the rolls that succeed: with a
+  threshold of 3, rolls of 1 to 3 succeed unpaid, and rolls of 1 to 6 after
+  paying 3 IPP.
 - **Success:** the lowered roll is at most the threshold. The warlord joins the
   CCP, or, for Japan, joins Dadao, which the first success creates.
 - **A natural 12** always sends the warlord to the KMT instead, whatever was
