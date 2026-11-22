@@ -237,7 +237,8 @@ last run saved ([record](archive/records/long_run_samples_2026_11_21.md)):
 - **Targets that say which actions were tried.** At 41% of the kept decisions
   there were 17 or more legal actions. There the 64 simulations visited 31 to 69
   actions, mostly once each, and the most visited action had 3% to 23% of the
-  visits.
+  visits. A real decision of 28 legal actions, 17 of them tried once, is in
+  [the design document](design/README.md#are-64-simulations-enough-when-there-are-many-legal-actions).
 
 **Why it matters.** The values learn from final scores, one set per game, and
 the number of games is what limits them. Trained on 1,324 of the saved games,

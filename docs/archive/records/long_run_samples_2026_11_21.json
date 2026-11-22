@@ -3170,5 +3170,359 @@
     "progress_reporting": 0.4
    }
   }
+ },
+ "visits_at_many_legal_actions": {
+  "method": "counted on 22 November 2026 from the same training samples: an action's visits are its visit share divided by the decision's smallest visit share, one visit",
+  "by_legal_actions": {
+   "17-63": {
+    "decisions": 7197,
+    "mean_legal_actions": 31.41586772266222,
+    "share_of_legal_actions_tried": 0.9996973196830752,
+    "share_of_tried_actions_visited_once": 0.620518569607209,
+    "median_visits_of_most_visited": 15,
+    "most_visited_among_networks_three_likeliest": 0.46588856467972767
+   },
+   "64 or more": {
+    "decisions": 2988,
+    "mean_legal_actions": 151.65562248995985,
+    "share_of_legal_actions_tried": 0.5609179508203104,
+    "share_of_tried_actions_visited_once": 0.9807313835715791,
+    "median_visits_of_most_visited": 2.0,
+    "most_visited_among_networks_three_likeliest": 0.5127175368139224
+   }
+  },
+  "example_decision": {
+   "replay_index": 21691,
+   "alliance": "allies",
+   "nation": "kmt",
+   "game_round": 11,
+   "phase": "combat_movement",
+   "played_by_generation": 9,
+   "final_scores": [
+    28.39999999999999,
+    -43.8,
+    -97.8
+   ],
+   "legal_actions": 28,
+   "total_visits": 64,
+   "actions": [
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_kweichow",
+      "land_china_szechwan",
+      "land_china_hopeh"
+     ],
+     "visits": 16,
+     "visit_share": 0.25,
+     "network_probability": 0.045615166916085824
+    },
+    {
+     "kind": "movement_route",
+     "unit": "infantry",
+     "path": [
+      "land_china_beiping",
+      "land_manchuria_rehe"
+     ],
+     "visits": 10,
+     "visit_share": 0.15624999999999997,
+     "network_probability": 0.04910162154671149
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_szechwan",
+      "land_china_hopeh"
+     ],
+     "visits": 4,
+     "visit_share": 0.0625,
+     "network_probability": 0.05836990115355592
+    },
+    {
+     "kind": "movement_route",
+     "unit": "infantry",
+     "path": [
+      "land_china_sikang",
+      "land_china_tsinghai"
+     ],
+     "visits": 3,
+     "visit_share": 0.046874999999999986,
+     "network_probability": 0.02860744591599866
+    },
+    {
+     "kind": "movement_route",
+     "unit": "infantry",
+     "path": [
+      "land_china_beiping",
+      "land_china_hopeh"
+     ],
+     "visits": 2,
+     "visit_share": 0.031249999999999993,
+     "network_probability": 0.07731819033033561
+    },
+    {
+     "kind": "movement_route",
+     "unit": "motorized_infantry",
+     "path": [
+      "land_china_kweichow",
+      "land_china_hunan",
+      "land_china_shantung"
+     ],
+     "visits": 2,
+     "visit_share": 0.031249999999999993,
+     "network_probability": 0.06295688355529849
+    },
+    {
+     "kind": "end_phase",
+     "unit": null,
+     "path": [],
+     "visits": 2,
+     "visit_share": 0.031249999999999993,
+     "network_probability": 0.05319762833828211
+    },
+    {
+     "kind": "movement_route",
+     "unit": "infantry",
+     "path": [
+      "land_china_szechwan",
+      "land_china_hopeh"
+     ],
+     "visits": 2,
+     "visit_share": 0.031249999999999993,
+     "network_probability": 0.045719146302702976
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_szechwan",
+      "land_china_shensi"
+     ],
+     "visits": 2,
+     "visit_share": 0.031249999999999993,
+     "network_probability": 0.0417734392907607
+    },
+    {
+     "kind": "movement_route",
+     "unit": "infantry",
+     "path": [
+      "land_china_szechwan",
+      "land_china_shantung"
+     ],
+     "visits": 2,
+     "visit_share": 0.031249999999999993,
+     "network_probability": 0.03405702637147162
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_kweichow",
+      "land_china_szechwan",
+      "land_china_shensi"
+     ],
+     "visits": 2,
+     "visit_share": 0.031249999999999993,
+     "network_probability": 0.02307505656910642
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_szechwan",
+      "land_china_hunan",
+      "land_china_shantung"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.04583775337938084
+    },
+    {
+     "kind": "movement_route",
+     "unit": "infantry",
+     "path": [
+      "land_china_szechwan",
+      "land_china_tsinghai"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.0387652920242677
+    },
+    {
+     "kind": "movement_route",
+     "unit": "motorized_infantry",
+     "path": [
+      "land_china_sikang",
+      "land_china_tsinghai"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.0367209191252984
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_szechwan",
+      "land_china_shantung"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.03525836004897778
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_kweichow",
+      "land_china_szechwan",
+      "land_china_tsinghai"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.035133144884707077
+    },
+    {
+     "kind": "movement_route",
+     "unit": "infantry",
+     "path": [
+      "land_china_sikang",
+      "land_china_tsinghai"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.03447941938145745
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_szechwan",
+      "land_china_tsinghai"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.030935947873929805
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_kweichow",
+      "land_china_szechwan",
+      "land_china_shantung"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.02856724660272661
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_tibet",
+      "land_china_tsinghai"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.026481398354607943
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_szechwan",
+      "land_china_sikang",
+      "land_china_tsinghai"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.025644111270557227
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_yunnan",
+      "land_china_sikang",
+      "land_china_tsinghai"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.02464007259269067
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_tibet",
+      "land_china_sikang",
+      "land_china_tsinghai"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.023342900324124227
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_kweichow",
+      "land_china_hunan",
+      "land_china_shantung"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.022425468857639685
+    },
+    {
+     "kind": "movement_route",
+     "unit": "cavalry",
+     "path": [
+      "land_china_kweichow",
+      "land_china_sikang",
+      "land_china_tsinghai"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.02114542981885153
+    },
+    {
+     "kind": "movement_route",
+     "unit": "infantry",
+     "path": [
+      "land_china_sikang",
+      "land_china_tsinghai"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.02100105346864174
+    },
+    {
+     "kind": "movement_route",
+     "unit": "infantry",
+     "path": [
+      "land_china_hunan",
+      "land_china_shantung"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.018671341414516155
+    },
+    {
+     "kind": "movement_route",
+     "unit": "infantry",
+     "path": [
+      "land_china_szechwan",
+      "land_china_shensi"
+     ],
+     "visits": 1,
+     "visit_share": 0.015625000000000007,
+     "network_probability": 0.011158634287315344
+    }
+   ]
+  }
  }
 }

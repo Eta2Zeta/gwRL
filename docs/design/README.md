@@ -3336,9 +3336,11 @@ measured and what would settle it.
     ([record](../archive/records/value_loss_weights_2026_11_21.md)). The values
     are limited by the number of games
     ([the open question on what the values read](#should-the-values-read-what-the-zones-hold-in-total)).
-  - **Most policy targets say which actions were tried:** at 41% of the kept
-    decisions the 64 simulations visited 31 to 69 legal actions, mostly once
-    each ([the open question](#are-64-simulations-enough-when-there-are-many-legal-actions)).
+  - **At half of the searched decisions the policy targets mostly say which
+    actions were tried:** at those with 17 or more legal actions, 41% of the
+    kept decisions, the 64 simulations visited 31 to 69 legal actions, most of
+    them once
+    ([the open question](#are-64-simulations-enough-when-there-are-many-legal-actions)).
   - **Self-play mostly plays other moves than the search's choice,** at 63% of
     its searched decisions, while 99 of every 100 of its searches keep no
     training sample
@@ -3626,7 +3628,34 @@ can be checked first with the same scripted comparison.
 #### Are 64 simulations enough when there are many legal actions?
 
 **Now.** A search runs 64 simulations, and the visit share each action at the
-root received becomes the policy target (section 4.5).
+root received becomes the policy target (section 4.5), toward which training
+moves the network's probabilities (section 8.1). An action no simulation has
+tried yet gets a value term of 1 (section 4.3), so the search tries every legal
+action once before it tries any twice, as long as its simulations last. Where
+there are many legal actions, most of the 64 simulations go to these first
+tries.
+
+**A real case,** from the long run's last run: the KMT's Combat Movement in game
+round 11 of a game, with 28 legal actions, 27 attacks, each moving one unit into
+an enemy zone, and ending Combat Movement
+([record](../archive/records/long_run_samples_2026_11_21.md#at-decisions-with-many-legal-actions)):
+
+| Legal action | Visits | Visit share, the policy target | The network's probability |
+| --- | ---: | ---: | ---: |
+| The cavalry in Kweichow attacks Hopeh, through Szechwan | 16 | 0.25 | 0.046 |
+| The infantry in Beiping attacks Manchuria-Rehe | 10 | 0.16 | 0.049 |
+| The cavalry in Szechwan attacks Hopeh | 4 | 0.06 | 0.058 |
+| The infantry in Sikang attacks Tsinghai | 3 | 0.05 | 0.029 |
+| Seven more, among them the infantry in Beiping attacking Hopeh, the network's likeliest action, and ending Combat Movement | 2 each | 0.03 each | 0.023 to 0.077 |
+| The other 17 attacks | 1 each | 0.016 each | 0.011 to 0.046 |
+
+The first 28 simulations tried each legal action once. The other 36 went mostly
+to the two attacks whose simulations kept coming out best (section 4.5): their
+visit shares, 0.25 and 0.16, carry what the search found. The 17 visit shares of
+0.016, one visit in 64, say only that an attack was tried once and not again. An
+attack whose one simulation went badly and one that looked merely no better
+than the two leaders get the same policy target, and training moves the
+network's probability of each toward it alike.
 
 **Measured** on 31 October: at Japan's opening, with 308 legal actions, the
 search tried 63 of them, almost all once, and in an eleven-round game 60% of
@@ -3636,12 +3665,14 @@ Such targets say little more than which actions were tried. Since then Combat
 Movement decisions have shrunk to about a third as many legal actions
 ([record](../archive/records/combat_movement_combats_only_2026_11_01.md)).
 
-**Measured** on 21 November, on the 25,000 training samples of the long run's
-last run: 41% of the kept decisions had 17 or more legal actions. At those with
-17 to 63 the search visited 31 of them on average and gave the most visited
-action 23% of the visits; at those with 64 or more, a median of 128, it visited
-69, mostly once each, and the most visited action had 3%. Naval decisions were
-half of the searched training samples
+**Measured** on the 25,000 training samples of the long run's last run: 41% of
+the kept decisions, half of the searched ones, had 17 or more legal actions. At
+those with 17 to 63, 31 on average, the search tried every legal action and 62%
+of them only once; the most visited action had a median of 15 of the visits,
+and it was among the network's three likeliest actions at 47% of these
+decisions. At those with 64 or more, a median of 128, the search tried 56% of
+the legal actions, 98% of those once, and the most visited action had a median
+of 2 visits. Naval decisions were half of the searched training samples
 ([record](../archive/records/long_run_samples_2026_11_21.md#what-the-search-leaves-as-policy-targets)).
 
 **Alternatives:** more simulations where there are many legal actions, fewer legal

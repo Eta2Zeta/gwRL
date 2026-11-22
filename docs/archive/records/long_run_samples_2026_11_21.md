@@ -94,6 +94,31 @@ of the visits, and the move played was the other one 27% of the time. Among the
 alliances, the Axis made 62% of the searched samples, with 33.9 legal actions on
 average, the Allies 26% with 56.7, and the Comintern 12% with 8.8.
 
+### At decisions with many legal actions
+
+Counted on 22 November from the same training samples, with each action's visits
+taken as its visit share divided by the decision's smallest visit share, one
+visit. At the 7,197 kept decisions with 17 to 63 legal actions, 31 on average,
+the search tried every legal action, and 62% of them only once; the most
+visited action had a median of 15 visits and was among the network's three
+likeliest actions at 47% of these decisions. At the 2,988 with 64 or more, it
+tried 56% of the legal actions, 98% of those once, and the most visited action
+had a median of 2 visits.
+
+A decision of the first kind, training sample 21,691 of the replay buffer: the
+KMT's Combat Movement in game round 11 of a game that generation 9 played, which
+ended Axis +28.4, Allies −43.8 and Comintern −97.8. Its 28 legal actions were 27
+attacks, each moving one unit into an enemy zone, and ending Combat Movement:
+
+| Legal action | Visits | Visit share | The network's probability |
+| --- | ---: | ---: | ---: |
+| The cavalry in Kweichow attacks Hopeh, through Szechwan | 16 | 0.25 | 0.046 |
+| The infantry in Beiping attacks Manchuria-Rehe | 10 | 0.16 | 0.049 |
+| The cavalry in Szechwan attacks Hopeh | 4 | 0.06 | 0.058 |
+| The infantry in Sikang attacks Tsinghai | 3 | 0.05 | 0.029 |
+| Seven more, among them the infantry in Beiping attacking Hopeh, the network's likeliest action, and ending Combat Movement | 2 each | 0.03 each | 0.023 to 0.077 |
+| The other 17 attacks | 1 each | 0.016 each | 0.011 to 0.046 |
+
 ## The values, game round by game round, beside a linear model
 
 For each game round, the share of the variance of each alliance's final score
@@ -205,10 +230,11 @@ It shows:
 - **The layers below the two heads learn almost only from the policy loss.**
   There the value loss's gradient is a sixth to a ninth the size of the policy
   loss's.
-- **Most policy targets record which actions were tried.** At 41% of the kept
-  decisions there are 17 or more legal actions, and the search's 64 simulations
-  visit 31 to 69 of them, mostly once, giving the most visited action 3% to 23%
-  of the visits.
+- **At half of the searched decisions the policy targets mostly record which
+  actions were tried.** 41% of the kept decisions, half of the searched ones,
+  have 17 or more legal actions; there the search's 64 simulations visit 31 to
+  69 of them, mostly once, giving the most visited action 3% to 23% of the
+  visits.
 - **Self-play mostly does not play the search's choice.** At 63% of searched
   decisions the move played is not a most visited action: about 800 of a
   game's 1,260 searched decisions.
