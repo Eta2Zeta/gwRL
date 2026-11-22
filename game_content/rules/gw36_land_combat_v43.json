@@ -103,6 +103,14 @@
       "scope": "Ordinary Low Morale without a legal attack-origin retreat; recorded as RCL-016."
     },
     {
+      "id": "developer_low_morale_no_retreat_reported_2026_11_21",
+      "kind": "developer_clarification_reported_by_user",
+      "date": "2026-11-21",
+      "quote": "mark 016 as a dev clarification",
+      "scope": "Confirms RCL-016: an attacking minor KMT regular Infantry/Cavalry unit that rolls 10+ and cannot retreat to the zone it attacked from, such as one landed from the sea, is eliminated.",
+      "independently_verified": false
+    },
+    {
       "id": "developer_airborne_correction_2026_10_06",
       "kind": "developer_correction_reported_by_user_and_inspected_in_discord",
       "date": "2026-10-06",
@@ -350,6 +358,10 @@
         },
         {
           "source_id": "user_low_morale_no_retreat_2026_11_02",
+          "clarification": "RCL-016"
+        },
+        {
+          "source_id": "developer_low_morale_no_retreat_reported_2026_11_21",
           "clarification": "RCL-016"
         }
       ]

@@ -111,7 +111,8 @@ Only the attacker retreats, before a combat round begins (rulebook section
 **KMT Low Morale.** While the KMT is a minor power, its attacking Infantry and
 Cavalry lose heart: a unit whose attack die shows 10 or more goes back to the
 zone it came from and is out of the battle. If it has nowhere to go back to,
-for example after a landing, it is eliminated (RCL-016). Defending KMT units
+for example after a landing, it is eliminated, as the game's developers have
+clarified (RCL-016). Defending KMT units
 and a KMT that has become a major power are not affected.
 
 **Attacking an empty zone.** A battle is still registered and begun, so that

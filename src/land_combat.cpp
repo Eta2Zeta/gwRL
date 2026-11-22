@@ -1602,7 +1602,7 @@ void LandCombatRules::applyChance(State &s, const ChanceRequest &request,
                 // A unit that cannot retreat to the zone it attacked from, such
                 // as one landed from the sea (RB 10.8.3), is eliminated, as are
                 // attackers that must retreat but cannot in RB 1.7.5 and 1.7.7
-                // (user ruling RCL-016).
+                // (RCL-016, clarified by the game's developers).
                 const auto from = approach(s, b, unit);
                 if (s.territories.contains(from) && passableLandBorder(s, b.zone, from) &&
                     s.territories.at(from).possessor &&
