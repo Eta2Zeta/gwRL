@@ -249,6 +249,29 @@ void ccpNoUnitsIsNotSurrenderOrGameEnd() {
     state.validate();
 }
 
+void kmtWarlordPermissionOutlastsCcpRevival() {
+    auto state = fixture("kmt", Phase::CombatMovement);
+    const auto kmt = nationNumber(state, "kmt"), ccp = nationNumber(state, "ccp");
+    const auto warlord = nationNumber(state, "warlord_beiping_hopeh"), mongolia = nationNumber(state, "mongolia");
+    check(!mayDeclareWar(state, kmt, warlord, DeclarationMode::LandAttack).allowed,
+          "KMT attacked a warlord before the CCP had been eliminated");
+    std::set<Id> communistUnits;
+    for (const auto& [id, unit] : state.units) if (unit.owner == ccp) communistUnits.insert(id);
+    removePoliticalUnits(state, communistUnits);
+    check(flagged(state.nations.at(ccp).gameFlags, mark::civil_war_eliminated),
+          "Losing its last unit did not mark the CCP eliminated before the next political refresh");
+    // The CCP places a new unit before the KMT's turn. The KMT's permission
+    // holds "if CCP previously has been eliminated" (RB 5.1, page 35).
+    addUnit(state, "returned_ccp_infantry", "ccp", shensi);
+    refreshPoliticalState(state);
+    check(flagged(state.nations.at(ccp).gameFlags, mark::civil_war_eliminated),
+          "A new CCP unit cleared the record of the CCP's elimination");
+    check(mayDeclareWar(state, kmt, warlord, DeclarationMode::LandAttack).allowed
+            && mayDeclareWar(state, kmt, mongolia, DeclarationMode::LandAttack).allowed,
+          "KMT's warlord and Mongolia permission ended when the CCP had units again");
+    state.validate();
+}
+
 void captureCapitalAndFacilities() {
     auto state = fixture("kmt");
     state.nations.at(nationNumber(state, "kmt")).atWarWith.insert(nationNumber(state, "japan"));
@@ -550,6 +573,7 @@ int main() {
         {"CCP evolution removes minor actions", ccpEvolutionLosesMinorActionsImmediately},
         {"One China point versus surrender entitlement", oneChinaPointIsNotSurrenderBonus},
         {"CCP elimination is not surrender", ccpNoUnitsIsNotSurrenderOrGameEnd},
+        {"KMT warlord permission outlasts the CCP's revival", kmtWarlordPermissionOutlastsCcpRevival},
         {"capital capture and facility aftermath", captureCapitalAndFacilities},
         {"mandatory liberation and proven withdrawal", mandatoryLiberationAndProvenWithdrawal},
         {"Chinese factions keep their conquests", chineseFactionsKeepTheirConquests},

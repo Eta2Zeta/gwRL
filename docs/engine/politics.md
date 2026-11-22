@@ -33,7 +33,7 @@ at war. A war begins in one of three ways:
 | The KMT or the CCP, while a minor power | Japan or Dadao, while that nation holds land or has units in the Chinese Home Country |
 | The KMT or the CCP, as a major power | Japan or Dadao |
 | The CCP | A warlord, by attacking it |
-| The KMT | A warlord or Mongolia, by attacking it, but only once the CCP has no units left |
+| The KMT | A warlord or Mongolia, by attacking it, from the CCP's first elimination to the end of the game |
 | Dadao | A Chinese nation or a warlord, by attacking it |
 | Mongolia | Nobody |
 
@@ -44,11 +44,14 @@ follows rulebook 15.4 (page 105). Mongolia starts no war because the power
 that controls a minor power may not declare war for it (rulebook 4.5,
 page 27).
 
-The KMT's row is the engine's reading of the printed condition that the CCP
-has been eliminated before: it allows the attack only while the CCP has no
-units. Whether the permission should last once the CCP has been eliminated is
-an open question
-([Q-006](../questions.md#q-006-the-kmt-after-the-ccp-comes-back)).
+The KMT's row follows the printed condition "if CCP previously has been
+eliminated" (rulebook 5.1, page 35; KMT sheet, page 2): once the CCP has been
+left with no units, the KMT may make these attacks for the rest of the game,
+even after the CCP has units again, as the owner confirmed on 21 November 2026.
+The engine records the elimination in the mark `civil_war_eliminated` on the
+CCP, which it sets the moment the CCP's last unit is removed
+(`removePoliticalUnits`) and never clears, and `mayDeclareWar` asks that mark.
+The KMT carries the same mark, set the same way.
 
 No nation may declare war inside its own alliance (rulebook 5.1, page 35), and
 while the Chinese Truce holds the KMT and the CCP cannot declare war on each
@@ -181,7 +184,8 @@ attacked by the CCP or Dadao joins the KMT at the end of Combat, unless the KMT
 has surrendered.
 
 **The KMT attacks it.** The warlord joins the CCP at once. The KMT may attack a
-warlord only when the CCP has no units left, so this brings the CCP back.
+warlord only once the CCP has been eliminated ([section 1](#1-war)), so an
+attack while the CCP has no units brings the CCP back.
 
 **Influence.** In its Place Units Phase, Japan, or the CCP while it is a minor
 power, may try once to win over an unaligned warlord (`influence_roll`): the

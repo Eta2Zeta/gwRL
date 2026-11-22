@@ -33,16 +33,11 @@ Other open things stay in the pages that own them, and
 | Number | Question | About | Recommended |
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
-| [Q-006](#q-006-the-kmt-after-the-ccp-comes-back) | Once the CCP has been eliminated, may the KMT attack warlords and Mongolia for good, or only while the CCP has no units? | A printed rule | For good, as the printed words say |
 | [Q-014](#q-014-a-land-battle-that-no-unit-can-end) | How does a land battle end when the attacker's remaining units can neither fire nor retreat and the defender's cannot fire? | A printed rule | The attacking units that can neither fire nor retreat are eliminated |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
-Q-006 was raised on 15 November 2026, while the printed rules on Mongolia's
-attacks on Chinese land (Q-001, since answered) were being looked up. Its
-numbers are in the
-[record of which features random games give values to](archive/records/answer_census_2026_11_15.md).
 Q-014 was raised on 21 November 2026, when the one failed move the long run had kept
 was replayed. Its case is in the
 [record of a land battle that no unit could end](archive/records/land_battle_without_end_2026_11_20.md).
@@ -116,75 +111,6 @@ Stopping only a run that stays over keeps a brief peak from costing a training i
 **If answered.** What the supervisor measures and when it stops a run belong in
 the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
 and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
-
-## Q-006: The KMT after the CCP comes back
-
-**The question.** Once the CCP has been eliminated, may the KMT attack Chinese
-warlords and Mongolia for the rest of the game, or only while the CCP has no
-units?
-
-**What the engine does now.** It lets the KMT start a war with a warlord or
-with Mongolia, by a land attack, only while the CCP has no units at that
-moment (`mayDeclareWar` in `src/politics.cpp`;
-[politics](engine/politics.md#1-war)). When the CCP has a unit again, the
-permission is gone. A CCP without units still holds its land and its treasury,
-so it can buy a unit in its next Production Phase.
-
-**The printed rules.**
-
-| Rule | What it says |
-| --- | --- |
-| 5.1, page 35, and the KMT's national reference sheet, page 2 | Can the KMT declare war on Chinese warlords or Mongolia? "Yes, if CCP previously has been eliminated. Via combat movement." |
-| 4.9, page 30 | Before the CCP is eliminated the KMT may not attack a Chinese warlord. One it attacks afterwards aligns with the CCP, which brings the CCP back. |
-| 14.3, page 101 | The Chinese Civil War ends when one faction no longer has any surviving units. |
-
-The word is "previously", and 4.9 says "until": both speak of something that
-has happened, not of how things stand now. No rule says that the permission
-ends when the CCP has units again. The earlier check of this subject settled
-only that an eliminated CCP has not surrendered and can come back
-(`game_content/rules/source_answered_questions.md`, the row on CCP
-elimination).
-
-**A real case** (random game, seed 9105;
-[record](archive/records/answer_census_2026_11_15.md#the-kmt-and-mongolia-after-the-ccp-comes-back)).
-
-1. Game round 2, the CCP's Combat Phase: the CCP loses its last two units in
-   battles on its own turn. It has no units.
-2. Three decisions later, in its Place Units Phase, the CCP places an infantry
-   it had bought. It has one unit again.
-3. Later in game round 2, the KMT's Combat Movement: KMT units in Tsinghai stand
-   next to Mongolian land. The engine offers the KMT seven combat moves, none
-   into Mongolia, because the CCP has a unit.
-
-Under the printed words the attack would be allowed: the CCP had been
-eliminated before.
-
-**How often.** In 480 random games the CCP was without units at some decision
-in 154, and had units again later in 57. In 43 games the KMT then stood next
-to Mongolia in its Combat Movement, not yet at war with it, and was not
-offered the attack, at 600 decisions in all. While the CCP had no units, the
-attack was offered in 124 games
-([record](archive/records/answer_census_2026_11_15.md#the-kmt-and-mongolia-after-the-ccp-comes-back)).
-
-**Why it matters.** It decides how free the KMT is once the CCP has been
-without units for the first time: for good, or only in the short windows when
-the CCP has nothing on the map. It also decides what the CCP's player has to prevent: ever
-dropping to no units, or only being without units on the KMT's turn.
-
-**The choices.**
-
-| Choice | What it changes |
-| --- | --- |
-| A. Keep it: only while the CCP has no units | Nothing. |
-| B. For good, once the CCP has been without units | The engine remembers that the CCP has been eliminated, in a mark on the CCP, and `mayDeclareWar` asks that mark. The mark needs a question in the network's input, so it is a layout change. |
-
-**Recommendation: B, with moderate confidence.** It is what the words say.
-The engine's reading is not unreasonable, since 4.9 speaks of the CCP coming
-back, but no rule states that the ban returns. This is a good one to put to
-the game's developers.
-
-**If answered.** A ruling becomes the next rule clarification, with
-`mayDeclareWar`, its test and the politics page changed in the same commit.
 
 ## Q-014: A land battle that no unit can end
 
@@ -318,6 +244,11 @@ the page that now states it.
   position that breaks one. Stated in
   [what the global features ask about a nation](design/network_input.md#what-the-global-features-ask-about-a-nation).
 
+- **Q-006**, the KMT after the CCP comes back. Answered on 21 November 2026:
+  the printed words decide, so once the CCP has been eliminated the KMT may
+  attack warlords and Mongolia for the rest of the game, even after the CCP
+  has units again. Stated in [the politics page](engine/politics.md#1-war)
+  and [the archived source checks](../game_content/rules/source_answered_questions.md).
 - **Q-007**, self-play stopping at each training iteration's end. Answered on
   17 November 2026: self-play never stops; network updates run beside the games.
   Stated in [the training loop](design/README.md#91-the-training-loop) and

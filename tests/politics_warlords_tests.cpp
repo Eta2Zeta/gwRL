@@ -217,8 +217,8 @@ void attacksAndDefeatedKmt() {
     recordLandAttack(revival, nationNumber(revival, "kmt"), zoneNumber(revival, "w1a"));
     require(isNation(revival, revival.territories.at(zoneNumber(revival, "w1b")).possessor, "ccp") && revival.units.at("w1_guard_a").owner == nationNumber(revival, "ccp"),
             "KMT attack did not immediately revive CCP through the whole warlord");
-    require(!revival.politics.surrendered.contains(nationNumber(revival, "ccp")) && revival.nations.at(nationNumber(revival, "ccp")).gameFlags.at(mark::civil_war_eliminated) == 0,
-            "CCP elimination was treated as permanent surrender");
+    require(!revival.politics.surrendered.contains(nationNumber(revival, "ccp")) && revival.nations.at(nationNumber(revival, "ccp")).gameFlags.at(mark::civil_war_eliminated) == 1,
+            "CCP elimination was treated as permanent surrender, or its record of having been eliminated was cleared");
 }
 
 void dadaoAlignment() {

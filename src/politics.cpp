@@ -389,10 +389,26 @@ void addPoliticalUnit(State& s,NationId nation,const Id& type,ZoneId zone,int co
         u.movementRemaining=0;u.turnFlags[mark::placed_this_turn]=1;s.units.emplace(u.id,std::move(u));
     }
 }
+// RB 14.3: a Chinese faction left with no surviving units has been eliminated.
+// The mark stays once set, because the KMT may attack warlords and Mongolia once
+// the CCP "previously has been eliminated" (RB 5.1, page 35; KMT sheet, page 2),
+// even after the CCP has units again.
+void markEliminatedChineseFactions(State& s) {
+    for(const char* name:{"ccp","kmt"}) {
+        const auto found=findNation(s,name);
+        if(s.nations.contains(found)&&!hasUnits(s,*found))s.nations.at(*found).gameFlags[mark::civil_war_eliminated]=1;
+    }
+}
+
 void removePoliticalUnits(State& s,const std::set<Id>& ids) {
     auto removed=ids;bool changed=true;
     while(changed) {changed=false;for(const auto& [id,u]:s.units)if(u.carriedBy&&removed.contains(*u.carriedBy))changed=removed.insert(id).second||changed;}
+    const auto& known=knownNations(s);bool chineseLoss=false;
+    for(const auto& id:removed)if(s.units.contains(id)) {const auto owner=s.units.at(id).owner;chineseLoss=chineseLoss||owner==known.ccp||owner==known.kmt;}
     for(const auto& id:removed)s.units.erase(id);
+    // Marked at once: a faction can lose its last unit and place a new one
+    // before the next refreshPoliticalState.
+    if(chineseLoss)markEliminatedChineseFactions(s);
     for(auto& [id,u]:s.units)u.cargo.erase(std::remove_if(u.cargo.begin(),u.cargo.end(),[&](const auto& item){return removed.contains(item);}),u.cargo.end());
     for(auto it=s.repairs.begin();it!=s.repairs.end();)if(removed.contains(it->second.target))it=s.repairs.erase(it);else ++it;
     for(auto& [id,b]:s.battles)for(auto* group:{&b.attackers,&b.defenders})group->erase(std::remove_if(group->begin(),group->end(),[&](const auto& x){return removed.contains(x);}),group->end());
@@ -468,7 +484,7 @@ void refreshPoliticalState(State& s) {
         if(!s.nations.contains(found))continue;
         const auto nation=*found;
         auto& n=s.nations.at(nation);
-        n.gameFlags[mark::civil_war_eliminated]=hasUnits(s,nation)?0:1;
+        if(!hasUnits(s,nation))n.gameFlags[mark::civil_war_eliminated]=1;
         if(n.powerStatus=="major"||s.politics.surrendered.contains(nation))continue;
         int total=0;for(const auto& zone:possessedLand(s,nation))total+=effectiveTerritorialIpp(s,zone);
         if(total<13)continue;
@@ -572,7 +588,11 @@ PoliticalPermission mayDeclareWar(const State& s,NationId actor,NationId target,
     if(b.powerStatus!="major"&&mode==DeclarationMode::MajorPowerDeclaration)return {false,"Minor declarations require land combat movement"};
     if(mode==DeclarationMode::LandAttack&&(s.clock.phase!=Phase::CombatMovement||(actor!=s.currentNation()&&!controlledBy(s,actor,s.currentNation()))))return {false,"Land attack outside actor's combat movement"};
     if(actor==known.kmt&&(warlord(s,target)||target==known.mongolia)) {
-        if(hasUnits(s,nationNumber(s, "ccp")))return {false,"CCP has not been eliminated"};
+        // "If CCP previously has been eliminated" (RB 5.1, page 35; KMT sheet,
+        // page 2): from the CCP's first elimination to the end of the game.
+        const auto ccp=nationNumber(s, "ccp");
+        const bool eliminated=!hasUnits(s,ccp)||(s.nations.contains(ccp)&&marked(s.nations.at(ccp).gameFlags,mark::civil_war_eliminated));
+        if(!eliminated)return {false,"CCP has not been eliminated"};
         return {mode==DeclarationMode::LandAttack,"KMT warlord/Mongolia attack requires combat movement"};
     }
     if(actor==known.ccp&&warlord(s,target))return {mode==DeclarationMode::LandAttack,"Warlord attack requires combat movement"};
