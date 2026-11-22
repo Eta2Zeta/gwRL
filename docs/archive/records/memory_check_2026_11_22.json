@@ -1,0 +1,105 @@
+{
+  "record": "memory_check_2026_11_22",
+  "run_folder": "studies/campaign/runs/training-2026-11-22/1-memory-checked",
+  "commit": "3153079",
+  "checked_engine": {
+    "build_log": "studies/campaign/runs/training-2026-11-22/checked-engine/build.log",
+    "compile_flags": [
+      "-fsanitize=address",
+      "-fno-omit-frame-pointer",
+      "-g",
+      "-O2",
+      "-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_FAST",
+      "-DGWRL_CHECK_SLOT_MAPS"
+    ],
+    "asan_options": "log_path=$D/reports/asan:halt_on_error=1:abort_on_error=1:detect_container_overflow=1:malloc_context_size=30:detect_leaks=0:quarantine_size_mb=1024",
+    "where": "the game process only, through GWRL_GAME_PYTHON=game-python.sh; the training process and the inference server run the ordinary build of the same commit on the GPU"
+  },
+  "command": "exec env -u MallocNanoZone OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 \\\n  NUMEXPR_NUM_THREADS=1 PYTHONHASHSEED=0 MallocDebugReport=stderr \\\n  /Users/home/Projects/gwRL/tmp/gpu-mps-env/bin/python -m studies.campaign.run train --run-dir \"$D/1-memory-checked\" \\\n  --threads 1 --cpu-budget 8 --calendar-rounds 11 --complete-episodes --batches 1000000 \\\n  --simulations 16 --kept-simulations 256 --sampling-game-rounds 1 --max-depth 16 \\\n  --hidden-dim 256 --message-layers 8 --batch-size 32 --epochs 33 --replay-capacity 25000 --sample-fraction 0.01 \\\n  --transitions-per-batch 20000 --seed 20261122 --neural-device mps --continuous --compiled-forward \\\n  --episode-workers 1 --games-per-process 16 --parallel-envs 16",
+  "started": "2026-11-22 11:59:47",
+  "game_process": "one game process of 16 games, pid 14453, started 2026-11-22 11:59:51 and never replaced",
+  "at_network_update": {
+    "network_update": 134,
+    "time": "2026-11-22 17:35",
+    "hours_of_play": 5.6,
+    "counters": {
+      "batches": 133,
+      "chance_events": 158384,
+      "decisions": 1513584,
+      "episodes": 2144,
+      "transitions": 1671968,
+      "updates": 134
+    },
+    "network_evaluations": 20727976,
+    "network_evaluations_per_decision": 13.69,
+    "network_evaluations_per_hour": 3700898,
+    "decisions_per_hour": 270244
+  },
+  "cpu_and_memory": {
+    "source": "watch.log, one line a minute: the CPU cores and memory of the training process and its children",
+    "minutes": 336,
+    "median_cpu_cores": 7.6,
+    "share_of_minutes_over_8_cpu_cores": 0.158,
+    "minutes_over_9_cpu_cores": 0,
+    "median_gb": 8.11,
+    "peak_gb": 9.12,
+    "peak_at": "2026-11-22 16:37:00"
+  },
+  "findings": {
+    "memory_checker_reports": 0,
+    "game_process_crashes": 0,
+    "failed_moves_kept": 0,
+    "note": "reports/ is empty, the run folder has no crash-reports/ or failed-positions/ folder, and run.out holds only network-update events"
+  },
+  "training_2026_11_19": {
+    "decisions": 14224222,
+    "game_process_crashes": 6,
+    "network_evaluations_per_decision": 53.99,
+    "decisions_behind_that_rate": 11947162,
+    "network_evaluations_estimated": 767904002,
+    "network_evaluations_per_crash": 127984000,
+    "decisions_per_crash": 2370704,
+    "method": "per network-update interval inside one invocation of the program, from each part's manifest.json (the evaluator's counter restarts with each invocation); the estimate multiplies the run's decisions by the rate"
+  },
+  "memory_check_2026_11_21": {
+    "decisions": 1276928,
+    "network_evaluations_counted": 66431589,
+    "counted_by_invocation": [
+      12460973,
+      53970616
+    ],
+    "decisions_at_last_network_update": 1260701,
+    "note": "the evaluator's counter at the last network update of each of the attempt 7-quarantine-1gb's two invocations; the games in play at the pause and the stop are not counted"
+  },
+  "chance_of_a_report": {
+    "assumption": "the checker catches the defect as often as the training run of 19 to 21 November crashed; P = 1 - exp(-checked / per crash)",
+    "by_network_evaluations": {
+      "this_run": 0.15,
+      "memory_check_2026_11_21": 0.405,
+      "both": 0.494,
+      "projected_at_this_pace": {
+        "after 24 more hours of play": 0.747,
+        "after 48 more hours of play": 0.874,
+        "after 72 more hours of play": 0.937
+      }
+    },
+    "by_decisions": {
+      "this_run": 0.472,
+      "memory_check_2026_11_21": 0.416,
+      "both": 0.692
+    }
+  },
+  "full_speed_comparison": {
+    "training_2026_11_19_hours_of_play": 35.5,
+    "training_2026_11_19_decisions_per_hour": 400682,
+    "training_2026_11_19_network_evaluations_per_hour": 21631099,
+    "times_this_part": 5.84,
+    "hours_per_crash_at_that_pace": 5.92,
+    "note": "inferred for choice D's searches at full speed, which are not measured"
+  },
+  "sanitizer_pace_21_november": {
+    "source": "crash_diagnosis_2026_11_21.json sanitizer_runs, the two runs side by side from 07:44:49, uniform priors, no encoding",
+    "thread_sanitizer_decisions_per_thread_second": 1.54,
+    "address_sanitizer_decisions_per_thread_second": 3.27
+  }
+}

@@ -33,10 +33,15 @@ Other open things stay in the pages that own them, and
 | Number | Question | About | Recommended |
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
+| [Q-018](#q-018-how-to-go-on-looking-for-the-game-process-crash) | The memory-checked training has found nothing: go on as it is, look with ThreadSanitizer for a while first, or start the full-speed part now? | Running training | ThreadSanitizer for about 12 hours of play, then go on as now |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
+
+Q-018 was raised on 22 November 2026, after the memory-checked first part of
+the training run of 22 November had found nothing in 5.6 hours. Its numbers are
+in the [record of that part](archive/records/memory_check_2026_11_22.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -107,6 +112,66 @@ Stopping only a run that stays over keeps a brief peak from costing a training i
 **If answered.** What the supervisor measures and when it stops a run belong in
 the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
 and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
+
+## Q-018: How to go on looking for the game process crash
+
+**The question.** The first part of the training run of 22 November 2026 plays
+with its game process on an engine built with AddressSanitizer, to find the
+defect behind the game process crashes, and it has found nothing. Should it go
+on as it is until AddressSanitizer reports, look with ThreadSanitizer for a while
+first, or give way now to the full-speed part, which would crash now and then?
+
+**What the program does now.** The part,
+`studies/campaign/runs/training-2026-11-22/1-memory-checked`, plays one game
+process of 16 games on that engine built with AddressSanitizer, the checked
+engine, within the 8 CPU cores and 16 GB
+that the owner gave to looking for the defect on 21 November; the training
+process and the inference server run the ordinary build on the GPU.
+AddressSanitizer, the memory checker built into the checked engine, stops the game
+process at the first write to freed memory, second free or out-of-bounds
+access, and names the code that made it. The part also trains: once the defect
+is found, its newest network is to start the full-speed part, six game
+processes of 42 games on the ordinary engine, as the owner planned on 22
+November.
+
+**A real case.** By its 134th network update, at 17:35 on 22 November, the part
+had played 5.6 hours: 1,513,584 decisions and 2,144 games, about 270,000
+decisions an hour, and the inference server had answered 20.7 million network
+evaluations for it. AddressSanitizer wrote no report. Nor did it in the memory check
+of 21 and 22 November, in 21.2 hours and 66.4 million network evaluations. The
+training run of 19 to 21 November crashed once in about 128 million network
+evaluations, all six times while the search freed the game copies that its
+tree's nodes hold, work that grows with the network evaluations (inferred). So
+if AddressSanitizer caught the defect as often as that run crashed, a report by now
+was about as likely as not: 0.49
+([record](archive/records/memory_check_2026_11_22.md)).
+
+**Why it matters.** The full-speed part waits until the defect is found, and it would play
+about six times as fast as this part: the training run of 19 to 21 November did
+5.8 times this part's network evaluations an hour (same record; not measured
+for choice D's searches). And the longer AddressSanitizer finds nothing, the likelier
+it is that the defect is one it cannot see, such as one that needs the timing
+of 42 game threads on the fast engine.
+
+**The choices.**
+
+| Choice | What it changes |
+| --- | --- |
+| A. Go on as now until AddressSanitizer reports | Nothing changes. At 3.7 million network evaluations an hour, the chance of a report reaches 0.75 after 24 more hours of play, 0.87 after 48 and 0.94 after 72, if AddressSanitizer sees the defect at all. The network goes on training at this part's pace. |
+| B. ThreadSanitizer for about 12 hours of play, then A | The part stops, keeping its checkpoint and losing only the games in play; its game process then runs the same sources built with ThreadSanitizer, in the same layout, and the part resumes from the checkpoint. ThreadSanitizer reports two threads that touch the same memory without a lock between them the first time it happens, not only on the rare occasion when the touch damages memory. It has run only in a test script, with three or four game threads and no inference server, for about 8,000 decisions ([record](archive/records/crash_diagnosis_2026_11_21.md)). The damage has crossed games: before the second crash of 20 November, two other games of that process failed the state check ([record](archive/records/second_game_process_crash_2026_11_20.md)), which a race between game threads would explain, as would a second free. In the test script it played 1.54 decisions a thread-second against 3.27 for that day's AddressSanitizer build, so training would go at roughly a third of this part's pace (inferred). Its memory in this layout is not measured; a few minutes would measure it before it replaces the checked engine. It finds nothing if the defect is not a race. |
+| C. Start the full-speed part now | Six game processes of 42 games on the ordinary engine, from this part's newest network. The crashes come back, about one every six hours if they keep their rate per network evaluation (inferred). Each costs the dead process's unfinished games, a few minutes of play, and leaves their move logs, the crash report and the allocator's message ([running training on the Mac](design/README.md#92-running-training-on-the-mac)). The defect stays unfound, and its damage can reach a game's state, as it did twice on 20 November. |
+
+**Recommendation: B, then A.** ThreadSanitizer is the one check not yet made
+where the crashes happen, with the inference server and many game threads, and
+each hour in which AddressSanitizer finds nothing makes a defect it cannot see
+more likely. Twelve hours of B cost about eight hours of this part's training
+(inferred), and A goes on from the same checkpoint if B finds nothing. If A then
+passes a chance of about 0.9 with no report, after about 56 more hours of play,
+C is what remains.
+
+**If answered.** How the defect is looked for, and what that finds, belong in the
+[known gaps](design/README.md#known-gaps) of the design document, and the run's
+parts in the [list of runs](archive/runs.md).
 
 ## Open elsewhere
 

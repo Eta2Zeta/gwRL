@@ -3437,8 +3437,18 @@ measured and what would settle it.
   of a game thread's time, and a run keeps what the next crash leaves
   (section 9.2). The sixth crash came in such a build, with neither check
   firing; its 42 games, rebuilt from their move logs and searched again under
-  AddressSanitizer with the network on the CPU, did not reproduce it. On the
-  night of 2 November, before the search ran in C++, a game process
+  AddressSanitizer with the network on the CPU, did not reproduce it. Training
+  play with the game process on an engine built with AddressSanitizer found
+  nothing either: 1.28 million decisions on 21 and 22 November
+  ([record](../archive/records/memory_check_2026_11_21.md)) and, under choice
+  D's searches, 1.51 million in the first 5.6 hours of the training run of 22
+  November ([record](../archive/records/memory_check_2026_11_22.md)). Counted in
+  network evaluations, which grow with the game copies the search makes and
+  frees, the two checked about 87 million, against one crash in about 128
+  million in the training run of 19 to 21 November, so a report was about as
+  likely as not (inferred). How to go on looking is
+  [Q-018](../questions.md#q-018-how-to-go-on-looking-for-the-game-process-crash).
+  On the night of 2 November, before the search ran in C++, a game process
   crashed twice early in training iteration 3, and about 4.5 hours of replays in
   builds with memory checks did not reproduce it. A race between the game
   threads of one process, which run side by side without taking turns at
