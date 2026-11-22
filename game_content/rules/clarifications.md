@@ -65,6 +65,7 @@ including retired IDs RCL-006, RCL-007, RCL-008 and RCL-011.
 | RCL-020 | A patrol plane attacked in its own sea zone: the carrier choice or the patrol choice, before or after scrambles | Adopted: the patrol choice, made before any scramble; staying out costs nothing |
 | RCL-021 | Upgrading a unit aboard a transport into one the transport may not carry, or aboard a ship at sea | Adopted: neither allowed; the upgrade waits on the build queue |
 | RCL-022 | An attack on land that was Chinese at the start: when a nation outside China holds it, and when the attacker may not go to war with all of China | Closed: the printed owner decides; the attack puts the attacker at war with every Chinese nation outside its own alliance, and Mongolia may make it; developer clarification reported by user |
+| RCL-023 | A land battle that no unit can end: the attacker's remaining units can neither fire nor retreat, and the defender's cannot fire | Adopted: the attacker retreats, and its units with nowhere to go are eliminated |
 
 ## Pilot discussion review
 
@@ -617,6 +618,64 @@ war with Mongolia; the cavalry may attack Suiyuan, which is an invasion of
 China too. While the Ma Clique holds Tsinghai and Mongolia is not at war with
 it, the cavalry may not attack Tsinghai; after Mongolia's invasion of China it
 may.
+
+## RCL-023: A land battle that no unit can end
+
+**Status: adopted by the user, 22 November 2026.** It answers Q-014 of the
+project's list of questions, raised on 21 November 2026 after a training game
+failed on such a battle.
+
+**Sources:** RB §1.7.5 p12 and §1.7.7 p13 (tundra or ice and city round
+limits); §10.3 p62 (retreating from combat); §10.5 p64, steps 9 and 10 (the
+attacker may retreat if possible; the rounds repeat until the battle is over);
+§10.8.3 p71 (no retreat from an amphibious assault); RCL-016.
+
+**Question:** how does a land battle end when the attacker's remaining units
+can neither fire nor retreat, and the defender's units cannot fire either?
+§10.5 repeats the combat rounds "until the battle is over" (p64, step 10).
+Aircraft and land units that attacked from neighbouring land zones may retreat,
+while units that came from the sea or by air drop must stay (§10.3 p62) and
+"must continue the attack until combat is resolved" (§10.8.3 p71). Only a city
+battle, after three rounds, and a tundra or ice battle, after one, have a
+printed end for units that must retreat and cannot: they are eliminated (§1.7.7
+p13, §1.7.5 p12).
+
+**The case.** On 20 November 2026 Japan attacked the KMT in Manchuria-Rehe, a
+zone of normal terrain with no city, with a Self-propelled Artillery that came
+overland from Korea and an Anti-aircraft Artillery landed from sea zone P14;
+the KMT defended with one Anti-aircraft Artillery. Japan retreated after the
+first round: the Self-propelled Artillery went back to Korea, and the
+Anti-aircraft Artillery, having come from the sea, had to stay. Neither
+Anti-aircraft Artillery fires at land units, so no unit could roll a die again,
+and the engine stopped the game
+([record](../../docs/archive/records/land_battle_without_end_2026_11_20.md)).
+
+**Ruling:**
+
+- When no unit of either side could roll a die in the next combat round, the
+  battle could never end by fighting, and the attacker retreats: retreating is
+  its only action. Its units that may retreat go back as in any retreat, each
+  to a zone it may retreat to (§10.3 p62). Its units with nowhere to go are
+  eliminated: those that came from the sea or by air drop, and land units with
+  no Friendly zone to go back to. The defender keeps the zone.
+- The same holds when the attacker retreats by choice and leaves behind units
+  that came from the sea or by air drop: if no unit of either side could roll a
+  die in the next round, those units are eliminated at once.
+- Read here, not stated by the user: every other battle keeps the printed
+  rules. Units that came from the sea or by air drop stay and fight on after a
+  retreat whenever some unit of either side can still roll, and the attacker
+  may fight another round instead of retreating.
+
+**Authority:** the user in chat on 22 November 2026: "Let's say the player is
+allowed to retreat as an action and if the unit has nowhere to go that unit
+dies."
+
+**Examples:** in the case above, Japan's retreat takes the Self-propelled
+Artillery back to Korea and eliminates the Anti-aircraft Artillery, and the KMT
+keeps Manchuria-Rehe. Had Japan attacked with the Anti-aircraft Artillery
+alone, overland from Korea, the first round would roll no die, and Japan's only
+action would be to retreat it to Korea. Had it landed from the sea, it would be
+eliminated after the first round.
 
 ## Maintenance
 

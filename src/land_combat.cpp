@@ -365,7 +365,8 @@ std::vector<Id> eligibleHits(const State &s, const BattleState &b, const V &hit)
 void advance(State &, BattleState &);
 // Rounds that one call begins with no dice or choice since the last: such a
 // round changes nothing, so the battle could never end (seed 8131 of the
-// 2 November random games recursed until the stack overflowed).
+// 2 November random games recursed until the stack overflowed). Since RCL-023
+// the attacker retreats before such a round; the count remains as a guard.
 thread_local int advanceDepth = 0, roundsWithoutPause = 0;
 thread_local Id roundsBattle;
 void chooseHit(State &s, BattleState &b) {
@@ -536,24 +537,14 @@ void requestPairing(State &s, BattleState &b, bool attacker, const Id &after) {
     setStage(b, after);
     advance(s, b);
 }
-void shoot(State &s, BattleState &b, const Id &which) {
+// The dice that the units of a battle roll in one firing step (`which`) of
+// combat round `round`, one shot for each die. shoot() rolls them; the
+// Fortification's own dice of the first round are added there.
+A unitShots(State &s, BattleState &b, const Id &which, int round) {
     A shots;
-    int round = integer(b, "round", 1);
     const bool first = which == "first_strike";
     const bool airStep = which == "air_fire";
     const bool attackerOnly = which == "attacker_fire" || which == "attrition_fire";
-    if (which == "city_airborne_aaa") {
-        if (city(s, b.zone) &&
-            !hasTechnology(s, b.attacker, knownTechnologies(s).airborne_doctrine))
-            for (const auto &id : living(s, b, true)) {
-                const auto &u = s.units.at(id);
-                if (aircraft(s, u) && airborne(u) && !u.cargo.empty())
-                    addShot(shots, "city_aaa", nationName(s, b.defender), true, 3, 0, {},
-                            {{"eligible", ids({id})}, {"air_only", V(true)}});
-            }
-        requestShots(s, b, std::move(shots), "first_strike");
-        return;
-    }
     for (bool attacking : {true, false}) {
         if (attackerOnly && !attacking)
             continue;
@@ -649,6 +640,34 @@ void shoot(State &s, BattleState &b, const Id &which) {
                         stats.targetClasses, extra);
         }
     }
+    return shots;
+}
+// Whether any unit of either side would roll a die in combat round `round`, a
+// second or later round, whose only firing steps are the attacker's fire and
+// the defender's. If no unit would, no later round would either: a round
+// without dice takes no unit out of the battle, and nothing else changes from
+// one such round to the next, so the battle could never end by fighting.
+bool someoneRolls(State &s, BattleState &b, int round) {
+    return !unitShots(s, b, "attacker_fire", round).empty() || !unitShots(s, b, "defender_fire", round).empty();
+}
+void shoot(State &s, BattleState &b, const Id &which) {
+    A shots;
+    int round = integer(b, "round", 1);
+    const bool first = which == "first_strike";
+    const bool airStep = which == "air_fire";
+    if (which == "city_airborne_aaa") {
+        if (city(s, b.zone) &&
+            !hasTechnology(s, b.attacker, knownTechnologies(s).airborne_doctrine))
+            for (const auto &id : living(s, b, true)) {
+                const auto &u = s.units.at(id);
+                if (aircraft(s, u) && airborne(u) && !u.cargo.empty())
+                    addShot(shots, "city_aaa", nationName(s, b.defender), true, 3, 0, {},
+                            {{"eligible", ids({id})}, {"air_only", V(true)}});
+            }
+        requestShots(s, b, std::move(shots), "first_strike");
+        return;
+    }
+    shots = unitShots(s, b, which, round);
     if (first && round == 1)
         for (const auto &[id, f] : s.facilities)
             if (f.zone == b.zone && f.type == knownFacilityTypes(s).fortification) {
@@ -866,6 +885,16 @@ void finishRetreat(State &s, BattleState &b) {
         finishBattle(s, b, "retreated");
         return;
     }
+    // The units that had to stay, having come from the sea or by air drop,
+    // fight on unless no unit of either side could roll a die in the next
+    // round: then they have nowhere to go and are eliminated (RCL-023).
+    if (!someoneRolls(s, b, integer(b, "round", 1) + 1)) {
+        for (const auto &id : remaining)
+            if (ground(s, s.units.at(id)))
+                eraseUnit(s, id);
+        finishBattle(s, b, "retreated");
+        return;
+    }
     put(b, "round", num(integer(b, "round", 1) + 1));
     put(b, "after_pairing", V(std::string("attacker_fire")));
     put(b, "attack_pairs", V(O{}));
@@ -976,9 +1005,15 @@ void advance(State &s, BattleState &b) {
                     auto border = borderApproach(s, approach(s, b, id), b.zone).borderTerrain;
                     t.insert(border.begin(), border.end());
                 }
+        // The attacker must retreat when a city battle has had its three
+        // rounds or a tundra or ice battle its one, and when no unit of either
+        // side could roll a die in the next round, so that the battle could
+        // never end by fighting (RCL-023). Units that cannot retreat are then
+        // eliminated.
         bool forced = (city(s, b.zone) && integer(b, "round", 1) >= 3 &&
                        !marked(b.flags, mark::japanese_surprise_attack)) ||
-                      t.contains("tundra") || t.contains("ice") || t.contains("tundra/ice");
+                      t.contains("tundra") || t.contains("ice") || t.contains("tundra/ice") ||
+                      !someoneRolls(s, b, integer(b, "round", 1) + 1);
         setStage(b, "retreat");
         retreatDecision(s, b, forced);
         return;

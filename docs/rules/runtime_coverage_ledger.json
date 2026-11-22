@@ -10,7 +10,7 @@
     "src/catalog.cpp": "31300d35fa95af67c13b7d61909c5dc6d84c35d34094036feb3f811f534697e4",
     "src/economy.cpp": "1e67f1044592a63393237be5fe79462e0cde70e068055d99518bf32cd0cb1d93",
     "src/economy_lendlease.cpp": "072712e5c80734056353b7aa3f3af9c450a92aa21f9a7481b97c58f5ffddf15a",
-    "src/land_combat.cpp": "44c6f2a0118caeac48e5526d208b4152780e3450f6c586ef96f26e7c7f7c3139",
+    "src/land_combat.cpp": "f7c9c984aaec30b0f7704b44f458af264fe695353d61451fbe4d81190e2bd1ea",
     "src/movement.cpp": "145cf277ac37379d3a26791ac69b1dc5a056d17360df2819c299358eabc5bf9f",
     "src/naval_combat.cpp": "febf83872c98152c43500d76596a551f78b52be3076d74a3b126336ab84b4bfb",
     "src/naval_movement.cpp": "624a6aff6bc5e0a661e64b6f357c02e1681c7ac2c69fd8312817ff248a0e5e5d",
@@ -29,7 +29,7 @@
     "tests/campaign_state_tests.cpp": "0d540142764809a6e4328e07e67ae6bde18ceceafc013e65b604ecbcf4431dab",
     "tests/catalog_tests.cpp": "b53e20f93661f1c3f75ee8e93400ca4fc9c14c20a8ee07eb8e31c4fe394b2dbc",
     "tests/economy_tests.cpp": "83f4f653f6b65e36e2204afc18ceb25a5e214584097dc0e8440fdc02d9b7687c",
-    "tests/land_combat_tests.cpp": "81a30b5b273286fe43a2e9e6d910c3e46be140471ff2633db7974c89f77cd6d3",
+    "tests/land_combat_tests.cpp": "867578a090a3a6f5a5cf1b10576cd5dc20c9e7d056df1dacfacee25674d0ac6c",
     "tests/land_truce_tests.cpp": "9334c5b5525931adbc2cafead57741621ebbce7f57907607ecfea2876af0cc52",
     "tests/movement_tests.cpp": "d5f1d499ed2520dc952f2c2e97787ec70777ddf949faa40b8072e1d8ddc82810",
     "tests/naval_combat_tests.cpp": "93eb5e2c31d0d1591b722677d56fb9cb847cfc1cbfaa3d7a7ef559611b3a15d7",
@@ -201,7 +201,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
         },
         {
           "file": "src/naval_combat.cpp",
@@ -323,7 +323,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         },
         {
           "file": "src/movement.cpp",
@@ -451,7 +451,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         },
         {
           "file": "src/movement.cpp",
@@ -515,7 +515,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         }
       ],
       "fixtures": [
@@ -561,7 +561,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         },
         {
           "file": "src/movement.cpp",
@@ -620,12 +620,12 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "citySurrounded",
-          "line": 989
+          "line": 1024
         },
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         }
       ],
       "fixtures": [
@@ -661,7 +661,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         },
         {
           "file": "src/movement.cpp",
@@ -759,12 +759,12 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         },
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
         }
       ],
       "fixtures": [
@@ -1853,7 +1853,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "LandCombatRules::applyChance",
-          "line": 1548
+          "line": 1583
         }
       ],
       "fixtures": [
@@ -2144,12 +2144,12 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         },
         {
           "file": "src/land_combat.cpp",
           "symbol": "registerAttritionBattle",
-          "line": 1195
+          "line": 1230
         }
       ],
       "fixtures": [
@@ -2397,7 +2397,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
         }
       ],
       "fixtures": [
@@ -2482,7 +2482,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
         }
       ],
       "fixtures": [
@@ -2772,7 +2772,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         }
       ],
       "fixtures": [
@@ -3379,7 +3379,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
         }
       ],
       "fixtures": [
@@ -3766,12 +3766,12 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "LandCombatRules::actions",
-          "line": 1316
+          "line": 1351
         },
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
         },
         {
           "file": "src/air.cpp",
@@ -3830,7 +3830,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "LandCombatRules::applyChance",
-          "line": 1548
+          "line": 1583
         },
         {
           "file": "src/naval_combat.cpp",
@@ -3889,7 +3889,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "LandCombatRules::applyChance",
-          "line": 1548
+          "line": 1583
         }
       ],
       "fixtures": [
@@ -3941,7 +3941,12 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landRetreatOrigins",
-          "line": 1266
+          "line": 1301
+        },
+        {
+          "file": "src/land_combat.cpp",
+          "symbol": "someoneRolls",
+          "line": 650
         },
         {
           "file": "src/naval_combat.cpp",
@@ -3957,6 +3962,20 @@
           "behavior_assertions": [
             "Aircraft entry created a ground retreat destination",
             "The land entrant's death erased its genuine retreat origin"
+          ]
+        },
+        {
+          "file": "tests/land_combat_tests.cpp",
+          "symbol": "aRetreatLeavingNoUnitThatCanFightEliminatesTheUnitsThatStay",
+          "line": 1173,
+          "behavior_assertions": [
+            "The Self-propelled Artillery did not roll",
+            "A battle the Self-propelled Artillery can still fight lost its choice to continue",
+            "The retreat did not end the battle",
+            "The Self-propelled Artillery did not go back",
+            "The Anti-aircraft Artillery that came from the sea was not eliminated",
+            "The defender lost the zone",
+            "The retreat's replay diverged"
           ]
         },
         {
@@ -4038,12 +4057,17 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "LandCombatRules::actions",
-          "line": 1316
+          "line": 1351
         },
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
+        },
+        {
+          "file": "src/land_combat.cpp",
+          "symbol": "someoneRolls",
+          "line": 650
         },
         {
           "file": "src/air.cpp",
@@ -4079,6 +4103,27 @@
           ]
         },
         {
+          "file": "tests/land_combat_tests.cpp",
+          "symbol": "aBattleNoUnitCanEndEliminatesTheUnitsThatCannotLeave",
+          "line": 1150,
+          "behavior_assertions": [
+            "The battle asked something with nothing to choose",
+            "A battle no unit can end did not end in a forced retreat",
+            "The units that came from the sea were not eliminated",
+            "The defender lost the zone"
+          ]
+        },
+        {
+          "file": "tests/land_combat_tests.cpp",
+          "symbol": "aBattleNoUnitCanFightOffersOnlyTheRetreat",
+          "line": 1207,
+          "behavior_assertions": [
+            "A battle no unit can fight offered more than the retreat",
+            "The forced retreat did not end the battle",
+            "The retreating unit did not go back"
+          ]
+        },
+        {
           "file": "tests/air_mission_tests.cpp",
           "symbol": "scrambleReturnAtPhaseEnd",
           "line": 294,
@@ -4102,7 +4147,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "blitzEligible",
-          "line": 1278
+          "line": 1313
         },
         {
           "file": "src/movement.cpp",
@@ -4167,7 +4212,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "registerAttritionBattle",
-          "line": 1195
+          "line": 1230
         },
         {
           "file": "src/air.cpp",
@@ -4212,7 +4257,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
         }
       ],
       "fixtures": [
@@ -4251,7 +4296,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
         }
       ],
       "fixtures": [
@@ -4555,7 +4600,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "LandCombatRules::applyChance",
-          "line": 1548
+          "line": 1583
         }
       ],
       "fixtures": [
@@ -4668,7 +4713,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
         }
       ],
       "fixtures": [
@@ -4725,7 +4770,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
         }
       ],
       "fixtures": [
@@ -4785,7 +4830,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "LandCombatRules::applyChance",
-          "line": 1548
+          "line": 1583
         },
         {
           "file": "src/politics.cpp",
@@ -5596,7 +5641,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         },
         {
           "file": "src/catalog.cpp",
@@ -5665,7 +5710,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         }
       ],
       "fixtures": [
@@ -5734,7 +5779,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         }
       ],
       "fixtures": [
@@ -5760,7 +5805,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "LandCombatRules::applyChance",
-          "line": 1548
+          "line": 1583
         }
       ],
       "fixtures": [
@@ -5822,7 +5867,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         }
       ],
       "fixtures": [
@@ -5940,7 +5985,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
         }
       ],
       "fixtures": [
@@ -6298,12 +6343,12 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         },
         {
           "file": "src/land_combat.cpp",
           "symbol": "beginLandBattle",
-          "line": 1235
+          "line": 1270
         }
       ],
       "fixtures": [
@@ -6754,7 +6799,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         },
         {
           "file": "src/air.cpp",
@@ -6821,7 +6866,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "landCombatStats",
-          "line": 1015
+          "line": 1050
         }
       ],
       "fixtures": [
@@ -6869,7 +6914,7 @@
         {
           "file": "src/land_combat.cpp",
           "symbol": "LandCombatRules::applyChance",
-          "line": 1548
+          "line": 1583
         },
         {
           "file": "src/economy.cpp",

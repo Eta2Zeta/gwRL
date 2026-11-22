@@ -41,8 +41,8 @@ retreat nor blitz and must continue the attack until combat is resolved
 round of combat, at aircraft, though it may be taken as a casualty in any round
 (section 10.2, page 61). With only those two units left, no round can resolve
 the battle.
-[Q-014](../../questions.md#q-014-a-land-battle-that-no-unit-can-end) asks how
-such a battle should end.
+[Q-014](../../questions.md#answered) asks how
+such a battle should end; it has since been answered, as RCL-023.
 
 It does not show how often the search's copies reach such positions without the
 game failing: a copy's failure fails the game only when the search reaches it,

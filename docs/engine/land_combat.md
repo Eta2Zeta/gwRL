@@ -48,22 +48,30 @@ rounds.
 The battle ends when one side has no units left, or the attacker retreats. If
 an attacking land unit is left alone in the zone, the zone is captured.
 
-**A battle no unit can end.** If neither side can roll and the attacker has no
-choice, the engine goes on to the next combat round unasked; after three such
-rounds within one move it stops the game with the error "cannot end: rounds
-pass with no dice and no choice" (`retreatDecision` in `src/land_combat.cpp`).
-It happened once in the long training run of 19 to 21 November 2026. Japan
-attacked with a Self-propelled Artillery from Korea and an Anti-aircraft
-Artillery from the sea, and retreated after the first combat round: the
-Self-propelled Artillery left, and the Anti-aircraft Artillery, having come from
-the sea, had to stay (who may leave is in [section 4](#4-retreat)). Japan's
-Anti-aircraft Artillery was left facing the KMT's, and neither fires at land
-units
-([record](../archive/records/land_battle_without_end_2026_11_20.md)). Except in
-a city or on tundra, where attacking units that must retreat and cannot are
-eliminated, the printed rules give such a battle no end;
-[Q-014](../questions.md#q-014-a-land-battle-that-no-unit-can-end) asks how it
-should end.
+**A battle no unit can end.** When no unit of either side could roll a die in
+the next combat round, the battle could never end by fighting, and the attacker
+must retreat ([RCL-023](../../game_content/rules/clarifications.md#rcl-023-a-land-battle-that-no-unit-can-end),
+the user's ruling of 22 November 2026). When some of its units can leave, its
+one action is then `land_retreat_begin`; when none can, the retreat happens
+without a decision. Its units that cannot retreat are eliminated, as in the
+forced retreat of [section 4](#4-retreat). Whether any unit would roll is
+read from the dice the next round would roll (`someoneRolls` and `unitShots` in
+`src/land_combat.cpp`). A retreat by choice that leaves behind only units that
+came from the sea or by air drop eliminates them at once when no unit could
+roll in the next round (`finishRetreat`). The case that raised the question
+came from the long training run of 19 to 21 November 2026. Japan attacked with
+a Self-propelled Artillery from Korea and an Anti-aircraft Artillery from the
+sea, and retreated after the first combat round: the Self-propelled Artillery
+left, and the Anti-aircraft Artillery, having come from the sea, had to stay
+(who may leave is in [section 4](#4-retreat)). It was left facing the KMT's
+Anti-aircraft Artillery, and neither fires at land units
+([record](../archive/records/land_battle_without_end_2026_11_20.md)). The
+engine then stopped the game; under the ruling the retreat eliminates Japan's
+Anti-aircraft Artillery, and the KMT keeps the zone. The engine's earlier guard
+stays in `retreatDecision`: after three combat rounds with no die and no choice
+within one move it stops the game with the error "cannot end: rounds pass with
+no dice and no choice". No battle should reach it now, since a round is fought
+only when some unit can roll in it (inferred from the code).
 
 **Who chooses.** Each decision goes to the alliance entitled to it, also during
 another alliance's turn. Two nations defending one zone together agree on their
@@ -93,18 +101,21 @@ Only the attacker retreats, before a combat round begins (rulebook section
 - **Who leaves.** A retreat takes all of the attacker's units out of the
   battle, except its units that came from the sea (an amphibious assault) or by
   air drop (an airborne assault): those must stay and fight on (section 10.3,
-  page 62; section 10.8.3, page 71). How a unit entered the battle decides
-  whether it leaves, not the unit's type (`amphibious` and `airborne` in
-  `src/land_combat.cpp`): a
-  Self-propelled Artillery that came overland leaves, and an Anti-aircraft
-  Artillery that came from the sea stays.
+  page 62; section 10.8.3, page 71), unless no unit of either side could roll
+  a die in the next round, in which case they are eliminated (RCL-023). How a
+  unit entered the battle decides whether it leaves, not the unit's type
+  (`amphibious` and `airborne` in `src/land_combat.cpp`): a Self-propelled
+  Artillery that came overland leaves, and an Anti-aircraft Artillery that came
+  from the sea stays.
 - **Where to.** Each retreating unit goes back to a zone it or another attacker
   came from, if that zone is still friendly (`land_retreat_unit`). Units may
   retreat to different zones (section 10.3, page 62).
 - **Forced retreat.** In a city the attacker must retreat after three combat
-  rounds, except in Japan's Surprise Attack, and in tundra or ice after one.
-  Units that then cannot retreat are eliminated (section 1.7.7, page 13;
-  section 1.7.5, page 12).
+  rounds, except in Japan's Surprise Attack, and in tundra or ice after one
+  (section 1.7.7, page 13; section 1.7.5, page 12). It must also retreat when
+  no unit of either side could roll a die in the next round (RCL-023; see
+  [a battle no unit can end](#2-a-battle-one-combat-round-at-a-time)). Units
+  that then cannot retreat are eliminated.
 
 ## 5. Special cases
 

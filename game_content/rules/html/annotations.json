@@ -326,6 +326,24 @@
       "reference_url": "../clarifications.md#rcl-022-an-attack-on-land-that-was-chinese-at-the-start",
       "reference_label": "Rule register",
       "authority_detail": "The user reported the developers' answer on 22 November 2026, answering the project's questions Q-001 and Q-002. It replaces the user's reading of 19 November 2026, under which rules 4.5 and 5.1 forbade the attack to Mongolia."
+    },
+    {
+      "id": "RCL-023",
+      "category": "clarification",
+      "title": "A land battle that no unit can end",
+      "body": "Project ruling: when no unit of either side could roll a die in the next combat round, the battle could never end by fighting, and the attacker retreats as its only action. Its units that may retreat go back as in any retreat; its units with nowhere to go, those that came from the sea or by air drop and land units with no Friendly zone to go back to, are eliminated, and the defender keeps the zone. A retreat by choice that leaves only units that came from the sea or by air drop eliminates them at once when no unit of either side could roll in the next round. Every other battle keeps the printed rules: such units stay and fight on while some unit can still roll.",
+      "section_ids": [
+        "rb-10-5",
+        "rb-10-3",
+        "rb-10-8-3",
+        "rb-1-7-7"
+      ],
+      "date": "2026-11-22",
+      "authority": "User-adopted interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-023-a-land-battle-that-no-unit-can-end",
+      "reference_label": "Rule register",
+      "authority_detail": "The user adopted this on 22 November 2026, answering the project's question Q-014: \"Let's say the player is allowed to retreat as an action and if the unit has nowhere to go that unit dies.\" The rulebook repeats the combat rounds until the battle is over and gives a printed end for attackers that must retreat and cannot only in a city, after three rounds, and on tundra or ice, after one (1.7.7, 1.7.5)."
     }
   ]
 }

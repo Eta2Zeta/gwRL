@@ -121,6 +121,15 @@
       "posted_version": "v4.4",
       "adoption": "Applied to this project at user request 2026-10-23; the local source rulebook remains v4.3.",
       "finding": "Both sides Fighters and AAA resolve once in step 4; step 5 moves surviving transports to landing. Airborne infantry remains linked with its transporting aircraft for casualties in steps 3 and 4."
+    },
+    {
+      "id": "user_battle_without_end_2026_11_22",
+      "kind": "user_ruling",
+      "date": "2026-11-22",
+      "question": "How does a land battle end when the attacker's remaining units can neither fire nor retreat, and the defender's units cannot fire either? (Q-014: Japan's Anti-aircraft Artillery landed from the sea stayed in Manchuria-Rehe facing the KMT's after Japan's Self-propelled Artillery retreated, and no unit could roll.)",
+      "quote": "Let's say the player is allowed to retreat as an action and if the unit has nowhere to go that unit dies.",
+      "ruling": "When no unit of either side could roll a die in the next combat round, the attacker retreats as its only action: its units that may retreat go back as in any retreat, and its units with nowhere to go, those that came from the sea or by air drop and land units with no Friendly zone to go back to, are eliminated. A voluntary retreat that leaves only units that came from the sea or by air drop eliminates them at once when no unit of either side could roll in the next round.",
+      "scope": "Only battles that could never end by fighting; elsewhere amphibious and airborne assaulting units still remain and fight on (RB 10.3, 10.8.3). Recorded as RCL-023."
     }
   ],
   "rules": [
@@ -441,6 +450,31 @@
         "tests/land_combat_tests.cpp"
       ],
       "implementation_audit": "Source correction, 2026-10-22"
+    },
+    {
+      "id": "LC023",
+      "rule": "When no unit of either side could roll a die in the next combat round, the attacker must retreat: retreating is its only action, units that may retreat go back as in any retreat, and units with nowhere to go are eliminated. A voluntary retreat that leaves only units that must remain in such a battle eliminates them at once.",
+      "source_refs": [
+        {
+          "source_id": "rulebook",
+          "pdf_page": 64,
+          "section": "10.5 steps 9-10: retreat if possible; repeat until the battle is over"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 62,
+          "section": "10.3 amphibiously and airborne assaulting units are forced to remain"
+        },
+        {
+          "source_id": "rulebook",
+          "pdf_page": 13,
+          "section": "1.7.5-1.7.7 attackers unable to retreat are eliminated"
+        },
+        {
+          "source_id": "user_battle_without_end_2026_11_22",
+          "clarification": "RCL-023"
+        }
+      ]
     }
   ],
   "inactive_rules": [

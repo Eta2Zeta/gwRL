@@ -1144,11 +1144,14 @@ void replayableGroundCampaignAndCounterattack() {
           "Multi-turn movement/combat/accounting replay diverged");
 }
 
-} // namespace
-void aBattleNeitherSideCanWinFailsClearly() {
+Id result(const Engine &e, const Id &battle) {
+    return e.state().battles.at(battle).data.require("result").asString();
+}
+void aBattleNoUnitCanEndEliminatesTheUnitsThatCannotLeave() {
     // Amphibious militia can neither retreat nor hit, and a lone anti-aircraft
-    // gun fires only at aircraft. The rounds used to recurse until the stack
-    // overflowed (seed 8131 of the 2 November random games).
+    // gun fires only at aircraft, so no unit could ever roll (RCL-023). The
+    // rounds once recursed until the stack overflowed (seed 8131 of the
+    // 2 November random games), and then stopped the game with an error.
     auto s = fixture();
     clearTerrain(s, hopeh);
     for (const auto *id : {"m1", "m2"}) {
@@ -1156,17 +1159,74 @@ void aBattleNeitherSideCanWinFailsClearly() {
         s.units.at(id).commitments.insert(mark::amphibious_assault);
     }
     add(s, "gun", "kmt", hopeh, "anti_aircraft_artillery");
-    battle(s, {"m1", "m2"}, {{"m1", beiping}, {"m2", beiping}});
+    const auto id = battle(s, {"m1", "m2"}, {{"m1", beiping}, {"m2", beiping}});
     Engine e(s, rules(), 3);
-    try {
-        begin(e);
-    } catch (const std::runtime_error &error) {
-        check(std::string(error.what()).find("cannot end") != std::string::npos,
-              std::string("Wrong failure: ") + error.what());
-        return;
-    }
-    throw std::runtime_error("A battle neither side can win did not stop");
+    begin(e);
+    check(!e.state().chance && e.state().decisions.empty(), "The battle asked something with nothing to choose");
+    check(flag(e.state().battles.at(id).flags, mark::finished) && result(e, id) == "forced_retreat",
+          "A battle no unit can end did not end in a forced retreat");
+    check(!e.state().units.contains("m1") && !e.state().units.contains("m2") && e.state().units.contains("gun"),
+          "The units that came from the sea were not eliminated");
+    check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt"),
+          "The defender lost the zone");
 }
+void aRetreatLeavingNoUnitThatCanFightEliminatesTheUnitsThatStay() {
+    // The case of Q-014 (20 November 2026, Manchuria-Rehe): Japan attacks with
+    // a Self-propelled Artillery from a neighbouring land zone and an
+    // Anti-aircraft Artillery from the sea, misses, and retreats. The
+    // Self-propelled Artillery goes back; the Anti-aircraft Artillery may not
+    // leave and could never fight the KMT's, so it is eliminated (RCL-023).
+    auto s = fixture();
+    clearTerrain(s, hopeh);
+    add(s, "spa", "japan", hopeh, "self_propelled_artillery");
+    add(s, "aa", "japan", hopeh, "anti_aircraft_artillery");
+    s.units.at("aa").commitments.insert(mark::amphibious_assault);
+    add(s, "gun", "kmt", hopeh, "anti_aircraft_artillery");
+    const auto id = battle(s, {"spa", "aa"}, {{"spa", beiping}, {"aa", beiping}});
+    Engine e(s, rules(), 3);
+    e.setDiceTapeForTesting({12, 12, 12});
+    const auto initial = e.serialize();
+    begin(e);
+    check(e.state().chance.has_value(), "The Self-propelled Artillery did not roll");
+    e.resolveChance();
+    auto choices = e.legalActions();
+    check(std::any_of(choices.begin(), choices.end(), [](const Action &a) { return a.kind == "land_continue_fighting"; }),
+          "A battle the Self-propelled Artillery can still fight lost its choice to continue");
+    choose(e, "land_retreat_begin");
+    choose(e, "land_retreat_unit", "spa");
+    check(flag(e.state().battles.at(id).flags, mark::finished) && result(e, id) == "retreated",
+          "The retreat did not end the battle");
+    check(e.state().units.at("spa").zone == zoneNumber(e.state(), beiping), "The Self-propelled Artillery did not go back");
+    check(!e.state().units.contains("aa") && e.state().units.contains("gun"),
+          "The Anti-aircraft Artillery that came from the sea was not eliminated");
+    check(isNation(e.state(), e.state().territories.at(zoneNumber(e.state(), hopeh)).possessor, "kmt"),
+          "The defender lost the zone");
+    auto replayed = Engine::replay(s.definition, rules(), initial, e.state().history);
+    check(replayed.exactReplayIdentity() == e.exactReplayIdentity(), "The retreat's replay diverged");
+}
+void aBattleNoUnitCanFightOffersOnlyTheRetreat() {
+    // An Anti-aircraft Artillery that came overland faces another: neither
+    // fires at land units, so the attacker's one action is to retreat
+    // (RCL-023), and the unit goes back to the zone it came from.
+    auto s = fixture();
+    clearTerrain(s, hopeh);
+    add(s, "aa", "japan", hopeh, "anti_aircraft_artillery");
+    add(s, "gun", "kmt", hopeh, "anti_aircraft_artillery");
+    const auto id = battle(s, {"aa"}, {{"aa", beiping}});
+    Engine e(s, rules(), 3);
+    begin(e);
+    const auto choices = e.legalActions();
+    check(choices.size() == 1 && choices.front().kind == "land_retreat_begin",
+          "A battle no unit can fight offered more than the retreat");
+    choose(e, "land_retreat_begin");
+    choose(e, "land_retreat_unit", "aa");
+    check(flag(e.state().battles.at(id).flags, mark::finished) && result(e, id) == "forced_retreat",
+          "The forced retreat did not end the battle");
+    check(e.state().units.at("aa").zone == zoneNumber(e.state(), beiping) && e.state().units.contains("gun"),
+          "The retreating unit did not go back");
+}
+
+} // namespace
 int main() {
     try {
         for (const auto &[name, test] : std::vector<std::pair<std::string, std::function<void()>>>{
@@ -1203,7 +1263,9 @@ int main() {
                  {"joint defender dispute", jointDefendersConsentAndDiceDispute},
                  {"Dadao calendar slot", directAxisDadaoUsesJapanCalendarSlot},
                  {"ground campaign replay", replayableGroundCampaignAndCounterattack},
-                 {"unwinnable battle stops", aBattleNeitherSideCanWinFailsClearly}}) {
+                 {"battle no unit can end", aBattleNoUnitCanEndEliminatesTheUnitsThatCannotLeave},
+                 {"retreat leaving no unit that can fight", aRetreatLeavingNoUnitThatCanFightEliminatesTheUnitsThatStay},
+                 {"battle no unit can fight", aBattleNoUnitCanFightOffersOnlyTheRetreat}}) {
             test();
             std::cout << "PASS " << name << '\n';
         }
