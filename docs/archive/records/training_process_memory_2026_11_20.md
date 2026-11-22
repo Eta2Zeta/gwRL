@@ -1,4 +1,4 @@
-# The training process's memory in a long training run — 20 November 2026
+# The training process's memory in the training run of 19 to 21 November — 20 November 2026
 
 The long training run started on 19 November 2026 from commit `999c90c` plays
 252 concurrent games, in six game processes of 42 game threads, against the

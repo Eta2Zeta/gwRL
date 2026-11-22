@@ -33,14 +33,10 @@ Other open things stay in the pages that own them, and
 | Number | Question | About | Recommended |
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
-| [Q-017](#q-017-how-the-fresh-run-starts) | Should the run started on 22 November 2026 begin from the long run's network, now that a fresh network under choice D plays narrow games? | Training | Yes: build the converter and start from the long run's network |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
-Q-017 was raised on 22 November 2026, from the first 80 games of the run started
-that day. Its numbers are in the
-[record of a fresh network's first games under choice D](archive/records/fresh_network_games_2026_11_22.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -111,46 +107,6 @@ Stopping only a run that stays over keeps a brief peak from costing a training i
 **If answered.** What the supervisor measures and when it stops a run belong in
 the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
 and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
-
-## Q-017: How the fresh run starts
-
-**The question.** Should the training run started on 22 November 2026 begin
-from the long run's network instead of a fresh one?
-
-**What the program does now.** The run (`studies/campaign/runs/training-2026-11-22`)
-began from a fresh network, as the owner chose that day, with self-play as in
-choice D of Q-016. Its first 80 games were half as long as the long run's first
-games, which also began from a fresh network but drew every move from the
-visit shares: a median of 502 decisions against 1,048, with 39% of the actions
-ending a phase against 18%, a third of the movement routes and a sixth of the
-land battles, 7.8 a game against 44.2, for about the same final scores
-([record](archive/records/fresh_network_games_2026_11_22.md)). At 99 of every
-100 decisions the 16 simulations mostly visit 16 legal actions once each, so
-the move is the one whose child the network values best for the alliance
-choosing, and a fresh network's values are the same arbitrary function in every
-game (inferred).
-
-**Why it matters.** The run has two jobs. Its networks are to start the
-full-speed run once the game process crash is found, and its game processes
-look for that crash. Games with few moves and battles teach the network little
-about them, and the untrained Axis's near-passive play has scored best before
-([what the long run learned](archive/records/long_run_progress_2026_11_21.md)),
-so play could stay narrow (inferred). The six crashes all happened while the
-search freed game copies in the long run's longer games, so the memory check
-may meet the defect less often in these games (inferred).
-
-**The choices.**
-
-| Choice | What it changes |
-| --- | --- |
-| A. Keep the fresh network | Nothing now. The kept decisions' searches of 256 simulations may teach the network to act; whether they do is not measured. The memory check plays these games meanwhile. |
-| B. Start from the long run's network | A converter matches the network's input features by name and starts the 27 restored since 19 November at zero, so the long run's newest network, after 38 network updates, starts the run with choice D unchanged. That network's own games were active, its value predictions weak; whether it plays actively under choice D is not measured. About one to two hours of work (estimate) before the run restarts. |
-| C. Draw every move in the memory-checked part | `--sampling-game-rounds 11` until the full-speed run, with choice D's search budgets. Games as varied as the long run's first ones (inferred), no new code; but most moves are then not the search's choice, which choice D was meant to end. |
-
-**Recommendation: B.** It keeps choice D as chosen, gives both jobs active
-games, and keeps what the long run learned instead of starting from nothing.
-The owner chose a fresh start on the advice that the long run's network was not
-worth the converter's hours; these games change that advice.
 
 ## Open elsewhere
 
@@ -254,8 +210,7 @@ the page that now states it.
   [running training on the Mac](design/README.md#92-running-training-on-the-mac)
   and [known gaps](design/README.md#known-gaps).
 - **Q-013**, how many games a network update learns from. Answered on 20
-  November 2026: choice B, so the long run keeps 1% of each game's decisions as
-  training samples and 25,000 in its replay buffer, those of about 1,700 games,
+  November 2026: choice B, so training keeps 1% of each game's decisions as training samples and 25,000 in its replay buffer, those of about 1,700 games,
   instead of 5% and 8,000, those of about 110
   ([record](archive/records/replay_buffer_fit_2026_11_20.md)). Stated in
   [how often a training sample is drawn](design/README.md#87-how-often-a-training-sample-is-drawn)
@@ -272,7 +227,7 @@ the page that now states it.
   [rule clarification RCL-023](../game_content/rules/clarifications.md#rcl-023-a-land-battle-that-no-unit-can-end)
   and [the land combat page](engine/land_combat.md#2-a-battle-one-combat-round-at-a-time).
 - **Q-015**, the weight of the value loss. Answered on 21 November 2026: test it
-  first on the long run's saved training samples. Trained from generation 3 on
+  first on the training samples saved by the training run of 19 to 21 November. Trained from generation 3 on
   1,324 saved games at weights 1, 10, 50 and 200, no weight above 1 predicted 330
   held-out games better; every copy did best after drawing each training sample
   once or twice and then fit its training games instead
@@ -283,11 +238,21 @@ the page that now states it.
   drawn before its search; a kept decision is searched with 256 simulations and
   exploration noise, any other with 16 and none; self-play draws its move from
   the visit shares in game round 1 and plays the most visited action after it;
-  and held-out evaluation plays 24 seeds instead of 6. In the long run, which
-  drew every move, 63% of the searched decisions played an action other than
+  and held-out evaluation plays 24 seeds instead of 6. In the training run of 19 to 21 November, which drew every move, 63% of the searched decisions played an action other than
   the most visited one, and 99 of every 100 searches kept no training sample
   ([record](archive/records/long_run_samples_2026_11_21.md)). Stated in
   [the move played](design/README.md#45-after-the-simulations-visit-shares-and-the-move-played),
   [which decisions are kept](design/README.md#71-a-training-iterations-games),
   [measuring strength](design/README.md#10-measuring-strength) and
   [training on the Mac](../studies/campaign/README.md#training-on-the-mac).
+- **Q-017**, which network the training run started on 22 November 2026 begins
+  from. Raised and withdrawn on 22 November 2026, before an answer. The run's
+  first 80 games, from a fresh network playing as choice D of Q-016 says, were
+  narrow: a median of 502 decisions a game against 1,048 in the first games of
+  the training run of 19 to 21 November, 39% of the actions ending a phase
+  against 18%, and 7.8 land battles a game against 44.2; starting the run
+  instead from the newest network of the training run of 19 to 21 November was
+  recommended. By its network updates 56 to 69 the run's games had widened by
+  themselves: a median of 694 decisions, 28% of the actions ending a phase, and 201 moves of a land unit a game against 54 at first, though still about 10 land
+  battles a game ([record](archive/records/fresh_network_games_2026_11_22.md)).
+  So the run goes on from the fresh network, as the owner chose.

@@ -253,21 +253,22 @@ decision is searched with `--kept-simulations` 256 and exploration noise, any
 other with `--simulations` 16 and none, only to choose the move. Self-play draws
 its move from the visit shares in the first `--sampling-game-rounds` game
 rounds, here 1, and plays the most visited action after them. This is the
-owner's answer to Q-016 of 22 November 2026; the long run before it searched
+owner's answer to Q-016 of 22 November 2026; the training run of 19 to 21
+November 2026 before it searched
 every decision with 64 simulations and drew every move
 ([the move played](../../docs/design/README.md#45-after-the-simulations-visit-shares-and-the-move-played),
 [which decisions are kept](../../docs/design/README.md#71-a-training-iterations-games)).
-No run has used these settings yet.
+The training run started on 22 November 2026 is the first to use them.
 
 These learning settings are the speed test's, not tuned values. A training
 iteration plays the 24 games the profile plays at once (`--batches` counts
 training iterations); with 525 training steps a network update draws each kept
 training sample as often as the 700 training steps did with the 32 games of the
 eight game processes before 15 November 2026. With more games at once, as the
-252 of the long run on the GPU, a network update follows that many games. With
+252 of the training run of 19 to 21 November on the GPU, a network update follows that many games. With
 5% of decisions and 8,000 training samples its training steps then drew from
 only the latest 110 games or so, which the network fit much better than new
-games, so since 20 November 2026 the long run keeps 1% of each game's decisions
+games, so since 20 November 2026 training keeps 1% of each game's decisions
 and 25,000 training samples, those of about 1,700 games
 (`--sample-fraction 0.01 --replay-capacity 25000`;
 [how often a training sample is drawn](../../docs/design/README.md#87-how-often-a-training-sample-is-drawn)). `--batch-size` is the minibatch

@@ -45,10 +45,10 @@
   "transitions_per_batch": 20000,
   "value_scale": 100.0
  },
- "initial_models": "the long run's 4-choice-b generation 10 (38 network updates)",
+ "initial_models": "studies/campaign/runs/training-2026-11-19/4-choice-b generation 10, the network after the 38th network update of the training run of 19 to 21 November",
  "attempts": [
   {
-   "run_folder": "run",
+   "run_folder": "1-two-processes",
    "game_processes": 2,
    "games_per_process": 42,
    "quarantine_mb": 256,
@@ -62,7 +62,7 @@
    "peak_gb": 10.52
   },
   {
-   "run_folder": "run-one-process",
+   "run_folder": "2-one-process",
    "game_processes": 1,
    "games_per_process": 42,
    "quarantine_mb": 256,
@@ -76,7 +76,7 @@
    "peak_gb": 6.64
   },
   {
-   "run_folder": "run-seven-games",
+   "run_folder": "3-seven-games",
    "game_processes": 1,
    "games_per_process": 7,
    "quarantine_mb": 256,
@@ -90,7 +90,7 @@
    "peak_gb": 3.9
   },
   {
-   "run_folder": "run-fourteen-games",
+   "run_folder": "4-fourteen-games",
    "game_processes": 1,
    "games_per_process": 14,
    "quarantine_mb": 256,
@@ -104,7 +104,7 @@
    "peak_gb": 4.69
   },
   {
-   "run_folder": "run-large-quarantine",
+   "run_folder": "5-quarantine-4gb",
    "game_processes": 1,
    "games_per_process": 14,
    "quarantine_mb": 4096,
@@ -118,7 +118,7 @@
    "peak_gb": 13.97
   },
   {
-   "run_folder": "run-quarantine-2gb",
+   "run_folder": "6-quarantine-2gb",
    "game_processes": 1,
    "games_per_process": 14,
    "quarantine_mb": 2048,
@@ -132,7 +132,7 @@
    "peak_gb": 13.98
   },
   {
-   "run_folder": "run-quarantine-1gb",
+   "run_folder": "7-quarantine-1gb",
    "game_processes": 1,
    "games_per_process": 14,
    "quarantine_mb": 1024,
@@ -147,7 +147,7 @@
    "part": "before the pause"
   },
   {
-   "run_folder": "run-quarantine-1gb",
+   "run_folder": "7-quarantine-1gb",
    "game_processes": 1,
    "games_per_process": 14,
    "quarantine_mb": 1024,
@@ -163,7 +163,7 @@
   }
  ],
  "main_run": {
-  "run_folder": "run-quarantine-1gb",
+  "run_folder": "7-quarantine-1gb",
   "started": "2026-11-21 13:56:53",
   "paused": [
    "2026-11-21 17:53:46",
@@ -183,7 +183,7 @@
   "checker_reports": [],
   "hardening_or_slot_map_check_fired": false
  },
- "long_run_crashes": {
+ "training_2026_11_19_crashes": {
   "parts": {
    "1-first-night": {
     "decisions": 4565044,

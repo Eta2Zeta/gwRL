@@ -1,4 +1,4 @@
-# What the long training run learned in 38 network updates — 21 November 2026
+# What the training run of 19 to 21 November learned in 38 network updates — 21 November 2026
 
 The long training run of 19 to 21 November 2026 played 252 concurrent
 eleven-round games against one 256×8 network for the three alliances, on the

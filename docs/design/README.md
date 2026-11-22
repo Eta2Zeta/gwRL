@@ -393,28 +393,36 @@ after the decision: the states the game goes on to, where its later training
 samples are kept, and the game's final scores, from which every training sample
 of the game takes its value target (section 7.2).
 
-**Why only the first game round.** Drawing at every decision, as the long run
-did, played an action other than the most visited one at most decisions. Where
+**Why only the first game round.** Drawing at every decision, as the training run of 19 to 21 November 2026 did, played an action other than the most visited one at most decisions. Where
 the simulations spread over many legal actions, the most visited action often
 has a small visit share, and the draw then usually plays another action. At the
 KMT's Combat Movement with 28 legal actions, in the
 [open question on many legal actions](#are-the-simulations-enough-when-there-are-many-legal-actions)
 (section 11), the most visited attack had 16 of the 64 visits, so the draw had a
 chance of 0.25 to play it, and a chance of 0.27 to play one of the 17 attacks
-that the search tried once and not again. In the long run's last run, the chance
-that the draw played none of the most visited actions was 63% on average over
+that the search tried once and not again. In the fourth part of the training run of 19 to 21 November, the chance that the draw played none of the most visited actions was 63% on average over
 the searched decisions, about 800 of a game's 1,260 searched decisions, and 36%
 at decisions with two to four legal actions
 ([record](../archive/records/long_run_samples_2026_11_21.md#what-the-search-leaves-as-policy-targets)).
 So every training sample's value target came from a game in which most moves
-were not the most visited action. Playing the most visited action from game
-round 2 on is the owner's answer to Q-016
-([answered](../questions.md#answered)); no run has used it yet. Not measured
-either: whether games still explore enough when, after game round 1, only the
-kept decisions, 1 in 100 in the long run, are searched with exploration noise,
-and the dice, the noise and game round 1 are what make one game differ from
-another. Early in a run this matters most: a fresh network's priors come from
-its random initial weights, the same in every game.
+were not the most visited action. Playing the most visited action from game round 2 on is the owner's answer to Q-016
+([answered](../questions.md#answered)). The training run started on 22 November
+2026 is the first to play this way, from a fresh network, and its first games were
+narrow: its first 80 games had a median of 502 decisions, against 1,048 in the first
+games of the training run of 19 to 21 November, which drew every move; 39% of their
+actions ended a phase, against 18%; and they began 7.8 land battles a game, against
+44.2. At a decision searched with 16 simulations the simulations mostly visit each
+legal action once, so the rules for ties above choose the move, and a fresh
+network's values and priors are the same in every game
+([section 6.9](#69-the-whole-network)), so its choices repeat from game to game
+(inferred). The run's play widened as its network trained: in network updates
+56 to 69 its games had a median of 694 decisions, 28% of their actions ended a
+phase, and they moved a land unit 201 times a game (`movement_route`), more than
+the 160 of the first games of the training run of 19 to 21 November, though they still began only about 10 land
+battles a game ([record](../archive/records/fresh_network_games_2026_11_22.md)).
+Not measured: whether games explore enough when, after game round 1, only the
+kept decisions, 1 in 100, are searched with exploration noise, and the dice, the
+noise and game round 1 are what make one game differ from another.
 
 **A decision with only one legal action** is played at once, with no search and
 without asking the network.
@@ -1457,7 +1465,7 @@ is drawn before its search (`play_episode` in `studies/campaign/learning.py`):
 a kept decision is searched with 256 simulations (`--kept-simulations`) and
 exploration noise, so that its visit shares, the training sample's policy
 target, say more; any other is searched with 16 (`--simulations`) and no noise,
-only to choose the move. In the long run, which kept 1% of the decisions and
+only to choose the move. In the fourth part of the training run of 19 to 21 November, which kept 1% of the decisions and
 searched every one with 64 simulations, 99 of every 100 searches kept no
 training sample, and the inference server's forward passes set the run's speed
 ([record](../archive/records/long_run_samples_2026_11_21.md)). With 1% kept, a
@@ -1637,11 +1645,11 @@ training step's minibatch: the value loss over all of them, and the policy loss
 over all of them too, since the network serves all three alliances; with a
 network for each alliance, a network's policy loss is averaged over those where
 its own alliance chose (section 8.4). The training step lowers their sum.
-In the long run of 19 to 21 November the value loss on the minibatches was about
+In the training run of 19 to 21 November the value loss on the minibatches was about
 0.005 to 0.02 and the policy loss about 2.1
 ([record](../archive/records/replay_buffer_fit_2026_11_20.md)), so the value
 loss was under 1% of the sum. Weighting it 10, 50 or 200 times as much did not
-help: trained on 1,324 of the long run's saved games, a network predicted 330
+help: trained on 1,324 of the games the same training run saved, a network predicted 330
 others no better at any of those weights than at 1, and fit its training games
 faster ([record](../archive/records/value_loss_weights_2026_11_21.md)). So the
 two losses count equally (Q-015, [answered](../questions.md#answered)).
@@ -1943,8 +1951,8 @@ before. A training iteration of 24 games kept 1,354 training samples on
 on 5 November.
 
 The replay buffer's size cancels only while the replay buffer holds more than
-one training iteration's training samples. The long run on the Mac's GPU plays
-252 concurrent games, and a network update follows 252 games. Keeping 5% of
+one training iteration's training samples. The training run of 19 to 21 November on the Mac's GPU
+played 252 concurrent games, and a network update followed 252 games. Keeping 5% of
 their decisions, those games kept about 18,300 training samples, more than twice
 a replay buffer of 8,000: more than half of those training samples left the
 replay buffer before a training step could draw them, and a network update's
@@ -1957,14 +1965,16 @@ positions lead to final scores. AlphaGo's value network was trained on 30
 million positions, each from a different self-play game, to avoid overfitting
 to the strong correlations between the positions of self-play (Sutton and
 Barto, *Reinforcement Learning: An Introduction*, 2nd edition, section 16.6.1,
-page 446). So since the evening of 20 November 2026 the long run keeps 1% of
+page 446). So since the evening of 20 November 2026 training keeps 1% of
 each game's decisions and 25,000 training samples
 (`--sample-fraction 0.01 --replay-capacity 25000`; Q-013 in
 [the questions page](../questions.md#answered)): a network update's 252 games
 keep about 3,700 training samples, the replay
-buffer holds those of about seven network updates, some 1,700 games, and each
-training sample is drawn about 4.6 times while it stays. Whether the network
-then fits new games better is not yet measured.
+buffer holds those of about seven network updates, some 1,700 games, and each training sample is drawn about 4.6 times while it stays. In the fourth
+part of the training run of 19 to 21 November, which kept these, the network fit the
+games in its replay buffer a median of 1.3 times better, by value loss, than the
+games it played next, once its replay buffer was full, against 3.3 with 5% and 8,000
+([record](../archive/records/long_run_progress_2026_11_21.md)).
 
 ## 9. The whole loop, and running it
 
@@ -2052,9 +2062,9 @@ networks and nothing else (`load_initial_weights` in
 and the input the same layout (section 5.5), since each learned row of the input
 belongs to one feature. What those networks learned stays valid where the game
 is unchanged; a rule that changes only rare positions leaves most of it, and
-further training adjusts the rest. The long run of 19 to 21 November 2026 went
-through four runs this way, each starting from the previous run's newest
-networks ([record](../archive/records/long_run_progress_2026_11_21.md)).
+further training adjusts the rest. The training run of 19 to 21 November 2026 went
+on in five parts this way, each after the first starting from the previous part's
+newest networks ([record](../archive/records/long_run_progress_2026_11_21.md)).
 
 **The inference server.** Game threads do not run the network themselves; the
 inference server, which the tools and the dated records name the *coordinator*,
@@ -2420,7 +2430,7 @@ therefore answers with the layers as written (`answer_as_written` in
 
 **When a game process dies.** A game process runs native code, the engine and
 the search, and a defect there can end it: on 20 November 2026 one aborted after
-5.13 hours of a long training run, on memory being freed that had not been
+5.13 hours of the training run of 19 to 21 November, on memory being freed that had not been
 allocated. That run's code stopped the whole run with it, and the next network
 update came about 51 minutes late
 ([record](../archive/records/game_process_crash_2026_11_20.md)). A run loses
@@ -2465,8 +2475,8 @@ for its diagnosis:
   work on the Mac's GPU. AddressSanitizer stops a game process at the first
   write to freed memory and names the code that made it.
 
-In the long run's layout of
-six processes of 42 games, a crash costs the games in play in one process: when
+In the layout of the training run of 19 to 21 November, six game processes of
+42 games, a crash costs the games in play in one process: when
 a second process aborted the same way later that day, the run lost 44 games,
 about 7 minutes of its play (inferred), and went on
 ([record](../archive/records/second_game_process_crash_2026_11_20.md)), and
@@ -2485,9 +2495,9 @@ found, also not by the sanitizer runs of 21 November 2026
 ([record](../archive/records/crash_diagnosis_2026_11_21.md)) nor by 21.2 hours
 of training play, 1.28 million decisions, whose game processes ran under
 AddressSanitizer ([record](../archive/records/memory_check_2026_11_21.md)),
-though at the long run's rate of one crash in about 2.37 million decisions
-that run would have caught a defect as frequent with a probability of only
-0.42; the training build
+though at the rate at which the training run of 19 to 21 November crashed, once in about
+2.37 million decisions, 1.28 million decisions would have met a defect as frequent
+with a probability of only 0.42; the training build
 keeps two checks that would stop it where it happens if it is an out-of-bounds
 index or a stale SlotMap iterator (`setup.py`).
 
@@ -3216,7 +3226,7 @@ training process takes each result off the list of arrived results as it reads
 it (`keep_playing` in `studies/campaign/run.py`; `play_shared_games` in
 `studies/campaign/shared_evaluator.py` counts the games that reported apart from
 that list). Kept, the results of every game played grew the training process by
-about 1.25 GB an hour in the long training run of 19 and 20 November
+about 1.25 GB an hour in the training run of 19 to 21 November, on 19 and 20 November
 ([record](../archive/records/training_process_memory_2026_11_20.md)). It still
 holds the results of the games the latest network update trained on and of the
 games finished since that update began. With the search trees measured above,
@@ -3439,13 +3449,12 @@ measured and what would settle it.
   run the Python search, which is also what the C++ search is checked against
   (`tests/test_campaign_native_search.py`). A change to the search must be made
   in both, or that check fails.
-- **No training run has yet made the agents stronger.** The long run of 19 to
-  21 November 2026, 252 concurrent eleven-round games at 256×8 on the Mac's GPU
-  in four runs, trained on 9,576 games in 38 network updates by 07:40 on
+- **No training run has yet made the agents stronger.** The training run of 19
+  to 21 November 2026, 252 concurrent eleven-round games at 256×8 on the Mac's GPU
+  in four parts, trained on 9,576 games in 38 network updates by 07:40 on
   21 November, far fewer games than published systems needed
   ([how big](#how-big-should-the-network-and-the-search-be);
-  [record](../archive/records/long_run_progress_2026_11_21.md)). In that long
-  run:
+  [record](../archive/records/long_run_progress_2026_11_21.md)). In the training run of 19 to 21 November:
   - The value head learned during the first night to predict final scores
     better than always predicting their average, and then, for about a day,
     explained 17% to 30% of the final scores' variance on new games, pooled over
@@ -3464,9 +3473,11 @@ measured and what would settle it.
     error 8.2), though some 10 to 16 points better than the untrained network;
     as the Axis 6.8 worse (7.3), and 36.5 below the untrained network, which
     plays almost passively; as the Comintern the same, near −92 whoever plays
-    it. The long run's evaluations test all three alliances since 21 November.
+    it. Since 21 November a training run's evaluations test all three
+    alliances.
 
-  Before the long run, the most games a training run had played was 792
+  Before the training run of 19 to 21 November, the most games a training run had
+  played was 792
   three-round games, on the PC on the night of 14 November, in which no trained
   network beat the scripted policy in its seat by a clear margin
   ([record](../archive/records/three_round_training_2026_11_14.md)). Two design
@@ -3474,7 +3485,8 @@ measured and what would settle it.
   [objective](#is-the-final-wealth-gap-the-right-goal) and
   [flat search targets](#are-the-simulations-enough-when-there-are-many-legal-actions).
 
-  The 25,000 training samples that the long run's last run kept, each rated by
+  The 25,000 training samples that the fourth part of the training run of 19 to 21 November
+  kept, each rated by
   the network that played its decision, point to three more parts of the reason
   ([record](../archive/records/long_run_samples_2026_11_21.md)):
   - **The values read less from the input than a linear model does.** In every
@@ -3491,7 +3503,7 @@ measured and what would settle it.
     ([the open question on what the values read](#should-the-values-read-what-the-zones-hold-in-total)).
   - **At half of the searched decisions the policy targets mostly say which
     actions were tried:** at those with 17 or more legal actions, 41% of the
-    kept decisions, the long run's 64 simulations visited 31 to 69 legal
+    kept decisions, the search's 64 simulations visited 31 to 69 legal
     actions, most of them once
     ([the open question](#are-the-simulations-enough-when-there-are-many-legal-actions)).
   - **Self-play mostly played an action other than the most visited one,** at
@@ -3686,7 +3698,7 @@ more games:
 | DORA, two-player Diplomacy | an equilibrium search each turn | not stated | 192 GPUs, about a week per training stage |
 | AlphaZero.jl, Connect Four | 600 | 75,000 | one GPU, about a day |
 | TD-Gammon 2.1 | none; a 2-ply lookahead in play | 1.5 million | not stated |
-| This project, the long run of 19 to 21 November 2026 | 64 | 9,576 | the Mac, about 36 hours |
+| This project, the training run of 19 to 21 November 2026 | 64 | 9,576 | the Mac, about 36 hours |
 
 A game here has about 1,000 decisions, many more than a game of chess or Go has
 moves, so it holds more decisions to learn from, but its final score comes much
@@ -3745,7 +3757,7 @@ busy zone from dominating, but it also takes away the overall size of a zone's
 vector, so how much a zone holds reaches the values only through the direction
 of its vector.
 
-**Measured** on 21 November, on the long run's saved training samples: a linear
+**Measured** on 21 November, on the training samples saved by the training run of 19 to 21 November: a linear
 model that adds up each zone feature's values over all the zones predicted the
 final scores of the last game rounds better than any network trained on the same
 games. In game round 11 it explained 80% of the variance of the Axis's final
@@ -3797,7 +3809,7 @@ search tries every legal action once before it tries any twice, as long as its
 simulations last. Where there are many legal actions, most of the simulations go
 to these first tries.
 
-**A real case,** from the long run's last run, which searched every decision
+**A real case,** from the fourth part of the training run of 19 to 21 November, which searched every decision
 with 64 simulations: the KMT's Combat Movement in game
 round 11 of a game, with 28 legal actions, 27 attacks, each moving one unit into
 an enemy zone, and ending Combat Movement
@@ -3828,7 +3840,7 @@ Such targets say little more than which actions were tried. Since then Combat
 Movement decisions have shrunk to about a third as many legal actions
 ([record](../archive/records/combat_movement_combats_only_2026_11_01.md)).
 
-**Measured** on the 25,000 training samples of the long run's last run: 41% of
+**Measured** on the 25,000 training samples of the fourth part of the training run of 19 to 21 November: 41% of
 the kept decisions, half of the searched ones, had 17 or more legal actions. At
 those with 17 to 63, 31 on average, the search tried every legal action and 62%
 of them only once; the most visited action had a median of 15 of the visits,
@@ -3842,7 +3854,7 @@ of 2 visits. Naval decisions were half of the searched training samples
 actions per decision, or Gumbel root search, which the review suggests because it
 was designed for fewer simulations than legal actions. The owner's answer to
 Q-016 ([answered](../questions.md#answered)) took the first: a kept decision now
-gets 256 simulations, four times the long run's 64, paid for by 16 at the
+gets 256 simulations, four times the 64 of the training run of 19 to 21 November, paid for by 16 at the
 decisions that keep nothing. Inferred, not measured: at 17 to 63 legal actions,
 31 on average, that tries each action several times; at 128 still about two
 each. **Would settle it:** comparing learning at equal compute.
@@ -3858,7 +3870,7 @@ competing method, and older networks as extra opponents for when held-out
 evaluation shows overfitting to the current ones. Neither has been tried.
 
 **Measured** on 21 November: as the Allies against the scripted policy on the
-six held-out seeds, the network of the long run's last network update made 249
+six held-out seeds, the network after the last network update of the training run of 19 to 21 November made 249
 decisions a game against the scripted Allies' 483, and the KMT ended with 8.5
 land territories against 18.5
 ([record](../archive/records/long_run_samples_2026_11_21.md#the-network-as-the-allies-against-the-scripted-policy)).

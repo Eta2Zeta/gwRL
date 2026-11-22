@@ -21,9 +21,97 @@
     -59.5,
     -105.0
    ]
+  },
+  "by_network_updates": {
+   "1-5": {
+    "games": 80,
+    "decisions_per_game": {
+     "p25": 412.5,
+     "median": 502.5,
+     "p75": 608.5
+    },
+    "end_phase_share_of_actions": 0.3868,
+    "movement_routes_per_game": 53.5,
+    "land_battles_begun_per_game": 7.8,
+    "mean_final_scores_axis_allies_comintern": [
+     37.2,
+     -59.5,
+     -105.0
+    ]
+   },
+   "6-20": {
+    "games": 240,
+    "decisions_per_game": {
+     "p25": 567.75,
+     "median": 616.5,
+     "p75": 686.0
+    },
+    "end_phase_share_of_actions": 0.319,
+    "movement_routes_per_game": 89.4,
+    "land_battles_begun_per_game": 7.9,
+    "mean_final_scores_axis_allies_comintern": [
+     40.4,
+     -60.3,
+     -103.1
+    ]
+   },
+   "21-40": {
+    "games": 320,
+    "decisions_per_game": {
+     "p25": 543.5,
+     "median": 617.0,
+     "p75": 752.0
+    },
+    "end_phase_share_of_actions": 0.2948,
+    "movement_routes_per_game": 157.9,
+    "land_battles_begun_per_game": 10.1,
+    "mean_final_scores_axis_allies_comintern": [
+     42.5,
+     -60.9,
+     -102.0
+    ]
+   },
+   "41-55": {
+    "games": 240,
+    "decisions_per_game": {
+     "p25": 652.0,
+     "median": 707.5,
+     "p75": 812.5
+    },
+    "end_phase_share_of_actions": 0.2691,
+    "movement_routes_per_game": 215.9,
+    "land_battles_begun_per_game": 10.8,
+    "mean_final_scores_axis_allies_comintern": [
+     45.7,
+     -62.9,
+     -100.6
+    ]
+   },
+   "56-69": {
+    "games": 224,
+    "decisions_per_game": {
+     "p25": 635.75,
+     "median": 694.5,
+     "p75": 761.25
+    },
+    "end_phase_share_of_actions": 0.2786,
+    "movement_routes_per_game": 201.0,
+    "land_battles_begun_per_game": 10.3,
+    "mean_final_scores_axis_allies_comintern": [
+     47.5,
+     -64.1,
+     -100.1
+    ]
+   }
+  },
+  "counted_through": {
+   "network_updates": 69,
+   "games": 1104,
+   "hours_of_play": 2.9,
+   "decisions_at_update_69": 754416
   }
  },
- "long_run_first_two_updates": {
+ "training_2026_11_19_first_two_updates": {
   "folder": "studies/campaign/runs/training-2026-11-19/1-first-night/run",
   "commit": "999c90c",
   "settings": "fresh network 256x8, 64 simulations at every decision, every move drawn from the visit shares; 252 games in 6 game processes",
@@ -45,5 +133,61 @@
     -96.3
    ]
   }
- }
+ },
+ "training_2026_11_19_by_network_updates": {
+  "folders": [
+   "studies/campaign/runs/training-2026-11-19/1-first-night/run",
+   "studies/campaign/runs/training-2026-11-19/4-choice-b/run"
+  ],
+  "settings": "64 simulations at every decision, every move drawn from the visit shares; 252 games per network update",
+  "network updates 1-2 (first part)": {
+   "games": 504,
+   "decisions_per_game": {
+    "p25": 968.75,
+    "median": 1047.5,
+    "p75": 1128.75
+   },
+   "end_phase_share_of_actions": 0.1846,
+   "movement_routes_per_game": 160.2,
+   "land_battles_begun_per_game": 44.2,
+   "mean_final_scores_axis_allies_comintern": [
+    35.5,
+    -56.8,
+    -96.3
+   ]
+  },
+  "network updates 11-13 (first part)": {
+   "games": 756,
+   "decisions_per_game": {
+    "p25": 1353.0,
+    "median": 1441.5,
+    "p75": 1531.0
+   },
+   "end_phase_share_of_actions": 0.1348,
+   "movement_routes_per_game": 265.3,
+   "land_battles_begun_per_game": 52.1,
+   "mean_final_scores_axis_allies_comintern": [
+    29.4,
+    -55.8,
+    -87.3
+   ]
+  },
+  "network updates 36-38 (fourth part, its 8-10)": {
+   "games": 756,
+   "decisions_per_game": {
+    "p25": 1392.75,
+    "median": 1475.0,
+    "p75": 1573.25
+   },
+   "end_phase_share_of_actions": 0.131,
+   "movement_routes_per_game": 261.1,
+   "land_battles_begun_per_game": 55.0,
+   "mean_final_scores_axis_allies_comintern": [
+    31.3,
+    -55.6,
+    -88.4
+   ]
+  }
+ },
+ "method": "Per game, from manifest.json runner.updates[].episodes: decisions = the sum of decisions_by_actor; action_counts end_phase, movement_route and land_begin_battle; final scores from observed_terminal_returns. Quartiles of the blocks by numpy.percentile (linear); the first-games summaries' quartiles were counted earlier the same day with another quantile rule, within 2 decisions of these."
 }

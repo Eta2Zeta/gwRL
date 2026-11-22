@@ -1,4 +1,4 @@
-# How the long run's network fits its replay buffer and new games — 20 November 2026
+# How the network of the training run of 19 to 21 November fits its replay buffer and new games — 20 November 2026
 
 The long training run of 19 and 20 November 2026 played 252 concurrent
 eleven-round games against one 256×8 network for the three alliances, on the

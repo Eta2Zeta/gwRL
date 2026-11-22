@@ -59,7 +59,7 @@ read from the dice the next round would roll (`someoneRolls` and `unitShots` in
 `src/land_combat.cpp`). A retreat by choice that leaves behind only units that
 came from the sea or by air drop eliminates them at once when no unit could
 roll in the next round (`finishRetreat`). The case that raised the question
-came from the long training run of 19 to 21 November 2026. Japan attacked with
+came from the training run of 19 to 21 November 2026. Japan attacked with
 a Self-propelled Artillery from Korea and an Anti-aircraft Artillery from the
 sea, and retreated after the first combat round: the Self-propelled Artillery
 left, and the Anti-aircraft Artillery, having come from the sea, had to stay

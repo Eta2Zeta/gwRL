@@ -20,7 +20,7 @@ its own date.
   `checkpoint.pt` (what a resume needs), and, in runs that keep them,
   `game-moves/` (each game's move log), `crash-reports/` and `failed-positions/`
   ([training runs and resume](../../studies/campaign/README.md#training-runs-and-resume)).
-- **What a long run keeps beside it.** A run started by a script keeps, next to
+- **What a script keeps beside its run.** A run started by a script keeps, next to
   its run folder, the script, `code/` (the files of the commit it ran, with the
   engine build it used) and its logs. The scripts and logs name the paths of
   their own date.
@@ -36,11 +36,11 @@ which the records of their date still name.
 | `smoke-test-2026-10-23` | 23 Oct | Two short checks of the training command: one-round games, a 16×1 network, 2 simulations; `1-interrupted` stopped by hand, `2-completed` made two network updates. | |
 | `one-round-training-2026-10-23` | 23 Oct | One-round games, a 16×1 network, 4 simulations: 8 games, 2 network updates. | |
 | `three-round-training-2026-10-24` | 24 Oct | Three-round games, 16×1, 16 simulations, 4 games at a time: two attempts stopped early (`1-first-attempt`, `2-second-attempt`), an overnight run of 60 games and 15 network updates (`3-first-60-games`), continued to 120 games and 30 network updates on 25 October (`4-sixty-more-games`). | |
-| `training-2026-10-30` | 30 Oct | The first night of eleven-round training: 64×2 on the CPU, 11 or 13 games at a time, one per worker process, in four runs one after another (`training` to `training-4`), and recorded games of its networks (`games/`). | |
+| `training-2026-10-30` | 30 Oct | The first night of eleven-round training: 64×2 on the CPU, 11 or 13 games at a time, one per worker process, in four parts one after another: `1-thirteen-games`, stopped by the memory limit; `2-eleven-games`, stopped by a game worker's error; `3-eleven-games-again`, stopped to move to new code; and `4-raider-fix`, the rest of the night on the code with the raider fix, and recorded games of its networks (`games/`). | |
 | `gpu-training-2026-10-31` | 31 Oct | Eleven-round training at 64×2 with the network on the GPU: 64 games, 2 network updates. | [One real training sample](records/training_sample_2026_11_05.md) |
 | `training-2026-11-02` | 2 Nov | The night run at 256×8 on the GPU: 9 game processes of 13 games, 117 at a time; two game process crashes in its third training iteration, then replayed outside the supervisor (`LINEAGE.md`). | [One real training sample](records/training_sample_2026_11_05.md) |
-| `training-2026-11-19` | 19 Nov | The long run: 256×8 on the GPU, 252 games at a time in 6 game processes of 42, self-play that never stops, in five parts: `1-first-night`, `2-morning`, `3-afternoon`, `4-choice-b` (1% of decisions kept, a replay buffer of 25,000) and `5-restart`, which crashed after 3.6 minutes; 38 network updates in all. | [What the long run learned](records/long_run_progress_2026_11_21.md) |
-| `memory-check-2026-11-21` | 21 Nov | Training games whose game processes ran an engine built with AddressSanitizer, to find the game process crashes: one process of 14 games, 21.2 hours, 1,276,928 decisions, no report. | [The memory-checked run](records/memory_check_2026_11_21.md) |
+| `training-2026-11-19` | 19 Nov | The longest training so far, 35.5 hours of play: a 256×8 network on the GPU, 252 games at a time in 6 game processes of 42, every decision searched with 64 simulations and every move drawn from the visit shares, self-play that never stops, in five parts: `1-first-night`, `2-morning`, `3-afternoon`, `4-choice-b` (1% of decisions kept, a replay buffer of 25,000) and `5-restart`, which crashed after 3.6 minutes; 9,576 games and 38 network updates in all. Its game processes crashed six times, and it was stopped on 21 November to look for the cause. | [What it learned in 38 network updates](records/long_run_progress_2026_11_21.md) |
+| `memory-check-2026-11-21` | 21 Nov | Training games whose game processes ran an engine built with AddressSanitizer, to find the game process crashes: one process of 14 games, 21.2 hours, 1,276,928 decisions, no report; seven attempts, `1-two-processes` to `7-quarantine-1gb`, the last of which is the run. | [The memory-checked run](records/memory_check_2026_11_21.md) |
 | `training-2026-11-22` | 22 Nov | The first training under the rules since RCL-022 and RCL-023 and choice D's searches, from a fresh network. Its first part, `1-memory-checked`, plays one game process of 16 games on an engine built with AddressSanitizer, to find the game process crashes within 8 cores; launches with 42 and 24 games kept about 12 and 10 cores busy and were stopped within minutes. | [A fresh network's first games](records/fresh_network_games_2026_11_22.md) |
 
 ## Measurements and checks
@@ -118,6 +118,10 @@ GPU self-play branch retired on 31 October 2026.
 | `studies/campaign/runs/three-round-10h-2026-10-24-r3` | `three-round-training-2026-10-24/3-first-60-games` |
 | `studies/campaign/runs/three-round-60more-2026-10-25` | `three-round-training-2026-10-24/4-sixty-more-games` |
 | `studies/campaign/runs/night-2026-10-30` | `training-2026-10-30` |
+| `studies/campaign/runs/night-2026-10-30/training` | `training-2026-10-30/1-thirteen-games` |
+| `studies/campaign/runs/night-2026-10-30/training-2` | `training-2026-10-30/2-eleven-games` |
+| `studies/campaign/runs/night-2026-10-30/training-3` | `training-2026-10-30/3-eleven-games-again` |
+| `studies/campaign/runs/night-2026-10-30/training-4` | `training-2026-10-30/4-raider-fix` |
 | `studies/campaign/runs/night-2026-11-02` | `training-2026-11-02` |
 | `studies/campaign/runs/archive` | `retired-branch-bundle-2026-10-31` |
 | `tmp/action-interface-2026-10-24` | `action-interface-2026-10-24` |
@@ -140,3 +144,10 @@ GPU self-play branch retired on 31 October 2026.
 | `tmp/training-2026-11-20c` | `training-2026-11-19/4-choice-b` |
 | `tmp/training-2026-11-21` | `training-2026-11-19/5-restart` |
 | `tmp/diagnosis-2026-11-21` | `memory-check-2026-11-21` |
+| `tmp/diagnosis-2026-11-21/run` | `memory-check-2026-11-21/1-two-processes` |
+| `tmp/diagnosis-2026-11-21/run-one-process` | `memory-check-2026-11-21/2-one-process` |
+| `tmp/diagnosis-2026-11-21/run-seven-games` | `memory-check-2026-11-21/3-seven-games` |
+| `tmp/diagnosis-2026-11-21/run-fourteen-games` | `memory-check-2026-11-21/4-fourteen-games` |
+| `tmp/diagnosis-2026-11-21/run-large-quarantine` | `memory-check-2026-11-21/5-quarantine-4gb` |
+| `tmp/diagnosis-2026-11-21/run-quarantine-2gb` | `memory-check-2026-11-21/6-quarantine-2gb` |
+| `tmp/diagnosis-2026-11-21/run-quarantine-1gb` | `memory-check-2026-11-21/7-quarantine-1gb` |

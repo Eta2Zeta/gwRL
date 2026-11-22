@@ -1,4 +1,4 @@
-# Training on the long run's saved samples at four weights of the value loss — 21 November 2026
+# Training on the saved samples of the training run of 19 to 21 November at four weights of the value loss — 21 November 2026
 
 Q-015 asked whether the value loss should count for more in a training step,
 since a linear model of the network's input had predicted the long run's final

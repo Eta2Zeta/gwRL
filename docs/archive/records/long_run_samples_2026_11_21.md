@@ -1,4 +1,4 @@
-# What the long run's training samples show about its values and search targets — 21 November 2026
+# What the training samples of the training run of 19 to 21 November show about its values and search targets — 21 November 2026
 
 The long training run of 19 to 21 November 2026 played 9,576 eleven-round games
 in four runs and 38 network updates, with one 256×8 network for the three
