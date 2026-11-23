@@ -109,9 +109,12 @@ In the Place Units Phase the nation puts its ready projects on the map
 - **Upgrades replace a piece.** An upgrade is placed onto a unit or facility of
   the type it upgrades, chosen at placement. A unit placed this turn cannot be
   upgraded.
-- **No upgrade at sea or into the wrong cargo** (RCL-021). A unit aboard a ship
-  at sea is not offered an upgrade, and neither is a unit whose transport could
-  not carry the upgraded type. The upgrade waits in the queue.
+- **No upgrade at sea or into the wrong cargo.** A unit aboard a ship at sea is
+  in no land zone, which RB §12.3 needs a Supply Path to, and a unit whose
+  transport could not carry the upgraded type cannot take the upgrade
+  (RB §13.1.5, §13.1.6). Neither is offered it, and the upgrade waits in the
+  queue (RB §12.3;
+  [RCL-021](../../game_content/rules/source_answered_questions.md#rcl-021-upgrading-a-unit-aboard-a-transport)).
 
 ## 5. Repairs
 

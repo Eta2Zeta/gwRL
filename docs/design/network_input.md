@@ -625,9 +625,11 @@ to 9239, 314,594 decisions), measured on 5 November 2026. One of the latter,
 seed 9239, reaches a feature removed as impossible (section 8): an air
 transport carrying motorized infantry. The rules forbid that cargo, and the
 engine made it by upgrading an infantry already aboard
-([record](../archive/records/zone_name_check_early_end_2026_11_05.md)). Since
-[RCL-021](../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport)
-the engine no longer offers that upgrade.
+([record](../archive/records/zone_name_check_early_end_2026_11_05.md)). The
+engine no longer offers that upgrade: a transport carries only the units its
+table lists, and an upgrade that cannot reach a suitable unit waits on the build
+queue (RB §13.1.5, §12.3;
+[RCL-021](../../game_content/rules/source_answered_questions.md#rcl-021-upgrading-a-unit-aboard-a-transport)).
 
 Before 4 November the lists lacked names in four groups. On 3 November the random
 check found 31: 16 battle notes, 12 railroad names, the label `damage`, a city as

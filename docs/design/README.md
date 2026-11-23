@@ -4009,9 +4009,9 @@ of several identical units, and lets a player skip the free recruitment roll.
 that look so are not. Cargo kept aboard a landed air transport cannot be
 carpet-bombed, since carpet bombing attacks only land units, so taking every unit
 off its transport before the Place Units Phase would change the game. The user
-kept that choice and instead barred upgrades that would leave a transport with
-cargo it may not carry
-([RCL-021](../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport)).
+kept that choice; what the rules forbid is an upgrade that would leave a
+transport with cargo it may not carry
+([RCL-021](../../game_content/rules/source_answered_questions.md#rcl-021-upgrading-a-unit-aboard-a-transport)).
 Merging identical units touches the list of legal actions, the network input and
 the search, so it needs its own check.
 

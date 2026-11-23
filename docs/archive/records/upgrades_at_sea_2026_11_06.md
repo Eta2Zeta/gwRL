@@ -3,7 +3,7 @@
 RB 12.3 requires a Supply Path to the land zone that the unit receiving an
 upgrade is in. A unit aboard a ship at sea is in no land zone, yet the engine
 offered it upgrades: after
-[RCL-021](../../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport)
+[RCL-021](../../../game_content/rules/source_answered_questions.md#rcl-021-upgrading-a-unit-aboard-a-transport)
 barred upgrades into cargo a transport may not carry, random games still had
 139 such offers in 85 of 241 games, 43 of them taken
 ([record](never_better_choices_2026_11_05.md#checks)). Asked on 6 November

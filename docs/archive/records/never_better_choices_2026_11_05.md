@@ -83,7 +83,7 @@ The user's answer:
 - **Cargo may stay aboard.** Since staying aboard can be better, the choice is
   kept. Instead an upgrade may not turn a loaded unit into one its transport
   cannot carry: user ruling
-  [RCL-021](../../../game_content/rules/clarifications.md#rcl-021-upgrading-a-unit-aboard-a-transport).
+  [RCL-021](../../../game_content/rules/source_answered_questions.md#rcl-021-upgrading-a-unit-aboard-a-transport).
 - **Moves that do the same thing in a more expensive way are left out:** the
   strategic rail move where an ordinary move reaches the same zone, and the
   printed price once Improved Construction offers the discount.

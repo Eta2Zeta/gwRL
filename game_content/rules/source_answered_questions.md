@@ -6,7 +6,10 @@ Their IDs and original source conclusions are retained for traceability. No rule
 or project decision changes as a result of this cleanup.
 
 RCL-002 was moved here from the register on 22 November 2026, when the user
-judged that the printed text allows only one reading.
+judged that the printed text allows only one reading. RCL-021 followed on
+23 November 2026, closed at the user's word once RB §12.3, which keeps an
+upgrade that cannot reach a suitable unit on the build queue, was seen to answer
+it with the transports' printed limits.
 
 ## RCL-002: influence spending before the die roll
 
@@ -137,3 +140,69 @@ repair before construction can advance. A setback past the starting stage
 removes the project. No refund or subtraction of historical paid IPP is implied.
 This is an example-supported reading, not a user or publisher-issued ruling.
 The wording remains useful to report to the developers.
+
+## RCL-021: Upgrading a unit aboard a transport
+
+**Status: closed after checking, 23 November 2026.** First recorded on
+5 November 2026 as an interpretation the user adopted, and its part on ships at
+sea on 6 November 2026.
+
+**Sources:** RB §8.4 p51 (upgrades); §12.3 p80 (placing upgrades, and an
+upgrade that cannot reach a suitable unit); §11.3.1 p75, §11.4.1 p76 and §11.5
+pp77-78 (cargo still aboard; a ship in port); §13.1.1 p83 and §13.1.2 pp84-85
+(unit classes); §13.1.5 pp88-89 and §13.1.6 p92 (what each transport carries).
+
+**The question it answered.** An upgrade replaces one of a nation's units with a
+better unit in the Place Units Phase (RB §8.4). If that unit is still aboard a
+transport then, may the upgrade be placed when the transport may not carry the
+upgraded unit, and may it be placed while the transport is a ship at sea?
+
+**Source-backed conclusion:**
+
+1. **A unit can be aboard a transport in the Place Units Phase.** An air
+   transport may unload its cargo in a Friendly-possessed land zone but need not
+   (RB §11.3.1). A naval transport may go in port with its cargo aboard
+   (RB §11.5). A unit of an Aligned member of the transport owner's alliance
+   boards on its own Player Turn, travels on the owner's and leaves only on its
+   own next one (RB §§11.3.1, 11.4.1).
+2. **Not aboard a ship at sea.** RB §12.3 requires a Supply Path to the land
+   zone the upgraded unit is in. A ship in port is located in the land zone of
+   its Naval Facility (RB §11.5, p78), and its cargo with it; a ship at sea and
+   its cargo are in a sea zone, which is no land zone. So an upgrade cannot
+   reach a unit aboard a ship at sea.
+3. **Not into cargo the transport may not carry.** An Air Transport carries one
+   infantry-class unit (RB §13.1.5, p88), a Heavy Air Transport one
+   infantry-class unit, one Artillery or one Anti-aircraft Artillery (p89), and
+   a Naval Transport two infantry-class units, or one infantry-class unit and
+   one other land unit or Strategic Rocket (RB §13.1.6, p92). Militia and
+   Infantry are infantry-class (RB §13.1.1); Motorized Infantry is vehicle-class
+   (RB §13.1.2). An upgrade that would leave a transport carrying a unit it may
+   not carry cannot replace that unit: an Infantry aboard an Air Transport may
+   not become Motorized Infantry, and of two Infantry aboard one Naval Transport
+   only one may.
+4. **Such an upgrade waits.** An upgrade that cannot reach a suitable unit
+   stays on the build queue until a Supply Path reaches a suitable unit in a
+   later Place Units Phase (RB §12.3).
+
+Other upgrades of carried units are allowed: an Infantry aboard a Naval
+Transport in port may become Motorized Infantry when nothing else aboard is
+outside the infantry class, and a Militia aboard an Air Transport may become
+Infantry. No rule makes cargo leave its transport before the Place Units Phase,
+so it may stay aboard; the user kept that choice open on 5 November 2026 because
+staying aboard can be better, as carpet bombing attacks only land units
+(RB §10.6.5, p68).
+
+Examples: a KMT Air Transport landed in Sikang still carries an Infantry in the
+KMT's Place Units Phase, and the KMT has bought an upgrade to Motorized
+Infantry; the upgrade is offered only on an Infantry not aboard a transport, or
+aboard one that could carry the result. A Japanese Naval Transport at sea off
+Tokyo carries an Infantry and a Militia, and Japan has bought an upgrade for
+each; neither is offered for them until the ship is in port or the units are
+ashore.
+
+The program has followed this reading since 6 November 2026:
+`upgradeUnitLegal` (`src/economy.cpp`) offers an upgrade on a unit only if the
+unit is in a land zone that a Supply Path reaches and if `upgradeKeepsCargo`
+finds that its transport, if it has one, could still carry its cargo; the tests
+`upgradesKeepCargo` and `upgradesWaitAtSea` (`tests/economy_tests.cpp`) check
+both parts.
