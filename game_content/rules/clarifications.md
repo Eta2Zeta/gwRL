@@ -381,8 +381,14 @@ land zone. The case needs every step below.
    (RB §6.6).
 5. **No Friendly land is left.** If the zone was the KMT's last, the KMT
    surrenders, as it does when it possesses no land zone (KMT p1). The CCP
-   possesses none either, and no nation is Aligned with it. RB §0.3 names no
-   other destination and no other outcome, and the CCP cannot surrender.
+   possesses none either, and no nation is Aligned with it. Mongolia's land
+   does not count: Mongolia shares the Comintern with the CCP, but members of
+   one Alliance are not Aligned by that alone (RB p5; RB p6 gives London, not
+   Friendly to the USA until the two are Aligned), Mongolia Aligns only with
+   the USSR (RB §4.7, p29), and the CCP Aligns with no one until it becomes a
+   Major Power (CCP p1), which ends the Truce (RB §6.6). The program agrees
+   (`politicallyFriendly` in `src/politics.cpp`). RB §0.3 names no other
+   destination and no other outcome, and the CCP cannot surrender.
 
 **Adopted ruling.** Units that RB §0.3 must relocate are eliminated, with any
 units they carry, only when no Friendly-possessed land zone exists. Otherwise
