@@ -1,0 +1,948 @@
+{
+  "record": "training_progress_2026_11_22",
+  "run_folder": "studies/campaign/runs/training-2026-11-22/1-memory-checked",
+  "commit": "3153079",
+  "at_network_update": {
+    "network_update": 141,
+    "time": "2026-11-22 17:56",
+    "hours_of_play": 5.94,
+    "counters": {
+      "batches": 140,
+      "chance_events": 168521,
+      "decisions": 1597750,
+      "episodes": 2256,
+      "transitions": 1766271,
+      "updates": 141
+    }
+  },
+  "self_play_by_20_network_updates": [
+    {
+      "network_updates": "1-20",
+      "games": 320,
+      "median_decisions": 601.5,
+      "land_battles_begun_per_game": 7.9,
+      "final_scores": {
+        "axis": {
+          "mean": 39.6,
+          "standard_error": 0.6,
+          "n": 320
+        },
+        "allies": {
+          "mean": -60.1,
+          "standard_error": 0.6,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -103.6,
+          "standard_error": 0.5,
+          "n": 320
+        }
+      },
+      "wealth": {
+        "axis": {
+          "wealth": 81.8,
+          "income_rate": 15.3,
+          "units": 425.5,
+          "infrastructure": 171.9,
+          "treasury": 39.0,
+          "paid_construction": 28.8
+        },
+        "allies": {
+          "wealth": 32.0,
+          "income_rate": 10.3,
+          "units": 105.6,
+          "infrastructure": 41.9,
+          "treasury": 65.2,
+          "paid_construction": 4.0
+        },
+        "comintern": {
+          "wealth": 10.3,
+          "income_rate": 3.0,
+          "units": 59.2,
+          "infrastructure": 6.3,
+          "treasury": 6.8,
+          "paid_construction": 0.0
+        }
+      }
+    },
+    {
+      "network_updates": "21-40",
+      "games": 320,
+      "median_decisions": 617.0,
+      "land_battles_begun_per_game": 10.1,
+      "final_scores": {
+        "axis": {
+          "mean": 42.5,
+          "standard_error": 0.7,
+          "n": 320
+        },
+        "allies": {
+          "mean": -60.9,
+          "standard_error": 0.7,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -102.0,
+          "standard_error": 0.5,
+          "n": 320
+        }
+      }
+    },
+    {
+      "network_updates": "41-60",
+      "games": 320,
+      "median_decisions": 704.0,
+      "land_battles_begun_per_game": 10.9,
+      "final_scores": {
+        "axis": {
+          "mean": 45.8,
+          "standard_error": 0.6,
+          "n": 320
+        },
+        "allies": {
+          "mean": -63.1,
+          "standard_error": 0.6,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -100.5,
+          "standard_error": 0.4,
+          "n": 320
+        }
+      }
+    },
+    {
+      "network_updates": "61-80",
+      "games": 320,
+      "median_decisions": 709.0,
+      "land_battles_begun_per_game": 12.3,
+      "final_scores": {
+        "axis": {
+          "mean": 46.6,
+          "standard_error": 0.6,
+          "n": 320
+        },
+        "allies": {
+          "mean": -63.3,
+          "standard_error": 0.7,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -99.4,
+          "standard_error": 0.4,
+          "n": 320
+        }
+      },
+      "wealth": {
+        "axis": {
+          "wealth": 81.4,
+          "income_rate": 14.8,
+          "units": 443.3,
+          "infrastructure": 165.7,
+          "treasury": 28.2,
+          "paid_construction": 28.0
+        },
+        "allies": {
+          "wealth": 26.4,
+          "income_rate": 8.9,
+          "units": 117.6,
+          "infrastructure": 38.7,
+          "treasury": 16.5,
+          "paid_construction": 2.0
+        },
+        "comintern": {
+          "wealth": 8.4,
+          "income_rate": 2.9,
+          "units": 44.7,
+          "infrastructure": 6.7,
+          "treasury": 3.2,
+          "paid_construction": 0.0
+        }
+      }
+    },
+    {
+      "network_updates": "81-100",
+      "games": 320,
+      "median_decisions": 711.0,
+      "land_battles_begun_per_game": 15.7,
+      "final_scores": {
+        "axis": {
+          "mean": 48.2,
+          "standard_error": 0.5,
+          "n": 320
+        },
+        "allies": {
+          "mean": -64.8,
+          "standard_error": 0.6,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -98.3,
+          "standard_error": 0.4,
+          "n": 320
+        }
+      }
+    },
+    {
+      "network_updates": "101-120",
+      "games": 320,
+      "median_decisions": 710.0,
+      "land_battles_begun_per_game": 18.3,
+      "final_scores": {
+        "axis": {
+          "mean": 48.0,
+          "standard_error": 0.5,
+          "n": 320
+        },
+        "allies": {
+          "mean": -64.6,
+          "standard_error": 0.6,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -96.8,
+          "standard_error": 0.4,
+          "n": 320
+        }
+      }
+    },
+    {
+      "network_updates": "121-141",
+      "games": 336,
+      "median_decisions": 704.5,
+      "land_battles_begun_per_game": 17.9,
+      "final_scores": {
+        "axis": {
+          "mean": 49.9,
+          "standard_error": 0.4,
+          "n": 336
+        },
+        "allies": {
+          "mean": -66.3,
+          "standard_error": 0.5,
+          "n": 336
+        },
+        "comintern": {
+          "mean": -97.0,
+          "standard_error": 0.3,
+          "n": 336
+        }
+      },
+      "wealth": {
+        "axis": {
+          "wealth": 81.7,
+          "income_rate": 14.9,
+          "units": 421.5,
+          "infrastructure": 176.8,
+          "treasury": 34.8,
+          "paid_construction": 34.2
+        },
+        "allies": {
+          "wealth": 23.6,
+          "income_rate": 8.5,
+          "units": 99.4,
+          "infrastructure": 35.5,
+          "treasury": 14.8,
+          "paid_construction": 0.6
+        },
+        "comintern": {
+          "wealth": 8.2,
+          "income_rate": 2.8,
+          "units": 44.1,
+          "infrastructure": 6.6,
+          "treasury": 3.2,
+          "paid_construction": 0.0
+        }
+      }
+    }
+  ],
+  "fresh_game_losses": {
+    "source": "tools/compare_training_runs.py --run today=studies/campaign/runs/training-2026-11-22/1-memory-checked, run at network update 141",
+    "hours": [
+      {
+        "hours": "0-1",
+        "network_updates": 25,
+        "games": 400,
+        "losses": {
+          "axis": {
+            "samples": 928,
+            "value_loss": 0.0227,
+            "score_variance": 0.0116,
+            "explained": -0.958,
+            "policy_kl": 0.295,
+            "typical_miss_points": 15.1,
+            "miss_of_the_mean_points": 10.8
+          },
+          "allies": {
+            "samples": 664,
+            "value_loss": 0.0163,
+            "score_variance": 0.0125,
+            "explained": -0.299,
+            "policy_kl": 0.294,
+            "typical_miss_points": 12.8,
+            "miss_of_the_mean_points": 11.2
+          },
+          "comintern": {
+            "samples": 818,
+            "value_loss": 0.0229,
+            "score_variance": 0.0111,
+            "explained": -1.055,
+            "policy_kl": 0.09,
+            "typical_miss_points": 15.1,
+            "miss_of_the_mean_points": 10.6
+          },
+          "all": {
+            "samples": 2410,
+            "value_loss": 0.021,
+            "score_variance": 0.0118,
+            "explained": -0.785,
+            "policy_kl": 0.225,
+            "typical_miss_points": 14.5,
+            "miss_of_the_mean_points": 10.8
+          }
+        }
+      },
+      {
+        "hours": "1-2",
+        "network_updates": 23,
+        "games": 368,
+        "losses": {
+          "axis": {
+            "samples": 823,
+            "value_loss": 0.006,
+            "score_variance": 0.0127,
+            "explained": 0.529,
+            "policy_kl": 0.235,
+            "typical_miss_points": 7.7,
+            "miss_of_the_mean_points": 11.3
+          },
+          "allies": {
+            "samples": 1115,
+            "value_loss": 0.0054,
+            "score_variance": 0.0171,
+            "explained": 0.682,
+            "policy_kl": 0.349,
+            "typical_miss_points": 7.4,
+            "miss_of_the_mean_points": 13.1
+          },
+          "comintern": {
+            "samples": 732,
+            "value_loss": 0.0051,
+            "score_variance": 0.0124,
+            "explained": 0.588,
+            "policy_kl": 0.1,
+            "typical_miss_points": 7.2,
+            "miss_of_the_mean_points": 11.1
+          },
+          "all": {
+            "samples": 2670,
+            "value_loss": 0.0055,
+            "score_variance": 0.0149,
+            "explained": 0.63,
+            "policy_kl": 0.246,
+            "typical_miss_points": 7.4,
+            "miss_of_the_mean_points": 12.2
+          }
+        }
+      },
+      {
+        "hours": "2-3",
+        "network_updates": 23,
+        "games": 368,
+        "losses": {
+          "axis": {
+            "samples": 846,
+            "value_loss": 0.005,
+            "score_variance": 0.0094,
+            "explained": 0.475,
+            "policy_kl": 0.246,
+            "typical_miss_points": 7.0,
+            "miss_of_the_mean_points": 9.7
+          },
+          "allies": {
+            "samples": 1127,
+            "value_loss": 0.0044,
+            "score_variance": 0.0105,
+            "explained": 0.585,
+            "policy_kl": 0.395,
+            "typical_miss_points": 6.6,
+            "miss_of_the_mean_points": 10.2
+          },
+          "comintern": {
+            "samples": 759,
+            "value_loss": 0.004,
+            "score_variance": 0.0086,
+            "explained": 0.542,
+            "policy_kl": 0.127,
+            "typical_miss_points": 6.3,
+            "miss_of_the_mean_points": 9.3
+          },
+          "all": {
+            "samples": 2732,
+            "value_loss": 0.0044,
+            "score_variance": 0.0097,
+            "explained": 0.544,
+            "policy_kl": 0.274,
+            "typical_miss_points": 6.7,
+            "miss_of_the_mean_points": 9.9
+          }
+        }
+      },
+      {
+        "hours": "3-4",
+        "network_updates": 22,
+        "games": 352,
+        "losses": {
+          "axis": {
+            "samples": 765,
+            "value_loss": 0.0055,
+            "score_variance": 0.0095,
+            "explained": 0.424,
+            "policy_kl": 0.22,
+            "typical_miss_points": 7.4,
+            "miss_of_the_mean_points": 9.8
+          },
+          "allies": {
+            "samples": 1088,
+            "value_loss": 0.0042,
+            "score_variance": 0.0135,
+            "explained": 0.691,
+            "policy_kl": 0.38,
+            "typical_miss_points": 6.5,
+            "miss_of_the_mean_points": 11.6
+          },
+          "comintern": {
+            "samples": 759,
+            "value_loss": 0.0055,
+            "score_variance": 0.0111,
+            "explained": 0.509,
+            "policy_kl": 0.093,
+            "typical_miss_points": 7.4,
+            "miss_of_the_mean_points": 10.5
+          },
+          "all": {
+            "samples": 2612,
+            "value_loss": 0.0049,
+            "score_variance": 0.0117,
+            "explained": 0.578,
+            "policy_kl": 0.25,
+            "typical_miss_points": 7.0,
+            "miss_of_the_mean_points": 10.8
+          }
+        }
+      },
+      {
+        "hours": "4-5",
+        "network_updates": 26,
+        "games": 416,
+        "losses": {
+          "axis": {
+            "samples": 874,
+            "value_loss": 0.0044,
+            "score_variance": 0.0078,
+            "explained": 0.435,
+            "policy_kl": 0.228,
+            "typical_miss_points": 6.6,
+            "miss_of_the_mean_points": 8.8
+          },
+          "allies": {
+            "samples": 1276,
+            "value_loss": 0.0037,
+            "score_variance": 0.0086,
+            "explained": 0.574,
+            "policy_kl": 0.34,
+            "typical_miss_points": 6.1,
+            "miss_of_the_mean_points": 9.3
+          },
+          "comintern": {
+            "samples": 891,
+            "value_loss": 0.0035,
+            "score_variance": 0.007,
+            "explained": 0.495,
+            "policy_kl": 0.095,
+            "typical_miss_points": 5.9,
+            "miss_of_the_mean_points": 8.4
+          },
+          "all": {
+            "samples": 3041,
+            "value_loss": 0.0038,
+            "score_variance": 0.0079,
+            "explained": 0.516,
+            "policy_kl": 0.236,
+            "typical_miss_points": 6.2,
+            "miss_of_the_mean_points": 8.9
+          }
+        }
+      },
+      {
+        "hours": "5-6",
+        "network_updates": 22,
+        "games": 352,
+        "losses": {
+          "axis": {
+            "samples": 773,
+            "value_loss": 0.0035,
+            "score_variance": 0.0065,
+            "explained": 0.451,
+            "policy_kl": 0.242,
+            "typical_miss_points": 6.0,
+            "miss_of_the_mean_points": 8.0
+          },
+          "allies": {
+            "samples": 1017,
+            "value_loss": 0.0033,
+            "score_variance": 0.007,
+            "explained": 0.522,
+            "policy_kl": 0.393,
+            "typical_miss_points": 5.8,
+            "miss_of_the_mean_points": 8.4
+          },
+          "comintern": {
+            "samples": 750,
+            "value_loss": 0.0035,
+            "score_variance": 0.0066,
+            "explained": 0.479,
+            "policy_kl": 0.1,
+            "typical_miss_points": 5.9,
+            "miss_of_the_mean_points": 8.1
+          },
+          "all": {
+            "samples": 2540,
+            "value_loss": 0.0034,
+            "score_variance": 0.0067,
+            "explained": 0.49,
+            "policy_kl": 0.26,
+            "typical_miss_points": 5.9,
+            "miss_of_the_mean_points": 8.2
+          }
+        }
+      }
+    ],
+    "after_first_hour": {
+      "hours": "1-5.9",
+      "network_updates": 116,
+      "games": 1856,
+      "losses": {
+        "axis": {
+          "samples": 4081,
+          "value_loss": 0.0049,
+          "score_variance": 0.0095,
+          "explained": 0.488,
+          "policy_kl": 0.234,
+          "typical_miss_points": 7.0,
+          "miss_of_the_mean_points": 9.8
+        },
+        "allies": {
+          "samples": 5623,
+          "value_loss": 0.0042,
+          "score_variance": 0.0122,
+          "explained": 0.656,
+          "policy_kl": 0.37,
+          "typical_miss_points": 6.5,
+          "miss_of_the_mean_points": 11.1
+        },
+        "comintern": {
+          "samples": 3891,
+          "value_loss": 0.0043,
+          "score_variance": 0.0094,
+          "explained": 0.544,
+          "policy_kl": 0.103,
+          "typical_miss_points": 6.5,
+          "miss_of_the_mean_points": 9.7
+        },
+        "all": {
+          "samples": 13595,
+          "value_loss": 0.0044,
+          "score_variance": 0.0107,
+          "explained": 0.585,
+          "policy_kl": 0.253,
+          "typical_miss_points": 6.7,
+          "miss_of_the_mean_points": 10.3
+        }
+      }
+    }
+  },
+  "held_out_evaluation": {
+    "command": "studies/campaign/runs/training-2026-11-22/evaluations/evaluate.sh: studies.campaign.run evaluate --target all --seeds 1009,1013,1019,1021,1031,1033 --baseline-style balanced --simulations 64 --max-depth 16 --max-transitions 10000 --neural-device cpu, from the run's code folder, one CPU core; the control adds --target-script balanced",
+    "ran": "2026-11-22 17:58 to 18:55",
+    "players": {
+      "scripted balanced policy": {
+        "report": "studies/campaign/runs/training-2026-11-22/evaluations/scripted-balanced.json",
+        "model_versions": {
+          "allies": "allies:generation-141:1f35761aea9122563e069d9e56ed96625b1074d6b7eb2146e706c1b99cebd307",
+          "axis": "axis:generation-141:1f35761aea9122563e069d9e56ed96625b1074d6b7eb2146e706c1b99cebd307",
+          "comintern": "comintern:generation-141:1f35761aea9122563e069d9e56ed96625b1074d6b7eb2146e706c1b99cebd307"
+        },
+        "axis": {
+          "final_score_by_seed": {
+            "1009": 58.5,
+            "1013": 4.3,
+            "1019": 17.6,
+            "1021": 13.7,
+            "1031": 11.1,
+            "1033": 30.7
+          },
+          "final_score": {
+            "mean": 22.7,
+            "standard_error": 8.0,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 1129.2,
+          "land_battles_begun_per_game": 98.7,
+          "wall_seconds": 109,
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "campaign-active-baseline-v2:balanced"
+          }
+        },
+        "allies": {
+          "final_score_by_seed": {
+            "1009": -64.5,
+            "1013": -16.7,
+            "1019": -18.2,
+            "1021": -41.7,
+            "1031": -11.1,
+            "1033": -37.1
+          },
+          "final_score": {
+            "mean": -31.5,
+            "standard_error": 8.2,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 505.5,
+          "land_battles_begun_per_game": 98.7,
+          "wall_seconds": 111,
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "campaign-active-baseline-v2:balanced"
+          }
+        },
+        "comintern": {
+          "final_score_by_seed": {
+            "1009": -103.9,
+            "1013": -92.7,
+            "1019": -106.6,
+            "1021": -70.3,
+            "1031": -103.7,
+            "1033": -101.3
+          },
+          "final_score": {
+            "mean": -96.4,
+            "standard_error": 5.6,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 257.3,
+          "land_battles_begun_per_game": 98.7,
+          "wall_seconds": 114,
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "campaign-active-baseline-v2:balanced"
+          }
+        }
+      },
+      "generation 141": {
+        "report": "studies/campaign/runs/training-2026-11-22/evaluations/generation-000141.json",
+        "model_versions": {
+          "allies": "allies:generation-141:1f35761aea9122563e069d9e56ed96625b1074d6b7eb2146e706c1b99cebd307",
+          "axis": "axis:generation-141:1f35761aea9122563e069d9e56ed96625b1074d6b7eb2146e706c1b99cebd307",
+          "comintern": "comintern:generation-141:1f35761aea9122563e069d9e56ed96625b1074d6b7eb2146e706c1b99cebd307"
+        },
+        "axis": {
+          "final_score_by_seed": {
+            "1009": 47.1,
+            "1013": 36.5,
+            "1019": 46.7,
+            "1021": 56.9,
+            "1031": 74.3,
+            "1033": 53.1
+          },
+          "final_score": {
+            "mean": 52.4,
+            "standard_error": 5.2,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 239.8,
+          "land_battles_begun_per_game": 52.7,
+          "wall_seconds": 656,
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "000cc773e410c38844342f98b7190649bc6cadf9c8fec8f3d3fafd2ecdcb4426"
+          }
+        },
+        "allies": {
+          "final_score_by_seed": {
+            "1009": -67.6,
+            "1013": -73.2,
+            "1019": -77.3,
+            "1021": -85.3,
+            "1031": -113.0,
+            "1033": -73.5
+          },
+          "final_score": {
+            "mean": -81.7,
+            "standard_error": 6.7,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 215.5,
+          "land_battles_begun_per_game": 87.5,
+          "wall_seconds": 679,
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "000cc773e410c38844342f98b7190649bc6cadf9c8fec8f3d3fafd2ecdcb4426"
+          }
+        },
+        "comintern": {
+          "final_score_by_seed": {
+            "1009": -91.3,
+            "1013": -108.1,
+            "1019": -85.7,
+            "1021": -85.1,
+            "1031": -85.9,
+            "1033": -96.6
+          },
+          "final_score": {
+            "mean": -92.1,
+            "standard_error": 3.7,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 227.7,
+          "land_battles_begun_per_game": 74.8,
+          "wall_seconds": 674,
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "000cc773e410c38844342f98b7190649bc6cadf9c8fec8f3d3fafd2ecdcb4426"
+          }
+        }
+      },
+      "generation 0, untrained": {
+        "report": "studies/campaign/runs/training-2026-11-22/evaluations/generation-000000.json",
+        "model_versions": {
+          "allies": "allies:generation-0:29f8012a4d010f35502a3f74301a434cb8072f0431d9d3909c2cda2feb1be5cb",
+          "axis": "axis:generation-0:29f8012a4d010f35502a3f74301a434cb8072f0431d9d3909c2cda2feb1be5cb",
+          "comintern": "comintern:generation-0:29f8012a4d010f35502a3f74301a434cb8072f0431d9d3909c2cda2feb1be5cb"
+        },
+        "axis": {
+          "final_score_by_seed": {
+            "1009": 32.9,
+            "1013": 60.7,
+            "1019": 42.7,
+            "1021": 55.0,
+            "1031": 49.2,
+            "1033": 48.5
+          },
+          "final_score": {
+            "mean": 48.2,
+            "standard_error": 3.9,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 71.5,
+          "land_battles_begun_per_game": 64.0,
+          "wall_seconds": 262,
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "24f309eb0ee91ad2c3116a0a54f372a8bb8749681544a5724b1c414fcd1b4210"
+          }
+        },
+        "allies": {
+          "final_score_by_seed": {
+            "1009": -68.0,
+            "1013": -67.2,
+            "1019": -86.1,
+            "1021": -70.1,
+            "1031": -71.9,
+            "1033": -88.1
+          },
+          "final_score": {
+            "mean": -75.2,
+            "standard_error": 3.8,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 73.5,
+          "land_battles_begun_per_game": 82.0,
+          "wall_seconds": 284,
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "24f309eb0ee91ad2c3116a0a54f372a8bb8749681544a5724b1c414fcd1b4210"
+          }
+        },
+        "comintern": {
+          "final_score_by_seed": {
+            "1009": -91.8,
+            "1013": -91.1,
+            "1019": -97.2,
+            "1021": -94.6,
+            "1031": -89.3,
+            "1033": -95.2
+          },
+          "final_score": {
+            "mean": -93.2,
+            "standard_error": 1.2,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 120.2,
+          "land_battles_begun_per_game": 75.2,
+          "wall_seconds": 443,
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "24f309eb0ee91ad2c3116a0a54f372a8bb8749681544a5724b1c414fcd1b4210"
+          }
+        }
+      }
+    },
+    "paired_differences": {
+      "generation 141 minus scripted balanced policy, axis": {
+        "mean": 29.8,
+        "standard_error": 10.1,
+        "higher_on_seeds": 5,
+        "seeds": 6
+      },
+      "generation 141 minus scripted balanced policy, allies": {
+        "mean": -50.1,
+        "standard_error": 13.2,
+        "higher_on_seeds": 0,
+        "seeds": 6
+      },
+      "generation 141 minus scripted balanced policy, comintern": {
+        "mean": 4.3,
+        "standard_error": 6.5,
+        "higher_on_seeds": 4,
+        "seeds": 6
+      },
+      "generation 141 minus generation 0, untrained, axis": {
+        "mean": 4.3,
+        "standard_error": 6.7,
+        "higher_on_seeds": 5,
+        "seeds": 6
+      },
+      "generation 141 minus generation 0, untrained, allies": {
+        "mean": -6.4,
+        "standard_error": 8.2,
+        "higher_on_seeds": 3,
+        "seeds": 6
+      },
+      "generation 141 minus generation 0, untrained, comintern": {
+        "mean": 1.1,
+        "standard_error": 4.2,
+        "higher_on_seeds": 4,
+        "seeds": 6
+      },
+      "generation 0, untrained minus scripted balanced policy, axis": {
+        "mean": 25.5,
+        "standard_error": 11.6,
+        "higher_on_seeds": 5,
+        "seeds": 6
+      },
+      "generation 0, untrained minus scripted balanced policy, allies": {
+        "mean": -43.7,
+        "standard_error": 9.7,
+        "higher_on_seeds": 0,
+        "seeds": 6
+      },
+      "generation 0, untrained minus scripted balanced policy, comintern": {
+        "mean": 3.2,
+        "standard_error": 5.8,
+        "higher_on_seeds": 5,
+        "seeds": 6
+      }
+    }
+  }
+}

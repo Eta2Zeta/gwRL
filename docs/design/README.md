@@ -3805,6 +3805,11 @@ for the scripted Axis with 1,118. After 3.7 hours of training the two runs' Axis
 networks made 856 and 780 decisions a game and scored +6.5 and +8.3, 33.2 ± 5.2
 and 33.9 ± 4.1 points below their untrained networks
 ([record](../archive/records/one_network_comparison_2026_11_17.md#held-out-evaluation)).
+On 6 held-out seeds on 22 November, after 141 network updates under choice D of
+Q-016, the Axis network made 240 decisions a game and scored +52.4, 4.3 ± 6.7
+above its untrained network, which made 72 and scored +48.2, and 29.8 ± 10.1
+above the scripted Axis, which made 1,129
+([record](../archive/records/training_progress_2026_11_22.md#play-against-the-scripted-balanced-policy)).
 
 **Would settle it:** the owner's decision on the objective. A changed objective
 can be checked first with the same scripted comparison.
