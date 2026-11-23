@@ -1445,7 +1445,8 @@ std::vector<Action> AirRules::actions(const State &s) const {
             if (isAircraft(s, u) && movementController(s, u.owner) && marked(u.turnFlags, mark::blitz_eligible) &&
                 (fighter(s, u) || u.type == knownUnitTypes(s).tactical_bomber) && u.movementRemaining.value_or(0) > 0) {
                 for (const auto &zone : neighbors(s, u.zone))
-                    if (s.territories.contains(zone) && blitzPairValid(s, u, u.zone, zone)) {
+                    if (s.territories.contains(zone) && blitzPairValid(s, u, u.zone, zone) &&
+                        !friendlyLand(s, u.owner, zone)) {
                         std::vector<ZoneId> path{u.zone, zone};
                         if (!validateFlight(s, id, path, true, true).allowed)
                             continue;
@@ -1869,10 +1870,12 @@ void AirRules::apply(State &s, const Action &a) const {
         auto id = p.require("unit").asString();
         auto path = zoneNumbers(s, readIds(p.require("path")));
         require(validateFlight(s, id, path, true, true).allowed, "Invalid attack flight");
-        if (a.kind == "air_blitz")
+        if (a.kind == "air_blitz") {
             require(marked(s.units.at(id).turnFlags, mark::blitz_eligible) &&
                         blitzPairValid(s, s.units.at(id), path.front(), path.back()),
                     "Aircraft has no paired blitz path");
+            require(!friendlyLand(s, s.units.at(id).owner, path.back()), "Cannot blitz into friendly land");
+        }
         require(flightKeepsLanding(s, id, path), "No joint legal return landing plan");
         moveFlight(s, id, path);
         auto &u = s.units.at(id);

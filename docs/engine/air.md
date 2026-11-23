@@ -143,7 +143,7 @@ with them ([naval](naval.md#5-patrol-planes-and-ships)).
 | `air_choose_casualty` | Combat | the side that was hit |
 | `air_choose_rail_border`, `air_choose_technology_loss` | Combat | see [section 4](#4-strategic-bombing) |
 | `air_land` | Combat | the owner of the aircraft |
-| `air_blitz` | Combat | the attacker: a fighter or tactical bomber flies on with a [blitz](land_combat.md#5-special-cases) |
+| `air_blitz` | Combat | the attacker: a fighter or tactical bomber paired with armour follows it on a [blitz](land_combat.md#5-special-cases), before the armour's battle in the zone it entered is fought |
 | `air_fly`, `air_land_noncombat`, `air_end_patrol` | Noncombat Movement | the alliance of the nation whose turn it is |
 | `air_load`, `air_unload`, `air_allied_load`, `air_allied_unload` | Combat Movement, Noncombat Movement | the same alliance |
 | `air_failed_landing` | Combat Movement, Noncombat Movement | the owner of the aircraft |

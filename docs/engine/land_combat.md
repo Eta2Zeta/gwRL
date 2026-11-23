@@ -137,7 +137,13 @@ in them is eliminated (RCL-012).
 **Blitz.** If the attacker wins within two combat rounds, its armour may move
 on. The attacker pairs companions with each armour unit (`land_pair_blitz`,
 `land_finish_blitz_pairing`), and they follow it in a
-[blitz move](movement.md#2-the-ways-to-move).
+[blitz move](movement.md#2-the-ways-to-move), or with `air_blitz` for a fighter
+or tactical bomber ([air](air.md#7-the-kinds-of-action)). The armour's blitz into an enemy
+zone registers a battle there, even when the zone is empty. A companion can
+follow the armour only until that battle is fought: once the armour has taken
+the zone, the zone is friendly, and RB 10.5.1 (p64) forbids blitzing into a
+land zone that the blitzing nation or a politically friendly nation possesses
+(`friendlyLand` in `src/movement.cpp`).
 
 **Attrition.** Advanced Artillery that has not moved may bombard a neighbouring
 enemy zone without entering it (`land_declare_attrition`, in Combat Movement).

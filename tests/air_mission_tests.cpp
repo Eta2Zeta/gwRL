@@ -367,6 +367,36 @@ void pairedAircraftBlitz() {
             attackers.end(),
         "Aircraft blitz failed to join armor's pending battle");
 }
+// RB 10.5.1 (p64) forbids blitzing into a friendly-possessed land zone. When
+// the paired armour's battle in an empty zone has been fought before its
+// fighter follows, the zone is already the attacker's: the fighter stays, as a
+// land companion does, instead of failing in recordLandAttack.
+void noAircraftBlitzIntoCapturedZone() {
+  auto s = fixture(Phase::Combat);
+  add(s, "armor", "light_armor", "japan", beiping);
+  add(s, "fighter", "fighter", "japan", beiping);
+  auto &fighter = s.units.at("fighter");
+  fighter.turnFlags[mark::blitz_eligible] = 1;
+  fighter.commitments.insert(MarkKey(mark::blitz_with, "armor"));
+  auto &armor = s.units.at("armor");
+  armor.zone = zoneNumber(s, hopeh);
+  armor.commitments.insert(MarkKey(mark::blitz_from, beiping));
+  armor.commitments.insert(MarkKey(mark::blitz_to, hopeh));
+  const auto action = select(AirRules{}.actions(s), "air_blitz");
+  changePossession(s, zoneNumber(s, hopeh), nationNumber(s, "japan"), PossessionCause::Capture, nationNumber(s, "japan"));
+  const auto after = AirRules{}.actions(s);
+  check(std::none_of(after.begin(), after.end(),
+                     [](const auto &a) { return a.kind == "air_blitz"; }),
+        "Aircraft offered a blitz into the zone its armour already captured");
+  bool refused = false;
+  try {
+    AirRules{}.apply(s, action);
+  } catch (const std::runtime_error &e) {
+    refused = std::string(e.what()) == "Cannot blitz into friendly land";
+  }
+  check(refused && s.units.at("fighter").zone == zoneNumber(s, beiping),
+        "A stale blitz into the captured zone was not refused");
+}
 } // namespace
 int main() {
   try {
@@ -381,7 +411,8 @@ int main() {
     scrambleReturnAtPhaseEnd();
     immediatePatrolLandingLoss();
     pairedAircraftBlitz();
-    std::cout << "11 air mission fixture groups passed\n";
+    noAircraftBlitzIntoCapturedZone();
+    std::cout << "12 air mission fixture groups passed\n";
     return 0;
   } catch (const std::exception &e) {
     std::cerr << e.what() << '\n';

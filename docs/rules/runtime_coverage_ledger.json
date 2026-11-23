@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "scope": "Evidence index for all rows of the core rules ledger. A listed focused fixture exercises the named mechanic; it is not a claim that every clause or legal position has exhaustive coverage. Full initial-state campaign traces are separately recorded.",
-  "ledger_sha256": "9138929bdcce38cbed03a3b8c8930806e428345905ca7eb23f260594f8322b6f",
+  "ledger_sha256": "c04caa02bc996d430abddc8bbd4571d438ed9ab3652d3f70f586c3db6472b019",
   "evidence_file_sha256": {
-    "src/air.cpp": "da67c67781a738fa7f0ccabc00f79bc6b75a268f6d10d8be0f6f343ac84b942f",
+    "src/air.cpp": "9683ee2bf52f6ff8f8abf8ad4187b6e9a014cfbe2d971886a6cb4f840dc4eae3",
     "src/campaign_objective.cpp": "2bd3113cbe9d9f9923e53b473d83ef4a1eefd9dce0a9a9eeccac4abffea53541",
     "src/campaign_runtime.cpp": "6700efbf18ba8dc6c30ee4700dd63721c8898631590b2e5f48650efda003a890",
     "src/campaign_setup.cpp": "1a7db3e6958d657e4bed2a39dd765b782a76e4c26fadc721f188b9cbe9fd3502",
@@ -11,7 +11,7 @@
     "src/economy.cpp": "1e67f1044592a63393237be5fe79462e0cde70e068055d99518bf32cd0cb1d93",
     "src/economy_lendlease.cpp": "072712e5c80734056353b7aa3f3af9c450a92aa21f9a7481b97c58f5ffddf15a",
     "src/land_combat.cpp": "f7c9c984aaec30b0f7704b44f458af264fe695353d61451fbe4d81190e2bd1ea",
-    "src/movement.cpp": "145cf277ac37379d3a26791ac69b1dc5a056d17360df2819c299358eabc5bf9f",
+    "src/movement.cpp": "91d5f82f5a23139189b1577f1f0f634e0b5709695c28a7a6e25e0582d4bad175",
     "src/naval_combat.cpp": "febf83872c98152c43500d76596a551f78b52be3076d74a3b126336ab84b4bfb",
     "src/naval_movement.cpp": "624a6aff6bc5e0a661e64b6f357c02e1681c7ac2c69fd8312817ff248a0e5e5d",
     "src/naval_operations.cpp": "a44be18906ec4632d91eaa68db33aba09e926d10592fd4066a282071b079ff89",
@@ -20,7 +20,7 @@
     "src/politics_warlords.cpp": "ad77f9a0a1905187c32c08e05f39467f0752c3a3a6831b916120d2afc0a7d9fb",
     "tests/air_integration_tests.cpp": "8f5b94cdd6192cfd3e68907a2085376a32a5f7f633021d91359ad7030ad8c448",
     "tests/air_logistics_tests.cpp": "774247565026cdd6ea6dc7e91d07196e0198190aa90533d3b3e42ae3b82d84a8",
-    "tests/air_mission_tests.cpp": "215c27e4cd17d7b5892aa7e1aa6ea01ff2df79ba783be935ea29e80eddee9102",
+    "tests/air_mission_tests.cpp": "98a15e13bacda7bb6d36a074280f8f5cda7e8b8db4c1dcecbccc379c4a1a5c94",
     "tests/air_tests.cpp": "5dcdd88671c30b54ad11bfa9aeb377cfeef6e88ae1e02f850637d63ab974e067",
     "tests/campaign_env_tests.cpp": "b3270902ba72325de57e936aec18831f68a033f9ea1e7399c5f21e80b016896e",
     "tests/campaign_integration_tests.cpp": "6107e6f61a1498ab02e1a85f12b69ea2bf8d07a1675fbc55b7e69e5d78d7ee3e",
@@ -280,7 +280,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 627
+          "line": 629
         },
         {
           "file": "src/air.cpp",
@@ -333,7 +333,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 627
+          "line": 629
         }
       ],
       "fixtures": [
@@ -461,7 +461,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 627
+          "line": 629
         }
       ],
       "fixtures": [
@@ -510,7 +510,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 627
+          "line": 629
         },
         {
           "file": "src/land_combat.cpp",
@@ -571,7 +571,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 627
+          "line": 629
         }
       ],
       "fixtures": [
@@ -671,7 +671,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 627
+          "line": 629
         }
       ],
       "fixtures": [
@@ -733,7 +733,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 627
+          "line": 629
         }
       ],
       "fixtures": [
@@ -799,12 +799,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "supplyRoute",
-          "line": 1017
+          "line": 1019
         },
         {
           "file": "src/movement.cpp",
           "symbol": "inSupply",
-          "line": 1033
+          "line": 1035
         }
       ],
       "fixtures": [
@@ -2205,7 +2205,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2074
+          "line": 2077
         },
         {
           "file": "src/naval_combat.cpp",
@@ -2392,7 +2392,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/land_combat.cpp",
@@ -2696,12 +2696,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 627
+          "line": 629
         },
         {
           "file": "src/movement.cpp",
           "symbol": "validateFactoryRailRoute",
-          "line": 685
+          "line": 687
         },
         {
           "file": "src/naval_movement.cpp",
@@ -2762,12 +2762,12 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2074
+          "line": 2077
         },
         {
           "file": "src/land_combat.cpp",
@@ -3094,7 +3094,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "lendLeaseSupplyRoute",
-          "line": 1021
+          "line": 1023
         }
       ],
       "fixtures": [
@@ -3222,7 +3222,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 627
+          "line": 629
         }
       ],
       "fixtures": [
@@ -3374,7 +3374,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/land_combat.cpp",
@@ -3707,12 +3707,12 @@
         {
           "file": "src/movement.cpp",
           "symbol": "seaBlockaded",
-          "line": 814
+          "line": 816
         },
         {
           "file": "src/movement.cpp",
           "symbol": "facilityBlockaded",
-          "line": 820
+          "line": 822
         }
       ],
       "fixtures": [
@@ -4140,7 +4140,7 @@
     {
       "id": "R083",
       "source": "RB \u00a710.5.1 p64",
-      "contract": "R/C: blitz after <=2rounds with remaining movement; eligible armor/pairing; terrain/fortification/city/amphibious prohibitions per origin",
+      "contract": "R/C: blitz after <=2rounds with remaining movement; eligible armor/pairing; terrain/fortification/city/amphibious prohibitions per origin; no blitz into friendly-possessed land, so companions follow before the armor's new battle is fought",
       "acceptance_fixture": "Unit entering over fortified border cannot blitz although another attacking origin's unit may",
       "status": "runtime_and_executable_evidence_indexed",
       "handlers": [
@@ -4153,6 +4153,11 @@
           "file": "src/movement.cpp",
           "symbol": "blitzPairValid",
           "line": 436
+        },
+        {
+          "file": "src/movement.cpp",
+          "symbol": "friendlyLand",
+          "line": 451
         }
       ],
       "fixtures": [
@@ -4186,6 +4191,15 @@
             "Paired aircraft blitz did not consume its route and eligibility",
             "Aircraft blitz failed to join armor's pending battle"
           ]
+        },
+        {
+          "file": "tests/air_mission_tests.cpp",
+          "symbol": "noAircraftBlitzIntoCapturedZone",
+          "line": 374,
+          "behavior_assertions": [
+            "Aircraft offered a blitz into the zone its armour already captured",
+            "A stale blitz into the captured zone was not refused"
+          ]
         }
       ]
     },
@@ -4217,7 +4231,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         }
       ],
       "fixtures": [
@@ -4291,7 +4305,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/land_combat.cpp",
@@ -4381,7 +4395,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2074
+          "line": 2077
         }
       ],
       "fixtures": [
@@ -4430,7 +4444,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2074
+          "line": 2077
         }
       ],
       "fixtures": [
@@ -4467,7 +4481,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2074
+          "line": 2077
         }
       ],
       "fixtures": [
@@ -4498,7 +4512,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::applyChance",
-          "line": 2074
+          "line": 2077
         }
       ],
       "fixtures": [
@@ -4590,7 +4604,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/air.cpp",
@@ -4947,7 +4961,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 627
+          "line": 629
         }
       ],
       "fixtures": [
@@ -4991,7 +5005,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 627
+          "line": 629
         }
       ],
       "fixtures": [
@@ -5048,7 +5062,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/air.cpp",
@@ -5422,7 +5436,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "lendLeaseSupplyRoute",
-          "line": 1021
+          "line": 1023
         }
       ],
       "fixtures": [
@@ -5705,7 +5719,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "validateRoute",
-          "line": 627
+          "line": 629
         },
         {
           "file": "src/land_combat.cpp",
@@ -5980,7 +5994,7 @@
         {
           "file": "src/air.cpp",
           "symbol": "AirRules::apply",
-          "line": 1706
+          "line": 1707
         },
         {
           "file": "src/land_combat.cpp",
@@ -6044,7 +6058,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "navalFacilityUsable",
-          "line": 826
+          "line": 828
         }
       ],
       "fixtures": [
@@ -6192,7 +6206,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "navalFacilityUsable",
-          "line": 826
+          "line": 828
         }
       ],
       "fixtures": [
@@ -6263,7 +6277,7 @@
         {
           "file": "src/movement.cpp",
           "symbol": "navalFacilityUsable",
-          "line": 826
+          "line": 828
         }
       ],
       "fixtures": [

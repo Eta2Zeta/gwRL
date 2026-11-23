@@ -75,6 +75,10 @@ RouteResult validateFactoryRailRoute(const State &, const Id &facility,
                                      const std::vector<ZoneId> &path);
 bool blitzPairValid(const State &, const UnitState &, ZoneId from,
                     ZoneId to);
+// Whether a land zone is possessed by the nation or by a nation politically
+// friendly to it. RB 10.5.1 (p64) forbids blitzing into such a zone: once the
+// paired armour's battle has captured its target, no companion follows it there.
+bool friendlyLand(const State &, NationId nation, ZoneId zone);
 
 std::vector<ZoneId> navalFacilitySeaZones(const State &, const Id &facility);
 bool seaBlockaded(const State &, NationId nation, ZoneId sea);

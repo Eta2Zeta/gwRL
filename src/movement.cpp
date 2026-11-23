@@ -448,6 +448,10 @@ bool blitzPairValid(const State &s, const UnitState &u, ZoneId from,
     }
   return false;
 }
+bool friendlyLand(const State &s, NationId nation, ZoneId zone) {
+  const auto owner = s.territories.at(zone).possessor;
+  return owner && (*owner == nation || politicallyFriendly(s, nation, *owner));
+}
 
 static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
   RouteResult out;
@@ -555,9 +559,7 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
     } else {
       if (!landAccess(s, u.owner, b, r.combat))
         return fail("Land access is prohibited");
-      const auto owner = s.territories.at(b).possessor;
-      const bool friendly = owner && (*owner == u.owner ||
-                                      politicallyFriendly(s, u.owner, *owner));
+      const bool friendly = friendlyLand(s, u.owner, b);
       if (!friendly && i + 1 < r.path.size())
         return fail("Enemy land ends ordinary movement; resolve combat before "
                     "blitzing");
