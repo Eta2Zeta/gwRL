@@ -1,0 +1,4826 @@
+{
+  "record": "training_land_weighted_2026_11_23",
+  "run_folder": "studies/campaign/runs/training-land-weighted-2026-11-22/1-memory-checked",
+  "commit": "1101c2e",
+  "at_network_update": {
+    "network_update": 197,
+    "time": "2026-11-23 05:57",
+    "hours_of_play": 9.69,
+    "counters": {
+      "batches": 196,
+      "chance_events": 318638,
+      "decisions": 2690295,
+      "episodes": 3152,
+      "transitions": 3008933,
+      "updates": 197
+    },
+    "network_evaluations": 38294676
+  },
+  "wealth_at_start": {
+    "source": "CampaignEnv.wealth() at the start of a game, the same for every seed",
+    "allies": {
+      "income_rate": 6,
+      "infrastructure": 25,
+      "land_zones": 5,
+      "paid_construction": 0,
+      "treasury": 6,
+      "units": 33,
+      "wealth": 14.2
+    },
+    "axis": {
+      "income_rate": 15,
+      "infrastructure": 156,
+      "land_zones": 11,
+      "paid_construction": 10,
+      "treasury": 15,
+      "units": 329,
+      "wealth": 51.5
+    },
+    "comintern": {
+      "income_rate": 2,
+      "infrastructure": 2,
+      "land_zones": 5,
+      "paid_construction": 0,
+      "treasury": 2,
+      "units": 20,
+      "wealth": 8.2
+    }
+  },
+  "self_play_by_20_network_updates": [
+    {
+      "network_updates": "1-20",
+      "games": 320,
+      "median_decisions": 699.0,
+      "land_battles_begun_per_game": 7.5,
+      "final_scores": {
+        "axis": {
+          "mean": 18.6,
+          "standard_error": 0.6,
+          "n": 320
+        },
+        "allies": {
+          "mean": -44.9,
+          "standard_error": 0.5,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -76.2,
+          "standard_error": 0.5,
+          "n": 320
+        }
+      },
+      "land_zones_at_game_end": {
+        "axis": 11.78,
+        "allies": 9.41,
+        "comintern": 6.35
+      },
+      "wealth_at_game_end": {
+        "axis": {
+          "wealth": 60.54,
+          "land_zones": 11.78,
+          "income_rate": 15.43,
+          "units": 382.27,
+          "infrastructure": 161.28,
+          "treasury": 71.67,
+          "paid_construction": 51.35
+        },
+        "allies": {
+          "wealth": 28.8,
+          "land_zones": 9.41,
+          "income_rate": 9.31,
+          "units": 136.13,
+          "infrastructure": 38.72,
+          "treasury": 22.72,
+          "paid_construction": 4.08
+        },
+        "comintern": {
+          "wealth": 13.12,
+          "land_zones": 6.35,
+          "income_rate": 3.18,
+          "units": 58.62,
+          "infrastructure": 6.87,
+          "treasury": 5.93,
+          "paid_construction": 0.12
+        }
+      }
+    },
+    {
+      "network_updates": "21-40",
+      "games": 320,
+      "median_decisions": 878.0,
+      "land_battles_begun_per_game": 15.5,
+      "final_scores": {
+        "axis": {
+          "mean": 18.4,
+          "standard_error": 0.6,
+          "n": 320
+        },
+        "allies": {
+          "mean": -44.6,
+          "standard_error": 0.5,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -73.6,
+          "standard_error": 0.5,
+          "n": 320
+        }
+      },
+      "land_zones_at_game_end": {
+        "axis": 11.78,
+        "allies": 8.95,
+        "comintern": 6.91
+      },
+      "wealth_at_game_end": {
+        "axis": {
+          "wealth": 59.09,
+          "land_zones": 11.78,
+          "income_rate": 15.56,
+          "units": 376.43,
+          "infrastructure": 165.52,
+          "treasury": 51.97,
+          "paid_construction": 41.27
+        },
+        "allies": {
+          "wealth": 27.62,
+          "land_zones": 8.95,
+          "income_rate": 9.12,
+          "units": 120.72,
+          "infrastructure": 35.78,
+          "treasury": 31.38,
+          "paid_construction": 2.89
+        },
+        "comintern": {
+          "wealth": 13.11,
+          "land_zones": 6.91,
+          "income_rate": 3.35,
+          "units": 44.96,
+          "infrastructure": 8.1,
+          "treasury": 3.99,
+          "paid_construction": 0.02
+        }
+      }
+    },
+    {
+      "network_updates": "41-60",
+      "games": 320,
+      "median_decisions": 797.0,
+      "land_battles_begun_per_game": 19.0,
+      "final_scores": {
+        "axis": {
+          "mean": 18.7,
+          "standard_error": 0.7,
+          "n": 320
+        },
+        "allies": {
+          "mean": -43.3,
+          "standard_error": 0.7,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -73.4,
+          "standard_error": 0.6,
+          "n": 320
+        }
+      },
+      "land_zones_at_game_end": {
+        "axis": 11.64,
+        "allies": 9.13,
+        "comintern": 6.52
+      },
+      "wealth_at_game_end": {
+        "axis": {
+          "wealth": 58.33,
+          "land_zones": 11.64,
+          "income_rate": 15.49,
+          "units": 387.45,
+          "infrastructure": 164.49,
+          "treasury": 24.58,
+          "paid_construction": 47.55
+        },
+        "allies": {
+          "wealth": 27.32,
+          "land_zones": 9.13,
+          "income_rate": 9.2,
+          "units": 116.58,
+          "infrastructure": 37.7,
+          "treasury": 21.3,
+          "paid_construction": 4.19
+        },
+        "comintern": {
+          "wealth": 12.29,
+          "land_zones": 6.52,
+          "income_rate": 3.07,
+          "units": 42.83,
+          "infrastructure": 7.65,
+          "treasury": 3.67,
+          "paid_construction": 0.11
+        }
+      }
+    },
+    {
+      "network_updates": "61-80",
+      "games": 320,
+      "median_decisions": 668.5,
+      "land_battles_begun_per_game": 16.6,
+      "final_scores": {
+        "axis": {
+          "mean": 21.4,
+          "standard_error": 0.5,
+          "n": 320
+        },
+        "allies": {
+          "mean": -44.2,
+          "standard_error": 0.7,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -75.1,
+          "standard_error": 0.6,
+          "n": 320
+        }
+      },
+      "land_zones_at_game_end": {
+        "axis": 11.77,
+        "allies": 8.98,
+        "comintern": 6.15
+      },
+      "wealth_at_game_end": {
+        "axis": {
+          "wealth": 59.64,
+          "land_zones": 11.77,
+          "income_rate": 15.46,
+          "units": 396.52,
+          "infrastructure": 167.02,
+          "treasury": 27.56,
+          "paid_construction": 57.3
+        },
+        "allies": {
+          "wealth": 26.88,
+          "land_zones": 8.98,
+          "income_rate": 9.17,
+          "units": 124.98,
+          "infrastructure": 35.88,
+          "treasury": 11.57,
+          "paid_construction": 2.18
+        },
+        "comintern": {
+          "wealth": 11.41,
+          "land_zones": 6.15,
+          "income_rate": 2.75,
+          "units": 40.69,
+          "infrastructure": 5.93,
+          "treasury": 3.33,
+          "paid_construction": 0.09
+        }
+      }
+    },
+    {
+      "network_updates": "81-100",
+      "games": 320,
+      "median_decisions": 651.5,
+      "land_battles_begun_per_game": 17.5,
+      "final_scores": {
+        "axis": {
+          "mean": 22.6,
+          "standard_error": 0.5,
+          "n": 320
+        },
+        "allies": {
+          "mean": -44.9,
+          "standard_error": 0.7,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -74.5,
+          "standard_error": 0.6,
+          "n": 320
+        }
+      },
+      "land_zones_at_game_end": {
+        "axis": 11.7,
+        "allies": 8.64,
+        "comintern": 6.07
+      },
+      "wealth_at_game_end": {
+        "axis": {
+          "wealth": 59.71,
+          "land_zones": 11.7,
+          "income_rate": 15.47,
+          "units": 377.43,
+          "infrastructure": 167.59,
+          "treasury": 49.54,
+          "paid_construction": 56.18
+        },
+        "allies": {
+          "wealth": 25.95,
+          "land_zones": 8.64,
+          "income_rate": 9.12,
+          "units": 116.18,
+          "infrastructure": 36.05,
+          "treasury": 10.72,
+          "paid_construction": 0.91
+        },
+        "comintern": {
+          "wealth": 11.16,
+          "land_zones": 6.07,
+          "income_rate": 2.62,
+          "units": 40.44,
+          "infrastructure": 5.76,
+          "treasury": 3.09,
+          "paid_construction": 0.1
+        }
+      }
+    },
+    {
+      "network_updates": "101-120",
+      "games": 320,
+      "median_decisions": 639.5,
+      "land_battles_begun_per_game": 16.8,
+      "final_scores": {
+        "axis": {
+          "mean": 23.9,
+          "standard_error": 0.4,
+          "n": 320
+        },
+        "allies": {
+          "mean": -44.5,
+          "standard_error": 0.5,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -75.3,
+          "standard_error": 0.5,
+          "n": 320
+        }
+      },
+      "land_zones_at_game_end": {
+        "axis": 11.67,
+        "allies": 8.5,
+        "comintern": 5.71
+      },
+      "wealth_at_game_end": {
+        "axis": {
+          "wealth": 59.87,
+          "land_zones": 11.67,
+          "income_rate": 15.32,
+          "units": 393.81,
+          "infrastructure": 167.37,
+          "treasury": 48.92,
+          "paid_construction": 47.52
+        },
+        "allies": {
+          "wealth": 25.69,
+          "land_zones": 8.5,
+          "income_rate": 9.3,
+          "units": 111.67,
+          "infrastructure": 36.0,
+          "treasury": 9.91,
+          "paid_construction": 0.33
+        },
+        "comintern": {
+          "wealth": 10.29,
+          "land_zones": 5.71,
+          "income_rate": 2.35,
+          "units": 36.83,
+          "infrastructure": 4.69,
+          "treasury": 2.91,
+          "paid_construction": 0.11
+        }
+      }
+    },
+    {
+      "network_updates": "121-140",
+      "games": 320,
+      "median_decisions": 707.5,
+      "land_battles_begun_per_game": 19.6,
+      "final_scores": {
+        "axis": {
+          "mean": 22.6,
+          "standard_error": 0.4,
+          "n": 320
+        },
+        "allies": {
+          "mean": -44.9,
+          "standard_error": 0.6,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -73.3,
+          "standard_error": 0.5,
+          "n": 320
+        }
+      },
+      "land_zones_at_game_end": {
+        "axis": 11.69,
+        "allies": 8.46,
+        "comintern": 6.08
+      },
+      "wealth_at_game_end": {
+        "axis": {
+          "wealth": 59.06,
+          "land_zones": 11.69,
+          "income_rate": 15.22,
+          "units": 381.5,
+          "infrastructure": 164.58,
+          "treasury": 44.48,
+          "paid_construction": 52.25
+        },
+        "allies": {
+          "wealth": 25.31,
+          "land_zones": 8.46,
+          "income_rate": 9.21,
+          "units": 106.63,
+          "infrastructure": 35.91,
+          "treasury": 9.74,
+          "paid_construction": 0.47
+        },
+        "comintern": {
+          "wealth": 11.11,
+          "land_zones": 6.08,
+          "income_rate": 2.61,
+          "units": 39.88,
+          "infrastructure": 5.43,
+          "treasury": 3.06,
+          "paid_construction": 0.08
+        }
+      }
+    },
+    {
+      "network_updates": "141-160",
+      "games": 320,
+      "median_decisions": 741.0,
+      "land_battles_begun_per_game": 19.5,
+      "final_scores": {
+        "axis": {
+          "mean": 22.9,
+          "standard_error": 0.5,
+          "n": 320
+        },
+        "allies": {
+          "mean": -43.7,
+          "standard_error": 0.7,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -73.7,
+          "standard_error": 0.5,
+          "n": 320
+        }
+      },
+      "land_zones_at_game_end": {
+        "axis": 11.62,
+        "allies": 8.69,
+        "comintern": 5.75
+      },
+      "wealth_at_game_end": {
+        "axis": {
+          "wealth": 58.73,
+          "land_zones": 11.62,
+          "income_rate": 15.13,
+          "units": 365.98,
+          "infrastructure": 162.31,
+          "treasury": 66.18,
+          "paid_construction": 44.94
+        },
+        "allies": {
+          "wealth": 25.44,
+          "land_zones": 8.69,
+          "income_rate": 9.33,
+          "units": 100.75,
+          "infrastructure": 37.03,
+          "treasury": 9.98,
+          "paid_construction": 0.64
+        },
+        "comintern": {
+          "wealth": 10.43,
+          "land_zones": 5.75,
+          "income_rate": 2.45,
+          "units": 36.7,
+          "infrastructure": 4.94,
+          "treasury": 2.9,
+          "paid_construction": 0.1
+        }
+      }
+    },
+    {
+      "network_updates": "161-180",
+      "games": 320,
+      "median_decisions": 922.5,
+      "land_battles_begun_per_game": 22.4,
+      "final_scores": {
+        "axis": {
+          "mean": 22.4,
+          "standard_error": 0.6,
+          "n": 320
+        },
+        "allies": {
+          "mean": -43.0,
+          "standard_error": 0.8,
+          "n": 320
+        },
+        "comintern": {
+          "mean": -75.0,
+          "standard_error": 0.6,
+          "n": 320
+        }
+      },
+      "land_zones_at_game_end": {
+        "axis": 11.78,
+        "allies": 9.3,
+        "comintern": 5.54
+      },
+      "wealth_at_game_end": {
+        "axis": {
+          "wealth": 59.03,
+          "land_zones": 11.78,
+          "income_rate": 15.75,
+          "units": 366.37,
+          "infrastructure": 162.37,
+          "treasury": 52.23,
+          "paid_construction": 49.03
+        },
+        "allies": {
+          "wealth": 26.3,
+          "land_zones": 9.3,
+          "income_rate": 9.51,
+          "units": 100.21,
+          "infrastructure": 38.55,
+          "treasury": 9.99,
+          "paid_construction": 0.98
+        },
+        "comintern": {
+          "wealth": 10.32,
+          "land_zones": 5.54,
+          "income_rate": 2.47,
+          "units": 37.91,
+          "infrastructure": 5.2,
+          "treasury": 2.98,
+          "paid_construction": 0.17
+        }
+      }
+    },
+    {
+      "network_updates": "181-197",
+      "games": 272,
+      "median_decisions": 814.0,
+      "land_battles_begun_per_game": 22.4,
+      "final_scores": {
+        "axis": {
+          "mean": 22.9,
+          "standard_error": 0.5,
+          "n": 272
+        },
+        "allies": {
+          "mean": -44.1,
+          "standard_error": 0.8,
+          "n": 272
+        },
+        "comintern": {
+          "mean": -73.8,
+          "standard_error": 0.7,
+          "n": 272
+        }
+      },
+      "land_zones_at_game_end": {
+        "axis": 11.56,
+        "allies": 8.91,
+        "comintern": 5.75
+      },
+      "wealth_at_game_end": {
+        "axis": {
+          "wealth": 58.94,
+          "land_zones": 11.56,
+          "income_rate": 15.2,
+          "units": 372.18,
+          "infrastructure": 160.99,
+          "treasury": 65.12,
+          "paid_construction": 45.31
+        },
+        "allies": {
+          "wealth": 25.44,
+          "land_zones": 8.91,
+          "income_rate": 9.53,
+          "units": 90.41,
+          "infrastructure": 39.11,
+          "treasury": 10.08,
+          "paid_construction": 0.44
+        },
+        "comintern": {
+          "wealth": 10.61,
+          "land_zones": 5.75,
+          "income_rate": 2.42,
+          "units": 40.0,
+          "infrastructure": 5.6,
+          "treasury": 2.95,
+          "paid_construction": 0.13
+        }
+      }
+    }
+  ],
+  "self_play_games_rebuilt_at_0607": {
+    "method": "self_play_japan.py and self_play_battles.py replay, without searching, the move logs of the 16 games in play at 06:07 on 23 November (self-play-moves/), each to the last game round it had reached",
+    "game_rounds_reached": [
+      10,
+      11,
+      9,
+      10,
+      8,
+      9,
+      8,
+      7,
+      6,
+      2,
+      4,
+      3,
+      2,
+      2,
+      2,
+      2
+    ],
+    "land_battles_begun_by_nation": {
+      "kmt": 95,
+      "ccp": 46,
+      "japan": 15,
+      "mongolia": 2
+    },
+    "possession_changes": {
+      "a warlord to kmt": 33,
+      "a warlord to ccp": 12,
+      "a warlord to dadao": 8,
+      "kmt to ccp": 7,
+      "ccp to kmt": 7,
+      "mongolia to japan": 3,
+      "dadao to kmt": 3,
+      "japan to kmt": 2,
+      "japan to mongolia": 1,
+      "mongolia to kmt": 1
+    },
+    "units_moved_to_attack_by_nation_and_zone": {
+      "ccp into land_china_szechwan": 50,
+      "kmt into land_china_szechwan": 46,
+      "kmt into land_china_shensi": 44,
+      "kmt into land_china_suiyuan": 37,
+      "kmt into land_manchuria_rehe": 31,
+      "kmt into land_china_hopeh": 28,
+      "kmt into land_china_beiping": 17,
+      "ccp into land_china_hopeh": 11,
+      "ccp into land_china_suiyuan": 7,
+      "kmt into land_mongolia_central_mongolia": 5,
+      "ccp into land_china_tsinghai": 4,
+      "japan into land_manchuria_western": 4,
+      "kmt into land_china_kweichow": 4,
+      "ccp into land_manchuria_rehe": 3,
+      "japan into land_china_beiping": 3,
+      "japan into land_mongolia_kerulen": 3,
+      "japan into land_mongolia_central_mongolia": 2,
+      "kmt into land_manchuria_western": 2,
+      "ccp into land_china_hunan": 1,
+      "kmt into land_mongolia_ulyassutai": 1,
+      "ccp into land_china_kweichow": 1,
+      "mongolia into land_manchuria_rehe": 1,
+      "mongolia into land_manchuria_western": 1,
+      "dadao into land_china_hopeh": 1,
+      "japan into land_manchuria_rehe": 1
+    },
+    "japan": [
+      {
+        "log": "game-3179-seed-441548112435554217.jsonl",
+        "game_rounds_reached": 10,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3181-seed-8915352499309735518.jsonl",
+        "game_rounds_reached": 11,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3185-seed-3356053837445831971.jsonl",
+        "game_rounds_reached": 9,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3186-seed-4161887202423780142.jsonl",
+        "game_rounds_reached": 10,
+        "land_battles_begun_by_game_round": {
+          "1": 1,
+          "4": 6,
+          "5": 3,
+          "6": 1,
+          "7": 1,
+          "8": 1
+        },
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3188-seed-6216688015968167789.jsonl",
+        "game_rounds_reached": 8,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3191-seed-8544714263267614109.jsonl",
+        "game_rounds_reached": 9,
+        "land_battles_begun_by_game_round": {
+          "3": 1,
+          "7": 1
+        },
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3193-seed-2411593842500162770.jsonl",
+        "game_rounds_reached": 8,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3195-seed-3927508589109742049.jsonl",
+        "game_rounds_reached": 7,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3196-seed-920088234083436100.jsonl",
+        "game_rounds_reached": 6,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3197-seed-2775436614927781849.jsonl",
+        "game_rounds_reached": 2,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3198-seed-8270457085159706144.jsonl",
+        "game_rounds_reached": 4,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3199-seed-579872216568966554.jsonl",
+        "game_rounds_reached": 3,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3200-seed-4998557693280688367.jsonl",
+        "game_rounds_reached": 2,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3201-seed-1716914017562657991.jsonl",
+        "game_rounds_reached": 2,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3202-seed-2782447696981886196.jsonl",
+        "game_rounds_reached": 2,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      },
+      {
+        "log": "game-3203-seed-2037634884311465894.jsonl",
+        "game_rounds_reached": 2,
+        "land_battles_begun_by_game_round": {},
+        "chinese_zones_held_at_last_round": []
+      }
+    ]
+  },
+  "failed_games": [
+    {
+      "batch": 82,
+      "failure": "FailedMoveError: Cannot attack one's own possession",
+      "moves": "game-moves/game-1316-seed-6826777815930024147.jsonl",
+      "position": "failed-positions/game-1316-seed-6826777815930024147.json",
+      "root": 1316,
+      "seconds": 185.28299904207233,
+      "seed": 6826777815930024147,
+      "slot": 13
+    }
+  ],
+  "failed_move_replay": {
+    "tool": "tools/replay_failed_move.py",
+    "with_the_run_code": "same_failure",
+    "with_commit_f7b7c2d": "move_not_offered"
+  },
+  "fresh_game_losses": {
+    "source": "tools/compare_training_runs.py --run land=studies/campaign/runs/training-land-weighted-2026-11-22/1-memory-checked, run at network update 197",
+    "hours": [
+      {
+        "hours": "0-1",
+        "network_updates": 21,
+        "games": 336,
+        "losses": {
+          "axis": {
+            "samples": 909,
+            "value_loss": 0.0193,
+            "score_variance": 0.0119,
+            "explained": -0.614,
+            "policy_kl": 0.33,
+            "typical_miss_points": 13.9,
+            "miss_of_the_mean_points": 10.9
+          },
+          "allies": {
+            "samples": 898,
+            "value_loss": 0.0138,
+            "score_variance": 0.0109,
+            "explained": -0.268,
+            "policy_kl": 0.629,
+            "typical_miss_points": 11.7,
+            "miss_of_the_mean_points": 10.4
+          },
+          "comintern": {
+            "samples": 745,
+            "value_loss": 0.0174,
+            "score_variance": 0.01,
+            "explained": -0.737,
+            "policy_kl": 0.093,
+            "typical_miss_points": 13.2,
+            "miss_of_the_mean_points": 10.0
+          },
+          "all": {
+            "samples": 2552,
+            "value_loss": 0.0168,
+            "score_variance": 0.0111,
+            "explained": -0.515,
+            "policy_kl": 0.366,
+            "typical_miss_points": 13.0,
+            "miss_of_the_mean_points": 10.5
+          }
+        }
+      },
+      {
+        "hours": "1-2",
+        "network_updates": 20,
+        "games": 320,
+        "losses": {
+          "axis": {
+            "samples": 1429,
+            "value_loss": 0.0085,
+            "score_variance": 0.0105,
+            "explained": 0.191,
+            "policy_kl": 0.435,
+            "typical_miss_points": 9.2,
+            "miss_of_the_mean_points": 10.3
+          },
+          "allies": {
+            "samples": 640,
+            "value_loss": 0.008,
+            "score_variance": 0.011,
+            "explained": 0.272,
+            "policy_kl": 0.456,
+            "typical_miss_points": 8.9,
+            "miss_of_the_mean_points": 10.5
+          },
+          "comintern": {
+            "samples": 810,
+            "value_loss": 0.0081,
+            "score_variance": 0.0104,
+            "explained": 0.222,
+            "policy_kl": 0.141,
+            "typical_miss_points": 9.0,
+            "miss_of_the_mean_points": 10.2
+          },
+          "all": {
+            "samples": 2879,
+            "value_loss": 0.0083,
+            "score_variance": 0.0106,
+            "explained": 0.22,
+            "policy_kl": 0.357,
+            "typical_miss_points": 9.1,
+            "miss_of_the_mean_points": 10.3
+          }
+        }
+      },
+      {
+        "hours": "2-3",
+        "network_updates": 18,
+        "games": 288,
+        "losses": {
+          "axis": {
+            "samples": 1402,
+            "value_loss": 0.0146,
+            "score_variance": 0.0177,
+            "explained": 0.176,
+            "policy_kl": 0.414,
+            "typical_miss_points": 12.1,
+            "miss_of_the_mean_points": 13.3
+          },
+          "allies": {
+            "samples": 565,
+            "value_loss": 0.0103,
+            "score_variance": 0.0153,
+            "explained": 0.326,
+            "policy_kl": 0.359,
+            "typical_miss_points": 10.1,
+            "miss_of_the_mean_points": 12.4
+          },
+          "comintern": {
+            "samples": 695,
+            "value_loss": 0.0105,
+            "score_variance": 0.0143,
+            "explained": 0.267,
+            "policy_kl": 0.152,
+            "typical_miss_points": 10.2,
+            "miss_of_the_mean_points": 12.0
+          },
+          "all": {
+            "samples": 2662,
+            "value_loss": 0.0126,
+            "score_variance": 0.0164,
+            "explained": 0.233,
+            "policy_kl": 0.334,
+            "typical_miss_points": 11.2,
+            "miss_of_the_mean_points": 12.8
+          }
+        }
+      },
+      {
+        "hours": "3-4",
+        "network_updates": 22,
+        "games": 352,
+        "losses": {
+          "axis": {
+            "samples": 1369,
+            "value_loss": 0.0113,
+            "score_variance": 0.0158,
+            "explained": 0.282,
+            "policy_kl": 0.343,
+            "typical_miss_points": 10.6,
+            "miss_of_the_mean_points": 12.6
+          },
+          "allies": {
+            "samples": 754,
+            "value_loss": 0.0096,
+            "score_variance": 0.016,
+            "explained": 0.404,
+            "policy_kl": 0.338,
+            "typical_miss_points": 9.8,
+            "miss_of_the_mean_points": 12.7
+          },
+          "comintern": {
+            "samples": 839,
+            "value_loss": 0.0061,
+            "score_variance": 0.011,
+            "explained": 0.442,
+            "policy_kl": 0.181,
+            "typical_miss_points": 7.8,
+            "miss_of_the_mean_points": 10.5
+          },
+          "all": {
+            "samples": 2962,
+            "value_loss": 0.0094,
+            "score_variance": 0.0147,
+            "explained": 0.359,
+            "policy_kl": 0.296,
+            "typical_miss_points": 9.7,
+            "miss_of_the_mean_points": 12.1
+          }
+        }
+      },
+      {
+        "hours": "4-5",
+        "network_updates": 23,
+        "games": 368,
+        "losses": {
+          "axis": {
+            "samples": 1156,
+            "value_loss": 0.0119,
+            "score_variance": 0.0154,
+            "explained": 0.228,
+            "policy_kl": 0.305,
+            "typical_miss_points": 10.9,
+            "miss_of_the_mean_points": 12.4
+          },
+          "allies": {
+            "samples": 889,
+            "value_loss": 0.0119,
+            "score_variance": 0.0164,
+            "explained": 0.274,
+            "policy_kl": 0.296,
+            "typical_miss_points": 10.9,
+            "miss_of_the_mean_points": 12.8
+          },
+          "comintern": {
+            "samples": 844,
+            "value_loss": 0.007,
+            "score_variance": 0.0097,
+            "explained": 0.282,
+            "policy_kl": 0.143,
+            "typical_miss_points": 8.4,
+            "miss_of_the_mean_points": 9.9
+          },
+          "all": {
+            "samples": 2889,
+            "value_loss": 0.0105,
+            "score_variance": 0.0142,
+            "explained": 0.261,
+            "policy_kl": 0.255,
+            "typical_miss_points": 10.2,
+            "miss_of_the_mean_points": 11.9
+          }
+        }
+      },
+      {
+        "hours": "5-6",
+        "network_updates": 25,
+        "games": 400,
+        "losses": {
+          "axis": {
+            "samples": 1183,
+            "value_loss": 0.0086,
+            "score_variance": 0.0131,
+            "explained": 0.344,
+            "policy_kl": 0.303,
+            "typical_miss_points": 9.3,
+            "miss_of_the_mean_points": 11.5
+          },
+          "allies": {
+            "samples": 915,
+            "value_loss": 0.0063,
+            "score_variance": 0.0098,
+            "explained": 0.353,
+            "policy_kl": 0.314,
+            "typical_miss_points": 7.9,
+            "miss_of_the_mean_points": 9.9
+          },
+          "comintern": {
+            "samples": 957,
+            "value_loss": 0.0057,
+            "score_variance": 0.0085,
+            "explained": 0.335,
+            "policy_kl": 0.133,
+            "typical_miss_points": 7.5,
+            "miss_of_the_mean_points": 9.2
+          },
+          "all": {
+            "samples": 3055,
+            "value_loss": 0.007,
+            "score_variance": 0.0107,
+            "explained": 0.347,
+            "policy_kl": 0.253,
+            "typical_miss_points": 8.4,
+            "miss_of_the_mean_points": 10.3
+          }
+        }
+      },
+      {
+        "hours": "6-7",
+        "network_updates": 21,
+        "games": 336,
+        "losses": {
+          "axis": {
+            "samples": 1337,
+            "value_loss": 0.0071,
+            "score_variance": 0.0107,
+            "explained": 0.337,
+            "policy_kl": 0.37,
+            "typical_miss_points": 8.4,
+            "miss_of_the_mean_points": 10.4
+          },
+          "allies": {
+            "samples": 749,
+            "value_loss": 0.0051,
+            "score_variance": 0.0085,
+            "explained": 0.404,
+            "policy_kl": 0.241,
+            "typical_miss_points": 7.1,
+            "miss_of_the_mean_points": 9.2
+          },
+          "comintern": {
+            "samples": 748,
+            "value_loss": 0.0048,
+            "score_variance": 0.0079,
+            "explained": 0.385,
+            "policy_kl": 0.125,
+            "typical_miss_points": 7.0,
+            "miss_of_the_mean_points": 8.9
+          },
+          "all": {
+            "samples": 2834,
+            "value_loss": 0.006,
+            "score_variance": 0.0094,
+            "explained": 0.366,
+            "policy_kl": 0.271,
+            "typical_miss_points": 7.7,
+            "miss_of_the_mean_points": 9.7
+          }
+        }
+      },
+      {
+        "hours": "7-8",
+        "network_updates": 16,
+        "games": 256,
+        "losses": {
+          "axis": {
+            "samples": 1378,
+            "value_loss": 0.0139,
+            "score_variance": 0.0212,
+            "explained": 0.344,
+            "policy_kl": 0.404,
+            "typical_miss_points": 11.8,
+            "miss_of_the_mean_points": 14.6
+          },
+          "allies": {
+            "samples": 673,
+            "value_loss": 0.0091,
+            "score_variance": 0.017,
+            "explained": 0.464,
+            "policy_kl": 0.273,
+            "typical_miss_points": 9.5,
+            "miss_of_the_mean_points": 13.0
+          },
+          "comintern": {
+            "samples": 594,
+            "value_loss": 0.0074,
+            "score_variance": 0.012,
+            "explained": 0.384,
+            "policy_kl": 0.122,
+            "typical_miss_points": 8.6,
+            "miss_of_the_mean_points": 10.9
+          },
+          "all": {
+            "samples": 2645,
+            "value_loss": 0.0112,
+            "score_variance": 0.0182,
+            "explained": 0.383,
+            "policy_kl": 0.307,
+            "typical_miss_points": 10.6,
+            "miss_of_the_mean_points": 13.5
+          }
+        }
+      },
+      {
+        "hours": "8-9",
+        "network_updates": 17,
+        "games": 272,
+        "losses": {
+          "axis": {
+            "samples": 1303,
+            "value_loss": 0.0112,
+            "score_variance": 0.02,
+            "explained": 0.44,
+            "policy_kl": 0.36,
+            "typical_miss_points": 10.6,
+            "miss_of_the_mean_points": 14.1
+          },
+          "allies": {
+            "samples": 673,
+            "value_loss": 0.0096,
+            "score_variance": 0.0203,
+            "explained": 0.526,
+            "policy_kl": 0.329,
+            "typical_miss_points": 9.8,
+            "miss_of_the_mean_points": 14.2
+          },
+          "comintern": {
+            "samples": 659,
+            "value_loss": 0.0101,
+            "score_variance": 0.0156,
+            "explained": 0.352,
+            "policy_kl": 0.107,
+            "typical_miss_points": 10.1,
+            "miss_of_the_mean_points": 12.5
+          },
+          "all": {
+            "samples": 2635,
+            "value_loss": 0.0105,
+            "score_variance": 0.0191,
+            "explained": 0.45,
+            "policy_kl": 0.289,
+            "typical_miss_points": 10.2,
+            "miss_of_the_mean_points": 13.8
+          }
+        }
+      },
+      {
+        "hours": "9-10",
+        "network_updates": 14,
+        "games": 224,
+        "losses": {
+          "axis": {
+            "samples": 945,
+            "value_loss": 0.0101,
+            "score_variance": 0.0179,
+            "explained": 0.433,
+            "policy_kl": 0.324,
+            "typical_miss_points": 10.1,
+            "miss_of_the_mean_points": 13.4
+          },
+          "allies": {
+            "samples": 686,
+            "value_loss": 0.0088,
+            "score_variance": 0.0183,
+            "explained": 0.518,
+            "policy_kl": 0.324,
+            "typical_miss_points": 9.4,
+            "miss_of_the_mean_points": 13.5
+          },
+          "comintern": {
+            "samples": 510,
+            "value_loss": 0.0064,
+            "score_variance": 0.0116,
+            "explained": 0.445,
+            "policy_kl": 0.106,
+            "typical_miss_points": 8.0,
+            "miss_of_the_mean_points": 10.8
+          },
+          "all": {
+            "samples": 2141,
+            "value_loss": 0.0088,
+            "score_variance": 0.0167,
+            "explained": 0.47,
+            "policy_kl": 0.272,
+            "typical_miss_points": 9.4,
+            "miss_of_the_mean_points": 12.9
+          }
+        }
+      }
+    ],
+    "after_first_hour": {
+      "hours": "1-9.7",
+      "network_updates": 176,
+      "games": 2816,
+      "losses": {
+        "axis": {
+          "samples": 11502,
+          "value_loss": 0.0109,
+          "score_variance": 0.0161,
+          "explained": 0.323,
+          "policy_kl": 0.366,
+          "typical_miss_points": 10.4,
+          "miss_of_the_mean_points": 12.7
+        },
+        "allies": {
+          "samples": 6544,
+          "value_loss": 0.0087,
+          "score_variance": 0.0148,
+          "explained": 0.412,
+          "policy_kl": 0.322,
+          "typical_miss_points": 9.3,
+          "miss_of_the_mean_points": 12.2
+        },
+        "comintern": {
+          "samples": 6656,
+          "value_loss": 0.0072,
+          "score_variance": 0.0112,
+          "explained": 0.351,
+          "policy_kl": 0.137,
+          "typical_miss_points": 8.5,
+          "miss_of_the_mean_points": 10.6
+        },
+        "all": {
+          "samples": 24702,
+          "value_loss": 0.0093,
+          "score_variance": 0.0145,
+          "explained": 0.357,
+          "policy_kl": 0.293,
+          "typical_miss_points": 9.7,
+          "miss_of_the_mean_points": 12.0
+        }
+      }
+    }
+  },
+  "held_out_evaluation": {
+    "command": "studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/evaluate.sh and axis_again.sh: the Axis games by watch_japan.py, the others by studies.campaign.run evaluate --target allies|comintern --seeds 1009,1013,1019,1021,1031,1033 --baseline-style balanced --simulations 64 --max-depth 16 --max-transitions 10000 --neural-device cpu, from the run's code folder, each on one CPU core; the control adds --target-script balanced",
+    "log": [
+      "2026-11-23 06:00:33 japan-generation-000197 from generation-000197 started",
+      "2026-11-23 06:00:33 japan-scripted-balanced from generation-000197 started",
+      "2026-11-23 06:02:29 japan-scripted-balanced finished with 0",
+      "2026-11-23 06:02:29 scripted-balanced-allies from generation-000197 started",
+      "2026-11-23 06:04:20 scripted-balanced-allies finished with 0",
+      "2026-11-23 06:04:20 scripted-balanced-comintern from generation-000197 started",
+      "2026-11-23 06:04:35 japan-generation-000197 finished with 0",
+      "2026-11-23 06:04:35 generation-000197-allies from generation-000197 started",
+      "2026-11-23 06:04:56 note: japan-generation-000197 above was stopped by hand at 06:04:35, as watch_japan.py did not yet keep each game's end-of-game wealth; axis_again.sh plays it again, and the scripted Axis too",
+      "2026-11-23 06:06:15 scripted-balanced-comintern finished with 0",
+      "2026-11-23 06:06:15 japan-generation-000000 from generation-000000 started",
+      "2026-11-23 06:10:48 japan-generation-000000 finished with 0",
+      "2026-11-23 06:10:48 generation-000000-allies from generation-000000 started",
+      "2026-11-23 06:17:51 generation-000000-allies finished with 0",
+      "2026-11-23 06:17:51 generation-000000-comintern from generation-000000 started",
+      "2026-11-23 06:23:31 generation-000197-allies finished with 0",
+      "2026-11-23 06:23:31 generation-000197-comintern from generation-000197 started",
+      "2026-11-23 06:26:11 generation-000000-comintern finished with 0",
+      "2026-11-23 06:26:19 japan-generation-000197 from generation-000197 started again",
+      "2026-11-23 06:33:51 generation-000197-comintern finished with 0",
+      "2026-11-23 06:33:51 all finished",
+      "2026-11-23 07:07:31 japan-generation-000197 finished with 0",
+      "2026-11-23 07:07:31 japan-scripted-balanced from generation-000197 started again",
+      "2026-11-23 07:10:42 japan-scripted-balanced finished with 0",
+      "2026-11-23 07:10:42 axis_again finished"
+    ],
+    "players": {
+      "scripted balanced policy": {
+        "axis": {
+          "report": "studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/japan-scripted-balanced.json",
+          "settings": "watch_japan.py: evaluate(target_player='axis', seeds 1009-1033, baseline_style='balanced', simulations=64, max_depth=16, max_transitions=10000, track_japan=True)",
+          "final_score_by_seed": {
+            "1009": 39.2,
+            "1013": -24.3,
+            "1019": -6.2,
+            "1021": -12.2,
+            "1031": -17.9,
+            "1033": 5.4
+          },
+          "final_score": {
+            "mean": -2.7,
+            "standard_error": 9.4,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 1129.2,
+          "land_battles_begun_per_game": 98.7
+        },
+        "allies": {
+          "report": "studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/scripted-balanced-allies.json",
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "campaign-active-baseline-v2:balanced"
+          },
+          "final_score_by_seed": {
+            "1009": -50.3,
+            "1013": 11.2,
+            "1019": 5.9,
+            "1021": -27.9,
+            "1031": 18.0,
+            "1033": -14.5
+          },
+          "final_score": {
+            "mean": -9.6,
+            "standard_error": 10.7,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 505.5,
+          "land_battles_begun_per_game": 98.7
+        },
+        "comintern": {
+          "report": "studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/scripted-balanced-comintern.json",
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "campaign-active-baseline-v2:balanced"
+          },
+          "final_score_by_seed": {
+            "1009": -93.0,
+            "1013": -86.8,
+            "1019": -101.3,
+            "1021": -56.2,
+            "1031": -99.3,
+            "1033": -93.6
+          },
+          "final_score": {
+            "mean": -88.4,
+            "standard_error": 6.8,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 257.3,
+          "land_battles_begun_per_game": 98.7
+        }
+      },
+      "generation 197": {
+        "axis": {
+          "report": "studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/japan-generation-000197.json",
+          "settings": "watch_japan.py: evaluate(target_player='axis', seeds 1009-1033, baseline_style='balanced', simulations=64, max_depth=16, max_transitions=10000, track_japan=True)",
+          "final_score_by_seed": {
+            "1009": 20.0,
+            "1013": 21.9,
+            "1019": -1.2,
+            "1021": 12.0,
+            "1031": 18.8,
+            "1033": 17.3
+          },
+          "final_score": {
+            "mean": 14.8,
+            "standard_error": 3.5,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 871.8,
+          "land_battles_begun_per_game": 63.8
+        },
+        "allies": {
+          "report": "studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/generation-000197-allies.json",
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "95b79b37e356eb1ffe125b5a1f138e85050d26e5aa5caa0a458cc441f918f5db"
+          },
+          "final_score_by_seed": {
+            "1009": 1.6,
+            "1013": -37.7,
+            "1019": -77.2,
+            "1021": -69.8,
+            "1031": -3.9,
+            "1033": -77.4
+          },
+          "final_score": {
+            "mean": -44.1,
+            "standard_error": 14.9,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 355.2,
+          "land_battles_begun_per_game": 90.3
+        },
+        "comintern": {
+          "report": "studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/generation-000197-comintern.json",
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "95b79b37e356eb1ffe125b5a1f138e85050d26e5aa5caa0a458cc441f918f5db"
+          },
+          "final_score_by_seed": {
+            "1009": -102.8,
+            "1013": -87.4,
+            "1019": -95.7,
+            "1021": -70.3,
+            "1031": -103.7,
+            "1033": -74.5
+          },
+          "final_score": {
+            "mean": -89.0,
+            "standard_error": 5.8,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 228.7,
+          "land_battles_begun_per_game": 91.3
+        }
+      },
+      "generation 0, untrained": {
+        "axis": {
+          "report": "studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/japan-generation-000000.json",
+          "settings": "watch_japan.py: evaluate(target_player='axis', seeds 1009-1033, baseline_style='balanced', simulations=64, max_depth=16, max_transitions=10000, track_japan=True)",
+          "final_score_by_seed": {
+            "1009": 7.7,
+            "1013": 17.1,
+            "1019": 3.7,
+            "1021": 13.2,
+            "1031": -15.1,
+            "1033": 17.9
+          },
+          "final_score": {
+            "mean": 7.4,
+            "standard_error": 5.0,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 70.8,
+          "land_battles_begun_per_game": 62.8
+        },
+        "allies": {
+          "report": "studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/generation-000000-allies.json",
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "21530cb2c374e37aa4e89a32d0bbbdf0224ae655e75502dd5db10ba1ea3e3cf3"
+          },
+          "final_score_by_seed": {
+            "1009": -60.5,
+            "1013": -57.6,
+            "1019": -77.5,
+            "1021": -64.6,
+            "1031": -53.3,
+            "1033": -80.1
+          },
+          "final_score": {
+            "mean": -65.6,
+            "standard_error": 4.4,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 72.8,
+          "land_battles_begun_per_game": 79.7
+        },
+        "comintern": {
+          "report": "studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/generation-000000-comintern.json",
+          "settings": {
+            "seeds": [
+              1009,
+              1013,
+              1019,
+              1021,
+              1031,
+              1033
+            ],
+            "simulations": 64,
+            "max_depth": 16,
+            "root_noise": false,
+            "opponents": "campaign-active-baseline-v2:balanced",
+            "target_policy": "21530cb2c374e37aa4e89a32d0bbbdf0224ae655e75502dd5db10ba1ea3e3cf3"
+          },
+          "final_score_by_seed": {
+            "1009": -87.9,
+            "1013": -90.5,
+            "1019": -88.6,
+            "1021": -88.8,
+            "1031": -85.5,
+            "1033": -91.1
+          },
+          "final_score": {
+            "mean": -88.7,
+            "standard_error": 0.8,
+            "n": 6
+          },
+          "decisions_of_the_alliance_played_per_game": 120.5,
+          "land_battles_begun_per_game": 76.2
+        }
+      }
+    },
+    "paired_differences": {
+      "generation 197 minus scripted balanced policy, axis": {
+        "mean": 17.5,
+        "standard_error": 9.6,
+        "higher_on_seeds": 5,
+        "seeds": 6
+      },
+      "generation 197 minus scripted balanced policy, allies": {
+        "mean": -34.4,
+        "standard_error": 19.2,
+        "higher_on_seeds": 1,
+        "seeds": 6
+      },
+      "generation 197 minus scripted balanced policy, comintern": {
+        "mean": -0.7,
+        "standard_error": 4.9,
+        "higher_on_seeds": 2,
+        "seeds": 6
+      },
+      "generation 197 minus generation 0, untrained, axis": {
+        "mean": 7.4,
+        "standard_error": 5.8,
+        "higher_on_seeds": 3,
+        "seeds": 6
+      },
+      "generation 197 minus generation 0, untrained, allies": {
+        "mean": 21.5,
+        "standard_error": 11.5,
+        "higher_on_seeds": 5,
+        "seeds": 6
+      },
+      "generation 197 minus generation 0, untrained, comintern": {
+        "mean": -0.3,
+        "standard_error": 6.4,
+        "higher_on_seeds": 3,
+        "seeds": 6
+      },
+      "generation 0, untrained minus scripted balanced policy, axis": {
+        "mean": 10.1,
+        "standard_error": 10.0,
+        "higher_on_seeds": 5,
+        "seeds": 6
+      },
+      "generation 0, untrained minus scripted balanced policy, allies": {
+        "mean": -56.0,
+        "standard_error": 11.1,
+        "higher_on_seeds": 0,
+        "seeds": 6
+      },
+      "generation 0, untrained minus scripted balanced policy, comintern": {
+        "mean": -0.4,
+        "standard_error": 7.0,
+        "higher_on_seeds": 4,
+        "seeds": 6
+      }
+    }
+  },
+  "japan_in_china": {
+    "method": "watch_japan.py plays the six Axis games of each player with evaluate(track_japan=True) and logs Japan's actions. China's 13 land zones are those named land_china_.",
+    "players": {
+      "scripted balanced policy": {
+        "games": [
+          {
+            "seed": 1009,
+            "axis_score": 39.2,
+            "japan_decisions": 1138,
+            "land_battles_begun_by_japan": 47,
+            "japan_land_moves": 107,
+            "japan_purchases": 72,
+            "chinese_zones_held_by_japan_at_end": [
+              "land_china_hopeh",
+              "land_china_nanking",
+              "land_china_shantung"
+            ],
+            "most_chinese_zones_held_by_japan": 3,
+            "japan_zones_at_end": [
+              "land_china_hopeh",
+              "land_china_nanking",
+              "land_china_shantung",
+              "land_formosa",
+              "land_hainan",
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western",
+              "land_mongolia_kerulen",
+              "land_mongolia_ulyassutai"
+            ],
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 11,
+            "units_lost": {
+              "warlords": 3,
+              "ccp": 22,
+              "japan": 38,
+              "kmt": 31,
+              "other": 9
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_advance": 3,
+              "economy_purchase": 72,
+              "movement_route": 107,
+              "air_ground_attack": 8,
+              "air_support": 1,
+              "naval_load": 41,
+              "naval_start_move": 283,
+              "naval_route": 283,
+              "naval_declare_assault": 36,
+              "air_start_patrol": 1,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 47,
+              "land_continue_fighting": 12,
+              "land_take_casualty": 37,
+              "air_land": 2,
+              "naval_begin_assault": 23,
+              "naval_finish_shore_selection": 23,
+              "land_retreat_begin": 1,
+              "land_retreat_unit": 1,
+              "air_end_patrol": 1,
+              "economy_place": 74,
+              "air_ground": 1,
+              "politics_keep_capture": 1,
+              "land_progress_battle": 1
+            },
+            "axis_land_zones_at_end": 17,
+            "land_battles_begun_by_japan_by_game_round": {
+              "1": 8,
+              "2": 2,
+              "3": 4,
+              "4": 5,
+              "5": 5,
+              "6": 4,
+              "7": 3,
+              "8": 3,
+              "9": 4,
+              "10": 5,
+              "11": 4
+            },
+            "chinese_zones_taken_by_japan": [
+              {
+                "game_round": 2,
+                "zone": "land_china_suiyuan",
+                "from": "ccp"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_shensi",
+                "from": "ccp"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_beiping",
+                "from": "ccp"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_hunan",
+                "from": "kmt"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_hopeh",
+                "from": "ccp"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_beiping",
+                "from": "ccp"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_nanking",
+                "from": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_suiyuan",
+                "from": "mongolia"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_shensi",
+                "from": "ccp"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_hopeh",
+                "from": "ccp"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_beiping",
+                "from": "ccp"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_suiyuan",
+                "from": "ccp"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_nanking",
+                "from": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_hopeh",
+                "from": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_shantung",
+                "from": "kmt"
+              }
+            ],
+            "japan_possession_events": [
+              {
+                "game_round": 1,
+                "zone": "land_mongolia_kerulen",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_mongolia_kerulen",
+                "from": "japan",
+                "to": "mongolia"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_china_suiyuan",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "mongolia"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_shensi",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_beiping",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_hunan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_suiyuan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_beiping",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_manchuria_eastern",
+                "from": "japan",
+                "to": "mongolia"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_hopeh",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_manchuria_western",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_hunan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_shensi",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_mongolia_kerulen",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_beiping",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_nanking",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_hainan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_hopeh",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_nanking",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "mongolia"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_suiyuan",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_beiping",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_mongolia_kerulen",
+                "from": "japan",
+                "to": "mongolia"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_shensi",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_manchuria_eastern",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_suiyuan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "mongolia"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_manchuria_western",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_hopeh",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_shensi",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_beiping",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_manchuria_rehe",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_mongolia_kerulen",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_hopeh",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_suiyuan",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_mongolia_central_mongolia",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_nanking",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_beiping",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_hopeh",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_shantung",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_mongolia_ulyassutai",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_mongolia_central_mongolia",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_suiyuan",
+                "from": "japan",
+                "to": "kmt"
+              }
+            ]
+          },
+          {
+            "seed": 1013,
+            "axis_score": -24.3,
+            "japan_decisions": 1171,
+            "land_battles_begun_by_japan": 57,
+            "japan_land_moves": 87,
+            "japan_purchases": 69,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 3,
+            "japan_zones_at_end": [
+              "land_formosa"
+            ],
+            "manchurian_zones_lost": [
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 2,
+              "japan": 55,
+              "ccp": 16,
+              "other": 3,
+              "kmt": 37
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_advance": 3,
+              "economy_purchase": 69,
+              "movement_route": 87,
+              "air_ground_attack": 15,
+              "air_support": 1,
+              "naval_load": 30,
+              "naval_start_move": 293,
+              "naval_route": 293,
+              "naval_declare_assault": 30,
+              "air_start_patrol": 2,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 57,
+              "land_take_casualty": 54,
+              "air_land": 9,
+              "land_continue_fighting": 30,
+              "naval_begin_assault": 20,
+              "naval_finish_shore_selection": 20,
+              "land_retreat_begin": 1,
+              "land_retreat_unit": 2,
+              "air_end_patrol": 2,
+              "economy_place": 71,
+              "politics_keep_capture": 1,
+              "land_progress_battle": 1,
+              "air_ground": 1
+            },
+            "axis_land_zones_at_end": 6,
+            "land_battles_begun_by_japan_by_game_round": {
+              "1": 8,
+              "2": 5,
+              "3": 5,
+              "4": 5,
+              "5": 5,
+              "6": 6,
+              "7": 5,
+              "8": 6,
+              "9": 6,
+              "10": 5,
+              "11": 1
+            },
+            "chinese_zones_taken_by_japan": [
+              {
+                "game_round": 2,
+                "zone": "land_china_suiyuan",
+                "from": "ccp"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_hunan",
+                "from": "kmt"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_nanking",
+                "from": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_sinkiang",
+                "from": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_shantung",
+                "from": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_suiyuan",
+                "from": "ccp"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_szechwan",
+                "from": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_hopeh",
+                "from": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_beiping",
+                "from": "ccp"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_suiyuan",
+                "from": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_shantung",
+                "from": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_nanking",
+                "from": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_hunan",
+                "from": "kmt"
+              }
+            ],
+            "japan_possession_events": [
+              {
+                "game_round": 2,
+                "zone": "land_china_suiyuan",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_mongolia_kerulen",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_mongolia_central_mongolia",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_hunan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_hunan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_suiyuan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_mongolia_ulyassutai",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_nanking",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_mongolia_central_mongolia",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_mongolia_kerulen",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_sinkiang",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_shantung",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_mongolia_kobdo",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_mongolia_ulyassutai",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_nanking",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_suiyuan",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_szechwan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_mongolia_central_mongolia",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_hopeh",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_manchuria_eastern",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_sinkiang",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_mongolia_kobdo",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_shantung",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_mongolia_kerulen",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_manchuria_western",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_szechwan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_suiyuan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_hopeh",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_mongolia_central_mongolia",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_beiping",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_suiyuan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_suiyuan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_beiping",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_mongolia_kerulen",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_manchuria_eastern",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_shantung",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_nanking",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_hunan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_shantung",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_manchuria_eastern",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_hunan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_nanking",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_manchuria_northern",
+                "from": "japan",
+                "to": "kmt"
+              }
+            ]
+          },
+          {
+            "seed": 1019,
+            "axis_score": -6.2,
+            "japan_decisions": 1079,
+            "land_battles_begun_by_japan": 44,
+            "japan_land_moves": 79,
+            "japan_purchases": 56,
+            "chinese_zones_held_by_japan_at_end": [
+              "land_china_beiping"
+            ],
+            "most_chinese_zones_held_by_japan": 1,
+            "japan_zones_at_end": [
+              "land_china_beiping",
+              "land_formosa",
+              "land_manchuria_western"
+            ],
+            "manchurian_zones_lost": [
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe"
+            ],
+            "japanese_units_in_china_at_end": 1,
+            "units_lost": {
+              "warlords": 2,
+              "ccp": 19,
+              "japan": 45,
+              "kmt": 32,
+              "other": 4
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_advance": 3,
+              "economy_purchase": 56,
+              "movement_route": 79,
+              "air_ground_attack": 9,
+              "air_support": 1,
+              "naval_load": 32,
+              "naval_start_move": 281,
+              "naval_route": 281,
+              "naval_declare_assault": 35,
+              "air_start_patrol": 1,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 44,
+              "land_continue_fighting": 17,
+              "land_take_casualty": 43,
+              "air_land": 3,
+              "naval_begin_assault": 25,
+              "naval_finish_shore_selection": 25,
+              "land_retreat_begin": 2,
+              "land_retreat_unit": 3,
+              "air_end_patrol": 1,
+              "economy_place": 58,
+              "air_ground": 1
+            },
+            "axis_land_zones_at_end": 9,
+            "land_battles_begun_by_japan_by_game_round": {
+              "1": 8,
+              "2": 4,
+              "3": 2,
+              "4": 5,
+              "5": 2,
+              "6": 5,
+              "7": 3,
+              "8": 3,
+              "9": 5,
+              "10": 3,
+              "11": 4
+            },
+            "chinese_zones_taken_by_japan": [
+              {
+                "game_round": 2,
+                "zone": "land_china_suiyuan",
+                "from": "ccp"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_beiping",
+                "from": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_nanking",
+                "from": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_hopeh",
+                "from": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_beiping",
+                "from": "kmt"
+              }
+            ],
+            "japan_possession_events": [
+              {
+                "game_round": 1,
+                "zone": "land_mongolia_kerulen",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_china_suiyuan",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_mongolia_kerulen",
+                "from": "japan",
+                "to": "mongolia"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_mongolia_central_mongolia",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_suiyuan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_mongolia_kerulen",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_mongolia_central_mongolia",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_manchuria_northern",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_manchuria_western",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_mongolia_kerulen",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_manchuria_eastern",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_manchuria_eastern",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_manchuria_northern",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_beiping",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_manchuria_rehe",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_beiping",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_manchuria_eastern",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_manchuria_western",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_nanking",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_manchuria_northern",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_manchuria_eastern",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_hopeh",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_nanking",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_manchuria_northern",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_hopeh",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_manchuria_eastern",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_manchuria_western",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_beiping",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_manchuria_northern",
+                "from": "japan",
+                "to": "kmt"
+              }
+            ]
+          },
+          {
+            "seed": 1021,
+            "axis_score": -12.2,
+            "japan_decisions": 1083,
+            "land_battles_begun_by_japan": 44,
+            "japan_land_moves": 54,
+            "japan_purchases": 64,
+            "chinese_zones_held_by_japan_at_end": [
+              "land_china_sikang"
+            ],
+            "most_chinese_zones_held_by_japan": 4,
+            "japan_zones_at_end": [
+              "land_china_sikang",
+              "land_formosa",
+              "land_hainan",
+              "land_tibet"
+            ],
+            "manchurian_zones_lost": [
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "japan": 48,
+              "kmt": 34,
+              "other": 2,
+              "ccp": 23
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_advance": 3,
+              "economy_purchase": 64,
+              "movement_route": 54,
+              "air_ground_attack": 11,
+              "air_support": 1,
+              "naval_load": 31,
+              "naval_start_move": 285,
+              "naval_route": 285,
+              "naval_declare_assault": 30,
+              "air_start_patrol": 1,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 44,
+              "land_continue_fighting": 23,
+              "land_take_casualty": 46,
+              "air_land": 6,
+              "naval_begin_assault": 21,
+              "naval_finish_shore_selection": 21,
+              "land_retreat_begin": 2,
+              "land_retreat_unit": 3,
+              "air_end_patrol": 1,
+              "economy_place": 66,
+              "air_defend": 1,
+              "air_scramble": 1,
+              "air_ground": 2,
+              "politics_keep_capture": 1,
+              "land_progress_battle": 1
+            },
+            "axis_land_zones_at_end": 9,
+            "land_battles_begun_by_japan_by_game_round": {
+              "1": 8,
+              "2": 6,
+              "3": 3,
+              "4": 4,
+              "5": 4,
+              "6": 3,
+              "7": 3,
+              "8": 4,
+              "9": 5,
+              "10": 3,
+              "11": 1
+            },
+            "chinese_zones_taken_by_japan": [
+              {
+                "game_round": 3,
+                "zone": "land_china_beiping",
+                "from": "ccp"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_hunan",
+                "from": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_beiping",
+                "from": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_nanking",
+                "from": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_suiyuan",
+                "from": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_hunan",
+                "from": "kmt"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_kweichow",
+                "from": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_sikang",
+                "from": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_hopeh",
+                "from": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_shensi",
+                "from": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_suiyuan",
+                "from": "ccp"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_hunan",
+                "from": "kmt"
+              }
+            ],
+            "japan_possession_events": [
+              {
+                "game_round": 1,
+                "zone": "land_mongolia_kerulen",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_mongolia_kerulen",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_beiping",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_hunan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_beiping",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_hunan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_manchuria_eastern",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_manchuria_northern",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_beiping",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_nanking",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_hainan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_suiyuan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_hunan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_beiping",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_suiyuan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_kweichow",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_hunan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_sikang",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_hopeh",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_nanking",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_shensi",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_tibet",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_hopeh",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_suiyuan",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_hunan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_hunan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_suiyuan",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_shensi",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_kweichow",
+                "from": "japan",
+                "to": "kmt"
+              }
+            ]
+          },
+          {
+            "seed": 1031,
+            "axis_score": -17.9,
+            "japan_decisions": 1152,
+            "land_battles_begun_by_japan": 51,
+            "japan_land_moves": 80,
+            "japan_purchases": 67,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 2,
+            "japan_zones_at_end": [
+              "land_formosa",
+              "land_manchuria_eastern"
+            ],
+            "manchurian_zones_lost": [
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 2,
+              "ccp": 11,
+              "japan": 48,
+              "other": 3,
+              "kmt": 44
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_advance": 3,
+              "economy_purchase": 67,
+              "movement_route": 80,
+              "air_ground_attack": 12,
+              "air_support": 1,
+              "naval_load": 26,
+              "naval_start_move": 298,
+              "naval_route": 298,
+              "naval_declare_assault": 24,
+              "air_start_patrol": 3,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 51,
+              "land_take_casualty": 50,
+              "land_continue_fighting": 36,
+              "air_land": 6,
+              "naval_begin_assault": 17,
+              "naval_finish_shore_selection": 17,
+              "land_retreat_begin": 4,
+              "land_retreat_unit": 6,
+              "air_end_patrol": 3,
+              "economy_place": 69,
+              "air_ground": 2
+            },
+            "axis_land_zones_at_end": 7,
+            "land_battles_begun_by_japan_by_game_round": {
+              "1": 8,
+              "2": 7,
+              "3": 4,
+              "4": 2,
+              "5": 6,
+              "6": 2,
+              "7": 5,
+              "8": 5,
+              "9": 4,
+              "10": 6,
+              "11": 2
+            },
+            "chinese_zones_taken_by_japan": [
+              {
+                "game_round": 2,
+                "zone": "land_china_beiping",
+                "from": "kmt"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_china_hunan",
+                "from": "kmt"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_suiyuan",
+                "from": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_nanking",
+                "from": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_sinkiang",
+                "from": "ccp"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_hopeh",
+                "from": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_nanking",
+                "from": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_hunan",
+                "from": "kmt"
+              }
+            ],
+            "japan_possession_events": [
+              {
+                "game_round": 2,
+                "zone": "land_mongolia_kerulen",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_china_beiping",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_china_hunan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_china_hunan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_suiyuan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_beiping",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_mongolia_central_mongolia",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_suiyuan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_mongolia_ulyassutai",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_mongolia_kobdo",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_nanking",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_mongolia_central_mongolia",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_nanking",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_mongolia_kerulen",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_china_sinkiang",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_mongolia_kobdo",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_mongolia_ulyassutai",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_manchuria_western",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_mongolia_kobdo",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_hopeh",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_sinkiang",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_mongolia_kerulen",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_mongolia_central_mongolia",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_hopeh",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_mongolia_kobdo",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_mongolia_ulyassutai",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_nanking",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_hunan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_mongolia_central_mongolia",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_mongolia_kerulen",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_mongolia_kobdo",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_mongolia_ulyassutai",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_hunan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_mongolia_kobdo",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_nanking",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_manchuria_northern",
+                "from": "japan",
+                "to": "kmt"
+              }
+            ]
+          },
+          {
+            "seed": 1033,
+            "axis_score": 5.4,
+            "japan_decisions": 1152,
+            "land_battles_begun_by_japan": 48,
+            "japan_land_moves": 58,
+            "japan_purchases": 68,
+            "chinese_zones_held_by_japan_at_end": [
+              "land_china_beiping",
+              "land_china_hunan",
+              "land_china_nanking"
+            ],
+            "most_chinese_zones_held_by_japan": 3,
+            "japan_zones_at_end": [
+              "land_china_beiping",
+              "land_china_hunan",
+              "land_china_nanking",
+              "land_formosa",
+              "land_manchuria_eastern"
+            ],
+            "manchurian_zones_lost": [
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 10,
+            "units_lost": {
+              "warlords": 1,
+              "japan": 50,
+              "ccp": 20,
+              "kmt": 44,
+              "other": 3
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_advance": 3,
+              "economy_purchase": 68,
+              "movement_route": 58,
+              "air_ground_attack": 11,
+              "air_support": 1,
+              "naval_load": 38,
+              "naval_start_move": 288,
+              "naval_route": 288,
+              "naval_declare_assault": 40,
+              "air_start_patrol": 1,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 48,
+              "land_take_casualty": 52,
+              "land_continue_fighting": 48,
+              "air_land": 5,
+              "naval_begin_assault": 22,
+              "naval_finish_shore_selection": 22,
+              "air_end_patrol": 1,
+              "economy_place": 70,
+              "air_ground": 1,
+              "politics_keep_capture": 3,
+              "land_progress_battle": 4,
+              "land_retreat_begin": 1
+            },
+            "axis_land_zones_at_end": 10,
+            "land_battles_begun_by_japan_by_game_round": {
+              "1": 8,
+              "2": 5,
+              "3": 4,
+              "4": 4,
+              "5": 5,
+              "6": 3,
+              "7": 5,
+              "8": 1,
+              "9": 4,
+              "10": 4,
+              "11": 5
+            },
+            "chinese_zones_taken_by_japan": [
+              {
+                "game_round": 1,
+                "zone": "land_china_shantung",
+                "from": "kmt"
+              },
+              {
+                "game_round": 1,
+                "zone": "land_china_beiping",
+                "from": "kmt"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_china_suiyuan",
+                "from": "ccp"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_china_hopeh",
+                "from": "ccp"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_shantung",
+                "from": "ccp"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_nanking",
+                "from": "ccp"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_beiping",
+                "from": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_hopeh",
+                "from": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_shensi",
+                "from": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_hunan",
+                "from": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_nanking",
+                "from": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_hopeh",
+                "from": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_beiping",
+                "from": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_nanking",
+                "from": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_hunan",
+                "from": "kmt"
+              }
+            ],
+            "japan_possession_events": [
+              {
+                "game_round": 1,
+                "zone": "land_mongolia_kerulen",
+                "from": "mongolia",
+                "to": "japan"
+              },
+              {
+                "game_round": 1,
+                "zone": "land_china_shantung",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 1,
+                "zone": "land_china_beiping",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_mongolia_kerulen",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_china_shantung",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_china_suiyuan",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 2,
+                "zone": "land_china_hopeh",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_shantung",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_suiyuan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 3,
+                "zone": "land_china_hopeh",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_manchuria_eastern",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_nanking",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_shantung",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_china_beiping",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_manchuria_northern",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_china_nanking",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 6,
+                "zone": "land_manchuria_eastern",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_china_beiping",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 7,
+                "zone": "land_manchuria_eastern",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_hopeh",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_china_beiping",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_shensi",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_hunan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_nanking",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_hopeh",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_kwangtung",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_nanking",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_shensi",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_hunan",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_manchuria_eastern",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_hopeh",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_beiping",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_nanking",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_hunan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_kwangtung",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_hopeh",
+                "from": "japan",
+                "to": "kmt"
+              }
+            ]
+          }
+        ],
+        "means": {
+          "japan_decisions": 1129.2,
+          "land_battles_begun_by_japan": 48.5,
+          "japan_land_moves": 77.5,
+          "japan_purchases": 66.0,
+          "japanese_units_lost": 47.3,
+          "kmt_ccp_and_warlord_units_lost": 57.3,
+          "games_ending_with_japan_holding_a_zone_of_china": 4,
+          "games_in_which_japan_lost_a_zone_of_manchuria": 5,
+          "chinese_zones_held_by_japan_at_end": 1.33,
+          "japan_zones_at_end": 4.33,
+          "axis_land_zones_at_end": 9.67,
+          "starting_zones_of_manchuria_lost_in_all_six_games": 17,
+          "land_battles_begun_by_japan_by_game_round_in_all_six_games": {
+            "1": 48,
+            "2": 29,
+            "3": 22,
+            "4": 25,
+            "5": 27,
+            "6": 23,
+            "7": 24,
+            "8": 22,
+            "9": 28,
+            "10": 26,
+            "11": 17
+          }
+        }
+      },
+      "generation 197": {
+        "games": [
+          {
+            "seed": 1009,
+            "axis_score": 20.0,
+            "japan_decisions": 844,
+            "land_battles_begun_by_japan": 9,
+            "japan_land_moves": 17,
+            "japan_purchases": 32,
+            "chinese_zones_held_by_japan_at_end": [
+              "land_china_beiping",
+              "land_china_hunan"
+            ],
+            "most_chinese_zones_held_by_japan": 2,
+            "japan_zones_at_end": [
+              "land_china_beiping",
+              "land_china_hunan",
+              "land_formosa",
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe"
+            ],
+            "manchurian_zones_lost": [
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 7,
+            "units_lost": {
+              "warlords": 1,
+              "japan": 10,
+              "kmt": 35,
+              "ccp": 19,
+              "other": 4
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_purchase": 32,
+              "naval_load": 29,
+              "influence_roll": 1,
+              "economy_place": 17,
+              "land_take_casualty": 7,
+              "naval_enter_port": 14,
+              "naval_start_move": 203,
+              "naval_route": 203,
+              "naval_force_add": 57,
+              "air_start_patrol": 13,
+              "movement_route": 17,
+              "air_land_noncombat": 59,
+              "naval_designate_raider": 3,
+              "air_fly": 25,
+              "air_end_patrol": 9,
+              "naval_unload": 17,
+              "naval_strategic_pickup": 1,
+              "air_failed_landing": 2,
+              "economy_lease_declare": 1,
+              "air_ground_attack": 3,
+              "air_support": 6,
+              "naval_remove_raider": 2,
+              "naval_declare_assault": 11,
+              "land_begin_battle": 9,
+              "air_land": 7,
+              "naval_begin_assault": 6,
+              "naval_finish_shore_selection": 6,
+              "naval_select_bombardment": 5,
+              "land_continue_fighting": 1,
+              "air_defend": 1
+            },
+            "axis_land_zones_at_end": 12,
+            "land_battles_begun_by_japan_by_game_round": {
+              "9": 4,
+              "10": 1,
+              "11": 4
+            },
+            "chinese_zones_taken_by_japan": [
+              {
+                "game_round": 9,
+                "zone": "land_china_hopeh",
+                "from": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_hunan",
+                "from": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_beiping",
+                "from": "kmt"
+              }
+            ],
+            "japan_possession_events": [
+              {
+                "game_round": 3,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_manchuria_rehe",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_china_hopeh",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_hunan",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_beiping",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_china_hopeh",
+                "from": "japan",
+                "to": "kmt"
+              }
+            ]
+          },
+          {
+            "seed": 1013,
+            "axis_score": 21.9,
+            "japan_decisions": 968,
+            "land_battles_begun_by_japan": 2,
+            "japan_land_moves": 85,
+            "japan_purchases": 29,
+            "chinese_zones_held_by_japan_at_end": [
+              "land_china_suiyuan"
+            ],
+            "most_chinese_zones_held_by_japan": 1,
+            "japan_zones_at_end": [
+              "land_china_suiyuan",
+              "land_formosa",
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_western"
+            ],
+            "manchurian_zones_lost": [
+              "land_manchuria_rehe"
+            ],
+            "japanese_units_in_china_at_end": 4,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 37,
+              "ccp": 23,
+              "japan": 6,
+              "other": 4
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 8,
+              "economy_finish_research": 11,
+              "economy_purchase": 29,
+              "naval_load": 28,
+              "influence_roll": 5,
+              "economy_place": 18,
+              "air_start_patrol": 16,
+              "naval_enter_port": 5,
+              "land_take_casualty": 5,
+              "economy_request_rail": 4,
+              "naval_start_move": 258,
+              "naval_route": 258,
+              "naval_force_add": 47,
+              "air_land_noncombat": 28,
+              "naval_designate_raider": 1,
+              "air_fly": 43,
+              "movement_route": 85,
+              "air_end_patrol": 16,
+              "naval_unload": 25,
+              "recruitment_roll": 4,
+              "air_ground": 2,
+              "air_defend": 3,
+              "air_ground_attack": 1,
+              "air_support": 2,
+              "land_begin_battle": 2,
+              "air_land": 3
+            },
+            "axis_land_zones_at_end": 11,
+            "land_battles_begun_by_japan_by_game_round": {
+              "10": 2
+            },
+            "chinese_zones_taken_by_japan": [
+              {
+                "game_round": 10,
+                "zone": "land_china_suiyuan",
+                "from": "dadao"
+              }
+            ],
+            "japan_possession_events": [
+              {
+                "game_round": 6,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_manchuria_rehe",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_suiyuan",
+                "from": "dadao",
+                "to": "japan"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "ccp"
+              }
+            ]
+          },
+          {
+            "seed": 1019,
+            "axis_score": -1.2,
+            "japan_decisions": 917,
+            "land_battles_begun_by_japan": 4,
+            "japan_land_moves": 32,
+            "japan_purchases": 34,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "japan_zones_at_end": [
+              "land_formosa",
+              "land_manchuria_northern",
+              "land_manchuria_western"
+            ],
+            "manchurian_zones_lost": [
+              "land_manchuria_eastern",
+              "land_manchuria_rehe"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 28,
+              "ccp": 25,
+              "japan": 7,
+              "other": 3
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 10,
+              "economy_finish_research": 11,
+              "economy_purchase": 34,
+              "naval_load": 32,
+              "naval_start_move": 234,
+              "naval_force_add": 63,
+              "naval_route": 234,
+              "air_start_patrol": 9,
+              "influence_roll": 3,
+              "economy_place": 17,
+              "economy_request_rail": 1,
+              "air_end_patrol": 4,
+              "air_fly": 47,
+              "air_land_noncombat": 70,
+              "movement_route": 32,
+              "air_failed_landing": 3,
+              "naval_unload": 17,
+              "naval_designate_raider": 6,
+              "naval_remove_raider": 5,
+              "air_support": 4,
+              "land_begin_battle": 4,
+              "land_continue_fighting": 8,
+              "land_take_casualty": 4,
+              "air_land": 3,
+              "naval_enter_port": 6,
+              "air_ground_attack": 1
+            },
+            "axis_land_zones_at_end": 9,
+            "land_battles_begun_by_japan_by_game_round": {
+              "8": 1,
+              "9": 1,
+              "10": 1,
+              "11": 1
+            },
+            "chinese_zones_taken_by_japan": [],
+            "japan_possession_events": [
+              {
+                "game_round": 9,
+                "zone": "land_mongolia_kerulen",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_mongolia_kerulen",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_mongolia_kerulen",
+                "from": "kmt",
+                "to": "japan"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_mongolia_kerulen",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_manchuria_eastern",
+                "from": "japan",
+                "to": "kmt"
+              }
+            ]
+          },
+          {
+            "seed": 1021,
+            "axis_score": 12.0,
+            "japan_decisions": 556,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 96,
+            "japan_purchases": 32,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "japan_zones_at_end": [
+              "land_formosa",
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 3,
+              "kmt": 32,
+              "ccp": 30,
+              "japan": 3,
+              "other": 4
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_purchase": 32,
+              "naval_load": 11,
+              "naval_start_move": 94,
+              "naval_force_add": 20,
+              "naval_route": 94,
+              "air_start_patrol": 4,
+              "influence_roll": 4,
+              "economy_place": 25,
+              "land_take_casualty": 2,
+              "air_fly": 13,
+              "movement_route": 96,
+              "air_end_patrol": 2,
+              "air_land_noncombat": 15,
+              "air_failed_landing": 2,
+              "naval_unload": 2,
+              "naval_enter_port": 29,
+              "economy_advance": 2,
+              "air_defend": 1,
+              "land_pair_artillery": 4,
+              "naval_designate_raider": 14,
+              "naval_remove_raider": 13
+            },
+            "axis_land_zones_at_end": 11,
+            "land_battles_begun_by_japan_by_game_round": {},
+            "chinese_zones_taken_by_japan": [],
+            "japan_possession_events": []
+          },
+          {
+            "seed": 1031,
+            "axis_score": 18.8,
+            "japan_decisions": 821,
+            "land_battles_begun_by_japan": 8,
+            "japan_land_moves": 75,
+            "japan_purchases": 35,
+            "chinese_zones_held_by_japan_at_end": [
+              "land_china_beiping",
+              "land_china_nanking"
+            ],
+            "most_chinese_zones_held_by_japan": 2,
+            "japan_zones_at_end": [
+              "land_china_beiping",
+              "land_china_nanking",
+              "land_formosa",
+              "land_manchuria_eastern",
+              "land_manchuria_northern"
+            ],
+            "manchurian_zones_lost": [
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 5,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 39,
+              "ccp": 19,
+              "japan": 11,
+              "other": 9
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 9,
+              "economy_finish_research": 11,
+              "economy_purchase": 35,
+              "naval_load": 23,
+              "air_start_patrol": 3,
+              "influence_roll": 5,
+              "economy_place": 20,
+              "economy_request_rail": 22,
+              "economy_lease_declare": 1,
+              "recruitment_roll": 10,
+              "economy_lease_upgrade": 2,
+              "air_fly": 37,
+              "air_end_patrol": 1,
+              "movement_route": 75,
+              "air_land_noncombat": 30,
+              "naval_start_move": 162,
+              "naval_force_add": 25,
+              "naval_route": 162,
+              "air_failed_landing": 1,
+              "naval_unload": 17,
+              "air_ground": 1,
+              "land_take_casualty": 10,
+              "naval_enter_port": 43,
+              "air_scramble": 1,
+              "air_defend": 1,
+              "land_begin_battle": 8,
+              "naval_declare_assault": 3,
+              "air_ground_attack": 3,
+              "naval_designate_raider": 1,
+              "land_continue_fighting": 2,
+              "naval_begin_assault": 3,
+              "naval_finish_shore_selection": 3,
+              "naval_select_bombardment": 1,
+              "economy_lease_deliver": 1
+            },
+            "axis_land_zones_at_end": 12,
+            "land_battles_begun_by_japan_by_game_round": {
+              "9": 1,
+              "10": 7
+            },
+            "chinese_zones_taken_by_japan": [
+              {
+                "game_round": 10,
+                "zone": "land_china_nanking",
+                "from": "ccp"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_beiping",
+                "from": "kmt"
+              }
+            ],
+            "japan_possession_events": [
+              {
+                "game_round": 7,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_nanking",
+                "from": "ccp",
+                "to": "japan"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_beiping",
+                "from": "kmt",
+                "to": "japan"
+              }
+            ]
+          },
+          {
+            "seed": 1033,
+            "axis_score": 17.3,
+            "japan_decisions": 1125,
+            "land_battles_begun_by_japan": 1,
+            "japan_land_moves": 145,
+            "japan_purchases": 36,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "japan_zones_at_end": [
+              "land_formosa",
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 4,
+              "ccp": 22,
+              "kmt": 34,
+              "japan": 3,
+              "other": 4
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_purchase": 36,
+              "naval_load": 33,
+              "naval_start_move": 238,
+              "naval_force_add": 35,
+              "naval_route": 238,
+              "air_start_patrol": 7,
+              "influence_roll": 1,
+              "economy_place": 23,
+              "economy_request_rail": 23,
+              "naval_enter_port": 114,
+              "movement_route": 145,
+              "recruitment_roll": 10,
+              "economy_lease_upgrade": 2,
+              "air_fly": 44,
+              "air_failed_landing": 3,
+              "air_end_patrol": 6,
+              "air_land_noncombat": 27,
+              "naval_unload": 32,
+              "air_defend": 2,
+              "naval_designate_raider": 2,
+              "land_begin_battle": 1
+            },
+            "axis_land_zones_at_end": 12,
+            "land_battles_begun_by_japan_by_game_round": {
+              "10": 1
+            },
+            "chinese_zones_taken_by_japan": [],
+            "japan_possession_events": []
+          }
+        ],
+        "means": {
+          "japan_decisions": 871.8,
+          "land_battles_begun_by_japan": 4.0,
+          "japan_land_moves": 75.0,
+          "japan_purchases": 33.0,
+          "japanese_units_lost": 6.7,
+          "kmt_ccp_and_warlord_units_lost": 59.0,
+          "games_ending_with_japan_holding_a_zone_of_china": 3,
+          "games_in_which_japan_lost_a_zone_of_manchuria": 4,
+          "chinese_zones_held_by_japan_at_end": 0.83,
+          "japan_zones_at_end": 4.83,
+          "axis_land_zones_at_end": 11.17,
+          "starting_zones_of_manchuria_lost_in_all_six_games": 6,
+          "land_battles_begun_by_japan_by_game_round_in_all_six_games": {
+            "8": 1,
+            "9": 6,
+            "10": 12,
+            "11": 5
+          }
+        }
+      },
+      "generation 0, untrained": {
+        "games": [
+          {
+            "seed": 1009,
+            "axis_score": 7.7,
+            "japan_decisions": 71,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 0,
+            "japan_purchases": 0,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "japan_zones_at_end": [
+              "land_formosa",
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_western"
+            ],
+            "manchurian_zones_lost": [
+              "land_manchuria_rehe"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 2,
+              "kmt": 27,
+              "japan": 3,
+              "ccp": 29,
+              "other": 4
+            },
+            "japan_actions_by_kind": {
+              "economy_finish_research": 11,
+              "land_take_casualty": 3,
+              "economy_lease_upgrade": 2
+            },
+            "axis_land_zones_at_end": 10,
+            "land_battles_begun_by_japan_by_game_round": {},
+            "chinese_zones_taken_by_japan": [],
+            "japan_possession_events": [
+              {
+                "game_round": 11,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "ccp"
+              }
+            ]
+          },
+          {
+            "seed": 1013,
+            "axis_score": 17.1,
+            "japan_decisions": 68,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 0,
+            "japan_purchases": 0,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "japan_zones_at_end": [
+              "land_formosa",
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 36,
+              "ccp": 28,
+              "other": 4
+            },
+            "japan_actions_by_kind": {
+              "economy_finish_research": 11,
+              "economy_lease_upgrade": 2
+            },
+            "axis_land_zones_at_end": 11,
+            "land_battles_begun_by_japan_by_game_round": {},
+            "chinese_zones_taken_by_japan": [],
+            "japan_possession_events": []
+          },
+          {
+            "seed": 1019,
+            "axis_score": 3.7,
+            "japan_decisions": 72,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 0,
+            "japan_purchases": 0,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "japan_zones_at_end": [
+              "land_formosa",
+              "land_manchuria_eastern"
+            ],
+            "manchurian_zones_lost": [
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 35,
+              "japan": 6,
+              "ccp": 27
+            },
+            "japan_actions_by_kind": {
+              "economy_finish_research": 11,
+              "land_take_casualty": 6
+            },
+            "axis_land_zones_at_end": 8,
+            "land_battles_begun_by_japan_by_game_round": {},
+            "chinese_zones_taken_by_japan": [],
+            "japan_possession_events": [
+              {
+                "game_round": 3,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "ccp"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_manchuria_northern",
+                "from": "japan",
+                "to": "ccp"
+              }
+            ]
+          },
+          {
+            "seed": 1021,
+            "axis_score": 13.2,
+            "japan_decisions": 68,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 0,
+            "japan_purchases": 0,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "japan_zones_at_end": [
+              "land_formosa",
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 2,
+              "ccp": 33,
+              "kmt": 29,
+              "japan": 2,
+              "other": 4
+            },
+            "japan_actions_by_kind": {
+              "economy_finish_research": 11,
+              "land_take_casualty": 2
+            },
+            "axis_land_zones_at_end": 11,
+            "land_battles_begun_by_japan_by_game_round": {},
+            "chinese_zones_taken_by_japan": [],
+            "japan_possession_events": []
+          },
+          {
+            "seed": 1031,
+            "axis_score": -15.1,
+            "japan_decisions": 79,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 0,
+            "japan_purchases": 0,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "japan_zones_at_end": [
+              "land_formosa"
+            ],
+            "manchurian_zones_lost": [
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "ccp": 26,
+              "kmt": 31,
+              "japan": 10,
+              "other": 5
+            },
+            "japan_actions_by_kind": {
+              "economy_finish_research": 11,
+              "naval_designate_raider": 1,
+              "land_take_casualty": 10,
+              "economy_lease_upgrade": 2
+            },
+            "axis_land_zones_at_end": 6,
+            "land_battles_begun_by_japan_by_game_round": {},
+            "chinese_zones_taken_by_japan": [],
+            "japan_possession_events": [
+              {
+                "game_round": 9,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_manchuria_northern",
+                "from": "japan",
+                "to": "kmt"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_manchuria_eastern",
+                "from": "japan",
+                "to": "kmt"
+              }
+            ]
+          },
+          {
+            "seed": 1033,
+            "axis_score": 17.9,
+            "japan_decisions": 67,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 0,
+            "japan_purchases": 0,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "japan_zones_at_end": [
+              "land_formosa",
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 37,
+              "ccp": 44,
+              "japan": 1
+            },
+            "japan_actions_by_kind": {
+              "economy_finish_research": 11,
+              "land_take_casualty": 1
+            },
+            "axis_land_zones_at_end": 11,
+            "land_battles_begun_by_japan_by_game_round": {},
+            "chinese_zones_taken_by_japan": [],
+            "japan_possession_events": []
+          }
+        ],
+        "means": {
+          "japan_decisions": 70.8,
+          "land_battles_begun_by_japan": 0.0,
+          "japan_land_moves": 0.0,
+          "japan_purchases": 0.0,
+          "japanese_units_lost": 3.7,
+          "kmt_ccp_and_warlord_units_lost": 65.0,
+          "games_ending_with_japan_holding_a_zone_of_china": 0,
+          "games_in_which_japan_lost_a_zone_of_manchuria": 3,
+          "chinese_zones_held_by_japan_at_end": 0.0,
+          "japan_zones_at_end": 3.67,
+          "axis_land_zones_at_end": 9.5,
+          "starting_zones_of_manchuria_lost_in_all_six_games": 8,
+          "land_battles_begun_by_japan_by_game_round_in_all_six_games": {}
+        }
+      }
+    }
+  },
+  "wealth_at_game_end_in_the_axis_games": {
+    "source": "each game's wealth_components_at_stop, means over the six Axis games",
+    "scripted balanced policy": {
+      "axis": {
+        "wealth": 48.99,
+        "land_zones": 9.67,
+        "income_rate": 14.67,
+        "units": 340.0,
+        "infrastructure": 135.17,
+        "treasury": 18.0,
+        "paid_construction": 0.0
+      },
+      "allies": {
+        "wealth": 45.52,
+        "land_zones": 18.67,
+        "income_rate": 16.83,
+        "units": 119.67,
+        "infrastructure": 64.0,
+        "treasury": 16.83,
+        "paid_construction": 0.0
+      },
+      "comintern": {
+        "wealth": 6.14,
+        "land_zones": 2.67,
+        "income_rate": 2.5,
+        "units": 9.33,
+        "infrastructure": 4.83,
+        "treasury": 3.17,
+        "paid_construction": 2.17
+      },
+      "axis_final_score": -2.67
+    },
+    "generation 197": {
+      "axis": {
+        "wealth": 58.5,
+        "land_zones": 11.17,
+        "income_rate": 16.17,
+        "units": 359.83,
+        "infrastructure": 154.33,
+        "treasury": 20.67,
+        "paid_construction": 88.5
+      },
+      "allies": {
+        "wealth": 31.8,
+        "land_zones": 15.0,
+        "income_rate": 10.83,
+        "units": 67.67,
+        "infrastructure": 40.5,
+        "treasury": 11.17,
+        "paid_construction": 0.0
+      },
+      "comintern": {
+        "wealth": 11.92,
+        "land_zones": 4.67,
+        "income_rate": 4.67,
+        "units": 29.67,
+        "infrastructure": 15.0,
+        "treasury": 6.33,
+        "paid_construction": 0.67
+      },
+      "axis_final_score": 14.78
+    },
+    "generation 0, untrained": {
+      "axis": {
+        "wealth": 55.13,
+        "land_zones": 9.5,
+        "income_rate": 13.33,
+        "units": 318.67,
+        "infrastructure": 142.33,
+        "treasury": 172.83,
+        "paid_construction": 12.0
+      },
+      "allies": {
+        "wealth": 35.22,
+        "land_zones": 14.83,
+        "income_rate": 13.83,
+        "units": 68.17,
+        "infrastructure": 48.83,
+        "treasury": 14.0,
+        "paid_construction": 0.0
+      },
+      "comintern": {
+        "wealth": 12.51,
+        "land_zones": 6.0,
+        "income_rate": 4.17,
+        "units": 24.33,
+        "infrastructure": 12.83,
+        "treasury": 6.33,
+        "paid_construction": 3.33
+      },
+      "axis_final_score": 7.4
+    }
+  },
+  "memory_check": {
+    "network_evaluations_millions": 38.3,
+    "earlier_memory_checks_millions": 95.9,
+    "crash_rate": "one in about 128 million network evaluations, the training run of 19 to 21 November",
+    "probability_of_a_report_by_now": 0.65,
+    "network_evaluations_millions_an_hour": 3.95,
+    "more_hours_of_play_to_reach": {
+      "0.75": 10.9,
+      "0.87": 32.1,
+      "0.9": 40.6,
+      "0.94": 57.2
+    },
+    "reports": 0
+  }
+}

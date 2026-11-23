@@ -3829,7 +3829,8 @@ combined wealth after the July 1941 game round, the approved objective
 Since 22 November 2026 every land zone held counts 1 besides its income, and
 units, infrastructure, treasury and paid construction a twentieth of their
 worth (section 2.4). Until then a land zone counted only through its income and
-the rest a tenth, and every measurement below was made under those weights.
+the rest a tenth, and every measurement below but the last was made under those
+weights.
 
 **Measured.** In the [decision
 review](../archive/records/decision_review_2026_10_31.md#the-objective-rewards-a-passive-japan),
@@ -3868,10 +3869,32 @@ Allies 17.8 points richer, most likely from the warlords who joined them when Ja
 those weights a zone of land was worth many units, but only if it was held at
 the game's end, and Japan's invasion first gave the warlords to China.
 
-**Would settle it:** the training run started on the evening of 22 November
-2026 under the new weights, measured as that day's: whether its Japan fights and
-keeps land, against the scripted Axis and its own untrained network. Any further
-change of the objective is the owner's decision.
+Under the land-weighted score, on the same six seeds on 23 November, after 197
+network updates of the training run started the evening before, the Axis
+network made 872 decisions a game and scored +14.8: 7.4 ± 5.8 above its
+untrained network, which made 71 and scored +7.4, and 17.5 ± 9.6 above the
+scripted Axis, whose same games the new weights score −2.7
+([record](../archive/records/training_land_weighted_2026_11_23.md#play-against-the-scripted-balanced-policy)).
+Its Japan began 4.0 land battles a game, all in game rounds 8 to 11, and ended
+three of the six games holding one or two zones of China, each taken in game
+rounds 9 to 11; its Axis ended with 11.2 land zones, against 11 at the start,
+9.7 for the scripted Axis and 9.5 for the untrained one
+([record](../archive/records/training_land_weighted_2026_11_23.md#what-japan-does-in-china)).
+In self-play the Axis ended games holding about the 11 land zones it starts
+with in every block of 20 network updates, and in the 16 self-play games
+rebuilt from their move logs at 06:07 the KMT and the CCP began most land
+battles. So under these weights the network's Japan keeps its land and
+takes some at the very end, when the final score counts it and no game round is
+left to take it back; and the scripted Japan, which attacks from the first game
+round, still scores below the untrained Japan, which never moves, by
+10.1 ± 10.0 points on 5 of 6 seeds.
+
+**Would settle it:** whether the network's Japan comes to attack earlier as the
+training run under the land-weighted score goes on, measured the same way. If it
+keeps its attacks for the last game rounds, the score rewards land taken when
+the game's end protects it, which a score counting the land held at the end of
+every game round would not; that, or any other change of the objective, is the
+owner's decision.
 
 #### Are the simulations enough when there are many legal actions?
 
