@@ -177,7 +177,7 @@
     }
   ],
   "opening_queue_asset_total_ipp": 10,
-  "opening_queue_axis_wealth_contribution": 1.0,
+  "opening_queue_axis_wealth_contribution": 0.5,
   "research_chart": {
     "source_refs": [
       {

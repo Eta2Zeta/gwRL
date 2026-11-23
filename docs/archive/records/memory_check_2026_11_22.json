@@ -101,5 +101,21 @@
     "source": "crash_diagnosis_2026_11_21.json sanitizer_runs, the two runs side by side from 07:44:49, uniform priors, no encoding",
     "thread_sanitizer_decisions_per_thread_second": 1.54,
     "address_sanitizer_decisions_per_thread_second": 3.27
+  },
+  "at_stop": {
+    "time": "2026-11-22 20:04",
+    "reason": "the owner changed the final score",
+    "hours_of_play": 8.05,
+    "counters": {
+      "batches": 186,
+      "chance_events": 240545,
+      "decisions": 2161353,
+      "episodes": 2992,
+      "transitions": 2401898,
+      "updates": 187
+    },
+    "network_evaluations": 29481366,
+    "memory_checker_reports": 0,
+    "chance_of_a_report_both_runs_by_network_evaluations": 0.527
   }
 }

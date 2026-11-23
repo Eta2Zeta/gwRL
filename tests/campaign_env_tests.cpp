@@ -301,6 +301,12 @@ void failedSearchCopiesRefuseEveryCall() {
 void setupValuesAndNoDoubleCounting() {
     auto s = loadScenario(scenario);
     const auto initial = allianceWealth(s);
+    near(initial[0].landZones, 11, "Japan's eleven starting land zones did not count");
+    near(initial[1].landZones, 5, "The KMT's five starting land zones did not count");
+    near(initial[2].landZones, 5, "The CCP's and Mongolia's five starting land zones did not count");
+    for (const auto& w : initial)
+        near(w.total(), w.landZones + w.incomeRate + 0.05 * (w.units + w.infrastructure + w.treasury + w.paidConstruction),
+             "Wealth is not land zones plus income plus a twentieth of the assets");
     near(initial[0].paidConstruction, 10, "Opening queue paid amounts changed");
     near(initial[0].treasury, 15, "Opening treasury was debited historical payments");
     const auto first = std::find_if(s.units.begin(), s.units.end(), [&](const auto& item) { return item.second.type == unitTypeNumber(s, "torpedo_boat_destroyer"); });

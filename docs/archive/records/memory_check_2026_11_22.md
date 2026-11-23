@@ -103,4 +103,9 @@ engine, so the threads' timing differs, and a use of freed memory after more
 than 1 GB of later frees falls outside the quarantine. If the defect is one
 AddressSanitizer cannot see, no length of play finds it.
 
-How to go on looking was put to the owner on 22 November 2026 as Q-018.
+How to go on looking was put to the owner on 22 November 2026 as Q-018. The
+part was stopped at 20:04 that evening, when the owner changed the final score,
+after 8.05 hours of play: 187 network updates, 2,161,353 decisions, 2,992
+complete games and 29.5 million network evaluations, with no report. With the
+memory check of 21 and 22 November, the probability of a report by then, on the
+assumption above, was 0.53.

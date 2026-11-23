@@ -389,7 +389,7 @@
   "sources": {
     "theatre_map": {
       "path": "game_content/scenarios/japan_china_1936/map.json",
-      "sha256": "05b405ae273d177fbe8aa04d4701d0d9ebd11b5cb0d73ef85a65b911105bd2c7"
+      "sha256": "452ea26cf7e4c71879630ef3306bcadce535c0fd1230efff28caf27c88688597"
     },
     "japan_setup": {
       "path": "game_content/scenarios/japan_china_1936/japan_setup.json",

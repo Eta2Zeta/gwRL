@@ -101,6 +101,7 @@
         "status": "implemented",
         "comparison": "own_wealth_minus_combined_other_two_sides",
         "components": [
+          "land_zone_value",
           "income_rate",
           "unit_value",
           "infrastructure_value",
@@ -108,11 +109,12 @@
           "paid_construction_value"
         ],
         "component_weights": {
+          "land_zone_value": 1,
           "income_rate": 1,
-          "unit_value": 0.1,
-          "infrastructure_value": 0.1,
-          "treasury": 0.1,
-          "paid_construction_value": 0.1
+          "unit_value": 0.05,
+          "infrastructure_value": 0.05,
+          "treasury": 0.05,
+          "paid_construction_value": 0.05
         },
         "income_definition": "current_income_per_turn_rate_not_cumulative_collections",
         "completed_asset_valuation": "undiscounted_catalog_price_minus_remaining_repair_price",
@@ -123,7 +125,8 @@
           "include_treasury",
           "include_paid_construction_value",
           "current_income_per_turn_rate",
-          "asset_weight_0.1_relative_to_income_1",
+          "land_zone_value_1_each_plus_its_income",
+          "asset_weight_0.05_relative_to_income_1",
           "include_setup_assets",
           "official_starting_pieces_on_included_tiles_only",
           "theatre_adjusted_starting_treasury",
@@ -132,7 +135,7 @@
           "zero_additional_city_label_price",
           "one_rail_connection_counted_once_and_split_between_endpoint_owners",
           "cumulative_paid_construction_value",
-          "treasury_and_paid_construction_weight_0.1"
+          "treasury_and_paid_construction_weight_0.05"
         ],
         "minor_asset_attribution": "controlled_or_aligned_to_controlling_alliance_uncontrolled_unaligned_to_nobody",
         "interpretations": [],
@@ -2484,7 +2487,7 @@
     "source_map": "game_content/maps/gw36_manual_map.json",
     "source_map_sha256": "5afddbbc72126a2563db6d8255982e2d0b0fe8ef206e70aca5134f55590520a3",
     "manifest": "game_content/scenarios/japan_china_1936/manifest.json",
-    "manifest_sha256": "de4d580e10a9c92f520c65a35fae2c61f6fb6666cf21e6ddb86e4175570a4334"
+    "manifest_sha256": "36d8afbfbdefe47613b7a57d67d3b501fe59e4648aa0fa6e2b64e11371248349"
   },
   "nodes": {
     "land_china_beiping": {

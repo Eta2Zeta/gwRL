@@ -59,15 +59,24 @@ this timing does not create a Soviet participant, account, possession or unlock.
 
 ### Wealth definition and approved accounting decisions
 
-For alliance $i$, the approved income/asset weighting gives its wealth $W_i$:
+For alliance $i$, the approved land/income/asset weighting gives its wealth $W_i$:
 
 $$
 \begin{aligned}
-W_i ={}& \text{current income rate}_i \\
-&+ 0.1 \times \bigl(\text{completed unit value}_i + \text{completed infrastructure value}_i \\
+W_i ={}& \text{land zones held}_i + \text{current income rate}_i \\
+&+ 0.05 \times \bigl(\text{completed unit value}_i + \text{completed infrastructure value}_i \\
 &\qquad + \text{treasury}_i + \text{paid unfinished construction}_i\bigr)
 \end{aligned}
 $$
+
+On **22 November 2026** the owner set these weights: "Let's divide the units by
+20 instead of 10. Also land with no income shhould be worth something, so let's
+make each of them 1 and then we add the income as bonus." Every land zone that
+a nation of the alliance possesses counts 1, whether or not it yields IPP, and
+its income counts on top; an unaligned warlord's zones count for nobody, as its
+pieces do. Treasury, paid construction and infrastructure keep the units'
+weight, now a twentieth, for the reason given below. Until then the land term
+was absent and the asset weight was 0.1, as approved on 21 October 2026.
 
 Alliance $i$'s final score $R_i$ is its own wealth $W_i$ minus the wealth of the
 other two alliances combined, taken when the game ends; before the end no score
@@ -82,14 +91,14 @@ $$
 $$
 
 The user confirmed income means the **current income-per-turn rate**, not
-cumulative collections; one point of that rate has the weight of ten IPP of
-assets. Damaged units/facilities use purchase price minus their remaining repair
+cumulative collections; one point of that rate has the weight of twenty IPP
+of assets. Damaged units/facilities use purchase price minus their remaining repair
 price; undamaged assets have zero repair deduction. Official setup units and
 facilities count even though the learner did not buy them. A destroyed piece is
 absent, not a surviving asset. No extra depreciation/floor convention is assumed.
 
-Treasury and paid unfinished construction remain included at the same 0.1 asset
-weight in the approved contract. This keeps spending cash on a normally priced asset from
+Treasury and paid unfinished construction remain included at the same asset
+weight as units, 0.05, in the approved contract. This keeps spending cash on a normally priced asset from
 changing wealth merely because its category changed. Repairing an asset similarly
 reduces cash while increasing its net value. Do not substitute historical income
 or pay the full wealth score repeatedly every turn. The adopted construction
@@ -263,12 +272,13 @@ Tannu Tuva is not included and its political ambiguity is deferred.
 
 ## 3. Recorded rule decisions
 
-1. **Remaining valuation-table details:** current income rate, asset weight 0.1,
+1. **Remaining valuation-table details:** one point for each land zone held,
+   current income rate, asset weight 0.05 (0.1 until 22 November 2026),
    purchase-price-minus-repair valuation and inclusion of setup assets are decided.
    Transcribe prices/repair costs and reconcile non-purchasable setup types,
    discounts and upgrades without assigning setup assets zero merely
-   because they were initially free. Cash and paid construction use the same 0.1
-   coefficient as the explicit interpretation in section 1. Unpaid future
+   because they were initially free. Cash and paid construction use the same
+   coefficient as units, as the explicit interpretation in section 1. Unpaid future
    construction obligations are not completed assets.
    Minor attribution is now approved: controlled/aligned assets go to the legal
    controller's alliance; uncontrolled unaligned assets go to nobody. Setup-only

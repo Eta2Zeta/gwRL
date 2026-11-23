@@ -109,11 +109,12 @@ class TheatreScenarioIntegrationTests(unittest.TestCase):
         self.assertEqual(objective["completed_asset_valuation"], "undiscounted_catalog_price_minus_remaining_repair_price")
         self.assertTrue(objective["include_setup_asset_value"])
         self.assertEqual(objective["component_weights"], {
+            "land_zone_value": 1,
             "income_rate": 1,
-            "unit_value": 0.1,
-            "infrastructure_value": 0.1,
-            "treasury": 0.1,
-            "paid_construction_value": 0.1,
+            "unit_value": 0.05,
+            "infrastructure_value": 0.05,
+            "treasury": 0.05,
+            "paid_construction_value": 0.05,
         })
         self.assertEqual(objective["standalone_city_asset_value_ipp"], 0)
         self.assertTrue(objective["railway_valuation"]["count_once"])

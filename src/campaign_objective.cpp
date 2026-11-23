@@ -50,17 +50,18 @@ void requireObjective(const State& s) {
     if (objective.require("comparison").asString() != "own_wealth_minus_combined_other_two_sides")
         throw std::runtime_error("Unsupported campaign objective");
     const auto& weights = objective.require("weights");
-    if (weights.require("income_rate").asNumber() != 1 ||
-        weights.require("unit_value").asNumber() != 0.1 ||
-        weights.require("infrastructure_value").asNumber() != 0.1 ||
-        weights.require("treasury").asNumber() != 0.1 ||
-        weights.require("paid_construction_value").asNumber() != 0.1)
+    if (weights.require("land_zone_value").asNumber() != landZoneWeight ||
+        weights.require("income_rate").asNumber() != 1 ||
+        weights.require("unit_value").asNumber() != assetWeight ||
+        weights.require("infrastructure_value").asNumber() != assetWeight ||
+        weights.require("treasury").asNumber() != assetWeight ||
+        weights.require("paid_construction_value").asNumber() != assetWeight)
         throw std::runtime_error("Unsupported campaign wealth weights");
 }
 }  // namespace
 
 double WealthComponents::total() const {
-    return incomeRate + 0.1 * (units + infrastructure + treasury + paidConstruction);
+    return landZoneWeight * landZones + incomeRate + assetWeight * (units + infrastructure + treasury + paidConstruction);
 }
 
 std::array<WealthComponents, 3> allianceWealth(const State& s) {
@@ -70,6 +71,9 @@ std::array<WealthComponents, 3> allianceWealth(const State& s) {
         values[*i].incomeRate += evaluateIncome(s, nation).total;
         values[*i].treasury += n.treasury.value_or(0);
     }
+    // Every land zone counts, an unaligned warlord's for nobody, as its pieces do.
+    for (const auto& [zone, territory] : s.territories)
+        if (const auto i = recipient(s, territory.possessor)) values[*i].landZones += 1;
     for (const auto& [id, unit] : s.units) if (const auto i = recipient(s, unit.owner)) {
         const bool crew = std::any_of(unit.gameFlags.begin(), unit.gameFlags.end(), [](const auto& flag) {
             return flag.second && flag.first.base() == mark::ship_crew;
@@ -126,7 +130,7 @@ V wealthJson(const State& s) {
     O out;
     for (std::size_t i = 0; i < allianceOrder.size(); ++i) {
         const auto& x = values[i];
-        out.emplace(allianceOrder[i], V(O{{"income_rate", V(x.incomeRate)}, {"units", V(x.units)},
+        out.emplace(allianceOrder[i], V(O{{"land_zones", V(x.landZones)}, {"income_rate", V(x.incomeRate)}, {"units", V(x.units)},
             {"infrastructure", V(x.infrastructure)}, {"treasury", V(x.treasury)},
             {"paid_construction", V(x.paidConstruction)}, {"wealth", V(x.total())}}));
     }

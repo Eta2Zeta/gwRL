@@ -205,7 +205,7 @@ void bombingAndPaidRepairCannotCreateValue() {
     check(e.state().facilities.at("target_factory").damage == 4, "Bombing did not damage the real facility");
     const auto damaged = allianceWealth(e.state())[1];
     near(damaged.infrastructure, healthy.infrastructure - 4, "Damage did not deduct its paid repair cost");
-    near(damaged.total(), healthy.total() - 0.4, "Facility damage created an incorrect wealth change");
+    near(damaged.total(), healthy.total() - 4 * assetWeight, "Facility damage created an incorrect wealth change");
     check(e.state().chance && e.state().chance->purpose == "air_facility_aa", "Facility AAA was skipped");
     e.resolveChance();
     choose(e, "air_land");
@@ -237,7 +237,7 @@ void bombingAndPaidRepairCannotCreateValue() {
           "Placement did not consume the paid repair");
     near(allianceWealth(repaired.state())[1].infrastructure, beforeFinish.infrastructure,
          "Repair completion credited the same work a second time");
-    near(allianceWealth(repaired.state())[1].total(), beforeFinish.total() + 0.1 * income,
+    near(allianceWealth(repaired.state())[1].total(), beforeFinish.total() + assetWeight * income,
          "Only legitimate end-turn income may increase wealth during repair completion");
     replayMatches(repaired, repairCheckpoint);
 }
@@ -280,6 +280,8 @@ void conquestTransfersAssetsAndDoesNotRewardDeclarations() {
     near(captured[0].infrastructure, before[0].infrastructure + facilityValue, "Captured factory was not credited to its possessor");
     near(captured[1].infrastructure, 0, "Former owner retained captured infrastructure value");
     near(captured[0].units, before[0].units, "Ground capture duplicated its attacking unit");
+    near(captured[0].landZones, before[0].landZones + 1, "A captured land zone did not count for its new possessor");
+    near(captured[1].landZones, before[1].landZones - 1, "A lost land zone still counted for its former possessor");
     near(captured[0].treasury, before[0].treasury, "Noncapital capture minted treasury");
     replayMatches(e, checkpoint);
 }

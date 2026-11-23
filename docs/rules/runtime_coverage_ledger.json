@@ -4,7 +4,7 @@
   "ledger_sha256": "9138929bdcce38cbed03a3b8c8930806e428345905ca7eb23f260594f8322b6f",
   "evidence_file_sha256": {
     "src/air.cpp": "da67c67781a738fa7f0ccabc00f79bc6b75a268f6d10d8be0f6f343ac84b942f",
-    "src/campaign_objective.cpp": "9e0e01963a6d78558a5df71f9b116f9c8405ceac63d90db4e664785af950b0b5",
+    "src/campaign_objective.cpp": "2bd3113cbe9d9f9923e53b473d83ef4a1eefd9dce0a9a9eeccac4abffea53541",
     "src/campaign_runtime.cpp": "6700efbf18ba8dc6c30ee4700dd63721c8898631590b2e5f48650efda003a890",
     "src/campaign_setup.cpp": "1a7db3e6958d657e4bed2a39dd765b782a76e4c26fadc721f188b9cbe9fd3502",
     "src/catalog.cpp": "31300d35fa95af67c13b7d61909c5dc6d84c35d34094036feb3f811f534697e4",
@@ -16,13 +16,13 @@
     "src/naval_movement.cpp": "624a6aff6bc5e0a661e64b6f357c02e1681c7ac2c69fd8312817ff248a0e5e5d",
     "src/naval_operations.cpp": "a44be18906ec4632d91eaa68db33aba09e926d10592fd4066a282071b079ff89",
     "src/politics.cpp": "62e45c4fd51928081578570b91121bc296600eba2351661f89b2cc9704a5a9c3",
-    "src/politics_influence.cpp": "6c1e591c1aadd0ee709b9e367ee52e3e1cadbef9a031a9eadd254847ef001d24",
+    "src/politics_influence.cpp": "74e8e82a6af52b902fe666685adf28cb0bc762e72a5b6d542b62584940d134ed",
     "src/politics_warlords.cpp": "ad77f9a0a1905187c32c08e05f39467f0752c3a3a6831b916120d2afc0a7d9fb",
     "tests/air_integration_tests.cpp": "8f5b94cdd6192cfd3e68907a2085376a32a5f7f633021d91359ad7030ad8c448",
     "tests/air_logistics_tests.cpp": "774247565026cdd6ea6dc7e91d07196e0198190aa90533d3b3e42ae3b82d84a8",
     "tests/air_mission_tests.cpp": "215c27e4cd17d7b5892aa7e1aa6ea01ff2df79ba783be935ea29e80eddee9102",
     "tests/air_tests.cpp": "5dcdd88671c30b54ad11bfa9aeb377cfeef6e88ae1e02f850637d63ab974e067",
-    "tests/campaign_env_tests.cpp": "ccc70ba2374a569b14f83aa2ee8f6b2a2fa6b9b84637d910232de473494c5ab3",
+    "tests/campaign_env_tests.cpp": "b3270902ba72325de57e936aec18831f68a033f9ea1e7399c5f21e80b016896e",
     "tests/campaign_integration_tests.cpp": "6107e6f61a1498ab02e1a85f12b69ea2bf8d07a1675fbc55b7e69e5d78d7ee3e",
     "tests/campaign_runtime_tests.cpp": "9026865b1bc4ac27ac269bfdb0861ee5b38f6a8b66128f5a48582376007df7b0",
     "tests/campaign_setup_tests.cpp": "0212e799b0c4fdcedd75e0bf20eb3ed7683f47a31c69ebd564e2e4ec02c78eb6",
@@ -928,7 +928,7 @@
         {
           "file": "src/campaign_objective.cpp",
           "symbol": "terminalReturns",
-          "line": 120
+          "line": 124
         }
       ],
       "fixtures": [
@@ -949,7 +949,7 @@
         {
           "file": "tests/campaign_env_tests.cpp",
           "symbol": "terminalThreeVector",
-          "line": 371,
+          "line": 377,
           "behavior_assertions": [
             "Terminal returns do not use approved wealth"
           ]
@@ -3067,7 +3067,7 @@
         {
           "file": "tests/campaign_env_tests.cpp",
           "symbol": "repairsRailAndNeutralAttribution",
-          "line": 327,
+          "line": 333,
           "behavior_assertions": [
             "No retained rail asset"
           ]
@@ -5526,12 +5526,12 @@
         {
           "file": "src/politics_influence.cpp",
           "symbol": "influenceActions",
-          "line": 229
+          "line": 230
         },
         {
           "file": "src/politics_influence.cpp",
           "symbol": "applyInfluenceChance",
-          "line": 277
+          "line": 278
         }
       ],
       "fixtures": [
@@ -6594,17 +6594,17 @@
         {
           "file": "src/politics_influence.cpp",
           "symbol": "influenceActions",
-          "line": 229
+          "line": 230
         },
         {
           "file": "src/politics_influence.cpp",
           "symbol": "applyInfluenceAction",
-          "line": 249
+          "line": 250
         },
         {
           "file": "src/politics_influence.cpp",
           "symbol": "applyInfluenceChance",
-          "line": 277
+          "line": 278
         }
       ],
       "fixtures": [
@@ -6707,17 +6707,17 @@
         {
           "file": "src/politics_influence.cpp",
           "symbol": "influenceActions",
-          "line": 229
+          "line": 230
         },
         {
           "file": "src/politics_influence.cpp",
           "symbol": "applyInfluenceAction",
-          "line": 249
+          "line": 250
         },
         {
           "file": "src/politics_influence.cpp",
           "symbol": "applyInfluenceChance",
-          "line": 277
+          "line": 278
         }
       ],
       "fixtures": [

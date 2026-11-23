@@ -148,45 +148,52 @@ bounded list of legal actions: see
 ### 2.4 The final score
 
 Only the end of the game is scored; there is no reward along the way. Each
-alliance's wealth is its income plus a tenth of what its units, its
-infrastructure, its treasury and its paid construction are worth. Its *final
-score* is its own wealth minus the other two alliances' wealth combined
-(`src/campaign_objective.cpp`).
+alliance's wealth is the number of land zones it holds, plus its income, plus a
+twentieth of what its units, its infrastructure, its treasury and its paid
+construction are worth. Its *final score* is its own wealth minus the other two
+alliances' wealth combined (`src/campaign_objective.cpp`). These weights are the
+owner's of 22 November 2026; until then a land zone counted only through its
+income, and units and the rest a tenth of their worth.
 
 Wealth is counted in IPP, the game's money (industrial production points). A
 nation's income is the IPP that the land zones it holds yield each turn,
 counted for Japan, the KMT and the CCP only, and for Japan 1 more for each of
 six Chinese zones it holds: Beiping, Hopeh, Shantung, Nanking, Hunan and
-Kwangtung (`evaluateIncome` in `src/economy.cpp`). A unit counts at its price:
-a militia 2 IPP, an infantry or a cavalry 3, an artillery or a light armor 4, a
-fighter 10. So a land zone that yields 1 IPP a turn adds as much to an
-alliance's wealth as 10 IPP of units, and taking it from another alliance
-raises the taker's final score by 2, as much as 20 IPP of units. At the start of
-every game (`CampaignAdapter.wealth`):
+Kwangtung (`evaluateIncome` in `src/economy.cpp`; Wartime Bonus Income on page 2
+of Japan's national reference sheet). The KMT's bonus for an open Burma Road and
+the CCP's for a railroad to Soviet land cannot occur here, since Burma and the
+Soviet Union are outside the scenario. Every land zone that an alliance's
+nations hold counts 1, whether or not it yields IPP; an unaligned warlord's
+zones count for nobody. A unit counts at its price: a militia 2 IPP, an
+infantry or a cavalry 3, an artillery or a light armor 4, a fighter 10. Units,
+infrastructure, treasury and paid construction share one weight, so that
+buying, building and repairing leave wealth unchanged. A land zone is thus
+worth as much as 20 IPP of units, and each IPP it yields 20 more, and taking a
+zone from another alliance raises the taker's final score by twice its worth.
+At the start of every game (`CampaignAdapter.wealth`):
 
-| Alliance | Income from land | Units: price, and a tenth | Infrastructure, a tenth | Treasury and paid construction, a tenth | Wealth |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Axis: Japan | 15 | 329, 32.9 | 15.6 | 2.5 | 66.0 |
-| Allies: the KMT | 6 | 33, 3.3 | 2.5 | 0.6 | 12.4 |
-| Comintern: the CCP and Mongolia | 2 | 20, 2.0 | 0.2 | 0.2 | 4.4 |
-| All three | 23 | 382, 38.2 | 18.3 | 3.3 | 82.8 |
+| Alliance | Land zones | Income | Units: price, and a twentieth | Infrastructure, a twentieth | Treasury and paid construction, a twentieth | Wealth |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Axis: Japan | 11 | 15 | 329, 16.45 | 7.8 | 1.25 | 51.5 |
+| Allies: the KMT | 5 | 6 | 33, 1.65 | 1.25 | 0.3 | 14.2 |
+| Comintern: the CCP and Mongolia | 5 | 2 | 20, 1.0 | 0.1 | 0.1 | 8.2 |
+| All three | 21 | 23 | 382, 19.1 | 9.15 | 1.65 | 73.9 |
 
-So land counts ten times as much as units for each IPP, but units count more in
-all, 38.2 points against 23, most of them Japan's army, navy and air force. The
-land Japan could take yields 18 IPP a turn: the KMT's 6, the CCP's 2,
-Mongolia's 2, which Mongolia does not collect, and the warlords' 8, which count for no
-alliance until a warlord joins one with its land and its 83 IPP of units
-(`incorporateNation` in `src/politics.cpp`). Held at the game's end, with
-Japan's six bonuses, all of it would raise Japan's final score by 32 to 40
-points, about what Japan's forces at the start are worth. Nanking, taken from
-the KMT, is worth 5 points, as much as 50 IPP of units, about 17 infantry;
-Kweichow, Szechwan, Sikang, Sinkiang, Tsinghai and Tibet yield no IPP and are
-worth nothing. Why a trained Japan still does not attack is an
+So land, 44 points, outweighs units, 19.1. The land Japan could take is 20
+zones yielding 18 IPP a turn: the KMT's 5 zones and 6 IPP, the CCP's 1 and 2,
+Mongolia's 4 and 2, which Mongolia does not collect, and the warlords' 10 and
+8, which count for no alliance until a warlord joins one with its land and its
+83 IPP of units (`incorporateNation` in `src/politics.cpp`). Held at the game's
+end, with Japan's six bonuses, all of it would raise Japan's final score by 62
+to 80 points, four to five times what Japan's units at the start are worth.
+Nanking, taken from the KMT, is worth 7 points, as much as 140 IPP of units,
+about 47 infantry; Kweichow, which yields nothing, 2 points, about 13 infantry.
+Whether a trained Japan now attacks is an
 [open design question](#is-the-final-wealth-gap-the-right-goal).
 
 The three final scores form one list,
-`[Axis, Allies, Comintern]`. The game of decision 612 ended Axis +49.0, Allies
-−63.8 and Comintern −106.2.
+`[Axis, Allies, Comintern]`. The game of decision 612, played under the earlier
+weights, ended Axis +49.0, Allies −63.8 and Comintern −106.2.
 
 ### 2.5 What the learner asks of the engine
 
@@ -3819,6 +3826,10 @@ before layer normalization, or global features that count each nation's units.
 **Now.** Each alliance maximizes its wealth minus the other two alliances'
 combined wealth after the July 1941 game round, the approved objective
 ([plan](../plans/japan_china_full_rules_plan.md#wealth-definition-and-approved-accounting-decisions)).
+Since 22 November 2026 every land zone held counts 1 besides its income, and
+units, infrastructure, treasury and paid construction a twentieth of their
+worth (section 2.4). Until then a land zone counted only through its income and
+the rest a tenth, and every measurement below was made under those weights.
 
 **Measured.** In the [decision
 review](../archive/records/decision_review_2026_10_31.md#the-objective-rewards-a-passive-japan),
@@ -3854,12 +3865,13 @@ Compared with the network's Japan, the attacking scripted Japan ended with as
 much income from land, 14.7 against 15.0, because what it took in China it lost
 in Manchuria, with 12.5 points less of units and infrastructure, and with the
 Allies 17.8 points richer, most likely from the warlords who joined them when Japan invaded. Under
-the final wealth gap a zone of land is worth many units (section 2.4), but only
-if it is held at the game's end, and Japan's invasion first gives the warlords
-to China.
+those weights a zone of land was worth many units, but only if it was held at
+the game's end, and Japan's invasion first gave the warlords to China.
 
-**Would settle it:** the owner's decision on the objective. A changed objective
-can be checked first with the same scripted comparison.
+**Would settle it:** the training run started on the evening of 22 November
+2026 under the new weights, measured as that day's: whether its Japan fights and
+keeps land, against the scripted Axis and its own untrained network. Any further
+change of the objective is the owner's decision.
 
 #### Are the simulations enough when there are many legal actions?
 

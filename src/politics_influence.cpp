@@ -5,7 +5,8 @@
 #include <stdexcept>
 
 // v4.3 source contract: RB glossary p6; recruitment p82; CCP pp103-104;
-// Dadao p105; CCP NRS p3; Japan NRS p4; adopted spending ruling RCL-002.
+// Dadao p105; CCP NRS p3; Japan NRS p4; the spending cap read from RB pp104-105
+// (RCL-002, closed as answered by the printed text).
 // These services do not grant movement, income or purchase permissions.
 namespace game::campaign {
 namespace {

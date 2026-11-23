@@ -151,15 +151,16 @@ no purchase row; the scenario counts them as worth 5 and 4 IPP for scoring.
 ## 6. The final score
 
 Nothing is scored before the end. After the last turn of game round 11, each
-alliance's *wealth* is its income per turn plus a tenth of what its units, its
-facilities and railroads, its treasury and the money paid into unfinished
-construction are worth. An alliance's *final score* is its own wealth minus the
-other two alliances' wealth (`src/campaign_objective.cpp`). The exact
+alliance's *wealth* is the number of land zones it holds, plus its income per
+turn, plus a twentieth of what its units, its facilities and railroads, its
+treasury and the money paid into unfinished construction are worth, as the
+owner set on 22 November 2026. An alliance's *final score* is its own wealth
+minus the other two alliances' wealth (`src/campaign_objective.cpp`). The exact
 definition, with its accounting decisions, is in the
 [plan](../plans/japan_china_full_rules_plan.md#wealth-definition-and-approved-accounting-decisions).
 
-At the start the Axis's wealth is 66.0, the Allies' 12.4 and the Comintern's
-4.4. A warlord's pieces count for nobody until it aligns.
+At the start the Axis's wealth is 51.5, the Allies' 14.2 and the Comintern's
+8.2. A warlord's land and pieces count for nobody until it aligns.
 
 ## 7. Where the scenario is stored
 

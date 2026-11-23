@@ -130,11 +130,19 @@
   },
   "wealth": {
     "weights": {
+      "land_zone_value": 1,
       "income_rate": 1,
-      "unit_value": 0.1,
-      "infrastructure_value": 0.1,
-      "treasury": 0.1,
-      "paid_construction_value": 0.1
+      "unit_value": 0.05,
+      "infrastructure_value": 0.05,
+      "treasury": 0.05,
+      "paid_construction_value": 0.05
+    },
+    "weights_authority": {
+      "date": "2026-11-22",
+      "kind": "owner_decision",
+      "quote": "Let's divide the units by 20 instead of 10. Also land with no income shhould be worth something, so let's make each of them 1 and then we add the income as bonus",
+      "applied": "Each land zone that a nation of the alliance possesses counts 1, and its income counts on top. Units, infrastructure, treasury and paid construction keep one shared weight, now a twentieth, so that buying, building and repairing leave wealth unchanged.",
+      "replaces": "income 1 and a tenth of units, infrastructure, treasury and paid construction, approved on 21 October 2026"
     },
     "comparison": "own_wealth_minus_combined_other_two_sides",
     "income_definition": "current_legally_collectable_income_per_turn_rate",

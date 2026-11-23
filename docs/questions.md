@@ -115,16 +115,18 @@ and in [section 9.2 of the design document](design/README.md#92-running-training
 
 ## Q-018: How to go on looking for the game process crash
 
-**The question.** The first part of the training run of 22 November 2026 plays
-with its game process on an engine built with AddressSanitizer, to find the
-defect behind the game process crashes, and it has found nothing. Should it go
-on as it is until AddressSanitizer reports, look with ThreadSanitizer for a while
-first, or give way now to the full-speed part, which would crash now and then?
+**The question.** Training plays with its game process on an engine built with
+AddressSanitizer, to find the defect behind the game process crashes, and it has
+found nothing. Should it go on as it is until AddressSanitizer reports, look
+with ThreadSanitizer for a while first, or give way now to a full-speed part,
+which would crash now and then?
 
-**What the program does now.** The part,
-`studies/campaign/runs/training-2026-11-22/1-memory-checked`, plays one game
-process of 16 games on that engine built with AddressSanitizer, the checked
-engine, within the 8 CPU cores and 16 GB
+**What the program does now.** The training run under the land-weighted score,
+started on the evening of 22 November 2026, plays its first part,
+`studies/campaign/runs/training-land-weighted-2026-11-22/1-memory-checked`, as
+the training run of 22 November played its own: one game process of 16 games on
+that engine built with AddressSanitizer, the checked engine, within the 8 CPU
+cores and 16 GB
 that the owner gave to looking for the defect on 21 November; the training
 process and the inference server run the ordinary build on the GPU.
 AddressSanitizer, the memory checker built into the checked engine, stops the game
@@ -134,17 +136,20 @@ is found, its newest network is to start the full-speed part, six game
 processes of 42 games on the ordinary engine, as the owner planned on 22
 November.
 
-**A real case.** By its 134th network update, at 17:35 on 22 November, the part
-had played 5.6 hours: 1,513,584 decisions and 2,144 games, about 270,000
+**A real case.** By its 134th network update, at 17:35 on 22 November, the
+memory-checked first part of the training run of 22 November had played 5.6
+hours: 1,513,584 decisions and 2,144 games, about 270,000
 decisions an hour, and the inference server had answered 20.7 million network
 evaluations for it. AddressSanitizer wrote no report. Nor did it in the memory check
 of 21 and 22 November, in 21.2 hours and 66.4 million network evaluations. The
 training run of 19 to 21 November crashed once in about 128 million network
 evaluations, all six times while the search freed the game copies that its
 tree's nodes hold, work that grows with the network evaluations (inferred). So
-if AddressSanitizer caught the defect as often as that run crashed, a report by now
-was about as likely as not: 0.49
-([record](archive/records/memory_check_2026_11_22.md)).
+if AddressSanitizer caught the defect as often as that run crashed, a report by
+then was about as likely as not: 0.49
+([record](archive/records/memory_check_2026_11_22.md)). That part stopped at
+20:04, when the owner changed the final score, after 187 network updates with
+no report, 0.53 by the same count.
 
 **Why it matters.** The full-speed part waits until the defect is found, and it would play
 about six times as fast as this part: the training run of 19 to 21 November did
