@@ -349,20 +349,30 @@ land zone. The case needs every step below.
    turn. Against Mongolia, no nation may declare war on a member of its own
    alliance (RB §5.1).
 
-   Japan cannot be that nation in the program. It is the only Major Power while
-   the Truce lasts, since a Chinese faction that becomes one ends the Truce
-   (RB §6.6), and the program offers the Truce only after Japan has attacked a
-   land zone Originally possessed by the CCP, the KMT or a warlord, an attack
-   that RB §4.9 (p30) counts as a declaration of war on all of China, the CCP
+   In this campaign the attacker cannot be a Major Power. Japan is the only one
+   while the Truce lasts, since a Chinese faction that becomes one ends the
+   Truce (RB §6.6), and the program offers the Truce only after Japan has
+   attacked a land zone Originally possessed by the CCP, the KMT or a warlord,
+   which RB §4.9 (p30) counts as a declaration of war on all of China, the CCP
    included (`recordLandAttack` in `src/politics.cpp`,
-   `beginCombatPoliticalResolution` in `src/politics_warlords.cpp`). So while
-   the Truce lasts Japan is at war with the CCP, and CCP units in a KMT land
-   zone that Japan attacks defend with the KMT's units and are eliminated with
-   them if Japan takes the zone. RB §10.10.1 (p73) lets a Major Power that
-   conquers a land zone of Chinese Home Country it did not Originally possess
-   keep the zone or give it to a Chinese faction, but after Japan's conquest no
-   CCP unit is left in the zone to be moved, so that choice never changes the
-   case above.
+   `beginCombatPoliticalResolution` in `src/politics_warlords.cpp`). CCP units
+   in a KMT land zone that Japan attacks therefore defend with the KMT's units
+   and are eliminated with them if Japan takes the zone. The campaign has no
+   USSR: the Comintern plays Mongolia alone (`china_minor_setup.json`).
+
+   In the full game the USSR can be the nation of this step, and the outcome
+   could then differ. A Major Power of the Comintern, the CCP's alliance, it
+   goes to war with the KMT but not with the CCP when it attacks KMT land
+   (RCL-022), and neither it nor the CCP may declare war on the other
+   (RB §5.1). A Major Power that conquers a land zone of Chinese Home Country
+   it did not Originally possess must at once keep the zone or give it to a
+   Chinese faction (RB §10.10.1, p73). The USSR may give it to the CCP if its
+   conquering units can move to a Friendly land zone or naval transport in the
+   following Noncombat Movement Phase, since the two are not Aligned (CCP p1).
+   Given to the CCP, the zone is Friendly-possessed land for the CCP units
+   standing in it, and they would need to move nowhere, if the gift comes
+   before the move that RB §0.3 orders. The rules do not say which comes
+   first.
 4. **The attacker takes the zone.** The units that sat out must move to the
    nearest Friendly-possessed land zone, regardless of distance (RB §0.3). A
    land zone is Friendly to a nation that possesses it or is Aligned with its
@@ -385,7 +395,11 @@ that sat out to `queueNeutralRelocation`, which looks for the nearest Friendly
 land zones (`nearestFriendlyLand`). It moves a unit at once when one land zone
 is nearest, lets the owner choose with `politics_relocate_neutral` when several
 are, and with none eliminates the unit and its cargo and records the
-elimination under RCL-015 (`destroyUnrelocatableNeutralUnit`). The test
+elimination under RCL-015 (`destroyUnrelocatableNeutralUnit`). When a
+conquest also gives a Major Power the choice of RB §10.10.1, `captureLand`
+moves or eliminates these units before the Major Power answers it; in this
+campaign only Japan has that choice, and its conquests leave no unit that sat
+out. The test
 `neutralRelocationWithoutFriendlyLandUsesAdoptedElimination`
 (`tests/politics_warlords_tests.cpp`) plays the case above: under the Truce,
 with the CCP's land in Japan's hands, Dadao takes the KMT's last land zone, in
@@ -396,7 +410,11 @@ nor a relocation came up ([record](../../docs/archive/records/move_census_2026_1
 **The question for the developers.** After a conquest, RB §0.3 moves units that
 did not take part to the nearest Friendly-possessed land zone. When none exists,
 as for CCP units in the KMT's last land zone, taken by Dadao while the CCP is
-not at war with Dadao, what happens to those units?
+not at war with Dadao, what happens to those units? And when the conqueror is a
+Major Power that may give the zone to a Chinese faction under RB §10.10.1, as
+the USSR may give the KMT's last land zone to the CCP, does that choice come
+before the move, so that CCP units in a zone given to the CCP stay where they
+are?
 
 ## RCL-016: KMT Low Morale with no legal retreat
 
