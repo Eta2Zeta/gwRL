@@ -318,17 +318,70 @@ that exact example was not in the developer's message.
 
 **Status: provisionally adopted by the user, 23 October 2026; pending developer clarification.**
 
-**Sources:** RB §0.3 p8; §4.5 p27; §5.1 p35; §6.6 p42; §15.4 p105; CCP reference sheet p1.
+**The question.** When an attacker takes a land zone, units in it that did not
+take part in the battle are moved to the nearest Friendly-possessed land zone
+(RB §0.3, p8). What happens to them when no such land zone exists anywhere?
 
-**Question:** CCP has surviving units but no possessed land. Its units share KMT
-land under the Chinese Truce. KMT previously attacked Dadao; CCP did not join
-that war. Dadao later captures KMT's last land. The neutral CCP units must
-relocate to the nearest Friendly land, but none remains. CCP never surrenders. What happens to these units?
+**How the case comes about.** Units of two nations share a land zone only when
+the two are Aligned, or when the CCP and the KMT have signed the Chinese Truce
+(RB §0.3, p8). On this campaign's map only the Truce brings it about: until it
+becomes a Major Power the CCP aligns with no one (CCP p1), and the program
+merges a minor power that aligns with another nation into that nation
+(`incorporateNation` in `src/politics.cpp`), so no other two nations share a
+land zone. The case needs every step below.
 
-**Adopted ruling:** eliminate the nonparticipating units only when no Friendly
-relocation destination exists. Otherwise use the printed nearest-Friendly-land
-relocation rule. The elimination consequence is a provisional project
-interpretation, not a developer-confirmed rule.
+1. **A foreign Major Power declares war on China, and the CCP and the KMT sign
+   the Chinese Truce** (RB §6.6, p42). Under the Truce each may move freely in
+   the other's land zones, so CCP units may stand in KMT land.
+2. **The CCP loses all its own land but keeps units** in KMT land. The CCP
+   never surrenders (CCP p1), so it stays in the game with units and no land.
+3. **A nation at war with the KMT but not with the CCP attacks the KMT land
+   zone where those CCP units stand.** Dadao can be that nation: its attacks on
+   Chinese land are not a declaration of war on all of China (RB §4.9, p30;
+   RB §15.4, p105), so if the KMT has attacked Dadao and the CCP has not, Dadao
+   is at war with the KMT alone. Mongolia can be another: an attack of its own
+   on Chinese land puts it at war only with the Chinese nations outside the
+   Comintern, its alliance and the CCP's (RCL-022). The CCP units sit out the
+   battle unless the CCP or the attacker declares war (RB §0.3), and neither can
+   then. Against Dadao, Japan may not put Dadao into a war it is not already in
+   (RB §4.5, p27), and the CCP declares war on a Minor Power only by moving land
+   units to attack it (RB §5.1, p35), which it cannot do in another nation's
+   turn. Against Mongolia, no nation may declare war on a member of its own
+   alliance (RB §5.1).
+4. **The attacker takes the zone.** The units that sat out must move to the
+   nearest Friendly-possessed land zone, regardless of distance (RB §0.3). A
+   land zone is Friendly to a nation that possesses it or is Aligned with its
+   possessor (RB p6); the program counts KMT land as Friendly to the CCP while
+   the Truce lasts, since the two move and defend together as if Aligned
+   (RB §6.6).
+5. **No Friendly land is left.** If the zone was the KMT's last, the KMT
+   surrenders, as it does when it possesses no land zone (KMT p1). The CCP
+   possesses none either, and no nation is Aligned with it. RB §0.3 names no
+   other destination and no other outcome, and the CCP cannot surrender.
+
+**Adopted ruling.** Units that RB §0.3 must relocate are eliminated, with any
+units they carry, only when no Friendly-possessed land zone exists. Otherwise
+the printed rule applies: they move to the nearest Friendly-possessed land zone,
+and their owner chooses among equally near ones. The elimination is a
+provisional project interpretation, not a developer-confirmed rule.
+
+**What the program does.** `captureLand` (`src/politics.cpp`) sends the units
+that sat out to `queueNeutralRelocation`, which looks for the nearest Friendly
+land zones (`nearestFriendlyLand`). It moves a unit at once when one land zone
+is nearest, lets the owner choose with `politics_relocate_neutral` when several
+are, and with none eliminates the unit and its cargo and records the
+elimination under RCL-015 (`destroyUnrelocatableNeutralUnit`). The test
+`neutralRelocationWithoutFriendlyLandUsesAdoptedElimination`
+(`tests/politics_warlords_tests.cpp`) plays the case above: under the Truce,
+with the CCP's land in Japan's hands, Dadao takes the KMT's last land zone, in
+which three CCP units stand, one of them an air transport carrying a fourth, and
+all four are eliminated. In the 240 random games of 14 November neither the Truce
+nor a relocation came up ([record](../../docs/archive/records/move_census_2026_11_14.md)).
+
+**The question for the developers.** After a conquest, RB §0.3 moves units that
+did not take part to the nearest Friendly-possessed land zone. When none exists,
+as for CCP units in the KMT's last land zone, taken by Dadao while the CCP is
+not at war with Dadao, what happens to those units?
 
 ## RCL-016: KMT Low Morale with no legal retreat
 
