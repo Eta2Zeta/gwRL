@@ -155,13 +155,19 @@ update, at 05:57 on 23 November: 2,690,295 decisions, 3,152 games and 38.3
 million network evaluations, with no report, which brings the chance of a
 report by then to 0.65
 ([record](archive/records/training_land_weighted_2026_11_23.md#the-memory-check)).
+By its 288th network update, at 13:38 that day, it had played 17.37 hours,
+4,345,022 decisions, 4,608 games and 63.1 million network evaluations, still
+with no report: 0.71
+([record](archive/records/training_land_weighted_update_288_2026_11_23.md#the-memory-check)).
 One game of that part failed, on a defect of the rules that the replay of its
 kept move confirmed and that is now fixed, not on damaged memory.
 
 **Why it matters.** The full-speed part waits until the defect is found, and it would play
-about five times as fast as this part: the training run of 19 to 21 November did
+several times as fast as this part: the training run of 19 to 21 November did
 about 21.6 million network evaluations an hour, 5.5 times this part's 3.95
-million (same records; not measured for choice D's searches). And the longer AddressSanitizer finds nothing, the likelier
+million to its 197th network update and 6.7 times its 3.23 million since, when
+each network evaluation took about a fifth longer (same records; not measured
+for choice D's searches). And the longer AddressSanitizer finds nothing, the likelier
 it is that the defect is one it cannot see, such as one that needs the timing
 of 42 game threads on the fast engine.
 
@@ -169,7 +175,7 @@ of 42 game threads on the fast engine.
 
 | Choice | What it changes |
 | --- | --- |
-| A. Go on as now until AddressSanitizer reports | Nothing changes. At about 4 million network evaluations an hour, the chance of a report reaches 0.75 after 11 more hours of play, 0.87 after 32 and 0.94 after 57, counted from 05:57 on 23 November, if AddressSanitizer sees the defect at all. The network goes on training at this part's pace. |
+| A. Go on as now until AddressSanitizer reports | Nothing changes. At about 3.2 million network evaluations an hour, the chance of a report reaches 0.75 after 6 more hours of play, 0.87 after 32 and 0.94 after 62, counted from 13:38 on 23 November, if AddressSanitizer sees the defect at all. The network goes on training at this part's pace. |
 | B. ThreadSanitizer for about 12 hours of play, then A | The part stops, keeping its checkpoint and losing only the games in play; its game process then runs the same sources built with ThreadSanitizer, in the same layout, and the part resumes from the checkpoint. ThreadSanitizer reports two threads that touch the same memory without a lock between them the first time it happens, not only on the rare occasion when the touch damages memory. It has run only in a test script, with three or four game threads and no inference server, for about 8,000 decisions ([record](archive/records/crash_diagnosis_2026_11_21.md)). The damage has crossed games: before the second crash of 20 November, two other games of that process failed the state check ([record](archive/records/second_game_process_crash_2026_11_20.md)), which a race between game threads would explain, as would a second free. In the test script it played 1.54 decisions a thread-second against 3.27 for that day's AddressSanitizer build, so training would go at roughly a third of this part's pace (inferred). Its memory in this layout is not measured; a few minutes would measure it before it replaces the checked engine. It finds nothing if the defect is not a race. |
 | C. Start the full-speed part now | Six game processes of 42 games on the ordinary engine, from this part's newest network. The crashes come back, about one every six hours if they keep their rate per network evaluation (inferred). Each costs the dead process's unfinished games, a few minutes of play, and leaves their move logs, the crash report and the allocator's message ([running training on the Mac](design/README.md#92-running-training-on-the-mac)). The defect stays unfound, and its damage can reach a game's state, as it did twice on 20 November. |
 
@@ -178,8 +184,8 @@ where the crashes happen, with the inference server and many game threads, and
 each hour in which AddressSanitizer finds nothing makes a defect it cannot see
 more likely. Twelve hours of B cost about eight hours of this part's training
 (inferred), and A goes on from the same checkpoint if B finds nothing. If A then
-passes a chance of about 0.9 with no report, after about 41 more hours of play
-from 05:57 on 23 November, C is what remains.
+passes a chance of about 0.9 with no report, after about 42 more hours of play
+from 13:38 on 23 November, C is what remains.
 
 **If answered.** How the defect is looked for, and what that finds, belong in the
 [known gaps](design/README.md#known-gaps) of the design document, and the run's
