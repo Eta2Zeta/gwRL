@@ -1,6 +1,6 @@
 # GW36 v4.3 rule clarifications and open questions
 
-Updated: 22 November 2026.
+Updated: 23 November 2026.
 
 This is the project's shared register of **unclear official rules**, including
 interpretations adopted after discussion. It is **not publisher-issued errata**.
@@ -31,12 +31,12 @@ uncertain artwork is not automatically an error in the official rules.
 - **Closed — developer clarification reported:** the user reports that the
   developers clarified the rule. Record the clarified rule and report date.
 
-`RB` means [Global War 1936 v4.3 Rulebook](</Users/home/Desktop/gwRL/game_content/rules/Global War 1936 v4.3 Rulebook.pdf>);
+`RB` means [Global War 1936 v4.3 Rulebook](<Global War 1936 v4.3 Rulebook.pdf>);
 its printed and PDF page numbers coincide. `Japan`, `CCP` and `KMT` mean their
 v4.3 national reference sheets, using one-based PDF pages:
-[Japan](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - Japan v4.3.pdf>),
-[CCP](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - CCP v4.3.pdf>),
-[KMT](</Users/home/Desktop/gwRL/game_content/rules/GW36 - NRS - KMT v4.3.pdf>).
+[Japan](<GW36 - NRS - Japan v4.3.pdf>),
+[CCP](<GW36 - NRS - CCP v4.3.pdf>),
+[KMT](<GW36 - NRS - KMT v4.3.pdf>).
 Discord messages are community evidence unless publisher authority is verified.
 A new entry requires a genuine omission or incompatible applicable rules after
 checking definitions, examples, cross-references and national exceptions.
@@ -176,23 +176,83 @@ because USSR is excluded.
 
 **Status: adopted by the user, 22 October 2026; pending developer clarification.**
 
-**Sources:** Japan p4, Dadao Government; RB §15.4 p105; §12.4 p80;
-Home Country and Originally Possessed definitions, pp6-7.
+**The question.** The rules let Japan send lend-lease to the Dadao Government,
+but they deliver lend-lease only into the receiving nation's Home Country, and
+Dadao has none. Where does Japan's lend-lease to Dadao arrive, and where does
+Dadao place a lend-leased base or Militia upgrade?
 
-**Problem:** Japan's Dadao ability explicitly permits lend-lease to its controlled
-Dadao Government. The ordinary delivery rule requires the recipient's possessed
-Home Country as the destination. Dadao forms during play and has no originally
-possessed territories, so the ordinary Home Country definition supplies no
-destination. The aid permission itself is settled; the missing destination is
-the issue to report to the developers.
+**What the rules say.**
 
-**Adopted project ruling:** Japan may deliver lend-lease to **any land zone
-currently possessed by Dadao within Chinese Home Country**. Retain the ordinary
-supply-route, possession-timing, blockade, item and per-recipient limits. This
-settles delivery and subsequent placement of that aid; it does not redefine
-Dadao's Home Country for unrelated rules or permit aid without a real route.
-The user will report this issue to the developers. This is a user-approved
-campaign interpretation, not a reported developer ruling.
+1. **The gift is allowed.** RB §8.7 (p52) gives each sender's lend-lease
+   conditions in a table. For Japan it lists the Dadao Government with a plain
+   "Yes", while any other recipient must be at war with a Major Power. Japan p4
+   and RB §15.4 (p105), under Dadao Government, say the same in words: as long as
+   Japan controls Dadao, Dadao may receive lend-lease from Japan. Japan's own
+   lend-lease table (Japan p3) has a single row, any nation at war with a Major
+   Power, and does not name Dadao; the Dadao Government ability on the next page
+   adds it.
+2. **Lend-lease arrives only in the receiving nation's Home Country.** RB §12.4
+   (p80): the delivery starts in the sender's Home Country and moves along a
+   Supply Path to a land zone in the receiving nation's Home Country, and it
+   stops in the first land zone of that Home Country which the receiver
+   possesses. A lend-leased base or Militia upgrade goes to the receiver's build
+   queue and is placed anywhere in the receiver's Home Country in its next Place
+   Units Phase. Lend-lease that cannot be delivered waits on the build queue and
+   is tried again the next Player Turn.
+3. **Dadao has no Home Country.** RB p6 (Home Country) lists the Home Country of
+   each nation it names; Dadao is not among them. A nation not listed has as its
+   Home Country all its Originally possessed land zones except offshore ones.
+   RB p7 (Originally) means since the start of the game: the nation whose roundel
+   is printed in the land zone on the map. No land zone carries a Dadao roundel.
+   Dadao comes into being during play, when Japan's influence roll succeeds on a
+   Chinese warlord and that warlord's land zones and units become or join the
+   Dadao Government (Japan p4; RB §15.4, p105). After a foreign invasion of
+   China, a warlord bordering Dadao's land may also align with Dadao (RB §4.9,
+   pp30-31). So Dadao originally possesses no land zone, and its Home Country is
+   empty.
+4. **The land zones Dadao holds belong to China's Home Country.** RB p6 gives
+   the CCP and the KMT one Home Country: every land zone originally with a
+   Chinese warlord, KMT, CCP, Manchukuo or Mongolian roundel, with Formosa and
+   Hong Kong. Every land zone that Dadao gets from a warlord, or takes from the
+   KMT or the CCP, is therefore in Chinese Home Country.
+
+Read literally, these rules let Japan declare lend-lease to Dadao but give the
+delivery no land zone to arrive in, so it would wait on Japan's build queue for
+the rest of the game. Dadao's recruitment has no such gap: a recruited unit is
+placed in a land zone that Dadao has possessed since the beginning of the Player
+Turn, with no mention of a Home Country (RB §12.7, p82).
+
+**Another reading the developers might give.** The Dadao ability says that the
+first warlord's land zones become the Dadao Government. If Dadao took over that
+warlord's roundel, it would originally possess that warlord's printed land
+zones, and its Home Country would be those zones, less any offshore one, and no
+others: not the land zones of warlords that join it later, nor those it takes
+in battle.
+
+**Adopted project ruling.** Japan's lend-lease to Dadao may be delivered to any
+land zone that Dadao possesses within Chinese Home Country, and a delivered base
+or Militia upgrade is placed in such a land zone. Everything else in RB §12.4
+still applies: the delivery starts in Japan's Home Country and needs a real
+Supply Path, the naval facilities it uses must be undamaged and possessed since
+the beginning of the Player Turn, blockades and interdiction apply, and Japan
+sends Dadao at most one lend-lease a Player Turn (RB §8.7, p52). The ruling does
+not give Dadao a Home Country for any other rule. The user will report the
+question to the developers; this is a user-approved campaign interpretation,
+not a reported developer ruling.
+
+**What the program does.** `lendLeasePermitted` (`src/economy_lendlease.cpp`)
+allows Japan's lend-lease to Dadao while Japan controls Dadao.
+`lendLeaseSupplyRoute` (`src/movement.cpp`) and `recipientHome`
+(`src/economy_lendlease.cpp`) accept as the destination a land zone that Dadao
+possesses in Chinese Home Country, while Dadao's own Home Country stays empty
+(`src/campaign_setup.cpp`). For example, once a successful influence roll has
+brought the warlord of Beiping and Hopeh over to Dadao, Japan's lend-lease to
+Dadao may arrive in Beiping or Hopeh, by a Supply Path from Japan's Home
+Country.
+
+**The question for the developers.** The Dadao Government has no printed roundel
+and so no Home Country. Where is lend-lease from Japan to Dadao delivered, and
+where does Dadao place a lend-leased base or Militia upgrade?
 
 ## RCL-012: Chinese Truce combat and retreat
 
