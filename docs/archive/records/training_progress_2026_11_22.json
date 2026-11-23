@@ -944,5 +944,1049 @@
         "seeds": 6
       }
     }
+  },
+  "japan_in_china": {
+    "method": "watch_japan.py replays the six Axis games of each player of evaluate.sh with evaluate(track_japan=True) and logs Japan's actions; the replays reproduced every game's final scores. self_play_japan.py replays, without searching, the 16 self-play games in play at 19:10 (move logs copied to self-play-moves/). China's 13 land zones are those named land_china_.",
+    "players": {
+      "scripted balanced policy": {
+        "games": [
+          {
+            "seed": 1009,
+            "axis_score": 58.5,
+            "japan_decisions": 1138,
+            "land_battles_begun_by_japan": 47,
+            "japan_land_moves": 107,
+            "japan_purchases": 72,
+            "chinese_zones_held_by_japan_at_end": [
+              "land_china_hopeh",
+              "land_china_nanking",
+              "land_china_shantung"
+            ],
+            "most_chinese_zones_held_by_japan": 3,
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 11,
+            "units_lost": {
+              "warlords": 3,
+              "ccp": 22,
+              "japan": 38,
+              "kmt": 31,
+              "other": 9
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_advance": 3,
+              "economy_purchase": 72,
+              "movement_route": 107,
+              "air_ground_attack": 8,
+              "air_support": 1,
+              "naval_load": 41,
+              "naval_start_move": 283,
+              "naval_route": 283,
+              "naval_declare_assault": 36,
+              "air_start_patrol": 1,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 47,
+              "land_continue_fighting": 12,
+              "land_take_casualty": 37,
+              "air_land": 2,
+              "naval_begin_assault": 23,
+              "naval_finish_shore_selection": 23,
+              "land_retreat_begin": 1,
+              "land_retreat_unit": 1,
+              "air_end_patrol": 1,
+              "economy_place": 74,
+              "air_ground": 1,
+              "politics_keep_capture": 1,
+              "land_progress_battle": 1
+            },
+            "possession_events": null,
+            "possession_gains": 25
+          },
+          {
+            "seed": 1013,
+            "axis_score": 4.3,
+            "japan_decisions": 1171,
+            "land_battles_begun_by_japan": 57,
+            "japan_land_moves": 87,
+            "japan_purchases": 69,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 3,
+            "manchurian_zones_lost": [
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 2,
+              "japan": 55,
+              "ccp": 16,
+              "other": 3,
+              "kmt": 37
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_advance": 3,
+              "economy_purchase": 69,
+              "movement_route": 87,
+              "air_ground_attack": 15,
+              "air_support": 1,
+              "naval_load": 30,
+              "naval_start_move": 293,
+              "naval_route": 293,
+              "naval_declare_assault": 30,
+              "air_start_patrol": 2,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 57,
+              "land_take_casualty": 54,
+              "air_land": 9,
+              "land_continue_fighting": 30,
+              "naval_begin_assault": 20,
+              "naval_finish_shore_selection": 20,
+              "land_retreat_begin": 1,
+              "land_retreat_unit": 2,
+              "air_end_patrol": 2,
+              "economy_place": 71,
+              "politics_keep_capture": 1,
+              "land_progress_battle": 1,
+              "air_ground": 1
+            },
+            "possession_events": null,
+            "possession_gains": 21
+          },
+          {
+            "seed": 1019,
+            "axis_score": 17.6,
+            "japan_decisions": 1079,
+            "land_battles_begun_by_japan": 44,
+            "japan_land_moves": 79,
+            "japan_purchases": 56,
+            "chinese_zones_held_by_japan_at_end": [
+              "land_china_beiping"
+            ],
+            "most_chinese_zones_held_by_japan": 1,
+            "manchurian_zones_lost": [
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe"
+            ],
+            "japanese_units_in_china_at_end": 1,
+            "units_lost": {
+              "warlords": 2,
+              "ccp": 19,
+              "japan": 45,
+              "kmt": 32,
+              "other": 4
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_advance": 3,
+              "economy_purchase": 56,
+              "movement_route": 79,
+              "air_ground_attack": 9,
+              "air_support": 1,
+              "naval_load": 32,
+              "naval_start_move": 281,
+              "naval_route": 281,
+              "naval_declare_assault": 35,
+              "air_start_patrol": 1,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 44,
+              "land_continue_fighting": 17,
+              "land_take_casualty": 43,
+              "air_land": 3,
+              "naval_begin_assault": 25,
+              "naval_finish_shore_selection": 25,
+              "land_retreat_begin": 2,
+              "land_retreat_unit": 3,
+              "air_end_patrol": 1,
+              "economy_place": 58,
+              "air_ground": 1
+            },
+            "possession_events": null,
+            "possession_gains": 16
+          },
+          {
+            "seed": 1021,
+            "axis_score": 13.7,
+            "japan_decisions": 1083,
+            "land_battles_begun_by_japan": 44,
+            "japan_land_moves": 54,
+            "japan_purchases": 64,
+            "chinese_zones_held_by_japan_at_end": [
+              "land_china_sikang"
+            ],
+            "most_chinese_zones_held_by_japan": 4,
+            "manchurian_zones_lost": [
+              "land_manchuria_eastern",
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "japan": 48,
+              "kmt": 34,
+              "other": 2,
+              "ccp": 23
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_advance": 3,
+              "economy_purchase": 64,
+              "movement_route": 54,
+              "air_ground_attack": 11,
+              "air_support": 1,
+              "naval_load": 31,
+              "naval_start_move": 285,
+              "naval_route": 285,
+              "naval_declare_assault": 30,
+              "air_start_patrol": 1,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 44,
+              "land_continue_fighting": 23,
+              "land_take_casualty": 46,
+              "air_land": 6,
+              "naval_begin_assault": 21,
+              "naval_finish_shore_selection": 21,
+              "land_retreat_begin": 2,
+              "land_retreat_unit": 3,
+              "air_end_patrol": 1,
+              "economy_place": 66,
+              "air_defend": 1,
+              "air_scramble": 1,
+              "air_ground": 2,
+              "politics_keep_capture": 1,
+              "land_progress_battle": 1
+            },
+            "possession_events": null,
+            "possession_gains": 15
+          },
+          {
+            "seed": 1031,
+            "axis_score": 11.1,
+            "japan_decisions": 1152,
+            "land_battles_begun_by_japan": 51,
+            "japan_land_moves": 80,
+            "japan_purchases": 67,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 2,
+            "manchurian_zones_lost": [
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 2,
+              "ccp": 11,
+              "japan": 48,
+              "other": 3,
+              "kmt": 44
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_advance": 3,
+              "economy_purchase": 67,
+              "movement_route": 80,
+              "air_ground_attack": 12,
+              "air_support": 1,
+              "naval_load": 26,
+              "naval_start_move": 298,
+              "naval_route": 298,
+              "naval_declare_assault": 24,
+              "air_start_patrol": 3,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 51,
+              "land_take_casualty": 50,
+              "land_continue_fighting": 36,
+              "air_land": 6,
+              "naval_begin_assault": 17,
+              "naval_finish_shore_selection": 17,
+              "land_retreat_begin": 4,
+              "land_retreat_unit": 6,
+              "air_end_patrol": 3,
+              "economy_place": 69,
+              "air_ground": 2
+            },
+            "possession_events": null,
+            "possession_gains": 18
+          },
+          {
+            "seed": 1033,
+            "axis_score": 30.7,
+            "japan_decisions": 1152,
+            "land_battles_begun_by_japan": 48,
+            "japan_land_moves": 58,
+            "japan_purchases": 68,
+            "chinese_zones_held_by_japan_at_end": [
+              "land_china_beiping",
+              "land_china_hunan",
+              "land_china_nanking"
+            ],
+            "most_chinese_zones_held_by_japan": 3,
+            "manchurian_zones_lost": [
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 10,
+            "units_lost": {
+              "warlords": 1,
+              "japan": 50,
+              "ccp": 20,
+              "kmt": 44,
+              "other": 3
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 11,
+              "economy_finish_research": 11,
+              "economy_advance": 3,
+              "economy_purchase": 68,
+              "movement_route": 58,
+              "air_ground_attack": 11,
+              "air_support": 1,
+              "naval_load": 38,
+              "naval_start_move": 288,
+              "naval_route": 288,
+              "naval_declare_assault": 40,
+              "air_start_patrol": 1,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 48,
+              "land_take_casualty": 52,
+              "land_continue_fighting": 48,
+              "air_land": 5,
+              "naval_begin_assault": 22,
+              "naval_finish_shore_selection": 22,
+              "air_end_patrol": 1,
+              "economy_place": 70,
+              "air_ground": 1,
+              "politics_keep_capture": 3,
+              "land_progress_battle": 4,
+              "land_retreat_begin": 1
+            },
+            "possession_events": null,
+            "possession_gains": 19
+          }
+        ],
+        "means": {
+          "japan_decisions": 1129.2,
+          "land_battles_begun_by_japan": 48.5,
+          "japan_land_moves": 77.5,
+          "japan_purchases": 66.0,
+          "japanese_units_lost": 47.3,
+          "chinese_units_lost": 57.3,
+          "games_holding_a_chinese_zone_at_end": 4,
+          "games_losing_manchurian_zones": 5
+        }
+      },
+      "generation 141": {
+        "games": [
+          {
+            "seed": 1009,
+            "axis_score": 47.1,
+            "japan_decisions": 144,
+            "land_battles_begun_by_japan": 1,
+            "japan_land_moves": 3,
+            "japan_purchases": 34,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "manchurian_zones_lost": [
+              "land_manchuria_northern",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 2,
+              "japan": 6,
+              "kmt": 35,
+              "ccp": 26
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 9,
+              "economy_finish_research": 11,
+              "economy_purchase": 34,
+              "influence_roll": 1,
+              "land_take_casualty": 6,
+              "economy_request_rail": 1,
+              "economy_place": 18,
+              "movement_route": 3,
+              "air_start_patrol": 4,
+              "naval_load": 1,
+              "land_begin_battle": 1
+            },
+            "possession_events": [
+              {
+                "game_round": 3,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "ccp",
+                "action_kind": "chance_events"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "ccp",
+                "action_kind": "chance_events"
+              },
+              {
+                "game_round": 5,
+                "zone": "land_manchuria_northern",
+                "from": "japan",
+                "to": "ccp",
+                "action_kind": "chance_events"
+              },
+              {
+                "game_round": 9,
+                "zone": "land_manchuria_rehe",
+                "from": "ccp",
+                "to": "japan",
+                "action_kind": "chance_events"
+              }
+            ]
+          },
+          {
+            "seed": 1013,
+            "axis_score": 36.5,
+            "japan_decisions": 200,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 15,
+            "japan_purchases": 28,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "manchurian_zones_lost": [
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 22,
+              "ccp": 26,
+              "other": 7,
+              "japan": 4
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 21,
+              "economy_finish_research": 11,
+              "economy_request_rail": 2,
+              "economy_purchase": 28,
+              "influence_roll": 4,
+              "economy_place": 24,
+              "air_start_patrol": 5,
+              "movement_route": 15,
+              "naval_enter_port": 23,
+              "economy_lease_declare": 3,
+              "economy_lease_deliver": 1,
+              "naval_load": 1,
+              "land_take_casualty": 4,
+              "land_pair_artillery": 3
+            },
+            "possession_events": [
+              {
+                "game_round": 11,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "kmt",
+                "action_kind": "chance_events"
+              }
+            ]
+          },
+          {
+            "seed": 1019,
+            "axis_score": 46.7,
+            "japan_decisions": 420,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 84,
+            "japan_purchases": 32,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 44,
+              "ccp": 26,
+              "other": 3,
+              "japan": 4
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 21,
+              "economy_finish_research": 11,
+              "economy_request_rail": 1,
+              "economy_purchase": 32,
+              "influence_roll": 4,
+              "economy_place": 22,
+              "movement_route": 84,
+              "naval_enter_port": 37,
+              "air_fly": 10,
+              "air_land_noncombat": 8,
+              "naval_start_move": 57,
+              "naval_route": 57,
+              "air_failed_landing": 3,
+              "naval_load": 5,
+              "naval_unload": 4,
+              "naval_force_add": 6,
+              "air_defend": 2,
+              "economy_lease_declare": 1
+            },
+            "possession_events": []
+          },
+          {
+            "seed": 1021,
+            "axis_score": 56.9,
+            "japan_decisions": 178,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 7,
+            "japan_purchases": 31,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 32,
+              "ccp": 16,
+              "japan": 1,
+              "other": 6
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 17,
+              "economy_finish_research": 11,
+              "economy_request_rail": 1,
+              "economy_purchase": 31,
+              "influence_roll": 7,
+              "economy_place": 25,
+              "naval_enter_port": 21,
+              "movement_route": 7,
+              "economy_lease_declare": 2,
+              "economy_advance": 1
+            },
+            "possession_events": []
+          },
+          {
+            "seed": 1031,
+            "axis_score": 74.3,
+            "japan_decisions": 269,
+            "land_battles_begun_by_japan": 2,
+            "japan_land_moves": 9,
+            "japan_purchases": 31,
+            "chinese_zones_held_by_japan_at_end": [
+              "land_china_beiping",
+              "land_china_suiyuan"
+            ],
+            "most_chinese_zones_held_by_japan": 2,
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 5,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 45,
+              "ccp": 19,
+              "japan": 4,
+              "other": 9
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 21,
+              "economy_finish_research": 11,
+              "economy_request_rail": 24,
+              "economy_purchase": 31,
+              "influence_roll": 5,
+              "economy_place": 25,
+              "naval_enter_port": 25,
+              "movement_route": 9,
+              "recruitment_roll": 8,
+              "economy_advance": 3,
+              "land_take_casualty": 2,
+              "naval_load": 4,
+              "air_start_patrol": 8,
+              "naval_designate_raider": 1,
+              "land_begin_battle": 2
+            },
+            "possession_events": [
+              {
+                "game_round": 10,
+                "zone": "land_china_beiping",
+                "from": "dadao",
+                "to": "japan",
+                "action_kind": "end_phase"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_china_suiyuan",
+                "from": "dadao",
+                "to": "japan",
+                "action_kind": "end_phase"
+              }
+            ]
+          },
+          {
+            "seed": 1033,
+            "axis_score": 53.1,
+            "japan_decisions": 228,
+            "land_battles_begun_by_japan": 2,
+            "japan_land_moves": 10,
+            "japan_purchases": 32,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "manchurian_zones_lost": [
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "ccp": 18,
+              "kmt": 44,
+              "other": 6
+            },
+            "japan_actions_by_kind": {
+              "economy_research": 21,
+              "economy_finish_research": 11,
+              "economy_request_rail": 10,
+              "economy_purchase": 32,
+              "influence_roll": 1,
+              "economy_place": 28,
+              "recruitment_roll": 10,
+              "economy_advance": 3,
+              "movement_route": 10,
+              "land_begin_battle": 2,
+              "land_retreat_begin": 1,
+              "land_retreat_unit": 1,
+              "naval_enter_port": 21,
+              "naval_load": 3,
+              "air_start_patrol": 2,
+              "land_pair_artillery": 4
+            },
+            "possession_events": [
+              {
+                "game_round": 10,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "kmt",
+                "action_kind": "chance_events"
+              }
+            ]
+          }
+        ],
+        "means": {
+          "japan_decisions": 239.8,
+          "land_battles_begun_by_japan": 0.8,
+          "japan_land_moves": 21.3,
+          "japan_purchases": 31.3,
+          "japanese_units_lost": 3.2,
+          "chinese_units_lost": 60.0,
+          "games_holding_a_chinese_zone_at_end": 1,
+          "games_losing_manchurian_zones": 3
+        }
+      },
+      "generation 0, untrained": {
+        "games": [
+          {
+            "seed": 1009,
+            "axis_score": 32.9,
+            "japan_decisions": 76,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 0,
+            "japan_purchases": 0,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "manchurian_zones_lost": [
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 2,
+              "kmt": 29,
+              "japan": 5,
+              "ccp": 32,
+              "other": 4
+            },
+            "japan_actions_by_kind": {
+              "economy_finish_research": 11,
+              "economy_request_rail": 1,
+              "economy_place": 1,
+              "land_take_casualty": 5,
+              "economy_lease_upgrade": 3
+            },
+            "possession_events": [
+              {
+                "game_round": 3,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "ccp",
+                "action_kind": "chance_events"
+              },
+              {
+                "game_round": 4,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "ccp",
+                "action_kind": "chance_events"
+              },
+              {
+                "game_round": 8,
+                "zone": "land_manchuria_northern",
+                "from": "japan",
+                "to": "kmt",
+                "action_kind": "chance_events"
+              }
+            ]
+          },
+          {
+            "seed": 1013,
+            "axis_score": 60.7,
+            "japan_decisions": 68,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 0,
+            "japan_purchases": 0,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 29,
+              "ccp": 23
+            },
+            "japan_actions_by_kind": {
+              "economy_finish_research": 11,
+              "economy_request_rail": 1,
+              "economy_place": 1
+            },
+            "possession_events": []
+          },
+          {
+            "seed": 1019,
+            "axis_score": 42.7,
+            "japan_decisions": 70,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 0,
+            "japan_purchases": 0,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "manchurian_zones_lost": [
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 33,
+              "japan": 2,
+              "ccp": 30,
+              "other": 2
+            },
+            "japan_actions_by_kind": {
+              "economy_finish_research": 11,
+              "economy_request_rail": 1,
+              "economy_place": 1,
+              "land_take_casualty": 2
+            },
+            "possession_events": [
+              {
+                "game_round": 9,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "kmt",
+                "action_kind": "chance_events"
+              }
+            ]
+          },
+          {
+            "seed": 1021,
+            "axis_score": 55.0,
+            "japan_decisions": 77,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 0,
+            "japan_purchases": 0,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "manchurian_zones_lost": [
+              "land_manchuria_northern",
+              "land_manchuria_rehe",
+              "land_manchuria_western"
+            ],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "ccp": 28,
+              "kmt": 41,
+              "japan": 5,
+              "other": 6
+            },
+            "japan_actions_by_kind": {
+              "economy_finish_research": 11,
+              "economy_request_rail": 1,
+              "economy_place": 1,
+              "land_take_casualty": 5,
+              "economy_lease_upgrade": 3,
+              "economy_lease_deliver": 1
+            },
+            "possession_events": [
+              {
+                "game_round": 8,
+                "zone": "land_manchuria_rehe",
+                "from": "japan",
+                "to": "ccp",
+                "action_kind": "chance_events"
+              },
+              {
+                "game_round": 10,
+                "zone": "land_manchuria_western",
+                "from": "japan",
+                "to": "kmt",
+                "action_kind": "chance_events"
+              },
+              {
+                "game_round": 11,
+                "zone": "land_manchuria_northern",
+                "from": "japan",
+                "to": "kmt",
+                "action_kind": "chance_events"
+              }
+            ]
+          },
+          {
+            "seed": 1031,
+            "axis_score": 49.2,
+            "japan_decisions": 69,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 0,
+            "japan_purchases": 0,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "ccp": 25,
+              "kmt": 34,
+              "japan": 1,
+              "other": 2
+            },
+            "japan_actions_by_kind": {
+              "economy_finish_research": 11,
+              "economy_request_rail": 1,
+              "economy_place": 1,
+              "land_take_casualty": 1
+            },
+            "possession_events": []
+          },
+          {
+            "seed": 1033,
+            "axis_score": 48.5,
+            "japan_decisions": 69,
+            "land_battles_begun_by_japan": 0,
+            "japan_land_moves": 0,
+            "japan_purchases": 0,
+            "chinese_zones_held_by_japan_at_end": [],
+            "most_chinese_zones_held_by_japan": 0,
+            "manchurian_zones_lost": [],
+            "japanese_units_in_china_at_end": 0,
+            "units_lost": {
+              "warlords": 1,
+              "kmt": 36,
+              "ccp": 27,
+              "japan": 1,
+              "other": 1
+            },
+            "japan_actions_by_kind": {
+              "economy_finish_research": 11,
+              "economy_request_rail": 1,
+              "economy_place": 1,
+              "land_take_casualty": 1
+            },
+            "possession_events": []
+          }
+        ],
+        "means": {
+          "japan_decisions": 71.5,
+          "land_battles_begun_by_japan": 0.0,
+          "japan_land_moves": 0.0,
+          "japan_purchases": 0.0,
+          "japanese_units_lost": 2.3,
+          "chinese_units_lost": 62.3,
+          "games_holding_a_chinese_zone_at_end": 0,
+          "games_losing_manchurian_zones": 3
+        }
+      }
+    },
+    "self_play": {
+      "games": [
+        {
+          "log": "game-2680-seed-1273844938927550649.jsonl",
+          "game_rounds_reached": 11,
+          "land_battles_begun_by_japan": 6,
+          "after_game_round_1": 4,
+          "combat_moves_into": [
+            "land_mongolia_kerulen",
+            "land_china_beiping",
+            "land_mongolia_central_mongolia",
+            "land_mongolia_kobdo",
+            "land_mongolia_central_mongolia"
+          ],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2681-seed-7521717486832584878.jsonl",
+          "game_rounds_reached": 11,
+          "land_battles_begun_by_japan": 7,
+          "after_game_round_1": 0,
+          "combat_moves_into": [
+            "land_mongolia_kerulen",
+            "land_china_suiyuan",
+            "land_china_suiyuan"
+          ],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2685-seed-7444357664039803537.jsonl",
+          "game_rounds_reached": 11,
+          "land_battles_begun_by_japan": 0,
+          "after_game_round_1": 0,
+          "combat_moves_into": [],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2686-seed-2737294585236591312.jsonl",
+          "game_rounds_reached": 8,
+          "land_battles_begun_by_japan": 0,
+          "after_game_round_1": 0,
+          "combat_moves_into": [],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2687-seed-3706744504438963118.jsonl",
+          "game_rounds_reached": 7,
+          "land_battles_begun_by_japan": 2,
+          "after_game_round_1": 0,
+          "combat_moves_into": [
+            "land_china_suiyuan"
+          ],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2688-seed-3967498128280655945.jsonl",
+          "game_rounds_reached": 10,
+          "land_battles_begun_by_japan": 0,
+          "after_game_round_1": 0,
+          "combat_moves_into": [],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2689-seed-5554764747240499939.jsonl",
+          "game_rounds_reached": 9,
+          "land_battles_begun_by_japan": 0,
+          "after_game_round_1": 0,
+          "combat_moves_into": [],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2690-seed-2529679707965726693.jsonl",
+          "game_rounds_reached": 10,
+          "land_battles_begun_by_japan": 0,
+          "after_game_round_1": 0,
+          "combat_moves_into": [],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2691-seed-3355330436062078821.jsonl",
+          "game_rounds_reached": 8,
+          "land_battles_begun_by_japan": 0,
+          "after_game_round_1": 0,
+          "combat_moves_into": [],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2692-seed-3904199358108876202.jsonl",
+          "game_rounds_reached": 8,
+          "land_battles_begun_by_japan": 1,
+          "after_game_round_1": 0,
+          "combat_moves_into": [
+            "land_mongolia_kerulen",
+            "land_manchuria_western"
+          ],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2693-seed-6255451066438003166.jsonl",
+          "game_rounds_reached": 7,
+          "land_battles_begun_by_japan": 1,
+          "after_game_round_1": 1,
+          "combat_moves_into": [
+            "land_mongolia_kerulen",
+            "land_mongolia_kerulen"
+          ],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2694-seed-5265538591285710444.jsonl",
+          "game_rounds_reached": 4,
+          "land_battles_begun_by_japan": 0,
+          "after_game_round_1": 0,
+          "combat_moves_into": [],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2695-seed-6266576885449155718.jsonl",
+          "game_rounds_reached": 4,
+          "land_battles_begun_by_japan": 0,
+          "after_game_round_1": 0,
+          "combat_moves_into": [],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2696-seed-5679687547180324327.jsonl",
+          "game_rounds_reached": 1,
+          "land_battles_begun_by_japan": 0,
+          "after_game_round_1": 0,
+          "combat_moves_into": [],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2697-seed-7788189683186662830.jsonl",
+          "game_rounds_reached": 1,
+          "land_battles_begun_by_japan": 0,
+          "after_game_round_1": 0,
+          "combat_moves_into": [],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        },
+        {
+          "log": "game-2698-seed-4551096711738102322.jsonl",
+          "game_rounds_reached": 1,
+          "land_battles_begun_by_japan": 0,
+          "after_game_round_1": 0,
+          "combat_moves_into": [],
+          "chinese_zones_held_by_japan_at_last_round": [],
+          "japanese_units_in_china_at_last_round": 0
+        }
+      ],
+      "games_reaching_round_4": 13,
+      "of_those_without_a_japanese_land_battle": 8,
+      "of_those_with_one_after_game_round_1": 2,
+      "games_with_japan_holding_a_chinese_zone_at_last_round": 0
+    }
   }
 }

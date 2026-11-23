@@ -101,6 +101,46 @@ first player scored higher:
 The scripted policy's own scores are close to those it had on the same seeds
 under the rules and code of 21 November: +21.2, −31.9 and −92.4.
 
+## What Japan does in China
+
+The owner asked the same day whether the Axis destroys China or does nothing.
+The six Axis games of each player above were played again exactly, every final
+score the same, with Japan's actions and its possessions logged
+(`watch_japan.py` in the run's `evaluations` folder). Japan starts with Formosa
+and the four zones of Manchuria; China's 13 land zones in the game are Beiping,
+Hopeh, Hunan, Kweichow, Nanking, Shantung, Shensi, Sikang, Sinkiang, Suiyuan,
+Szechwan, Tsinghai and Yunnan, held at the start by the KMT, the CCP and the
+warlords. Means a game over the six games, or counts of games:
+
+| Japan played by | Japan's decisions | Land battles Japan began | Japan's land-unit moves | Japan's purchases | Japanese units lost | KMT, CCP and warlord units lost | Games ending with Japan holding a zone of China | Games in which Japan lost a zone of Manchuria |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| The scripted balanced policy | 1,129 | 48.5 | 77.5 | 66.0 | 47.3 | 57.3 | 4 of 6 | 5 of 6 |
+| The network after 141 network updates | 240 | 0.8 | 21.3 | 31.3 | 3.2 | 60.0 | 1 of 6 | 3 of 6 |
+| The untrained network | 72 | 0 | 0 | 0 | 2.3 | 62.3 | 0 of 6 | 3 of 6 |
+
+The network after 141 network updates began no land battle in three of its six
+games. Its game on seed 1021 is typical: in each of 11 game rounds Japan
+bought and placed units, researched and asked for railroads, and in some it
+moved ships into port; it made no combat move, held no zone of China and lost
+one unit. In the one game that ended with Japan holding zones of China, seed
+1031, which gave its best score, +74.3, Japan stood still for nine game rounds;
+in game round 10 it moved 6 units into China and took Beiping and Suiyuan from
+Dadao, Japan's puppet government, which then held them.
+China attacked Japan instead: in seed 1009 the CCP took Rehe and western and
+northern Manchuria from Japan in game rounds 3 to 5, and Japan won Rehe back in
+game round 9, its one land battle of that game; the KMT took western Manchuria
+in game round 11 of seed 1013 and in game round 10 of seed 1033. The KMT, the
+CCP and the warlords lost about as many units whoever played Japan.
+
+In self-play, the 16 games in play at 19:10 on 22 November, played by the
+networks of about network update 166, were rebuilt from their move logs
+(`self_play_japan.py`). Japan held no zone of China and had no unit in China at
+the last game round each had reached. Of the 13 that had reached game round 4,
+8 had no land battle begun by Japan, and only 2 had one after game round 1, the
+only game round whose moves are drawn from the search's visit shares. Japan's
+combat moves went into Mongolia eight times, into Suiyuan three times, and into
+Beiping and western Manchuria once each.
+
 ## What this shows and does not show
 
 It shows that the self-play games changed steadily over 141 network updates,
@@ -119,6 +159,14 @@ network after 141 network updates plays no alliance measurably better than the
 untrained network it started from. As the Axis both score well above the
 scripted policy, which fights far more; as the Allies both score far below it,
 on every seed; as the Comintern all three score about the same.
+
+It shows that the network's Japan does not fight China: in the held-out games
+it began fewer than one land battle a game and in self-play almost none after
+game round 1; it took no zone of China from the KMT, the CCP or a warlord, while
+in three of six held-out games the CCP or the KMT took zones of Manchuria from
+it; and it lost a fifteenth of the units that the scripted Japan lost, which
+fought about 48 land battles a game. Its score comes from keeping its own
+wealth, which the final wealth gap rewards.
 
 It does not show small gains: six seeds give standard errors of 4 to 13 points.
 It does not show whether the self-play changes are better play, since one

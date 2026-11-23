@@ -3810,6 +3810,13 @@ Q-016, the Axis network made 240 decisions a game and scored +52.4, 4.3 ± 6.7
 above its untrained network, which made 72 and scored +48.2, and 29.8 ± 10.1
 above the scripted Axis, which made 1,129
 ([record](../archive/records/training_progress_2026_11_22.md#play-against-the-scripted-balanced-policy)).
+That network's Japan did not fight China. It began 0.8 land battles a game
+against 48.5 for the scripted Japan, took no zone of China from the KMT, the
+CCP or a warlord, and lost 3.2 units a game against 47.3, while in three of the
+six games the CCP or the KMT took zones of Manchuria from it. In self-play it
+began land battles almost only in game round 1, whose moves are drawn from the
+visit shares
+([record](../archive/records/training_progress_2026_11_22.md#what-japan-does-in-china)).
 
 **Would settle it:** the owner's decision on the objective. A changed objective
 can be checked first with the same scripted comparison.
