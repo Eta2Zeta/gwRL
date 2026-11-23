@@ -3889,12 +3889,13 @@ left to take it back; and the scripted Japan, which attacks from the first game
 round, still scores below the untrained Japan, which never moves, by
 10.1 ± 10.0 points on 5 of 6 seeds.
 
-**Would settle it:** whether the network's Japan comes to attack earlier as the
-training run under the land-weighted score goes on, measured the same way. If it
-keeps its attacks for the last game rounds, the score rewards land taken when
-the game's end protects it, which a score counting the land held at the end of
-every game round would not; that, or any other change of the objective, is the
-owner's decision.
+**Would settle it:** whether the network's Japan goes on to take and keep more
+land as the training run under the land-weighted score continues, measured the
+same way. The owner judged on 23 November that waiting and then taking land late
+in the game is "something that I would do if I was a player", and chose to keep
+training under these weights. A score that counted the land held at the end of
+every game round would pay more for an earlier conquest than for a late one; it,
+or any other change of the objective, is the owner's decision.
 
 #### Are the simulations enough when there are many legal actions?
 
