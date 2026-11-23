@@ -132,6 +132,25 @@ game round 9, its one land battle of that game; the KMT took western Manchuria
 in game round 11 of seed 1013 and in game round 10 of seed 1033. The KMT, the
 CCP and the warlords lost about as many units whoever played Japan.
 
+The alliances' wealth at the games' end shows where the scores part. Means over
+the six games; units and infrastructure at their price in IPP, of which wealth
+counts a tenth:
+
+| Japan played by | Japan's income | Japan's units | Japan's infrastructure | Japan's wealth | The Allies' income | The Allies' units | The Allies' wealth | The Comintern's wealth | Axis final score |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| The scripted balanced policy | 14.7 | 340 | 135 | 64.0 | 16.8 | 120 | 36.9 | 4.5 | +22.7 |
+| The network after 141 network updates | 15.0 | 418 | 183 | 80.8 | 9.3 | 52 | 19.1 | 9.3 | +52.4 |
+| The untrained network | 13.8 | 322 | 149 | 79.3 | 6.2 | 43 | 14.4 | 16.8 | +48.2 |
+
+Against the network's Japan, the scripted Japan ended with as much income from
+land, 14.7 against 15.0, because what it took in China it lost in Manchuria,
+and with 12.5 points less of units and infrastructure. The Allies ended 17.8
+points richer, with 7.5 more income and 67 IPP more units: about the warlords'
+8 IPP of land and 83 IPP of units, which join a side when Japan invades China
+(RCL-003), most of them the Allies' in these games (inferred from the sizes).
+The untrained network's Japan bought nothing and ended with 171.5 IPP in its
+treasury.
+
 In self-play, the 16 games in play at 19:10 on 22 November, played by the
 networks of about network update 166, were rebuilt from their move logs
 (`self_play_japan.py`). Japan held no zone of China and had no unit in China at
@@ -166,7 +185,9 @@ game round 1; it took no zone of China from the KMT, the CCP or a warlord, while
 in three of six held-out games the CCP or the KMT took zones of Manchuria from
 it; and it lost a fifteenth of the units that the scripted Japan lost, which
 fought about 48 land battles a game. Its score comes from keeping its own
-wealth, which the final wealth gap rewards.
+wealth, which the final wealth gap rewards, and from leaving the warlords out of
+the war: the attacking scripted Japan kept no more income from land and left
+the Allies 17.8 points richer.
 
 It does not show small gains: six seeds give standard errors of 4 to 13 points.
 It does not show whether the self-play changes are better play, since one

@@ -1987,6 +1987,117 @@
       "of_those_without_a_japanese_land_battle": 8,
       "of_those_with_one_after_game_round_1": 2,
       "games_with_japan_holding_a_chinese_zone_at_last_round": 0
+    },
+    "wealth_at_game_end_in_the_axis_games": {
+      "source": "each game's wealth_components_at_stop in the evaluation reports, means over the six Axis games",
+      "scripted balanced policy": {
+        "axis": {
+          "income_rate": 14.67,
+          "units": 340.0,
+          "infrastructure": 135.17,
+          "treasury": 18.0,
+          "paid_construction": 0.0,
+          "wealth": 63.98
+        },
+        "allies": {
+          "income_rate": 16.83,
+          "units": 119.67,
+          "infrastructure": 64.0,
+          "treasury": 16.83,
+          "paid_construction": 0.0,
+          "wealth": 36.88
+        },
+        "comintern": {
+          "income_rate": 2.5,
+          "units": 9.33,
+          "infrastructure": 4.83,
+          "treasury": 3.17,
+          "paid_construction": 2.17,
+          "wealth": 4.45
+        },
+        "axis_final_score": 22.65
+      },
+      "generation 141": {
+        "axis": {
+          "income_rate": 15.0,
+          "units": 418.17,
+          "infrastructure": 182.5,
+          "treasury": 15.5,
+          "paid_construction": 42.0,
+          "wealth": 80.82
+        },
+        "allies": {
+          "income_rate": 9.33,
+          "units": 52.33,
+          "infrastructure": 36.0,
+          "treasury": 9.5,
+          "paid_construction": 0.0,
+          "wealth": 19.12
+        },
+        "comintern": {
+          "income_rate": 5.0,
+          "units": 21.33,
+          "infrastructure": 12.67,
+          "treasury": 6.33,
+          "paid_construction": 2.33,
+          "wealth": 9.27
+        },
+        "axis_final_score": 52.43
+      },
+      "generation 0, untrained": {
+        "axis": {
+          "income_rate": 13.83,
+          "units": 322.33,
+          "infrastructure": 148.83,
+          "treasury": 171.5,
+          "paid_construction": 11.67,
+          "wealth": 79.27
+        },
+        "allies": {
+          "income_rate": 6.17,
+          "units": 43.33,
+          "infrastructure": 31.83,
+          "treasury": 6.33,
+          "paid_construction": 0.33,
+          "wealth": 14.35
+        },
+        "comintern": {
+          "income_rate": 8.5,
+          "units": 44.67,
+          "infrastructure": 25.67,
+          "treasury": 9.5,
+          "paid_construction": 2.67,
+          "wealth": 16.75
+        },
+        "axis_final_score": 48.17
+      }
+    },
+    "wealth_at_start": {
+      "source": "CampaignAdapter.wealth() at the start of a game, the same for every seed",
+      "allies": {
+        "income_rate": 6,
+        "infrastructure": 25,
+        "paid_construction": 0,
+        "treasury": 6,
+        "units": 33,
+        "wealth": 12.4
+      },
+      "axis": {
+        "income_rate": 15,
+        "infrastructure": 156,
+        "paid_construction": 10,
+        "treasury": 15,
+        "units": 329,
+        "wealth": 66
+      },
+      "comintern": {
+        "income_rate": 2,
+        "infrastructure": 2,
+        "paid_construction": 0,
+        "treasury": 2,
+        "units": 20,
+        "wealth": 4.4
+      }
     }
   }
 }
