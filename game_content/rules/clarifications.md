@@ -631,63 +631,94 @@ scramble to join it.
 **Status: adopted by the user, 5 November 2026; the part on ships at sea on
 6 November 2026.**
 
-**Sources:** RB §8.4 p51 (upgrades); §10.6.5 pp68-69 (carpet bombing); §11.3.1
-pp75-76 and §11.4.1 pp76-77 (air and naval cargo); §11.5 pp77-78 (ships in
-port); §12.3 p80 (placing upgrades); §13.1.5 pp89-92 and §13.1.6 p92 (what each
-transport carries).
+**The question.** An upgrade replaces one of a nation's units with a better
+unit in the Place Units Phase. If that unit is still aboard a transport then,
+may the upgrade be placed when the transport may not carry the upgraded unit,
+and may it be placed while the transport is a ship at sea?
 
-**Question:** a unit can still be aboard a transport when its owner places
-upgrades in the Place Units Phase: on a ship at sea or in port, or on an air
-transport. §11.3.1 does not require an air transport to unload its cargo, and
-an ally's unit boards on its own turn and leaves on its next (§§11.3.1 and
-11.4.1). Two questions follow.
+**How the case comes about.**
 
-- An upgrade can turn it into a unit the transport may not carry. An air
-  transport carries one infantry-class unit, a Heavy Air Transport also
-  artillery, so an infantry aboard may not become motorized infantry, which is
-  vehicle-class. A naval transport carries two infantry-class units or one and
-  another land unit, so of two infantry aboard only one may. The rulebook does
-  not say whether such an upgrade may be placed.
-- §12.3 requires a Supply Path to the land zone the unit is in. A unit aboard a
-  ship at sea is in no land zone, while a ship in port is located in the land
-  zone of its Naval Facility (§11.5). The rulebook does not apply this to
-  carried units in particular.
+1. **An upgrade is placed on a unit already on the map.** An upgrade bought in
+   the Production Phase waits on the build queue and replaces the old unit in
+   the Place Units Phase (RB §8.4, p51). Two upgrades act on units that
+   transports carry: Militia to Infantry and Infantry to Motorized Infantry, at
+   most two of each a Player Turn (RB §8.4).
+2. **The unit can still be aboard a transport in that phase.** An air
+   transport may unload its cargo in a Friendly-possessed land zone but need not
+   (RB §11.3.1, p75). A naval transport may go in port with its cargo aboard
+   (RB §11.5, p77). A unit of an Aligned member of the transport owner's
+   alliance boards on its own Player Turn, travels on the owner's and leaves
+   only on its own next one (RB §11.3.1; RB §11.4.1, p76), so it is aboard in
+   the Place Units Phase of the Player Turn in which it boarded.
+3. **Each transport carries only some units.** An Air Transport carries one
+   infantry-class unit (RB §13.1.5, p88), a Heavy Air Transport one
+   infantry-class unit, one Artillery or one Anti-aircraft Artillery (p89), and
+   a Naval Transport two infantry-class units, or one infantry-class unit and
+   one other land unit or Strategic Rocket (RB §13.1.6, p92). Militia and Infantry are infantry-class
+   (RB §13.1.1, p83); Motorized Infantry is vehicle-class (RB §13.1.2,
+   pp84-85). So an Infantry aboard an Air Transport that became Motorized
+   Infantry would be cargo its transport may not carry, and of two Infantry
+   aboard one Naval Transport only one could become Motorized Infantry.
+4. **An upgrade needs a Supply Path to the land zone of its unit** (RB §12.3,
+   p80). A ship in port is located in the land zone of its Naval Facility
+   (RB §11.5, p78), and its cargo with it. A ship at sea and its cargo are in a
+   sea zone, which is no land zone.
 
-**The engine before this ruling** offered an upgrade on any unit of the right
-type that a Supply Path reaches, carried or not, and its Supply Path search
-also ends in sea zones. In random play it made an air transport carry motorized
-infantry, and it upgraded infantry aboard ships at sea.
+**What the rules leave open.** The rulebook does not say whether an upgrade may
+be placed when its transport could not carry the upgraded unit afterwards, nor
+does RB §12.3 mention units aboard ships; read as written, a unit at sea is in
+no land zone, so no Supply Path reaches the land zone it is in. When an upgrade
+cannot reach a suitable unit, RB §12.3 keeps it on the build queue until a
+Supply Path reaches one in a later Place Units Phase.
 
 **Adopted ruling:**
 
 - An upgrade may not be placed on a unit aboard a transport if the transport
   could not carry its cargo afterwards.
 - An upgrade may not be placed on a unit aboard a ship at sea. Aboard a ship in
-  port it may, within the first point.
+  port it may, if the ship could carry its cargo afterwards.
 - In both cases the upgrade stays on the build queue until it can reach a
-  suitable unit, as §12.3 provides when it cannot reach one.
-- Other upgrades of carried units are unchanged: an infantry aboard a naval
-  transport in port may become motorized infantry when nothing else aboard is
-  outside the infantry class, and a militia aboard an air transport may become
-  infantry.
+  suitable unit, as RB §12.3 provides when it cannot reach one.
+- Other upgrades of carried units are unchanged: an Infantry aboard a Naval
+  Transport in port may become Motorized Infantry when nothing else aboard is
+  outside the infantry class, and a Militia aboard an Air Transport may become
+  Infantry.
 - Cargo may still stay aboard. Making every unit leave its transport before the
   Place Units Phase was considered and not adopted, because staying aboard can
-  be better: carpet bombing attacks only land units (§10.6.5).
+  be better: carpet bombing attacks only land units (RB §10.6.5, p68).
 
 **Authority:** the user in chat on 5 November 2026: "if there are cases where
 not unloading is better we then should keep the option of having them loaded,
 lets just make it not allowed to upgrade a loaded unit to something not
 carry-able then". On 6 November 2026, asked whether to bar upgrades of units
-aboard ships at sea as §12.3's wording implies, the user answered "Yes, bar
+aboard ships at sea as RB §12.3's wording implies, the user answered "Yes, bar
 them".
 
-**Examples:** a KMT air transport landed in Sikang still carries an infantry in
-the KMT's Place Units Phase, and the KMT has bought an upgrade to motorized
-infantry. Before this ruling the upgrade could be placed on that infantry. Now
-it is offered only on an infantry not aboard a transport, or aboard one that
-could carry the result. A Japanese naval transport at sea off Tokyo carries an
-infantry and a militia, and Japan has bought an upgrade for each. Neither is
-offered for them until the ship is in port or the units are ashore.
+**Examples:** a KMT Air Transport landed in Sikang still carries an Infantry in
+the KMT's Place Units Phase, and the KMT has bought an upgrade to Motorized
+Infantry. The upgrade is offered only on an Infantry not aboard a transport, or
+aboard one that could carry the result. A Japanese Naval Transport at sea off
+Tokyo carries an Infantry and a Militia, and Japan has bought an upgrade for
+each. Neither is offered for them until the ship is in port or the units are
+ashore.
+
+**What the program does.** `upgradeUnitLegal` (`src/economy.cpp`) offers an
+upgrade on a unit only if the unit is in a land zone that a Supply Path
+reaches, which a unit aboard a ship at sea never is, and if `upgradeKeepsCargo`
+finds that the unit's transport, if it has one, could still carry its cargo
+with the unit upgraded (`airCargoTypeFits`, `navalCargoTypesFit`). An upgrade
+that no unit can take stays on the build queue. Before the ruling the program
+offered an upgrade on any unit of the right type that a Supply Path reached,
+and its Supply Path search also ends in sea zones: in random play an Air
+Transport came to carry Motorized Infantry, and Infantry were upgraded aboard
+ships at sea. The tests `upgradesKeepCargo` and `upgradesWaitAtSea`
+(`tests/economy_tests.cpp`) check both parts of the ruling.
+
+**The question for the developers.** When a unit is still aboard a transport in
+its owner's Place Units Phase, may an upgrade be placed on it if the transport
+could not carry the upgraded unit, such as an Infantry aboard an Air Transport
+becoming Motorized Infantry? And may an upgrade be placed on a unit aboard a
+ship at sea, which is in no land zone for RB §12.3's Supply Path?
 
 ## RCL-022: An attack on land that was Chinese at the start
 
