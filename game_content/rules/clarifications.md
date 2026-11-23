@@ -348,6 +348,21 @@ land zone. The case needs every step below.
    units to attack it (RB §5.1, p35), which it cannot do in another nation's
    turn. Against Mongolia, no nation may declare war on a member of its own
    alliance (RB §5.1).
+
+   Japan cannot be that nation in the program. It is the only Major Power while
+   the Truce lasts, since a Chinese faction that becomes one ends the Truce
+   (RB §6.6), and the program offers the Truce only after Japan has attacked a
+   land zone Originally possessed by the CCP, the KMT or a warlord, an attack
+   that RB §4.9 (p30) counts as a declaration of war on all of China, the CCP
+   included (`recordLandAttack` in `src/politics.cpp`,
+   `beginCombatPoliticalResolution` in `src/politics_warlords.cpp`). So while
+   the Truce lasts Japan is at war with the CCP, and CCP units in a KMT land
+   zone that Japan attacks defend with the KMT's units and are eliminated with
+   them if Japan takes the zone. RB §10.10.1 (p73) lets a Major Power that
+   conquers a land zone of Chinese Home Country it did not Originally possess
+   keep the zone or give it to a Chinese faction, but after Japan's conquest no
+   CCP unit is left in the zone to be moved, so that choice never changes the
+   case above.
 4. **The attacker takes the zone.** The units that sat out must move to the
    nearest Friendly-possessed land zone, regardless of distance (RB §0.3). A
    land zone is Friendly to a nation that possesses it or is Aligned with its
