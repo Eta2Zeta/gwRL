@@ -229,9 +229,9 @@ evaluations an hour played since the 363rd network update, the chance would
 reach 0.87 after 11.0 more hours of play, 0.9 after 20.5, 0.94 after 38.9 and
 0.95 after 45.5. Whether the defect comes as often in this layout, one game
 process of 16 games on the engine built with AddressSanitizer, as in that run's
-six game processes of 42 games on the ordinary engine, is not known:
-[Q-018](../../questions.md#q-018-how-to-go-on-looking-for-the-game-process-crash)
-asks how to go on looking.
+six game processes of 42 games on the ordinary engine, is not known.
+[Q-018](../../questions.md#answered) asked how to go on looking; the owner
+answered it later the same day: stop looking, and train at full speed.
 
 ## Play against the scripted balanced policy
 

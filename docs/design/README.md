@@ -3490,9 +3490,10 @@ measured and what would settle it.
   makes and frees, the three checked about 222 million, against one crash in
   about 128 million in the training run of 19 to 21 November: had
   AddressSanitizer caught the defect as often as that run crashed, it would
-  have reported it by then with a chance of 0.82 (inferred). How to go on
-  looking is
-  [Q-018](../questions.md#q-018-how-to-go-on-looking-for-the-game-process-crash).
+  have reported it by then with a chance of 0.82 (inferred). On 24 November
+  2026 the owner chose to stop looking
+  ([Q-018, answered](../questions.md#answered)): training is to play at full
+  speed and keep what each crash leaves (section 9.2).
   On the night of 2 November, before the search ran in C++, a game process
   crashed twice early in training iteration 3, and about 4.5 hours of replays in
   builds with memory checks did not reproduce it. A race between the game
@@ -3618,6 +3619,94 @@ measured and what would settle it.
   ([record](../archive/records/self_play_limits_2026_11_16.md)).
 
 ### Open design questions
+
+#### Why did training stop improving?
+
+**Now.** In the training run under the land-weighted score the self-play final
+scores rose for about 360 network updates and then stayed flat: the Axis's mean
+went from +18.6 over the first 20 network updates to +24.6 over the 341st to
+the 363rd, and stayed between +24.8 and +25.2 in every block of about 40 up to
+the 595th, while the Allies' and the Comintern's moved by at most 1.6 points
+([record](../archive/records/training_land_weighted_update_595_2026_11_24.md#self-play)). Against the scripted balanced policy, on all 24
+held-out seeds, the network's Axis scored +15.7, +15.7 and +14.3 after 288, 363
+and 595 network updates, 5 to 7 points above the untrained network. After 595,
+its Allies scored 72.0 ± 6.7 below the scripted Allies and 6.9 ± 3.0 below the
+untrained network ([record](../archive/records/training_land_weighted_update_595_2026_11_24.md#play-against-the-scripted-balanced-policy)).
+Only the values still improved a little: from the 363rd to the 595th network
+update they explained 46% to 61% of the variance of new games' final scores,
+against 36% to 56% in the six hours before
+([record](../archive/records/training_land_weighted_update_595_2026_11_24.md#predicting-each-game-before-training-on-it)). The run was
+stopped on 24 November after 637 network updates, 10,192 games and 94,036
+training samples.
+
+**What the loop needs to keep improving.** Training moves the network's action
+probabilities toward the search's visit shares, and its values toward the final
+scores of the games played (sections 7.3 and 8.1). So the network gets better
+only where the search finds better actions than the network's own
+probabilities, and only in the states that self-play reaches. AlphaZero, whose
+loop this design follows, searched every move of its self-play games, learned
+from all of them, and kept improving over millions of games
+([paper](https://arxiv.org/abs/1712.01815),
+[DeepMind](https://deepmind.google/blog/alphazero-shedding-new-light-on-chess-shogi-and-go/)).
+This run stopped improving after 4,600 to 5,800 games, between its 288th and
+363rd network updates, 7 points above its untrained network. Six things in it
+hold back what its search can find, the states its self-play reaches, or both;
+that they are why it stopped is inferred, from the measurements each names:
+
+1. **Little search behind the moves played.** 99 decisions in 100 are searched
+   with 16 simulations (section 7.1), and a search tries every legal action
+   once before it tries any twice (section 4.3). Half of the searched decisions
+   have 17 or more legal actions (measured on 21 November in the training run
+   of 19 to 21 November,
+   [record](../archive/records/long_run_samples_2026_11_21.md#what-the-search-leaves-as-policy-targets)).
+   There the 16 simulations look one action ahead at the network's 16 likeliest
+   actions, each tried once, and the move played is the one whose state after
+   it the values rate best (section 4.5). Only the kept decision, 1 in 100,
+   gets 256 simulations, and only it becomes a training sample: 9.2 a game.
+2. **Little exploration.** From game round 2 every move is the most visited
+   action, and exploration noise reaches only the kept decisions (section 7.1).
+   So the games are much alike, and the network meets few states it would not
+   play into itself. In the 31 self-play games that finished just after the
+   595th network update Japan invaded no zone of China
+   ([record](../archive/records/training_land_weighted_update_595_2026_11_24.md#who-fought-in-the-self-play-games-that-finished-from-0742-to-0757)).
+3. **A search shorter than a plan.** A simulation stops after 16 actions and
+   dice rolls (section 4.2). An action moves one unit or ends a phase, and a
+   fleet's order takes several (section 2.3), while an invasion takes dozens of
+   actions over several Player Turns. So the search judges an invasion's first
+   steps by the values alone, and the values have learned from games without
+   invasions. The first steps also cost at once: at the end of the Combat Phase
+   of the first invasion of China, every warlord not yet aligned joins a side,
+   most often the KMT ([politics](../engine/politics.md#2-the-warlords)). In
+   the 24 held-out games in which the scripted Japan invaded from game round 1,
+   the Allies ended with 20.3 land zones, against 12.8 when the network played
+   Japan ([record](../archive/records/training_land_weighted_update_595_2026_11_24.md#what-japan-does-in-china-manchuria-and-mongolia)).
+4. **Weak values.** On 21 November a linear model that adds up each zone
+   feature over all the zones predicted the final scores of the last game
+   rounds better than the network did
+   ([below](#should-the-values-read-what-the-zones-hold-in-total)), and on the
+   layers both heads read, the value loss's gradient was a sixth to a ninth the
+   size of the policy loss's
+   ([record](../archive/records/long_run_samples_2026_11_21.md#the-two-losses-gradients)).
+   Every search rests on the values.
+5. **One opponent.** One network plays all three alliances, so each alliance
+   learns only against the others' current play
+   ([below](#search-guided-self-play-or-direct-policy-learning-and-which-opponents)).
+   Its Allies, which have rarely met an invading Japan, lose to the scripted
+   one.
+6. **Little data.** 94,036 training samples from 10,192 games in 38.4 hours.
+
+**Is it the final score?** Not by itself (inferred): the score pays for land
+held at the game's end, and nothing in it forbids an invasion. But with the
+warlords' rule it makes an invasion start at a loss and pay only at the end, the
+kind of plan that the six things above make hardest to find. Whether a
+well-coordinated invasion beats keeping still under this score is not measured:
+the only player that invades, the scripted policy, scores 15.5 ± 4.9 below the
+untrained Japan, which never moves
+([below](#is-the-final-wealth-gap-the-right-goal)).
+
+**Would settle it:** changes compared with training as it was, at equal compute
+on all 24 held-out seeds. Which to make first is
+[Q-020](../questions.md#q-020-what-to-change-in-training-first).
 
 #### One embedding per combination, or embeddings built from parts?
 

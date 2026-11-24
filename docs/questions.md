@@ -33,15 +33,15 @@ Other open things stay in the pages that own them, and
 | Number | Question | About | Recommended |
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
-| [Q-018](#q-018-how-to-go-on-looking-for-the-game-process-crash) | The memory-checked training has found nothing: go on as it is, look with ThreadSanitizer for a while first, or start the full-speed part now? | Running training | ThreadSanitizer for about 12 hours of play, then go on as now |
+| [Q-020](#q-020-what-to-change-in-training-first) | Training stopped improving after about 5,000 games: train as it was at full speed, mend the learning loop, show the network a coordinated invasion, or give it actions that move several units at once? | Training | First a scripted invasion from the owner's plan, measured, and better values checked on saved samples, neither needing a run |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
 
-Q-018 was raised on 22 November 2026, after the memory-checked first part of
-the training run of 22 November had found nothing in 5.6 hours. Its numbers are
-in the [record of that part](archive/records/memory_check_2026_11_22.md).
+Q-020 was raised on 24 November 2026, after the training run under the
+land-weighted score had stopped improving. Its numbers are in the [record of
+its 595th network update](archive/records/training_land_weighted_update_595_2026_11_24.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -113,89 +113,61 @@ Stopping only a run that stays over keeps a brief peak from costing a training i
 the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
 and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
 
-## Q-018: How to go on looking for the game process crash
+## Q-020: What to change in training first
 
-**The question.** Training plays with its game process on an engine built with
-AddressSanitizer, to find the defect behind the game process crashes, and it has
-found nothing. Should it go on as it is until AddressSanitizer reports, look
-with ThreadSanitizer for a while first, or give way now to a full-speed part,
-which would crash now and then?
+**The question.** The training run under the land-weighted score stopped
+improving after about 5,000 games. What should change first: nothing but the
+speed, the learning loop, what the network is shown of an invasion, or the size
+of its actions?
 
-**What the program does now.** The training run under the land-weighted score,
-started on the evening of 22 November 2026, plays its first part,
-`studies/campaign/runs/training-land-weighted-2026-11-22/1-memory-checked`, as
-the training run of 22 November played its own: one game process of 16 games on
-that engine built with AddressSanitizer, the checked engine, within the 8 CPU
-cores and 16 GB
-that the owner gave to looking for the defect on 21 November; the training
-process and the inference server run the ordinary build on the GPU.
-AddressSanitizer, the memory checker built into the checked engine, stops the game
-process at the first write to freed memory, second free or out-of-bounds
-access, and names the code that made it. The part also trains: once the defect
-is found, its newest network is to start the full-speed part, six game
-processes of 42 games on the ordinary engine, as the owner planned on 22
-November. The part plays its own copy of the code, from 22 November. Since
-RCL-024 (commit `c07d0f2`, 24 November) the network input of the current code
-has 26 more features, and the part's networks do not load in it: the
-full-speed part can start from the part's newest network only on the part's own
-copy of the code, which keeps the two defects of the rules that each failed
-one of its games (games 1316 and 5967, both fixed in the current code), or from
-a fresh network on the current code.
+**What the program does now.** Self-play plays every decision with the newest
+network and the search of section 4 of the design document. 99 decisions in 100
+are searched with 16 simulations, and 1 in 100 with 256 and kept as a training
+sample; from game round 2 every move is the most visited action (choice D of
+Q-016, [section 7.1](design/README.md#71-a-training-iterations-games)). One
+network plays all three alliances. Nothing trains now: the owner stopped the
+run on 24 November. Its networks load only in its own copy of the code, from 22
+November, since RCL-024 added 26 features to the network input; a run on the
+current code starts from a fresh network unless they are converted.
 
-**A real case.** By its 134th network update, at 17:35 on 22 November, the
-memory-checked first part of the training run of 22 November had played 5.6
-hours: 1,513,584 decisions and 2,144 games, about 270,000
-decisions an hour, and the inference server had answered 20.7 million network
-evaluations for it. AddressSanitizer wrote no report. Nor did it in the memory check
-of 21 and 22 November, in 21.2 hours and 66.4 million network evaluations. The
-training run of 19 to 21 November crashed once in about 128 million network
-evaluations, all six times while the search freed the game copies that its
-tree's nodes hold, work that grows with the network evaluations (inferred). So
-if AddressSanitizer caught the defect as often as that run crashed, a report by
-then was about as likely as not: 0.49
-([record](archive/records/memory_check_2026_11_22.md)). That part stopped at
-20:04, when the owner changed the final score, after 187 network updates with
-no report, 0.53 by the same count. The memory-checked first part of the training
-run under the land-weighted score then played 35.38 hours to its 595th network
-update, at 07:39 on 24 November: 8,724,175 decisions, 9,520 games and 126.1
-million network evaluations, with no report. With the 66.4 and 29.5 million
-before it, that brings the chance of a report by then to 0.82; put the other
-way, if AddressSanitizer caught the defect as often as that run crashed, seeing
-no report by then had a chance of 0.18
-([record](archive/records/training_land_weighted_update_595_2026_11_24.md#the-memory-check)).
-Two games of that part failed, at 00:19 and at 20:07 on 23 November, each on a
-defect of the rules, not on damaged memory; both defects are now fixed, the
-second by the answer to Q-019 ([answered](#answered)), though the part runs
-on with its own copy of the code.
+**A real case.** In self-play the Axis's mean final score rose from +18.6 over
+the run's first 20 network updates to +24.6 over the 341st to the 363rd, and
+stayed between +24.8 and +25.2 up to the 595th. Against the scripted balanced
+policy on the 24 held-out seeds its Axis scored +15.7, +15.7 and +14.3 after
+288, 363 and 595 network updates, 5 to 7 points above the untrained network, and
+after 595 its Japan held 1 zone of China it had taken, in 1 game of 24, against
+14 in 9 after 288. Its Allies scored 72.0 ± 6.7 below the scripted Allies and
+6.9 ± 3.0 below the untrained network ([record](archive/records/training_land_weighted_update_595_2026_11_24.md)). The [design
+document](design/README.md#why-did-training-stop-improving) gives six likely
+reasons: little search behind the moves played, little exploration, a search
+shorter than a plan, weak values, one opponent and little data.
 
-**Why it matters.** The full-speed part waits until the defect is found, and it would play
-several times as fast as this part: the training run of 19 to 21 November did
-about 21.6 million network evaluations an hour, 5.5 to 7.5 times this part's
-2.87 to 3.95 million in the stretches between its records, and 6.1 times its
-3.55 million since its 363rd network update (same records; not measured for
-choice D's searches). And the longer AddressSanitizer finds nothing, the likelier
-it is that the defect is one it cannot see, such as one that needs the timing
-of 42 game threads on the fast engine.
+**Why it matters.** More of the same training would most likely stay flat
+(inferred), and the owner's aim, a Japan that takes and keeps Chinese land by
+coordinating many moves, is the kind of plan the present loop finds hardest:
+the first invasion of China makes every warlord not yet aligned join a side at
+once, most often the KMT, and the gain comes only after dozens of actions.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. Go on as now until AddressSanitizer reports | Nothing changes. At about 3.55 million network evaluations an hour, the chance of a report reaches 0.87 after 11 more hours of play, 0.9 after 20.5 and 0.94 after 39, counted from 07:39 on 24 November, if AddressSanitizer sees the defect at all. The network goes on training at this part's pace. |
-| B. ThreadSanitizer for about 12 hours of play, then A | ThreadSanitizer looks for a data race: two game threads of one process touching the same memory, at least one of them writing, with no lock between them. No data race has been found; one is a suspected cause of the crashes, and one that AddressSanitizer would see only on the rare occasion when the two touches damage memory. ThreadSanitizer reports the two touches as soon as it sees them, whether or not anything is damaged that time, and names the two places in the code that made them. A data race found that way is fixed by a lock around that memory, or by not sharing it between the threads; the full-speed part could then run without the crashes. The part stops, keeping its checkpoint and losing only the games in play; its game process then runs the part's own sources built with ThreadSanitizer, in the same layout, and the part resumes from the checkpoint. It has run only in a test script, with three or four game threads and no inference server, for about 8,000 decisions ([record](archive/records/crash_diagnosis_2026_11_21.md)). The damage has crossed games: before the second crash of 20 November, two other games of that process failed the state check ([record](archive/records/second_game_process_crash_2026_11_20.md)), which a data race between game threads would explain, as would a second free. In the test script it played 1.54 decisions a thread-second against 3.27 for that day's AddressSanitizer build, so training would go at roughly a third of this part's pace (inferred). Its memory in this layout is not measured; a few minutes would measure it before it replaces the checked engine. It finds nothing if the defect is not a data race. |
-| C. Start the full-speed part now | Six game processes of 42 games on the ordinary engine, from this part's newest network on its own copy of the code, or from a fresh network on the current code. The crashes come back, about one every six hours if they keep their rate per network evaluation (inferred). Each costs the dead process's unfinished games, a few minutes of play, and leaves their move logs, the crash report and the allocator's message ([running training on the Mac](design/README.md#92-running-training-on-the-mac)). The defect stays unfound, and its damage can reach a game's state, as it did twice on 20 November. |
+| A. Train as it was, at full speed | Nothing in the loop. Six game processes of 42 games played 173,717 decisions in their first 16 minutes on 24 November, while still starting up, about 2.5 times the memory-checked part's rate (measured before their first network update). It shows whether more data alone helps; if the six reasons hold, the scores stay flat. |
+| B. Mend the learning loop | Three changes, each checked before the next. Values that also read the zones' totals, checked first on saved training samples with `tools/train_on_saved_samples.py`, without a run. More search behind the moves played: 64 simulations instead of 16 where nothing is kept, and 5% of the decisions kept instead of 1%, which gives each game five times the training samples but plays about a quarter as many games an hour (inferred: about 74 simulations a decision instead of 18). And the scripted balanced policy in one seat of one self-play game in four, so that the network's Allies meet an invading Japan. Then a full-speed run, compared with A at equal compute. It does not by itself show Japan a coordinated invasion. |
+| C. Show the network an invasion | A scripted Japan that invades as the owner would, written from the owner's plan (which zones, with which units, in which game rounds), first played against the scripted balanced policy on the 24 held-out seeds. That settles whether this final score pays a well-coordinated invasion more than keeping still. If it does, its games can teach the network: it plays Japan in some self-play games, and its decisions become training samples whose policy target is its own move. |
+| D. Actions that move several units at once | One decision sends every chosen unit into one zone, so that an attack takes a few decisions instead of dozens and fits in the search's 16 actions. The largest change: the engine's legal actions, the search and the network's action features. |
 
-**Recommendation: B, then A.** ThreadSanitizer is the one check not yet made
-where the crashes happen, with the inference server and many game threads, and
-each hour in which AddressSanitizer finds nothing makes a defect it cannot see
-more likely. Twelve hours of B cost about eight hours of this part's training
-(inferred), and A goes on from the same checkpoint if B finds nothing. If A then
-passes a chance of about 0.9 with no report, after about 20 more hours of play
-from 07:39 on 24 November, C is what remains.
+**Recommendation: C's measurement and B's check of the values first, both
+without a training run.** The measurement answers with games whether this score
+rewards the invasion the owner has in mind, and needs the owner's plan; the
+check of the values took 67 minutes on one CPU core on 21 November
+([record](archive/records/value_loss_weights_2026_11_21.md)). What they show
+decides between the rest of B, C's teaching and D, each then compared with A
+at equal compute.
 
-**If answered.** How the defect is looked for, and what that finds, belong in the
-[known gaps](design/README.md#known-gaps) of the design document, and the run's
-parts in the [list of runs](archive/runs.md).
+**If answered.** What changes belongs in sections 4, 7 and 8 of the design
+document and in the open question that it settles, and the runs in the [list of
+runs](archive/runs.md).
 
 ## Open elsewhere
 
@@ -345,6 +317,17 @@ the page that now states it.
   themselves: a median of 694 decisions, 28% of the actions ending a phase, and 201 moves of a land unit a game against 54 at first, though still about 10 land
   battles a game ([record](archive/records/fresh_network_games_2026_11_22.md)).
   So the run goes on from the fresh network, as the owner chose.
+- **Q-018**, how to go on looking for the game process crash. Answered on 24
+  November 2026: stop looking, and train at full speed, crashes and all
+  (choice C). The memory-checked part of the training run under the
+  land-weighted score stopped at 10:40 after 637 network updates and 38.4 hours
+  with no memory-checker report, where at the crash rate of the training run of
+  19 to 21 November a report had a chance of 0.82 by its 595th network update
+  ([record](archive/records/training_land_weighted_update_595_2026_11_24.md#the-memory-check)). The full-speed part, started at 10:42, was
+  stopped at 11:01 at the owner's word, before its first network update, until
+  [Q-020](#q-020-what-to-change-in-training-first) is answered. Stated in the
+  [known gaps](design/README.md#known-gaps) of the design document and the
+  [list of runs](archive/runs.md).
 - **Q-019**, two attacks on one land zone by Japan and Dadao. Answered on 24
   November 2026: no. Of the nations that share a Player Turn, a controlled
   minor power and the major power that controls it, only the first to attack
