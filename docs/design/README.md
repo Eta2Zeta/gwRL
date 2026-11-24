@@ -3870,32 +3870,33 @@ those weights a zone of land was worth many units, but only if it was held at
 the game's end, and Japan's invasion first gave the warlords to China.
 
 Under the land-weighted score the Axis network of the training run started on
-the evening of 22 November played the same six seeds three times on 23
-November. The untrained network scored +7.4 there with 71 decisions a game, and
-the new weights score the scripted Axis's same games −2.7. The mean Axis final
-score of each network, its paired differences from the untrained network and
-from the scripted Axis, with standard errors in brackets, and what its Japan
-did in the six games:
+the evening of 22 November was played on 23 November after 197, 288 and 363
+network updates: after 197 on the first six of the 24 held-out seeds, after 288
+and 363 on all 24. On the 24 the untrained network scored +8.8 with 70
+decisions a game, and the new weights score the scripted Axis's games −6.7; on
+the six, +7.4 and −2.7. The mean Axis final score of each network, its paired
+differences from the untrained network and from the scripted Axis on the same
+seeds, with standard errors in brackets, and what its Japan did in those games:
 
-| Network updates | Axis final score | Above the untrained network | Above the scripted Axis | The Axis's decisions a game | Zones of China taken from the KMT or the CCP and held at the end | Starting zones of Manchuria lost | Axis land zones at the end |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 197 | +14.8 (3.5) | +7.4 (5.8) | +17.5 (9.6) | 872 | 4, in 2 games | 6 | 11.2 |
-| 288 | +19.0 (3.9) | +11.6 (5.1) | +21.7 (12.2) | 1,170 | 4, in 2 games | 2 | 11.8 |
-| 363 | +8.8 (5.1) | +1.4 (8.4) | +11.5 (13.6) | 475 | none | 5 | 10.5 |
+| Network updates | Seeds | Axis final score | Above the untrained network | Above the scripted Axis | The Axis's decisions a game | Zones of China taken from the KMT or the CCP and held at the end | Starting zones of Manchuria lost | Axis land zones at the end |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 197 | 6 | +14.8 (3.5) | +7.4 (5.8) | +17.5 (9.6) | 872 | 4, in 2 games | 6 | 11.2 |
+| 288 | 24 | +15.7 (1.7) | +6.9 (2.9) | +22.4 (5.7) | 1,177 | 14, in 9 games | 16 | 11.4 |
+| 363 | 24 | +15.7 (2.6) | +6.9 (3.5) | +22.4 (5.8) | 451 | 5, in 3 games | 16 | 11.1 |
 
 ([after 197](../archive/records/training_land_weighted_2026_11_23.md#play-against-the-scripted-balanced-policy),
-[after 288](../archive/records/training_land_weighted_update_288_2026_11_23.md#play-against-the-scripted-balanced-policy),
-[after 363](../archive/records/training_land_weighted_update_363_2026_11_23.md#play-against-the-scripted-balanced-policy)).
-The Axis starts with 11 land zones; the scripted Axis ended with 9.7 and the
-untrained one with 9.5. After 197 network updates the land battles begun in
-Japan's turns, by Japan or by Dadao, Japan's minor power, all came in game
-rounds 8 to 11, and the zones held at the end had been taken in game rounds 10
-and 11. After 288 one of them, Nanking, had been taken in game round 7. After
-363 most of the battles went to taking back zones of Manchuria and to one
-invasion of China from game round 7, which took no zone of China
+[after 288 and 363](../archive/records/training_land_weighted_24_seeds_2026_11_23.md#the-axiss-final-scores)).
+On the first six seeds alone the network after 363 network updates had scored
+10.2 ± 5.6 below the one after 288, and on the other 18 it scored 3.3 ± 3.7
+above. The Axis starts with 11 land zones; on the 24 seeds the scripted Axis
+ended with 8.9 and the untrained one with 9.6. The land battles begun in
+Japan's turns, by Japan or by Dadao, Japan's minor power, came mostly late:
+after 197 network updates all 24 of them in game rounds 8 to 11, after 288
+and 363, 111 of 135 and 69 of 93. Of the 14 zones of China that the network after 288
+network updates held at the end, 10 had been taken in game rounds 10 and 11,
+and one, Beiping, in game round 5
 ([after 197](../archive/records/training_land_weighted_2026_11_23.md#what-japan-does-in-china),
-[after 288](../archive/records/training_land_weighted_update_288_2026_11_23.md#what-japan-does-in-china),
-[after 363](../archive/records/training_land_weighted_update_363_2026_11_23.md#what-japan-does-in-china)).
+[after 288 and 363](../archive/records/training_land_weighted_24_seeds_2026_11_23.md#what-japan-does-in-china-and-manchuria)).
 In self-play the Axis ended games holding about the 11 land zones it starts
 with in every block of 20 network updates. In the 36 self-play games that
 finished just after the 288th network update neither Japan nor Dadao began a
@@ -3905,16 +3906,17 @@ and in two of them held zones of China at the end
 ([record](../archive/records/training_land_weighted_update_363_2026_11_23.md#who-fought-in-the-self-play-games-that-finished-from-1931-to-1946)).
 So under these weights the network's Japan keeps most of its land and sometimes
 takes some late in the game, when the final score counts it and few game
-rounds are left to take it back, but it has not taken more as training went
-on; and the scripted Japan, which attacks from the first game round, still
-scores below the untrained Japan, which never moves, by 10.1 ± 10.0 points on 5
-of 6 seeds.
+rounds are left to take it back. From the 288th to the 363rd network update it
+did not take more: it kept 5 zones of China instead of 14, with a quarter of
+the fleet moves and the same final score. The scripted Japan, which attacks
+from the first game round, still scores below the untrained Japan, which never
+moves, by 15.5 ± 4.9 points on 20 of 24 seeds.
 
 **Would settle it:** whether the network's Japan goes on to take and keep more
 land as the training run under the land-weighted score continues, measured the
-same way on enough seeds: on six, the Axis's mean final score moved by 4.2 and
-10.2 points from one evaluation to the next, with standard errors of 3.7 and
-5.6. The owner judged on 23 November that waiting and then taking land late in
+same way on all 24 held-out seeds: on six, the networks after 288 and 363
+network updates seemed 10.2 points apart, and on 24 they scored the same. The
+owner judged on 23 November that waiting and then taking land late in
 the game is "something that I would do if I was a player", and chose to keep
 training under these weights. A score that counted the land held at the end of
 every game round would pay more for an earlier conquest than for a late one; it,

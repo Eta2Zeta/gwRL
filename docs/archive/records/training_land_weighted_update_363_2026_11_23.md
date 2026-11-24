@@ -19,6 +19,11 @@ holds every number below, read from the part's `manifest.json`, from
 `tools/compare_training_runs.py` and from the reports and scripts in the run's
 `evaluations` folder (`make_record_363.py` writes it).
 
+Later the same evening the Axis games of the other 18 held-out seeds put the
+networks of the 288th and 363rd network updates level, +15.7 each on all 24
+seeds: the fall of 10.2 points on the six seeds below was the luck of those six
+([record of the 24 seeds](training_land_weighted_24_seeds_2026_11_23.md)).
+
 ## Self-play
 
 An alliance's final score is its wealth minus the other two alliances' wealth
