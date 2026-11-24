@@ -3783,7 +3783,11 @@ result only when the Combat Phase that follows resolves it. Second, a game here
 is long and its only reward comes at its end: about 880 decisions, and three
 alliances rather than two opponents, so self-play has no single winner to
 settle on, and a network learns from fewer outcomes for each decision it
-makes.
+makes. In seven-player Diplomacy, self-play from scratch settled on strategies
+incompatible with agents started from human games, and two runs with different
+seeds on different equilibria ([Bakhtin et al. 2021](https://arxiv.org/abs/2110.02924),
+section 5.2; see
+[which opponents](#search-guided-self-play-or-direct-policy-learning-and-which-opponents)).
 
 **How big published networks are.** AlphaZero's networks, and most that
 followed them, are stacks of *residual blocks*. A residual block is two
@@ -3913,7 +3917,12 @@ measured):
   simulations give about 12 for each legal action at the mean searched decision,
   47 at the median, and 8 at the mean of Japan's: between chess and Go. The 16
   simulations of the training run under the land-weighted score gave 0.25 for
-  each legal action at the mean. KataGo spent full searches of 600 to 1,000
+  each legal action at the mean. AlphaZero's policy can fail to improve when its
+  search does not try every action at the root, and on 9×9 Go MuZero did not
+  learn at all with 16 simulations or fewer, where Gumbel MuZero, which samples
+  the actions it tries, learned with 2
+  ([Danihelka et al. 2022](https://openreview.net/forum?id=bERaNdoegnO), section
+  7). KataGo spent full searches of 600 to 1,000
   simulations on a quarter of its moves, which alone became training samples, and
   searched the others with 100 to 200, so as to play them well for less: here
   800 on a quarter of the decisions and 150 on the rest would average about 310
@@ -3964,10 +3973,14 @@ MB larger than the one it started from, about 23 KB a training sample
 
 **Unmeasured:** whether this game needs as many games as Go, whether a larger
 network or a longer search learns faster here for the same compute, and whether
-network depth or width matters more. In Hex, the strength a fixed amount of
-compute buys falls predictably as the board grows, and compute spent in
-training can stand in for search at play time
-([Jones 2021](https://arxiv.org/abs/2104.03113)). Gumbel search learned with a
+network depth or width matters more. In Hex, the strongest agents for each
+amount of training compute gained about 500 Elo for every tenfold increase in
+compute, the compute needed for perfect play grew sevenfold with each step up in
+board size, and ten times the training compute replaced about fifteen times the
+search at play time ([Jones 2021](https://arxiv.org/abs/2104.03113), section
+IV). So steady gains are a straight line against the logarithm of the compute:
+each doubling of training buys about the same gain, and so each later gain
+takes about as long as all the training before it (inferred). Gumbel search learned with a
 few simulations where plain search failed, so the search budget and the search
 method are one question.
 
@@ -4198,7 +4211,18 @@ decisions a game against the scripted Allies' 483, and the KMT ended with 8.5
 land territories against 18.5
 ([record](../archive/records/long_run_samples_2026_11_21.md#the-network-as-the-allies-against-the-scripted-policy)).
 Playing only itself, the network had not met a Japan that attacks as the
-scripted one does (inferred). On 24 November, on all 24 held-out seeds, the
+scripted one does (inferred). Elsewhere, OpenAI Five played its newest network
+against itself in 80% of its games and against older networks in 20%, to avoid
+a strategy collapse in which the agent forgets how to play against other
+opponents ([Berner et al. 2019](https://arxiv.org/abs/1912.06680), section
+3.2); AlphaStar started from networks trained on human games and trained a
+league of agents, because plain self-play forgot what it had learned and chased
+its tail
+([DeepMind](https://deepmind.google/blog/alphastar-grandmaster-level-in-starcraft-ii-using-multi-agent-reinforcement-learning/));
+and in seven-player Diplomacy, self-play from scratch converged to strategies
+incompatible with agents started from human games, which its authors take as
+evidence that self-play from scratch may be insufficient there
+([Bakhtin et al. 2021](https://arxiv.org/abs/2110.02924)). On 24 November, on all 24 held-out seeds, the
 network after 595 network updates of the training run under the land-weighted
 score scored −74.1 as the Allies, 72.0 ± 6.7 below the scripted Allies and
 6.9 ± 3.0 below the untrained network; its Allies ended with 7.5 land zones
