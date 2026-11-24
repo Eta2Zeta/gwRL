@@ -3756,11 +3756,13 @@ every zone to every other, once.
 
 **How this game differs from theirs.** Measured on 97 self-play games of the
 training run under the land-weighted score
-([record](../archive/records/game_size_2026_11_24.md)), beside the estimates
-usually cited for the board games
-([game complexity](https://en.wikipedia.org/wiki/Game_complexity), after
-[Allis 1994](https://project.dke.maastrichtuniversity.nl/games/files/phd/SearchingForSolutions.pdf)),
-in which the game tree is the branching factor raised to the game's length:
+([record](../archive/records/game_size_2026_11_24.md)), beside the board
+games' usual estimates, in which the game tree is the branching factor raised to
+the game's length: Allis's for chess and Go
+([Allis 1994](https://project.dke.maastrichtuniversity.nl/games/files/phd/SearchingForSolutions.pdf),
+sections 6.3.9 and 6.3.12) and Iida, Sakuta and Rollason's for shogi, as the
+[game-complexity table](https://en.wikipedia.org/wiki/Game_complexity) cites
+them. That table now gives Go 211 plies and a game tree of $10^{505}$:
 
 | | Chess | Shogi | Go, 19×19 | This campaign |
 | --- | --- | --- | --- | --- |
@@ -3926,8 +3928,11 @@ measured):
   games, strong professional Go after 1.0 million and superhuman Go after 2.5
   million (tables 6 and 7 of its paper). At about 250 moves a game (inferred),
   that is 100, 250 and 625 million moves; at the 693 searched decisions of a game
-  here, about 145,000, 360,000 and 900,000 games. Whether this game needs as
-  many is not known: it is the only yardstick there is.
+  here, about 145,000, 360,000 and 900,000 games. Counted in training samples
+  instead, 23, 55 and 140 million at those points (table 6), the same yardstick
+  at about 173 training samples a game here gives about 133,000, 318,000 and
+  809,000 games. Whether this game needs as many is not known: it is the only
+  yardstick there is.
 
 **What it would cost here.** With 800 simulations on a quarter of the decisions
 and 150 on the rest, a game asks for about 217,000 network evaluations, 17 times
