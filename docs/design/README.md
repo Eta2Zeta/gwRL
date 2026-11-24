@@ -3705,8 +3705,13 @@ untrained Japan, which never moves
 ([below](#is-the-final-wealth-gap-the-right-goal)).
 
 **Would settle it:** changes compared with training as it was, at equal compute
-on all 24 held-out seeds. Which to make first is
-[Q-020](../questions.md#q-020-what-to-change-in-training-first).
+on all 24 held-out seeds. On 24 November the owner chose to size training to
+AlphaZero's and KataGo's scale ([Q-020, answered](../questions.md#answered)),
+which addresses four of the six together: more search behind the moves played,
+exploration noise at a quarter of the decisions instead of 1 in 100, simulations
+that reach the end of a Combat Phase, and about 25 times the training samples a
+game; the values and the one opponent stay open. See [how big the network and
+the search should be](#how-big-should-the-network-and-the-search-be).
 
 #### One embedding per combination, or embeddings built from parts?
 
@@ -3736,17 +3741,47 @@ compute, compared on held-out value error and in held-out evaluation games.
 
 #### How big should the network and the search be?
 
-**Now.** The Mac profile runs a 64×2 network (section 6) with 16 simulations per
-decision, and 256 at a decision kept as a training sample (section 7.1), and no
-training run has played more than about 500
-eleven-round games: the night run of 2 November played 467, with a 256×8
-network. After $d$ message-passing layers, a network depth of $d$, a zone's
-vector reflects zones up to $d$ borders away (section 6.6). The map is 7 borders
-across, from Tokyo to Sinkiang, and two zones are on average 3.2 borders apart.
-So a 64×2 network relates each zone to about a third of the others, and to the
-average of all zones through the global vector; 7 message-passing layers would
-relate every zone to every other. Inferred, not measured: in China many threats
-are three or more borders away.
+**Now.** The training runs since 19 November used a 256×8 network (section 6).
+The training run under the land-weighted score searched 99 decisions in 100 with
+16 simulations and the kept 1 in 100 with 256 (section 7.1); in 38.4 hours it
+played 10,192 games and kept 94,036 training samples, and it stopped improving
+after about 5,000 games ([above](#why-did-training-stop-improving)). On 24
+November the owner judged that sizes like these cannot show what the method can
+learn, and asked for the network and the search to be sized from AlphaZero's
+and KataGo's by comparing this game with theirs. After $d$ message-passing
+layers, a network depth of $d$, a zone's vector reflects zones up to $d$ borders
+away (section 6.6). The map is 7 borders across, from Tokyo to Sinkiang, and two
+zones are on average 3.2 borders apart, so 7 message-passing layers relate
+every zone to every other, once.
+
+**How this game differs from theirs.** Measured on 97 self-play games of the
+training run under the land-weighted score
+([record](../archive/records/game_size_2026_11_24.md)), beside the estimates
+usually cited for the board games
+([game complexity](https://en.wikipedia.org/wiki/Game_complexity), after
+[Allis 1994](https://project.dke.maastrichtuniversity.nl/games/files/phd/SearchingForSolutions.pdf)),
+in which the game tree is the branching factor raised to the game's length:
+
+| | Chess | Shogi | Go, 19×19 | This campaign |
+| --- | --- | --- | --- | --- |
+| Sides | 2, one's gain the other's loss | 2, the same | 2, the same | 3 alliances, each scoring its wealth against the other two's, so one's gain need not be another's loss |
+| Dice | none | none | none | 92 chance events a game |
+| Places on the board | 64 squares | 81 squares | 361 points | 37 zones |
+| Moves or decisions a game | about 80 | about 115 | about 150 | 883 decisions, 693 of them with a choice |
+| Legal actions at a choice | about 35 | about 92 | about 250 | median 17, mean 65; in Japan's turns median 62, mean 99 |
+| Decisions in one player's turn | 1 | 1 | 1 | median 12, mean 20.5; Japan's mean 42, at most 251 |
+| Game tree, base-10 logarithm | 123 | 226 | 360 | 914 on average, counting the engine's action sequences and leaving the dice out |
+
+Two of these differences set the sizes below. First, a move there is a whole
+turn, and here a turn is a median of 12 decisions, each moving one unit, making
+one purchase or ending a phase (section 2.3). A search there compares whole
+turns several turns ahead; a search here, at one decision, compares that
+decision's options a few decisions into the same turn, and an attack shows its
+result only when the Combat Phase that follows resolves it. Second, a game here
+is long and its only reward comes at its end: about 880 decisions, and three
+alliances rather than two opponents, so self-play has no single winner to
+settle on, and a network learns from fewer outcomes for each decision it
+makes.
 
 **How big published networks are.** AlphaZero's networks, and most that
 followed them, are stacks of *residual blocks*. A residual block is two
@@ -3772,6 +3807,8 @@ in chess, 37 zones here.
 | This project, 64×2 | this game, 37 zones | 2 | 64 | 0.13 million | 3.4 million | 0.3 |
 | This project, 256×8 | this game | 8 | 256 | 4.4 million | 173 million | 1.1 |
 | This project, 512×16 | this game | 16 | 512 | 30 million | 1.3 billion | 2.3 |
+| This project, 256×16, not built | this game | 16 | 256 | about 8 million | about 340 million | 2.3 |
+| This project, 384×20, not built | this game | 20 | 384 | about 22 million | about 940 million | 2.9 |
 
 The published networks' parameters and FLOPs are worked out here from their
 published sizes, counting the convolutions' parameters and two FLOPs per
@@ -3795,7 +3832,13 @@ A 256×8 network is about as large as the smallest published ones: more paramete
 than KataGo's first two networks or AlphaZero.jl's, less arithmetic than
 KataGo's, since it has 37 zones to their 361 points, and a receptive field of the
 whole map. A 512×16 network has a little more than AlphaZero's parameters, under
-half its arithmetic and the receptive field of KataGo's final network.
+half its arithmetic and the receptive field of KataGo's final network. The two
+sizes not built are worked out from the three measured ones, whose arithmetic
+grows as the width squared times the number of layers, about 320 FLOPs for each
+unit of that product, and whose parameters outside the tables about 7.5 times
+it: 256×16 would have the receptive field of KataGo's final 2019 network with a
+third of its parameters, and 384×20 about AlphaZero's parameters with a third of
+its arithmetic.
 
 **What those sizes were enough for.** TD-Gammon 2.1's 80 hidden neurons played
 backgammon at a strong master level after 1.5 million games. KataGo's first
@@ -3843,42 +3886,91 @@ more games:
 | AlphaZero.jl, Connect Four | 600 | 75,000 | one GPU, about a day |
 | TD-Gammon 2.1 | none; a 2-ply lookahead in play | 1.5 million | not stated |
 | This project, the training run of 19 to 21 November 2026 | 64 | 9,576 | the Mac, about 36 hours |
+| This project, the training run under the land-weighted score, 22 to 24 November 2026 | 16 on 99 decisions in 100, 256 on the 1 kept | 10,192 | the Mac, 38 hours, its game process memory-checked |
 
-A game here has about 1,000 decisions, many more than a game of chess or Go has
-moves, so it holds more decisions to learn from, but its final score comes much
-later. Published work on war and strategy board games is small: an
+A game here has about 880 decisions ([record](../archive/records/game_size_2026_11_24.md)), many more than a game
+of chess or Go has moves, so it holds more decisions to learn from, but its
+final score comes much later. Published work on war and strategy board games is small: an
 AlphaZero-style agent for a hex-and-counter wargame was trained on a 5×5 map
 with two kinds of unit and grew weaker on larger maps
 ([arXiv 2502.13918](https://arxiv.org/abs/2502.13918)).
 
-**What it would cost here.** On the Mac, at least about 51 days per 100,000 games
-at 256×8 with 256 simulations and at least about 450 days at 512×16 with 800
-simulations, both limited by its GPU in inference batches of 64 states
-([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost), whose rates
-are upper bounds). Three months of eight-hour nights, about 720 hours, would
-play at most about 59,000 games at the first size and 6,600 at the second.
-AlphaGo Zero's first run played 4.9 million games, 49 times as many as 100,000,
-and KataGo's 2019 run 4.2 million.
+**Their sizes, carried over.** Taken one measure at a time (inferred, not
+measured):
 
-**Unmeasured:** whether a larger network or a longer search learns faster here
-for the same compute, whether network depth or width matters more, and how many
-games this game needs. In Hex, the strength a fixed amount of compute buys falls
-predictably as the board grows, and compute spent in training can stand in for
-search at play time ([Jones 2021](https://arxiv.org/abs/2104.03113)). Gumbel
-search learned with a few simulations where plain search failed, so the search
-budget and the search method are one question.
+- **The network.** The published networks carry information 0.8 to 5.6 times
+  across their boards. Here 16 to 20 message-passing layers would carry it 2.3
+  to 2.9 times across the map, at the published widths of 256 to 384. That is
+  256×16 or 384×20 in the table above. But the network that learns best is sized
+  to the compute it will get, not to the game: KataGo grew its network from 1 to
+  24 million parameters within one run, and the best size grew with the compute
+  in Neumann and Gros's study. So 384×20 is the size for AlphaZero's compute, and
+  256×16 a size to start from on less.
+- **The search at each decision.** AlphaZero searched every move with 800
+  simulations: about 23 for each legal move in chess and about 3 in Go. Here 800
+  simulations give about 12 for each legal action at the mean searched decision,
+  47 at the median, and 8 at the mean of Japan's: between chess and Go. The 16
+  simulations of the training run under the land-weighted score gave 0.25 for
+  each legal action at the mean. KataGo spent full searches of 600 to 1,000
+  simulations on a quarter of its moves, which alone became training samples, and
+  searched the others with 100 to 200, so as to play them well for less: here
+  800 on a quarter of the decisions and 150 on the rest would average about 310
+  simulations a searched decision, 17 times the 18.4 of that run, and keep 25
+  times as many training samples a game, about 173.
+- **The search's reach.** AlphaZero's simulations end where its network has not
+  yet been asked, however deep. Here a simulation also stops after 16 actions and
+  dice rolls (section 4.2), less than one of Japan's turns, which average 42
+  decisions; to see an attack's result it would have to reach the end of the
+  Combat Phase that resolves it.
+- **The games.** KataGo's 2019 run played strong amateur Go after 0.4 million
+  games, strong professional Go after 1.0 million and superhuman Go after 2.5
+  million (tables 6 and 7 of its paper). At about 250 moves a game (inferred),
+  that is 100, 250 and 625 million moves; at the 693 searched decisions of a game
+  here, about 145,000, 360,000 and 900,000 games. Whether this game needs as
+  many is not known: it is the only yardstick there is.
 
-**Would settle it:** a ladder of training runs at growing sizes, each given the
-same compute and compared in held-out evaluation (section 10), with the search's
-targets checked as in
-[the question on many legal actions](#are-the-simulations-enough-when-there-are-many-legal-actions),
-then repeated with more compute; or one long training run that grows its network,
-as KataGo's did. Inferred from the published networks, not measured: a first
-ladder would run from 64×2 through 256×8, the smallest of the measured sizes whose
-layers reach across the map, to 512×16, a little more than AlphaZero's
-parameters. The size that does best for a budget is the target for that budget,
-and section 9.3's costs at that size say which part of a computer limits it, and
-so what hardware it needs.
+**What it would cost here.** With 800 simulations on a quarter of the decisions
+and 150 on the rest, a game asks for about 217,000 network evaluations, 17 times
+the training run under the land-weighted score's 12,750. Each network evaluation
+takes about 1.3 ms of a CPU core in engine work and search (section 9.3), so
+145,000 games take about 11,000 CPU-core hours, plus the network's arithmetic:
+about $1.1 \times 10^{19}$ FLOPs at 256×16 and $3.0 \times 10^{19}$ at 384×20
+(inferred). On the Mac, at the network rates of section 9.3 in inference
+batches of 64 states, which are upper bounds:
+
+| Network on the Mac | Network evaluations a second | Games a day | 145,000 games |
+| --- | ---: | ---: | --- |
+| 256×8 | about 4,500 | about 1,800 | about 81 days |
+| 384×12 | about 2,600 | about 1,050 | about 138 days |
+| 512×16 | about 1,600 | about 650 | about 221 days |
+
+256×16 and 384×20 were not measured; by their arithmetic they fall between
+256×8 and 384×12, and between 384×12 and 512×16. Played at 800 simulations on
+every decision, as AlphaZero played, every number of days above is 2.6 times as
+large. A computer with 32 CPU cores for the games and a GPU that evaluates
+23,000 states a second at the chosen size would play 145,000 games in about 16
+days; with 64 cores and twice the GPU, in about 8 (inferred, from the 1.3 ms of
+a CPU core and the 217,000 network evaluations a game). Memory grows with the
+games in flight, about 200 MB for each game's search tree at 800 simulations
+(section 9.3), and with the replay buffer: the checkpoint of the training run
+under the land-weighted score, with its 25,000 training samples, was about 580
+MB larger than the one it started from, about 23 KB a training sample
+(inferred).
+
+**Unmeasured:** whether this game needs as many games as Go, whether a larger
+network or a longer search learns faster here for the same compute, and whether
+network depth or width matters more. In Hex, the strength a fixed amount of
+compute buys falls predictably as the board grows, and compute spent in
+training can stand in for search at play time
+([Jones 2021](https://arxiv.org/abs/2104.03113)). Gumbel search learned with a
+few simulations where plain search failed, so the search budget and the search
+method are one question.
+
+**Would settle it:** a learning curve: a training run at the search above, from
+a 256×16 network, measured on all 24 held-out seeds for all three alliances at
+regular intervals (section 10), and then the network grown or compared with a
+larger one at equal compute, as KataGo did. Where to run it is
+[Q-021](../questions.md#q-021-where-to-run-training-at-alphazeros-and-katagos-scale).
 
 #### How should a count count?
 

@@ -1,0 +1,736 @@
+{
+ "record": "game_size_2026_11_24",
+ "source": [
+  "/Users/home/Projects/gwRL/studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/self-play-moves-update-363",
+  "/Users/home/Projects/gwRL/studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/self-play-moves-update-595"
+ ],
+ "script": "studies/campaign/runs/training-land-weighted-2026-11-22/evaluations/game_size.py",
+ "method": "How large a game of the campaign is, decision by decision, for sizing the network and the search.\n\nThe owner asked on 24 November 2026 for the network and the search to be sized from AlphaZero's and KataGo's, by\ncomparing this game with theirs. This replays, without searching, the move logs of self-play games of the training\nrun under the land-weighted score that collect_finished_games.sh kept (self-play-moves-update-363/ and\nself-play-moves-update-595/, each game copied at most 10 seconds before its end), and records at every decision the\nnumber of legal actions, the nation whose turn it is, the phase and the game round, and counts the chance events.\nFrom these it works out: decisions a game; the legal actions a decision (mean, median, percentiles); the sum of\nlog10(legal actions) over a game's decisions, the size of the tree of a game's action sequences leaving the dice\nout, as Shannon's 10^120 for chess counts it; decisions a Player Turn and a phase; and the same by phase. Run from\nthe run's code folder with PYTHONPATH set to it:  game_size.py OUTPUT FOLDER [FOLDER ...]\nThe replayed decisions are kept beside OUTPUT (OUTPUT-decisions.json) and read again on a second run.\n",
+ "summary": {
+  "games": 97,
+  "game_rounds_reached": {
+   "11": 94,
+   "10": 3
+  },
+  "decisions_a_game": {
+   "mean": 882.5,
+   "median": 813,
+   "min": 465,
+   "max": 1914
+  },
+  "decisions_with_two_or_more_legal_actions_a_game": {
+   "mean": 692.5,
+   "median": 627
+  },
+  "chance_events_a_game": 92.4,
+  "legal_actions_a_decision": {
+   "mean": 51.3,
+   "percentiles": {
+    "10": 1,
+    "25": 2,
+    "50": 9,
+    "75": 61,
+    "90": 197,
+    "99": 395
+   }
+  },
+  "legal_actions_at_decisions_with_two_or_more": {
+   "mean": 65.1,
+   "percentiles": {
+    "10": 2,
+    "25": 5,
+    "50": 17,
+    "75": 88,
+    "90": 220,
+    "99": 411
+   },
+   "share_with_17_or_more": 0.503,
+   "share_with_64_or_more": 0.313,
+   "share_with_200_or_more": 0.125
+  },
+  "log10_of_the_action_sequences_of_a_game": {
+   "mean": 914.2,
+   "min": 341.4,
+   "max": 2190.3
+  },
+  "decisions_a_player_turn": {
+   "mean": 20.5,
+   "percentiles": {
+    "10": 7,
+    "25": 9,
+    "50": 12,
+    "75": 21,
+    "90": 33,
+    "99": 160
+   }
+  },
+  "decisions_a_player_turn_by_nation": {
+   "null": {
+    "turns": 35,
+    "mean": 18.6,
+    "max": 29
+   },
+   "ccp": {
+    "turns": 966,
+    "mean": 11.4,
+    "max": 41
+   },
+   "japan": {
+    "turns": 1053,
+    "mean": 42.4,
+    "max": 251
+   },
+   "kmt": {
+    "turns": 1069,
+    "mean": 19.3,
+    "max": 66
+   },
+   "mongolia": {
+    "turns": 1058,
+    "mean": 8.1,
+    "max": 20
+   }
+  },
+  "decisions_a_phase_of_a_player_turn": {
+   "mean": 4.1,
+   "percentiles": {
+    "10": 1,
+    "25": 1,
+    "50": 2,
+    "75": 4,
+    "90": 6,
+    "99": 37
+   }
+  },
+  "by_phase": {
+   "non_combat_movement": {
+    "decisions_a_game": 334.4,
+    "mean_legal_actions": 85.4,
+    "median_legal_actions": 45,
+    "max_legal_actions": 767
+   },
+   "production": {
+    "decisions_a_game": 184.5,
+    "mean_legal_actions": 64.1,
+    "median_legal_actions": 5.0,
+    "max_legal_actions": 342
+   },
+   "place_units": {
+    "decisions_a_game": 154.1,
+    "mean_legal_actions": 7.2,
+    "median_legal_actions": 3.0,
+    "max_legal_actions": 182
+   },
+   "combat_movement": {
+    "decisions_a_game": 110.8,
+    "mean_legal_actions": 32.3,
+    "median_legal_actions": 14,
+    "max_legal_actions": 199
+   },
+   "combat": {
+    "decisions_a_game": 98.8,
+    "mean_legal_actions": 1.6,
+    "median_legal_actions": 1,
+    "max_legal_actions": 28
+   }
+  }
+ },
+ "more": {
+  "japan_decisions_with_two_or_more_legal_actions": {
+   "a_game": 403.3,
+   "mean_legal_actions": 99.2,
+   "median_legal_actions": 62.0,
+   "90th_percentile": 232,
+   "99th_percentile": 441
+  },
+  "share_of_decisions_with_one_legal_action": 0.215,
+  "games_kept_just_after_update_363": 66,
+  "games_kept_just_after_update_595": 31,
+  "decisions_a_game_after_363": 792.2,
+  "decisions_a_game_after_595": 1074.8
+ },
+ "games": [
+  {
+   "log": "game-5799-seed-2798649621510663842.jsonl",
+   "decisions": 1914,
+   "chance_events": 190,
+   "log10_action_sequences": 2143.7
+  },
+  {
+   "log": "game-5810-seed-7004492777990662919.jsonl",
+   "decisions": 792,
+   "chance_events": 52,
+   "log10_action_sequences": 992.4
+  },
+  {
+   "log": "game-5813-seed-4646071526759507994.jsonl",
+   "decisions": 761,
+   "chance_events": 101,
+   "log10_action_sequences": 720.0
+  },
+  {
+   "log": "game-5814-seed-1541515995389421366.jsonl",
+   "decisions": 915,
+   "chance_events": 88,
+   "log10_action_sequences": 1009.3
+  },
+  {
+   "log": "game-5816-seed-3485267181872932917.jsonl",
+   "decisions": 813,
+   "chance_events": 83,
+   "log10_action_sequences": 847.1
+  },
+  {
+   "log": "game-5817-seed-1598162485178474163.jsonl",
+   "decisions": 1630,
+   "chance_events": 220,
+   "log10_action_sequences": 1687.6
+  },
+  {
+   "log": "game-5818-seed-1664105305318735560.jsonl",
+   "decisions": 720,
+   "chance_events": 100,
+   "log10_action_sequences": 668.6
+  },
+  {
+   "log": "game-5819-seed-6672231600425800328.jsonl",
+   "decisions": 556,
+   "chance_events": 71,
+   "log10_action_sequences": 426.0
+  },
+  {
+   "log": "game-5820-seed-442313121120013330.jsonl",
+   "decisions": 623,
+   "chance_events": 78,
+   "log10_action_sequences": 550.5
+  },
+  {
+   "log": "game-5821-seed-2999352036186618706.jsonl",
+   "decisions": 608,
+   "chance_events": 68,
+   "log10_action_sequences": 512.4
+  },
+  {
+   "log": "game-5822-seed-184772641472594034.jsonl",
+   "decisions": 560,
+   "chance_events": 54,
+   "log10_action_sequences": 494.0
+  },
+  {
+   "log": "game-5823-seed-3126235920561023845.jsonl",
+   "decisions": 1201,
+   "chance_events": 123,
+   "log10_action_sequences": 1412.2
+  },
+  {
+   "log": "game-5824-seed-844422646118658335.jsonl",
+   "decisions": 631,
+   "chance_events": 69,
+   "log10_action_sequences": 581.4
+  },
+  {
+   "log": "game-5825-seed-2824930942916555004.jsonl",
+   "decisions": 564,
+   "chance_events": 76,
+   "log10_action_sequences": 430.1
+  },
+  {
+   "log": "game-5826-seed-4902653555327885194.jsonl",
+   "decisions": 506,
+   "chance_events": 55,
+   "log10_action_sequences": 415.8
+  },
+  {
+   "log": "game-5827-seed-7300321849318449801.jsonl",
+   "decisions": 980,
+   "chance_events": 99,
+   "log10_action_sequences": 1095.6
+  },
+  {
+   "log": "game-5828-seed-8523944391841916255.jsonl",
+   "decisions": 1203,
+   "chance_events": 98,
+   "log10_action_sequences": 1441.3
+  },
+  {
+   "log": "game-5829-seed-7815054460960752954.jsonl",
+   "decisions": 465,
+   "chance_events": 58,
+   "log10_action_sequences": 341.4
+  },
+  {
+   "log": "game-5830-seed-1676226366307233629.jsonl",
+   "decisions": 614,
+   "chance_events": 91,
+   "log10_action_sequences": 526.1
+  },
+  {
+   "log": "game-5831-seed-2215166617476954023.jsonl",
+   "decisions": 681,
+   "chance_events": 90,
+   "log10_action_sequences": 588.5
+  },
+  {
+   "log": "game-5832-seed-6658359905235783958.jsonl",
+   "decisions": 652,
+   "chance_events": 61,
+   "log10_action_sequences": 634.9
+  },
+  {
+   "log": "game-5833-seed-5928063392261168150.jsonl",
+   "decisions": 484,
+   "chance_events": 54,
+   "log10_action_sequences": 360.8
+  },
+  {
+   "log": "game-5834-seed-735255498038606444.jsonl",
+   "decisions": 593,
+   "chance_events": 72,
+   "log10_action_sequences": 507.7
+  },
+  {
+   "log": "game-5835-seed-3661669834207708799.jsonl",
+   "decisions": 593,
+   "chance_events": 73,
+   "log10_action_sequences": 512.5
+  },
+  {
+   "log": "game-5836-seed-3273325006082215647.jsonl",
+   "decisions": 882,
+   "chance_events": 107,
+   "log10_action_sequences": 926.3
+  },
+  {
+   "log": "game-5837-seed-7167627854789875822.jsonl",
+   "decisions": 1252,
+   "chance_events": 117,
+   "log10_action_sequences": 1478.1
+  },
+  {
+   "log": "game-5838-seed-384890342233690159.jsonl",
+   "decisions": 1044,
+   "chance_events": 111,
+   "log10_action_sequences": 1108.6
+  },
+  {
+   "log": "game-5839-seed-4941222503900935849.jsonl",
+   "decisions": 789,
+   "chance_events": 92,
+   "log10_action_sequences": 732.0
+  },
+  {
+   "log": "game-5840-seed-9078739328326917175.jsonl",
+   "decisions": 735,
+   "chance_events": 125,
+   "log10_action_sequences": 670.5
+  },
+  {
+   "log": "game-5841-seed-9194946417497369032.jsonl",
+   "decisions": 988,
+   "chance_events": 70,
+   "log10_action_sequences": 1179.0
+  },
+  {
+   "log": "game-5842-seed-8789714858482857455.jsonl",
+   "decisions": 665,
+   "chance_events": 77,
+   "log10_action_sequences": 601.7
+  },
+  {
+   "log": "game-5843-seed-8358383151619308641.jsonl",
+   "decisions": 606,
+   "chance_events": 102,
+   "log10_action_sequences": 458.8
+  },
+  {
+   "log": "game-5844-seed-6520016700710338186.jsonl",
+   "decisions": 669,
+   "chance_events": 74,
+   "log10_action_sequences": 609.9
+  },
+  {
+   "log": "game-5845-seed-3999917138165270058.jsonl",
+   "decisions": 623,
+   "chance_events": 72,
+   "log10_action_sequences": 541.2
+  },
+  {
+   "log": "game-5846-seed-1494064494762138261.jsonl",
+   "decisions": 696,
+   "chance_events": 80,
+   "log10_action_sequences": 615.3
+  },
+  {
+   "log": "game-5847-seed-4528064990974132509.jsonl",
+   "decisions": 662,
+   "chance_events": 78,
+   "log10_action_sequences": 554.8
+  },
+  {
+   "log": "game-5848-seed-6968665132896419745.jsonl",
+   "decisions": 766,
+   "chance_events": 72,
+   "log10_action_sequences": 722.3
+  },
+  {
+   "log": "game-5849-seed-4817859888183928624.jsonl",
+   "decisions": 686,
+   "chance_events": 125,
+   "log10_action_sequences": 581.0
+  },
+  {
+   "log": "game-5850-seed-4255470809554555553.jsonl",
+   "decisions": 768,
+   "chance_events": 134,
+   "log10_action_sequences": 634.3
+  },
+  {
+   "log": "game-5851-seed-3030039750644760781.jsonl",
+   "decisions": 638,
+   "chance_events": 88,
+   "log10_action_sequences": 530.4
+  },
+  {
+   "log": "game-5852-seed-223223275493785129.jsonl",
+   "decisions": 1254,
+   "chance_events": 97,
+   "log10_action_sequences": 1414.1
+  },
+  {
+   "log": "game-5853-seed-1630157884580511892.jsonl",
+   "decisions": 817,
+   "chance_events": 74,
+   "log10_action_sequences": 875.2
+  },
+  {
+   "log": "game-5854-seed-3256589614080315484.jsonl",
+   "decisions": 677,
+   "chance_events": 119,
+   "log10_action_sequences": 553.7
+  },
+  {
+   "log": "game-5855-seed-531828260333213336.jsonl",
+   "decisions": 1007,
+   "chance_events": 78,
+   "log10_action_sequences": 1096.0
+  },
+  {
+   "log": "game-5856-seed-2120527508460675080.jsonl",
+   "decisions": 909,
+   "chance_events": 91,
+   "log10_action_sequences": 960.6
+  },
+  {
+   "log": "game-5857-seed-652174292625061234.jsonl",
+   "decisions": 633,
+   "chance_events": 102,
+   "log10_action_sequences": 524.1
+  },
+  {
+   "log": "game-5858-seed-9076139813909142700.jsonl",
+   "decisions": 683,
+   "chance_events": 88,
+   "log10_action_sequences": 559.8
+  },
+  {
+   "log": "game-5859-seed-7600988255448167722.jsonl",
+   "decisions": 741,
+   "chance_events": 109,
+   "log10_action_sequences": 616.3
+  },
+  {
+   "log": "game-5860-seed-7623454673715553149.jsonl",
+   "decisions": 742,
+   "chance_events": 58,
+   "log10_action_sequences": 756.7
+  },
+  {
+   "log": "game-5861-seed-6612993611288443422.jsonl",
+   "decisions": 654,
+   "chance_events": 128,
+   "log10_action_sequences": 504.8
+  },
+  {
+   "log": "game-5862-seed-5992326804556457345.jsonl",
+   "decisions": 915,
+   "chance_events": 99,
+   "log10_action_sequences": 983.6
+  },
+  {
+   "log": "game-5863-seed-3006606730270066592.jsonl",
+   "decisions": 1231,
+   "chance_events": 131,
+   "log10_action_sequences": 1479.9
+  },
+  {
+   "log": "game-5864-seed-417174788849387853.jsonl",
+   "decisions": 793,
+   "chance_events": 103,
+   "log10_action_sequences": 786.9
+  },
+  {
+   "log": "game-5865-seed-3003650576101370068.jsonl",
+   "decisions": 946,
+   "chance_events": 79,
+   "log10_action_sequences": 998.0
+  },
+  {
+   "log": "game-5866-seed-2429460090150807842.jsonl",
+   "decisions": 759,
+   "chance_events": 80,
+   "log10_action_sequences": 806.0
+  },
+  {
+   "log": "game-5867-seed-7911669638356535797.jsonl",
+   "decisions": 701,
+   "chance_events": 57,
+   "log10_action_sequences": 703.9
+  },
+  {
+   "log": "game-5868-seed-2077922838809624932.jsonl",
+   "decisions": 706,
+   "chance_events": 125,
+   "log10_action_sequences": 599.0
+  },
+  {
+   "log": "game-5869-seed-8135231658775666629.jsonl",
+   "decisions": 1138,
+   "chance_events": 146,
+   "log10_action_sequences": 1138.4
+  },
+  {
+   "log": "game-5870-seed-4716409143869543572.jsonl",
+   "decisions": 870,
+   "chance_events": 79,
+   "log10_action_sequences": 845.8
+  },
+  {
+   "log": "game-5873-seed-2560875484673676105.jsonl",
+   "decisions": 850,
+   "chance_events": 121,
+   "log10_action_sequences": 846.2
+  },
+  {
+   "log": "game-5874-seed-5427476852352421216.jsonl",
+   "decisions": 649,
+   "chance_events": 75,
+   "log10_action_sequences": 613.1
+  },
+  {
+   "log": "game-5875-seed-8538341615395943983.jsonl",
+   "decisions": 745,
+   "chance_events": 86,
+   "log10_action_sequences": 687.5
+  },
+  {
+   "log": "game-5876-seed-7237665849814002205.jsonl",
+   "decisions": 601,
+   "chance_events": 55,
+   "log10_action_sequences": 555.3
+  },
+  {
+   "log": "game-5879-seed-2039706213641298712.jsonl",
+   "decisions": 572,
+   "chance_events": 63,
+   "log10_action_sequences": 473.3
+  },
+  {
+   "log": "game-5880-seed-2369216486963359240.jsonl",
+   "decisions": 671,
+   "chance_events": 90,
+   "log10_action_sequences": 553.0
+  },
+  {
+   "log": "game-5883-seed-4988520985047754711.jsonl",
+   "decisions": 494,
+   "chance_events": 50,
+   "log10_action_sequences": 413.0
+  },
+  {
+   "log": "game-9531-seed-1025238412204519032.jsonl",
+   "decisions": 768,
+   "chance_events": 120,
+   "log10_action_sequences": 782.2
+  },
+  {
+   "log": "game-9533-seed-1440299737449830196.jsonl",
+   "decisions": 1054,
+   "chance_events": 71,
+   "log10_action_sequences": 1309.0
+  },
+  {
+   "log": "game-9534-seed-629413006515577195.jsonl",
+   "decisions": 810,
+   "chance_events": 88,
+   "log10_action_sequences": 788.1
+  },
+  {
+   "log": "game-9535-seed-1993440483283355329.jsonl",
+   "decisions": 1249,
+   "chance_events": 112,
+   "log10_action_sequences": 1468.4
+  },
+  {
+   "log": "game-9536-seed-3924229007999831220.jsonl",
+   "decisions": 1317,
+   "chance_events": 87,
+   "log10_action_sequences": 1582.9
+  },
+  {
+   "log": "game-9537-seed-8762301443143715029.jsonl",
+   "decisions": 1174,
+   "chance_events": 78,
+   "log10_action_sequences": 1291.8
+  },
+  {
+   "log": "game-9538-seed-417130150762407943.jsonl",
+   "decisions": 1571,
+   "chance_events": 112,
+   "log10_action_sequences": 1846.0
+  },
+  {
+   "log": "game-9539-seed-5347926310338472063.jsonl",
+   "decisions": 1092,
+   "chance_events": 85,
+   "log10_action_sequences": 1161.3
+  },
+  {
+   "log": "game-9540-seed-2615628282088687391.jsonl",
+   "decisions": 1354,
+   "chance_events": 90,
+   "log10_action_sequences": 1550.4
+  },
+  {
+   "log": "game-9541-seed-9143030050282691334.jsonl",
+   "decisions": 966,
+   "chance_events": 87,
+   "log10_action_sequences": 1052.0
+  },
+  {
+   "log": "game-9542-seed-4898180902337359451.jsonl",
+   "decisions": 950,
+   "chance_events": 124,
+   "log10_action_sequences": 970.1
+  },
+  {
+   "log": "game-9543-seed-7536147628379160627.jsonl",
+   "decisions": 886,
+   "chance_events": 123,
+   "log10_action_sequences": 917.5
+  },
+  {
+   "log": "game-9544-seed-2501779130268516060.jsonl",
+   "decisions": 1048,
+   "chance_events": 108,
+   "log10_action_sequences": 1166.7
+  },
+  {
+   "log": "game-9545-seed-799263730754029281.jsonl",
+   "decisions": 665,
+   "chance_events": 54,
+   "log10_action_sequences": 720.4
+  },
+  {
+   "log": "game-9546-seed-7260452023199461911.jsonl",
+   "decisions": 957,
+   "chance_events": 123,
+   "log10_action_sequences": 979.3
+  },
+  {
+   "log": "game-9547-seed-5023314106949296074.jsonl",
+   "decisions": 1050,
+   "chance_events": 100,
+   "log10_action_sequences": 1153.7
+  },
+  {
+   "log": "game-9548-seed-4907423044671684644.jsonl",
+   "decisions": 1556,
+   "chance_events": 89,
+   "log10_action_sequences": 1901.2
+  },
+  {
+   "log": "game-9549-seed-2023451522965047984.jsonl",
+   "decisions": 1002,
+   "chance_events": 84,
+   "log10_action_sequences": 1157.7
+  },
+  {
+   "log": "game-9550-seed-7456469603167066378.jsonl",
+   "decisions": 1153,
+   "chance_events": 78,
+   "log10_action_sequences": 1291.8
+  },
+  {
+   "log": "game-9551-seed-994009217958885992.jsonl",
+   "decisions": 1731,
+   "chance_events": 97,
+   "log10_action_sequences": 2190.3
+  },
+  {
+   "log": "game-9553-seed-17273689090055155.jsonl",
+   "decisions": 919,
+   "chance_events": 113,
+   "log10_action_sequences": 973.8
+  },
+  {
+   "log": "game-9554-seed-681411412635278.jsonl",
+   "decisions": 1445,
+   "chance_events": 83,
+   "log10_action_sequences": 1803.4
+  },
+  {
+   "log": "game-9555-seed-8637151427595742894.jsonl",
+   "decisions": 919,
+   "chance_events": 69,
+   "log10_action_sequences": 1087.3
+  },
+  {
+   "log": "game-9556-seed-3959218661685484499.jsonl",
+   "decisions": 878,
+   "chance_events": 49,
+   "log10_action_sequences": 1042.7
+  },
+  {
+   "log": "game-9557-seed-1371011462603861053.jsonl",
+   "decisions": 835,
+   "chance_events": 62,
+   "log10_action_sequences": 915.9
+  },
+  {
+   "log": "game-9558-seed-2871831175681116376.jsonl",
+   "decisions": 859,
+   "chance_events": 121,
+   "log10_action_sequences": 826.1
+  },
+  {
+   "log": "game-9559-seed-7654726639614516155.jsonl",
+   "decisions": 1309,
+   "chance_events": 141,
+   "log10_action_sequences": 1436.0
+  },
+  {
+   "log": "game-9560-seed-6707416103715117157.jsonl",
+   "decisions": 903,
+   "chance_events": 90,
+   "log10_action_sequences": 992.7
+  },
+  {
+   "log": "game-9561-seed-3974394015041690839.jsonl",
+   "decisions": 859,
+   "chance_events": 95,
+   "log10_action_sequences": 862.8
+  },
+  {
+   "log": "game-9562-seed-7262364573013987489.jsonl",
+   "decisions": 940,
+   "chance_events": 86,
+   "log10_action_sequences": 1026.0
+  },
+  {
+   "log": "game-9563-seed-5743259748685519692.jsonl",
+   "decisions": 1100,
+   "chance_events": 108,
+   "log10_action_sequences": 1241.8
+  }
+ ]
+}

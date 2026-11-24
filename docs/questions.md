@@ -33,15 +33,16 @@ Other open things stay in the pages that own them, and
 | Number | Question | About | Recommended |
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
-| [Q-020](#q-020-what-to-change-in-training-first) | Training stopped improving after about 5,000 games: train as it was at full speed, mend the learning loop, show the network a coordinated invasion, or give it actions that move several units at once? | Training | First a scripted invasion from the owner's plan, measured, and better values checked on saved samples, neither needing a run |
+| [Q-021](#q-021-where-to-run-training-at-alphazeros-and-katagos-scale) | Training sized from AlphaZero and KataGo needs about 217,000 network evaluations a game and KataGo's yardstick about 145,000 games: run it on the Mac now, on new hardware, or on rented machines? | Training | Start on the Mac now, at 256×16 with KataGo's search, while the owner chooses hardware for the 384×20 network |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
 
-Q-020 was raised on 24 November 2026, after the training run under the
-land-weighted score had stopped improving. Its numbers are in the [record of
-its 595th network update](archive/records/training_land_weighted_update_595_2026_11_24.md).
+Q-021 was raised on 24 November 2026, when the owner asked for training at
+AlphaZero's and KataGo's scale. Its numbers are in the [record of the game's
+size](archive/records/game_size_2026_11_24.md) and in [section 9.3 of the design
+document](design/README.md#93-what-a-larger-network-and-a-longer-search-cost).
 
 ## Q-005: The supervisor's count of cores
 
@@ -113,61 +114,52 @@ Stopping only a run that stays over keeps a brief peak from costing a training i
 the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
 and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
 
-## Q-020: What to change in training first
+## Q-021: Where to run training at AlphaZero's and KataGo's scale
 
-**The question.** The training run under the land-weighted score stopped
-improving after about 5,000 games. What should change first: nothing but the
-speed, the learning loop, what the network is shown of an invasion, or the size
-of its actions?
+**The question.** Training sized from AlphaZero's and KataGo's needs far more
+computing than the runs so far. Should it start on the Mac now, wait for new
+hardware, or run on rented machines?
 
-**What the program does now.** Self-play plays every decision with the newest
-network and the search of section 4 of the design document. 99 decisions in 100
-are searched with 16 simulations, and 1 in 100 with 256 and kept as a training
-sample; from game round 2 every move is the most visited action (choice D of
-Q-016, [section 7.1](design/README.md#71-a-training-iterations-games)). One
-network plays all three alliances. Nothing trains now: the owner stopped the
-run on 24 November. Its networks load only in its own copy of the code, from 22
-November, since RCL-024 added 26 features to the network input; a run on the
-current code starts from a fresh network unless they are converted.
+**What the program does now.** Nothing trains. The Mac gives training 9 of its
+10 performance cores, its GPU and up to 30 GB of its 36 GB of memory, of which
+the owner's other programs often take 11 to 17 GB. The code has also run on a
+Windows PC with an NVIDIA GPU (`studies/campaign/profiles/windows.json`, three-round
+games on 14 November), never on a Linux machine.
 
-**A real case.** In self-play the Axis's mean final score rose from +18.6 over
-the run's first 20 network updates to +24.6 over the 341st to the 363rd, and
-stayed between +24.8 and +25.2 up to the 595th. Against the scripted balanced
-policy on the 24 held-out seeds its Axis scored +15.7, +15.7 and +14.3 after
-288, 363 and 595 network updates, 5 to 7 points above the untrained network, and
-after 595 its Japan held 1 zone of China it had taken, in 1 game of 24, against
-14 in 9 after 288. Its Allies scored 72.0 ± 6.7 below the scripted Allies and
-6.9 ± 3.0 below the untrained network ([record](archive/records/training_land_weighted_update_595_2026_11_24.md)). The [design
-document](design/README.md#why-did-training-stop-improving) gives six likely
-reasons: little search behind the moves played, little exploration, a search
-shorter than a plan, weak values, one opponent and little data.
+**A real case.** The [design
+document](design/README.md#how-big-should-the-network-and-the-search-be) carries
+AlphaZero's and KataGo's sizes over to this game, measured on 97 self-play games
+([record](archive/records/game_size_2026_11_24.md)): a 256×16 network to start from and 384×20 for AlphaZero's
+compute; 800 simulations with exploration noise on a quarter of the decisions,
+which become training samples, and 150 on the rest, as KataGo searched; a
+simulation reaching to the end of the Combat Phase. A game then asks for about
+217,000 network evaluations, 17 times the last run's, and keeps about 173
+training samples, 25 times as many. By KataGo's yardstick, strong amateur play
+came after about 145,000 games of this length. At about 1.3 ms of a CPU core for
+each network evaluation, those games need about 11,000 CPU-core hours, plus the
+network's arithmetic (inferred).
 
-**Why it matters.** More of the same training would most likely stay flat
-(inferred), and the owner's aim, a Japan that takes and keeps Chinese land by
-coordinating many moves, is the kind of plan the present loop finds hardest:
-the first invasion of China makes every warlord not yet aligned join a side at
-once, most often the KMT, and the gain comes only after dozens of actions.
+**Why it matters.** On the Mac the first 145,000 games take about 81 days at
+256×8, 138 at 384×12 and 221 at 512×16, the network on its GPU (section 9.3's
+rates, upper bounds); KataGo's superhuman play came after about six times as
+many games. The owner wants steady gains from continuous training, which needs
+both the search and the games.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. Train as it was, at full speed | Nothing in the loop. Six game processes of 42 games played 173,717 decisions in their first 16 minutes on 24 November, while still starting up, about 2.5 times the memory-checked part's rate (measured before their first network update). It shows whether more data alone helps; if the six reasons hold, the scores stay flat. |
-| B. Mend the learning loop | Three changes, each checked before the next. Values that also read the zones' totals, checked first on saved training samples with `tools/train_on_saved_samples.py`, without a run. More search behind the moves played: 64 simulations instead of 16 where nothing is kept, and 5% of the decisions kept instead of 1%, which gives each game five times the training samples but plays about a quarter as many games an hour (inferred: about 74 simulations a decision instead of 18). And the scripted balanced policy in one seat of one self-play game in four, so that the network's Allies meet an invading Japan. Then a full-speed run, compared with A at equal compute. It does not by itself show Japan a coordinated invasion. |
-| C. Show the network an invasion | A scripted Japan that invades as the owner would, written from the owner's plan (which zones, with which units, in which game rounds), first played against the scripted balanced policy on the 24 held-out seeds. That settles whether this final score pays a well-coordinated invasion more than keeping still. If it does, its games can teach the network: it plays Japan in some self-play games, and its decisions become training samples whose policy target is its own move. |
-| D. Actions that move several units at once | One decision sends every chosen unit into one zone, so that an attack takes a few decisions instead of dozens and fits in the search's 16 actions. The largest change: the engine's legal actions, the search and the network's action features. |
+| A. The Mac, now | A training run on the current code from a fresh 256×16 network, with KataGo's search, about 1,300 to 1,800 games a day (inferred). Its learning curve, measured on the 24 held-out seeds for all three alliances, shows within days whether the gains continue at this search; 145,000 games take three to four months, and 384×20 would take about twice as long. No cost. |
+| B. New hardware | A computer with many more CPU cores and a large NVIDIA GPU: 32 cores for the games and a GPU evaluating 23,000 states a second would play 145,000 games in about 16 days (inferred). The PC priced in November, with a 16-core Ryzen 9 9950X3D, would be limited by its cores at about 12,000 network evaluations a second, about 30 days. The code would move to Windows or Linux with CUDA, where only three-round games have run, and the supervisor's memory checks, which read macOS's, would need their counterparts. |
+| C. Rented machines | A machine with 64 or more CPU cores and one or two datacenter GPUs, about a week for 145,000 games (inferred), by the hour; prices not looked up. The same port as B. |
 
-**Recommendation: C's measurement and B's check of the values first, both
-without a training run.** The measurement answers with games whether this score
-rewards the invasion the owner has in mind, and needs the owner's plan; the
-check of the values took 67 minutes on one CPU core on 21 November
-([record](archive/records/value_loss_weights_2026_11_21.md)). What they show
-decides between the rest of B, C's teaching and D, each then compared with A
-at equal compute.
+**Recommendation: A now, then B or C for 384×20.** A costs nothing and starts the
+learning curve at once, at the search the owner asked for; its first days say
+whether gains continue at this scale before money is spent. The 384×20 network
+and KataGo's game counts need B or C.
 
-**If answered.** What changes belongs in sections 4, 7 and 8 of the design
-document and in the open question that it settles, and the runs in the [list of
-runs](archive/runs.md).
+**If answered.** The run's settings belong in sections 7 and 9 of the design
+document and its parts in the [list of runs](archive/runs.md).
 
 ## Open elsewhere
 
@@ -317,6 +309,15 @@ the page that now states it.
   themselves: a median of 694 decisions, 28% of the actions ending a phase, and 201 moves of a land unit a game against 54 at first, though still about 10 land
   battles a game ([record](archive/records/fresh_network_games_2026_11_22.md)).
   So the run goes on from the fresh network, as the owner chose.
+- **Q-020**, what to change in training first. Answered on 24 November 2026:
+  none of the proposed checks. The owner holds that "coordinated attacks
+  against china with no consequence is obvious going to get japan more reward",
+  and that the small networks and searches of the runs so far could never learn
+  them: training is to be sized to AlphaZero's and KataGo's scale, from a
+  comparison of this game with theirs, and judged by steady gains over
+  continuous training rather than by speed. Stated in the design document's
+  [open questions](design/README.md#how-big-should-the-network-and-the-search-be);
+  where to run it is [Q-021](#q-021-where-to-run-training-at-alphazeros-and-katagos-scale).
 - **Q-018**, how to go on looking for the game process crash. Answered on 24
   November 2026: stop looking, and train at full speed, crashes and all
   (choice C). The memory-checked part of the training run under the
@@ -324,8 +325,8 @@ the page that now states it.
   with no memory-checker report, where at the crash rate of the training run of
   19 to 21 November a report had a chance of 0.82 by its 595th network update
   ([record](archive/records/training_land_weighted_update_595_2026_11_24.md#the-memory-check)). The full-speed part, started at 10:42, was
-  stopped at 11:01 at the owner's word, before its first network update, until
-  [Q-020](#q-020-what-to-change-in-training-first) is answered. Stated in the
+  stopped at 11:01 at the owner's word, before its first network update, for
+  the training itself to be looked at first (Q-020). Stated in the
   [known gaps](design/README.md#known-gaps) of the design document and the
   [list of runs](archive/runs.md).
 - **Q-019**, two attacks on one land zone by Japan and Dadao. Answered on 24
