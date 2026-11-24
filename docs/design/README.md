@@ -3480,13 +3480,18 @@ measured and what would settle it.
   AddressSanitizer with the network on the CPU, did not reproduce it. Training
   play with the game process on an engine built with AddressSanitizer found
   nothing either: 1.28 million decisions on 21 and 22 November
-  ([record](../archive/records/memory_check_2026_11_21.md)) and, under choice
-  D's searches, 1.51 million in the first 5.6 hours of the training run of 22
-  November ([record](../archive/records/memory_check_2026_11_22.md)). Counted in
-  network evaluations, which grow with the game copies the search makes and
-  frees, the two checked about 87 million, against one crash in about 128
-  million in the training run of 19 to 21 November, so a report was about as
-  likely as not (inferred). How to go on looking is
+  ([record](../archive/records/memory_check_2026_11_21.md)), and under choice
+  D's searches 2.16 million in the first part of the training run of 22
+  November ([record](../archive/records/memory_check_2026_11_22.md)) and 8.72
+  million in the first 35.4 hours of the training run under the land-weighted
+  score
+  ([record](../archive/records/training_land_weighted_update_595_2026_11_24.md#the-memory-check)).
+  Counted in network evaluations, which grow with the game copies the search
+  makes and frees, the three checked about 222 million, against one crash in
+  about 128 million in the training run of 19 to 21 November: had
+  AddressSanitizer caught the defect as often as that run crashed, it would
+  have reported it by then with a chance of 0.82 (inferred). How to go on
+  looking is
   [Q-018](../questions.md#q-018-how-to-go-on-looking-for-the-game-process-crash).
   On the night of 2 November, before the search ran in C++, a game process
   crashed twice early in training iteration 3, and about 4.5 hours of replays in
@@ -3871,10 +3876,10 @@ the game's end, and Japan's invasion first gave the warlords to China.
 
 Under the land-weighted score the Axis network of the training run started on
 the evening of 22 November was played on 23 November after 197, 288 and 363
-network updates: after 197 on the first six of the 24 held-out seeds, after 288
-and 363 on all 24. On the 24 the untrained network scored +8.8 with 70
-decisions a game, and the new weights score the scripted Axis's games −6.7; on
-the six, +7.4 and −2.7. The mean Axis final score of each network, its paired
+network updates and on 24 November after 595: after 197 on the first six of
+the 24 held-out seeds, after the others on all 24. On the 24 the untrained
+network scored +8.8 with 70 decisions a game, and the new weights score the
+scripted Axis's games −6.7; on the six, +7.4 and −2.7. The mean Axis final score of each network, its paired
 differences from the untrained network and from the scripted Axis on the same
 seeds, with standard errors in brackets, and what its Japan did in those games:
 
@@ -3883,44 +3888,53 @@ seeds, with standard errors in brackets, and what its Japan did in those games:
 | 197 | 6 | +14.8 (3.5) | +7.4 (5.8) | +17.5 (9.6) | 872 | 4, in 2 games | 6 | 11.2 |
 | 288 | 24 | +15.7 (1.7) | +6.9 (2.9) | +22.4 (5.7) | 1,177 | 14, in 9 games | 16 | 11.4 |
 | 363 | 24 | +15.7 (2.6) | +6.9 (3.5) | +22.4 (5.8) | 451 | 5, in 3 games | 16 | 11.1 |
+| 595 | 24 | +14.3 (1.9) | +5.4 (3.7) | +21.0 (5.2) | 768 | 1, in 1 game | 9 | 11.2 |
 
 ([after 197](../archive/records/training_land_weighted_2026_11_23.md#play-against-the-scripted-balanced-policy),
-[after 288 and 363](../archive/records/training_land_weighted_24_seeds_2026_11_23.md#the-axiss-final-scores)).
+[after 288 and 363](../archive/records/training_land_weighted_24_seeds_2026_11_23.md#the-axiss-final-scores),
+[after 595](../archive/records/training_land_weighted_update_595_2026_11_24.md#play-against-the-scripted-balanced-policy)).
 On the first six seeds alone the network after 363 network updates had scored
 10.2 ± 5.6 below the one after 288, and on the other 18 it scored 3.3 ± 3.7
-above. The Axis starts with 11 land zones; on the 24 seeds the scripted Axis
-ended with 8.9 and the untrained one with 9.6. The land battles begun in
-Japan's turns, by Japan or by Dadao, Japan's minor power, came mostly late:
-after 197 network updates all 24 of them in game rounds 8 to 11, after 288
-and 363, 111 of 135 and 69 of 93. Of the 14 zones of China that the network after 288
+above; the network after 595 would have seemed 11.3 ± 4.4 above the one after
+363, and on the other 18 it scored 5.7 ± 3.1 below. The Axis starts with 11
+land zones; on the 24 seeds the scripted Axis ended with 8.9 and the untrained
+one with 9.6. The land battles begun in Japan's turns, by Japan or by Dadao,
+Japan's minor power, came mostly late: after 197 network updates all 24 of
+them in game rounds 8 to 11, after 288, 363 and 595, 111 of 135, 69 of 93 and
+14 of 19. Of the 14 zones of China that the network after 288
 network updates held at the end, 10 had been taken in game rounds 10 and 11,
 and one, Beiping, in game round 5
 ([after 197](../archive/records/training_land_weighted_2026_11_23.md#what-japan-does-in-china),
 [after 288 and 363](../archive/records/training_land_weighted_24_seeds_2026_11_23.md#what-japan-does-in-china-and-manchuria)).
 In self-play the Axis ended games holding about the 11 land zones it starts
-with in every block of 20 network updates. In the 36 self-play games that
-finished just after the 288th network update neither Japan nor Dadao began a
-land battle; in 3 of the 66 that finished just after the 363rd, Japan invaded
-China from game round 1, whose moves self-play draws from the visit shares,
-and in two of them held zones of China at the end
-([record](../archive/records/training_land_weighted_update_363_2026_11_23.md#who-fought-in-the-self-play-games-that-finished-from-1931-to-1946)).
+with in every block of network updates up to the 595th. In the 36 self-play
+games that finished just after the 288th network update neither Japan nor
+Dadao began a land battle; in 3 of the 66 that finished just after the 363rd,
+Japan invaded China from game round 1, whose moves self-play draws from the
+visit shares, and in two of them held zones of China at the end
+([record](../archive/records/training_land_weighted_update_363_2026_11_23.md#who-fought-in-the-self-play-games-that-finished-from-1931-to-1946));
+in 3 of the 31 that finished just after the 595th, Japan attacked only
+Mongolia, from game round 4 at the earliest, and held one to four of its zones
+in game round 11
+([record](../archive/records/training_land_weighted_update_595_2026_11_24.md#who-fought-in-the-self-play-games-that-finished-from-0742-to-0757)).
 So under these weights the network's Japan keeps most of its land and sometimes
 takes some late in the game, when the final score counts it and few game
-rounds are left to take it back. From the 288th to the 363rd network update it
-did not take more: it kept 5 zones of China instead of 14, with a quarter of
-the fleet moves and the same final score. The scripted Japan, which attacks
+rounds are left to take it back. From the 288th to the 595th network update it
+did not take more: on the 24 seeds it kept 14, then 5, then 1 zone of China
+taken from the KMT or the CCP, with final scores within 1.5 points of each
+other, and lost 16, 16 and then 9 of its starting zones of Manchuria. The scripted Japan, which attacks
 from the first game round, still scores below the untrained Japan, which never
 moves, by 15.5 ± 4.9 points on 20 of 24 seeds.
 
-**Would settle it:** whether the network's Japan goes on to take and keep more
-land as the training run under the land-weighted score continues, measured the
-same way on all 24 held-out seeds: on six, the networks after 288 and 363
-network updates seemed 10.2 points apart, and on 24 they scored the same. The
-owner judged on 23 November that waiting and then taking land late in
-the game is "something that I would do if I was a player", and chose to keep
-training under these weights. A score that counted the land held at the end of
-every game round would pay more for an earlier conquest than for a late one; it,
-or any other change of the objective, is the owner's decision.
+**Would settle it:** the same measurements, on all 24 held-out seeds, of a
+training run under another objective, if the owner chooses one: under these
+weights the network's Japan did not go on to take and keep more land in 595
+network updates. The owner judged on 23 November that waiting and then taking
+land late in the game is "something that I would do if I was a player", and
+chose to keep training under these weights. A score that counted the land
+held at the end of every game round would pay more for an earlier conquest than
+for a late one; it, or any other change of the objective, is the owner's
+decision.
 
 #### Are the simulations enough when there are many legal actions?
 
@@ -3998,8 +4012,15 @@ decisions a game against the scripted Allies' 483, and the KMT ended with 8.5
 land territories against 18.5
 ([record](../archive/records/long_run_samples_2026_11_21.md#the-network-as-the-allies-against-the-scripted-policy)).
 Playing only itself, the network had not met a Japan that attacks as the
-scripted one does (inferred). Scripted opponents in some self-play games are a
-third kind of opponent.
+scripted one does (inferred). On 24 November, on all 24 held-out seeds, the
+network after 595 network updates of the training run under the land-weighted
+score scored −74.1 as the Allies, 72.0 ± 6.7 below the scripted Allies and
+6.9 ± 3.0 below the untrained network; its Allies ended with 7.5 land zones
+against the scripted Allies' 20.3, and the scripted Axis with 15.8 against 8.9.
+In the 31 self-play games that finished just after the 595th network update,
+Japan invaded no zone of China
+([record](../archive/records/training_land_weighted_update_595_2026_11_24.md#play-against-the-scripted-balanced-policy)).
+Scripted opponents in some self-play games are a third kind of opponent.
 
 **Would settle it:** the equal-compute comparison the plan describes.
 
