@@ -134,7 +134,12 @@ turn.
 **An amphibious assault** is a landing against enemy land.
 
 1. **Declared** in Combat Movement (`naval_declare_assault`): the transport,
-   its cargo and the land zone.
+   its cargo and the land zone. The declaration is the attack on the zone:
+   Japan is offered none against a zone that Dadao has attacked in that turn,
+   nor Dadao against one Japan has attacked, and once made it closes the zone
+   to the other
+   ([one attacker for each land zone](politics.md#one-attacker-for-each-land-zone),
+   RCL-024).
 2. **The sea must be clear.** Any sea battle in the transport's zone is fought
    first.
 3. **Begun** in the Combat Phase (`naval_begin_assault`). The attacker picks

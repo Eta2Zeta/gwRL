@@ -61,6 +61,13 @@ All are declared in Combat Movement, as a flight to the target.
 Strategic bombers join land battles only with the technology Heavy Strategic
 Bombers. Seaplanes and transports do not attack.
 
+An aircraft supports only a battle of its own nation, and no aircraft attack,
+air drop or air blitz goes into a zone that the other nation of the Player
+Turn, Japan or Dadao, has attacked that turn
+([one attacker for each land zone](politics.md#one-attacker-for-each-land-zone),
+RCL-024). Bombing a zone's targets is not an attack on the zone and is not
+affected.
+
 ## 3. Aircraft in a land battle
 
 The attacker's aircraft arrive with the mission they declared. The defender

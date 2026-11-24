@@ -158,6 +158,7 @@ using MarkId = Number<MarkKind>;
     X(incorporated, "incorporated", "", nation) \
     X(influence_attempted, "influence_attempted", "", nation) \
     X(japanese_surprise_attack, "japanese_surprise_attack", "", battle) \
+    X(land_attack, "land_attack", "zone", nation) \
     X(land_battle_sequence, "land_battle_sequence", "", game) \
     X(land_decision_sequence, "land_decision_sequence", "", game) \
     X(land_retreating, "land_retreating", "", unit) \

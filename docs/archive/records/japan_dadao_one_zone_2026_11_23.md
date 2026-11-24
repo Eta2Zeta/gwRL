@@ -96,7 +96,7 @@ attack from the sea stops the game.
 Whether the two may attack one zone at all is a question of reading section
 7.1 (page 43): controlled Minor Powers share their controller's Player Turn,
 and "They may not attack together".
-[Q-019](../../questions.md#q-019-two-attacks-on-one-land-zone-by-japan-and-dadao)
+[Q-019](../../questions.md#answered)
 asks the owner which reading to apply.
 
 It does not show which order Japan would have chosen in the real game: the

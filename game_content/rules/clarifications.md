@@ -1,6 +1,6 @@
 # GW36 v4.3 rule clarifications and open questions
 
-Updated: 23 November 2026.
+Updated: 24 November 2026.
 
 This is the project's shared register of **unclear official rules**, including
 interpretations adopted after discussion. It is **not publisher-issued errata**.
@@ -64,6 +64,7 @@ including retired IDs RCL-002, RCL-006, RCL-007, RCL-008, RCL-011 and RCL-021.
 | RCL-020 | A patrol plane attacked in its own sea zone: the carrier choice or the patrol choice, before or after scrambles | Adopted: the patrol choice, made before any scramble; staying out costs nothing |
 | RCL-022 | An attack on land that was Chinese at the start: when a nation outside China holds it, and when the attacker may not go to war with all of China | Closed: the printed owner decides; the attack puts the attacker at war with every Chinese nation outside its own alliance, and Mongolia may make it; developer clarification reported by user |
 | RCL-023 | A land battle that no unit can end: the attacker's remaining units can neither fire nor retreat, and the defender's cannot fire | Adopted: the attacker retreats, and its units with nowhere to go are eliminated |
+| RCL-024 | A controlled Minor Power and its controller each attacking one land zone in their shared Player Turn | Adopted: only the first of the two to attack a land zone may attack it that turn |
 
 ## Pilot discussion review
 
@@ -752,6 +753,72 @@ keeps Manchuria-Rehe. Had Japan attacked with the Anti-aircraft Artillery
 alone, overland from Korea, the first round would roll no die, and Japan's only
 action would be to retreat it to Korea. Had it landed from the sea, it would be
 eliminated after the first round.
+
+## RCL-024: Two attacks on one land zone by a controlled Minor Power and its controller
+
+**Status: adopted by the user, 24 November 2026.** It answers Q-019 of the
+project's list of questions, raised on 23 November 2026 after a training game
+failed when Japan and Dadao had both attacked one land zone.
+
+**Sources:** RB §7.1 p43 (controlled Minor Powers share the Player Turns of
+their Controlling Major Power, and "They may not attack together"); §0.3 p8
+(nations may not share land zones until they are Aligned); §5.1 p35 (no
+declaration of war on a member of one's own Alliance); §10.1 p61 (the attacker
+orders the declared combats; a unit takes part in one battle a Player Turn,
+with four exceptions, blitzing among them); §10.5.1 p64 (blitz); §10.5.3 p65
+(attrition attacks); §10.10 p73 (constituents of the British Commonwealth may
+together conquer a land zone); §10.10.1 p73 (liberated land returns to its
+original owner); §15.4 p105 and Japan p1 (Dadao is a Minor Power that Japan
+controls); USA p5 (Operation Overlord).
+
+**Question:** may a controlled Minor Power and its Controlling Major Power each
+attack the same land zone in their shared Player Turn, in battles of their own?
+In this scenario the pair is Dadao and Japan. §7.1 forbids them to "attack
+together" but does not say whether two separate attacks on one zone count as
+attacking together.
+Where the rules let two nations attack together, they mean units of both
+against one land zone: Operation Overlord lets USA and British Commonwealth
+units "together amphibiously attack" a land zone (USA p5), and constituents of
+the British Commonwealth may "together conquer a land zone" (§10.10 p73).
+
+**The case.** In game 5967 of the training run under the land-weighted score,
+in game round 4 on 23 November 2026, Japan declared an assault on
+Manchuria-Rehe, which the KMT held and which was Japan's at the start, from sea
+zone P14, and Dadao attacked Rehe overland from Suiyuan. In a line of play that
+the search imagined, Dadao's battle was fought first and won; Rehe went back to
+Japan (§10.10.1), and Japan's landing then made a battle of Japan against
+Japan, which stopped the game. Played again from the same game round in
+other orders, with the dice chosen, the two attacks left Japanese and Dadao
+units together in one zone, which §0.3 forbids, or let the second battle take
+the zone from the nation that won the first, a member of the same Alliance
+(§5.1)
+([record](../../docs/archive/records/japan_dadao_one_zone_2026_11_23.md)).
+
+**Ruling:**
+
+- Of the nations that share a Player Turn, only the first to attack a land
+  zone may attack it in that turn. The other may not attack it in any way:
+  not overland or across a strait, not from the sea, not by air drop, not with
+  aircraft, not by blitzing and not by an attrition attack. The first may add
+  attacks of its own, which join its battle there as the rules provide.
+- An aircraft supports only a battle of its own nation, so neither nation's
+  aircraft joins a battle of the other.
+- The zone is open to both again in their next Player Turn.
+- Read here, not stated by the user: an attack counts from the moment it is
+  made or declared, even if the battle is then lost or the assault is called
+  off (RCL-018). Strategic bombing of a zone's facilities, cities or railroads
+  and rocket attacks on them are not attacks on the zone: they target no unit
+  and take nothing, and §10.1 p61 tells "an attack on" a land zone apart from
+  "strategic bombing of" a facility.
+
+**Authority:** the user in chat on 24 November 2026: "Go with A for Q19",
+choice A of Q-019, one attacker for each zone.
+
+**Examples:** in the case above, once Japan has declared its assault on
+Manchuria-Rehe, Dadao may not attack Rehe that turn; had Dadao attacked first,
+Japan could have made no attack on Rehe, but could still have attacked
+Shantung from the same sea zone. If Dadao attacks Hopeh and loses, Japan's
+armour may not blitz into Hopeh later in that Combat Phase.
 
 ## Maintenance
 

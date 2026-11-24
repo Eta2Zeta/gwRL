@@ -1229,6 +1229,7 @@ Id registerLandBattle(State &s, ZoneId zone, NationId attacker, const std::vecto
 }
 Id registerAttritionBattle(State &s, ZoneId zone, NationId attacker, const std::vector<Id> &units) {
     require(!units.empty(), "Attrition attack has no artillery");
+    require(!landAttackedByPartner(s, attacker, zone), partnerAttackedLand);
     std::map<Id, ZoneId> origins;
     for (const auto &id : units) {
         auto &u = s.units.at(id);
@@ -1265,6 +1266,7 @@ Id registerAttritionBattle(State &s, ZoneId zone, NationId attacker, const std::
     auto id = b.id;
     s.battles.emplace(id, std::move(b));
     s.battleOrder.push_back(id);
+    noteLandAttack(s, attacker, zone);
     return id;
 }
 void beginLandBattle(State &s, const Id &id) {
@@ -1373,7 +1375,7 @@ std::vector<Action> LandCombatRules::actions(const State &s) const {
                 for (const auto zone : mapNeighbors(s, u.zone)) {
                     if (s.territories.contains(zone) && s.territories.at(zone).possessor &&
                         opposing(s, u.owner, *s.territories.at(zone).possessor) &&
-                        passableLandBorder(s, u.zone, zone))
+                        passableLandBorder(s, u.zone, zone) && !landAttackedByPartner(s, u.owner, zone))
                         out.push_back(action(s, s.currentNation(), "land_declare_attrition",
                                              {{"unit", V(id)}, {"zone", V(zoneName(s, zone))}}));
                 }

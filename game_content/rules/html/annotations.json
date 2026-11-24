@@ -308,6 +308,22 @@
       "reference_url": "../clarifications.md#rcl-023-a-land-battle-that-no-unit-can-end",
       "reference_label": "Rule register",
       "authority_detail": "The user adopted this on 22 November 2026, answering the project's question Q-014: \"Let's say the player is allowed to retreat as an action and if the unit has nowhere to go that unit dies.\" The rulebook repeats the combat rounds until the battle is over and gives a printed end for attackers that must retreat and cannot only in a city, after three rounds, and on tundra or ice, after one (1.7.7, 1.7.5)."
+    },
+    {
+      "id": "RCL-024",
+      "category": "clarification",
+      "title": "Two attacks on one land zone by a controlled Minor Power and its controller",
+      "body": "Project ruling: of the nations that share a Player Turn, a controlled Minor Power and its Controlling Major Power, only the first to attack a land zone may attack it in that turn. The other may not attack it overland or across a strait, from the sea, by air drop, with aircraft, by blitzing or by an attrition attack, and an aircraft supports only a battle of its own nation. The first may add attacks of its own, and the zone is open to both again in their next Player Turn. An attack counts from the moment it is made or declared, even if its battle is lost or its assault is called off; strategic bombing and rocket attacks on facilities, cities or railroads are not attacks on the zone.",
+      "section_ids": [
+        "rb-7-1",
+        "rb-10-1"
+      ],
+      "date": "2026-11-24",
+      "authority": "User-adopted interpretation",
+      "scope": "prior_register_outside_pilot",
+      "reference_url": "../clarifications.md#rcl-024-two-attacks-on-one-land-zone-by-a-controlled-minor-power-and-its-controller",
+      "reference_label": "Rule register",
+      "authority_detail": "The user adopted this on 24 November 2026, answering the project's question Q-019: \"Go with A for Q19\". The rulebook says that controlled Minor Powers \"may not attack together\" with their controller (7.1) and, where it lets two nations attack together, means units of both against one land zone (10.10; Operation Overlord, USA sheet). Found when a training game stopped after Japan and Dadao had both attacked Manchuria-Rehe in one turn."
     }
   ]
 }

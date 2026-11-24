@@ -565,6 +565,8 @@ static RouteResult validateSingleRoute(const State &s, const RouteRequest &r) {
                     "blitzing");
       if (!friendly && u.type == knownUnitTypes(s).militia)
         return fail("Militia cannot attack");
+      if (!friendly && r.combat && landAttackedByPartner(s, u.owner, b))
+        return fail(partnerAttackedLand);
       if (!r.combat && !enterableThisTurn(s, u.owner, b))
         return fail("Cannot enter land captured this turn");
       const auto approach = borderApproach(s, a, b);

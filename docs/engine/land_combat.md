@@ -143,10 +143,17 @@ zone registers a battle there, even when the zone is empty. A companion can
 follow the armour only until that battle is fought: once the armour has taken
 the zone, the zone is friendly, and RB 10.5.1 (p64) forbids blitzing into a
 land zone that the blitzing nation or a politically friendly nation possesses
-(`friendlyLand` in `src/movement.cpp`).
+(`friendlyLand` in `src/movement.cpp`). Nor may Japan blitz into a zone that
+Dadao attacked earlier in the turn, or Dadao into one Japan attacked, even
+after that battle has ended
+([one attacker for each land zone](politics.md#one-attacker-for-each-land-zone),
+RCL-024).
 
 **Attrition.** Advanced Artillery that has not moved may bombard a neighbouring
 enemy zone without entering it (`land_declare_attrition`, in Combat Movement).
+The bombardment is an attack on that zone, so it closes the zone to the other
+of Japan and Dadao for the turn, and is not offered against a zone the other
+has attacked (RCL-024).
 
 **Japan's Surprise Attack.** In the turn Japan first declares war on a major
 power of the Allies, it names one zone for its Surprise Attack

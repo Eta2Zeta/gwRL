@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="678" viewBox="0 0 960 678" role="img" aria-labelledby="title desc">
-  <title id="title">Each zone has its own 35,329 input neurons; each feature has one embedding, used by every zone</title>
-  <desc id="desc">Decision 612's zone features as a matrix: one row per zone, each row that zone's input layer of 35,329 input neurons, one per zone feature, holding the zone's feature value after feature scaling; one column per zone feature. Shown are 8 columns, 0 possessor:ccp, 3 possessor:kmt, 81 units:ccp:militia, 83 units:ccp:mountain_infantry, 207 units:kmt:infantry, 216 units:kmt:militia, 20,621 project:kmt:fortification, 22,119 rail_to:land_china_hopeh, and 5 of the 37 rows. Shensi: 0.69 for possessor:ccp, 0.69 for units:ccp:militia, 0.69 for units:ccp:mountain_infantry, 0.69 for rail_to:land_china_hopeh; Hopeh: 0.69 for possessor:kmt, 0.69 for project:kmt:fortification; Suiyuan: 0.69 for possessor:kmt, 1.39 for units:kmt:militia; Szechwan: 0.69 for possessor:kmt; Tsinghai: 0.69 for possessor:kmt, 1.10 for units:kmt:infantry, 0.69 for units:kmt:militia; every other entry shown is 0. To the right, each zone's row gives its own 64 outputs. Below the matrix, the zone embedding table: one embedding of 64 learned numbers under each column, 35,329 in all, the same for every row. Column 3, possessor:kmt, is outlined: Hopeh, Suiyuan, Szechwan and Tsinghai each hold 0.69 in it, and each adds 0.69 times embedding 3 to its own outputs, one embedding used in four zones. Column 216, units:kmt:militia: Suiyuan adds 1.39 times embedding 216 for its 3 militia, Tsinghai 0.69 times embedding 216 for its 1. A zone's outputs add up, along its row, each input times the embedding under its column. The board has 37 rows of 35,329 input neurons, 37 × 35,329 = 1,307,173 in all, and the table has 35,329 embeddings, one per column, not one per zone.</desc>
+  <title id="title">Each zone has its own 35,342 input neurons; each feature has one embedding, used by every zone</title>
+  <desc id="desc">Decision 612's zone features as a matrix: one row per zone, each row that zone's input layer of 35,342 input neurons, one per zone feature, holding the zone's feature value after feature scaling; one column per zone feature. Shown are 8 columns, 0 possessor:ccp, 3 possessor:kmt, 81 units:ccp:militia, 83 units:ccp:mountain_infantry, 207 units:kmt:infantry, 216 units:kmt:militia, 20,621 project:kmt:fortification, 22,119 rail_to:land_china_hopeh, and 5 of the 37 rows. Shensi: 0.69 for possessor:ccp, 0.69 for units:ccp:militia, 0.69 for units:ccp:mountain_infantry, 0.69 for rail_to:land_china_hopeh; Hopeh: 0.69 for possessor:kmt, 0.69 for project:kmt:fortification; Suiyuan: 0.69 for possessor:kmt, 1.39 for units:kmt:militia; Szechwan: 0.69 for possessor:kmt; Tsinghai: 0.69 for possessor:kmt, 1.10 for units:kmt:infantry, 0.69 for units:kmt:militia; every other entry shown is 0. To the right, each zone's row gives its own 64 outputs. Below the matrix, the zone embedding table: one embedding of 64 learned numbers under each column, 35,342 in all, the same for every row. Column 3, possessor:kmt, is outlined: Hopeh, Suiyuan, Szechwan and Tsinghai each hold 0.69 in it, and each adds 0.69 times embedding 3 to its own outputs, one embedding used in four zones. Column 216, units:kmt:militia: Suiyuan adds 1.39 times embedding 216 for its 3 militia, Tsinghai 0.69 times embedding 216 for its 1. A zone's outputs add up, along its row, each input times the embedding under its column. The board has 37 rows of 35,342 input neurons, 37 × 35,342 = 1,307,654 in all, and the table has 35,342 embeddings, one per column, not one per zone.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -30,7 +30,7 @@
     </style>
   </defs>
   <rect x="0.5" y="0.5" width="959" height="677" rx="10" fill="#ffffff" stroke="#d0d7de"/>
-  <text class="title" x="24" y="36">Each zone has its own 35,329 input neurons; each feature has one embedding, used by every zone</text>
+  <text class="title" x="24" y="36">Each zone has its own 35,342 input neurons; each feature has one embedding, used by every zone</text>
   <text class="sub" x="24" y="58">Decision 612. A zone's row is its input layer: one input neuron per zone feature, holding the zone's feature value after feature scaling.</text>
   <text class="mono" x="193.0" y="196" transform="rotate(-40 193.0 196)">possessor:ccp</text>
   <text class="small" x="197.0" y="222" text-anchor="middle">0</text>
@@ -48,7 +48,7 @@
   <text class="small" x="473.0" y="222" text-anchor="middle">20,621</text>
   <text class="mono" x="515.0" y="196" transform="rotate(-40 515.0 196)">rail_to:land_china_hopeh</text>
   <text class="small" x="519.0" y="222" text-anchor="middle">22,119</text>
-  <text class="label" x="549" y="222">… 35,321 more columns</text>
+  <text class="label" x="549" y="222">… 35,334 more columns</text>
   <text class="small" x="24" y="222">feature number</text>
   <text class="label" x="700" y="222">the zone's 64 outputs</text>
   <rect x="219" y="210" width="48" height="390" rx="6" fill="none" stroke="#bc4c00" stroke-width="1.6"/>
@@ -158,7 +158,7 @@
   <text class="head" x="24" y="464">table</text>
   <text class="label" x="24" y="486">one embedding of 64</text>
   <text class="label" x="24" y="502">learned numbers under</text>
-  <text class="label" x="24" y="518">each column, 35,329</text>
+  <text class="label" x="24" y="518">each column, 35,342</text>
   <text class="label" x="24" y="534">in all, the same for</text>
   <text class="label" x="24" y="550">every row</text>
   <line x1="197.0" y1="408" x2="197.0" y2="426" stroke="#d4a72c" stroke-width="1" stroke-dasharray="3 3"/>
@@ -195,6 +195,6 @@
   <text class="label" x="700" y="548">Column 216, units:kmt:militia: Suiyuan</text>
   <text class="label" x="700" y="565">adds 1.39 × embedding 216 for its 3 militia,</text>
   <text class="label" x="700" y="582">Tsinghai 0.69 × embedding 216 for its 1.</text>
-  <text class="label" x="24" y="638">A zone's outputs add up, along its row, each input times the embedding under its column. The board has 37 rows of 35,329 input neurons,</text>
-  <text class="label" x="24" y="656">37 × 35,329 = 1,307,173 in all, and the table has 35,329 embeddings, one per column, not one per zone.</text>
+  <text class="label" x="24" y="638">A zone's outputs add up, along its row, each input times the embedding under its column. The board has 37 rows of 35,342 input neurons,</text>
+  <text class="label" x="24" y="656">37 × 35,342 = 1,307,654 in all, and the table has 35,342 embeddings, one per column, not one per zone.</text>
 </svg>

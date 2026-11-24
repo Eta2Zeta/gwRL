@@ -34,7 +34,6 @@ Other open things stay in the pages that own them, and
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-018](#q-018-how-to-go-on-looking-for-the-game-process-crash) | The memory-checked training has found nothing: go on as it is, look with ThreadSanitizer for a while first, or start the full-speed part now? | Running training | ThreadSanitizer for about 12 hours of play, then go on as now |
-| [Q-019](#q-019-two-attacks-on-one-land-zone-by-japan-and-dadao) | May Japan and Dadao each attack the same land zone in one of Japan's Player Turns? | The rules | No: one attacker for each zone |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
@@ -43,11 +42,6 @@ Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 Q-018 was raised on 22 November 2026, after the memory-checked first part of
 the training run of 22 November had found nothing in 5.6 hours. Its numbers are
 in the [record of that part](archive/records/memory_check_2026_11_22.md).
-
-Q-019 was raised on 23 November 2026, after a game of the training run under
-the land-weighted score failed when Japan and Dadao had both attacked
-Manchuria-Rehe in one turn. Its numbers are in the
-[record of that failure](archive/records/japan_dadao_one_zone_2026_11_23.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -162,8 +156,9 @@ million network evaluations, with no report, which brings the chance of a
 report by then to 0.75
 ([record](archive/records/training_land_weighted_update_363_2026_11_23.md#the-memory-check)).
 Two games of that part failed, at 00:19 and at 20:07 on 23 November, each on a
-defect of the rules, not on damaged memory; the first defect is fixed, and the
-second waits on [Q-019](#q-019-two-attacks-on-one-land-zone-by-japan-and-dadao).
+defect of the rules, not on damaged memory; both defects are now fixed, the
+second by the answer to Q-019 ([answered](#answered)), though the part runs
+on with its own copy of the code.
 
 **Why it matters.** The full-speed part waits until the defect is found, and it would play
 several times as fast as this part: the training run of 19 to 21 November did
@@ -193,89 +188,6 @@ from 19:30 on 23 November, C is what remains.
 **If answered.** How the defect is looked for, and what that finds, belong in the
 [known gaps](design/README.md#known-gaps) of the design document, and the run's
 parts in the [list of runs](archive/runs.md).
-
-## Q-019: Two attacks on one land zone by Japan and Dadao
-
-**The question.** May Japan and Dadao each attack the same land zone in one of
-Japan's Player Turns, in two battles of their own?
-
-**What the program does now.** It lets them. Dadao, the Dadao Government, is a
-Minor Power that Japan controls (rulebook section 15.4, page 105; Japan sheet,
-page 1), and a controlled Minor Power shares its controller's Player Turn
-(section 7.1, page 43). In Japan's Combat Movement both nations may send units
-into the same enemy zone. The engine gives each nation's attack its own battle,
-because `registerLandBattle` in `src/land_combat.cpp` refuses to put the units
-of two nations in one battle, and the attacking player fights the battles in
-the order it chooses (section 10.1, page 61). When the first of the two battles
-is won, the second finds the zone held by Japan or by Dadao, and the engine
-then does something the printed rules forbid:
-
-- If the zone was Japan's at the start of the game, Dadao must give it back to
-  Japan as soon as it wins it (section 10.10.1, page 73). A Japanese assault
-  from the sea that comes after registers a battle of Japan against Japan, and
-  the engine's check of the state (`State::validate` in
-  `src/campaign_state.cpp`) stops the game. A Japanese attack overland that
-  comes after ends with nothing to fight, and the Japanese and Dadao units stay
-  in the zone together. Section 0.3 (page 8) forbids nations that are not
-  Aligned to share a land zone, and Dadao is not Aligned with Japan while Japan
-  controls it (section 15.4, page 105).
-- If the zone was originally Chinese, the second battle finds no defender and
-  takes the zone from the nation that won the first: Japan from Dadao, or
-  Dadao from Japan. No nation may declare war on a member of its own alliance
-  (section 5.1, page 35), and both are in the Axis. Here too the two nations'
-  units stay in the zone together.
-
-**A real case.** In game 5967 of the training run under the land-weighted
-score, in game round 4, Japan declared an assault on Manchuria-Rehe, which the
-KMT held, with one Artillery aboard a Naval Transport in sea zone P14, and
-Dadao attacked Rehe with one Infantry from Suiyuan. In a line of play that the
-search for Japan's next decision imagined, Dadao's battle was fought first and
-won. Rehe was Japan's at the start of the game, so it went back to Japan, and
-Japan's assault then registered a battle of Japan against Japan: the game
-stopped at 20:07 on 23 November 2026. Played again from the kept position, with
-the run's code and with today's, the move fails the same way. Played from the
-same game round with the dice chosen, the engine also left Japanese and Dadao
-Infantry together in Rehe after two overland attacks, and let a second battle
-take Hopeh from Dadao, or from Japan, after the first had won it
-([record](archive/records/japan_dadao_one_zone_2026_11_23.md)).
-
-**Why it matters.** A game that stops is lost to training: game 5967 is the
-second game of this part to fail, when 5,952 had finished, and the only one on
-this defect. The other outcomes raise no error, and they change who holds land,
-which the land-weighted score counts. The network rarely makes the two attacks:
-in 118 self-play games of this run whose move logs were kept, from three times
-of 23 November, Japan and Dadao never attacked one zone in a Player Turn
-([record](archive/records/japan_dadao_one_zone_2026_11_23.md#how-often-japan-and-dadao-attack-one-zone)).
-So no choice changes much of today's play; the question is which rule the
-engine follows when the network does make them.
-
-**The choices.**
-
-| Choice | What it changes |
-| --- | --- |
-| A. One attacker for each zone | Section 7.1's "They may not attack together" is read as: Japan and Dadao may not both attack one land zone in a Player Turn. The engine no longer offers Japan an attack on a land zone where Dadao already has a battle that turn, nor Dadao one where Japan has: no move overland or from the sea, no air drop and no aircraft attack into that zone. The nation that attacks a zone first has it to itself. None of the outcomes above can happen, and the Axis can no longer send both nations' units against one zone. |
-| B. Two battles, the second called off | Both may attack one zone, but once the first battle is won the second is called off. An assault from the sea is called off as under RCL-018, its units staying aboard. Units that came overland are already in the zone, where section 0.3 does not let them stay beside the other nation's units and from which the printed rules give them no way out, so a further ruling would have to say where they go, for example back to the zone they came from. |
-| C. Mend only the stop | A second assault from the sea on a zone of the assaulting nation lands without a battle. The game no longer stops, but the two nations' units still end up together, and a second battle can still take a zone from the other nation. |
-
-**Recommendation: A.** It is the only choice that needs no rule beyond the
-printed ones, and it reads "together" as the rules use it for attacks. Where
-they let two nations attack together, they mean units of both against one land
-zone: Operation Overlord lets USA and British Commonwealth units "together
-amphibiously attack" a land zone (USA sheet, page 5), and constituents of the
-British Commonwealth may "together conquer a land zone" (section 10.10, page
-73). Section 7.1 refuses that to a controlled Minor Power and its controller.
-Choice A also fits section 10.1 (page 61): a unit fights in only one battle a
-Player Turn, except in the cases that section names, such as Germany's
-Blitzkrieg, whose example lets the defenders of Paris fight a second attack.
-Were two attacks on one zone allowed, section 10.1 would keep KMT units that
-had beaten off Dadao's attack from defending against Japan's in the same turn,
-and Japan would take the zone unopposed.
-
-**If answered.** The ruling goes into the
-[rule clarifications](../game_content/rules/clarifications.md) as a new entry
-and into the engine pages of [movement](engine/movement.md),
-[naval operations](engine/naval.md) and [air](engine/air.md), with a test
-built on game 5967's position.
 
 ## Open elsewhere
 
@@ -425,3 +337,13 @@ the page that now states it.
   themselves: a median of 694 decisions, 28% of the actions ending a phase, and 201 moves of a land unit a game against 54 at first, though still about 10 land
   battles a game ([record](archive/records/fresh_network_games_2026_11_22.md)).
   So the run goes on from the fresh network, as the owner chose.
+- **Q-019**, two attacks on one land zone by Japan and Dadao. Answered on 24
+  November 2026: no. Of the nations that share a Player Turn, a controlled
+  minor power and the major power that controls it, only the first to attack
+  a land zone may attack it in that turn, in any way, and an aircraft supports
+  only a battle of its own nation. In the case that raised it, game 5967 of
+  the training run under the land-weighted score, once Japan had declared its
+  assault on Manchuria-Rehe, Dadao could no longer attack Rehe that turn
+  ([record](archive/records/japan_dadao_one_zone_2026_11_23.md)). Stated in
+  [rule clarification RCL-024](../game_content/rules/clarifications.md#rcl-024-two-attacks-on-one-land-zone-by-a-controlled-minor-power-and-its-controller)
+  and [the politics page](engine/politics.md#one-attacker-for-each-land-zone).

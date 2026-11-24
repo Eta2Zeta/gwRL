@@ -94,6 +94,20 @@ void declareWar(State&, NationId actor, NationId target, DeclarationMode);
 // that attack, Mongolia too (RCL-022: the developers' answer).
 bool invadesChina(const State&, NationId attacker, ZoneId zone);
 void recordLandAttack(State&, NationId attacker, ZoneId zone);
+// Rule 7.1 (page 43): a controlled Minor Power shares the Player Turn of its
+// Controlling Major Power, and the two "may not attack together". RCL-024
+// reads it as: of the nations that move in one Player Turn, only the first to
+// attack a land zone may attack it that turn, overland, from the sea, by air
+// or by an attrition attack. noteLandAttack refuses an attack that breaks the
+// rule and, if another nation moves in this Player Turn, marks the attacker
+// land_attack:<zone> until the Combat Phase ends; recordLandAttack and an
+// attrition attack call it. landAttackedByPartner says whether a nation other
+// than the attacker has that mark for the zone: only a nation that moves in
+// this Player Turn can have it, since the marks go when its Combat Phase ends.
+bool landAttackedByPartner(const State&, NationId attacker, ZoneId zone);
+void noteLandAttack(State&, NationId attacker, ZoneId zone);
+inline constexpr char partnerAttackedLand[] =
+    "A controlled Minor Power and its controller may not both attack one land zone in a Player Turn (RB 7.1, RCL-024)";
 void surrenderNation(State&, NationId nation, NationId attacker);
 
 // Shared decision/chance helpers keep continuations explicit in State, so

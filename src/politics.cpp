@@ -2,6 +2,7 @@
 #include "game/economy.hpp"
 #include "game/air.hpp"
 #include "game/catalog.hpp"
+#include "game/movement.hpp"
 
 #include <algorithm>
 #include <deque>
@@ -618,12 +619,24 @@ bool invadesChina(const State& s,NationId attacker,ZoneId zone) {
     return (original==known.ccp||original==known.kmt||warlord(s,original))&&
            !isNation(s,s.territories.at(zone).possessor,"dadao");
 }
+bool landAttackedByPartner(const State& s,NationId attacker,ZoneId zone) {
+    const MarkKey key(mark::land_attack,zoneName(s,zone));
+    for(const auto& [id,n]:s.nations)if(id!=attacker&&marked(n.turnFlags,key))return true;
+    return false;
+}
+void noteLandAttack(State& s,NationId attacker,ZoneId zone) {
+    require(!landAttackedByPartner(s,attacker,zone),partnerAttackedLand);
+    bool shared=false;  // Another nation moves in this Player Turn.
+    for(const auto& [id,n]:s.nations)shared=shared||(id!=attacker&&movementController(s,id));
+    if(shared)s.nations.at(attacker).turnFlags[MarkKey(mark::land_attack,zoneName(s,zone))]=1;
+}
 void recordLandAttack(State& s,NationId attacker,ZoneId zone) {
     require(s.territories.contains(zone),"Land attack target is not land");
     const auto defender=s.territories.at(zone).possessor;
     require(defender!=attacker,"Cannot attack one's own possession");
     if(defender&&s.politics.chineseTruce&&((attacker== knownNations(s).ccp&&*defender== knownNations(s).kmt)||(attacker== knownNations(s).kmt&&*defender== knownNations(s).ccp)))
         throw std::runtime_error("Chinese Truce prevents attacking the other faction");
+    noteLandAttack(s,attacker,zone);
     const bool invasion=invadesChina(s,attacker,zone);
     // Whether this attack starts a war with the KMT or the CCP: by invading
     // China, it starts one with each of them that is not of the attacker's
@@ -786,6 +799,13 @@ void PoliticsRules::beginTurn(State& s) const {
 }
 void PoliticsRules::finishPhase(State& s) const {
     if(gameplay_)gameplay_->finishPhase(s);
+    // No land attack comes after the Combat Phase, so RCL-024's marks go with it.
+    if(s.clock.phase==Phase::Combat)
+        for(auto& [id,n]:s.nations)
+            for(auto it=n.turnFlags.begin();it!=n.turnFlags.end();) {
+                if(it->first.base()==mark::land_attack)it=n.turnFlags.erase(it);
+                else ++it;
+            }
     if(s.clock.phase==Phase::Combat&&!marked(s.nations.at(s.currentNation()).turnFlags,mark::politics_combat_finished)) {
         s.nations.at(s.currentNation()).turnFlags[mark::politics_combat_finished]=1;
         beginCombatPoliticalResolution(s);

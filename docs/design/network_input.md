@@ -54,8 +54,8 @@ process spent per game in the 2 November profile: about 4%, a rough estimate.
 The input for one decision is one bundle with three parts:
 
 1. **The zone features:** each of the 37 zones (31 land and 6 sea) has values for
-   the same list of 35,329 zone features.
-2. **The global features:** 2,766 features about the state as a whole: the game
+   the same list of 35,342 zone features.
+2. **The global features:** 2,779 features about the state as a whole: the game
    round, the phase, whose turn it is, treasuries, wars and so on.
 3. **The action features:** every legal action has values for the same list of
    11,046 action features about itself.
@@ -714,7 +714,7 @@ nation; a rare situation keeps its feature.
   facility, a construction project, a battle or the game as a whole
   ([names held as numbers](../engine/names.md#what-a-mark-is)). Each family of
   marks asks about a mark only on its own kind: `nation_flag` asks a nation
-  about the 48 marks a nation gets, but for its research rounds, which are
+  about the 49 marks a nation gets, but for its research rounds, which are
   `researched_round`, and not about a unit's `air_battle`; and
   `state_flag` asks about the 9 marks of the game as a whole that are not
   counters or features of their own. Until 18 November 2026 the input kept
@@ -722,7 +722,7 @@ nation; a rare situation keeps its feature.
   asked every kind about every mark of its list: 8,902 features, of which 290
   ever had a value in 480 random games
   ([record](../archive/records/answer_census_2026_11_15.md#which-questions-were-answered)).
-  1,680 remain. The four marks a nation gets when Improved Construction spares
+  1,706 remain. The four marks a nation gets when Improved Construction spares
   one of its factories or cities from bombing (rulebook 8.2.1, page 46;
   `applyFacilityBombDamage` and `applyCityBombDamage` in `src/air.cpp`), which
   neither list had, have their features. Twelve marks are on nothing: the test
@@ -762,7 +762,11 @@ November 2026 this took the global features from 6,477 to 4,076, and on 18
 November 2026 the facts that never change and the marks a nation is never given
 took them to 2,784. Removing the wars that no rule brings about, the CCP at
 war with Mongolia, its partner in the Comintern, and the KMT at war with a
-warlord, a war that ends as soon as it starts, took them to 2,766.
+warlord, a war that ends as soon as it starts, took them to 2,766. The mark
+`land_attack`, which a nation gets for each land zone it attacks while another
+nation shares its Player Turn
+([RCL-024](../../game_content/rules/clarifications.md#rcl-024-two-attacks-on-one-land-zone-by-a-controlled-minor-power-and-its-controller)),
+brought them to 2,779.
 
 | Features | Kept for | Why no other value can happen |
 | --- | --- | --- |
@@ -807,15 +811,17 @@ features*:
 - the 160 directed borders, with 22 static features each, such as rivers, narrow
   crossings, railway connections and terrain.
 
-The layout version, now `campaign-zone-v1-cd3d5a7f9e936bb3`, is a hash of every
+The layout version, now `campaign-zone-v1-0c67ec4e4810ee0f`, is a hash of every
 feature name and every static feature. A network refuses inputs of another
 layout, and a training run cannot resume across a layout change. It last changed
-on 22 November 2026, when the game's developers answered that Mongolia may
-attack land that was Chinese at the start
-([RCL-022](../../game_content/rules/clarifications.md#rcl-022-an-attack-on-land-that-was-chinese-at-the-start)):
-27 features came back, Mongolia at war with a warlord or Dadao, Mongolia as
-China's invader and Mongolia as a warlord's attacker
-([section 8](#what-the-global-features-ask-about-a-nation)).
+on 24 November 2026, when the owner ruled that Japan and Dadao may not both
+attack one land zone in a Player Turn
+([RCL-024](../../game_content/rules/clarifications.md#rcl-024-two-attacks-on-one-land-zone-by-a-controlled-minor-power-and-its-controller)):
+the engine marks a nation `land_attack` for each land zone it attacks while
+another nation shares its turn, and the layout gained the mark's 26 features,
+`nation_flag:<nation>:land_attack` among the global features and
+`nation_flag_here:<nation>:land_attack` among the zone features, one of each
+for each of the 13 nations.
 
 ## 10. Why the encoder translates names
 

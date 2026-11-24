@@ -2,6 +2,7 @@
 #include "game/catalog.hpp"
 #include "game/economy.hpp"
 #include "game/land_combat.hpp"
+#include "game/movement.hpp"
 #include "game/naval.hpp"
 #include "game/politics.hpp"
 
@@ -10,6 +11,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <optional>
 #include <set>
 #include <stdexcept>
 
@@ -1559,6 +1561,146 @@ void militiaStepAshoreWhenTheirShipBerths() {
   choose(e, "naval_unload", [](const Action &a) { return a.parameters.require("unit").asString() == "n"; });
   check(offered(e, "end_phase"), "Militia ashore at home still held the phase");
 }
+// The zone an attack goes into: an assault's or attrition attack's zone, or the
+// end of a move's or a flight's path; and the unit that attacks.
+Id attackTarget(const Action &a) {
+  if (const auto *zone = a.parameters.find("zone"))
+    return zone->asString();
+  if (const auto *path = a.parameters.find("path"))
+    return path->asArray().back().asString();
+  return {};
+}
+Id attackingUnit(const Action &a) {
+  if (const auto *cargo = a.parameters.find("cargo"))
+    return cargo->asString();
+  if (const auto *unit = a.parameters.find("unit"))
+    return unit->asString();
+  return {};
+}
+std::optional<Action> attackInto(Engine &e, const Id &kind, const Id &unit, const Id &zone) {
+  for (const auto &a : e.legalActions())
+    if (a.kind == kind && attackingUnit(a) == unit && attackTarget(a) == zone)
+      return a;
+  return std::nullopt;
+}
+// An attack the menu no longer offers is refused by its own module too.
+bool refusedByRcl024(const State &s, const Action &a) {
+  auto copy = s.clone();
+  try {
+    rules()->apply(copy, a);
+  } catch (const std::exception &x) {
+    return std::string(x.what()) == partnerAttackedLand;
+  }
+  return false;
+}
+bool landAttackMarked(const State &s) {
+  for (const auto &[id, n] : s.nations)
+    for (const auto &[key, value] : n.turnFlags)
+      if (key.base() == mark::land_attack)
+        return true;
+  return false;
+}
+// Game 5967 of the training run under the land-weighted score failed on 23
+// November 2026 in its search, in game round 4: in Japan's Combat Movement,
+// Japan declared an assault on Manchuria-Rehe, which the KMT held and which
+// was Japan's at the start, with an Artillery aboard a Naval Transport in sea
+// zone P14, and Dadao attacked Rehe with an Infantry from Suiyuan. Dadao's
+// battle was won first, Rehe went back to Japan, and Japan's landing then
+// registered a battle of Japan against Japan. RCL-024 (RB 7.1, page 43) lets
+// only the first of the two attack a land zone in a Player Turn, by any means;
+// the first may add attacks of its own, and the marks go when Combat ends.
+void japanAndDadaoNeverAttackOneZone() {
+  const Id rehe = "land_manchuria_rehe", suiyuan = "land_china_suiyuan",
+           western = "land_manchuria_western", korea = "land_korea";
+  auto s = fixture();
+  ensureDadao(s);
+  const auto kmt = nationNumber(s, "kmt"), dadao = nationNumber(s, "dadao");
+  s.nations.at(dadao).atWarWith.insert(kmt);
+  s.nations.at(kmt).atWarWith.insert(dadao);
+  s.territories.at(zoneNumber(s, rehe)).possessor = kmt;
+  s.territories.at(zoneNumber(s, suiyuan)).possessor = dadao;
+  add(s, "transport", "naval_transport", "japan", p14);
+  add(s, "artillery", "artillery", "japan", p14);
+  attachCargo(s, "transport", "artillery");
+  add(s, "dadao_infantry", "infantry", "dadao", suiyuan);
+  add(s, "dadao_fighter", "fighter", "dadao", suiyuan);
+  add(s, "japanese_infantry", "infantry", "japan", western);
+  add(s, "advanced_artillery", "advanced_artillery", "japan", western);
+  add(s, "air_transport", "air_transport", "japan", western);
+  add(s, "paratrooper", "airborne_infantry", "japan", western);
+  attachCargo(s, "air_transport", "paratrooper");
+  add(s, "fighter", "fighter", "japan", korea);
+  add(s, "defender", "infantry", "kmt", rehe);
+  s.captureTurnStart();
+
+  // Game 5967's order: Japan's assault first. Dadao may no longer attack
+  // Rehe, on foot or by air; Japan may still attack it overland too.
+  {
+    Engine e(s, rules());
+    const auto dadaoAttack = attackInto(e, "movement_route", "dadao_infantry", rehe);
+    check(dadaoAttack && attackInto(e, "air_ground_attack", "dadao_fighter", rehe),
+          "Dadao could not attack Rehe before Japan did");
+    choose(e, "naval_declare_assault", [&](const Action &a) { return attackTarget(a) == rehe; });
+    check(!attackInto(e, "movement_route", "dadao_infantry", rehe) &&
+              !attackInto(e, "air_ground_attack", "dadao_fighter", rehe),
+          "Dadao was offered an attack on the zone Japan's assault attacks");
+    check(refusedByRcl024(e.state(), *dadaoAttack), "Dadao's stale attack on Rehe was not refused");
+    const auto overland = attackInto(e, "movement_route", "japanese_infantry", rehe);
+    check(bool(overland), "Japan could not add an overland attack to its own assault");
+    e.step(*overland);
+    check(!attackInto(e, "air_support", "dadao_fighter", rehe),
+          "Dadao's fighter was offered to support Japan's battle");
+  }
+
+  // The other order: Dadao first. Japan may attack Rehe in no way, and still
+  // attacks other zones; the marks go when the Combat Phase ends.
+  Engine e(s, rules(), 3);
+  e.setDiceTapeForTesting(std::vector<int>(200, 1));
+  const auto assault = attackInto(e, "naval_declare_assault", "artillery", rehe);
+  const std::vector<std::pair<Id, Id>> japanese = {{"movement_route", "japanese_infantry"},
+                                                   {"air_ground_attack", "fighter"},
+                                                   {"air_assault", "air_transport"},
+                                                   {"land_declare_attrition", "advanced_artillery"}};
+  check(bool(assault), "Japan could not declare its assault on Rehe");
+  for (const auto &[kind, unit] : japanese)
+    check(bool(attackInto(e, kind, unit, rehe)), "Japan could not make a " + kind + " on Rehe before Dadao");
+  choose(e, "movement_route", [&](const Action &a) {
+    return attackingUnit(a) == "dadao_infantry" && attackTarget(a) == rehe;
+  });
+  check(e.state().nations.at(dadao).turnFlags.contains(MarkKey(mark::land_attack, rehe)),
+        "Dadao's attack on Rehe was not noted");
+  check(!attackInto(e, "naval_declare_assault", "artillery", rehe),
+        "Japan was offered an assault on the zone Dadao attacked");
+  for (const auto &[kind, unit] : japanese)
+    check(!attackInto(e, kind, unit, rehe), "Japan was offered a " + kind + " on the zone Dadao attacked");
+  check(refusedByRcl024(e.state(), *assault), "Japan's stale assault on Rehe was not refused");
+  check(bool(attackInto(e, "naval_declare_assault", "artillery", shantung)),
+        "Dadao's attack on Rehe closed another zone to Japan");
+  choose(e, "end_phase");
+  finishBattles(e);
+  choose(e, "end_phase");
+  check(!landAttackMarked(e.state()), "RCL-024's marks outlived the Combat Phase");
+}
+// A blitz is an attack too: Japan's armour may not blitz into a zone Dadao
+// attacked earlier in the turn, even after Dadao's battle there has ended.
+void noBlitzIntoTheZoneTheOtherAttacked() {
+  const Id rehe = "land_manchuria_rehe", western = "land_manchuria_western";
+  auto s = fixture(Phase::Combat);
+  ensureDadao(s);
+  s.territories.at(zoneNumber(s, rehe)).possessor = nationNumber(s, "kmt");
+  add(s, "armor", "light_armor", "japan", western);
+  s.units.at("armor").turnFlags[mark::blitz_eligible] = 1;
+  const RouteRequest blitz{"armor", zoneNumbers(s, {western, rehe}), MovementMode::Blitz, true};
+  check(validateRoute(s, blitz).allowed, "Japan's armour could not blitz into Rehe");
+  s.nations.at(nationNumber(s, "dadao")).turnFlags[MarkKey(mark::land_attack, rehe)] = 1;
+  const auto refusal = validateRoute(s, blitz);
+  check(!refusal.allowed && refusal.reason == partnerAttackedLand,
+        "Japan's armour blitzed into the zone Dadao had attacked");
+  const auto actions = MovementRules().actions(s);
+  check(std::none_of(actions.begin(), actions.end(), [&](const Action &a) {
+          return a.kind == "movement_route" && attackTarget(a) == rehe;
+        }), "A blitz into the zone Dadao had attacked was offered");
+}
 int main() {
   try {
     for (const auto &[name, test] :
@@ -1622,7 +1764,11 @@ int main() {
              {"uncleared assaults are called off as Combat ends",
               unclearedAssaultsAreCalledOffAsCombatEnds},
              {"called-off assaults do not hold up land battles",
-              calledOffAssaultsDoNotHoldUpLandBattles}}) {
+              calledOffAssaultsDoNotHoldUpLandBattles},
+             {"Japan and Dadao never attack one zone (game 5967)",
+              japanAndDadaoNeverAttackOneZone},
+             {"no blitz into the zone the other attacked",
+              noBlitzIntoTheZoneTheOtherAttacked}}) {
       test();
       std::cout << "PASS " << name << '\n';
     }

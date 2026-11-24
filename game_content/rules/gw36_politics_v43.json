@@ -64,7 +64,7 @@
     {
       "id": "clarifications",
       "path": "game_content/rules/clarifications.md",
-      "sha256": "66357171588cd150f06efee0859f964e9f9a469c3b3e155110de49aa6e3a51e3",
+      "sha256": "addd92a73e5a0262be9a63c2d6d360dfa6da9a0a48f6d2bd9f3585a9603cf488",
       "kind": "project_rule_register"
     },
     {
@@ -125,6 +125,15 @@
       "quote": "and also 003, the entire warlord is a deverloper closing",
       "scope": "Foreign-invasion alignment: the entire warlord aligns, one roll per whole warlord, as RCL-003 had adopted on 5 October 2026.",
       "independently_verified": false
+    },
+    {
+      "id": "user_one_attacker_per_land_zone_2026_11_24",
+      "kind": "user_ruling",
+      "date": "2026-11-24",
+      "question": "Q-019: may Japan and Dadao each attack the same land zone in one of Japan's Player Turns, in battles of their own?",
+      "quote": "Go with A for Q19",
+      "ruling": "Of the nations that share a Player Turn, a controlled Minor Power and its Controlling Major Power, only the first to attack a land zone may attack it in that turn: the other may not attack it overland, from the sea, by air drop, with aircraft, by blitzing or by an attrition attack, and an aircraft supports only a battle of its own nation.",
+      "scope": "Reads RB 7.1's \"They may not attack together\" (page 43); attacks count from the moment they are made or declared, and strategic bombing and rocket attacks on facilities, cities or railroads are not attacks on the zone. Recorded as RCL-024."
     }
   ],
   "rules": [
@@ -1255,6 +1264,7 @@
         "within_phase_order": "player_choice_unless_explicit_rule",
         "controlled_minors_share_controller_turn": true,
         "controlled_minors_and_controller_attack_together": false,
+        "land_zone_attackers_per_player_turn": "first_nation_of_the_shared_turn_only",
         "combat_order": "attacker_choice",
         "income_collection_phase": "place_units",
         "campaign_end": "after_complete_july_1941_round"
@@ -1264,6 +1274,14 @@
           "source_id": "rulebook",
           "pdf_page": 43,
           "section": "7.1"
+        },
+        {
+          "source_id": "clarifications",
+          "section": "RCL-024 two attacks on one land zone by a controlled Minor Power and its controller"
+        },
+        {
+          "source_id": "user_one_attacker_per_land_zone_2026_11_24",
+          "clarification": "RCL-024"
         },
         {
           "source_id": "rulebook",

@@ -61,7 +61,7 @@ part of the definition and of the catalog.
 | Unit classes | `UnitClassId` | Every class some unit of the catalog has | 17 |
 | Facility types | `FacilityTypeId` | The catalog's facilities (`facilities.json`) | 15 |
 | Technologies | `TechnologyId` | The catalog's technologies (`technologies.json`) | 16 |
-| Marks | `MarkId` | The bases in the engine's mark table, `GWRL_MARKS` in `include/game/marks.hpp` | 218 |
+| Marks | `MarkId` | The bases in the engine's mark table, `GWRL_MARKS` in `include/game/marks.hpp` | 219 |
 
 The campaign's 13 nations are the 12 of its faction index
 (`game_content/scenarios/japan_china_1936/faction_index.json`) and Dadao, which
@@ -514,127 +514,128 @@ The campaign, `game_content/scenarios/japan_china_1936`, and its catalog,
 | 94 | `incorporated` | — | nation |
 | 95 | `influence_attempted` | — | nation |
 | 96 | `japanese_surprise_attack` | — | battle |
-| 97 | `land_battle_sequence` | — | game |
-| 98 | `land_decision_sequence` | — | game |
-| 99 | `land_retreating` | — | unit |
-| 100 | `land_roll_sequence` | — | game |
-| 101 | `last_possession_change_turn` | — | territory |
-| 102 | `launched_from_carrier` | — | unit |
-| 103 | `lease_available_after_turns` | — | project |
-| 104 | `lease_declared` | nation | nation |
-| 105 | `lease_delivered` | nation | nation |
-| 106 | `lease_militia_upgrade` | — | project |
-| 107 | `lease_received` | — | project |
-| 108 | `lease_repair` | — | project |
-| 109 | `lease_repair_target` | repair target | project |
-| 110 | `lease_repair_wait` | repair target | nation |
-| 111 | `lease_sender` | nation | project |
-| 112 | `lease_wait_controller` | nation | project |
-| 113 | `lend_to` | nation | project |
-| 114 | `logistics_damaged_turn` | facility or railroad | game |
-| 115 | `logistics_last_turn_start` | — | nation |
-| 116 | `logistics_rail_created_turn` | railroad | game |
-| 117 | `logistics_start_damaged` | facility | game |
-| 118 | `map_declined_combat` | — | unit |
-| 119 | `map_range` | — | unit |
-| 120 | `maritime_air_patrol` | — | unit |
-| 121 | `moved_this_turn` | — | facility |
-| 122 | `must_withdraw_from_chinese_gift` | — | unit |
-| 123 | `national_objective_award` | — | project |
-| 124 | `naval_battle` | — | battle |
-| 125 | `naval_battle_sequence` | — | game |
-| 126 | `naval_berthing` | — | game |
-| 127 | `naval_casualty_dispute_decided` | — | battle |
-| 128 | `naval_combat` | — | unit |
-| 129 | `naval_combat_turn` | — | unit |
-| 130 | `naval_combat_unloaded` | — | unit |
-| 131 | `naval_decision_sequence` | — | game |
-| 132 | `naval_escort` | — | nowhere |
-| 133 | `naval_last_origin` | zone | unit |
-| 134 | `naval_loaded_completed_turns` | — | unit |
-| 135 | `naval_move_decisions` | — | game |
-| 136 | `naval_move_sequence` | — | game |
-| 137 | `naval_movement_immediate` | — | battle |
-| 138 | `naval_movement_plan` | — | battle |
-| 139 | `naval_movement_spent` | — | unit |
-| 140 | `naval_operation_decision_sequence` | — | game |
-| 141 | `naval_raider` | — | nowhere |
-| 142 | `naval_retreated` | — | unit |
-| 143 | `naval_roll_sequence` | — | game |
-| 144 | `naval_scramble_origin` | facility | unit |
-| 145 | `naval_scramble_turn` | — | facility |
-| 146 | `naval_scramble_used` | — | facility |
-| 147 | `naval_scrambled` | — | nowhere |
-| 148 | `naval_screening_continuing` | — | unit |
-| 149 | `naval_start_sea` | zone | unit |
-| 150 | `naval_strategic_destination` | facility | unit |
-| 151 | `naval_strategic_moved` | — | unit |
-| 152 | `naval_unloaded` | — | unit |
-| 153 | `newly_placed` | — | nowhere |
-| 154 | `objective_evolution` | — | nation |
-| 155 | `objective_one_china` | — | nation |
-| 156 | `on_map` | — | unit |
-| 157 | `one_china_bonus_awarded` | — | nation |
-| 158 | `one_china_bonus_eligible_at_surrender` | — | nation |
-| 159 | `original_owner` | nation | facility |
-| 160 | `original_type` | type | facility |
-| 161 | `payment` | payment number | project |
-| 162 | `placed_this_turn` | — | unit, facility |
-| 163 | `politics_combat_finished` | — | nation |
-| 164 | `politics_sequence` | — | game |
-| 165 | `port_aa_done` | — | battle |
-| 166 | `port_crew_prepared` | — | battle |
-| 167 | `port_unloaded_round` | — | unit |
-| 168 | `possessed_land_ipp` | — | nation |
-| 169 | `price` | price method | project |
-| 170 | `purchased` | row or cap group | nation |
-| 171 | `raider` | — | unit |
-| 172 | `rail_build_permission` | nation:zone:zone | nation |
-| 173 | `rail_declined` | project | nation |
-| 174 | `rail_permission` | nation | nation |
-| 175 | `rail_used` | player:region | nation |
-| 176 | `recruitment_attempted` | — | nation |
-| 177 | `repair` | — | unit |
-| 178 | `repair_at` | facility | unit |
-| 179 | `repairing` | — | unit |
-| 180 | `researched_this_turn` | — | facility |
-| 181 | `retreated` | — | unit |
-| 182 | `rocket_launched` | — | unit |
-| 183 | `rocket_mission` | — | battle |
-| 184 | `row` | build-chart row | project |
-| 185 | `scrambled` | — | unit |
-| 186 | `ship_crew` | unit | unit |
-| 187 | `shore_bombardment` | — | unit |
-| 188 | `shore_dispute_decided` | — | battle |
-| 189 | `shore_resolved` | — | battle |
-| 190 | `skeleton_crew` | — | nowhere |
-| 191 | `skeleton_crew_until_own_turn` | — | unit |
-| 192 | `slip_attempted` | — | battle |
-| 193 | `stages_paid` | — | project |
-| 194 | `stages_total` | — | project |
-| 195 | `stranded_aircraft_lost` | — | game |
-| 196 | `strategic_moved` | — | unit |
-| 197 | `strategic_naval_movement_in_progress` | — | nowhere |
-| 198 | `strategic_naval_used` | — | nation |
-| 199 | `submerged` | — | unit |
-| 200 | `surprise_attack_available` | — | nation |
-| 201 | `surprise_attack_linked_land` | zone | nation |
-| 202 | `surprise_attack_naval_sea` | zone | nation |
-| 203 | `surprise_attack_target` | nation | nation |
-| 204 | `surprise_attack_used` | — | nation |
-| 205 | `surprise_attack_zone` | zone | nation |
-| 206 | `surrendered` | — | nation |
-| 207 | `target` | repair target | project |
-| 208 | `towed_by` | unit | unit |
-| 209 | `towing` | unit | unit |
-| 210 | `transport_unloaded` | — | unit |
-| 211 | `truce_low_morale_eliminates` | — | battle |
-| 212 | `uncontested` | — | battle |
-| 213 | `under_construction` | — | nowhere |
-| 214 | `unit_upgrade` | — | project |
-| 215 | `unloaded_combat` | — | unit |
-| 216 | `unloaded_noncombat` | — | nowhere |
-| 217 | `upgraded_this_turn` | — | facility |
+| 97 | `land_attack` | zone | nation |
+| 98 | `land_battle_sequence` | — | game |
+| 99 | `land_decision_sequence` | — | game |
+| 100 | `land_retreating` | — | unit |
+| 101 | `land_roll_sequence` | — | game |
+| 102 | `last_possession_change_turn` | — | territory |
+| 103 | `launched_from_carrier` | — | unit |
+| 104 | `lease_available_after_turns` | — | project |
+| 105 | `lease_declared` | nation | nation |
+| 106 | `lease_delivered` | nation | nation |
+| 107 | `lease_militia_upgrade` | — | project |
+| 108 | `lease_received` | — | project |
+| 109 | `lease_repair` | — | project |
+| 110 | `lease_repair_target` | repair target | project |
+| 111 | `lease_repair_wait` | repair target | nation |
+| 112 | `lease_sender` | nation | project |
+| 113 | `lease_wait_controller` | nation | project |
+| 114 | `lend_to` | nation | project |
+| 115 | `logistics_damaged_turn` | facility or railroad | game |
+| 116 | `logistics_last_turn_start` | — | nation |
+| 117 | `logistics_rail_created_turn` | railroad | game |
+| 118 | `logistics_start_damaged` | facility | game |
+| 119 | `map_declined_combat` | — | unit |
+| 120 | `map_range` | — | unit |
+| 121 | `maritime_air_patrol` | — | unit |
+| 122 | `moved_this_turn` | — | facility |
+| 123 | `must_withdraw_from_chinese_gift` | — | unit |
+| 124 | `national_objective_award` | — | project |
+| 125 | `naval_battle` | — | battle |
+| 126 | `naval_battle_sequence` | — | game |
+| 127 | `naval_berthing` | — | game |
+| 128 | `naval_casualty_dispute_decided` | — | battle |
+| 129 | `naval_combat` | — | unit |
+| 130 | `naval_combat_turn` | — | unit |
+| 131 | `naval_combat_unloaded` | — | unit |
+| 132 | `naval_decision_sequence` | — | game |
+| 133 | `naval_escort` | — | nowhere |
+| 134 | `naval_last_origin` | zone | unit |
+| 135 | `naval_loaded_completed_turns` | — | unit |
+| 136 | `naval_move_decisions` | — | game |
+| 137 | `naval_move_sequence` | — | game |
+| 138 | `naval_movement_immediate` | — | battle |
+| 139 | `naval_movement_plan` | — | battle |
+| 140 | `naval_movement_spent` | — | unit |
+| 141 | `naval_operation_decision_sequence` | — | game |
+| 142 | `naval_raider` | — | nowhere |
+| 143 | `naval_retreated` | — | unit |
+| 144 | `naval_roll_sequence` | — | game |
+| 145 | `naval_scramble_origin` | facility | unit |
+| 146 | `naval_scramble_turn` | — | facility |
+| 147 | `naval_scramble_used` | — | facility |
+| 148 | `naval_scrambled` | — | nowhere |
+| 149 | `naval_screening_continuing` | — | unit |
+| 150 | `naval_start_sea` | zone | unit |
+| 151 | `naval_strategic_destination` | facility | unit |
+| 152 | `naval_strategic_moved` | — | unit |
+| 153 | `naval_unloaded` | — | unit |
+| 154 | `newly_placed` | — | nowhere |
+| 155 | `objective_evolution` | — | nation |
+| 156 | `objective_one_china` | — | nation |
+| 157 | `on_map` | — | unit |
+| 158 | `one_china_bonus_awarded` | — | nation |
+| 159 | `one_china_bonus_eligible_at_surrender` | — | nation |
+| 160 | `original_owner` | nation | facility |
+| 161 | `original_type` | type | facility |
+| 162 | `payment` | payment number | project |
+| 163 | `placed_this_turn` | — | unit, facility |
+| 164 | `politics_combat_finished` | — | nation |
+| 165 | `politics_sequence` | — | game |
+| 166 | `port_aa_done` | — | battle |
+| 167 | `port_crew_prepared` | — | battle |
+| 168 | `port_unloaded_round` | — | unit |
+| 169 | `possessed_land_ipp` | — | nation |
+| 170 | `price` | price method | project |
+| 171 | `purchased` | row or cap group | nation |
+| 172 | `raider` | — | unit |
+| 173 | `rail_build_permission` | nation:zone:zone | nation |
+| 174 | `rail_declined` | project | nation |
+| 175 | `rail_permission` | nation | nation |
+| 176 | `rail_used` | player:region | nation |
+| 177 | `recruitment_attempted` | — | nation |
+| 178 | `repair` | — | unit |
+| 179 | `repair_at` | facility | unit |
+| 180 | `repairing` | — | unit |
+| 181 | `researched_this_turn` | — | facility |
+| 182 | `retreated` | — | unit |
+| 183 | `rocket_launched` | — | unit |
+| 184 | `rocket_mission` | — | battle |
+| 185 | `row` | build-chart row | project |
+| 186 | `scrambled` | — | unit |
+| 187 | `ship_crew` | unit | unit |
+| 188 | `shore_bombardment` | — | unit |
+| 189 | `shore_dispute_decided` | — | battle |
+| 190 | `shore_resolved` | — | battle |
+| 191 | `skeleton_crew` | — | nowhere |
+| 192 | `skeleton_crew_until_own_turn` | — | unit |
+| 193 | `slip_attempted` | — | battle |
+| 194 | `stages_paid` | — | project |
+| 195 | `stages_total` | — | project |
+| 196 | `stranded_aircraft_lost` | — | game |
+| 197 | `strategic_moved` | — | unit |
+| 198 | `strategic_naval_movement_in_progress` | — | nowhere |
+| 199 | `strategic_naval_used` | — | nation |
+| 200 | `submerged` | — | unit |
+| 201 | `surprise_attack_available` | — | nation |
+| 202 | `surprise_attack_linked_land` | zone | nation |
+| 203 | `surprise_attack_naval_sea` | zone | nation |
+| 204 | `surprise_attack_target` | nation | nation |
+| 205 | `surprise_attack_used` | — | nation |
+| 206 | `surprise_attack_zone` | zone | nation |
+| 207 | `surrendered` | — | nation |
+| 208 | `target` | repair target | project |
+| 209 | `towed_by` | unit | unit |
+| 210 | `towing` | unit | unit |
+| 211 | `transport_unloaded` | — | unit |
+| 212 | `truce_low_morale_eliminates` | — | battle |
+| 213 | `uncontested` | — | battle |
+| 214 | `under_construction` | — | nowhere |
+| 215 | `unit_upgrade` | — | project |
+| 216 | `unloaded_combat` | — | unit |
+| 217 | `unloaded_noncombat` | — | nowhere |
+| 218 | `upgraded_this_turn` | — | facility |
 
 ## 4. Where names become numbers
 

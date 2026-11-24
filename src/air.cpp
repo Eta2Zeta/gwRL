@@ -1446,7 +1446,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                 (fighter(s, u) || u.type == knownUnitTypes(s).tactical_bomber) && u.movementRemaining.value_or(0) > 0) {
                 for (const auto &zone : neighbors(s, u.zone))
                     if (s.territories.contains(zone) && blitzPairValid(s, u, u.zone, zone) &&
-                        !friendlyLand(s, u.owner, zone)) {
+                        !friendlyLand(s, u.owner, zone) && !landAttackedByPartner(s, u.owner, zone)) {
                         std::vector<ZoneId> path{u.zone, zone};
                         if (!validateFlight(s, id, path, true, true).allowed)
                             continue;
@@ -1628,7 +1628,10 @@ std::vector<Action> AirRules::actions(const State &s) const {
                             out.push_back(
                                 action(s, s.currentNation(), "air_escort",
                                        {{"unit", V(id)}, {"path", V(zoneIds(s, path))}, {"battle", V(bid)}}));
-                if (u.type != knownUnitTypes(s).seaplane && !transport(s, u) &&
+                // RCL-024: no air attack on, or air drop into, a land zone that
+                // another nation of this Player Turn has attacked.
+                const bool partnerAttacked = landAttackedByPartner(s, u.owner, zone);
+                if (u.type != knownUnitTypes(s).seaplane && !transport(s, u) && !partnerAttacked &&
                     (!has(s, u, knownUnitClasses(s).strategic_bomber) || hasTechnology(s, u.owner, knownTechnologies(s).heavy_strategic_bombers))) {
                     bool existing = false;
                     for (const auto &[bid, b] : s.battles)
@@ -1639,9 +1642,11 @@ std::vector<Action> AirRules::actions(const State &s) const {
                         out.push_back(action(s, s.currentNation(), "air_ground_attack",
                                              {{"unit", V(id)}, {"path", V(zoneIds(s, path))}}));
                 }
+                // An aircraft supports only its own nation's battle: a controlled
+                // Minor Power and its controller never attack together (RCL-024).
                 if (u.type != knownUnitTypes(s).seaplane && !transport(s, u)) {
                     for (const auto &[bid, b] : s.battles)
-                        if (b.zone == zone && b.attacker == s.currentNation() &&
+                        if (b.zone == zone && b.attacker == u.owner &&
                             !marked(b.flags, mark::air_mission) && !marked(b.flags, mark::finished) &&
                             b.stage == "awaiting_combat_rules" &&
                             (!has(s, u, knownUnitClasses(s).strategic_bomber) || hasTechnology(s, u.owner, knownTechnologies(s).heavy_strategic_bombers)))
@@ -1649,7 +1654,7 @@ std::vector<Action> AirRules::actions(const State &s) const {
                                 action(s, s.currentNation(), "air_support",
                                        {{"unit", V(id)}, {"path", V(zoneIds(s, path))}, {"battle", V(bid)}}));
                 }
-                if (!u.commitments.contains(mark::air_screening_continued) && !u.cargo.empty() &&
+                if (!u.commitments.contains(mark::air_screening_continued) && !u.cargo.empty() && !partnerAttacked &&
                     (transport(s, u) || has(s, u, knownUnitClasses(s).strategic_bomber)) &&
                     std::all_of(u.cargo.begin(), u.cargo.end(), [&](const Id &c) {
                         const auto &cargo = s.units.at(c);
@@ -1876,6 +1881,10 @@ void AirRules::apply(State &s, const Action &a) const {
                     "Aircraft has no paired blitz path");
             require(!friendlyLand(s, s.units.at(id).owner, path.back()), "Cannot blitz into friendly land");
         }
+        if (a.kind == "air_support")
+            require(s.battles.at(p.require("battle").asString()).attacker == s.units.at(id).owner, partnerAttackedLand);
+        if (a.kind == "air_ground_attack" || a.kind == "air_blitz" || a.kind == "air_assault")
+            require(!landAttackedByPartner(s, s.units.at(id).owner, path.back()), partnerAttackedLand);
         require(flightKeepsLanding(s, id, path), "No joint legal return landing plan");
         moveFlight(s, id, path);
         auto &u = s.units.at(id);

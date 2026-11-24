@@ -72,6 +72,55 @@ Japan, the KMT and the CCP, are in three different alliances. The only allies
 are the KMT and the CCP under the Chinese Truce
 ([section 3](#3-the-chinese-truce)).
 
+### One attacker for each land zone
+
+A controlled minor power shares the Player Turn of the major power that
+controls it, and the two "may not attack together" (rulebook 7.1, page 43). In
+this campaign the pair is Japan and Dadao, a minor power that Japan controls
+(rulebook 15.4, page 105; Japan sheet, page 1): Japan's player moves Dadao's
+units in Japan's turn (`movementController` in `src/movement.cpp`). The owner
+ruled on 24 November 2026 what the rule forbids
+([RCL-024](../../game_content/rules/clarifications.md#rcl-024-two-attacks-on-one-land-zone-by-a-controlled-minor-power-and-its-controller)):
+of the nations that share a Player Turn, only the first to attack a land zone
+may attack it in that turn, in any way, and an aircraft supports only a battle
+of its own nation.
+
+**What the engine does.**
+
+- `noteLandAttack` (`src/politics.cpp`) sees every attack on a land zone:
+  `recordLandAttack` calls it for a move overland or across a strait, a blitz,
+  an assault from the sea, an aircraft's attack and an air drop, and
+  `registerAttritionBattle` (`src/land_combat.cpp`) for an attrition attack. It
+  refuses an attack on a zone that another nation of the turn has attacked.
+  When another nation shares the turn, it also gives the attacker the mark
+  `land_attack` for that zone, such as `land_attack:land_manchuria_rehe` on
+  Dadao.
+- `landAttackedByPartner` (same file) says whether another nation has that
+  mark for a zone. The lists of legal actions ask it before they offer an
+  attack: a land move, a strait crossing or a blitz (`validateRoute` in
+  `src/movement.cpp`), an assault from the sea (`src/naval_operations.cpp`), an
+  aircraft's attack, an air drop or an air blitz (`src/air.cpp`), and an
+  attrition attack (`src/land_combat.cpp`). An aircraft is offered support only
+  for a battle of its own nation.
+- The marks go when the Combat Phase ends (`PoliticsRules::finishPhase`), so
+  the zone is open to both nations again in their next turn. A nation's own
+  further attacks on a zone it has attacked are not affected, and a nation
+  that shares its turn with no other nation gets no mark.
+- The engine's test `japanAndDadaoNeverAttackOneZone`
+  (`tests/naval_operations_tests.cpp`) starts from the position of game 5967
+  of the training run under the land-weighted score, which failed when both
+  nations had attacked Manchuria-Rehe
+  ([record](../archive/records/japan_dadao_one_zone_2026_11_23.md)): the KMT
+  holds Rehe, Japan has an Artillery aboard a Naval Transport in sea zone P14,
+  and Dadao an Infantry in Suiyuan. The test adds units of both nations for
+  the other kinds of attack. Once Japan has declared its assault on Rehe,
+  Dadao's Infantry and Dadao's Fighter are offered no attack on Rehe, while
+  Japan may still attack it overland. When Dadao attacks first, Japan is
+  offered no attack on Rehe from the sea, overland, from the air, by air drop
+  or by attrition, and may still assault Shantung. In
+  `noBlitzIntoTheZoneTheOtherAttacked`, Japan's armour may not blitz into a
+  zone that Dadao attacked earlier in the turn.
+
 ### Invading China
 
 *Original Chinese land* is a land zone with a warlord's, the CCP's or the
