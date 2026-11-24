@@ -59,8 +59,12 @@ alliance, whoever holds the land; Mongolia may make that attack too, where the
 holder is already at war with it or nobody holds the land (`landAccess`;
 [politics](politics.md#invading-china)).
 
-**An attack registers a battle.** Units that enter the same enemy zone join one
-battle. The engine remembers, for each unit, the zone it came from. That zone
+**An attack registers a battle.** Units of one nation that enter the same enemy
+zone join one battle. Dadao, which moves in Japan's turn, fights a battle of its
+own if it attacks a zone that Japan attacks too (`registerLandBattle`); whether
+the two may both attack one zone is
+[Q-019](../questions.md#q-019-two-attacks-on-one-land-zone-by-japan-and-dadao).
+The engine remembers, for each unit, the zone it came from. That zone
 decides which border terrain and river crossing count against that unit, and
 where it may retreat to ([land combat](land_combat.md)). An attack on an empty
 zone also registers a battle.

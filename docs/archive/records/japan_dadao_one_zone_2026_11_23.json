@@ -1,0 +1,1253 @@
+{
+ "run": "studies/campaign/runs/training-land-weighted-2026-11-22/1-memory-checked",
+ "run_commit": "1101c2e",
+ "failed_game": {
+  "game": 5967,
+  "seed": 76431325591368820,
+  "failed_at": "2026-11-23 20:07 (file time)",
+  "where": "search",
+  "move": {
+   "id": "naval_finish_shore_selection_8a8edf2e1a4ca885d74a314525e17fa42923204925a9b144d8ff9fd82ca83756",
+   "kind": "action",
+   "search_stream": "13426568301517831862"
+  },
+  "error": "Battle opponents must differ except uncontested land or an explicit movement plan",
+  "kept_position": "studies/campaign/runs/training-land-weighted-2026-11-22/1-memory-checked/failed-positions/game-5967-seed-76431325591368820.json",
+  "kept_position_sha256": "b57d2840045b2535396104a32c685f782ad090958899ec1318d611813fc121c5",
+  "move_log": "studies/campaign/runs/training-land-weighted-2026-11-22/1-memory-checked/game-moves/game-5967-seed-76431325591368820.jsonl",
+  "move_log_sha256": "e24e4d1940d9402fc70c0759eb41428000b966304f5e5ebe93792553920b0839"
+ },
+ "part_progress_before_failure": {
+  "network_update": 372,
+  "time": "2026-11-23 20:05:54",
+  "games_finished": 5952,
+  "decisions": 5797589
+ },
+ "earlier_failed_game": {
+  "game": 1316,
+  "failed_at": "2026-11-23 00:19",
+  "record": "training_land_weighted_2026_11_23.md#the-game-that-failed"
+ },
+ "replay_with_run_code": {
+  "where": "search",
+  "move": {
+   "id": "naval_finish_shore_selection_8a8edf2e1a4ca885d74a314525e17fa42923204925a9b144d8ff9fd82ca83756",
+   "kind": "action",
+   "search_stream": "13426568301517831862"
+  },
+  "error": "Battle opponents must differ except uncontested land or an explicit movement plan",
+  "outcome": "same_failure",
+  "replay_error": "RuntimeError: Battle opponents must differ except uncontested land or an explicit movement plan",
+  "explanation": "The move fails again with the same error: the failure follows from the position and the move, a defect of the rules."
+ },
+ "replay_with_current_code": {
+  "commit": "fa18dcb",
+  "how": "replay_5967_current_code.py: the kept position's rules fingerprint set to the current one",
+  "output": [
+   "kept fingerprint 24c042c7118bd45b4f2779bf5af93e5731b94723614530f8c50fa35915f9dc35",
+   "current fingerprint e1e42087e251f0c276bd2bc6ebc21f7d8a0bf19430b077f19f2fe920b31076ee",
+   "kept move offered: True",
+   "outcome: FailedMoveError: Battle opponents must differ except uncontested land or an explicit movement plan"
+  ]
+ },
+ "orders_from_move_369": {
+  "log": "game-5967-seed-76431325591368820.jsonl",
+  "start_move": 369,
+  "orders": [
+   {
+    "order": "Rehe: Japan's Artillery by sea from P14 and Dadao's Infantry overland; Dadao's battle first",
+    "steps": [
+     {
+      "battle": "land_battle_11",
+      "attacker": "dadao",
+      "dice_favour": "dadao",
+      "zone": "land_manchuria_rehe",
+      "held_before": "kmt",
+      "held_after": "japan",
+      "units_in_zone_after": [
+       "dadao: setup_warlord_suiyuan_land_china_suiyuan_infantry_1"
+      ],
+      "battles_left": [
+       {
+        "battle": "amphibious_1",
+        "attacker": "japan",
+        "zone": "land_manchuria_rehe",
+        "defender": "kmt",
+        "defenders": 0
+       }
+      ]
+     },
+     {
+      "battle": "amphibious_1",
+      "attacker": "japan",
+      "dice_favour": "japan",
+      "zone": "land_manchuria_rehe",
+      "held_before": "japan"
+     }
+    ],
+    "declared": [
+     {
+      "battle": "amphibious_1",
+      "attacker": "japan",
+      "zone": "land_manchuria_rehe",
+      "defender": "kmt"
+     },
+     {
+      "battle": "land_battle_11",
+      "attacker": "dadao",
+      "zone": "land_manchuria_rehe",
+      "defender": "kmt"
+     }
+    ],
+    "stopped": "FailedMoveError: Battle opponents must differ except uncontested land or an explicit movement plan"
+   },
+   {
+    "order": "Rehe: Japan's Infantry overland from Eastern Manchuria and Dadao's Infantry overland; Dadao's battle first",
+    "steps": [
+     {
+      "battle": "land_battle_12",
+      "attacker": "dadao",
+      "dice_favour": "dadao",
+      "zone": "land_manchuria_rehe",
+      "held_before": "kmt",
+      "held_after": "japan",
+      "units_in_zone_after": [
+       "dadao: setup_warlord_suiyuan_land_china_suiyuan_infantry_1",
+       "japan: setup_japan_land_manchuria_eastern_infantry_1"
+      ],
+      "battles_left": [
+       {
+        "battle": "land_battle_11",
+        "attacker": "japan",
+        "zone": "land_manchuria_rehe",
+        "defender": "kmt",
+        "defenders": 0
+       }
+      ]
+     },
+     {
+      "battle": "land_battle_11",
+      "attacker": "japan",
+      "dice_favour": "japan",
+      "zone": "land_manchuria_rehe",
+      "held_before": "japan",
+      "held_after": "japan",
+      "units_in_zone_after": [
+       "dadao: setup_warlord_suiyuan_land_china_suiyuan_infantry_1",
+       "japan: setup_japan_land_manchuria_eastern_infantry_1"
+      ],
+      "battles_left": []
+     }
+    ],
+    "declared": [
+     {
+      "battle": "land_battle_11",
+      "attacker": "japan",
+      "zone": "land_manchuria_rehe",
+      "defender": "kmt"
+     },
+     {
+      "battle": "land_battle_12",
+      "attacker": "dadao",
+      "zone": "land_manchuria_rehe",
+      "defender": "kmt"
+     }
+    ]
+   },
+   {
+    "order": "Hopeh: Japan's Infantry by sea from P14 and Dadao's Infantry overland; Dadao's battle first",
+    "steps": [
+     {
+      "battle": "land_battle_11",
+      "attacker": "dadao",
+      "dice_favour": "dadao",
+      "zone": "land_china_hopeh",
+      "held_before": "kmt",
+      "held_after": "dadao",
+      "units_in_zone_after": [
+       "dadao: setup_warlord_suiyuan_land_china_suiyuan_infantry_1"
+      ],
+      "battles_left": [
+       {
+        "battle": "amphibious_1",
+        "attacker": "japan",
+        "zone": "land_china_hopeh",
+        "defender": "kmt",
+        "defenders": 0
+       }
+      ]
+     },
+     {
+      "battle": "amphibious_1",
+      "attacker": "japan",
+      "dice_favour": "japan",
+      "zone": "land_china_hopeh",
+      "held_before": "dadao",
+      "held_after": "dadao",
+      "units_in_zone_after": [
+       "dadao: setup_warlord_suiyuan_land_china_suiyuan_infantry_1",
+       "japan: setup_japan_land_manchuria_rehe_infantry_2"
+      ],
+      "battles_left": [
+       {
+        "battle": "land_battle_12",
+        "attacker": "japan",
+        "zone": "land_china_hopeh",
+        "defender": "dadao",
+        "defenders": 0
+       }
+      ]
+     },
+     {
+      "battle": "land_battle_12",
+      "attacker": "japan",
+      "dice_favour": "japan",
+      "zone": "land_china_hopeh",
+      "held_before": "dadao",
+      "held_after": "japan",
+      "units_in_zone_after": [
+       "dadao: setup_warlord_suiyuan_land_china_suiyuan_infantry_1",
+       "japan: setup_japan_land_manchuria_rehe_infantry_2"
+      ],
+      "battles_left": []
+     }
+    ],
+    "declared": [
+     {
+      "battle": "amphibious_1",
+      "attacker": "japan",
+      "zone": "land_china_hopeh",
+      "defender": "kmt"
+     },
+     {
+      "battle": "land_battle_11",
+      "attacker": "dadao",
+      "zone": "land_china_hopeh",
+      "defender": "kmt"
+     }
+    ]
+   },
+   {
+    "order": "Hopeh: Japan's Infantry by sea from P14 and Dadao's Infantry overland; Japan lands, Dadao's battle, then Japan's",
+    "steps": [
+     {
+      "battle": "amphibious_1",
+      "attacker": "japan",
+      "dice_favour": "japan",
+      "zone": "land_china_hopeh",
+      "held_before": "kmt",
+      "held_after": "kmt",
+      "units_in_zone_after": [
+       "dadao: setup_warlord_suiyuan_land_china_suiyuan_infantry_1",
+       "japan: setup_japan_land_manchuria_rehe_infantry_2",
+       "kmt: economy_unit_38"
+      ],
+      "battles_left": [
+       {
+        "battle": "land_battle_11",
+        "attacker": "dadao",
+        "zone": "land_china_hopeh",
+        "defender": "kmt",
+        "defenders": 1
+       },
+       {
+        "battle": "land_battle_12",
+        "attacker": "japan",
+        "zone": "land_china_hopeh",
+        "defender": "kmt",
+        "defenders": 1
+       }
+      ]
+     },
+     {
+      "battle": "land_battle_11",
+      "attacker": "dadao",
+      "dice_favour": "dadao",
+      "zone": "land_china_hopeh",
+      "held_before": "kmt",
+      "held_after": "dadao",
+      "units_in_zone_after": [
+       "dadao: setup_warlord_suiyuan_land_china_suiyuan_infantry_1",
+       "japan: setup_japan_land_manchuria_rehe_infantry_2"
+      ],
+      "battles_left": [
+       {
+        "battle": "land_battle_12",
+        "attacker": "japan",
+        "zone": "land_china_hopeh",
+        "defender": "kmt",
+        "defenders": 0
+       }
+      ]
+     },
+     {
+      "battle": "land_battle_12",
+      "attacker": "japan",
+      "dice_favour": "japan",
+      "zone": "land_china_hopeh",
+      "held_before": "dadao",
+      "held_after": "japan",
+      "units_in_zone_after": [
+       "dadao: setup_warlord_suiyuan_land_china_suiyuan_infantry_1",
+       "japan: setup_japan_land_manchuria_rehe_infantry_2"
+      ],
+      "battles_left": []
+     }
+    ],
+    "declared": [
+     {
+      "battle": "amphibious_1",
+      "attacker": "japan",
+      "zone": "land_china_hopeh",
+      "defender": "kmt"
+     },
+     {
+      "battle": "land_battle_11",
+      "attacker": "dadao",
+      "zone": "land_china_hopeh",
+      "defender": "kmt"
+     }
+    ]
+   },
+   {
+    "order": "Hopeh: Japan's Infantry by sea from P14 and Dadao's Infantry overland; Japan's landing and battle, then Dadao's",
+    "steps": [
+     {
+      "battle": "amphibious_1",
+      "attacker": "japan",
+      "dice_favour": "japan",
+      "zone": "land_china_hopeh",
+      "held_before": "kmt",
+      "held_after": "kmt",
+      "units_in_zone_after": [
+       "dadao: setup_warlord_suiyuan_land_china_suiyuan_infantry_1",
+       "japan: setup_japan_land_manchuria_rehe_infantry_2",
+       "kmt: economy_unit_38"
+      ],
+      "battles_left": [
+       {
+        "battle": "land_battle_11",
+        "attacker": "dadao",
+        "zone": "land_china_hopeh",
+        "defender": "kmt",
+        "defenders": 1
+       },
+       {
+        "battle": "land_battle_12",
+        "attacker": "japan",
+        "zone": "land_china_hopeh",
+        "defender": "kmt",
+        "defenders": 1
+       }
+      ]
+     },
+     {
+      "battle": "land_battle_12",
+      "attacker": "japan",
+      "dice_favour": "japan",
+      "zone": "land_china_hopeh",
+      "held_before": "kmt",
+      "held_after": "japan",
+      "units_in_zone_after": [
+       "dadao: setup_warlord_suiyuan_land_china_suiyuan_infantry_1",
+       "japan: setup_japan_land_manchuria_rehe_infantry_2"
+      ],
+      "battles_left": [
+       {
+        "battle": "land_battle_11",
+        "attacker": "dadao",
+        "zone": "land_china_hopeh",
+        "defender": "kmt",
+        "defenders": 0
+       }
+      ]
+     },
+     {
+      "battle": "land_battle_11",
+      "attacker": "dadao",
+      "dice_favour": "dadao",
+      "zone": "land_china_hopeh",
+      "held_before": "japan",
+      "held_after": "dadao",
+      "units_in_zone_after": [
+       "dadao: setup_warlord_suiyuan_land_china_suiyuan_infantry_1",
+       "japan: setup_japan_land_manchuria_rehe_infantry_2"
+      ],
+      "battles_left": []
+     }
+    ],
+    "declared": [
+     {
+      "battle": "amphibious_1",
+      "attacker": "japan",
+      "zone": "land_china_hopeh",
+      "defender": "kmt"
+     },
+     {
+      "battle": "land_battle_11",
+      "attacker": "dadao",
+      "zone": "land_china_hopeh",
+      "defender": "kmt"
+     }
+    ]
+   }
+  ]
+ },
+ "kept_self_play_games": {
+  "games": 119,
+  "games_with_a_case": 1,
+  "cases": [
+   {
+    "game_round": 4,
+    "zone": "land_manchuria_rehe",
+    "held_before": "kmt",
+    "battles": [
+     [
+      "dadao",
+      "awaiting_combat_rules"
+     ],
+     [
+      "japan",
+      "amphibious_declared"
+     ]
+    ],
+    "log": "game-moves/game-5967-seed-76431325591368820.jsonl"
+   }
+  ],
+  "per_game": [
+   {
+    "log": "self-play-moves/game-3179-seed-441548112435554217.jsonl",
+    "actions": 1609,
+    "game_rounds_reached": 10,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3181-seed-8915352499309735518.jsonl",
+    "actions": 1247,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3185-seed-3356053837445831971.jsonl",
+    "actions": 1024,
+    "game_rounds_reached": 9,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3186-seed-4161887202423780142.jsonl",
+    "actions": 1164,
+    "game_rounds_reached": 10,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3188-seed-6216688015968167789.jsonl",
+    "actions": 877,
+    "game_rounds_reached": 8,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3191-seed-8544714263267614109.jsonl",
+    "actions": 974,
+    "game_rounds_reached": 9,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3193-seed-2411593842500162770.jsonl",
+    "actions": 881,
+    "game_rounds_reached": 8,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3195-seed-3927508589109742049.jsonl",
+    "actions": 548,
+    "game_rounds_reached": 7,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3196-seed-920088234083436100.jsonl",
+    "actions": 470,
+    "game_rounds_reached": 6,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3197-seed-2775436614927781849.jsonl",
+    "actions": 273,
+    "game_rounds_reached": 2,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3198-seed-8270457085159706144.jsonl",
+    "actions": 247,
+    "game_rounds_reached": 4,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3199-seed-579872216568966554.jsonl",
+    "actions": 240,
+    "game_rounds_reached": 3,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3200-seed-4998557693280688367.jsonl",
+    "actions": 156,
+    "game_rounds_reached": 2,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3201-seed-1716914017562657991.jsonl",
+    "actions": 116,
+    "game_rounds_reached": 2,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3202-seed-2782447696981886196.jsonl",
+    "actions": 100,
+    "game_rounds_reached": 2,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves/game-3203-seed-2037634884311465894.jsonl",
+    "actions": 110,
+    "game_rounds_reached": 2,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4611-seed-436831481051475860.jsonl",
+    "actions": 1892,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4615-seed-5441001625127102294.jsonl",
+    "actions": 2023,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4616-seed-3477142232054035544.jsonl",
+    "actions": 1705,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4617-seed-4073661550220599989.jsonl",
+    "actions": 1830,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4618-seed-431218830605585439.jsonl",
+    "actions": 1122,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4620-seed-599646387705026246.jsonl",
+    "actions": 1875,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4621-seed-6561571737126418015.jsonl",
+    "actions": 1576,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4623-seed-6450705326389001552.jsonl",
+    "actions": 1839,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4624-seed-7196251608180903028.jsonl",
+    "actions": 1697,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4625-seed-4983215415628379907.jsonl",
+    "actions": 2106,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4626-seed-2212595661468598647.jsonl",
+    "actions": 990,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4627-seed-2853381857803018148.jsonl",
+    "actions": 1609,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4628-seed-9027427362861709798.jsonl",
+    "actions": 1050,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4629-seed-8720959511452107799.jsonl",
+    "actions": 1509,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4630-seed-3280246706248596085.jsonl",
+    "actions": 1423,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4631-seed-6417317341219577673.jsonl",
+    "actions": 1099,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4632-seed-7089554503865599149.jsonl",
+    "actions": 1631,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4633-seed-4832634888228177764.jsonl",
+    "actions": 1398,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4634-seed-7890198737331916041.jsonl",
+    "actions": 1127,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4635-seed-5096024111005812257.jsonl",
+    "actions": 1816,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4636-seed-7238558412990351631.jsonl",
+    "actions": 1386,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4637-seed-4841504234696839217.jsonl",
+    "actions": 1614,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4638-seed-6872954068654948401.jsonl",
+    "actions": 1611,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4639-seed-5798748333091969360.jsonl",
+    "actions": 791,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4640-seed-5971165575920022857.jsonl",
+    "actions": 978,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4641-seed-4315407673360616668.jsonl",
+    "actions": 1403,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4644-seed-8900576768273877415.jsonl",
+    "actions": 612,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4645-seed-2218329151972380439.jsonl",
+    "actions": 976,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4646-seed-8496691118070502724.jsonl",
+    "actions": 1214,
+    "game_rounds_reached": 10,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4647-seed-479110230030222708.jsonl",
+    "actions": 607,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4648-seed-3295967630776997379.jsonl",
+    "actions": 1103,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4649-seed-8633634266732613759.jsonl",
+    "actions": 784,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4650-seed-5882187117084663537.jsonl",
+    "actions": 1380,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4651-seed-3220999501703986444.jsonl",
+    "actions": 1194,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4653-seed-7754657163033334529.jsonl",
+    "actions": 640,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-288/game-4654-seed-433783398924227552.jsonl",
+    "actions": 979,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5799-seed-2798649621510663842.jsonl",
+    "actions": 1914,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5810-seed-7004492777990662919.jsonl",
+    "actions": 792,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5813-seed-4646071526759507994.jsonl",
+    "actions": 761,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5814-seed-1541515995389421366.jsonl",
+    "actions": 915,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5816-seed-3485267181872932917.jsonl",
+    "actions": 813,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5817-seed-1598162485178474163.jsonl",
+    "actions": 1630,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5818-seed-1664105305318735560.jsonl",
+    "actions": 720,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5819-seed-6672231600425800328.jsonl",
+    "actions": 556,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5820-seed-442313121120013330.jsonl",
+    "actions": 623,
+    "game_rounds_reached": 10,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5821-seed-2999352036186618706.jsonl",
+    "actions": 608,
+    "game_rounds_reached": 10,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5822-seed-184772641472594034.jsonl",
+    "actions": 560,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5823-seed-3126235920561023845.jsonl",
+    "actions": 1201,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5824-seed-844422646118658335.jsonl",
+    "actions": 631,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5825-seed-2824930942916555004.jsonl",
+    "actions": 564,
+    "game_rounds_reached": 10,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5826-seed-4902653555327885194.jsonl",
+    "actions": 506,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5827-seed-7300321849318449801.jsonl",
+    "actions": 980,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5828-seed-8523944391841916255.jsonl",
+    "actions": 1203,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5829-seed-7815054460960752954.jsonl",
+    "actions": 465,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5830-seed-1676226366307233629.jsonl",
+    "actions": 614,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5831-seed-2215166617476954023.jsonl",
+    "actions": 681,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5832-seed-6658359905235783958.jsonl",
+    "actions": 652,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5833-seed-5928063392261168150.jsonl",
+    "actions": 484,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5834-seed-735255498038606444.jsonl",
+    "actions": 593,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5835-seed-3661669834207708799.jsonl",
+    "actions": 593,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5836-seed-3273325006082215647.jsonl",
+    "actions": 882,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5837-seed-7167627854789875822.jsonl",
+    "actions": 1252,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5838-seed-384890342233690159.jsonl",
+    "actions": 1044,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5839-seed-4941222503900935849.jsonl",
+    "actions": 789,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5840-seed-9078739328326917175.jsonl",
+    "actions": 735,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5841-seed-9194946417497369032.jsonl",
+    "actions": 988,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5842-seed-8789714858482857455.jsonl",
+    "actions": 665,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5843-seed-8358383151619308641.jsonl",
+    "actions": 606,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5844-seed-6520016700710338186.jsonl",
+    "actions": 669,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5845-seed-3999917138165270058.jsonl",
+    "actions": 623,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5846-seed-1494064494762138261.jsonl",
+    "actions": 696,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5847-seed-4528064990974132509.jsonl",
+    "actions": 662,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5848-seed-6968665132896419745.jsonl",
+    "actions": 766,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5849-seed-4817859888183928624.jsonl",
+    "actions": 686,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5850-seed-4255470809554555553.jsonl",
+    "actions": 768,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5851-seed-3030039750644760781.jsonl",
+    "actions": 638,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5852-seed-223223275493785129.jsonl",
+    "actions": 1254,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5853-seed-1630157884580511892.jsonl",
+    "actions": 817,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5854-seed-3256589614080315484.jsonl",
+    "actions": 677,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5855-seed-531828260333213336.jsonl",
+    "actions": 1007,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5856-seed-2120527508460675080.jsonl",
+    "actions": 909,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5857-seed-652174292625061234.jsonl",
+    "actions": 633,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5858-seed-9076139813909142700.jsonl",
+    "actions": 683,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5859-seed-7600988255448167722.jsonl",
+    "actions": 741,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5860-seed-7623454673715553149.jsonl",
+    "actions": 742,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5861-seed-6612993611288443422.jsonl",
+    "actions": 654,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5862-seed-5992326804556457345.jsonl",
+    "actions": 915,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5863-seed-3006606730270066592.jsonl",
+    "actions": 1231,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5864-seed-417174788849387853.jsonl",
+    "actions": 793,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5865-seed-3003650576101370068.jsonl",
+    "actions": 946,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5866-seed-2429460090150807842.jsonl",
+    "actions": 759,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5867-seed-7911669638356535797.jsonl",
+    "actions": 701,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5868-seed-2077922838809624932.jsonl",
+    "actions": 706,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5869-seed-8135231658775666629.jsonl",
+    "actions": 1138,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5870-seed-4716409143869543572.jsonl",
+    "actions": 870,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5873-seed-2560875484673676105.jsonl",
+    "actions": 850,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5874-seed-5427476852352421216.jsonl",
+    "actions": 649,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5875-seed-8538341615395943983.jsonl",
+    "actions": 745,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5876-seed-7237665849814002205.jsonl",
+    "actions": 601,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5879-seed-2039706213641298712.jsonl",
+    "actions": 572,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5880-seed-2369216486963359240.jsonl",
+    "actions": 671,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "self-play-moves-update-363/game-5883-seed-4988520985047754711.jsonl",
+    "actions": 494,
+    "game_rounds_reached": 11,
+    "finished": false,
+    "cases": 0
+   },
+   {
+    "log": "game-moves/game-5967-seed-76431325591368820.jsonl",
+    "actions": 307,
+    "game_rounds_reached": 4,
+    "finished": false,
+    "cases": 1
+   }
+  ]
+ }
+}
