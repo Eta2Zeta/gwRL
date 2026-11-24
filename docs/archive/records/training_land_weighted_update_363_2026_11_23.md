@@ -181,7 +181,8 @@ final scores before it trained on the games.
 AddressSanitizer wrote no report, and between game 1316, the one the morning's
 record describes, and the 363rd network update no game failed. At 20:07, after
 this record's measurements, game 5967 failed on a defect of the rules: Japan and
-Dadao had both attacked Rehe, held by the KMT, in one Combat Movement Phase. By
+Dadao had both attacked Rehe, held by the KMT, in one Combat Movement Phase
+([record](japan_dadao_one_zone_2026_11_23.md)). By
 the 363rd network update the inference
 server had answered 82.9 million network evaluations for this part. With the
 66.4 million of the memory check of 21 and 22 November and the 29.5 million of
@@ -304,7 +305,8 @@ measured.
 
 It shows that the run went on without a fault for 75 more network updates and
 1,201 more games, with no memory-checker report and no failed game; at 20:07 a
-second game failed, on a defect of the rules. Since about
+second game failed, on a defect of the rules
+([record](japan_dadao_one_zone_2026_11_23.md)). Since about
 the 321st network update its games are about a quarter shorter, by fleet moves,
 land-unit moves and flights, and it plays 249 games an hour instead of 166.
 
