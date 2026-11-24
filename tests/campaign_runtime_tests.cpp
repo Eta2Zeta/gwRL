@@ -674,37 +674,37 @@ void runtimeStateKeysFollowEveryMutationAndIgnoreLoadedEventKeys() {
     require(first.get()==second.get() && cold.planningKey()==expected(cold),"Concurrent cold clone keys diverged");
 }
 
-void menuSourceKeysShareExactFeaturesAndNeverAuthorizeActions() {
-    const auto verify=[](const std::vector<Action>& actions) {
-        for(const auto& action:actions) {
-            require(action.neuralSourceKey && *action.neuralSourceKey==canonicalJson(actionJson(action)),
-                "Derived action source key omits or changes a public feature");
-            const auto external=actionFromJson(actionJson(action));
-            require(!external.neuralSourceKey && canonicalJson(actionJson(external))==*action.neuralSourceKey,
-                "Derived source metadata leaked into external action features");
-        }
-    };
+void menusAuthorizeTheirOwnActionsAndExactCopies() {
     auto rules=std::make_shared<CountingRules>();
     Engine engine(initialState(),rules,92);
-    const auto actions=engine.legalActions();verify(actions);
-    auto branch=engine.clone();const auto repeated=branch.legalActions();
-    for(std::size_t i=0;i<actions.size();++i)
-        require(actions[i].neuralSourceKey==repeated[i].neuralSourceKey,"Unchanged clone copied derived source bytes");
+    auto branch=engine.clone();
     const auto mark=findAction(engine,"mark");
+    // A copy from outside the menu, as a policy, a replay or Python holds one, is
+    // checked feature by feature against the menu's action of its identity.
     auto forged=mark;forged.parameters=V(O{{"value",V(999.0)}});
-    rejects([&]{engine.step(forged);},"A retained source key authorized a forged action payload");
-    auto alteredMetadata=mark;alteredMetadata.neuralSourceKey=std::make_shared<const std::string>("external derived metadata");
-    engine.step(alteredMetadata);branch.step(mark);
-    require(engine.serialize()==branch.serialize(),"Derived source metadata changed rule execution or history");
+    rejects([&]{engine.step(forged);},"A menu authorized a forged action payload");
+    auto unknown=mark;unknown.id="no_such_action";
+    rejects([&]{engine.step(unknown);},"A menu authorized an action it does not list");
+    const auto external=actionFromJson(actionJson(mark));
+    engine.step(external);
+    // The menu's own action, as the search plays it, needs no feature check.
+    const auto menu=branch.legalActionMenu();
+    const auto own=std::find_if(menu->begin(),menu->end(),[](const Action& action){return action.kind=="mark";});
+    require(own!=menu->end(),"The fixture lists no mark action");
+    branch.step(*own);
+    require(engine.serialize()==branch.serialize(),"An exact copy and the menu's own action played differently");
     const auto changed=findAction(engine,"mark");
-    require(changed.id==mark.id && *changed.neuralSourceKey!=*mark.neuralSourceKey,
-        "Same action ID with changed parameters reused stale source bytes");
-    const auto interrupts=engine.legalInterrupts();verify(interrupts);
+    require(changed.id==mark.id && canonicalJson(actionJson(changed))!=canonicalJson(actionJson(mark)),
+        "The fixture's mark action kept its parameters after a mark");
+    rejects([&]{engine.step(mark);},"A menu authorized an action with its identity and stale parameters");
+    const auto interrupts=engine.legalInterrupts();
+    auto forgedInterrupt=interrupts.front();forgedInterrupt.parameters=V(O{{"value",V(999.0)}});
+    rejects([&]{engine.interrupt(forgedInterrupt);},"An interrupt menu authorized a forged payload");
     engine.interrupt(interrupts.front());
     engine.step(findAction(engine,"request_reaction"));
-    const auto pending=engine.legalActions();verify(pending);
-    require(pending.front().decision && pending.front().player=="allies",
-        "Source-key fixture lost its defender decision metadata");
+    const auto pending=engine.legalActions();
+    require(!pending.empty() && pending.front().decision && pending.front().player=="allies",
+        "The fixture lost its defender decision metadata");
 }
 
 void reachedMenusAreSharedAcrossClonesAndBounded() {
@@ -719,8 +719,7 @@ void reachedMenusAreSharedAcrossClonesAndBounded() {
     const auto again = right.legalActions();
     require(rules->actionCalls == 2, "A clone regenerated a menu another clone built for the same decision state");
     require(reached.size() == again.size(), "Clones reaching one state received different menus");
-    for (std::size_t i = 0; i < reached.size(); ++i)
-        require(reached[i].neuralSourceKey == again[i].neuralSourceKey, "A shared menu copied or changed its source bytes");
+    require(left.legalActionMenu().get() == right.legalActionMenu().get(), "Clones reaching one state copied its menu");
     auto forged = findAction(right, "mark");
     forged.parameters = V(O{{"value", V(999.0)}});
     rejects([&] { right.step(forged); }, "A shared menu authorized a forged payload");
@@ -1041,7 +1040,7 @@ int main() {
         {"clone and search isolation", cloneAndSearchRandomnessAreIsolated},
         {"decision menu reuse and invalidation", decisionMenusAreReusedAndTransactional},
         {"state key reuse and invalidation", runtimeStateKeysFollowEveryMutationAndIgnoreLoadedEventKeys},
-        {"action source reuse and authoritative validation", menuSourceKeysShareExactFeaturesAndNeverAuthorizeActions},
+        {"menus authorize their own actions and exact copies", menusAuthorizeTheirOwnActionsAndExactCopies},
         {"reached menus shared across clones and bounded", reachedMenusAreSharedAcrossClonesAndBounded},
         {"transitions check added history and everything else", transitionsCheckAddedHistoryAndEverythingElse},
         {"interrupts and chance check added history", interruptsAndChanceCheckAddedHistory},

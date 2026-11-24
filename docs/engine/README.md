@@ -56,7 +56,11 @@ Two things are kept beside the state:
 - **The definition** never changes during a game: the map, the catalog of
   pieces, the rules data and the turn order. All copies of a game share one.
 - **The history** is a log of every action and every dice roll. No rule reads
-  it; it exists for replays and for inspection.
+  it; it exists for replays and for inspection. A search copy of the game
+  ([section 5](#5-dice)) leaves it behind but for its last event, against which
+  a move checks that the rules only added to the history, and records the
+  events of its own moves (`EventLog::LeftBehind` in
+  `include/game/campaign.hpp`).
 
 A rule may not keep anything of its own from one action or dice roll to the
 next. Whatever matters to a later decision is in the state, so a copy of the
@@ -246,9 +250,12 @@ does.
 
 ## 9. How the engine is checked
 
-- **Before it applies an action** the engine looks the chosen action up in the
-  state's list of legal actions, by its exact text, and refuses an action that
-  is not there (`Engine::step`). A rule module that would check an action
+- **Before it applies an action** the engine checks it against the state's
+  list of legal actions and refuses an action that is not there (`Engine::step`
+  and `allowedBy` in `src/campaign_runtime.cpp`). An action that is itself an
+  entry of that list, as the search plays them, is legal as it is; any other,
+  such as one from a policy, a replay or Python, must have the exact text of the
+  listed action with its identity. A rule module that would check an action
   against its own list of legal actions again skips that check for the action
   the engine has just found (`MenuCheckedAction` in
   `include/game/campaign.hpp`). An action a module builds for itself, such as

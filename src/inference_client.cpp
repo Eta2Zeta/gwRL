@@ -69,6 +69,9 @@ void InferenceClient::evaluate(const std::shared_ptr<const ZoneInput>&, const st
                                std::vector<double>&, SearchValues&) {
     throw std::runtime_error("The native inference client needs POSIX pipes and shared memory");
 }
+void InferenceClient::evaluateMany(const std::string&, const std::vector<SearchQuestion>&, std::vector<SearchAnswer>&) {
+    throw std::runtime_error("The native inference client needs POSIX pipes and shared memory");
+}
 
 #else
 
@@ -172,8 +175,100 @@ void InferenceClient::evaluate(const std::shared_ptr<const ZoneInput>& input, co
     for (std::size_t c = 0; c < 3; ++c, at += 8) values[c] = getDouble(at);
     if (versionLength) networkVersion_.emplace(reinterpret_cast<const char*>(at), versionLength);
     ++requests_;
+    ++evaluations_;
     prepareSeconds_ += seconds(sent - started);
     waitSeconds_ += seconds(SteadyClock::now() - sent);
+}
+
+void InferenceClient::evaluateMany(const std::string& layout, const std::vector<SearchQuestion>& questions,
+                                   std::vector<SearchAnswer>& answers) {
+    answers.resize(questions.size());
+    if (questions.size() == 1) {  // A request of one position, as evaluate sends it.
+        const auto& question = questions.front();
+        evaluate(question.input, layout, question.actor, question.options, answers.front().priors,
+                 answers.front().values);
+        return;
+    }
+    if (!buffer_) throw InferenceClosed("The inference client is closed");
+    if (layout.size() > 0xFFFF) throw std::invalid_argument("The layout version is too long");
+    constexpr std::size_t severalHeader = 8;
+    constexpr std::size_t positionHeader = 8 + 4 * fieldCount;
+    std::size_t first = 0;
+    while (first < questions.size()) {
+        const auto started = SteadyClock::now();
+        // As many positions as fit the buffer, from `first` on.
+        std::size_t offset = 0, last = first;
+        for (; last < questions.size(); ++last) {
+            const auto& question = questions[last];
+            if (!question.input) throw std::invalid_argument("The inference server needs the position's zone input");
+            if (question.input->actionCount() != question.options)
+                throw std::invalid_argument("The zone input does not list the requested options");
+            if (question.actor < -1 || question.actor > 2) throw std::invalid_argument("Unknown campaign decision player");
+            const auto parts = fields(*question.input);
+            std::size_t size = 0;
+            for (const auto* part : parts) size += part->size() * sizeof(std::int32_t);
+            if (offset + size > bytes_) {
+                if (last == first) throw std::length_error("A decision's zone input does not fit its shared buffer");
+                break;
+            }
+            for (const auto* part : parts) {
+                const auto bytes = part->size() * sizeof(std::int32_t);
+                if (bytes) std::memcpy(buffer_ + offset, part->data(), bytes);
+                offset += bytes;
+            }
+        }
+        const std::size_t count = last - first;
+        const auto payload = static_cast<std::uint32_t>(severalHeader + positionHeader * count + layout.size());
+        message_.assign(4 + payload, 0);
+        for (int i = 0; i < 4; ++i) message_[static_cast<std::size_t>(i)] = static_cast<unsigned char>(payload >> (8 * (3 - i)));
+        unsigned char* request = message_.data() + 4;
+        request[0] = 2;
+        request[1] = 0;
+        put16(request + 2, static_cast<std::uint16_t>(layout.size()));
+        put32(request + 4, static_cast<std::uint32_t>(count));
+        for (std::size_t j = 0; j < count; ++j) {
+            const auto& question = questions[first + j];
+            unsigned char* at = request + severalHeader + positionHeader * j;
+            put32(at, static_cast<std::uint32_t>(static_cast<std::int32_t>(question.actor)));
+            put32(at + 4, static_cast<std::uint32_t>(question.options));
+            const auto parts = fields(*question.input);
+            for (std::size_t i = 0; i < fieldCount; ++i) put32(at + 8 + 4 * i, static_cast<std::uint32_t>(parts[i]->size()));
+        }
+        std::memcpy(request + severalHeader + positionHeader * count, layout.data(), layout.size());
+        writeAll(message_.data(), message_.size());
+        const auto sent = SteadyClock::now();
+
+        unsigned char length[4];
+        readAll(length, 4);
+        const std::uint32_t size = (std::uint32_t{length[0]} << 24) | (std::uint32_t{length[1]} << 16) |
+                                   (std::uint32_t{length[2]} << 8) | std::uint32_t{length[3]};
+        if (size < replyHeader || size > (1U << 30)) throw std::runtime_error("The inference server sent a malformed reply");
+        message_.resize(size);
+        readAll(message_.data(), size);
+        if (get32(message_.data()) != count) throw std::runtime_error("The inference server answered another number of positions");
+        const auto versionLength = get32(message_.data() + 4);
+        const unsigned char* at = message_.data() + replyHeader;
+        const unsigned char* end = message_.data() + size;
+        for (std::size_t j = 0; j < count; ++j) {
+            if (end - at < 4) throw std::runtime_error("The inference server sent a malformed reply");
+            const auto options = get32(at);
+            at += 4;
+            if (options != questions[first + j].options) throw std::invalid_argument("The shared evaluator returned a different legal menu");
+            if (static_cast<std::size_t>(end - at) < 8 * (static_cast<std::size_t>(options) + 3))
+                throw std::runtime_error("The inference server sent a malformed reply");
+            auto& answer = answers[first + j];
+            answer.priors.resize(options);
+            for (std::uint32_t i = 0; i < options; ++i, at += 8) answer.priors[i] = getDouble(at);
+            for (std::size_t c = 0; c < 3; ++c, at += 8) answer.values[c] = getDouble(at);
+        }
+        if (static_cast<std::size_t>(end - at) != versionLength) throw std::runtime_error("The inference server sent a malformed reply");
+        if (versionLength) networkVersion_.emplace(reinterpret_cast<const char*>(at), versionLength);
+        ++requests_;
+        evaluations_ += count;
+        prepareSeconds_ += seconds(sent - started);
+        waitSeconds_ += seconds(SteadyClock::now() - sent);
+        first = last;
+    }
 }
 
 #endif

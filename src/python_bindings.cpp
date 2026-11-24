@@ -355,6 +355,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         .def("close", &game::campaign::InferenceClient::close)
         .def_property_readonly("network_version", &game::campaign::InferenceClient::networkVersion)
         .def_property_readonly("requests", &game::campaign::InferenceClient::requests)
+        .def_property_readonly("evaluations", &game::campaign::InferenceClient::evaluations)
         .def_property_readonly("prepare_seconds", &game::campaign::InferenceClient::prepareSeconds)
         .def_property_readonly("wait_seconds", &game::campaign::InferenceClient::waitSeconds);
 
@@ -595,14 +596,16 @@ PYBIND11_MODULE(gwrl_cpp, module) {
                                      const std::vector<std::string>& order, py::object evaluator, int simulations,
                                      double cPuct, int maxDepth, std::uint64_t seed, bool rootNoise,
                                      double dirichletAlpha, double dirichletEpsilon, bool searchForcedRoot,
-                                     py::object tree) {
+                                     py::object tree, int simulationsPerRequest) {
         game::campaign::SearchTree* kept = tree.is_none() ? nullptr : &tree.cast<game::campaign::SearchTree&>();
         game::campaign::SearchSchedule schedule;
         for (const auto& player : passed) schedule.passed |= static_cast<std::uint8_t>(1U << allianceNumber(player));
         if (order.size() != 3) throw std::invalid_argument("Interrupt order must contain each alliance exactly once");
         for (std::size_t i = 0; i < 3; ++i) schedule.order[i] = allianceNumber(order[i]);
+        if (simulationsPerRequest <= 0) throw std::invalid_argument("Simulations per request must be positive");
         const game::campaign::SearchSettings settings{simulations, cPuct, maxDepth, seed, rootNoise,
-                                                      dirichletAlpha, dirichletEpsilon, searchForcedRoot};
+                                                      dirichletAlpha, dirichletEpsilon, searchForcedRoot,
+                                                      simulationsPerRequest};
         game::campaign::UniformSearchEvaluator uniform;
         std::optional<PythonSearchEvaluator> callback;
         game::campaign::SearchEvaluator* chosen = &uniform;
@@ -638,9 +641,12 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     }, py::arg("env"), py::arg("passed"), py::arg("order"), py::arg("evaluator"), py::arg("simulations"),
        py::arg("c_puct"), py::arg("max_depth"), py::arg("seed"), py::arg("root_noise"), py::arg("dirichlet_alpha"),
        py::arg("dirichlet_epsilon"), py::arg("search_forced_root"), py::arg("tree") = py::none(),
+       py::arg("simulations_per_request") = 1,
        "Search one decision of `env` (include/game/search.hpp) without Python's lock. The evaluator is an "
        "InferenceClient, None for uniform priors and zero values, or an object whose evaluate_zone(zone_input, "
-       "actor) the search calls with Python's lock. Studies call it through studies/campaign/native_search.py.");
+       "actor) the search calls with Python's lock. simulations_per_request simulations ask their positions "
+       "together (SearchSettings::simulationsPerRequest). Studies call it through "
+       "studies/campaign/native_search.py.");
     module.attr("CAMPAIGN_SCHEMA") = "campaign_entities_v1";
     module.attr("CAMPAIGN_ACTION_SCHEMA") = game::campaign::trainingActionSchema;
 }

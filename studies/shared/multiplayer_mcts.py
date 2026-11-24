@@ -155,10 +155,16 @@ class MctsConfig:
     root_dirichlet_epsilon: float = 0.25
     record_trace: bool = False
     search_forced_root: bool = False  # Simulate a one-action root anyway.
+    # Simulations whose positions the C++ search asks about in one request
+    # (game/search.hpp, SearchSettings::simulationsPerRequest); this search plays
+    # one at a time and refuses any other number.
+    simulations_per_request: int = 1
 
     def __post_init__(self) -> None:
         if self.simulations <= 0 or self.max_depth <= 0:
             raise ValueError("Simulation budget and maximum depth must be positive")
+        if type(self.simulations_per_request) is not int or self.simulations_per_request <= 0:
+            raise ValueError("Simulations per request must be a positive integer")
         if not math.isfinite(self.c_puct) or self.c_puct < 0:
             raise ValueError("PUCT constant must be finite and nonnegative")
         if not self.rules_version or self.mode not in {"multiplayer", "fixed_opponents"}:
@@ -350,6 +356,8 @@ class VectorMCTS:
         self.evaluator = evaluator or UniformEvaluator()
         self.config = config or MctsConfig()
         self.opponent_policy = opponent_policy
+        if self.config.simulations_per_request != 1:
+            raise ValueError("The Python search plays one simulation at a time; only the C++ search asks for several")
         if not getattr(self.evaluator, "version", ""):
             raise ValueError("Evaluator needs a nonempty version")
         if (self.config.mode == "fixed_opponents") != (opponent_policy is not None):

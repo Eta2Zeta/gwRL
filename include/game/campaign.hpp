@@ -296,9 +296,6 @@ struct Action {
     Id nation;
     std::optional<Id> decision;
     json::Value parameters {json::Value::Object {}};
-    // Derived immutable bytes from the authoritative menu. Never serialized,
-    // supplied by a policy, or trusted as proof of legality.
-    std::shared_ptr<const std::string> neuralSourceKey;
 };
 
 struct Decision {
@@ -415,6 +412,36 @@ class EventLog {
     using iterator = const_iterator;
     using value_type = Event;
 
+    // While one is alive on a thread, a copy of an event log made there holds
+    // only its last event. A search copy of the game is made under one
+    // (Engine::cloneForSearch), so it keeps the game's last event, against which
+    // a transition checks that rules only added to the history, and then the
+    // events of its own moves: rules never read past events, and nothing reads a
+    // search copy's.
+    class LeftBehind {
+      public:
+        LeftBehind() { ++depth(); }
+        ~LeftBehind() { --depth(); }
+        LeftBehind(const LeftBehind&) = delete;
+        LeftBehind& operator=(const LeftBehind&) = delete;
+        static bool active() { return depth() > 0; }
+
+      private:
+        static int& depth() {
+            thread_local int value = 0;
+            return value;
+        }
+    };
+
+    EventLog() = default;
+    EventLog(const EventLog& other) : entries_(LeftBehind::active() ? last(other.entries_) : other.entries_) {}
+    EventLog& operator=(const EventLog& other) {
+        if (this != &other) entries_ = LeftBehind::active() ? last(other.entries_) : other.entries_;
+        return *this;
+    }
+    EventLog(EventLog&&) noexcept = default;
+    EventLog& operator=(EventLog&&) noexcept = default;
+
     void push_back(Event event) { entries_.push_back(std::make_shared<const Event>(std::move(event))); }
     void clear() { entries_.clear(); }
     std::size_t size() const { return entries_.size(); }
@@ -427,6 +454,7 @@ class EventLog {
     operator std::vector<Event>() const { return {begin(), end()}; }
 
   private:
+    static Entries last(const Entries& entries) { return entries.empty() ? Entries{} : Entries{entries.back()}; }
     Entries entries_;
 };
 

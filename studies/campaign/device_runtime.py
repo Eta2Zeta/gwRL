@@ -62,6 +62,7 @@ class MPSGraphCachePolicy:
         self.resets = 0
         self.clear_seconds = 0.0
         self.held = False
+        self.requested_clears = 0  # Releases between a network update's training steps.
         self.reset()
 
     def _clear(self) -> None:
@@ -94,6 +95,13 @@ class MPSGraphCachePolicy:
             return True
         return False
 
+    def release_now(self) -> None:
+        """Release at once, held or not: for a thread that knows no other thread works on
+        the device meanwhile, as the inference server does while a network update's
+        trainer waits for it (SharedEvaluatorServer.release_between_steps)."""
+        self._clear()
+        self.requested_clears += 1
+
     def reset(self) -> None:
         """Call at a completed restore boundary; no learning state is reset."""
         self._clear()
@@ -104,7 +112,8 @@ class MPSGraphCachePolicy:
                 "device": "mps", "clear_every_actor_forwards": self.clear_every,
                 "total_actor_forwards": self.total_actor_forwards,
                 "pending_actor_forwards": self.pending_actor_forwards,
-                "clears": self.clears, "resets": self.resets, "clear_seconds": self.clear_seconds,
+                "clears": self.clears, "resets": self.resets, "requested_clears": self.requested_clears,
+                "clear_seconds": self.clear_seconds,
                 "checkpoint_scope": "Derived process-local cache state; counters reset on fresh construction and pending count resets after restore"}
 
 

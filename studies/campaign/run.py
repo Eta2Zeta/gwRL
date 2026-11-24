@@ -37,6 +37,8 @@ from .neural import (CampaignModelConfig, NeuralEvaluator, alliance_networks, al
                      resolve_neural_device)
 
 RUN_SCHEMA = "campaign-foreground-run-v1"
+# How often self-play that never stops writes the inference server's totals to serving.jsonl.
+SERVING_LOG_SECONDS = 60.0
 
 
 @dataclass(frozen=True)
@@ -88,6 +90,9 @@ class RunConfig:
     # The inference server runs one network's zone and position layers compiled
     # by torch.compile, for fixed numbers of states (design document, section 9.2).
     compiled_forward: bool = False
+    # Simulations of a search whose positions go to the inference server in one
+    # request (design document, section 4.7); LearningConfig.
+    simulations_per_request: int = 1
 
     def __post_init__(self):
         if not isinstance(self.neural_device, str) or self.neural_device not in {"cpu", "mps", "cuda"} and not (
@@ -95,7 +100,7 @@ class RunConfig:
             raise ValueError("Neural device must be cpu, mps or an explicit CUDA device")
         positive = ("batches", "transitions_per_batch", "parallel_envs", "simulations", "max_depth",
                     "hidden_dim", "message_layers", "batch_size", "epochs",
-                    "replay_capacity", "threads")
+                    "replay_capacity", "threads", "simulations_per_request")
         if any(type(getattr(self, key)) is not int or getattr(self, key) <= 0 for key in positive):
             raise ValueError("Run counts and dimensions must be positive integers")
         if self.kept_simulations is not None and (type(self.kept_simulations) is not int or self.kept_simulations <= 0):
@@ -206,7 +211,8 @@ def _learner(config: RunConfig, template):
         sampling_game_rounds=config.sampling_game_rounds, max_depth=config.max_depth,
         batch_size=config.batch_size, epochs=config.epochs, learning_rate=config.learning_rate,
         replay_capacity=config.replay_capacity, value_scale=config.value_scale, seed=config.seed,
-        sample_fraction=config.sample_fraction, networks=config.networks)
+        sample_fraction=config.sample_fraction, networks=config.networks,
+        simulations_per_request=config.simulations_per_request)
     return CampaignLearner(models, model_config, learning, compatibility=compatibility(template),
                            runtime_policy=runtime_policy)
 
@@ -439,17 +445,37 @@ def train(args) -> int:
         last_start = getattr(args, "no_new_batch_after", None)
         state = {"version": learner.network_version(), "root": len(runner["training_environment_seeds"]),
                  "fed": 0, "accepted": 0, "finished": [], "failed": 0, "feeding": True, "exhausted": False,
-                 "mark": None}
+                 "mark": None, "logged": time.perf_counter()}
 
         def serving_mark(server):
             # The inference server's totals now, to time its work while an update runs and between updates.
             stats = server.stats
-            return (time.perf_counter(), stats.requests, stats.rounds, stats.forward_seconds, stats.idle_seconds)
+            return (time.perf_counter(), stats.evaluations, stats.rounds, stats.forward_seconds, stats.idle_seconds)
 
         def serving_between(before, after):
-            seconds, requests, rounds, forward, idle = (b - a for a, b in zip(before, after))
-            return {"seconds": seconds, "evaluations": requests, "inference_batches": rounds,
+            seconds, evaluations, rounds, forward, idle = (b - a for a, b in zip(before, after))
+            return {"seconds": seconds, "evaluations": evaluations, "inference_batches": rounds,
                     "answering_seconds": forward, "idle_seconds": idle}
+
+        def log_serving(server):
+            # The inference server's totals once a minute, in serving.jsonl: what it has
+            # answered while the games play, which a network update's report shows only
+            # when one ends. Rates are the differences between two lines.
+            now = time.perf_counter()
+            if now - state["logged"] < SERVING_LOG_SECONDS:
+                return
+            state["logged"] = now
+            stats = server.stats
+            line = {"time": datetime.now().isoformat(timespec="seconds"), "seconds": round(now - started, 1),
+                    "requests": stats.requests, "evaluations": stats.evaluations, "inference_batches": stats.rounds,
+                    "states": sum(size * count for size, count in stats.positions_per_pass.items()),
+                    "answering_seconds": round(stats.forward_seconds, 3), "idle_seconds": round(stats.idle_seconds, 3),
+                    "receiving_seconds": round(stats.receive_seconds, 3),
+                    "replying_seconds": round(stats.reply_seconds, 3),
+                    "games_finished": state["accepted"], "network_updates": runner["batch_index"],
+                    "updating": trainer["thread"] is not None}
+            with (output / "serving.jsonl").open("a") as handle:
+                handle.write(json.dumps(line) + "\n")
         trainer = {"thread": None, "result": None, "error": None, "seconds": 0.0, "episodes": [],
                    "weights": None, "version": None}
 
@@ -486,11 +512,14 @@ def train(args) -> int:
                 trainer["seconds"] = time.perf_counter() - began
 
             # The trainer works on the inference server's device beside it. Until it
-            # ends, no thread releases the device's caches and the inference server
-            # runs no compiled layers: on the Mac's GPU either beside the trainer's
-            # work aborts or deadlocks the process (device_runtime, answer_as_written).
+            # ends, the inference server runs no compiled layers, and the device's
+            # caches are released only by the inference server's thread, between two
+            # of its inference batches, while the trainer waits for it: on the Mac's
+            # GPU a compiled layer or a release beside the trainer's work deadlocks
+            # or aborts the process (answer_as_written, device_runtime).
             if learner._device_runtime is not None:
                 learner._device_runtime.hold()
+                learner.release_between_steps = server.release_between_steps
             server.answer_as_written(True)
             trainer["thread"] = threading.Thread(target=work, name="campaign-trainer", daemon=True)
             trainer["thread"].start()
@@ -499,6 +528,7 @@ def train(args) -> int:
             nonlocal stopped, signal_name
             trainer["thread"].join()
             trainer["thread"] = None
+            learner.release_between_steps = None
             if learner._device_runtime is not None:
                 learner._device_runtime.release()
             if trainer["error"] is not None:
@@ -566,6 +596,7 @@ def train(args) -> int:
                     state["finished"].append(result)
             if trainer["thread"] is not None and not trainer["thread"].is_alive():
                 finish_update(server)
+            log_serving(server)
             if stopped or state["exhausted"] or runner["batch_index"] >= config.batches:
                 return False
             if trainer["thread"] is None:

@@ -83,7 +83,9 @@ def search_decision(env: CampaignAdapter, evaluator: Any, config: MctsConfig, *,
                     tree: SearchTree | None = None) -> SearchResult:
     """Search env's decision, as VectorMCTS(evaluator, config).search(env,
     add_root_noise=add_root_noise, reuse_root=tree is not None, seed=config.seed)
-    would, with a VectorMCTS kept for the game in place of `tree`."""
+    would, with a VectorMCTS kept for the game in place of `tree`. With
+    config.simulations_per_request above one, which VectorMCTS does not play,
+    the simulations ask about their positions that many at a time."""
     if config.mode != "multiplayer" or config.record_trace:
         raise ValueError("The C++ search plays multiplayer mode and records no traces")
     if not isinstance(env, CampaignAdapter) or not isinstance(env.raw, gwrl_cpp.CampaignEnv):
@@ -97,7 +99,8 @@ def search_decision(env: CampaignAdapter, evaluator: Any, config: MctsConfig, *,
             env.raw, passed, order, native_evaluator(evaluator), simulations=config.simulations,
             c_puct=config.c_puct, max_depth=config.max_depth, seed=config.seed, root_noise=add_root_noise,
             dirichlet_alpha=config.root_dirichlet_alpha, dirichlet_epsilon=config.root_dirichlet_epsilon,
-            search_forced_root=config.search_forced_root, tree=None if tree is None else tree.native)
+            search_forced_root=config.search_forced_root, tree=None if tree is None else tree.native,
+            simulations_per_request=config.simulations_per_request)
     except gwrl_cpp.NoLegalSearchAction as error:
         raise NoLegalActionError(_Position(str(error))) from None
     except gwrl_cpp.SearchMoveFailed as error:

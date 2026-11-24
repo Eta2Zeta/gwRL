@@ -36,6 +36,16 @@ class InferenceClosed : public std::runtime_error {
 // of options and the length of a network version, 4 bytes each; one prior per
 // option and the three values, as 8-byte floats; then the network version, sent
 // only when it differs from the last one this pipe was told.
+//
+// Several positions go in one request of kind 2 (evaluateMany): a byte 2, a
+// zero byte, the layout version's length, 2 bytes, and the number of positions,
+// 4 bytes; then for each position its actor, its number of options and its 13
+// fields' lengths, 4 bytes each; then the layout version. Each position's fields
+// lie in the buffer after the previous position's. Its reply is the number of
+// positions and the length of a network version, 4 bytes each; for each
+// position its number of options, 4 bytes, its priors and its three values; then
+// the network version. Positions that do not all fit the buffer go in several
+// requests, one after another.
 class InferenceClient final : public SearchEvaluator {
   public:
     // The pipe end by its file descriptor, which stays the caller's, and the
@@ -48,12 +58,15 @@ class InferenceClient final : public SearchEvaluator {
 
     void evaluate(const std::shared_ptr<const ZoneInput>& input, const std::string& layout, int actor,
                   std::size_t options, std::vector<double>& priors, SearchValues& values) override;
+    void evaluateMany(const std::string& layout, const std::vector<SearchQuestion>& questions,
+                      std::vector<SearchAnswer>& answers) override;
     // Unmaps the buffer; later evaluations fail.
     void close();
 
     // The version of the networks that answered last, once the server has named one.
     const std::optional<std::string>& networkVersion() const { return networkVersion_; }
-    std::uint64_t requests() const { return requests_; }
+    std::uint64_t requests() const { return requests_; }        // Requests sent, of one position or several.
+    std::uint64_t evaluations() const { return evaluations_; }  // Positions asked about.
     double prepareSeconds() const { return prepareSeconds_; }  // Writing the input and sending the request.
     double waitSeconds() const { return waitSeconds_; }        // From the request sent to the reply read.
 
@@ -66,6 +79,7 @@ class InferenceClient final : public SearchEvaluator {
     std::optional<std::string> networkVersion_;
     std::vector<unsigned char> message_;
     std::uint64_t requests_{0};
+    std::uint64_t evaluations_{0};
     double prepareSeconds_{0.0};
     double waitSeconds_{0.0};
 };

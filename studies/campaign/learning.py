@@ -86,6 +86,9 @@ def _sample_index(actions: Any, policy: list[float], rng: random.Random) -> int:
 
 
 MOVES_SCHEMA = "campaign-game-moves-v1"
+# Training steps of a network update between two releases of the GPU's caches, when
+# something releases them during the update (CampaignLearner.release_between_steps).
+RELEASE_EVERY_TRAINING_STEPS = 20
 
 
 def write_move(moves: Any, line: Mapping[str, Any]) -> None:
@@ -200,7 +203,8 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
             search = MctsConfig(
                 simulations=simulations, max_depth=config.max_depth, c_puct=config.c_puct,
                 seed=search_random.getrandbits(64), rules_version=rules_version, mode=config.mode,
-                root_dirichlet_alpha=config.root_dirichlet_alpha, root_dirichlet_epsilon=config.root_dirichlet_epsilon)
+                root_dirichlet_alpha=config.root_dirichlet_alpha, root_dirichlet_epsilon=config.root_dirichlet_epsilon,
+                simulations_per_request=config.simulations_per_request)
             write_move(moves, {"move": counts["transitions"], "kind": "search", "search_seed": search.seed,
                                "tree": tree.size, "simulations": simulations, "root_noise": noise})
             result = search_decision(env, evaluator, search, add_root_noise=noise, tree=tree)
@@ -350,6 +354,9 @@ class LearningConfig:
     # a network for each alliance, whose policy learns from that alliance's
     # decisions.
     networks: str = "one"
+    # Simulations of a search whose positions go to the inference server in one
+    # request (native_search, design document section 4.7); one asks one at a time.
+    simulations_per_request: int = 1
 
     def __post_init__(self) -> None:
         for name in ("simulations", "max_depth", "batch_size", "epochs", "replay_capacity"):
@@ -374,6 +381,8 @@ class LearningConfig:
             raise ValueError("Learning updates all three policies in multiplayer mode")
         if self.networks not in ("three", "one"):
             raise ValueError("networks must be three or one")
+        if type(self.simulations_per_request) is not int or self.simulations_per_request <= 0:
+            raise ValueError("simulations_per_request must be a positive integer")
 
     def search_simulations(self, kept: bool) -> int:
         """Simulations of the search at a decision kept as a training sample, or not."""
@@ -471,6 +480,10 @@ class CampaignLearner:
                                     for model in distinct_networks(self.models))
         self._device_runtime = (runtime_policy if runtime_policy is not None else
                                 runtime_policy_for_device("mps") if self._mps_actor_count else None)
+        # Called every RELEASE_EVERY_TRAINING_STEPS training steps of an update, when set:
+        # in self-play that never stops, the inference server's release of the GPU's
+        # caches (SharedEvaluatorServer.release_between_steps).
+        self.release_between_steps: Callable[[], Any] | None = None
         self.optimizers = self._optimizers(self.models)
         self.policy_random = random.Random(self.config.seed)
         self.search_random = random.Random(self.config.seed ^ 0x9E3779B97F4A7C15)
@@ -860,7 +873,7 @@ class CampaignLearner:
                    if self.config.networks == "one" else
                    [(player, self.models[player], self.optimizers[player], (player,)) for player in PLAYERS])
         losses: dict[str, list[dict[str, float]]] = {name: [] for name, _, _, _ in trained}
-        for _ in range(self.config.epochs):
+        for step in range(self.config.epochs):
             samples = self.replay_random.sample(self.replay, min(self.config.batch_size, len(self.replay)))
             for name, model, optimizer, owners in trained:
                 model.train()
@@ -908,6 +921,8 @@ class CampaignLearner:
                 # All actor gradients and updates have completed; no pending
                 # autograd work is discarded by compilation-cache housekeeping.
                 self._device_runtime.completed(self._mps_actor_count)
+            if self.release_between_steps is not None and (step + 1) % RELEASE_EVERY_TRAINING_STEPS == 0:
+                self.release_between_steps()
         self.generation += 1
         self.counters["updates"] += 1
         return {"updated": True, "samples": min(self.config.batch_size, len(self.replay)), "losses": losses,

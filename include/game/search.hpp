@@ -20,9 +20,23 @@ namespace game::campaign {
 // each decision) on the declaration-offer scheduling of
 // studies/shared/campaign_adapter.py: given the same network outputs and seed it
 // makes the same choices, draws the same random numbers (PythonRandom) and
-// returns the same numbers, which tests/test_campaign_native_search.py checks.
+// returns the same numbers, which tests/test_campaign_native_search.py checks,
+// when it asks after each simulation (SearchSettings::simulationsPerRequest).
 
 using SearchValues = std::array<double, 3>;  // Axis, Allies, Comintern, as allianceOrder.
+
+// A position the search asks about, one of several sent together
+// (SearchEvaluator::evaluateMany), and its answer.
+struct SearchQuestion {
+    std::shared_ptr<const ZoneInput> input;  // Null for an evaluator that reads no input.
+    int actor{-1};
+    std::size_t options{0};
+};
+
+struct SearchAnswer {
+    std::vector<double> priors;
+    SearchValues values{0.0, 0.0, 0.0};
+};
 
 // Answers the search's network evaluations. `actor` is the alliance choosing at
 // the position (0 Axis, 1 Allies, 2 Comintern), or -1 at a chance position,
@@ -35,6 +49,15 @@ class SearchEvaluator {
     // Fills `priors` with one weight per option, in the input's option order.
     virtual void evaluate(const std::shared_ptr<const ZoneInput>& input, const std::string& layout, int actor,
                           std::size_t options, std::vector<double>& priors, SearchValues& values) = 0;
+    // Several positions, answered in order: by default one evaluate call each.
+    // The inference client sends them to the inference server in one request.
+    virtual void evaluateMany(const std::string& layout, const std::vector<SearchQuestion>& questions,
+                              std::vector<SearchAnswer>& answers) {
+        answers.resize(questions.size());
+        for (std::size_t i = 0; i < questions.size(); ++i)
+            evaluate(questions[i].input, layout, questions[i].actor, questions[i].options, answers[i].priors,
+                     answers[i].values);
+    }
 };
 
 // The untrained baseline: every option weighs the same and every value is zero
@@ -67,6 +90,13 @@ struct SearchSettings {
     double dirichletAlpha{0.3};
     double dirichletEpsilon{0.25};
     bool searchForcedRoot{false};  // Simulate a one-action root anyway.
+    // Simulations whose positions go to the evaluator together, in one request
+    // (the design document's section 4.7, "Several simulations in one request").
+    // Each one's path counts as visits that lost (a virtual loss) while the
+    // others choose theirs, so that they spread over the tree; a simulation that
+    // would ask about a position already asked about is dropped and another one
+    // walked. One plays the simulations one after another, VectorMCTS's way.
+    int simulationsPerRequest{1};
 };
 
 struct SearchOutcome {

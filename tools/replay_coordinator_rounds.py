@@ -11,12 +11,14 @@ them, with the pipes replaced by in-memory stand-ins. The pipes' own cost is
 not included.
 
 It reports the time per round, the best of --repeat passes over all rounds, with
-each round's time split into its steps: reading the requests' arrays
-(read_arrays), laying the positions out (pack_zone_arrays), making the pass's
-calls (neural._forward, which on a GPU returns once the calls are handed over),
-collecting the outputs (collect: on a GPU, waiting for it and copying the
-outputs back, then the priors) and the rest of answering (grouping by alliance,
-chance averages, the replies to the stand-in pipes). With --outputs it saves
+each round's time split into its steps: reading the requests (read_positions,
+or read_arrays in checkouts before 24 November), laying the positions out
+(pack_zone_arrays), making the pass's calls (neural._forward, which on a GPU
+returns once the calls are handed over), collecting the outputs (host_priors,
+the priors from the outputs on the host; collect in earlier checkouts, which
+also waited for the GPU and copied the outputs back) and the rest of answering
+(grouping by alliance, waiting for the GPU, chance averages, the replies to the
+stand-in pipes). With --outputs it saves
 every reply, so that two runs' replies can be compared with --compare:
 
     python tools/replay_coordinator_rounds.py ROOT ROUNDS.pickle --weights W.pt --outputs OUT.pickle
@@ -55,7 +57,8 @@ STEPS = ("reading", "laying_out", "making_calls", "collecting")
 
 
 class _Pipe:
-    """A game thread's end of the pipe, as the server sees it: replies are kept."""
+    """A game thread's end of the pipe, as the server sees it: replies are kept,
+    each as its priors and values."""
 
     def __init__(self) -> None:
         self.replies = []
@@ -63,10 +66,32 @@ class _Pipe:
     def send(self, value) -> None:
         self.replies.append(value)
 
+    def send_bytes(self, data: bytes) -> None:  # The binary replies of checkouts since 19 November.
+        import struct
+        import numpy as np
+        count, _ = struct.unpack_from("<II", data)
+        priors = np.frombuffer(data, np.float64, count, 8).tolist()
+        self.replies.append((priors, list(struct.unpack_from("<3d", data, 8 + 8 * count))))
+
 
 class _Buffer:
     def __init__(self, size: int) -> None:
         self.buf = memoryview(bytearray(size))
+
+
+def _request(shared_evaluator, buffer, actor, count, layout, arrays) -> bytes:
+    """A request of one position as a game thread's client sends it to checkouts with
+    read_positions (since 24 November): its arrays as 32-bit integers in the buffer,
+    in the order of ZONE_FIELDS, and the message naming them."""
+    import numpy as np
+    offset, lengths = 0, []
+    for name in shared_evaluator.ZONE_FIELDS:
+        values = np.asarray(arrays[name], dtype=np.int32)
+        np.ndarray(values.shape, np.int32, buffer=buffer, offset=offset)[...] = values
+        lengths.append(len(values))
+        offset += values.nbytes
+    number = -1 if actor is None else ("axis", "allies", "comintern").index(actor)
+    return shared_evaluator.REQUEST.pack(1, number, len(layout.encode()), count, *lengths) + layout.encode()
 
 
 def _writer(shared_evaluator):
@@ -173,19 +198,29 @@ def replay(rounds, models, device, repeat: int, keep_outputs: bool, autocast: st
     from studies.campaign import features, neural, shared_evaluator
     write = _writer(shared_evaluator)
     version = next(iter(models.values())).layout_version
+    # Checkouts since 24 November read a request's message in serve (read_positions) and turn
+    # logits into priors in host_priors; earlier ones read arrays in answer (read_arrays) and
+    # turned them into priors in collect.
+    messages = hasattr(shared_evaluator, "read_positions")
     steps = _StepTimes()
-    steps.wrap(shared_evaluator, "read_arrays", "reading")
+    if messages:
+        steps.wrap(shared_evaluator, "read_positions", "reading")
+        steps.wrap(shared_evaluator, "host_priors", "collecting")
+    else:
+        steps.wrap(shared_evaluator, "read_arrays", "reading")
+        steps.wrap(shared_evaluator, "collect", "collecting")
     steps.wrap(features, "pack_zone_arrays", "laying_out")
     steps.wrap(neural, "_forward", "making_calls")
-    steps.wrap(shared_evaluator, "collect", "collecting")
     prepared = []
     for saved in rounds:
         requests, memories = [], {}
         for actor, count, arrays in saved:
             pipe, memory = _Pipe(), _Buffer(sum(values.nbytes for values in arrays.values()) + 4096)
-            header = write(memory.buf, arrays)
             memories[pipe] = memory
-            requests.append((pipe, (actor, count, version, header)))
+            if messages:
+                requests.append((pipe, _request(shared_evaluator, memory.buf, actor, count, version, arrays)))
+            else:
+                requests.append((pipe, (actor, count, version, write(memory.buf, arrays))))
         prepared.append((requests, memories))
     server = shared_evaluator.SharedEvaluatorServer(models, device, [], [], compiled_forward=compiled)
     mixed = (torch.autocast(device_type=device.type, dtype=getattr(torch, autocast))
@@ -198,7 +233,11 @@ def replay(rounds, models, device, repeat: int, keep_outputs: bool, autocast: st
             steps.reset()
             started = time.perf_counter()
             with mixed:
-                server.answer(requests)
+                if messages:
+                    server.answer([(pipe, shared_evaluator.read_positions(memories[pipe].buf, message))
+                                   for pipe, message in requests])
+                else:
+                    server.answer(requests)
             total = time.perf_counter() - started
             rows.append((total, steps.reset()))
         if index:

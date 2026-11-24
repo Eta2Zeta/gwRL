@@ -18,7 +18,8 @@ from studies.campaign.curriculum import make_env
 from studies.campaign.features import make_zone_input
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
 from studies.campaign.shared_evaluator import (BUFFER_BYTES, REQUEST, ZONE_FIELDS, EvaluatorClosed, RemoteEvaluator,
-                                               SharedEvaluatorServer, evaluate_prepared, read_request, reply_bytes)
+                                               SharedEvaluatorServer, evaluate_prepared, read_positions, read_request,
+                                               reply_bytes)
 from studies.shared.multiplayer_mcts import PLAYERS, MctsConfig, UniformEvaluator, VectorMCTS
 from tools.benchmark_campaign_devices import Config, _shared_game_process
 from tests.machine import CPU_BUDGET
@@ -203,6 +204,45 @@ class SharedEvaluatorTests(unittest.TestCase):
         # Three decisions take one position each in a pass; the chance cutoff one per network.
         self.assertServesFourRequests(self.models, self.reference, positions=6)
 
+    def test_overlapped_inference_batches_answer_as_one_after_another(self):
+        # Handing each inference batch over before the last one is finished, as on a GPU.
+        self.assertServesFourRequests(self.models, self.reference, positions=6, overlapped=True)
+
+    def test_a_cache_release_asked_between_training_steps_runs_on_the_serving_thread(self):
+        class Policy:
+            def __init__(self):
+                self.threads = []
+
+            def release_now(self):
+                self.threads.append(threading.current_thread().name)
+
+            def completed(self, count=1):
+                pass
+
+        memory = shared_memory.SharedMemory(create=True, size=BUFFER_BYTES)
+        server_end, client_end = Pipe()
+        policy, going = Policy(), [True]
+        try:
+            server = SharedEvaluatorServer(self.models, torch.device("cpu"), [server_end], [memory.name], policy)
+            self.assertFalse(server.release_between_steps(timeout=1))  # Not serving yet.
+            serving = threading.Thread(target=server.serve, args=(lambda: going[0],),
+                                       kwargs={"until_closed": False}, name="serving", daemon=True)
+            serving.start()
+            self.assertTrue(server.release_between_steps(timeout=10))
+            self.assertTrue(server.release_between_steps(timeout=10))
+            self.assertEqual(policy.threads, ["serving", "serving"])
+            going[0] = False
+            serving.join(timeout=10)
+            self.assertFalse(serving.is_alive())
+            self.assertFalse(server.release_between_steps(timeout=10))  # Stopped: no wait.
+            self.assertEqual(len(policy.threads), 2)
+            server.close()
+        finally:
+            server_end.close()
+            client_end.close()
+            memory.close()
+            memory.unlink()
+
     def test_one_network_for_all_three_alliances_is_one_network_in_a_pass(self):
         one = self.models[PLAYERS[1]]
         models = {player: one for player in PLAYERS}
@@ -225,12 +265,13 @@ class SharedEvaluatorTests(unittest.TestCase):
         server.answer_as_written(False)
         self.assertTrue(server.stack.compiled)
 
-    def assertServesFourRequests(self, models, reference, *, positions, compiled_forward=False):
+    def assertServesFourRequests(self, models, reference, *, positions, compiled_forward=False, overlapped=None):
         memories = [shared_memory.SharedMemory(create=True, size=BUFFER_BYTES) for _ in range(2)]
         pipes = [Pipe() for _ in memories]
         try:
             server = SharedEvaluatorServer(models, torch.device("cpu"), [parent for parent, _ in pipes],
-                                           [memory.name for memory in memories], compiled_forward=compiled_forward)
+                                           [memory.name for memory in memories], compiled_forward=compiled_forward,
+                                           overlapped=overlapped)
             serving = threading.Thread(target=server.serve, args=(lambda: True,), daemon=True)
             serving.start()
             results = {}
@@ -277,7 +318,7 @@ class SharedEvaluatorTests(unittest.TestCase):
             message = REQUEST.pack(1, PLAYERS.index(env.current_decision_player()), len(other),
                                    len(arrays["action_source"]), *(len(arrays[name]) for name in ZONE_FIELDS)) + other
             server = SharedEvaluatorServer(self.models, torch.device("cpu"), [server_end], [memory.name])
-            request = read_request(memory.buf, message)
+            request = read_positions(memory.buf, message)
             with self.assertRaisesRegex(ValueError, "layout"):
                 server.answer([(server_end, request)])
             del request  # Its arrays are views into the buffer, which closes below.
@@ -298,7 +339,8 @@ class SharedEvaluatorTests(unittest.TestCase):
             layout, arrays = prepared(env, tuple(env.legal_actions()))
             server = SharedEvaluatorServer(self.models, torch.device("cpu"), [server_end], [memory.name])
             client_end.close()  # The game process has gone.
-            server.answer([(server_end, (env.current_decision_player(), len(arrays["action_source"]), layout, arrays))])
+            server.answer([(server_end, ([(env.current_decision_player(), len(arrays["action_source"]), arrays)],
+                                         layout, False))])
             self.assertEqual(server.connections, [])
             self.assertTrue(server_end.closed)
             self.assertEqual(server.stats.requests, 1)

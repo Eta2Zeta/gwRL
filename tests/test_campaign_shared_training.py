@@ -283,7 +283,8 @@ class SharedEpisodeWorkerTests(unittest.TestCase):
         self.assertEqual(collection["failed"], [])
         self.assertEqual({len(result["records"]) > 0 for result in collection["results"]}, {True})
         report = workers.report()
-        self.assertEqual(report["evaluations"], workers.serving.requests)
+        self.assertEqual(report["evaluations"], workers.serving.evaluations)
+        self.assertEqual(report["evaluations"], workers.serving.requests)  # One position a request by default.
         sizes = report["inference_batches"]
         self.assertEqual(sum(count for count, _ in sizes.values()), report["serving_rounds"])
         self.assertEqual(sum(int(size) * count for size, (count, _) in sizes.items()), report["evaluations"])
@@ -363,8 +364,16 @@ class SharedTrainingRunTests(unittest.TestCase):
                 return going
             return play(*arguments, keep_playing=keep, **options)
         with patch.object(SharedEvaluatorServer, "answer_as_written", recorded), \
-                patch.object(shared_evaluator, "play_shared_games", watched):
+                patch.object(shared_evaluator, "play_shared_games", watched), \
+                patch.object(run, "SERVING_LOG_SECONDS", 0.0):
             self.assertEqual(self.train(*ARGUMENTS, "--continuous", "--stop-after-waves", "1"), 130)
+        # The inference server's totals, written as the games played: they only grow.
+        lines = [json.loads(line) for line in (self.run_dir / "serving.jsonl").read_text().splitlines()]
+        self.assertGreater(len(lines), 1)
+        for before, after in zip(lines, lines[1:]):
+            for name in ("requests", "evaluations", "inference_batches", "states", "games_finished"):
+                self.assertGreaterEqual(after[name], before[name], name)
+        self.assertEqual(lines[-1]["evaluations"], lines[-1]["states"])  # One network: a state is one evaluation.
         # The run took each finished game's record as it read it: the list kept none.
         self.assertGreaterEqual(len(seen_records), 4)
         self.assertEqual(left, [])

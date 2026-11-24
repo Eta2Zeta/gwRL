@@ -674,7 +674,11 @@ next search starts from the node of the state the game has reached, with every
 node below it, their visit counts, values and saved copies, and drops the rest
 of the tree; AlphaZero does the same. The kept visits count in the new root's
 visit counts, so a search's visit shares rest on its new simulations and on the
-earlier ones that passed through that state. The dice rolled in the real game
+earlier ones that passed through that state. A search runs its whole budget of
+new simulations on top of them; whether the searches of decisions not kept as
+training samples should count the kept visits toward their budget, as KataGo's
+caps count a tree's nodes, is
+[Q-023](../questions.md#q-023-counting-the-kept-tree-toward-a-searchs-simulations). The dice rolled in the real game
 between two decisions pick one of the outcomes the simulations rolled, if they
 rolled it; a state the tree never reached starts a new tree. The exploration
 noise goes on the new root's actions alone, and the value bounds of the PUCT
@@ -718,6 +722,38 @@ with fresh trees and with trees kept from decision to decision.
 The Python search still serves held-out evaluation, whose fixed opponents
 (section 10) the C++ search does not play, the batching of several searches'
 network evaluations in one process (`studies/campaign/batching.py`), and tools.
+
+**Several simulations in one request.** With `--simulations-per-request N`
+(`SearchSettings::simulationsPerRequest` in `include/game/search.hpp`), the C++
+search walks up to N simulations before it asks the inference server anything,
+and then asks about all the states they stopped at in one inference request
+([section 9.2](#92-running-training-on-the-mac)). AlphaGo Zero ran its
+simulations on parallel search threads with a virtual loss, below, and evaluated
+their states in mini-batches of 8
+([Silver et al. 2017](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf),
+Methods, "Search Algorithm", under "Expand and evaluate" and "Backup"). While a
+simulation waits for its answer, every
+action on its path counts it as a visit that lost, a *virtual loss*: in the
+PUCT score (section 4.3) the visit raises the action's visit count, which lowers
+its exploration term, and it counts at the lowest value the bounds allow, 0 after
+normalizing. So the next simulation of the same request is steered elsewhere.
+When the answers come, each simulation takes its virtual losses back and backs up
+its real value, in the order the simulations were walked. A simulation whose walk
+would ask about a state already asked about in the same request is dropped and
+does not count; another is walked in its place, and after N such drops the
+request goes as it is. A walk that ends at a known value, the end of the game or
+a value asked for earlier, is backed up at once. With N = 1, the default, this is
+the search described above, simulation by simulation, which the Python search
+plays too and `tests/test_campaign_native_search.py` compares. With more, the
+simulations of one request choose their paths without each other's results, so
+a search of the same number of simulations explores a little differently. On 70
+positions with a stand-in network, 8 a request moved a search's visit shares by
+a total variation distance of 0.05 on average, both after 800 simulations with
+exploration noise, where another noise seed moved them by 0.17, and after 150
+without, where another seed moved them by 0.02
+([record](../archive/records/self_play_speed_256x16_2026_11_24.md)). The Python
+search refuses N above 1. Whether training uses 8 is
+[Q-022](../questions.md#q-022-several-simulations-in-one-inference-request).
 
 ## 5. How a decision becomes numbers
 
@@ -2142,6 +2178,31 @@ inference server turns each state's logarithms into its priors on the CPU, one
 state at a time, after copying them back from the GPU's memory when the forward
 pass ran there (`collect` in `studies/campaign/shared_evaluator.py`).
 
+An inference request holds one state, or, when the search gathers several
+simulations before asking ([section 4.7](#47-more-detail-on-the-search)), the
+states of all of them, their arrays one after another in the thread's shared
+memory, and the reply carries each state's priors and values in the same order
+(`InferenceClient::evaluateMany` in `include/game/inference_client.hpp`,
+`read_positions` in `studies/campaign/shared_evaluator.py`). An inference batch
+then holds every state of every request taken.
+
+**Overlapped inference batches.** When the forward pass runs on the GPU, the
+inference server does not wait for one inference batch to come back before it
+collates the next. It collates an inference batch and hands its forward pass to
+the GPU, with the copy of its outputs back to the CPU queued right behind it; it
+then reads the previous inference batch's outputs, which the GPU finished
+first, turns them into priors and sends their replies, while the GPU computes
+the new one (`submit` and `finish` of `SharedEvaluatorServer`). So the CPU's
+part of an inference batch, reading the requests, collating them, handing the
+forward pass over and sending the replies, no longer stands between two of the
+GPU's forward passes. While a network update trains beside self-play, the
+inference server finishes each inference batch before it collates the next: on
+PyTorch 2.14 a wait for all the GPU's work while the training thread hands it
+work aborted the process (below, under self-play that never stops), and whether
+the wait for one inference batch's outputs is safe then has not been checked. On
+the CPU a forward pass computes as it is handed over, so there the inference
+batches go one after another.
+
 **What a forward pass looks like.** A *forward pass* runs the network over the
 states of one inference batch, collated. Each state keeps its own vectors through
 the whole network of section 6: its 37 zone vectors, its global vector and an
@@ -2352,6 +2413,13 @@ encoding the state for the network 0.17 ms, playing an action 0.17 ms, copying
 the game for the search 0.10 ms and rolling dice 0.06 ms; the search's own work
 on its tree takes about 0.03 ms and the inference requests 0.01 ms
 ([record](../archive/records/search_in_cpp_2026_11_19.md#where-a-game-threads-time-goes-now)).
+At 256×16 with KataGo's search of 800 and 150 simulations and no depth limit, a
+network evaluation cost the game processes about 1.5 ms of CPU with 48
+concurrent games, their time on efficiency cores included, and 1.13 ms with 24,
+whose threads ran on performance cores 91% of their time; listing legal actions
+took half the engine's time or more, since nearly every simulation lists the
+actions of a new state
+([record](../archive/records/self_play_speed_256x16_2026_11_24.md)).
 The Python search's code, the adapter's and the inference requests' Python had
 taken 0.59 ms
 ([record](../archive/records/game_processes_gpu_2026_11_19.md#a-game-threads-cpu-per-network-evaluation)).
@@ -2452,21 +2520,31 @@ same layout, 4,085 against 3,759, about 286,000 decisions an hour against
 ([record](../archive/records/never_stops_gpu_2026_11_18.md)). Its network
 updates took about 115 seconds beside self-play against 35 alone, and while one
 ran, the inference server answered about 36% fewer network evaluations a second.
-Two things wait until the network update has ended, because on the Mac's GPU,
-with PyTorch 2.14, each stopped the process in a test on 18 November when a
-training thread worked beside it
+Two things go differently while a network update trains beside the inference
+server, because on the Mac's GPU, with PyTorch 2.14, each stopped the process in
+a test on 18 November when a training thread worked beside it
 ([record](../archive/records/never_stops_gpu_2026_11_18.md#training-beside-the-inference-server-on-the-macs-gpu)).
-The first is releasing the
-GPU's caches, which the training process does after every 2,048 forward passes
-and training steps: it starts by waiting for all the GPU's work, and that wait,
-made while the other thread was handing work to the GPU, aborted the process
-(`hold` and `release` of `MPSGraphCachePolicy` in
-`studies/campaign/device_runtime.py`). The second is the compiled layers
-(section 9.3): a compiled kernel waits for its turn on the GPU while it holds
-Python's lock, and the training thread's work, already in line, needed that lock
-to finish, so neither went on. While a network update runs, the inference server
-therefore answers with the layers as written (`answer_as_written` in
-`studies/campaign/shared_evaluator.py`).
+The first is releasing the GPU's caches, which the training process does after
+every 2,048 forward passes and training steps: a release starts by waiting for
+all the GPU's work, and that wait, made while the other thread was handing work
+to the GPU, aborted the process. So the releases that fall due during a network
+update wait until it has ended (`hold` and `release` of `MPSGraphCachePolicy` in
+`studies/campaign/device_runtime.py`), and instead, every 20 training steps, the
+training thread asks the inference server's thread for a release and waits until
+it is done; the inference server makes it between two of its inference batches,
+while no other thread hands the GPU work (`release_between_steps` of
+`SharedEvaluatorServer` in `studies/campaign/shared_evaluator.py`). These
+releases keep the memory down: the GPU keeps a compiled graph for every shape of
+array it meets, and nearly every minibatch brings new shapes. At 256×16 a network
+update of 300 training steps of 256 training samples grew the training process
+from 2.1 GB to 15.4 GB without them, and from 1.9 GB to at most 6.4 GB with
+them, the network update taking 124 seconds against 117
+([record](../archive/records/self_play_speed_256x16_2026_11_24.md)). The second
+is the compiled layers (section 9.3): a compiled kernel waits for its turn on the
+GPU while it holds Python's lock, and the training thread's work, already in
+line, needed that lock to finish, so neither went on. While a network update
+runs, the inference server therefore answers with the layers as written
+(`answer_as_written` in `studies/campaign/shared_evaluator.py`).
 
 **When a game process dies.** A game process runs native code, the engine and
 the search, and a defect there can end it: on 20 November 2026 one aborted after
@@ -2917,6 +2995,10 @@ since the search runs in C++:
 | 64×2 on one CPU core, 24 concurrent games (the Mac profile) | the inference server, busy 98% | about a fifth more with the Python search; not measured with the C++ search | a cheaper inference server; a cheaper engine little |
 | 256×8 on the GPU, 126 concurrent games, compiled layers | the inference server, busy 97%; the CPU cores a median of 6.5 busy | about 1.5 times as much | a cheaper inference server; more concurrent games, for larger inference batches, 18% more decisions an hour with 252 while all the games played (measured); self-play that never stops, about 9% measured with the Python search |
 | 512×16 on the GPU, not trained yet | the GPU's forward pass, about 2,000 states a second as written and 2,700 compiled, in inference batches of about 60 | three to four times as much | a cheaper forward pass on the GPU; the engine not at all |
+| 256×16 on the GPU with KataGo's search (800 simulations on a quarter of the decisions, 150 on the rest), 48 concurrent games, one simulation a request (24 November) | the inference server, busy 95%, in inference batches of 24 states, 2,761 network evaluations a second; the CPU cores about 4.5 busy | about twice as much (measured below) | larger inference batches: several simulations a request |
+| The same with 8 simulations a request and overlapped inference batches (24 November) | the CPU cores, a median of 9.4 busy, at about 6,100 network evaluations a second; the inference server busy about 73% in inference batches of about 125 states | they limit | a cheaper engine, in full, until the inference server limits again, about a third more |
+| The same with 24 concurrent games and the lighter engine bookkeeping (24 November) | the inference server, busy 94%, in inference batches of about 54 states, at about 6,700 network evaluations a second; the CPU cores a median of 7.7 busy | about a sixth more | larger inference batches, from more concurrent games or more simulations a request, as far as memory allows |
+| The same with 30 concurrent games and network updates of 50 training steps (24 November) | the inference server, busy 94%, in inference batches of about 71 states, at about 7,600 network evaluations a second between network updates and 7,300 with them; the CPU cores a median of 8.4 busy | about as much, about 7,700 | a cheaper inference server and a cheaper engine together; fewer network evaluations a game ([Q-023](../questions.md#q-023-counting-the-kept-tree-toward-a-searchs-simulations)) |
 
 The CPU cores' rates are inferred: the 9 CPU cores of the allowance, less the
 inference server's process, divided by the game processes' CPU time per network
@@ -2926,6 +3008,30 @@ at 512×16, in replayed forward passes
 [256×8](../archive/records/search_in_cpp_2026_11_19.md#the-matched-runs),
 [512×16](../archive/records/compiled_forward_2026_11_18.md#speed)). At 256×8 and
 512×16 that CPU time is the C++ search's, 0.98 ms a network evaluation.
+
+The 256×16 rows were measured in self-play at the sizes taken from AlphaZero and
+KataGo, 25 minutes each with 48 concurrent games
+([record](../archive/records/self_play_speed_256x16_2026_11_24.md)). With one
+simulation a request an inference batch held about half the games' states, 24,
+and the game threads waited for the inference server 81% of their time. With
+8 simulations a request the same games filled inference batches of about 125
+states, which the GPU answers for about half the cost a state, and the
+inference server hands each one to the GPU while it sends the last one's
+replies (section 9.2). Then the CPU cores, at the allowance, set the pace, and
+a network evaluation cost the game processes about 1.5 ms of CPU: at the
+search's 800 simulations and no depth limit a simulation lists the legal
+actions of a new state each time, and listing took about half the engine's
+time in a game process's stack samples. With 24 concurrent games and the
+engine's lighter bookkeeping (below), the inference server answered as many
+network evaluations a second as with 48, in inference batches of about 54
+states, and limited again: a network evaluation cost the game processes
+1.13 ms of CPU, a quarter less, as their threads ran on performance cores 91%
+of their time against 79% with 48. With 30, in inference batches of about 71
+states, the inference server answered about an eighth more, busy 94%, and the
+CPU cores, a median of 8.4 of the 9 busy, could have fed only a little more.
+So at these sizes the Mac's GPU and the CPU cores of the allowance limit
+self-play together, at about 7,600 network evaluations a second, and 30
+concurrent games are the layout the measurements suggest.
 
 A cheaper inference server pays until the CPU cores limit. At 256×8 the compiled
 layers made it about a tenth cheaper in the inference batches of steady play
@@ -2986,7 +3092,14 @@ beside two changes around the forward pass: leaner request handling and a second
 inference server. The first, fewer PyTorch calls, came with one network for all
 three alliances on 18 November; the second, compiling, is built for the zone and
 position layers as a setting; and more concurrent games, for larger inference
-batches, are a setting too. The others are not built. Half precision was
+batches, are a setting too. Since 24 November two more fill and feed the GPU:
+several simulations in one inference request
+([section 4.7](#47-more-detail-on-the-search)), which make inference batches
+larger for the same concurrent games, and overlapped inference batches (section
+9.2), which hand the GPU the next inference batch before the last one is read
+back; at 256×16 with KataGo's search the two together took the inference server
+from 2,761 network evaluations a second, busy 95%, to about 6,100, busy 73%
+(above). The others are not built. Half precision was
 tried on real inference batches saved from a training iteration and did not pay
 as it stands; which of the others pay, and how much, is open:
 
@@ -3074,10 +3187,11 @@ as it stands; which of the others pay, and how much, is open:
 - **Fewer graph compiles on the Mac's GPU.** On the Mac's GPU PyTorch runs many
   operations as graphs of Apple's MPSGraph framework, which compiles a graph
   once for each shape of an operation's arrays and keeps it until the GPU's
-  caches are released, every 2,048 forward passes and training steps
-  (section 9.2). Some arrays of a forward pass have a row for each legal action
-  of the inference batch, a number that changes with nearly every inference
-  batch, so their operations compile again and again. In a profiled training
+  caches are released, every 2,048 forward passes and training steps, and every
+  20 training steps of a network update (section 9.2). Some arrays of a forward
+  pass have a row for each legal action of the inference batch, a number that
+  changes with nearly every inference batch, so their operations compile again
+  and again. In a profiled training
   iteration at 256×8 with 126 concurrent games, compiling took about 23% of the
   inference server's time; 71% to 79% of that was one `Tensor.repeat`, which
   copies the actions' vectors once for each level of the hierarchical softmax
@@ -3202,11 +3316,23 @@ and not measured, except the first, which is built:
   `src/naval_movement.cpp`). Copying and destroying whole states take about
   0.17 ms, 17% of the CPU; copies that share the parts an action leaves
   unchanged, and checks that work on the state as it is, would take out part of
-  that.
-- **Lighter bookkeeping per action.** Listing legal actions writes every legal
-  action as canonical JSON, which playing an action compares with the action
-  played (`Engine::step` in `src/campaign_runtime.cpp`): about 0.04 ms, 4% of
-  the CPU.
+  that. One part is built: since 24 November a search copy leaves the game's
+  event history behind but for its last event (`EventLog::LeftBehind` in
+  `include/game/campaign.hpp`; no rule reads it), where a copy late in a game
+  used to copy about 1,500 events' pointers, a sixth of the copy's memory.
+- **Lighter bookkeeping per action, built on 24 November.** Listing legal
+  actions wrote every legal action as canonical JSON, which playing an action
+  compared with the action played: 5% to 7% of the engine's time in the stack
+  samples of 24 November
+  ([record](../archive/records/self_play_speed_256x16_2026_11_24.md)). Now an
+  action that is one of the listed actions themselves, as the search plays
+  them, is legal as it is, and only an action from elsewhere, from Python or a
+  replay, is written out and compared with the listed action of its identity
+  (`allowedBy` in `src/campaign_runtime.cpp`). With the history left out of
+  search copies (above), 40 random games played the same with 8.2% fewer
+  instructions in listing a state's legal actions, and 4 games searched as in
+  training the same with 3.6% fewer instructions in all, their network
+  evaluated in the same process.
 - **Starting each game from a prepared copy** instead of reading the scenario
   again: 1.4 seconds a game, about 0.03 ms a network evaluation, 2.6% of the
   CPU.
@@ -3285,10 +3411,22 @@ decisions an hour, and 378 already push the Mac into swap (above). With longer
 searches memory limits how full the
 inference batches can be. At 1,600 simulations, the search of AlphaGo Zero,
 inference batches of about 30 states would give the GPU less than its rate in
-inference batches of 64 (above, where an inference batch's states come from). A
-search that asks for several network evaluations at once would need fewer
-concurrent games, and a search tree that kept fewer copies of the game
-(section 4.7) less memory a game. Two other parts grow with the settings. The
+inference batches of 64 (above, where an inference batch's states come from).
+Several simulations in one inference request, built on 24 November (section
+4.7), fill the inference batches from fewer concurrent games: at 256×16 with
+KataGo's search, 48 concurrent games with 8 simulations a request filled
+inference batches of about 125 states, and their run peaked at 20.0 GB and was
+stopped when the Mac's swap had grown by 4 GB; with 24 concurrent games, as
+fast, the run's processes held 4 to 6 GB by their physical footprints while
+they played, and at most 9 GB during a network update of 300 training steps,
+once the GPU's caches were released every 20 of them (section 9.2)
+([record](../archive/records/self_play_speed_256x16_2026_11_24.md)). In twelve
+searches of 800 simulations at positions of scripted games, a search tree took
+about 133 KB a node, 1,000 nodes a search, once search copies left the game's
+history behind and menus stopped keeping each action's canonical JSON, against
+163 KB before (same record). A search
+tree that kept fewer copies of the game (section 4.7) would need less memory a
+game. Two other parts grow with the settings. The
 replay buffer's 8,000 training samples take about 17 KB each as saved, about
 0.13 GB; a million would take about 17 GB. The network is small beside them:
 512×16 has about 55 million parameters with its embedding tables, about 0.9 GB with
@@ -3504,7 +3642,10 @@ measured and what would settle it.
   evaluations in one process (`studies/campaign/batching.py`) and tools still
   run the Python search, which is also what the C++ search is checked against
   (`tests/test_campaign_native_search.py`). A change to the search must be made
-  in both, or that check fails.
+  in both, or that check fails. Gathering several simulations into one
+  inference request is the one exception: only the C++ search does it, the
+  Python search refuses it, and the check compares the two with one simulation
+  a request; with several, the C++ search is checked by its own tests.
 - **No training run has yet made the agents stronger.** The training run of 19
   to 21 November 2026, 252 concurrent eleven-round games at 256×8 on the Mac's GPU
   in four parts, trained on 9,576 games in 38 network updates by 07:40 on
@@ -3607,9 +3748,15 @@ measured and what would settle it.
   hour; a trainer process of its own would avoid that, which is untested
   ([record](../archive/records/self_play_never_stops_2026_11_17.md#the-inference-server-while-a-network-update-runs)).
   With the network on the GPU, the inference server runs without the compiled
-  layers while a network update trains beside it, and holds back the GPU's
-  cache releases, because of two faults of PyTorch 2.14 on the Mac's GPU
-  (section 9.2); a trainer process of its own would avoid both. Within the
+  layers while a network update trains beside it, and only its own thread
+  releases the GPU's caches, every 20 training steps while the training thread
+  waits, because of two faults of PyTorch 2.14 on the Mac's GPU (section 9.2); a
+  trainer process of its own would avoid both. Since the search
+  gathers 8 simulations a request, the CPU cores rather than the inference
+  server limit self-play at 256×16 with 48 concurrent games, and the inference
+  server and the CPU cores together with 30 (section 9.3); there a network
+  update of 50 training steps cut the inference server's rate to under a third
+  for about 24 seconds after every 30 finished games. Within the
   engine, listing a state's legal actions now
   costs the most each time, and checking a naval route copies the whole state and
   works out its carriers' reach and supply again with no cache
@@ -3927,7 +4074,13 @@ measured):
   searched the others with 100 to 200, so as to play them well for less: here
   800 on a quarter of the decisions and 150 on the rest would average about 310
   simulations a searched decision, 17 times the 18.4 of that run, and keep 25
-  times as many training samples a game, about 173.
+  times as many training samples a game, about 173. KataGo's caps count the
+  nodes of the search tree: a search stops "when the tree reaches a cap of N
+  nodes" (section 3.1 of its paper), so the nodes of a tree kept from the move
+  before, if self-play kept one, count toward the cap; the paper does not say
+  whether it did. Here a search runs its 800 or 150 simulations on top of what
+  its kept tree holds (section 4.7), so it may search more than KataGo's caps
+  ([Q-023](../questions.md#q-023-counting-the-kept-tree-toward-a-searchs-simulations)).
 - **The search's reach.** AlphaZero's simulations end where its network has not
   yet been asked, however deep. Here a simulation also stops after 16 actions and
   dice rolls (section 4.2), less than one of Japan's turns, which average 42
@@ -3958,8 +4111,23 @@ batches of 64 states, which are upper bounds:
 | 384×12 | about 2,600 | about 1,050 | about 138 days |
 | 512×16 | about 1,600 | about 650 | about 221 days |
 
-256×16 and 384×20 were not measured; by their arithmetic they fall between
-256×8 and 384×12, and between 384×12 and 512×16. Played at 800 simulations on
+384×20 was not measured; by its arithmetic it falls between 384×12 and 512×16.
+256×16 was measured on 24 November in self-play at this search, with a fresh
+network ([record](../archive/records/self_play_speed_256x16_2026_11_24.md)): as
+the program then was, about 2,800 network evaluations a second, about 1,100 games
+a day of 217,000 network evaluations, and 145,000 games in about 132 days; with
+8 simulations in each inference request
+([Q-022](../questions.md#q-022-several-simulations-in-one-inference-request)) and
+the inference batches overlapped on the GPU, about 6,100, 2,400 games a day and
+about 60 days, with 48 concurrent games, more than the Mac's memory allowed
+beside its other programs (below); and with 30 concurrent games and the
+engine's lighter bookkeeping, about 7,300 with the network updates, about 2,900
+games a day and about 50 days, the GPU and the 9 CPU cores both near their
+limits (section 9.3). Counting the visits a kept search tree brings toward the
+150 simulations of a fast search
+([Q-023](../questions.md#q-023-counting-the-kept-tree-toward-a-searchs-simulations))
+would ask for about 18% fewer network evaluations a game, and would take about
+9 days off the 50 (inferred). Played at 800 simulations on
 every decision, as AlphaZero played, every number of days above is 2.6 times as
 large. A computer with 32 CPU cores for the games and a GPU that evaluates
 23,000 states a second at the chosen size would play 145,000 games in about 16
@@ -3969,7 +4137,14 @@ games in flight, about 200 MB for each game's search tree at 800 simulations
 (section 9.3), and with the replay buffer: the checkpoint of the training run
 under the land-weighted score, with its 25,000 training samples, was about 580
 MB larger than the one it started from, about 23 KB a training sample
-(inferred).
+(inferred). With 48 concurrent games at this search the run's processes peaked
+at 17 to 20 GB by the supervisor's count, which counts the memory they share in
+each of them, and the faster run was stopped after 22 minutes when the Mac's
+swap had grown by 4 GB, its other programs then holding about 24 GB of its
+36 GB. With 30, the run's processes held about 7 GB by their physical
+footprints, 11.5 GB at the peak of a network update of 50 training steps, and
+played their 20 minutes out
+([record](../archive/records/self_play_speed_256x16_2026_11_24.md)).
 
 **Unmeasured:** whether this game needs as many games as Go, whether a larger
 network or a longer search learns faster here for the same compute, and whether
@@ -3987,8 +4162,10 @@ method are one question.
 **Would settle it:** a learning curve: a training run at the search above, from
 a 256×16 network, measured on all 24 held-out seeds for all three alliances at
 regular intervals (section 10), and then the network grown or compared with a
-larger one at equal compute, as KataGo did. Where to run it is
-[Q-021](../questions.md#q-021-where-to-run-training-at-alphazeros-and-katagos-scale).
+larger one at equal compute, as KataGo did. The owner chose to run it on the
+Mac (Q-021, [answered](../questions.md#answered) on 24 November 2026), once
+self-play at these sizes was made as fast as the Mac allows
+([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)).
 
 #### How should a count count?
 
@@ -4333,6 +4510,12 @@ qualifier, and the names the code and the dated records use instead.
   the root before it stopped.
 - **Depth limit:** the greatest simulation depth allowed, 16 in current runs; a
   simulation that reaches it stops and uses an estimate of the state there.
+- **Simulations per request:** how many simulations a search walks before it
+  asks the inference server about all the states they stopped at, in one
+  inference request; 1 by default.
+- **Virtual loss:** a simulation waiting for its inference request's answer,
+  counted meanwhile on every action of its path as a visit with the worst value,
+  so that the other simulations of the same request choose other paths.
 
 **The input (section 5)**
 
@@ -4491,8 +4674,8 @@ qualifier, and the names the code and the dated records use instead.
   dated records name it the coordinator.
 - **Network evaluation:** a network's output for one state, its priors and values;
   a search asks for about one per simulation.
-- **Inference request:** a game thread's request for one state's network
-  evaluation.
+- **Inference request:** a game thread's request for the network evaluation of
+  one state, or of the states of several simulations of one search at once.
 - **Shared memory:** memory that two processes can both read; a game thread
   writes each inference request's arrays into its own block of it.
 - **Pipe:** a channel the operating system keeps between two processes; each
@@ -4501,7 +4684,9 @@ qualifier, and the names the code and the dated records use instead.
   (`include/game/inference_client.hpp`).
 - **Inference batch:** the states the inference server evaluates together: every
   inference request waiting when it starts, answered in one forward pass. Its
-  number of states is the *inference batch size*.
+  number of states is the *inference batch size*. On the GPU the inference
+  server collates the next inference batch while the GPU computes the last one
+  (*overlapped inference batches*).
 - **Collating:** joining the arrays of an inference batch's states end to end for
   one forward pass, with each state's indices shifted to point into the joined
   arrays; with a network for each alliance, each network's states together.

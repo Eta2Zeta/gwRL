@@ -72,6 +72,25 @@ REQUEST = struct.Struct("<BbHI" + "I" * len(ZONE_FIELDS))
 # and the three values as doubles, and the network version.
 REPLY = struct.Struct("<II")
 VALUES = struct.Struct("<3d")
+# A request of several positions, which a search sends when it gathers several
+# simulations before asking (simulations_per_request): kind 2, a zero byte, the
+# layout version's length and the number of positions; then for each position
+# its actor's number (-1 at chance), its option count and each field's length,
+# its fields lying in the buffer after the previous position's; the layout
+# version follows. Its reply: the number of positions and the network version's
+# length; then for each position its option count, its priors and its three
+# values as doubles; then the network version.
+SEVERAL = struct.Struct("<BBHI")
+POSITION = struct.Struct("<iI" + "I" * len(ZONE_FIELDS))
+COUNT = struct.Struct("<I")
+
+
+def _arrays(buffer: memoryview, lengths: Sequence[int], offset: int) -> tuple[dict[str, np.ndarray], int]:
+    arrays = {}
+    for name, length in zip(ZONE_FIELDS, lengths):
+        arrays[name] = np.ndarray((length,), np.int32, buffer=buffer, offset=offset)
+        offset += 4 * length
+    return arrays, offset
 
 
 def read_request(buffer: memoryview, message: bytes) -> tuple[str | None, int, str, dict[str, np.ndarray]]:
@@ -81,11 +100,29 @@ def read_request(buffer: memoryview, message: bytes) -> tuple[str | None, int, s
     if kind != 1 or not -1 <= actor < len(PLAYERS) or len(message) != REQUEST.size + layout_length:
         raise ValueError("A game sent a malformed inference request")
     layout = message[REQUEST.size:].decode()
-    arrays, offset = {}, 0
-    for name, length in zip(ZONE_FIELDS, lengths):
-        arrays[name] = np.ndarray((length,), np.int32, buffer=buffer, offset=offset)
-        offset += 4 * length
+    arrays, _ = _arrays(buffer, lengths, 0)
     return (None if actor < 0 else PLAYERS[actor]), count, layout, arrays
+
+
+def read_positions(buffer: memoryview, message: bytes) -> tuple[list[tuple[str | None, int, dict[str, np.ndarray]]], str, bool]:
+    """A request of one position or of several: each position's actor (None at
+    chance), option count and zone-input arrays, read in place from the thread's
+    buffer; the layout version; and whether the request was of several."""
+    if message[:1] != bytes((2,)):
+        actor, count, layout, arrays = read_request(buffer, message)
+        return [(actor, count, arrays)], layout, False
+    kind, zero, layout_length, positions = SEVERAL.unpack_from(message)
+    start = SEVERAL.size + positions * POSITION.size
+    if zero or not positions or len(message) != start + layout_length:
+        raise ValueError("A game sent a malformed inference request")
+    found, offset = [], 0
+    for index in range(positions):
+        actor, count, *lengths = POSITION.unpack_from(message, SEVERAL.size + index * POSITION.size)
+        if not -1 <= actor < len(PLAYERS):
+            raise ValueError("A game sent a malformed inference request")
+        arrays, offset = _arrays(buffer, lengths, offset)
+        found.append(((None if actor < 0 else PLAYERS[actor]), count, arrays))
+    return found, message[start:].decode(), True
 
 
 def reply_bytes(priors: Any, values: Sequence[float], version: str | None) -> bytes:
@@ -93,6 +130,17 @@ def reply_bytes(priors: Any, values: Sequence[float], version: str | None) -> by
     named = b"" if version is None else version.encode()
     weights = np.asarray(priors, dtype=np.float64)
     return REPLY.pack(len(weights), len(named)) + weights.tobytes() + VALUES.pack(*values) + named
+
+
+def several_reply_bytes(answers: Sequence[tuple[Any, Sequence[float]]], version: str | None) -> bytes:
+    """The reply to a request of several positions: each position's priors and values, in order."""
+    named = b"" if version is None else version.encode()
+    parts = [REPLY.pack(len(answers), len(named))]
+    for priors, values in answers:
+        weights = np.asarray(priors, dtype=np.float64)
+        parts += [COUNT.pack(len(weights)), weights.tobytes(), VALUES.pack(*values)]
+    parts.append(named)
+    return b"".join(parts)
 
 
 @dataclass
@@ -220,6 +268,13 @@ def evaluate_prepared(model: Any, items: Sequence[dict[str, np.ndarray]],
     return collect(model, *forward_prepared(model, items, device))
 
 
+def joined_outputs(model: Any, scores: Any, raw: Any) -> Any:
+    """Every logit and value of a pass in one array on the pass's device, values in NeuralEvaluator's units."""
+    import torch
+    # float(): a pass under automatic mixed precision may give 16-bit outputs, which numpy may not read.
+    return torch.cat((scores, (raw * model.config.value_scale).reshape(-1))).float()
+
+
 def collect(model: Any, scores: Any, lengths: Sequence[int], raw: Any,
             batch: Any = None, *, as_lists: bool = True) -> tuple[list[Any], list[list[float]]]:
     """Host priors and raw values from forward_prepared's device outputs.
@@ -227,9 +282,13 @@ def collect(model: Any, scores: Any, lengths: Sequence[int], raw: Any,
     Each position's priors are a list, or with as_lists=False a float64 array of
     the same numbers. Reading them back waits for the device, after which
     `batch` may go."""
-    import torch
-    # float(): a pass under automatic mixed precision may give 16-bit outputs, which numpy may not read.
-    host = torch.cat((scores, (raw * model.config.value_scale).reshape(-1))).float().cpu().numpy().astype(np.float64)
+    return host_priors(joined_outputs(model, scores, raw).cpu().numpy(), lengths, as_lists=as_lists)
+
+
+def host_priors(joined: np.ndarray, lengths: Sequence[int], *,
+                as_lists: bool = True) -> tuple[list[Any], list[list[float]]]:
+    """Each position's priors, by a softmax of its logits on the host, and its values, from joined_outputs on the host."""
+    host = joined.astype(np.float64)
     if not np.isfinite(host).all():
         raise ValueError("Neural evaluation returned a nonfinite logit or value")
     split = int(sum(lengths))
@@ -248,8 +307,36 @@ def collect(model: Any, scores: Any, lengths: Sequence[int], raw: Any,
 
 
 @dataclass
+class _Pass:
+    """An inference batch whose network pass has been handed to the device and whose
+    replies wait for its outputs (SharedEvaluatorServer.submit and finish)."""
+    requests: Sequence[tuple[Connection, tuple]]
+    first: list[int]                 # Each request's first position; then the number of positions.
+    actors: list[str | None]
+    order: list[int]                 # The positions in the pass's order, grouped by network.
+    lengths: list[int]               # Each of the pass's positions' option count.
+    outputs: Any                     # joined_outputs: on the host, or on its way there with `event`.
+    event: Any                       # A device event after the copy to the host, or None.
+    batch: Any                       # The laid-out positions, whose host buffers the device may still read.
+    version: str | None              # The networks' version that answers it.
+    seconds: float                   # The server's time on it so far.
+
+
+def _device_event(device: Any) -> Any:
+    """An event recorded on the device's stream after the work handed to it so far;
+    None on the CPU, where the work is done when it has been handed over."""
+    import torch
+    if device.type == "cpu":
+        return None
+    event = torch.mps.Event() if device.type == "mps" else torch.cuda.Event()
+    event.record()
+    return event
+
+
+@dataclass
 class ServerStats:
-    requests: int = 0
+    requests: int = 0                # Requests answered, each of one position or of several.
+    evaluations: int = 0             # Positions answered: network evaluations.
     rounds: int = 0                  # Serving rounds: the waiting requests answered together.
     requests_per_round: dict[int, int] = field(default_factory=dict)
     passes: int = 0                  # Network passes: one per round, for every alliance's positions.
@@ -262,16 +349,24 @@ class ServerStats:
     # Seconds of the inference batches of each size, by their number of requests:
     # reading the requests, answering them and replying, as in serve().
     seconds_per_round: dict[int, float] = field(default_factory=dict)
+    # The same seconds by the inference batch's number of positions, as positions_per_pass counts them.
+    seconds_per_pass: dict[int, float] = field(default_factory=dict)
 
 
 class SharedEvaluatorServer:
     """Answers every game thread's requests, batching whatever is waiting."""
 
     def __init__(self, models: dict[str, Any], device: Any, connections: Sequence[Connection],
-                 buffer_names: Sequence[str], runtime_policy: Any = None, *, compiled_forward: bool = False) -> None:
+                 buffer_names: Sequence[str], runtime_policy: Any = None, *, compiled_forward: bool = False,
+                 overlapped: bool | None = None) -> None:
         if set(models) != set(PLAYERS):
             raise ValueError("Provide one campaign model for Axis, Allies and Comintern")
         self.models, self.device = models, device
+        # On a GPU, the next inference batch is laid out and handed to the device
+        # while the last one computes, and its outputs are copied back without
+        # waiting for the next one (serve); on the CPU a pass computes as it is
+        # handed over, so batches go one after another.
+        self.overlapped = getattr(device, "type", "cpu") in ("mps", "cuda") if overlapped is None else overlapped
         # One network's zone and position layers compiled for fixed numbers of states,
         # unless the layers as written are asked for (answer_as_written).
         self.compiled_forward = compiled_forward
@@ -284,6 +379,13 @@ class SharedEvaluatorServer:
         self.memories: dict[Connection, shared_memory.SharedMemory] = {}
         self._buffers: dict[str, shared_memory.SharedMemory] = {}
         self._stack = None
+        self._computing: _Pass | None = None  # The inference batch handed to the device and not yet finished.
+        # A release of the device's caches another thread asked for (release_between_steps),
+        # and the event that tells it the release is done.
+        self._release_asked = threading.Event()
+        self._released = threading.Event()
+        self._release_done = False
+        self._serving = False  # Inside serve(), which does the releases.
         self.stats = ServerStats()
         # The version of `models`, named in a game thread's next reply whenever it
         # differs from the last one sent there. None names no version.
@@ -323,10 +425,44 @@ class SharedEvaluatorServer:
         as_written holds: while a network update trains beside self-play on the same
         device. On PyTorch 2.14 a compiled MPS kernel waits for the GPU's dispatch
         queue while it holds Python's lock, and a trainer's operation already on that
-        queue can need the lock, which deadlocks the process."""
+        queue can need the lock, which deadlocks the process. An inference batch
+        still computing is finished first, so that no wait for the device runs
+        while the trainer works on it; batches then go one after another (serve)."""
+        if as_written and self._computing is not None:
+            computing, self._computing = self._computing, None
+            self._finished(computing)
         if as_written != self.as_written:
             self.as_written = as_written
             self._stack = None  # The next inference batch builds the stack it needs.
+
+    def release_between_steps(self, timeout: float = 60.0) -> bool:
+        """Have the serving thread release the device's caches between two inference
+        batches, and wait until it has: for a network update's trainer thread, between
+        two of its training steps. While a network update trains beside self-play nothing
+        else may release them, since on PyTorch 2.14 a wait for all the device's work from
+        one thread while another hands it work aborts the process; this thread waits
+        meanwhile, so only the serving thread uses the device. Without the releases the
+        GPU keeps a compiled graph for every shape of minibatch, about 50 MB a training
+        step at 256x16. Returns whether the release was done within `timeout` seconds."""
+        if self.runtime_policy is None or not self._serving:
+            return False
+        self._release_done = False
+        self._released.clear()
+        self._release_asked.set()
+        done = self._released.wait(timeout) and self._release_done
+        self._release_asked.clear()
+        return done
+
+    def _release_if_asked(self) -> None:
+        if not self._release_asked.is_set():
+            return
+        if self._computing is not None:
+            computing, self._computing = self._computing, None
+            self._finished(computing)
+        self.runtime_policy.release_now()
+        self._release_asked.clear()
+        self._release_done = True
+        self._released.set()
 
     @property
     def stack(self) -> Any:
@@ -345,12 +481,34 @@ class SharedEvaluatorServer:
         game thread has closed its pipe. Without until_closed, serving goes on while
         keep_running() holds, for the game threads that `add` brings.
 
+        With `overlapped`, an inference batch is handed to the device and the one
+        handed over before it is then finished: its outputs read and its replies
+        sent while the device computes the newer one. Not while the networks run
+        as written beside a network update (answer_as_written), when each batch is
+        finished before the next is handed over.
+
         A pipe that ends, or whose reply cannot be sent, is no longer served: its
         game process has ended. Stopping closes the pipes still open, so a thread
         still sending or waiting for its reply gets EvaluatorClosed rather than
         waiting forever."""
+        self._serving = True
+        try:
+            self._serve(keep_running, until_closed)
+        finally:
+            # A thread still waiting for a release goes on without one.
+            self._serving = False
+            self._release_done = False
+            self._released.set()
+
+    def _serve(self, keep_running: Callable[[], bool], until_closed: bool) -> None:
         while self.connections or not until_closed:
+            self._release_if_asked()
+            # keep_running may hand the networks to a network update (answer_as_written),
+            # which finishes the inference batch still computing.
             if not keep_running():
+                if self._computing is not None:
+                    computing, self._computing = self._computing, None
+                    self._finished(computing)
                 for connection in self.connections:
                     connection.close()
                 self.connections = []
@@ -360,9 +518,10 @@ class SharedEvaluatorServer:
                 time.sleep(0.05)
                 self.stats.idle_seconds += time.perf_counter() - before
                 continue
-            ready = wait(self.connections, timeout=0.05)
+            ready = wait(self.connections, timeout=0 if self._computing is not None else 0.05)
             received = time.perf_counter()
-            self.stats.idle_seconds += received - before
+            if self._computing is None:
+                self.stats.idle_seconds += received - before
             requests = []
             for connection in ready:
                 try:
@@ -371,51 +530,102 @@ class SharedEvaluatorServer:
                     self._forget(connection)
                     connection.close()
                     continue
-                requests.append((connection, read_request(self.memories[connection].buf, message)))
-            self.stats.receive_seconds += time.perf_counter() - received
+                requests.append((connection, read_positions(self.memories[connection].buf, message)))
+            receiving = time.perf_counter() - received
+            self.stats.receive_seconds += receiving
+            overlapping = self.overlapped and not self.as_written
+            if requests and overlapping:
+                handed = self.submit(requests, overlapped=True)
+                handed.seconds += receiving
+                computing, self._computing = self._computing, handed
+                if computing is not None:
+                    self._finished(computing)
+                continue
+            if self._computing is not None:
+                computing, self._computing = self._computing, None
+                self._finished(computing)
             if requests:
-                self.answer(requests)
-                spent = self.stats.seconds_per_round
-                spent[len(requests)] = spent.get(len(requests), 0.0) + time.perf_counter() - received
+                handed = self.submit(requests, overlapped=False)
+                handed.seconds += receiving
+                self._finished(handed)
 
-    def answer(self, requests: Sequence[tuple[Connection, tuple]]) -> None:
+    def _finished(self, handed: _Pass) -> None:
+        positions = self.finish(handed)
+        for spent, key in ((self.stats.seconds_per_round, len(handed.requests)),
+                           (self.stats.seconds_per_pass, positions)):
+            spent[key] = spent.get(key, 0.0) + handed.seconds
+
+    def answer(self, requests: Sequence[tuple[Connection, tuple]]) -> int:
+        """Answer requests of one position or of several (read_positions) in one
+        network pass; returns the pass's positions."""
+        return self.finish(self.submit(requests, overlapped=False))
+
+    def submit(self, requests: Sequence[tuple[Connection, tuple]], *, overlapped: bool) -> _Pass:
+        """Lay the requests' positions out and hand their network pass to the device.
+        With `overlapped`, the outputs start on their way to the host behind the pass,
+        so that finishing this batch waits for its own work only."""
         import torch
         started = time.perf_counter()
         stack = self.stack
         rows: list[list[int]] = [[] for _ in stack.models]
-        items = []
-        for row, (connection, (actor, count, layout, arrays)) in enumerate(requests):
-            readers = PLAYERS if actor is None else (actor,)
-            if any(self.models[player].layout_version != layout for player in readers):
-                raise ValueError("A game sent a zone input of another layout")
-            if count != len(arrays["action_source"]):
-                raise ValueError("A game's request and zone input list different options")
-            items.append(arrays)
-            # A chance position is rated by every network, once by each.
-            for network in sorted({self._network_of[player] for player in readers}):
-                rows[network].append(row)
+        items, actors, first = [], [], []
+        for connection, (positions, layout, _) in requests:
+            first.append(len(items))
+            for actor, count, arrays in positions:
+                readers = PLAYERS if actor is None else (actor,)
+                if any(self.models[player].layout_version != layout for player in readers):
+                    raise ValueError("A game sent a zone input of another layout")
+                if count != len(arrays["action_source"]):
+                    raise ValueError("A game's request and zone input list different options")
+                # A chance position is rated by every network, once by each.
+                for network in sorted({self._network_of[player] for player in readers}):
+                    rows[network].append(len(items))
+                items.append(arrays)
+                actors.append(actor)
+        first.append(len(items))
         # One pass for every alliance's positions, grouped by network.
         order = [row for network_rows in rows for row in network_rows]
         with torch.inference_mode():
-            outputs = forward_prepared(stack, [items[row] for row in order], self.device,
-                                       [len(network_rows) for network_rows in rows])
-            row_priors, row_values = collect(stack, *outputs, as_lists=False)
-        priors: list[Any] = [[] for _ in requests]
+            scores, lengths, raw, batch = forward_prepared(stack, [items[row] for row in order], self.device,
+                                                           [len(network_rows) for network_rows in rows])
+            outputs = joined_outputs(stack, scores, raw)
+            event = None
+            if overlapped:
+                outputs = outputs.to("cpu", non_blocking=True)
+                event = _device_event(self.device)
+        return _Pass(requests, first, actors, order, lengths, outputs, event, batch, self.network_version,
+                     time.perf_counter() - started)
+
+    def finish(self, handed: _Pass) -> int:
+        """Read a handed-over batch's outputs, waiting for the device, and send its
+        replies; returns the pass's positions."""
+        started = time.perf_counter()
+        if handed.event is not None:
+            handed.event.synchronize()
+        with_host = handed.outputs.cpu().numpy()  # Already on the host when it went with an event.
+        row_priors, row_values = host_priors(with_host, handed.lengths, as_lists=False)
+        handed.batch = handed.outputs = None  # The device has read the batch and written the outputs.
+        requests, first, actors = handed.requests, handed.first, handed.actors
+        priors: list[Any] = [[] for _ in actors]
         chance: dict[int, list[list[float]]] = {}
-        values: list[list[float] | None] = [None] * len(requests)
-        for row, prior, value in zip(order, row_priors, row_values, strict=True):
-            if requests[row][1][0] is None:
+        values: list[list[float] | None] = [None] * len(actors)
+        for row, prior, value in zip(handed.order, row_priors, row_values, strict=True):
+            if actors[row] is None:
                 chance.setdefault(row, []).append(value)
             else:
                 priors[row], values[row] = prior, value
         for row, found in chance.items():
             values[row] = [sum(value[i] for value in found) / len(found) for i in range(3)]
         sending = time.perf_counter()
-        version = self.network_version
-        for (connection, _), row_priors, value in zip(requests, priors, values, strict=True):
+        version = handed.version
+        for index, (connection, (_, _, several)) in enumerate(requests):
             naming = version is not None and self._named.get(connection) != version
+            named = version if naming else None
+            start, end = first[index], first[index + 1]
+            reply = (several_reply_bytes([(priors[row], values[row]) for row in range(start, end)], named) if several
+                     else reply_bytes(priors[start], values[start], named))
             try:
-                connection.send_bytes(reply_bytes(row_priors, value, version if naming else None))
+                connection.send_bytes(reply)
             except OSError:  # Its game process ended after sending the request.
                 self._forget(connection)
                 connection.close()
@@ -425,15 +635,19 @@ class SharedEvaluatorServer:
         sent = time.perf_counter()
         if self.runtime_policy is not None:
             self.runtime_policy.completed(1)
+        ended = time.perf_counter()
         stats = self.stats
         stats.requests += len(requests)
+        stats.evaluations += len(actors)
         stats.rounds += 1
         stats.requests_per_round[len(requests)] = stats.requests_per_round.get(len(requests), 0) + 1
         stats.passes += 1
-        stats.positions_per_pass[len(order)] = stats.positions_per_pass.get(len(order), 0) + 1
+        stats.positions_per_pass[len(handed.order)] = stats.positions_per_pass.get(len(handed.order), 0) + 1
         stats.reply_seconds += sent - sending
-        # Graph-cache housekeeping after the replies counts as device work.
-        stats.forward_seconds += (sending - started) + (time.perf_counter() - sent)
+        # Laying out and handing over, reading the outputs and graph-cache housekeeping count as device work.
+        stats.forward_seconds += handed.seconds + (sending - started) + (ended - sent)
+        handed.seconds += ended - started
+        return len(handed.order)
 
     def close(self) -> None:
         for memory in self._buffers.values():

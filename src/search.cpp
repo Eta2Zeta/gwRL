@@ -107,6 +107,9 @@ struct Edge {
     int visits{0};
     SearchValues valueSum{0.0, 0.0, 0.0};
     int successor{-1};  // A move played from a position always reaches the same position.
+    // Simulations of the request being gathered whose paths take this edge and
+    // whose results have not come back yet (SearchSettings::simulationsPerRequest).
+    int pending{0};
 };
 
 bool keyLess(const Edge& a, const Edge& b) {
@@ -151,6 +154,27 @@ SearchValues finite(const SearchValues& values) {
     return values;
 }
 
+// Where a simulation's walk down the tree ends, and what it needs asked there.
+struct Leaf {
+    enum class Need : std::uint8_t {
+        Nothing,      // Its value is known: a terminal state's returns, or a value already asked for.
+        Expansion,    // A new state with two or more options: its priors and value.
+        Rating,       // A state with one option, expanded without asking, where the walk stops: its value.
+        ChanceValue,  // A chance state where the walk stops: its value only.
+    };
+    Need need{Need::Nothing};
+    int node{-1};
+    SearchValues values{0.0, 0.0, 0.0};  // With Need::Nothing.
+    std::vector<Option> options;          // What an expansion or a rating lists.
+};
+
+// A simulation whose question is in the request being gathered.
+struct Waiting {
+    std::vector<int> path;
+    std::vector<std::pair<int, int>> edges;  // (node, edge)
+    Leaf leaf;
+};
+
 }  // namespace searching
 
 struct SearchTree::Storage {
@@ -181,9 +205,19 @@ class Searcher {
     int reach(std::shared_ptr<const Engine> game, std::uint8_t passed);
     void retain(int root);
     std::vector<Option> options(Node& node);
-    std::optional<SearchValues> expand(int index, bool root);
-    SearchValues bootstrap(int index);
-    SearchValues chanceValue(const Node& node);
+    void expandRoot(int index);
+    // A new state's edges, from the priors the network gave its options, and its value.
+    void expandWith(int index, const std::vector<Option>& choices, const std::vector<double>& priors,
+                    const SearchValues& values);
+    // One simulation's walk from the root, which fills `path` and `edgesPath`
+    // and ends where it needs a question asked or knows its value.
+    Leaf walk(int number, std::vector<int>& path, std::vector<std::pair<int, int>>& edgesPath);
+    // What a walk that stops at a node needs: at the depth limit, or where it
+    // would reach a state it has already passed.
+    Leaf stopAt(int index);
+    SearchValues answered(const Leaf& leaf, const SearchAnswer& answer);
+    void backup(const std::vector<int>& path, const std::vector<std::pair<int, int>>& edgesPath,
+                const SearchValues& values);
     std::shared_ptr<const ZoneInput> encode(const Node& node, const std::vector<Option>& options) const;
     std::string actionId(const Node& node, const Option& option) const;
     std::string position(const Node& node) const;
@@ -202,6 +236,11 @@ class Searcher {
     std::shared_ptr<const ZoneInput> rootInput_;
     std::size_t evaluations_{0};
     std::vector<double> priors_;
+    int root_{0};
+    std::vector<int> onPath_;  // The walk that last put each node on its path.
+    std::vector<int> asked_;   // The request whose question is about each node.
+    std::vector<double> scores_;
+    std::vector<std::size_t> tied_;
 };
 
 int Searcher::reach(std::shared_ptr<const Engine> game, std::uint8_t passed) {
@@ -313,10 +352,29 @@ std::string Searcher::position(const Node& node) const {
                              {"anchor", V(node.game->planningKey())}}));
 }
 
-std::optional<SearchValues> Searcher::expand(int index, bool root) {
-    // Ask the network about a new state. A state with one legal action, other
-    // than the root, gets its one edge without an evaluation: a simulation
-    // plays the action and goes on (VectorMCTS._expand).
+void Searcher::expandWith(int index, const std::vector<Option>& choices, const std::vector<double>& priors,
+                          const SearchValues& values) {
+    // probabilities() in studies/shared/multiplayer_mcts.py.
+    Node& node = nodes_[static_cast<std::size_t>(index)];
+    if (priors.size() != choices.size())
+        throw std::invalid_argument("Policy must provide one finite nonnegative weight per legal action");
+    for (const double prior : priors)
+        if (!std::isfinite(prior) || prior < 0)
+            throw std::invalid_argument("Policy must provide one finite nonnegative weight per legal action");
+    const double total = pythonSum(priors.data(), priors.size());
+    if (!std::isfinite(total) || total <= 0) throw std::invalid_argument("Policy must have positive finite total weight");
+    node.evaluation = finite(values);
+    node.evaluated = true;
+    node.edges.reserve(choices.size());
+    for (std::size_t i = 0; i < choices.size(); ++i) {
+        const double prior = priors[i] / total;
+        node.edges.push_back(Edge{choices[i].action, choices[i].kind, prior, prior});
+    }
+    node.expanded = true;
+}
+
+void Searcher::expandRoot(int index) {
+    // The root is asked about even with one option (searchForcedRoot); VectorMCTS._expand.
     Node& node = nodes_[static_cast<std::size_t>(index)];
     if (node.decision.kind == DecisionKind::Terminal) {
         node.evaluation = finite(terminalReturns(node.game->state()));
@@ -326,70 +384,229 @@ std::optional<SearchValues> Searcher::expand(int index, bool root) {
     } else {
         const auto choices = options(node);
         if (choices.empty()) throw NoLegalSearchAction(position(node));
-        if (choices.size() == 1 && !root) {
-            node.edges.push_back(Edge{choices.front().action, choices.front().kind, 1.0, 1.0});
-            node.expanded = true;
-            return std::nullopt;
-        }
         std::shared_ptr<const ZoneInput> input;
         if (evaluator_.readsInput()) input = encode(node, choices);
         SearchValues values{};
         priors_.clear();
         evaluator_.evaluate(input, layout_, node.decision.owner, choices.size(), priors_, values);
         ++evaluations_;
-        if (root) rootInput_ = input;
-        // probabilities() in studies/shared/multiplayer_mcts.py.
-        if (priors_.size() != choices.size())
-            throw std::invalid_argument("Policy must provide one finite nonnegative weight per legal action");
-        for (const double prior : priors_)
-            if (!std::isfinite(prior) || prior < 0)
-                throw std::invalid_argument("Policy must provide one finite nonnegative weight per legal action");
-        const double total = pythonSum(priors_.data(), priors_.size());
-        if (!std::isfinite(total) || total <= 0) throw std::invalid_argument("Policy must have positive finite total weight");
-        node.evaluation = finite(values);
-        node.evaluated = true;
-        node.edges.reserve(choices.size());
-        for (std::size_t i = 0; i < choices.size(); ++i) {
-            const double prior = priors_[i] / total;
-            node.edges.push_back(Edge{choices[i].action, choices[i].kind, prior, prior});
-        }
+        rootInput_ = input;
+        expandWith(index, choices, priors_, values);
+        return;
     }
     node.expanded = true;
-    return node.evaluation;
 }
 
-SearchValues Searcher::chanceValue(const Node& node) {
-    // A chance position has no policy expansion; its cutoff is a value-only evaluation.
-    std::shared_ptr<const ZoneInput> input;
-    if (evaluator_.readsInput()) input = encode(node, {});
-    SearchValues values{};
-    priors_.clear();
-    evaluator_.evaluate(input, layout_, -1, 0, priors_, values);
-    ++evaluations_;
-    if (!priors_.empty()) throw std::invalid_argument("A chance evaluation has no policy");
-    return finite(values);
-}
-
-SearchValues Searcher::bootstrap(int index) {
-    if (nodes_[static_cast<std::size_t>(index)].decision.kind == DecisionKind::Chance)
-        return chanceValue(nodes_[static_cast<std::size_t>(index)]);
-    if (!nodes_[static_cast<std::size_t>(index)].expanded)
-        if (const auto value = expand(index, false)) return *value;
+Leaf Searcher::stopAt(int index) {
+    // VectorMCTS._bootstrap: a forced state is rated only once a walk stops at it.
     Node& node = nodes_[static_cast<std::size_t>(index)];
-    if (!node.evaluated) {
-        // A forced state, rated only now that a simulation stops at it.
-        const std::vector<Option> only{Option{node.edges.front().action, node.edges.front().kind}};
-        std::shared_ptr<const ZoneInput> input;
-        if (evaluator_.readsInput()) input = encode(node, only);
-        SearchValues values{};
-        priors_.clear();
-        evaluator_.evaluate(input, layout_, node.decision.owner, 1, priors_, values);
-        ++evaluations_;
-        if (priors_.size() != 1) throw std::invalid_argument("Policy must provide one finite nonnegative weight per legal action");
-        node.evaluation = finite(values);
-        node.evaluated = true;
+    Leaf leaf;
+    leaf.node = index;
+    if (node.decision.kind == DecisionKind::Terminal) {
+        leaf.values = finite(terminalReturns(node.game->state()));
+        return leaf;
     }
-    return node.evaluation;
+    if (node.decision.kind == DecisionKind::Chance) {
+        leaf.need = Leaf::Need::ChanceValue;  // A value-only evaluation, not kept.
+        return leaf;
+    }
+    if (!node.expanded) {
+        auto choices = options(node);
+        if (choices.empty()) throw NoLegalSearchAction(position(node));
+        if (choices.size() > 1) {
+            leaf.need = Leaf::Need::Expansion;
+            leaf.options = std::move(choices);
+            return leaf;
+        }
+        node.edges.push_back(Edge{choices.front().action, choices.front().kind, 1.0, 1.0});
+        node.expanded = true;
+    }
+    if (!node.evaluated) {
+        leaf.need = Leaf::Need::Rating;
+        leaf.options = {Option{node.edges.front().action, node.edges.front().kind}};
+        return leaf;
+    }
+    leaf.values = node.evaluation;
+    return leaf;
+}
+
+Leaf Searcher::walk(int number, std::vector<int>& path, std::vector<std::pair<int, int>>& edgesPath) {
+    const std::uint64_t seed = random_.getrandbits64();
+    PythonRandom policyRandom(seed ^ policySeedMix);
+    // Walk the tree on its saved positions. Only playing a new move or rolling
+    // dice copies one; each copy continues the dice of the last, from one stream
+    // started from the walk's seed.
+    std::optional<std::uint64_t> stream;
+    const auto copyOf = [&](const Node& node) {
+        return node.game->cloneForSearchFrom(stream ? *stream : Engine::searchStreamFor(seed));
+    };
+    // A move that fails on a copy leaves no position behind, so the error
+    // names the node's position, the move and where the dice stood.
+    const auto moveFailed = [&](const Node& node, const std::exception& error, const char* kind, const Id& action) {
+        const auto dice = stream ? *stream : Engine::searchStreamFor(seed);
+        O move{{"kind", V(std::string(kind))}, {"search_stream", V(std::to_string(dice))}};
+        if (!action.empty()) move.emplace("id", V(action));
+        O failure{{"error", V(std::string(error.what()))}, {"move", V(std::move(move))}};
+        try {
+            failure.emplace("position", V(position(node)));
+        } catch (const std::exception& unwritable) {
+            // A damaged position may not serialize; the rest still says what failed.
+            failure.emplace("position_error", V(std::string(unwritable.what())));
+        }
+        return SearchMoveFailed(canonicalJson(V(std::move(failure))));
+    };
+    const auto mark = [&](int index) {
+        if (onPath_.size() <= static_cast<std::size_t>(index)) onPath_.resize(nodes_.size(), -1);
+        onPath_[static_cast<std::size_t>(index)] = number;
+    };
+    const auto visited = [&](int index) {
+        return static_cast<std::size_t>(index) < onPath_.size() && onPath_[static_cast<std::size_t>(index)] == number;
+    };
+    int current = root_;
+    path.assign(1, root_);
+    edgesPath.clear();
+    mark(root_);
+    for (int depth = 0; depth < settings_.maxDepth; ++depth) {
+        Node& node = nodes_[static_cast<std::size_t>(current)];
+        if (node.decision.kind == DecisionKind::Terminal) {
+            Leaf leaf;
+            leaf.node = current;
+            leaf.values = finite(terminalReturns(node.game->state()));
+            return leaf;
+        }
+        int successor;
+        if (node.decision.kind == DecisionKind::Chance) {
+            auto copy = copyOf(node);
+            try {
+                copy.resolveChance();
+            } catch (const std::bad_alloc&) {
+                throw;
+            } catch (const std::exception& error) {
+                throw moveFailed(node, error, "chance", Id{});
+            }
+            stream = copy.searchStream();
+            const auto passedNow = passedAfter(node, copy);
+            successor = reach(std::make_shared<const Engine>(std::move(copy)), passedNow);
+            auto& reached = nodes_[static_cast<std::size_t>(current)].chanceSuccessors;
+            if (std::find(reached.begin(), reached.end(), successor) == reached.end()) reached.push_back(successor);
+        } else {
+            if (!node.expanded) {
+                auto choices = options(node);
+                if (choices.empty()) throw NoLegalSearchAction(position(node));
+                if (choices.size() > 1) {
+                    Leaf leaf;
+                    leaf.need = Leaf::Need::Expansion;
+                    leaf.node = current;
+                    leaf.options = std::move(choices);
+                    return leaf;
+                }
+                // A forced state gets its one edge without an evaluation: the walk
+                // plays its action and goes on (VectorMCTS._expand).
+                node.edges.push_back(Edge{choices.front().action, choices.front().kind, 1.0, 1.0});
+                node.expanded = true;
+            }
+            const int component = node.decision.owner;
+            const bool rootStep = depth == 0;
+            const auto& normalizer = bounds_[static_cast<std::size_t>(component)];
+            // Simulations of the request being gathered count as visits that
+            // lost: their paths' edges look worse until their results come back.
+            long total = 0;
+            for (const auto& edge : node.edges) total += edge.visits + edge.pending;
+            const double scale = std::sqrt(static_cast<double>(total) + 1.0);
+            scores_.resize(node.edges.size());
+            double best = -std::numeric_limits<double>::infinity();
+            for (std::size_t i = 0; i < node.edges.size(); ++i) {
+                const auto& edge = node.edges[i];
+                double normalized;
+                if (edge.pending == 0)
+                    normalized = edge.visits ? normalizer.normalize(edge.valueSum[static_cast<std::size_t>(component)] / edge.visits) : 1.0;
+                else
+                    normalized = edge.visits ? normalizer.normalize(edge.valueSum[static_cast<std::size_t>(component)] / edge.visits) *
+                                                   edge.visits / (edge.visits + edge.pending)
+                                             : 0.0;
+                const double prior = rootStep ? edge.selectionPrior : edge.prior;
+                const double score = normalized + settings_.cPuct * prior * scale / (static_cast<double>(edge.visits + edge.pending) + 1.0);
+                scores_[i] = score;
+                if (score > best) best = score;
+            }
+            tied_.clear();
+            for (std::size_t i = 0; i < scores_.size(); ++i)
+                if (scores_[i] == best) tied_.push_back(i);
+            std::sort(tied_.begin(), tied_.end(), [&](std::size_t a, std::size_t b) { return keyLess(node.edges[a], node.edges[b]); });
+            const auto selected = tied_[policyRandom.randbelow(static_cast<std::uint32_t>(tied_.size()))];
+            edgesPath.emplace_back(current, static_cast<int>(selected));
+            auto& edge = node.edges[selected];
+            if (edge.successor >= 0) {
+                successor = edge.successor;
+            } else if (edge.kind == OptionKind::Pass) {
+                // A pass changes no game state, rolls no dice and needs no copy.
+                if (!stream) stream = Engine::searchStreamFor(seed);
+                successor = reach(node.game, static_cast<std::uint8_t>(node.passed | (1U << node.decision.offered)));
+            } else {
+                auto copy = copyOf(node);
+                try {
+                    if (edge.kind == OptionKind::Interrupt) copy.interrupt(*edge.action);
+                    else copy.step(*edge.action);
+                } catch (const std::bad_alloc&) {
+                    throw;
+                } catch (const std::exception& error) {
+                    throw moveFailed(node, error, edge.kind == OptionKind::Interrupt ? "interrupt" : "action",
+                                     edge.action->id);
+                }
+                stream = copy.searchStream();
+                const auto passedNow = passedAfter(node, copy);
+                successor = reach(std::make_shared<const Engine>(std::move(copy)), passedNow);
+            }
+            // `node` and `edge` stay valid: nodes live in a deque.
+            nodes_[static_cast<std::size_t>(current)].edges[selected].successor = successor;
+        }
+        // A reversible planning sequence can return to an exact state. Stop at its
+        // first repetition and bootstrap, rather than count one simulation
+        // repeatedly in the same node and action.
+        if (visited(successor)) return stopAt(successor);
+        current = successor;
+        path.push_back(current);
+        mark(current);
+    }
+    return stopAt(current);
+}
+
+SearchValues Searcher::answered(const Leaf& leaf, const SearchAnswer& answer) {
+    Node& node = nodes_[static_cast<std::size_t>(leaf.node)];
+    switch (leaf.need) {
+        case Leaf::Need::Expansion:
+            expandWith(leaf.node, leaf.options, answer.priors, answer.values);
+            return node.evaluation;
+        case Leaf::Need::Rating:
+            if (answer.priors.size() != 1)
+                throw std::invalid_argument("Policy must provide one finite nonnegative weight per legal action");
+            node.evaluation = finite(answer.values);
+            node.evaluated = true;
+            return node.evaluation;
+        case Leaf::Need::ChanceValue:
+            if (!answer.priors.empty()) throw std::invalid_argument("A chance evaluation has no policy");
+            return finite(answer.values);
+        case Leaf::Need::Nothing:
+            break;
+    }
+    return leaf.values;
+}
+
+void Searcher::backup(const std::vector<int>& path, const std::vector<std::pair<int, int>>& edgesPath,
+                      const SearchValues& values) {
+    for (const int index : path) {
+        Node& node = nodes_[static_cast<std::size_t>(index)];
+        ++node.visits;
+        for (std::size_t c = 0; c < 3; ++c) node.valueSum[c] += values[c];
+    }
+    for (const auto& [nodeIndex, edgeIndex] : edgesPath) {
+        auto& edge = nodes_[static_cast<std::size_t>(nodeIndex)].edges[static_cast<std::size_t>(edgeIndex)];
+        ++edge.visits;
+        for (std::size_t c = 0; c < 3; ++c) {
+            edge.valueSum[c] += values[c];
+            bounds_[c].update(edge.valueSum[c] / edge.visits);
+        }
+    }
 }
 
 SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t passed) {
@@ -406,9 +623,9 @@ SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t
         nodes_.clear();
         index_.clear();
     }
-    const int root = reach(std::move(rootGame), passed);  // Node 0, kept or new.
+    root_ = reach(std::move(rootGame), passed);  // Node 0, kept or new.
     {
-        Node& node = nodes_[static_cast<std::size_t>(root)];
+        Node& node = nodes_[static_cast<std::size_t>(root_)];
         const bool policy = node.decision.kind == DecisionKind::Offer || node.decision.kind == DecisionKind::Play;
         if (policy && !settings_.searchForcedRoot) {
             const auto choices = options(node);
@@ -425,7 +642,7 @@ SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t
             }
         }
     }
-    if (!nodes_[static_cast<std::size_t>(root)].expanded) expand(root, true);
+    if (!nodes_[static_cast<std::size_t>(root_)].expanded) expandRoot(root_);
     // Noise belongs to this search's root alone, and the value bounds start
     // from the kept tree's actions, as the searches that made them left them.
     for (auto& node : nodes_)
@@ -434,7 +651,7 @@ SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t
             if (edge.visits)
                 for (std::size_t c = 0; c < 3; ++c) bounds_[c].update(edge.valueSum[c] / edge.visits);
         }
-    Node& rootNode = nodes_[static_cast<std::size_t>(root)];
+    Node& rootNode = nodes_[static_cast<std::size_t>(root_)];
     if (settings_.rootNoise && !rootNode.edges.empty()) {
         // Dirichlet noise over the root's options in action id order.
         std::vector<std::size_t> order(rootNode.edges.size());
@@ -454,160 +671,63 @@ SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t
         }
     }
 
+    // The simulations, gathered into requests of up to simulationsPerRequest
+    // questions. A walk that ends at a known value is backed up at once; one
+    // that needs a question waits, its path's edges counted as visits that lost,
+    // until the request's answers come back. A walk whose question is already in
+    // the request is dropped and does not count, and after as many drops as the
+    // request holds questions it is sent as it is. With one simulation a request
+    // this is VectorMCTS's search, simulation by simulation.
+    const int perRequest = std::max(1, settings_.simulationsPerRequest);
     std::vector<int> path;
-    std::vector<std::pair<int, int>> edgesPath;  // (node, edge)
-    std::vector<int> onPath;                     // The simulation that last put each node on its path.
-    std::vector<double> scores;
-    std::vector<std::size_t> tied;
-    for (int simulation = 0; simulation < settings_.simulations; ++simulation) {
-        const std::uint64_t seed = random_.getrandbits64();
-        PythonRandom policyRandom(seed ^ policySeedMix);
-        // Walk the tree on its saved positions. Only playing a new move or
-        // rolling dice copies one; each copy continues the dice of the last,
-        // from one stream started from the simulation's seed.
-        std::optional<std::uint64_t> stream;
-        const auto copyOf = [&](const Node& node) {
-            return node.game->cloneForSearchFrom(stream ? *stream : Engine::searchStreamFor(seed));
-        };
-        // A move that fails on a copy leaves no position behind, so the error
-        // names the node's position, the move and where the dice stood.
-        const auto moveFailed = [&](const Node& node, const std::exception& error, const char* kind,
-                                    const Id& action) {
-            const auto dice = stream ? *stream : Engine::searchStreamFor(seed);
-            O move{{"kind", V(std::string(kind))}, {"search_stream", V(std::to_string(dice))}};
-            if (!action.empty()) move.emplace("id", V(action));
-            O failure{{"error", V(std::string(error.what()))}, {"move", V(std::move(move))}};
-            try {
-                failure.emplace("position", V(position(node)));
-            } catch (const std::exception& unwritable) {
-                // A damaged position may not serialize; the rest still says what failed.
-                failure.emplace("position_error", V(std::string(unwritable.what())));
+    std::vector<std::pair<int, int>> edgesPath;
+    std::vector<Waiting> waiting;
+    std::vector<SearchQuestion> questions;
+    std::vector<SearchAnswer> answers;
+    int done = 0, walks = 0, request = 0;
+    while (done < settings_.simulations) {
+        ++request;
+        waiting.clear();
+        questions.clear();
+        int dropped = 0;
+        while (done + static_cast<int>(waiting.size()) < settings_.simulations &&
+               static_cast<int>(waiting.size()) < perRequest && dropped < perRequest) {
+            Leaf leaf = walk(walks++, path, edgesPath);
+            if (leaf.need == Leaf::Need::Nothing) {
+                backup(path, edgesPath, leaf.values);
+                ++done;
+                continue;
             }
-            return SearchMoveFailed(canonicalJson(V(std::move(failure))));
-        };
-        const auto mark = [&](int index) {
-            if (onPath.size() <= static_cast<std::size_t>(index)) onPath.resize(nodes_.size(), -1);
-            onPath[static_cast<std::size_t>(index)] = simulation;
-        };
-        const auto visited = [&](int index) {
-            return static_cast<std::size_t>(index) < onPath.size() && onPath[static_cast<std::size_t>(index)] == simulation;
-        };
-        int current = root;
-        path.assign(1, root);
-        edgesPath.clear();
-        mark(root);
-        SearchValues values{};
-        bool finished = false;
-        for (int depth = 0; depth < settings_.maxDepth; ++depth) {
-            Node& node = nodes_[static_cast<std::size_t>(current)];
-            if (node.decision.kind == DecisionKind::Terminal) {
-                values = finite(terminalReturns(node.game->state()));
-                finished = true;
-                break;
+            if (asked_.size() <= static_cast<std::size_t>(leaf.node)) asked_.resize(nodes_.size(), 0);
+            if (asked_[static_cast<std::size_t>(leaf.node)] == request) {
+                ++dropped;
+                continue;
             }
-            int successor;
-            if (node.decision.kind == DecisionKind::Chance) {
-                auto copy = copyOf(node);
-                try {
-                    copy.resolveChance();
-                } catch (const std::bad_alloc&) {
-                    throw;
-                } catch (const std::exception& error) {
-                    throw moveFailed(node, error, "chance", Id{});
-                }
-                stream = copy.searchStream();
-                const auto passedNow = passedAfter(node, copy);
-                successor = reach(std::make_shared<const Engine>(std::move(copy)), passedNow);
-                auto& reached = nodes_[static_cast<std::size_t>(current)].chanceSuccessors;
-                if (std::find(reached.begin(), reached.end(), successor) == reached.end()) reached.push_back(successor);
-            } else {
-                if (!node.expanded) {
-                    if (const auto value = expand(current, false)) {
-                        values = *value;
-                        finished = true;
-                        break;
-                    }
-                    // A forced state: its one action is played below, unasked.
-                }
-                const int component = node.decision.owner;
-                const bool rootStep = depth == 0;
-                const auto& normalizer = bounds_[static_cast<std::size_t>(component)];
-                long total = 0;
-                for (const auto& edge : node.edges) total += edge.visits;
-                const double scale = std::sqrt(static_cast<double>(total) + 1.0);
-                scores.resize(node.edges.size());
-                double best = -std::numeric_limits<double>::infinity();
-                for (std::size_t i = 0; i < node.edges.size(); ++i) {
-                    const auto& edge = node.edges[i];
-                    const double normalized = edge.visits ? normalizer.normalize(edge.valueSum[static_cast<std::size_t>(component)] / edge.visits) : 1.0;
-                    const double prior = rootStep ? edge.selectionPrior : edge.prior;
-                    const double score = normalized + settings_.cPuct * prior * scale / (static_cast<double>(edge.visits) + 1.0);
-                    scores[i] = score;
-                    if (score > best) best = score;
-                }
-                tied.clear();
-                for (std::size_t i = 0; i < scores.size(); ++i)
-                    if (scores[i] == best) tied.push_back(i);
-                std::sort(tied.begin(), tied.end(), [&](std::size_t a, std::size_t b) { return keyLess(node.edges[a], node.edges[b]); });
-                const auto selected = tied[policyRandom.randbelow(static_cast<std::uint32_t>(tied.size()))];
-                edgesPath.emplace_back(current, static_cast<int>(selected));
-                auto& edge = node.edges[selected];
-                if (edge.successor >= 0) {
-                    successor = edge.successor;
-                } else if (edge.kind == OptionKind::Pass) {
-                    // A pass changes no game state, rolls no dice and needs no copy.
-                    if (!stream) stream = Engine::searchStreamFor(seed);
-                    successor = reach(node.game, static_cast<std::uint8_t>(node.passed | (1U << node.decision.offered)));
-                } else {
-                    auto copy = copyOf(node);
-                    try {
-                        if (edge.kind == OptionKind::Interrupt) copy.interrupt(*edge.action);
-                        else copy.step(*edge.action);
-                    } catch (const std::bad_alloc&) {
-                        throw;
-                    } catch (const std::exception& error) {
-                        throw moveFailed(node, error, edge.kind == OptionKind::Interrupt ? "interrupt" : "action",
-                                         edge.action->id);
-                    }
-                    stream = copy.searchStream();
-                    const auto passedNow = passedAfter(node, copy);
-                    successor = reach(std::make_shared<const Engine>(std::move(copy)), passedNow);
-                }
-                // `node` and `edge` stay valid: nodes live in a deque.
-                nodes_[static_cast<std::size_t>(current)].edges[selected].successor = successor;
-            }
-            // A reversible planning sequence can return to an exact state. Stop at
-            // its first repetition and bootstrap, rather than count one simulation
-            // repeatedly in the same node and action.
-            if (visited(successor)) {
-                values = bootstrap(successor);
-                finished = true;
-                break;
-            }
-            current = successor;
-            path.push_back(current);
-            mark(current);
+            asked_[static_cast<std::size_t>(leaf.node)] = request;
+            const Node& node = nodes_[static_cast<std::size_t>(leaf.node)];
+            SearchQuestion question;
+            question.actor = leaf.need == Leaf::Need::ChanceValue ? -1 : node.decision.owner;
+            question.options = leaf.options.size();
+            if (evaluator_.readsInput()) question.input = encode(node, leaf.options);
+            questions.push_back(std::move(question));
+            for (const auto& [nodeIndex, edgeIndex] : edgesPath)
+                ++nodes_[static_cast<std::size_t>(nodeIndex)].edges[static_cast<std::size_t>(edgeIndex)].pending;
+            waiting.push_back(Waiting{path, edgesPath, std::move(leaf)});
         }
-        if (!finished) {
-            const Node& node = nodes_[static_cast<std::size_t>(current)];
-            values = node.decision.kind == DecisionKind::Terminal ? finite(terminalReturns(node.game->state())) : bootstrap(current);
-        }
-        for (const int index : path) {
-            Node& node = nodes_[static_cast<std::size_t>(index)];
-            ++node.visits;
-            for (std::size_t c = 0; c < 3; ++c) node.valueSum[c] += values[c];
-        }
-        for (const auto& [nodeIndex, edgeIndex] : edgesPath) {
-            auto& edge = nodes_[static_cast<std::size_t>(nodeIndex)].edges[static_cast<std::size_t>(edgeIndex)];
-            ++edge.visits;
-            for (std::size_t c = 0; c < 3; ++c) {
-                edge.valueSum[c] += values[c];
-                bounds_[c].update(edge.valueSum[c] / edge.visits);
-            }
+        if (waiting.empty()) continue;
+        evaluator_.evaluateMany(layout_, questions, answers);
+        if (answers.size() != questions.size()) throw std::runtime_error("The evaluator answered another number of positions");
+        evaluations_ += questions.size();
+        for (std::size_t i = 0; i < waiting.size(); ++i) {
+            const auto& simulation = waiting[i];
+            for (const auto& [nodeIndex, edgeIndex] : simulation.edges)
+                --nodes_[static_cast<std::size_t>(nodeIndex)].edges[static_cast<std::size_t>(edgeIndex)].pending;
+            backup(simulation.path, simulation.edges, answered(simulation.leaf, answers[i]));
+            ++done;
         }
     }
 
-    const Node& node = nodes_[static_cast<std::size_t>(root)];
+    const Node& node = nodes_[static_cast<std::size_t>(root_)];
     long total = 0;
     for (const auto& edge : node.edges) total += edge.visits;
     for (const auto& edge : node.edges) {

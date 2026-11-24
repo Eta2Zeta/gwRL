@@ -15,7 +15,8 @@ from studies.campaign.curriculum import make_env
 from studies.campaign.features import make_zone_input
 from studies.campaign.native_search import SearchTree, search_decision
 from studies.campaign.neural import CampaignModelConfig, CampaignPolicyValueNet, NeuralEvaluator
-from studies.campaign.shared_evaluator import BUFFER_BYTES, RemoteEvaluator, SharedEvaluatorServer
+from studies.campaign.shared_evaluator import (BUFFER_BYTES, RemoteEvaluator, SharedEvaluatorServer, read_positions,
+                                               reply_bytes, several_reply_bytes)
 from studies.shared.multiplayer_mcts import (PLAYERS, Evaluation, MctsConfig, NoLegalActionError, UniformEvaluator,
                                              VectorMCTS, vector)
 
@@ -192,6 +193,78 @@ class SameChoicesTests(unittest.TestCase):
         self.assertTrue(issubclass(NoLegalActionError, ValueError))
 
 
+def searched_decisions(seed, *, count, rounds=1):
+    """Positions along a game with at least three options, played on at random."""
+    env = make_env(seed, calendar_rounds=rounds)
+    rng = random.Random(seed)
+    found = []
+    while not env.is_terminal() and len(found) < count:
+        if env.decision_kind() == "chance":
+            env.resolve_chance()
+            continue
+        actions = env.legal_actions()
+        if len(actions) >= 3 and rng.random() < 0.3:
+            found.append(env.serialize())
+        env.apply_action(rng.choice(actions))
+    return found
+
+
+class SeveralSimulationsTests(unittest.TestCase):
+    """Simulations gathered into requests of several positions (simulations_per_request)."""
+
+    def at(self, serialized):
+        env = make_env(SEED, calendar_rounds=1)
+        env.restore(serialized)
+        return env
+
+    def test_one_simulation_a_request_is_the_plain_search(self):
+        for serialized in searched_decisions(21, count=6):
+            env = self.at(serialized)
+            config = MctsConfig(simulations=40, max_depth=16, seed=5)
+            plain = search_decision(env, HashEvaluator(), config, add_root_noise=True)
+            one = search_decision(env, HashEvaluator(), MctsConfig(simulations=40, max_depth=16, seed=5,
+                                                                    simulations_per_request=1), add_root_noise=True)
+            expected = VectorMCTS(HashEvaluator(), config).search(env, add_root_noise=True, reuse_root=False)
+            for name in ("visit_counts", "policy", "priors", "values", "action_values"):
+                self.assertEqual(getattr(one, name), getattr(plain, name), name)
+                self.assertEqual(getattr(one, name), getattr(expected, name), name)
+        with self.assertRaises(ValueError):
+            VectorMCTS(HashEvaluator(), MctsConfig(simulations=4, simulations_per_request=2))
+
+    def test_gathered_simulations_spend_the_budget_and_repeat_with_the_seed(self):
+        for per_request in (2, 8, 64):
+            for serialized in searched_decisions(22, count=5):
+                env = self.at(serialized)
+                evaluator = HashEvaluator()
+                config = MctsConfig(simulations=48, seed=7, max_depth=1000, simulations_per_request=per_request)
+                result = search_decision(env, evaluator, config, add_root_noise=True)
+                again = search_decision(env, HashEvaluator(), config, add_root_noise=True)
+                self.assertEqual(sum(result.visit_counts), 48)
+                for name in ("visit_counts", "policy", "values", "action_values"):
+                    self.assertEqual(getattr(again, name), getattr(result, name), name)
+                # Every question a new position's: nothing is asked twice in a request.
+                self.assertLessEqual(evaluator.requests, 49)
+                # The visits that lost while waiting spread the simulations over the root's options.
+                self.assertGreater(sum(1 for visits in result.visit_counts if visits), 1)
+
+    def test_gathered_simulations_keep_trees_along_a_game(self):
+        env = make_env(13, calendar_rounds=1)
+        rng = random.Random(13)
+        tree, checked, reused = SearchTree(), 0, 0
+        while not env.is_terminal() and checked < 30:
+            if env.decision_kind() == "chance":
+                env.resolve_chance()
+                continue
+            config = MctsConfig(simulations=32, max_depth=1000, seed=rng.getrandbits(64), simulations_per_request=8)
+            result = search_decision(env, HashEvaluator(), config, add_root_noise=True, tree=tree)
+            if result.values is not None:
+                self.assertGreaterEqual(sum(result.visit_counts), 32)
+            reused += result.reused_root
+            checked += 1
+            env.apply_action(result.best_action() if rng.random() < 0.5 else rng.choice(result.actions))
+        self.assertGreater(reused, checked // 2)
+
+
 class InferenceServerTests(unittest.TestCase):
     def served_search(self, models, env, *, native):
         """A search whose evaluations an inference server answers, one at a time."""
@@ -235,6 +308,99 @@ class InferenceServerTests(unittest.TestCase):
         self.assertEqual(python_requests, requests)
         for name in ("visit_counts", "policy", "priors", "values", "action_values"):
             self.assertEqual(getattr(python, name), getattr(result, name), name)
+
+    def test_several_positions_in_one_request_reach_their_own_answers(self):
+        """A stand-in server answers each position of a request of several with
+        HashEvaluator's numbers for its arrays: the search through it is the search
+        with HashEvaluator in the process, so each answer reached its own position."""
+        class Zone:
+            def __init__(self, arrays, count):
+                self._arrays, self.action_count = arrays, count
+
+            def arrays(self):
+                return self._arrays
+
+        for serialized in searched_decisions(23, count=4):
+            env = make_env(SEED, calendar_rounds=1)
+            env.restore(serialized)
+            memory = shared_memory.SharedMemory(create=True, size=BUFFER_BYTES)
+            server_end, client_end = Pipe()
+            counts = {"requests": 0, "several": 0, "positions": 0}
+
+            def answer():
+                hashing = HashEvaluator()
+                while True:
+                    try:
+                        message = server_end.recv_bytes()
+                    except (EOFError, OSError):
+                        return
+                    positions, _, several = read_positions(memory.buf, message)
+                    answers = []
+                    for actor, count, arrays in positions:
+                        evaluation = hashing.evaluate_zone(Zone({k: v.copy() for k, v in arrays.items()}, count), actor)
+                        answers.append((evaluation.priors, evaluation.values))
+                    del arrays
+                    counts["requests"] += 1
+                    counts["several"] += several
+                    counts["positions"] += len(positions)
+                    server_end.send_bytes(several_reply_bytes(answers, None) if several
+                                          else reply_bytes(answers[0][0], answers[0][1], None))
+
+            serving = threading.Thread(target=answer, daemon=True)
+            serving.start()
+            try:
+                config = MctsConfig(simulations=40, max_depth=1000, seed=3, simulations_per_request=8)
+                evaluator = RemoteEvaluator(client_end, memory.name, "test", native=True)
+                served = search_decision(env, evaluator, config, add_root_noise=True)
+                in_process = search_decision(env, HashEvaluator(), config, add_root_noise=True)
+                for name in ("visit_counts", "policy", "priors", "values", "action_values"):
+                    self.assertEqual(getattr(served, name), getattr(in_process, name), name)
+                self.assertEqual(evaluator.client.evaluations, counts["positions"])
+                self.assertEqual(evaluator.client.requests, counts["requests"])
+                self.assertGreater(counts["several"], 0)
+                self.assertLess(counts["requests"], counts["positions"])
+                evaluator.client.close()
+            finally:
+                server_end.close()
+                client_end.close()
+                serving.join(timeout=10)
+                memory.close()
+                memory.unlink()
+
+    def test_the_inference_server_answers_requests_of_several_positions(self):
+        torch.manual_seed(SEED)
+        model = CampaignPolicyValueNet(CampaignModelConfig(hidden_dim=16, message_layers=1)).eval()
+        models = {player: model for player in PLAYERS}
+        env = make_env(SEED, calendar_rounds=1)
+        while env.decision_kind() == "chance" or len(env.legal_actions()) < 3:
+            env.resolve_chance() if env.decision_kind() == "chance" else env.apply_action(env.legal_actions()[0])
+        memory = shared_memory.SharedMemory(create=True, size=BUFFER_BYTES)
+        server_end, client_end = Pipe()
+        try:
+            server = SharedEvaluatorServer(models, torch.device("cpu"), [server_end], [memory.name])
+            serving = threading.Thread(target=server.serve, args=(lambda: True,), daemon=True)
+            serving.start()
+            evaluator = RemoteEvaluator(client_end, memory.name, "test", native=True)
+            config = MctsConfig(simulations=48, max_depth=1000, seed=9, simulations_per_request=8)
+            result = search_decision(env, evaluator, config, add_root_noise=True)
+            client = evaluator.client
+            evaluations, requests = client.evaluations, client.requests
+            evaluator.close()
+            serving.join(timeout=60)
+            self.assertFalse(serving.is_alive())
+            self.assertEqual(sum(result.visit_counts), 48)
+            self.assertEqual((server.stats.evaluations, server.stats.requests), (evaluations, requests))
+            self.assertLess(requests, evaluations)
+            self.assertEqual(sum(size * count for size, count in server.stats.positions_per_pass.items()), evaluations)
+            reference = NeuralEvaluator(models, version="test").evaluate(env, result.actions)
+            for got, want in zip(result.priors, reference.priors, strict=True):
+                self.assertAlmostEqual(got, want, delta=1e-5)
+            server.close()
+        finally:
+            memory.close()
+            memory.unlink()
+            server_end.close()
+            client_end.close()
 
 
 if __name__ == "__main__":

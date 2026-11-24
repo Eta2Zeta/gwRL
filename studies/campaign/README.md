@@ -286,7 +286,8 @@ training iteration is then those 24 games and their network update, and
 `--stop-after-waves` or `--batches`, loses the games then in play. It needs
 `--games-per-process`. With `--neural-device mps` or `cuda` the network update
 trains on the GPU beside the inference server, which meanwhile runs the layers
-as written instead of `--compiled-forward`'s
+as written instead of `--compiled-forward`'s, and releases the GPU's caches every
+20 training steps while the update waits for it
 ([running training on the Mac](../../docs/design/README.md#92-running-training-on-the-mac)).
 The supervisor counts a core for the network updates, so the Mac's allowance
 leaves six game processes. `--no-continuous` alternates instead, as the Windows
@@ -298,6 +299,24 @@ On the Mac's GPU at 256×8, with 6 processes of 21 games and
 `--compiled-forward`, it answered 8.7% more network evaluations per wall-clock
 second than alternating training iterations at the same layout
 ([record](../../docs/archive/records/never_stops_gpu_2026_11_18.md)).
+
+While it plays, self-play that never stops writes the inference server's totals
+to `serving.jsonl` in the run directory once a minute: inference requests,
+network evaluations, inference batches, the states they held, the time spent
+answering and waiting, finished games and network updates. The difference
+between two lines is the rate over that minute, which the network updates'
+reports in `manifest.json` give only when one ends:
+
+```sh
+tail -f studies/campaign/runs/YOUR_RUN/serving.jsonl
+```
+
+`--simulations-per-request N` lets a search walk N simulations before it asks
+the inference server about the states they stopped at, all in one inference
+request, each waiting simulation's path counted meanwhile as visits that lost
+([section 4.7 of the design document](../../docs/design/README.md#47-more-detail-on-the-search)).
+The default, 1, asks after each simulation. Whether training uses 8 is
+[Q-022](../../docs/questions.md#q-022-several-simulations-in-one-inference-request).
 
 One network serves all three alliances by default (`--networks one`). The
 input tells it which alliance is choosing; its policy learns from every

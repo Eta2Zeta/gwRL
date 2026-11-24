@@ -122,7 +122,8 @@ def play_search(task: tuple[str, int, int, str]) -> dict:
     from studies.campaign.learning import LearningConfig, play_episode
     from studies.campaign.neural import NeuralEvaluator
     instructions = _instruction_reader(root)
-    evaluator = NeuralEvaluator(load_models(Path(weights)), "compare")
+    models, _ = load_models(Path(weights), torch.device("cpu"))
+    evaluator = NeuralEvaluator(models, "compare")
     config = LearningConfig(simulations=64, max_depth=16, seed=20261104, sample_fraction=0.05)
     env = make_env(seed, calendar_rounds=rounds)
     counted, started = instructions() if instructions else 0, time.process_time()

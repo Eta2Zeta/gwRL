@@ -8,10 +8,10 @@ coordinator, the trainer's main process answering every game thread's requests
 
   waiting     waiting for a request on the game threads' pipes
   receiving   reading the requests' headers from the pipes
-  reading     mapping each request's arrays in its shared buffer (read_arrays)
+  reading     reading each request's message and mapping its arrays in its shared buffer (read_positions)
   packing     laying the positions out for a pass (pack_zone_arrays)
   forward     the network pass (neural._forward)
-  collecting  priors and values from a pass's outputs (collect)
+  collecting  priors and values from a pass's outputs on the host (host_priors)
   replying    sending priors and values back
   other       the rest of answering: grouping requests by model, averaging the
               three models' values at chance positions, statistics
@@ -98,8 +98,8 @@ def _install(save_every: int) -> None:
     import numpy as np
     from studies.campaign import features, neural, shared_evaluator
 
-    shared_evaluator.read_arrays = _timed(shared_evaluator.read_arrays, "reading")
-    shared_evaluator.collect = _timed(shared_evaluator.collect, "collecting")
+    shared_evaluator.read_positions = _timed(shared_evaluator.read_positions, "reading")
+    shared_evaluator.host_priors = _timed(shared_evaluator.host_priors, "collecting")
     features.pack_zone_arrays = _timed(features.pack_zone_arrays, "packing")
     forward = neural._forward
 
@@ -119,39 +119,38 @@ def _install(save_every: int) -> None:
 
     neural._forward = timed_forward
     server = shared_evaluator.SharedEvaluatorServer
-    answer, serve = server.answer, server.serve
+    submit, serve = server.submit, server.serve
 
-    def saving_answer(self, requests):
+    def saving_submit(self, requests, **kwargs):
         _accounts.rounds_seen += 1
         if save_every and _accounts.rounds_seen % save_every == 0:
-            _accounts.saved.append([
-                (actor, count, {name: np.array(values) for name, values in
-                                shared_evaluator.read_arrays.__wrapped__(self.memories[connection].buf,
-                                                                         header).items()})
-                for connection, (actor, count, layout, header) in requests])
-        return answer(self, requests)
+            _accounts.saved.append([(actor, count, {name: np.array(values) for name, values in arrays.items()})
+                                    for _, (positions, _, _) in requests for actor, count, arrays in positions])
+        return submit(self, requests, **kwargs)
 
-    def profiled_serve(self, keep_running):
+    def profiled_serve(self, keep_running, **options):
         usage, started = _usage(), time.perf_counter()
         thread_started = time.thread_time()
         _accounts.serving = True
         try:
-            return serve(self, keep_running)
+            return serve(self, keep_running, **options)
         finally:
             _accounts.serving = False
             after = _usage()
             _write(self.stats, time.perf_counter() - started, time.thread_time() - thread_started,
                    (after.ru_utime - usage.ru_utime) + (after.ru_stime - usage.ru_stime))
 
-    server.answer = saving_answer if save_every else answer
+    server.submit = saving_submit if save_every else submit
     server.serve = profiled_serve
 
 
 def _write(stats, wall: float, thread_cpu: float, process_cpu: float) -> None:
     output = Path(os.environ[OUTPUT_VARIABLE])
     seconds = dict(_accounts.seconds)
-    seconds.update(waiting=stats.idle_seconds, receiving=stats.receive_seconds, replying=stats.reply_seconds)
-    inside = sum(seconds.get(step, 0.0) for step in ("reading", "packing", "forward", "collecting"))
+    # Reading a request happens while receiving it (serve), the rest inside answering.
+    seconds.update(waiting=stats.idle_seconds, receiving=stats.receive_seconds - seconds.get("reading", 0.0),
+                   replying=stats.reply_seconds)
+    inside = sum(seconds.get(step, 0.0) for step in ("packing", "forward", "collecting"))
     seconds["other"] = stats.forward_seconds - inside
     value = {"serve_wall_seconds": wall, "serve_thread_cpu_seconds": thread_cpu,
              "process_cpu_seconds_while_serving": process_cpu,

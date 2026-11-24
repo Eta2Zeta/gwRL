@@ -350,6 +350,21 @@ class CampaignLearningTests(unittest.TestCase):
         for player in PLAYERS:
             self.assertFalse(torch.equal(before[player]["values"], learner.models[player].values))
 
+    def test_an_update_asks_for_a_cache_release_every_twenty_training_steps(self):
+        from studies.campaign.learning import RELEASE_EVERY_TRAINING_STEPS
+        learner = self.learner(config=replace(self.config, epochs=2 * RELEASE_EVERY_TRAINING_STEPS + 3))
+        env = LearningToyEnv()
+        learner.replay = [{"input": env.zone_input(env.legal_actions()), "owner": "axis", "policy": [1.0, 0.0],
+                           "values": [20.0, 30.0, -50.0], "rollout_version": "exact-fixture",
+                           "target_source": "terminal", "target_schema": "campaign-raw-vector-target-v1"}]
+        asked = []
+        learner.release_between_steps = lambda: asked.append(len(asked))
+        learner.update()
+        self.assertEqual(asked, [0, 1])
+        learner.release_between_steps = None
+        learner.update()  # Nothing asked without a hook.
+        self.assertEqual(asked, [0, 1])
+
     def test_policy_loss_routes_only_to_actual_owner_and_scale_is_applied_once(self):
         learner = self.learner(config=replace(self.config, epochs=1, networks="three"))
         env = LearningToyEnv()

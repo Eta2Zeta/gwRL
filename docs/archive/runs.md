@@ -17,7 +17,9 @@ its own date.
 - **What the program writes.** A run folder made by `studies.campaign.run` holds
   `manifest.json` (the settings, counters and status), `progress.jsonl` (a line
   for each search wave and network update), `models/` (the model exports),
-  `checkpoint.pt` (what a resume needs), and, in runs that keep them,
+  `checkpoint.pt` (what a resume needs), in self-play that never stops since
+  24 November 2026 `serving.jsonl` (the inference server's totals once a
+  minute), and, in runs that keep them,
   `game-moves/` (each game's move log), `crash-reports/` and `failed-positions/`
   ([training runs and resume](../../studies/campaign/README.md#training-runs-and-resume)).
 - **What a script keeps beside its run.** A run started by a script keeps, next to
@@ -98,6 +100,7 @@ which the records of their date still name.
 | `engine-profile-2026-11-19` | 19 Nov | A profiled training iteration: where the game processes' time goes on the GPU. | [Game processes on the GPU](records/game_processes_gpu_2026_11_19.md) |
 | `search-cpp-2026-11-19` | 19 Nov | Two matched pairs before and after the search in C++. | [The search in C++](records/search_in_cpp_2026_11_19.md) |
 | `concurrent-cpp-2026-11-19` | 19 Nov | 189, 252 and 378 concurrent games with the search in C++. | [Concurrent games with the C++ search](records/concurrent_games_cpp_search_2026_11_19.md) |
+| `speed-256x16-2026-11-24` | 24 Nov | Self-play speed at the sizes taken from AlphaZero and KataGo: a fresh 256×16 network on the GPU, 800 simulations with exploration noise on a quarter of the decisions and 150 on the rest, no depth limit, 25 minutes a part, each part from its own copy of the code: `1-current-code` (48 concurrent games, one simulation a request), `2-eight-per-request-overlapped` (8 simulations a request and overlapped inference batches; stopped after 22 minutes by the supervisor when the Mac's swap had grown by 4 GB), `3-engine-cuts-24-games` (the engine's lighter bookkeeping, 6 game processes of 4 games, and a network update of 300 training steps; stopped after 8 minutes on the Mac's swap), `4-thirty-games` (the same code with 6 game processes of 5 games and network updates of 50 training steps, 20 minutes) and `5-update-releases` (the layout and network update of the third part, with the GPU's caches released every 20 training steps, 15 minutes). `run_part.sh` starts a part and `start_part3.sh` to `start_part5.sh` the later ones; `rates.py`, `summary.py`, `updates.py`, `memory.py` and `evidence.py` read them, `footprints.py` sampled the fourth and fifth parts' physical footprints, and `make_record_json.py` writes the record's evidence file; `benchmarks/` holds the GPU, search and memory benchmarks, the game processes' stack samples and the scripts that classify them. | [Self-play speed at 256×16](records/self_play_speed_256x16_2026_11_24.md) |
 
 `retired-branch-bundle-2026-10-31` is no run: it keeps, as a git bundle, the
 GPU self-play branch retired on 31 October 2026.

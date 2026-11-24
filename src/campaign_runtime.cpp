@@ -6,6 +6,7 @@
 #include "game/position_facts.hpp"
 
 #include <algorithm>
+#include <functional>
 #include <charconv>
 #include <cmath>
 #include <limits>
@@ -173,8 +174,31 @@ bool MenuCheckedAction::marks(const Action& action) { return menuCheckedAction =
 
 struct Engine::ActionMenu {
     std::vector<Action> actions;
-    std::map<Id, std::shared_ptr<const std::string>> canonicalById;
 };
+
+namespace {
+
+// Every action of a menu has an identity of its own.
+void requireDistinctIds(const std::vector<Action>& actions, const char* message) {
+    std::vector<const Id*> ids;
+    ids.reserve(actions.size());
+    for (const auto& action : actions) ids.push_back(&action.id);
+    std::sort(ids.begin(), ids.end(), [](const Id* a, const Id* b) { return *a < *b; });
+    for (std::size_t i = 1; i < ids.size(); ++i) require(*ids[i - 1] != *ids[i], message);
+}
+
+// Whether a menu allows `action`: it is one of the menu's own actions, as the
+// search plays them, or it equals the menu's action of its identity in every
+// public feature, as an action from a policy, a replay or Python must.
+bool allowedBy(const std::vector<Action>& menu, const Action& action) {
+    const std::less<const Action*> before;
+    if (!menu.empty() && !before(&action, menu.data()) && before(&action, menu.data() + menu.size())) return true;
+    for (const auto& listed : menu)
+        if (listed.id == action.id) return canonicalJson(actionJson(listed)) == canonicalJson(actionJson(action));
+    return false;
+}
+
+}  // namespace
 
 struct Engine::DecisionCache {
     std::mutex mutex;
@@ -380,11 +404,9 @@ std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
         actions.erase(std::remove_if(actions.begin(), actions.end(), [](const Action& action) {
             return action.kind != "land_begin_battle" && action.kind != "land_progress_battle";
         }), actions.end());
-    std::set<Id> ids;
     for (auto& action : actions) {
         require(!action.id.empty() && !action.kind.empty() && !reserved(action), "Rules action uses an empty or reserved identity");
         require(action.parameters.isObject(), "Action parameters must be an object");
-        require(ids.insert(action.id).second, "Rules actions have duplicate IDs");
         require(action.player == *player, "Rules action routes to wrong player");
         if (decisionPending) {
             const auto& decision = state_.decisions.back();
@@ -401,16 +423,11 @@ std::shared_ptr<const Engine::ActionMenu> Engine::actionMenu() const {
                      controlledBy(state_,*acting,state_.currentNation()) || directAxis) && !action.decision,
                     "Rules action does not match active nation");
         }
-        action.neuralSourceKey=std::make_shared<const std::string>(canonicalJson(actionJson(action)));
-        menu->canonicalById.emplace(action.id,action.neuralSourceKey);
     }
+    requireDistinctIds(actions, "Rules actions have duplicate IDs");
     if (!decisionPending && phaseWorkClear(state_) &&
-        (rules_->phaseComplete(state_) || (actions.empty() && strandedAircraftMayEndPhase(state_, *rules_)))) {
-        actions.push_back(endPhaseAction(state_, *player));
-        auto& action = actions.back();
-        action.neuralSourceKey=std::make_shared<const std::string>(canonicalJson(actionJson(action)));
-        menu->canonicalById.emplace(action.id,action.neuralSourceKey);
-    }
+        (rules_->phaseComplete(state_) || (actions.empty() && strandedAircraftMayEndPhase(state_, *rules_))))
+        actions.push_back(endPhaseAction(state_, *player));  // Its reserved identity no rules action has.
     menuTable_->insert(key, menu);
     return finish();
 }
@@ -445,10 +462,8 @@ template <class Change> void Engine::transition(Change&& change) {
 }
 
 void Engine::step(const Action& action) {
-    const auto proposed = canonicalJson(actionJson(action));
     const auto menu = actionMenu();
-    const auto found = menu->canonicalById.find(action.id);
-    require(found != menu->canonicalById.end() && *found->second == proposed, "Illegal campaign action");
+    require(allowedBy(menu->actions, action), "Illegal campaign action");
     // Changing state_ in place can destroy the decision option passed here.
     transition([chosen = action](Engine& next) {
         const RecordedHistory recorded(next.state_);
@@ -489,17 +504,14 @@ std::shared_ptr<const Engine::ActionMenu> Engine::interruptMenu() const {
     auto& actions=menu->actions;
     const PositionScope scope(state_);
     actions=rules_->interrupts(state_);
-    std::set<Id> ids;
     for(auto& action:actions) {
-        require(!reserved(action)&&!action.id.empty()&&ids.insert(action.id).second,
-                "Invalid political interrupt identity");
+        require(!reserved(action)&&!action.id.empty(),"Invalid political interrupt identity");
         const auto acting=findNation(state_,action.nation);
         require(state_.nations.contains(acting)&&state_.nations.at(*acting).player==action.player,
                 "Interrupt entitlement mismatch");
         require(!action.decision&&action.parameters.isObject(),"Invalid interrupt payload");
-        action.neuralSourceKey=std::make_shared<const std::string>(canonicalJson(actionJson(action)));
-        menu->canonicalById.emplace(action.id,action.neuralSourceKey);
     }
+    requireDistinctIds(actions, "Invalid political interrupt identity");
     return finish();
 }
 
@@ -513,10 +525,8 @@ std::shared_ptr<const std::vector<Action>> Engine::legalInterruptMenu() const {
 }
 
 void Engine::interrupt(const Action& action) {
-    const auto proposed=canonicalJson(actionJson(action));
     const auto menu=interruptMenu();
-    const auto found=menu->canonicalById.find(action.id);
-    require(found!=menu->canonicalById.end()&&*found->second==proposed, "Illegal campaign interrupt");
+    require(allowedBy(menu->actions, action), "Illegal campaign interrupt");
     transition([chosen=action](Engine& next) {
         const RecordedHistory recorded(next.state_);
         const auto before=next.state_.clock;
@@ -639,7 +649,12 @@ Engine Engine::clone() const {
 }
 
 Engine Engine::cloneForSearch(std::uint64_t seed) const {
-    Engine result = clone();
+    requireIntact();
+    // A search copy leaves the game's past events behind but its last (EventLog::LeftBehind).
+    Engine result = [this] {
+        const EventLog::LeftBehind leave;
+        return *this;
+    }();
     result.disposable_ = true;
     result.random_.search = RandomStreams::seeded(seed).search;
     result.random_.active = "search";

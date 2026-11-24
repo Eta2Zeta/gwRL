@@ -63,7 +63,7 @@ class DeviceRunTests(unittest.TestCase):
     def test_actual_gpu_adam_and_unfinished_rollout_survive_cpu_storage_roundtrip(self):
         config = CampaignModelConfig(hidden_dim=8, message_layers=1)
         learning = LearningConfig(simulations=2, max_depth=3, batch_size=4, epochs=1,
-                                  replay_capacity=16, root_noise=False, seed=37)
+                                  replay_capacity=16, root_noise=False, seed=37, networks="three")
         def learner():
             torch.manual_seed(31)
             models = {p: CampaignPolicyValueNet(config, device="mps") for p in PLAYERS}

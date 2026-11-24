@@ -33,16 +33,16 @@ Other open things stay in the pages that own them, and
 | Number | Question | About | Recommended |
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
-| [Q-021](#q-021-where-to-run-training-at-alphazeros-and-katagos-scale) | Training sized from AlphaZero and KataGo needs about 217,000 network evaluations a game and KataGo's yardstick about 145,000 games: run it on the Mac now, on new hardware, or on rented machines? | Training | Start on the Mac now, at 256×16 with KataGo's search, while the owner chooses hardware for the 384×20 network |
+| [Q-022](#q-022-several-simulations-in-one-inference-request) | Should self-play's search walk 8 simulations before it asks the inference server about their states, all in one inference request, as AlphaGo Zero did? | Search | Yes, 8 a request: about two and a half times the network evaluations a second at 256×16 on the Mac |
+| [Q-023](#q-023-counting-the-kept-tree-toward-a-searchs-simulations) | Should a fast search stop once its root holds 150 visits, counting those its kept tree brought, instead of always adding 150 new simulations? | Search | Yes, for the fast searches only: about 18% fewer network evaluations, the training samples' searches unchanged |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
 
-Q-021 was raised on 24 November 2026, when the owner asked for training at
-AlphaZero's and KataGo's scale. Its numbers are in the [record of the game's
-size](archive/records/game_size_2026_11_24.md) and in [section 9.3 of the design
-document](design/README.md#93-what-a-larger-network-and-a-longer-search-cost).
+Q-022 and Q-023 were raised on 24 November 2026, by the speed work before
+training at AlphaZero's and KataGo's scale. Their numbers are in the
+[record of self-play speed at 256×16](archive/records/self_play_speed_256x16_2026_11_24.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -114,52 +114,120 @@ Stopping only a run that stays over keeps a brief peak from costing a training i
 the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
 and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
 
-## Q-021: Where to run training at AlphaZero's and KataGo's scale
+## Q-022: Several simulations in one inference request
 
-**The question.** Training sized from AlphaZero's and KataGo's needs far more
-computing than the runs so far. Should it start on the Mac now, wait for new
-hardware, or run on rented machines?
+**The question.** Should self-play's search walk 8 simulations before it asks
+the inference server about the states they stopped at, and ask about all 8 in
+one inference request, as AlphaGo Zero did, instead of asking after each
+simulation?
 
-**What the program does now.** Nothing trains. The Mac gives training 9 of its
-10 performance cores, its GPU and up to 30 GB of its 36 GB of memory, of which
-the owner's other programs often take 11 to 17 GB. The code has also run on a
-Windows PC with an NVIDIA GPU (`studies/campaign/profiles/windows.json`, three-round
-games on 14 November), never on a Linux machine.
+**What the program does now.** A search asks after each simulation and waits
+for the answer before it walks the next (`--simulations-per-request 1`, the
+default). Since 24 November `--simulations-per-request N` walks up to N
+simulations first; while they wait, each one's path counts as visits that lost
+(a *virtual loss*), so that they spread over the tree, and a walk that would ask
+about a state already asked about is dropped and replaced
+([design document, section 4.7](design/README.md#47-more-detail-on-the-search)).
+AlphaGo Zero's search ran its simulations on parallel threads with a virtual
+loss and evaluated their states in mini-batches of 8 ([Silver et al.
+2017](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf),
+Methods, "Search Algorithm").
 
-**A real case.** The [design
-document](design/README.md#how-big-should-the-network-and-the-search-be) carries
-AlphaZero's and KataGo's sizes over to this game, measured on 97 self-play games
-([record](archive/records/game_size_2026_11_24.md)): a 256×16 network to start from and 384×20 for AlphaZero's
-compute; 800 simulations with exploration noise on a quarter of the decisions,
-which become training samples, and 150 on the rest, as KataGo searched; a
-simulation reaching to the end of the Combat Phase. A game then asks for about
-217,000 network evaluations, 17 times the last run's, and keeps about 173
-training samples, 25 times as many. By KataGo's yardstick, strong amateur play
-came after about 145,000 games of this length. At about 1.3 ms of a CPU core for
-each network evaluation, those games need about 11,000 CPU-core hours, plus the
-network's arithmetic (inferred).
+**A real case.** In self-play at 256×16 with 800 simulations on a quarter of the
+decisions and 150 on the rest, 48 concurrent games, measured for 25 minutes
+each ([record](archive/records/self_play_speed_256x16_2026_11_24.md)): with one
+simulation a request the inference server answered 2,761 network evaluations a
+second, in inference batches of 24 states, busy 95% of the time, while the game
+processes kept about 4.5 CPU cores busy; with 8 a request, and inference batches
+overlapped on the GPU, it answered about 6,100 a second, in inference batches of
+about 125 states, busy about 73%, and the CPU cores, at a median of 9.4 busy,
+set the pace instead. With 30 concurrent games instead of 48, and lighter
+bookkeeping in the engine, 8 a request answered about 7,600 network evaluations
+a second between network updates and 7,300 with them, in inference batches of
+about 71 states, the inference server busy 94% of the time and the CPU cores a
+median of 8.4, while the run's processes held about 7 GB by their physical
+footprints. On 70 positions of scripted games searched with a
+stand-in network, the most visited action after 800 simulations with
+exploration noise, as at a kept decision, was the same with 8 a request as with
+1 at 56 of them, and two searches of 1 a request with different seeds agreed at
+52; the visit shares differed by a total variation distance of 0.05 on average
+with 8 a request, and 0.17 with another seed. After 150 simulations without
+noise, as at the other decisions, 8 a request kept the most visited action at
+63 of the 70 and another seed at 66, with distances of 0.05 and 0.02.
 
-**Why it matters.** On the Mac the first 145,000 games take about 81 days at
-256×8, 138 at 384×12 and 221 at 512×16, the network on its GPU (section 9.3's
-rates, upper bounds); KataGo's superhuman play came after about six times as
-many games. The owner wants steady gains from continuous training, which needs
-both the search and the games.
+**Why it matters.** A game at these sizes asks for about 217,000 network
+evaluations once the network plays full games
+([design document](design/README.md#how-big-should-the-network-and-the-search-be)):
+about 1,100 games a day at 2,761 a second, and about 2,900 at 7,300. KataGo's
+yardstick of about 145,000 games takes about 132 days at the first rate and
+about 50 at the second (inferred). The simulations of one request choose
+their paths without each other's results, so a search of 800 simulations
+explores a little differently from one simulation at a time, as AlphaGo Zero's
+did.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. The Mac, now | A training run on the current code from a fresh 256×16 network, with KataGo's search, about 1,300 to 1,800 games a day (inferred). Its learning curve, measured on the 24 held-out seeds for all three alliances, shows within days whether the gains continue at this search; 145,000 games take three to four months, and 384×20 would take about twice as long. No cost. |
-| B. New hardware | A computer with many more CPU cores and a large NVIDIA GPU: 32 cores for the games and a GPU evaluating 23,000 states a second would play 145,000 games in about 16 days (inferred). The PC priced in November, with a 16-core Ryzen 9 9950X3D, would be limited by its cores at about 12,000 network evaluations a second, about 30 days. The code would move to Windows or Linux with CUDA, where only three-round games have run, and the supervisor's memory checks, which read macOS's, would need their counterparts. |
-| C. Rented machines | A machine with 64 or more CPU cores and one or two datacenter GPUs, about a week for 145,000 games (inferred), by the hour; prices not looked up. The same port as B. |
+| A. One simulation a request | The search as in every run so far, simulation by simulation; the inference server limits self-play at about 2,800 network evaluations a second at 256×16. |
+| B. 8 a request | AlphaGo Zero's size. About two and a half times the network evaluations a second with 30 concurrent games; the GPU and the CPU cores then limit together. |
+| C. 16 a request | The same inference batches from half as many concurrent games, so about half the search trees' memory, which does not limit at 8 with 30 games, and no faster; a 150-simulation search then chooses its paths in groups of 16, a tenth of it at a time. |
 
-**Recommendation: A now, then B or C for 384×20.** A costs nothing and starts the
-learning curve at once, at the search the owner asked for; its first days say
-whether gains continue at this scale before money is spent. The 384×20 network
-and KataGo's game counts need B or C.
+**Recommendation: B.** It gives about two and a half times the network
+evaluations a second, from 30 concurrent games where one a request needed 48 for
+less, and it is the search AlphaGo Zero learned with.
 
-**If answered.** The run's settings belong in sections 7 and 9 of the design
-document and its parts in the [list of runs](archive/runs.md).
+**If answered.** The run's command takes `--simulations-per-request` with the
+chosen number, and section 4.7 of the design document says that self-play
+searches that way.
+
+## Q-023: Counting the kept tree toward a search's simulations
+
+**The question.** Should a search stop once its root holds its budget of
+visits, 150 at a decision not kept as a training sample, counting the visits its
+tree kept from the decisions before, as KataGo's caps count the nodes of its
+tree, instead of always adding its 150 new simulations?
+
+**What the program does now.** A game keeps its search tree from decision to
+decision, the part below the state it has reached
+([design document, section 4.7](design/README.md#47-more-detail-on-the-search)),
+and every search then adds its full budget of new simulations, 800 at a kept
+decision and 150 at any other, on top of the visits the kept tree already holds
+at its root (`SearchSettings::simulations` in `include/game/search.hpp`).
+KataGo's search stops "when the tree reaches a cap of N nodes" (section 3.1 of
+[its paper](https://arxiv.org/abs/1902.10565)), which counts a kept tree's
+nodes; the paper does not say whether its self-play kept trees.
+
+**A real case.** In two games played with the run's search settings, 8
+simulations a request and a stand-in network
+([record](archive/records/self_play_speed_256x16_2026_11_24.md)), a fast
+search's root already held 127 visits from its kept tree on average, a median
+of 56, and 27% of the fast searches held 150 or more; a full search's root held
+114 on average. Counting those visits toward the cap would have run 26.4% fewer
+simulations in the 407 searches, and counting them in the fast searches alone
+17.7% fewer.
+
+**Why it matters.** A network evaluation is the unit of the run's cost: about
+18% fewer at the same speed is about 18% more games a day (inferred), the fast
+searches still ending with at least 150 visits at their roots. The searches of
+the kept decisions, whose visit shares become the training targets, would
+stay as they are. A trained network's sharper priors may keep more of a tree
+from one decision to the next than the stand-in network did, which this did not
+measure.
+
+**The choices.**
+
+| Choice | What it changes |
+| --- | --- |
+| A. Add the simulations on top, as now | Every search runs its full budget of new simulations. |
+| B. Count the kept visits toward every search's budget | About 26% fewer network evaluations; a kept decision's search, its training target, then rests in part on visits made before its exploration noise was drawn. |
+| C. Count them toward the fast searches' budget only | About 18% fewer network evaluations; the kept decisions' searches unchanged. |
+
+**Recommendation: C.** It takes most of the saving without touching the
+searches the network learns from.
+
+**If answered.** The search takes a setting for which searches count their kept
+visits, and section 4.7 of the design document says how the budget counts.
 
 ## Open elsewhere
 
@@ -309,6 +377,11 @@ the page that now states it.
   themselves: a median of 694 decisions, 28% of the actions ending a phase, and 201 moves of a land unit a game against 54 at first, though still about 10 land
   battles a game ([record](archive/records/fresh_network_games_2026_11_22.md)).
   So the run goes on from the fresh network, as the owner chose.
+- **Q-021**, where to run training at AlphaZero's and KataGo's scale. Answered
+  on 24 November 2026: on the Mac (choice A), after "a few more rounds of
+  optimization of the runs so that things are going as fast as it gets with
+  limited compute we have here". Stated in the design document's
+  [open question on sizes](design/README.md#how-big-should-the-network-and-the-search-be).
 - **Q-020**, what to change in training first. Answered on 24 November 2026:
   none of the proposed checks. The owner holds that "coordinated attacks
   against china with no consequence is obvious going to get japan more reward",
@@ -317,7 +390,7 @@ the page that now states it.
   comparison of this game with theirs, and judged by steady gains over
   continuous training rather than by speed. Stated in the design document's
   [open questions](design/README.md#how-big-should-the-network-and-the-search-be);
-  where to run it is [Q-021](#q-021-where-to-run-training-at-alphazeros-and-katagos-scale).
+  where to run it is Q-021, above.
 - **Q-018**, how to go on looking for the game process crash. Answered on 24
   November 2026: stop looking, and train at full speed, crashes and all
   (choice C). The memory-checked part of the training run under the
