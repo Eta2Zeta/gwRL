@@ -2183,7 +2183,8 @@ cores busy, because its game threads can compute at once (below). So layouts are
 chosen by the load they put on the Mac, which the supervisor measures while a
 run plays: the median of the cores used in the last ten one-minute windows, in
 its status file, with a warning, never a stop, when it passes the allowance
-([long unattended runs](../../studies/campaign/README.md#long-unattended-runs)). On 15 November, under the allowance of 9
+([long unattended runs](../../studies/campaign/README.md#long-unattended-runs)).
+On 15 November, under the allowance of 9
 cores then, 6 processes kept about 9 cores busy, and 7, which also fit the count
 then, about 10 ([record](../archive/records/nine_core_layouts_2026_11_15.md));
 after the engine work of 16 November the 6 kept only about 7 busy, because the
