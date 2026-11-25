@@ -3135,9 +3135,14 @@ under the allowance of 9 cores then, the Mac's GPU and the CPU cores limited
 self-play together, at about 7,600 network evaluations a second. Under the
 allowance of 8 cores, 30 concurrent games in 6 game processes kept a median of
 8.3 cores busy in the first 24 minutes of the training run of 25 November, too
-many, and 25 in 5 processes, which the run plays since, a median of 7.8 in its
-first 14 minutes, at about 6,800 network evaluations a second between network
-updates ([list of runs](../archive/runs.md), `training-256x16-2026-11-25`).
+many, and 25 in 5 processes a median of 7.8 in their first 14 minutes, at about
+6,800 network evaluations a second between network updates. As its games grew
+longer and heavier the load of those 25 rose to 9 cores by the afternoon, and at
+17:34 the run went on with 20 games in 5 processes, at about 6,900 network
+evaluations a second and a median of 7.7 cores in its first minutes
+([list of runs](../archive/runs.md), `training-256x16-2026-11-25`). With the
+inference server busy, fewer concurrent games lower the rate only a little, so
+they lower the load less than in proportion (inferred).
 
 A cheaper inference server pays until the CPU cores limit. At 256×8 the compiled
 layers made it about a tenth cheaper in the inference batches of steady play
@@ -4240,8 +4245,10 @@ beside its other programs (below); and with 30 concurrent games and the
 engine's lighter bookkeeping, about 7,300 with the network updates, about 2,900
 games a day and about 50 days, the GPU and the 9 CPU cores of the allowance then
 both near their limits (section 9.3). Under the allowance of 8 cores the
-training run plays 25 concurrent games, at about 6,800 network evaluations a
-second between network updates and about 6,500 with them (section 9.3). Since 25
+training run played 25 concurrent games, at about 6,800 network evaluations a
+second between network updates and about 6,500 with them, and plays 20 since
+the evening of 25 November, at about 6,900 in its first minutes (section 9.3).
+Since 25
 November the fast searches count the visits a reused tree brings toward their
 150 simulations ([Q-023](../questions.md#answered)): along two games with a
 stand-in network the searches then asked for about 14% fewer network evaluations
@@ -4290,9 +4297,13 @@ on 25 November 2026 with 6 game processes of 5 games, which kept a median of 8.3
 CPU cores busy, over the owner's allowance of 8, so after 24 minutes it started
 again from a fresh network with 5 processes of 5 games and a network update of
 50 training steps of 256 training samples after every 25 finished games, from a
-replay buffer of 100,000
-([list of runs](../archive/runs.md), `training-256x16-2026-11-25`). Its
-held-out evaluations are not set up yet.
+replay buffer of 100,000. At 17:34, its load having reached 9 cores and its
+memory the supervisor's stop line at network updates, it went on from its 19th
+network update's network with 5 processes of 4 games and a network update of 40
+training steps after every 20 finished games
+([list of runs](../archive/runs.md), `training-256x16-2026-11-25`;
+[record of its 19th network update](../archive/records/training_256x16_update_19_2026_11_25.md)).
+Its held-out evaluations are not set up yet.
 
 #### How should a count count?
 
