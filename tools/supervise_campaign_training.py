@@ -17,11 +17,12 @@ state.json gives the cause, the pressure and the swap.
 
 It also measures the CPU cores the run uses, from its processes' CPU times, in
 windows of LOAD_WINDOW_SECONDS, and keeps the last window and the median of the
-last LOAD_MEDIAN_WINDOWS in state.json's "load". When that median passes the
-core allowance it warns, in an event and a line on its standard output, and
-again when the median comes back within it; it never stops a run for its load
-(the owner's answer to Q-005, 25 November 2026): a stopped run would start again
-with the same layout, and a layout is changed by hand.
+last LOAD_MEDIAN_WINDOWS in state.json's "load". When that median reaches the
+core allowance plus LOAD_LIMIT_ABOVE_ALLOWANCE, 9 cores on the Mac, it warns, in
+an event and a line on its standard output, and again when the median comes back
+below; it never stops a run for its load (the owner's answer to Q-005, 25
+November 2026): a stopped run would start again with the same layout, and a
+layout is changed by hand.
 
 Example (run from the repository root)::
 
@@ -97,10 +98,13 @@ PRESSURE_LEVELS = {1: "normal", 2: "warning", 4: "critical"}
 CORE_ALLOWANCE = 8
 MEMORY_ALLOWANCE_BYTES = 20_000_000_000
 # The run's CPU load: cores used in each window of this many seconds, and the
-# median of the last LOAD_MEDIAN_WINDOWS windows, which is judged against the
-# core allowance once that many windows have been measured.
+# median of the last LOAD_MEDIAN_WINDOWS windows, which is judged once that many
+# windows have been measured. A little over the core allowance is fine, as long
+# as it stays below the allowance plus LOAD_LIMIT_ABOVE_ALLOWANCE: "a bit over 8
+# is fine, as along as it doesn't go to 9" (the owner, 25 November 2026).
 LOAD_WINDOW_SECONDS = 60.0
 LOAD_MEDIAN_WINDOWS = 10
+LOAD_LIMIT_ABOVE_ALLOWANCE = 1
 # Source/configuration errors normally exit 1 and must stop for inspection.
 if sys.platform == "win32":
     # Access violation, stack overflow, heap corruption and fail-fast exits.
@@ -392,10 +396,12 @@ def process_tree_cpu_seconds(child_pid: int) -> dict[int, float] | None:
 class LoadWatch:
     """The run's CPU cores in windows of LOAD_WINDOW_SECONDS, from its processes' CPU
     times: a process counts in a window when it was there at both its ends. Keeps the
-    last LOAD_MEDIAN_WINDOWS windows; judged once that many have been measured."""
+    last LOAD_MEDIAN_WINDOWS windows; judged once that many have been measured, against
+    the allowance plus LOAD_LIMIT_ABOVE_ALLOWANCE."""
 
     def __init__(self, allowance: int):
         self.allowance = allowance
+        self.limit = allowance + LOAD_LIMIT_ABOVE_ALLOWANCE
         self.windows: list[float] = []
         self.mark: tuple[float, dict[int, float]] | None = None
         self.over = False
@@ -414,7 +420,8 @@ class LoadWatch:
         median = statistics.median(self.windows)
         return {"window_seconds": LOAD_WINDOW_SECONDS, "cores_last_window": round(self.windows[-1], 2),
                 "median_cores": round(median, 2), "windows_in_median": len(self.windows),
-                "allowance_cores": self.allowance, "over_allowance": judged and median > self.allowance}
+                "allowance_cores": self.allowance, "limit_cores": self.limit,
+                "at_limit": judged and median >= self.limit}
 
 
 def process_group_alive(group: int | None) -> bool:
@@ -594,8 +601,9 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
             _event(state, "supervisor_initialized")
         state["load_scope"] = (
             f"CPU cores of the supervisor and its child process tree, from their CPU times, in windows of "
-            f"{LOAD_WINDOW_SECONDS:g} s; the median of the last {LOAD_MEDIAN_WINDOWS} windows is judged against "
-            f"the core allowance, {config.cpu_budget}, with a warning, never a stop")
+            f"{LOAD_WINDOW_SECONDS:g} s; a warning, never a stop, when the median of the last {LOAD_MEDIAN_WINDOWS} "
+            f"windows reaches {config.cpu_budget + LOAD_LIMIT_ABOVE_ALLOWANCE} cores, the core allowance of "
+            f"{config.cpu_budget} and the bit over it the owner accepts")
         state["machine_memory_scope"] = (
             "The whole machine's memory pressure and swap in use, on macOS only; a safe stop when the pressure stays "
             f"critical for {CRITICAL_PRESSURE_SECONDS:g} s or swap in use grows {SWAP_GROWTH_BYTES / 1e9:g} GB above "
@@ -702,13 +710,13 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                                                                       measured["median_cores"]
                                                                       if measured["windows_in_median"] >= LOAD_MEDIAN_WINDOWS
                                                                       else 0.0)
-                                    if measured["over_allowance"] != load.over:
-                                        load.over = measured["over_allowance"]
-                                        kind = "load_over_allowance" if load.over else "load_within_allowance"
+                                    if measured["at_limit"] != load.over:
+                                        load.over = measured["at_limit"]
+                                        kind = "load_at_limit" if load.over else "load_below_limit"
                                         _event(state, kind, median_cores=measured["median_cores"],
-                                               allowance_cores=config.cpu_budget, attempt=attempt)
+                                               limit_cores=load.limit, attempt=attempt)
                                         print(json.dumps({"event": kind, "median_cores": measured["median_cores"],
-                                                          "allowance_cores": config.cpu_budget,
+                                                          "limit_cores": load.limit,
                                                           "minutes": measured["windows_in_median"]}), flush=True)
                         # Keep monitoring while safe shutdown is pending: a
                         # checkpoint or unfinished wave can still allocate RAM.

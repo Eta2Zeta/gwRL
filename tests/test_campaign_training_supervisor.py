@@ -82,24 +82,28 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
                                        "(run / 'manifest.json').write_text(json.dumps({'status':'completed'}))\n",
                                        load_sampler=lambda pid: {pid: cores * (time.monotonic() - began)})
 
-    def test_a_load_over_the_allowance_is_reported_and_never_stops_the_run(self):
-        state = self.run_with_load(6.0)  # The configuration's allowance is 4 cores.
+    def test_a_load_at_the_limit_is_reported_and_never_stops_the_run(self):
+        state = self.run_with_load(6.0)  # The configuration's allowance is 4 cores, its limit 5.
         self.assertEqual(state["status"], "completed")
         self.assertEqual(len(state["attempts"]), 1)
-        over = [event for event in state["events"] if event["kind"] == "load_over_allowance"]
+        over = [event for event in state["events"] if event["kind"] == "load_at_limit"]
         self.assertEqual(len(over), 1)
-        self.assertEqual(over[0]["allowance_cores"], 4)
+        self.assertEqual(over[0]["limit_cores"], 5)
         self.assertAlmostEqual(over[0]["median_cores"], 6.0, delta=0.5)
-        self.assertTrue(state["load"]["over_allowance"])
+        self.assertTrue(state["load"]["at_limit"])
         self.assertEqual(state["load"]["windows_in_median"], 3)
-        self.assertGreater(state["attempts"][0]["peak_median_cores"], 4)
+        self.assertGreater(state["attempts"][0]["peak_median_cores"], 5)
 
-    def test_a_load_within_the_allowance_is_recorded_without_a_warning(self):
-        state = self.run_with_load(2.0)
-        self.assertEqual(state["status"], "completed")
-        self.assertFalse(any(event["kind"] == "load_over_allowance" for event in state["events"]))
-        self.assertFalse(state["load"]["over_allowance"])
-        self.assertAlmostEqual(state["load"]["median_cores"], 2.0, delta=0.5)
+    def test_a_load_a_little_over_the_allowance_is_recorded_without_a_warning(self):
+        for cores in (2.0, 4.5):
+            with self.subTest(cores=cores):
+                # Each case its own supervisor and run directory.
+                self.control, self.run = self.directory / f"control-{cores}", self.directory / f"training-{cores}"
+                state = self.run_with_load(cores)
+                self.assertEqual(state["status"], "completed")
+                self.assertFalse(any(event["kind"] == "load_at_limit" for event in state["events"]))
+                self.assertFalse(state["load"]["at_limit"])
+                self.assertAlmostEqual(state["load"]["median_cores"], cores, delta=0.5)
 
     def test_the_load_counts_a_process_only_in_windows_it_was_there_for(self):
         watch = LoadWatch(8)
@@ -107,7 +111,8 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
         # Process 2 ended and process 3 began: only process 1's 3 seconds count.
         load = watch.add(1.0, {1: 13.0, 3: 50.0})
         self.assertEqual(load["cores_last_window"], 3.0)
-        self.assertFalse(load["over_allowance"])  # Fewer windows than the median needs.
+        self.assertEqual((load["allowance_cores"], load["limit_cores"]), (8, 9))
+        self.assertFalse(load["at_limit"])  # Fewer windows than the median needs.
         self.assertEqual(_cpu_seconds("1-02:03:04.50"), 86400 + 7384.5)
         self.assertEqual(_cpu_seconds("3:04.25"), 184.25)
 

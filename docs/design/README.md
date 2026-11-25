@@ -2183,7 +2183,9 @@ itself, which leaves five game processes, but a game process keeps 1.2 to 1.5
 cores busy, because its game threads can compute at once (below). So layouts are
 chosen by the load they put on the Mac, which the supervisor measures while a
 run plays: the median of the cores used in the last ten one-minute windows, in
-its status file, with a warning, never a stop, when it passes the allowance
+its status file. A median a little over the 8 cores is fine, as long as it stays
+below 9, in the owner's words of 25 November 2026, and the supervisor warns,
+never stops, when it reaches 9
 ([long unattended runs](../../studies/campaign/README.md#long-unattended-runs)).
 On 15 November, under the allowance of 9
 cores then, 6 processes kept about 9 cores busy, and 7, which also fit the count
@@ -3826,9 +3828,9 @@ measured and what would settle it.
   ([record](../archive/records/search_in_cpp_2026_11_19.md)); with the Python
   search it went a little over the allowance of 9 cores then, a median of 9.5,
   which the owner accepted (19 November); since 21 November the allowance is 8
-  cores, the supervisor's count of cores allows 5 game processes, and the
-  supervisor warns when a run's median load passes the allowance
-  ([Q-005](../questions.md#answered)). The
+  cores, a little over it fine as long as it stays below 9, the supervisor's
+  count of cores allows 5 game processes, and the supervisor warns when a run's
+  median load reaches 9 ([Q-005](../questions.md#answered)). The
   inference server's levers are listed in section 9.3: fewer PyTorch calls came
   with one network, compiling and more concurrent games are settings, and the
   others are not built. In

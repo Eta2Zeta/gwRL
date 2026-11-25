@@ -236,9 +236,10 @@ the page that now states it.
 - **Q-005**, the supervisor's count of cores. Answered on 25 November 2026:
   choice D, measure and warn. While a run plays, the supervisor measures the CPU
   cores its processes use in each minute, keeps the median of the last ten
-  minutes in its status file and warns when that median passes the allowance,
-  8 cores since 21 November, without stopping the run; a layout that goes over
-  is changed by hand. Before a run starts it still counts a core for each game
+  minutes in its status file and warns when that median reaches 9 cores, the
+  allowance of 8 since 21 November and the bit over it the owner accepts ("a bit
+  over 8 is fine, as along as it doesn't go to 9", 25 November), without
+  stopping the run; a layout that goes over is changed by hand. Before a run starts it still counts a core for each game
   process, the inference server, the network updates and itself. Raised on 15
   November, when six game processes of four games, which counted 9 cores, kept
   about 9 busy and seven about 10

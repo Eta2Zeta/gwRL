@@ -200,12 +200,15 @@ from its checkpoint.
 Every minute the supervisor also measures the CPU cores the run uses, the
 supervisor's and all its child processes' CPU time over that minute
 (`process_tree_cpu_seconds` and `LoadWatch`), and keeps the last minute's cores
-and the median of the last ten minutes under `load` in `state.json`. When that
-median passes the core allowance it adds a `load_over_allowance` event and
-prints a line saying so, and a `load_within_allowance` event when the median
-comes back; it never stops a run for its load, since a run started again would
-play the same layout. A layout that goes over is changed by hand, as the owner
-chose on 25 November 2026 ([Q-005](../../docs/questions.md#answered)). Before a
+and the median of the last ten minutes under `load` in `state.json`. A median
+a little over the 8 cores of the allowance is fine, as long as it stays below
+9: "a bit over 8 is fine, as along as it doesn't go to 9", in the owner's words
+of 25 November 2026. When the median reaches 9 the supervisor adds a
+`load_at_limit` event and prints a line saying so, and a `load_below_limit`
+event when the median comes back below (`LOAD_LIMIT_ABOVE_ALLOWANCE`); it never
+stops a run for its load, since a run started again would play the same
+layout. A layout that goes over is changed by hand, as the owner chose on 25
+November 2026 ([Q-005](../../docs/questions.md#answered)). Before a
 run starts the supervisor still checks its layout by counting: one core for each
 game process, the inference server, the network updates of self-play that never
 stops and itself.
