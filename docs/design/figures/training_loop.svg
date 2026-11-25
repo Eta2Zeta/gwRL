@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="330" viewBox="0 0 960 330" role="img" aria-labelledby="title desc">
   <title id="title">The training loop</title>
-  <desc id="desc">The training loop of self-play that never stops. 1: self-play plays game after game with the newest network; at every decision the alliance to act searches, asking the network many times, and a random 5% of decisions are kept as training samples. When a game ends, its final scores are added to its training samples. 2: the training samples join a replay buffer of recent training samples; a training sample records what the network read, how many simulations began with each action and, once the game ends, the final scores. 3: after every 24 finished games, a network update's training steps train the network, one for all three alliances, beside self-play: its action probabilities shift toward the search's visit shares and its predicted final scores toward the real ones. 4: when the network update is done, every game takes up the new network at once.</desc>
+  <desc id="desc">The training loop of self-play that never stops. 1: self-play plays game after game with the newest network; at every decision the alliance to act searches, asking the network many times, and a random 5% of decisions are kept as training samples. When a game ends, its final scores are added to its training samples. 2: the training samples join a replay buffer of recent training samples; a training sample records what the network read, how many simulations began with each action and, once the game ends, the final scores. 3: after every 20 finished games, as many as are in play, a network update's training steps train the network, one for all three alliances, beside self-play: its action probabilities shift toward the search's visit shares and its predicted final scores toward the real ones. 4: when the network update is done, every game takes up the new network at once.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -57,7 +57,7 @@
   <text class="label" x="309" y="100" text-anchor="middle">game over:</text>
   <text class="label" x="309" y="115" text-anchor="middle">scores added</text>
   <line x1="600" y1="125" x2="691" y2="125" stroke="#57606a" stroke-width="2" marker-end="url(#arrow)"/>
-  <text class="label" x="645" y="100" text-anchor="middle">every 24 games:</text>
+  <text class="label" x="645" y="100" text-anchor="middle">every 20 games:</text>
   <text class="label" x="645" y="115" text-anchor="middle">a network update</text>
 
   <!-- Return arrow -->

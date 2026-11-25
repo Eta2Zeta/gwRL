@@ -403,7 +403,8 @@ built from `requirements-gpu-cuda.txt`, PyTorch 2.14 for CUDA 12.6. Build the ex
 `.gitattributes` keeps every text file's line endings LF, which the engine's
 data fingerprints need. That checkout syncs through OneDrive, so the environment
 and the run directories live outside it. Use the Mac's command with
-`--profile windows`: both machines play 24 games a training iteration.
+`--profile windows`: the Windows PC plays 24 games a training iteration, the Mac
+20.
 
 The supervisor holds the trainer and every process it starts in a Windows job
 object. A safe stop is a Ctrl+Break to the trainer's console process group,

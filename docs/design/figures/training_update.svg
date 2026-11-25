@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
   <title id="title">Where a training step's minibatch of 32 training samples comes from</title>
-  <desc id="desc">Where a training step's minibatch of 32 training samples comes from. 1: self-play plays 24 games at a time, in 6 game processes of 4 games each, and a game that ends is replaced at once; at each decision a random draw keeps it as a training sample with chance 5%, and when a game ends its final scores are added to its training samples; on 5 November 32 games kept 1,611 training samples from 33,062 decisions. 2: when a game ends, its training samples join the replay buffer in the main training process, the latest 8,000 training samples, about five network updates' worth of games, drawn as five bars from the oldest games, whose training samples leave first, to the newest; purple dots spread over all five bars mark one training step's minibatch of 32, drawn at random. 3: one training step, 525 per network update, each with a new minibatch: draw 32 different training samples at random from the whole replay buffer; the network reads all 32 at once; it compares its values with the final scores and its action probabilities with the visit shares, on all 32; its input names who chose each; the network takes one Adam step. 4: after the last training step every game takes up the new network at once. With a 64×2 network on the CPU, 24 games finish about every 5 minutes, and a network update's 525 training steps take about 14 seconds beside the games, which go on.</desc>
+  <desc id="desc">Where a training step's minibatch of 32 training samples comes from. 1: self-play plays 20 games at a time, in 5 game processes of 4 games each, and a game that ends is replaced at once; at each decision a random draw keeps it as a training sample with chance 5%, and when a game ends its final scores are added to its training samples; on 5 November 32 games kept 1,611 training samples from 33,062 decisions. 2: when a game ends, its training samples join the replay buffer in the main training process, the latest 8,000 training samples, about five network updates' worth of games, drawn as five bars from the oldest games, whose training samples leave first, to the newest; purple dots spread over all five bars mark one training step's minibatch of 32, drawn at random. 3: one training step, 525 per network update, each with a new minibatch: draw 32 different training samples at random from the whole replay buffer; the network reads all 32 at once; it compares its values with the final scores and its action probabilities with the visit shares, on all 32; its input names who chose each; the network takes one Adam step. 4: after the last training step every game takes up the new network at once. On 17 November, with a 64×2 network on the CPU and 24 games in play, 24 games finished about every 5 minutes, and a network update's 525 training steps took about 14 seconds beside the games, which went on.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
@@ -27,7 +27,7 @@
   <text class="step" x="48" y="54.5" text-anchor="middle">1</text>
   <text class="title" x="70" y="55">Self-play</text>
   <text class="sub" x="40" y="80">game after game, newest network</text>
-  <text class="body" x="40" y="108">24 games at a time, in 6 game</text>
+  <text class="body" x="40" y="108">20 games at a time, in 5 game</text>
   <text class="body" x="40" y="126">processes of 4; a game that ends</text>
   <text class="body" x="40" y="144">is replaced at once.</text>
   <text class="body" x="40" y="170">At each decision, a random</text>
@@ -115,5 +115,5 @@
   <circle cx="235" cy="356" r="12" fill="#57606a"/>
   <text class="step" x="235" y="360.5" text-anchor="middle">4</text>
   <text class="body bold" x="255" y="360.5">After the last training step: every game takes up the new network at once</text>
-  <text class="label" x="480" y="402" text-anchor="middle">With a 64×2 network on the CPU, 24 games finish about every 5 minutes, and a network update's 525 training steps take about 14 seconds beside the games, which go on.</text>
+  <text class="label" x="480" y="402" text-anchor="middle">On 17 November, 64×2 on the CPU with 24 games in play: 24 games finished about every 5 minutes; 525 training steps took about 14 s beside them.</text>
 </svg>
