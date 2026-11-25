@@ -111,7 +111,7 @@ Mean serving time of an inference batch, by its number of states:
 - **With the new code, 126 concurrent games keep more CPU cores busy than the
   allowance of 9.** The supervisor's count, one core for each game process, the
   inference server and itself, accepted both layouts
-  ([Q-005](../../questions.md#q-005-the-supervisors-count-of-cores)).
+  ([Q-005](../../questions.md#answered)).
 - **Not measured:** the decisions an hour of a layout that stays within the
   allowance, such as fewer game processes or fewer concurrent games; an
   unprofiled matched pair; padding the actions' arrays to fixed lengths, which

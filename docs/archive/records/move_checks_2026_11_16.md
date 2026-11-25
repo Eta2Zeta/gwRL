@@ -112,7 +112,7 @@ during them.
   processes and the coordinator kept 9.1 to 10.4 cores busy on average, more
   than the allowance. The layout's load grows into whatever cores are free; the
   open question on the supervisor's count of cores
-  ([Q-005](../../questions.md#q-005-the-supervisors-count-of-cores)) covers it.
+  ([Q-005](../../questions.md#answered)) covers it.
 - **Not shown:** whether the 7% fall in decisions per hour is real. Two pairs
   under differing loads cannot separate it from the Mac; the replay found no
   effect of the change on the coordinator.

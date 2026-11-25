@@ -30,104 +30,7 @@ Other open things stay in the pages that own them, and
 
 ## Open questions
 
-| Number | Question | About | Recommended |
-| --- | --- | --- | --- |
-| [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 8 cores by measuring the load, not by counting game processes? | Running training | Measure and warn, and change a layout that goes over by hand |
-
-Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
-`e62e01b`). Its numbers are in the
-[record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
-
-## Q-005: The supervisor's count of cores
-
-**The question.** Should the supervisor keep a training run within the owner's
-allowance of 8 cores by measuring the CPU its processes use, instead of
-counting one core for each game process?
-
-**What the supervisor does now.** Before it starts a run,
-`tools/supervise_campaign_training.py` checks that the run fits the allowance by
-counting: one core for each game process, one for the inference server and one for
-itself (`validate_training_arguments`, and `busy_cores` in
-`studies/campaign/run.py`). While the run plays it measures only memory: every
-second it reads the process table and stops the run if the memory used comes
-within 1 GB of 16 GB. But a game process plays four games, one on each of its
-threads, and the engine releases Python's lock while it works, so the four
-threads compute at the same time. A process keeps 1.2 to 1.5 cores busy, not
-one ([running training on the Mac](design/README.md#92-running-training-on-the-mac)).
-
-**A real case** (15 November 2026, one training iteration each, eleven-round games,
-64 simulations, the 64×2 network on the CPU). Seven game processes of four
-games count 7 + 1 + 1 = 9 cores, which the supervisor accepts. Measured every
-five seconds, they kept 9.9 cores busy in a typical half minute and up to 11.1,
-all ten of the Mac's performance cores. The Mac profile now runs six processes,
-chosen by hand from these measurements, which kept about 8.9 cores busy that
-day ([record](archive/records/nine_core_layouts_2026_11_15.md)). On 16 November,
-with less other work on the Mac, about 2 cores instead of 3, the same six
-processes kept 9.1 to 10.4 cores busy on average in four training iterations
-([record](archive/records/move_checks_2026_11_16.md#training-batches)). The
-layout's load grows into whatever cores are free. It also shrinks when the
-engine gets faster: after the engine work later that day the same six
-processes kept about 6.8 cores busy, the inference server setting the pace
-([record](archive/records/engine_speed_in_training_2026_11_16.md)). A count sees neither. A command line that adds
-`--episode-workers 7` overrides the profile, and the supervisor would accept it.
-
-**A second case** (18 November 2026, the 256×8 network on the GPU, 126
-concurrent games). Seven game processes of 18 games count 9 cores and kept a
-median of about 7.7 busy in their half-minute windows. Once the inference server
-had stopped making the GPU compile a graph for nearly every inference batch,
-the same layout kept a median of 9.46 busy, and six processes of 21 games, which
-count 9 with self-play that never stops, 9.5: the game processes did more
-engine work each second because the inference server answered them sooner
-([record](archive/records/readout_without_repeat_2026_11_18.md)). The supervisor
-accepted both; two runs were stopped by hand. On 19 November the owner said that
-going a little over the allowance of 9 cores then, as these runs did, was fine.
-On 21 November the owner set the allowance at 8 cores and 16 GB; how far over 8
-would still be a little has not been said, and a stop under choice A below would
-need that number.
-
-**A third case** (24 November 2026, the 256×16 network on the GPU, 800
-simulations on a quarter of the decisions and 150 on the rest, 8 simulations a
-request, self-play that never stops). Six game processes count 9 cores whatever
-their games. With 4 games each they kept a median of 7.7 cores busy, with 5 a
-median of 8.4 and with 8 a median of 9.46
-([record](archive/records/self_play_speed_256x16_2026_11_24.md)). The training
-run at these sizes started on 25 November with six processes of 5 games, which
-the supervisor's count of 9 cores then accepted; they kept a median of 8.3
-cores busy, over the allowance of 8, and the run started again with five
-processes of 5 games, which count 8 and kept a median of 7.8 in their first 14
-minutes ([list of runs](archive/runs.md), `training-256x16-2026-11-25`).
-
-**Why it matters.** The allowance is there to keep two performance cores free
-for everything else. The count does not show whether they are free, and even a
-layout chosen by measuring it goes over when the Mac is quiet. A different network, device,
-number of games per process or search would change the load without the
-supervisor noticing, and so would a faster inference server, as in the second
-case. So may the games of a long run as its network learns: a trained network's
-games were about 880 decisions long against a fresh network's 313
-([record](archive/records/game_size_2026_11_24.md)), with more battles and
-moves, which probably cost more engine work a network evaluation (inferred).
-The count can also be too strict: with the
-network on the GPU and a slow inference server, game threads wait more and use
-less than they count.
-
-**The choices.**
-
-| Choice | What it changes |
-| --- | --- |
-| A. Measure the load | The supervisor adds the processes' CPU time to the process table it already reads every second, and records the load over the last minute in its status file. A run that stays over the allowance, for example for five minutes, is stopped safely, as a requested stop is. Short peaks, such as starting up, stop nothing. The count stays as the check before a run starts. |
-| B. Count better | Count a game process of four games as 1.5 cores instead of one. Checked before the run starts and simple, but the factor depends on the network, the device, the games per process and the Mac's other work, so it would need measuring again whenever those change. |
-| C. Leave it | The count stays a rough check before a run starts, and layouts are chosen by measuring them, as on 15 November. A layout chosen by hand can pass the allowance unnoticed. |
-| D. Measure and warn | As A, but a run that stays over the allowance is not stopped: the supervisor's status file and log say so, and the layout is changed by hand. |
-
-**Recommendation: D.** It shows whether training keeps to the allowance,
-whatever the layout, and the supervisor already samples every process once a
-second. A stop would not help a long run: its keeper, which starts a stopped
-run again, as for the training runs since 19 November, would start the same
-layout, which would go over again.
-
-**If answered.** What the supervisor measures and when it stops a run belong in
-the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
-and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
+No question waits for an answer now.
 
 ## Open elsewhere
 
@@ -330,3 +233,18 @@ the page that now states it.
   the searches together for about 14% fewer
   ([record](archive/records/reused_visits_counted_2026_11_25.md)). Stated in
   [section 4.7 of the design document](design/README.md#47-more-detail-on-the-search).
+- **Q-005**, the supervisor's count of cores. Answered on 25 November 2026:
+  choice D, measure and warn. While a run plays, the supervisor measures the CPU
+  cores its processes use in each minute, keeps the median of the last ten
+  minutes in its status file and warns when that median passes the allowance,
+  8 cores since 21 November, without stopping the run; a layout that goes over
+  is changed by hand. Before a run starts it still counts a core for each game
+  process, the inference server, the network updates and itself. Raised on 15
+  November, when six game processes of four games, which counted 9 cores, kept
+  about 9 busy and seven about 10
+  ([record](archive/records/nine_core_layouts_2026_11_15.md)); on 25 November
+  six of five games at 256×16 kept a median of 8.3 busy under the allowance of 8
+  ([list of runs](archive/runs.md), `training-256x16-2026-11-25`). Stated in
+  the campaign learning guide's
+  [long unattended runs](../studies/campaign/README.md#long-unattended-runs)
+  and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).

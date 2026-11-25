@@ -15,6 +15,14 @@ or when the swap in use grows SWAP_GROWTH_BYTES above its level when the attempt
 started. The status is then machine_memory_short, and the stop's event in
 state.json gives the cause, the pressure and the swap.
 
+It also measures the CPU cores the run uses, from its processes' CPU times, in
+windows of LOAD_WINDOW_SECONDS, and keeps the last window and the median of the
+last LOAD_MEDIAN_WINDOWS in state.json's "load". When that median passes the
+core allowance it warns, in an event and a line on its standard output, and
+again when the median comes back within it; it never stops a run for its load
+(the owner's answer to Q-005, 25 November 2026): a stopped run would start again
+with the same layout, and a layout is changed by hand.
+
 Example (run from the repository root)::
 
     .venv/bin/python tools/supervise_campaign_training.py \
@@ -51,6 +59,7 @@ import math
 import os
 from pathlib import Path
 import signal
+import statistics
 import struct
 import subprocess
 import sys
@@ -86,6 +95,11 @@ PRESSURE_LEVELS = {1: "normal", 2: "warning", 4: "critical"}
 # by the processes' physical footprints (process_memory_charge).
 CORE_ALLOWANCE = 8
 MEMORY_ALLOWANCE_BYTES = 16_000_000_000
+# The run's CPU load: cores used in each window of this many seconds, and the
+# median of the last LOAD_MEDIAN_WINDOWS windows, which is judged against the
+# core allowance once that many windows have been measured.
+LOAD_WINDOW_SECONDS = 60.0
+LOAD_MEDIAN_WINDOWS = 10
 # Source/configuration errors normally exit 1 and must stop for inspection.
 if sys.platform == "win32":
     # Access violation, stack overflow, heap corruption and fail-fast exits.
@@ -344,6 +358,64 @@ def aggregate_rss(child_pid: int) -> int:
                for pid, _, _, resident in rows if pid in included)
 
 
+def _cpu_seconds(clock: str) -> float:
+    """ps's cumulative CPU time, [[days-]hours:]minutes:seconds, in seconds."""
+    days, _, clock = clock.rpartition("-")
+    fields = [float(part) for part in clock.split(":")]
+    while len(fields) < 3:
+        fields.insert(0, 0.0)
+    return fields[0] * 3600 + fields[1] * 60 + fields[2] + (float(days) * 86400 if days else 0.0)
+
+
+def process_tree_cpu_seconds(child_pid: int) -> dict[int, float] | None:
+    """The CPU seconds each process of this supervisor and its child's tree has used
+    so far, user and system time together, by PID; None where ps is not available."""
+    if sys.platform == "win32":
+        return None
+    result = subprocess.run(["ps", "-axo", "pid=,ppid=,pgid=,time=,stat="], capture_output=True,
+                            text=True, check=True, timeout=5)
+    rows = []
+    for line in result.stdout.splitlines():
+        fields = line.split()
+        if len(fields) >= 5 and not fields[4].startswith("Z"):
+            rows.append((int(fields[0]), int(fields[1]), int(fields[2]), _cpu_seconds(fields[3])))
+    included = {os.getpid(), child_pid}
+    while True:
+        expanded = included | {pid for pid, parent, group, _ in rows if parent in included or group == child_pid}
+        if expanded == included:
+            break
+        included = expanded
+    return {pid: seconds for pid, _, _, seconds in rows if pid in included}
+
+
+class LoadWatch:
+    """The run's CPU cores in windows of LOAD_WINDOW_SECONDS, from its processes' CPU
+    times: a process counts in a window when it was there at both its ends. Keeps the
+    last LOAD_MEDIAN_WINDOWS windows; judged once that many have been measured."""
+
+    def __init__(self, allowance: int):
+        self.allowance = allowance
+        self.windows: list[float] = []
+        self.mark: tuple[float, dict[int, float]] | None = None
+        self.over = False
+
+    def due(self, now: float) -> bool:
+        return self.mark is None or now - self.mark[0] >= LOAD_WINDOW_SECONDS
+
+    def add(self, now: float, seconds: dict[int, float]) -> dict | None:
+        """Take a sample; returns the load when a window has ended."""
+        mark, self.mark = self.mark, (now, seconds)
+        if mark is None or now <= mark[0]:
+            return None
+        used = sum(value - mark[1][pid] for pid, value in seconds.items() if pid in mark[1])
+        self.windows = (self.windows + [max(0.0, used) / (now - mark[0])])[-LOAD_MEDIAN_WINDOWS:]
+        judged = len(self.windows) >= LOAD_MEDIAN_WINDOWS
+        median = statistics.median(self.windows)
+        return {"window_seconds": LOAD_WINDOW_SECONDS, "cores_last_window": round(self.windows[-1], 2),
+                "median_cores": round(median, 2), "windows_in_median": len(self.windows),
+                "allowance_cores": self.allowance, "over_allowance": judged and median > self.allowance}
+
+
 def process_group_alive(group: int | None) -> bool:
     if group is not None and sys.platform == "win32":
         tree = _TREES.get(group)
@@ -477,7 +549,7 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
               working_directory: Path = ROOT,
               profile: str | None = None, unset_environment: tuple[str, ...] = (),
               command_factory=training_command, rss_sampler=aggregate_rss,
-              machine_sampler=machine_memory) -> dict:
+              machine_sampler=machine_memory, load_sampler=process_tree_cpu_seconds) -> dict:
     """Run/restart the same job. Injectable child construction and samplers support tiny tests."""
     control_dir, run_dir, working_directory = control_dir.resolve(), run_dir.resolve(), working_directory.resolve()
     if control_dir == run_dir or control_dir.is_relative_to(run_dir):
@@ -519,6 +591,10 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                      "memory_scope": "Supervisor and complete child process tree; " + memory_metric()
                                      + "; 1 GB safety margin, not a kernel allocation cap"}
             _event(state, "supervisor_initialized")
+        state["load_scope"] = (
+            f"CPU cores of the supervisor and its child process tree, from their CPU times, in windows of "
+            f"{LOAD_WINDOW_SECONDS:g} s; the median of the last {LOAD_MEDIAN_WINDOWS} windows is judged against "
+            f"the core allowance, {config.cpu_budget}, with a warning, never a stop")
         state["machine_memory_scope"] = (
             "The whole machine's memory pressure and swap in use, on macOS only; a safe stop when the pressure stays "
             f"critical for {CRITICAL_PRESSURE_SECONDS:g} s or swap in use grows {SWAP_GROWTH_BYTES / 1e9:g} GB above "
@@ -602,8 +678,37 @@ def supervise(control_dir: Path, run_dir: Path, config: SupervisorConfig, argume
                     stop_reason = None
                     stopping_at = None
                     critical_since = None
+                    load = LoadWatch(config.cpu_budget)
+                    load_failed = False
                     while process.poll() is None:
                         now = time.monotonic()
+                        # The run's CPU load: measured and reported, never a reason to stop.
+                        if not load_failed and load.due(now):
+                            try:
+                                seconds = load_sampler(process.pid)
+                            except Exception as error:  # A failed load sample never stops a run.
+                                seconds = None
+                                load_failed = True
+                                _event(state, "load_monitor_error",
+                                       **monitor_error_details(error, "cpu_time_sample", root_pid=process.pid))
+                            if seconds is None:
+                                load_failed = True
+                            else:
+                                measured = load.add(now, seconds)
+                                if measured is not None:
+                                    state["load"] = measured
+                                    record["peak_median_cores"] = max(record.get("peak_median_cores", 0.0),
+                                                                      measured["median_cores"]
+                                                                      if measured["windows_in_median"] >= LOAD_MEDIAN_WINDOWS
+                                                                      else 0.0)
+                                    if measured["over_allowance"] != load.over:
+                                        load.over = measured["over_allowance"]
+                                        kind = "load_over_allowance" if load.over else "load_within_allowance"
+                                        _event(state, kind, median_cores=measured["median_cores"],
+                                               allowance_cores=config.cpu_budget, attempt=attempt)
+                                        print(json.dumps({"event": kind, "median_cores": measured["median_cores"],
+                                                          "allowance_cores": config.cpu_budget,
+                                                          "minutes": measured["windows_in_median"]}), flush=True)
                         # Keep monitoring while safe shutdown is pending: a
                         # checkpoint or unfinished wave can still allocate RAM.
                         try:

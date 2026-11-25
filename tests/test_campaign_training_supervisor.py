@@ -13,11 +13,13 @@ import struct
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest.mock import Mock, patch
 
 from tools.supervise_campaign_training import (
-    KILL, PROFILE_SCHEMA, SupervisorConfig, aggregate_rss, exclusive_lock, keep_awake, load_profile, main,
+    KILL, PROFILE_SCHEMA, LoadWatch, SupervisorConfig, _cpu_seconds, aggregate_rss, exclusive_lock, keep_awake,
+    load_profile, main,
     machine_memory, profile_arguments, supervise, training_command, validate_training_arguments,
     process_group_alive, process_memory_charge, _darwin_physical_footprint, monitor_error_details,
 )
@@ -70,6 +72,44 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
     def supervise_machine(self, factory, machine_sampler):
         return supervise(self.control, self.run, self.config, ARGUMENTS, command_factory=factory,
                          rss_sampler=lambda _pid: 1_000_000, machine_sampler=machine_sampler)
+
+    def run_with_load(self, cores):
+        """A worker that plays for 0.6 s while its processes seem to use `cores` CPU cores."""
+        began = time.monotonic()
+        with patch("tools.supervise_campaign_training.LOAD_WINDOW_SECONDS", 0.05), \
+                patch("tools.supervise_campaign_training.LOAD_MEDIAN_WINDOWS", 3), patch("builtins.print"):
+            return self.run_supervisor("time.sleep(0.6)\n"
+                                       "(run / 'manifest.json').write_text(json.dumps({'status':'completed'}))\n",
+                                       load_sampler=lambda pid: {pid: cores * (time.monotonic() - began)})
+
+    def test_a_load_over_the_allowance_is_reported_and_never_stops_the_run(self):
+        state = self.run_with_load(6.0)  # The configuration's allowance is 4 cores.
+        self.assertEqual(state["status"], "completed")
+        self.assertEqual(len(state["attempts"]), 1)
+        over = [event for event in state["events"] if event["kind"] == "load_over_allowance"]
+        self.assertEqual(len(over), 1)
+        self.assertEqual(over[0]["allowance_cores"], 4)
+        self.assertAlmostEqual(over[0]["median_cores"], 6.0, delta=0.5)
+        self.assertTrue(state["load"]["over_allowance"])
+        self.assertEqual(state["load"]["windows_in_median"], 3)
+        self.assertGreater(state["attempts"][0]["peak_median_cores"], 4)
+
+    def test_a_load_within_the_allowance_is_recorded_without_a_warning(self):
+        state = self.run_with_load(2.0)
+        self.assertEqual(state["status"], "completed")
+        self.assertFalse(any(event["kind"] == "load_over_allowance" for event in state["events"]))
+        self.assertFalse(state["load"]["over_allowance"])
+        self.assertAlmostEqual(state["load"]["median_cores"], 2.0, delta=0.5)
+
+    def test_the_load_counts_a_process_only_in_windows_it_was_there_for(self):
+        watch = LoadWatch(8)
+        self.assertIsNone(watch.add(0.0, {1: 10.0, 2: 5.0}))
+        # Process 2 ended and process 3 began: only process 1's 3 seconds count.
+        load = watch.add(1.0, {1: 13.0, 3: 50.0})
+        self.assertEqual(load["cores_last_window"], 3.0)
+        self.assertFalse(load["over_allowance"])  # Fewer windows than the median needs.
+        self.assertEqual(_cpu_seconds("1-02:03:04.50"), 86400 + 7384.5)
+        self.assertEqual(_cpu_seconds("3:04.25"), 184.25)
 
     def test_completion_is_durable_and_does_not_launch_again(self):
         state = self.run_supervisor("(run / 'manifest.json').write_text(json.dumps({'status':'completed'}))\n")
