@@ -269,7 +269,7 @@ ones found promising.
 next simulation reads. Each state the search has met is a *node* of the tree. For
 every node, the tree holds the actions tried there, each with its *visit count*,
 how many simulations played it, and the total of the values those simulations
-found. A game keeps its tree from one decision to the next
+found. A game reuses its tree from one decision to the next
 ([section 4.7](#47-more-detail-on-the-search)), so the next search starts with
 what these simulations found below the action played.
 
@@ -667,37 +667,42 @@ The other 40 went deeper, 37 of them through two actions, which ended with 27 an
 nine. The deepest, at depth nine, chose to end Combat Movement and followed
 states earlier simulations had evaluated: the start of a battle, a retreat, a
 retreating unit and the next battle, with four dice rolls on the way. The 64
-simulations together played 57 actions and 38 dice rolls, and the tree kept 77
+simulations together played 57 actions and 38 dice rolls, and the tree held 77
 nodes. At a decision with 104 legal actions, 55 of the 64 simulations stopped at
 depth 1.
 
 **What the copies cost and save.** Every state the search reaches still comes
 from the real rules, played by the engine. A saved copy takes about 144 KB, so
-that tree held about 11 MB. Until
-4 November the tree kept no states, and every simulation copied the root and
-played its whole path again: 123 actions instead of 57 in the example, and about
-half of the time the game threads (section 9.2) spent not waiting for the network
+that tree held about 11 MB. Until 4 November the tree held no saved states, and
+every simulation copied the root and played its whole path again: 123 actions
+instead of 57 in the example, and about half of the time the game threads
+(section 9.2) spent not waiting for the network
 ([measurements](../archive/records/search_replays_2026_11_04.md)). Saving copies
 gave identical search results on 151 real states and played 59% fewer actions.
 In a matched training iteration it raised games per hour while playing from 152
 to 184, for 0.5 GB more peak memory
 ([record](../archive/records/search_copies_2026_11_04.md)).
 
-**The tree from one decision to the next.** A game keeps its search tree from
-decision to decision (`SearchTree` in `studies/campaign/native_search.py`). The
-next search starts from the node of the state the game has reached, with every
-node below it, their visit counts, values and saved copies, and drops the rest
-of the tree; AlphaZero does the same. The kept visits count in the new root's
-visit counts, so a search's visit shares rest on its new simulations and on the
-earlier ones that passed through that state. A search runs its whole budget of
-new simulations on top of them; whether the searches of decisions not kept as
-training samples should count the kept visits toward their budget, as KataGo's
-caps count a tree's nodes, is
-[Q-023](../questions.md#q-023-counting-the-kept-tree-toward-a-searchs-simulations). The dice rolled in the real game
-between two decisions pick one of the outcomes the simulations rolled, if they
-rolled it; a state the tree never reached starts a new tree. The exploration
+**Tree reuse: the tree from one decision to the next.** A game reuses its
+search tree from decision to decision (`SearchTree` in
+`studies/campaign/native_search.py`), as AlphaGo Zero did
+([Silver et al. 2017](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf),
+Methods, "Search Algorithm", under "Play"). The next search starts from the node
+of the state the game has reached, with every node below it, their visit
+counts, values and saved copies, and drops the rest of the tree. The part
+carried over is the *reused tree*. Its visits count in the new root's visit
+counts: before its first new simulation, the root already holds a visit for
+every earlier simulation that took one of its actions, and the search's visit
+shares rest on those and on its own simulations. A search runs its whole budget
+of new simulations on top of them. Whether a fast search, the search at a
+decision not kept as a training sample (section 7.1), should count them toward
+its budget instead is
+[Q-023](../questions.md#q-023-counting-a-reused-trees-visits-toward-a-fast-search).
+The dice rolled in the real game between two decisions pick one of the outcomes
+the simulations rolled, if they rolled it; a state the tree never reached
+starts a new tree. The exploration
 noise goes on the new root's actions alone, and the value bounds of the PUCT
-score (section 4.3) start from the kept actions' values. A tree also starts
+score (section 4.3) start from the reused actions' values. A tree also starts
 anew when other networks answer: its nodes hold network outputs, so in
 self-play that never stops it is dropped once the inference server names a new
 network version (section 9.1).
@@ -733,7 +738,7 @@ order, without fusing a multiplication and an addition into one rounding, and it
 sums the priors as Python's `sum` does. So given the same network outputs, the
 two searches make the same choices and return the same visit counts, priors and
 values, which `tests/test_campaign_native_search.py` checks along real games,
-with fresh trees and with trees kept from decision to decision.
+with fresh trees and with reused trees.
 The Python search still serves held-out evaluation, whose fixed opponents
 (section 10) the C++ search does not play, the batching of several searches'
 network evaluations in one process (`studies/campaign/batching.py`), and tools.
@@ -1577,8 +1582,13 @@ is drawn before its search (`play_episode` in `studies/campaign/learning.py`):
 a kept decision is searched with 256 simulations (`--kept-simulations`) and
 exploration noise, so that its visit shares, the training sample's policy
 target, say more; any other is searched with 16 (`--simulations`) and no noise,
-only to choose the move. In the fourth part of the training run of 19 to 21 November, which kept 1% of the decisions and
-searched every one with 64 simulations, 99 of every 100 searches kept no
+only to choose the move. KataGo, which split its searches this way, calls the
+first a *full search* and the second a *fast search*
+([Wu 2019](https://arxiv.org/abs/1902.10565), section 3.1), and so does this
+document. A search's budget counts only its own new simulations, on top of the
+visits a reused tree already brings to its root (section 4.7). In the fourth
+part of the training run of 19 to 21 November, which kept 1% of the decisions
+and searched every one with 64 simulations, 99 of every 100 searches kept no
 training sample, and the inference server's forward passes set the run's speed
 ([record](../archive/records/long_run_samples_2026_11_21.md)). With 1% kept, a
 searched decision now has on average
@@ -3035,7 +3045,7 @@ since the search runs in C++:
 | 256×16 on the GPU with KataGo's search (800 simulations on a quarter of the decisions, 150 on the rest), 48 concurrent games, one simulation a request (24 November) | the inference server, busy 95%, in inference batches of 24 states, 2,761 network evaluations a second; the CPU cores about 4.5 busy | about twice as much (measured below) | larger inference batches: several simulations a request |
 | The same with 8 simulations a request and overlapped inference batches (24 November) | the CPU cores, a median of 9.4 busy, at about 6,100 network evaluations a second; the inference server busy about 73% in inference batches of about 125 states | they limit | a cheaper engine, in full, until the inference server limits again, about a third more |
 | The same with 24 concurrent games and the lighter engine bookkeeping (24 November) | the inference server, busy 94%, in inference batches of about 54 states, at about 6,700 network evaluations a second; the CPU cores a median of 7.7 busy | about a sixth more | larger inference batches, from more concurrent games or more simulations a request, as far as memory allows |
-| The same with 30 concurrent games and network updates of 50 training steps (24 November) | the inference server, busy 94%, in inference batches of about 71 states, at about 7,600 network evaluations a second between network updates and 7,300 with them; the CPU cores a median of 8.4 busy | about as much, about 7,700 | a cheaper inference server and a cheaper engine together; fewer network evaluations a game ([Q-023](../questions.md#q-023-counting-the-kept-tree-toward-a-searchs-simulations)) |
+| The same with 30 concurrent games and network updates of 50 training steps (24 November) | the inference server, busy 94%, in inference batches of about 71 states, at about 7,600 network evaluations a second between network updates and 7,300 with them; the CPU cores a median of 8.4 busy | about as much, about 7,700 | a cheaper inference server and a cheaper engine together; fewer network evaluations a game ([Q-023](../questions.md#q-023-counting-a-reused-trees-visits-toward-a-fast-search)) |
 
 The CPU cores' rates are inferred: the 9 CPU cores of the allowance, less the
 inference server's process, divided by the game processes' CPU time per network
@@ -4113,11 +4123,13 @@ measured):
   simulations a searched decision, 17 times the 18.4 of that run, and keep 25
   times as many training samples a game, about 173. KataGo's caps count the
   nodes of the search tree: a search stops "when the tree reaches a cap of N
-  nodes" (section 3.1 of its paper), so the nodes of a tree kept from the move
-  before, if self-play kept one, count toward the cap; the paper does not say
-  whether it did. Here a search runs its 800 or 150 simulations on top of what
-  its kept tree holds (section 4.7), so it may search more than KataGo's caps
-  ([Q-023](../questions.md#q-023-counting-the-kept-tree-toward-a-searchs-simulations)).
+  nodes" (section 3.1 of its paper). Its self-play seems to have started each
+  search with a fresh tree: its gating games, which decide whether a new network
+  replaces the old, turned tree reuse on as one of their changes from self-play
+  (appendix E). Here a search reuses the tree below the state reached and runs
+  its 800 or 150 new simulations on top of what that tree holds (section 4.7),
+  so a fast search ends with more visits at its root than KataGo's did
+  ([Q-023](../questions.md#q-023-counting-a-reused-trees-visits-toward-a-fast-search)).
 - **The search's reach.** AlphaZero's simulations end where its network has not
   yet been asked, however deep. Here a simulation also stops after 16 actions and
   dice rolls (section 4.2), less than one of Japan's turns, which average 42
@@ -4160,9 +4172,9 @@ about 60 days, with 48 concurrent games, more than the Mac's memory allowed
 beside its other programs (below); and with 30 concurrent games and the
 engine's lighter bookkeeping, about 7,300 with the network updates, about 2,900
 games a day and about 50 days, the GPU and the 9 CPU cores both near their
-limits (section 9.3). Counting the visits a kept search tree brings toward the
-150 simulations of a fast search
-([Q-023](../questions.md#q-023-counting-the-kept-tree-toward-a-searchs-simulations))
+limits (section 9.3). Counting the visits a reused tree brings toward the 150
+simulations of a fast search
+([Q-023](../questions.md#q-023-counting-a-reused-trees-visits-toward-a-fast-search))
 would ask for about 18% fewer network evaluations a game, and would take about
 9 days off the 50 (inferred). Played at 800 simulations on
 every decision, as AlphaZero played, every number of days above is 2.6 times as
@@ -4529,8 +4541,11 @@ qualifier, and the names the code and the dated records use instead.
 - **Backing up:** adding a simulation's result to every state and action on its
   path, with one more visit each.
 - **Root:** the current state, where every simulation of a search starts.
-- **Search tree:** what a search remembers between simulations; a game keeps it
+- **Search tree:** what a search remembers between simulations; a game reuses it
   from one decision to the next, below the state reached.
+- **Tree reuse, reused tree:** the next search of a game starts from the part of
+  the last search's tree below the state the game reached, its visit counts
+  included: the reused tree.
 - **Node:** a state the search tree holds, with its planning key, the statistics
   of the actions tried there and a saved copy of the game at that state.
 - **Visit count:** how many simulations played an action.
@@ -4658,6 +4673,9 @@ qualifier, and the names the code and the dated records use instead.
 - **Kept decision:** a decision kept as a training sample. Whether it is kept is
   drawn before its search, which then runs 256 simulations with exploration
   noise instead of 16 without (section 7.1).
+- **Full search, fast search:** KataGo's names for the search at a kept
+  decision, with more simulations and exploration noise, and the search at any
+  other decision, with fewer and no noise, only to choose the move.
 - **Policy target:** a training sample's visit shares, the action probabilities a
   network is trained toward.
 - **Value target:** a training sample's final scores, divided by 100, the values

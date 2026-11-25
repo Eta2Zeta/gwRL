@@ -34,7 +34,7 @@ Other open things stay in the pages that own them, and
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
 | [Q-022](#q-022-several-simulations-in-one-inference-request) | Should self-play's search choose the paths of 8 simulations before it asks the network about the states where they stopped, all in one inference request, as AlphaGo Zero did? | Search | Yes, 8 a request: about two and a half times the network evaluations a second at 256×16 on the Mac |
-| [Q-023](#q-023-counting-the-kept-tree-toward-a-searchs-simulations) | Should a fast search stop once its root holds 150 visits, counting those its kept tree brought, instead of always adding 150 new simulations? | Search | Yes, for the fast searches only: about 18% fewer network evaluations, the training samples' searches unchanged |
+| [Q-023](#q-023-counting-a-reused-trees-visits-toward-a-fast-search) | Should a fast search, the 150-simulation search at a decision not kept as a training sample, run only enough new simulations to bring its root to 150 visits, counting those the searches before it left there? | Search | Yes, for the fast searches only: about 18% fewer network evaluations, the full searches and the training targets unchanged |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
@@ -200,53 +200,95 @@ less, and it is the search AlphaGo Zero learned with.
 chosen number, and section 4.7 of the design document says that self-play
 searches that way.
 
-## Q-023: Counting the kept tree toward a search's simulations
+## Q-023: Counting a reused tree's visits toward a fast search
 
-**The question.** Should a search stop once its root holds its budget of
-visits, 150 at a decision not kept as a training sample, counting the visits its
-tree kept from the decisions before, as KataGo's caps count the nodes of its
-tree, instead of always adding its 150 new simulations?
+**The question.** A fast search, the search of 150 simulations at a decision
+not kept as a training sample, often starts with many visits already at its
+root, left there by the searches before it. Should it run only as many new
+simulations as bring its root to 150 visits, and none if the root already holds
+150, instead of always running 150 new ones?
 
-**What the program does now.** A game keeps its search tree from decision to
-decision, the part below the state it has reached
-([design document, section 4.7](design/README.md#47-more-detail-on-the-search)),
-and every search then adds its full budget of new simulations, 800 at a kept
-decision and 150 at any other, on top of the visits the kept tree already holds
-at its root (`SearchSettings::simulations` in `include/game/search.hpp`).
-KataGo's search stops "when the tree reaches a cap of N nodes" (section 3.1 of
-[its paper](https://arxiv.org/abs/1902.10565)), which counts a kept tree's
-nodes; the paper does not say whether its self-play kept trees.
+**What the program does now.** Two parts of the design meet here.
+
+- *Full and fast searches.* At the sizes planned for the training run, a random
+  quarter of the decisions are kept as training samples, the *kept decisions*.
+  A kept decision gets a *full search*: 800 simulations with exploration noise,
+  whose visit shares become the training sample's policy target. Every other
+  decision gets a *fast search*: 150 simulations without noise, only to choose
+  the move
+  ([design document, section 7.1](design/README.md#71-a-training-iterations-games)).
+  KataGo searched this way, with 600 to 1,000 simulations and 100 to 200
+  ([Wu 2019](https://arxiv.org/abs/1902.10565), section 3.1).
+- *Tree reuse.* When the game has played a move, the next search does not start
+  from an empty tree. It takes over the part of the last search's tree below the
+  state the game reached, with all its visit counts, the *reused tree*, and
+  drops the rest, as AlphaGo Zero did
+  ([design document, section 4.7](design/README.md#47-more-detail-on-the-search)).
+  So the new search's root, the decision now to be made, already holds a visit
+  for every earlier simulation that took one of its actions.
+
+Every search then runs its whole budget of new simulations, 800 or 150, on top
+of the visits its root already holds (`SearchSettings::simulations` in
+`include/game/search.hpp`).
+
+**A worked example.** In the toy search of
+[section 4.4 of the design document](design/README.md#44-a-toy-search), with a
+budget of 4 simulations at the state R, simulation 4 went through RA on to RAx.
+Say the game then plays A. The next search starts at RA, whose action x already
+holds that 1 visit. With a budget of 4, the program now runs 4 new simulations,
+and RA's actions end with 5 visits. Counting the reused visit, it would run 3,
+and RA's actions would end with 4, the budget.
 
 **A real case.** In two games played with the run's search settings, 8
-simulations a request and a stand-in network
-([record](archive/records/self_play_speed_256x16_2026_11_24.md)), a fast
-search's root already held 127 visits from its kept tree on average, a median
-of 56, and 27% of the fast searches held 150 or more; a full search's root held
-114 on average. Counting those visits toward the cap would have run 26.4% fewer
-simulations in the 407 searches, and counting them in the fast searches alone
-17.7% fewer.
+simulations a request and a stand-in network that gives every state made-up
+priors and values, 407 searches
+([record](archive/records/self_play_speed_256x16_2026_11_24.md)): before its
+first new simulation, a fast search's root already held 127 visits on average,
+a median of 56, and 27% of the fast searches already held 150 or more. In one
+of the two games, a full search at a decision with two legal actions sent most
+of its 800 simulations through the action the game then played, and the fast
+search at the next searched decision began with 709 of their visits at its
+root; it then ran 150 new simulations on top. A full search's root already held
+114 visits on average. Counting the reused visits toward the budget would have
+run 17.7% fewer simulations in these 407 searches if only the fast searches
+counted them, and 26.4% fewer if every search did. Counted in the fast searches,
+a fast search's root would end with 150 visits at the median instead of 206,
+and 206 on average instead of 277, and 27% of the fast searches would run no
+new simulation and choose their move from the reused visits alone.
 
-**Why it matters.** A network evaluation is the unit of the run's cost: about
-18% fewer at the same speed is about 18% more games a day (inferred), the fast
-searches still ending with at least 150 visits at their roots. The searches of
-the kept decisions, whose visit shares become the training targets, would
-stay as they are. A trained network's sharper priors may keep more of a tree
-from one decision to the next than the stand-in network did, which this did not
-measure.
+**Why it matters.** Each simulation asks for one network evaluation, and network
+evaluations are the run's cost: 17.7% fewer a game is about a fifth more games a
+day at the same speed, and KataGo's yardstick of 145,000 games in about 41 days
+instead of about 50 (inferred, from the rates of
+[Q-022](#q-022-several-simulations-in-one-inference-request)). A fast search
+only chooses a move: no training sample stores its visit shares, so the training
+targets stay as they are. The moves still shape the games, and with them the
+final scores that every training sample of a game takes as its value target. A
+fast search would choose from fewer visits than now, but never fewer than 150,
+within the 100 to 200 of KataGo's fast searches. KataGo's self-play, moreover,
+seems to have started each search with a fresh tree: its gating games, which
+decide whether a new network replaces the old, turned tree reuse on as one of
+their changes from self-play ([Wu 2019](https://arxiv.org/abs/1902.10565),
+appendix E). Not measured: how many visits a trained network's searches leave
+to the next decision; probably more (inferred), since a trained network's
+priors send more of a search's simulations down the action the game then
+plays.
 
 **The choices.**
 
 | Choice | What it changes |
 | --- | --- |
-| A. Add the simulations on top, as now | Every search runs its full budget of new simulations. |
-| B. Count the kept visits toward every search's budget | About 26% fewer network evaluations; a kept decision's search, its training target, then rests in part on visits made before its exploration noise was drawn. |
-| C. Count them toward the fast searches' budget only | About 18% fewer network evaluations; the kept decisions' searches unchanged. |
+| A. As now: every search runs its whole budget of new simulations | A fast search ends with its reused visits plus 150. |
+| B. Count the reused visits toward every search's budget, full searches too | About 26% fewer network evaluations. A full search then runs fewer than 800 new simulations with its exploration noise, so its visit shares, the training target, rest more than now on reused visits, made before that noise was drawn. |
+| C. Count them toward the fast searches' budget only | About 18% fewer network evaluations; the full searches, and so the training targets, unchanged. |
 
-**Recommendation: C.** It takes most of the saving without touching the
-searches the network learns from.
+**Recommendation: C.** It takes two thirds of B's saving without touching the
+searches the network learns from, and every fast search still chooses its move
+from at least 150 visits.
 
-**If answered.** The search takes a setting for which searches count their kept
-visits, and section 4.7 of the design document says how the budget counts.
+**If answered.** The search takes a setting for which searches count the
+reused visits toward their budget, and sections 4.7 and 7.1 of the design
+document say how the budget counts.
 
 ## Open elsewhere
 
