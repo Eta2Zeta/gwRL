@@ -314,7 +314,7 @@ training iteration is then those 20 games and their network update, and
 `--games-per-process`. With `--neural-device mps` or `cuda` the network update
 trains on the GPU beside the inference server, which meanwhile runs the layers
 as written instead of `--compiled-forward`'s, and releases the GPU's caches every
-20 training steps while the update waits for it
+5 training steps while the update waits for it
 ([running training on the Mac](../../docs/design/README.md#92-running-training-on-the-mac)).
 The supervisor counts a core for the network updates, so the Mac's allowance
 leaves five game processes. `--no-continuous` alternates instead, as the Windows

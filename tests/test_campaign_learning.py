@@ -350,7 +350,7 @@ class CampaignLearningTests(unittest.TestCase):
         for player in PLAYERS:
             self.assertFalse(torch.equal(before[player]["values"], learner.models[player].values))
 
-    def test_an_update_asks_for_a_cache_release_every_twenty_training_steps(self):
+    def test_an_update_asks_for_a_cache_release_every_few_training_steps(self):
         from studies.campaign.learning import RELEASE_EVERY_TRAINING_STEPS
         learner = self.learner(config=replace(self.config, epochs=2 * RELEASE_EVERY_TRAINING_STEPS + 3))
         env = LearningToyEnv()

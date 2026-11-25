@@ -2620,7 +2620,7 @@ every 2,048 forward passes and training steps: a release starts by waiting for
 all the GPU's work, and that wait, made while the other thread was handing work
 to the GPU, aborted the process. So the releases that fall due during a network
 update wait until it has ended (`hold` and `release` of `MPSGraphCachePolicy` in
-`studies/campaign/device_runtime.py`), and instead, every 20 training steps, the
+`studies/campaign/device_runtime.py`), and instead, every 5 training steps, the
 training thread asks the inference server's thread for a release and waits until
 it is done; the inference server makes it between two of its inference batches,
 while no other thread hands the GPU work (`release_between_steps` of
@@ -2629,8 +2629,13 @@ releases keep the memory down: the GPU keeps a compiled graph for every shape of
 array it meets, and nearly every minibatch brings new shapes. At 256×16 a network
 update of 300 training steps of 256 training samples grew the training process
 from 2.1 GB to 15.4 GB without them, and from 1.9 GB to at most 6.4 GB with
-them, the network update taking 124 seconds against 117
-([record](../archive/records/self_play_speed_256x16_2026_11_24.md)). The second
+them every 20 training steps, the network update taking 124 seconds against 117
+([record](../archive/records/self_play_speed_256x16_2026_11_24.md)). In the
+training run at 256×16 of 25 November, its replay buffer full at 100,000
+training samples, the run's processes still reached the supervisor's stop line
+at the start of some network updates, 19.2 GB of the 20, so since then a release
+comes every 5 training steps ([list of runs](../archive/runs.md),
+`training-256x16-2026-11-25`). The second
 is the compiled layers (section 9.3): a compiled kernel waits for its turn on the
 GPU while it holds Python's lock, and the training thread's work, already in
 line, needed that lock to finish, so neither went on. While a network update
@@ -3289,7 +3294,7 @@ as it stands; which of the others pay, and how much, is open:
   operations as graphs of Apple's MPSGraph framework, which compiles a graph
   once for each shape of an operation's arrays and keeps it until the GPU's
   caches are released, every 2,048 forward passes and training steps, and every
-  20 training steps of a network update (section 9.2). Some arrays of a forward
+  5 training steps of a network update (section 9.2). Some arrays of a forward
   pass have a row for each legal action of the inference batch, a number that
   changes with nearly every inference batch, so their operations compile again
   and again. In a profiled training
@@ -3857,7 +3862,7 @@ measured and what would settle it.
   ([record](../archive/records/self_play_never_stops_2026_11_17.md#the-inference-server-while-a-network-update-runs)).
   With the network on the GPU, the inference server runs without the compiled
   layers while a network update trains beside it, and only its own thread
-  releases the GPU's caches, every 20 training steps while the training thread
+  releases the GPU's caches, every 5 training steps while the training thread
   waits, because of two faults of PyTorch 2.14 on the Mac's GPU (section 9.2); a
   trainer process of its own would avoid both. Since the search
   gathers 8 simulations a request, the CPU cores rather than the inference

@@ -88,7 +88,9 @@ def _sample_index(actions: Any, policy: list[float], rng: random.Random) -> int:
 MOVES_SCHEMA = "campaign-game-moves-v1"
 # Training steps of a network update between two releases of the GPU's caches, when
 # something releases them during the update (CampaignLearner.release_between_steps).
-RELEASE_EVERY_TRAINING_STEPS = 20
+# Every 5 since 25 November 2026: with 20, the training run at 256x16 of that day
+# reached the supervisor's memory stop line at the start of its network updates.
+RELEASE_EVERY_TRAINING_STEPS = 5
 
 
 def write_move(moves: Any, line: Mapping[str, Any]) -> None:
