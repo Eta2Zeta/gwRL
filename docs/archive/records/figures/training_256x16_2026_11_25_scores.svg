@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
+  <title id="title">Self-play final scores</title>
+  <desc id="desc">A line chart of each alliance's mean final score over each network update's 25 self-play games, for network updates 1 to 19, with dashed lines at the scores the starting wealth gives: Axis +29.1, Allies -45.5, Comintern -57.5. The Axis stays between +9 and +29, below its start; the Allies between -46 and -27, above theirs; the Comintern between -89 and -74, far below its start.</desc>
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+      .title { font-size: 15px; font-weight: 600; }
+      .sub { font-size: 12px; fill: #57606a; font-style: italic; }
+      .label { font-size: 12px; fill: #57606a; }
+      .tick { font-size: 12px; fill: #57606a; font-variant-numeric: tabular-nums; }
+      .end { font-size: 12px; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="419" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="title" x="24" y="36">Self-play final scores</text>
+  <text class="sub" x="24" y="58">Mean final score of each alliance in each network update's 25 games; dashed: the score each alliance's wealth gives at the start</text>
+  <line x1="24" y1="82" x2="46" y2="82" stroke="#2a78d6" stroke-width="2"/>
+  <text class="label" x="54" y="86">Axis</text>
+  <line x1="92" y1="82" x2="114" y2="82" stroke="#eb6834" stroke-width="2"/>
+  <text class="label" x="122" y="86">Allies</text>
+  <line x1="174" y1="82" x2="196" y2="82" stroke="#1baf7a" stroke-width="2"/>
+  <text class="label" x="204" y="86">Comintern</text>
+  <line x1="277" y1="82" x2="299" y2="82" stroke="#2a78d6" stroke-width="2" stroke-dasharray="5 4"/>
+  <text class="label" x="307" y="86">Axis at the start</text>
+  <line x1="436" y1="82" x2="458" y2="82" stroke="#eb6834" stroke-width="2" stroke-dasharray="5 4"/>
+  <text class="label" x="466" y="86">Allies at the start</text>
+  <line x1="609" y1="82" x2="631" y2="82" stroke="#1baf7a" stroke-width="2" stroke-dasharray="5 4"/>
+  <text class="label" x="639" y="86">Comintern at the start</text>
+  <line x1="76" y1="350.0" x2="760" y2="350.0" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="68" y="354.0" text-anchor="end">-100</text>
+  <line x1="76" y1="315.7" x2="760" y2="315.7" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="68" y="319.7" text-anchor="end">-80</text>
+  <line x1="76" y1="281.4" x2="760" y2="281.4" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="68" y="285.4" text-anchor="end">-60</text>
+  <line x1="76" y1="247.1" x2="760" y2="247.1" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="68" y="251.1" text-anchor="end">-40</text>
+  <line x1="76" y1="212.9" x2="760" y2="212.9" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="68" y="216.9" text-anchor="end">-20</text>
+  <line x1="76" y1="178.6" x2="760" y2="178.6" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="68" y="182.6" text-anchor="end">+0</text>
+  <line x1="76" y1="144.3" x2="760" y2="144.3" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="68" y="148.3" text-anchor="end">+20</text>
+  <line x1="76" y1="110.0" x2="760" y2="110.0" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="68" y="114.0" text-anchor="end">+40</text>
+  <text class="tick" x="76.0" y="368" text-anchor="middle">1</text>
+  <text class="tick" x="228.0" y="368" text-anchor="middle">5</text>
+  <text class="tick" x="418.0" y="368" text-anchor="middle">10</text>
+  <text class="tick" x="608.0" y="368" text-anchor="middle">15</text>
+  <text class="tick" x="760.0" y="368" text-anchor="middle">19</text>
+  <line x1="76" y1="350" x2="760" y2="350" stroke="#d0d7de" stroke-width="1"/>
+  <text class="label" x="418" y="390" text-anchor="middle">network update</text>
+  <text class="label" x="76" y="100">final score</text>
+  <polyline points="76.0,162.5 114.0,157.9 152.0,151.9 190.0,142.2 228.0,139.8 266.0,135.4 304.0,129.5 342.0,141.1 380.0,159.6 418.0,152.0 456.0,149.5 494.0,152.8 532.0,140.1 570.0,152.9 608.0,146.6 646.0,142.1 684.0,140.8 722.0,152.5 760.0,138.3" fill="none" stroke="#2a78d6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="76.0" cy="162.5" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="114.0" cy="157.9" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="152.0" cy="151.9" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="190.0" cy="142.2" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="228.0" cy="139.8" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="266.0" cy="135.4" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="304.0" cy="129.5" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="342.0" cy="141.1" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="380.0" cy="159.6" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="418.0" cy="152.0" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="456.0" cy="149.5" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="494.0" cy="152.8" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="532.0" cy="140.1" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="570.0" cy="152.9" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="608.0" cy="146.6" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="646.0" cy="142.1" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="684.0" cy="140.8" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="722.0" cy="152.5" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="760.0" cy="138.3" r="3.5" fill="#2a78d6" stroke="#ffffff" stroke-width="1.5"/>
+  <text class="end" x="768" y="142.3" fill="#2a78d6">+23.48</text>
+  <polyline points="76.0,240.7 114.0,233.8 152.0,238.8 190.0,244.6 228.0,249.4 266.0,253.0 304.0,256.8 342.0,248.2 380.0,225.1 418.0,225.7 456.0,225.0 494.0,228.0 532.0,237.0 570.0,229.2 608.0,233.4 646.0,242.4 684.0,247.0 722.0,232.0 760.0,255.6" fill="none" stroke="#eb6834" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="76.0" cy="240.7" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="114.0" cy="233.8" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="152.0" cy="238.8" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="190.0" cy="244.6" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="228.0" cy="249.4" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="266.0" cy="253.0" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="304.0" cy="256.8" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="342.0" cy="248.2" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="380.0" cy="225.1" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="418.0" cy="225.7" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="456.0" cy="225.0" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="494.0" cy="228.0" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="532.0" cy="237.0" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="570.0" cy="229.2" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="608.0" cy="233.4" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="646.0" cy="242.4" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="684.0" cy="247.0" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="722.0" cy="232.0" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="760.0" cy="255.6" r="3.5" fill="#eb6834" stroke="#ffffff" stroke-width="1.5"/>
+  <text class="end" x="768" y="259.6" fill="#eb6834">-44.91</text>
+  <polyline points="76.0,321.9 114.0,329.8 152.0,326.5 190.0,325.8 228.0,319.1 266.0,319.1 304.0,321.3 342.0,318.9 380.0,323.7 418.0,322.2 456.0,325.1 494.0,318.4 532.0,322.5 570.0,321.9 608.0,323.3 646.0,318.5 684.0,312.3 722.0,319.7 760.0,306.6" fill="none" stroke="#1baf7a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="76.0" cy="321.9" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="114.0" cy="329.8" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="152.0" cy="326.5" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="190.0" cy="325.8" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="228.0" cy="319.1" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="266.0" cy="319.1" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="304.0" cy="321.3" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="342.0" cy="318.9" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="380.0" cy="323.7" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="418.0" cy="322.2" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="456.0" cy="325.1" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="494.0" cy="318.4" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="532.0" cy="322.5" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="570.0" cy="321.9" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="608.0" cy="323.3" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="646.0" cy="318.5" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="684.0" cy="312.3" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="722.0" cy="319.7" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="760.0" cy="306.6" r="3.5" fill="#1baf7a" stroke="#ffffff" stroke-width="1.5"/>
+  <text class="end" x="768" y="310.6" fill="#1baf7a">-74.66</text>
+  <polyline points="76.0,128.7 760.0,128.7" fill="none" stroke="#2a78d6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4"/>
+  <polyline points="76.0,256.6 760.0,256.6" fill="none" stroke="#eb6834" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4"/>
+  <polyline points="76.0,277.1 760.0,277.1" fill="none" stroke="#1baf7a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 4"/>
+</svg>
