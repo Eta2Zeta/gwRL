@@ -172,13 +172,16 @@ which record reports it, and gets a line when a run starts.
 
 `tools/supervise_campaign_training.py` runs training under a fixed active-time
 budget, with bounded retries and graceful memory and deadline stops. It reserves
-its own core within the owner's allowance of nine cores (`CORE_ALLOWANCE`): the
-Mac has ten performance cores, and one stays free for everything else.
-`--all-cores` uses every core when the owner allows it.
+its own core within the owner's allowance of eight of the Mac's ten performance
+cores (`CORE_ALLOWANCE`), "like 8 cores and 16gbs of memory" in the owner's
+words of 21 November 2026. `--all-cores` uses every core when the owner allows
+it.
 
 Every second the supervisor adds up the memory of the run's processes
-(`aggregate_rss`). It asks the run to stop safely when that sum comes within
-1 GB of the run's allowance of 30 GB, and kills the run at 30 GB. On macOS it
+(`aggregate_rss`): on macOS their physical footprints, the memory Activity
+Monitor shows for them, which leave out the shared libraries and shared memory
+that every process maps. It asks the run to stop safely when that sum comes
+within 1 GB of the run's allowance of 16 GB, and kills the run at 16 GB. On macOS it
 also watches the memory of the whole Mac, which the run shares with every other
 program (`machine_memory`). It asks the run to stop safely when macOS's memory
 pressure stays critical for 10 seconds, or when the swap in use grows by 4 GB
@@ -223,18 +226,22 @@ hours of training play whose game processes ran under AddressSanitizer
 
 `--profile mac` gives the supervisor the setup measured on this Mac, kept in
 [profiles/mac.json](profiles/mac.json): PyTorch 2.14 from `tmp/gpu-mps-env`
-(built from `requirements-gpu-mps.txt`), six game processes of four games
-each, whose states one inference server evaluates on the CPU, the 30 GB
+(built from `requirements-gpu-mps.txt`), five game processes of four games
+each, whose states one inference server evaluates on the CPU, the 16 GB
 memory limit, the faster memory allocator and keeping the Mac awake. The
-supervisor counts one core per game process, one for the inference server and one
-for itself, but a process of four games keeps 1.2 to 1.5 cores busy. So the
-layout was chosen by the load it puts on the Mac: on 15 November 2026 these six
-processes kept about 9 cores busy, the allowance, and played about 192,000
-decisions an hour while playing; seven, which also fit the count, kept about 10
-busy ([record](../../docs/archive/records/nine_core_layouts_2026_11_15.md)).
-Since the engine work of 16 November the six keep about 7 cores busy and play
-about 301,000 decisions an hour while playing, the inference server setting the pace
+supervisor counts one core per game process, one for the inference server, one
+for the network updates of self-play that never stops and one for itself, which
+leaves five game processes within the 8 cores, but a process of four games keeps
+1.2 to 1.5 cores busy. So layouts are chosen by the load they put on the Mac:
+on 15 November 2026, under the allowance of 9 cores then, six processes kept
+about 9 cores busy and played about 192,000 decisions an hour while playing;
+seven, which also fit the count then, kept about 10 busy
+([record](../../docs/archive/records/nine_core_layouts_2026_11_15.md)). After the
+engine work of 16 November the six kept about 7 cores busy and played about
+301,000 decisions an hour while playing, the inference server setting the pace
 ([record](../../docs/archive/records/engine_speed_in_training_2026_11_16.md)).
+The profile has run five since 25 November 2026, when the supervisor's count
+came down to the 8 cores.
 Evaluating on the GPU instead played half as many games an hour on 2 November
 2026, with the eight game processes of the 12-core allowance then (58.7
 against 124): the zone network is so cheap per state that the GPU's cost per
@@ -263,10 +270,12 @@ every decision with 64 simulations and drew every move
 The training run started on 22 November 2026 is the first to use them.
 
 These learning settings are the speed test's, not tuned values. A training
-iteration plays the 24 games the profile plays at once (`--batches` counts
-training iterations); with 525 training steps a network update draws each kept
+iteration plays the 20 games the profile plays at once (`--batches` counts
+training iterations). The 525 training steps were chosen for the 24 games the
+profile played until 25 November 2026, so that a network update drew each kept
 training sample as often as the 700 training steps did with the 32 games of the
-eight game processes before 15 November 2026. With more games at once, as the
+eight game processes before 15 November 2026; with 20 games it draws each about
+a fifth more often. With more games at once, as the
 252 of the training run of 19 to 21 November on the GPU, a network update follows that many games. With
 5% of decisions and 8,000 training samples its training steps then drew from
 only the latest 110 games or so, which the network fit much better than new
@@ -278,12 +287,12 @@ size and `--epochs` the number of training steps per network update. Repeat the 
 machine gets its own file beside `mac.json`.
 
 The Mac profile runs *self-play that never stops* (`"continuous": true`, the flag
-`--continuous`). Its 24 game threads play one game after another. After every 24
+`--continuous`). Its 20 game threads play one game after another. After every 20
 games that end, a network update runs beside them, on a thread of the inference
 server's process, and when it is done every game takes up the new networks
 between two inference batches
 ([the training loop](../../docs/design/README.md#91-the-training-loop)). A
-training iteration is then those 24 games and their network update, and
+training iteration is then those 20 games and their network update, and
 `--batches` counts network updates. Stopping a run, by a signal,
 `--stop-after-waves` or `--batches`, loses the games then in play. It needs
 `--games-per-process`. With `--neural-device mps` or `cuda` the network update
@@ -292,7 +301,7 @@ as written instead of `--compiled-forward`'s, and releases the GPU's caches ever
 20 training steps while the update waits for it
 ([running training on the Mac](../../docs/design/README.md#92-running-training-on-the-mac)).
 The supervisor counts a core for the network updates, so the Mac's allowance
-leaves six game processes. `--no-continuous` alternates instead, as the Windows
+leaves five game processes. `--no-continuous` alternates instead, as the Windows
 profile does. On 17 November 2026, in two
 matched pairs of runs of four network updates, it played 6.5% and 12.5% more
 decisions per wall-clock hour in steady play than alternating training

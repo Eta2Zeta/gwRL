@@ -1559,17 +1559,17 @@ into the levels of section 6.8.
 ### 7.1 A training iteration's games
 
 Training learns from self-play in *training iterations*. In the Mac profile
-self-play never stops: 24 games are in play at a time, in 6 game processes of 4
+self-play never stops: 20 games are in play at a time, in 5 game processes of 4
 games each ([section 9.2](#92-running-training-on-the-mac)), and a game thread
-that finishes a game starts the next at once. After every 24 games that end, a
+that finishes a game starts the next at once. After every 20 games that end, a
 network update trains the network on their training samples and older ones
 (section 8.4), beside the games, which go on; when it is done, every game takes
 up the new network at once ([section 9.1](#91-the-training-loop)). A training
-iteration is those 24 games and their network update. At every decision the
+iteration is those 20 games and their network update. At every decision the
 alliance to act searches (section 4) and plays the move that section 4.5
 describes: in game round 1 one drawn at random from the visit shares, after it
 the most visited action. Training can also alternate between playing and
-learning, as the Windows profile does: a training iteration's 24 games then
+learning, as the Windows profile does: a training iteration's 20 games then
 start together with the network held fixed, and the network update runs when the
 last of them has ended. The code and the dated records name a training
 iteration's games a *batch* (as in the flag `--transitions-per-batch`); this
@@ -1580,8 +1580,9 @@ The settings in sections 7 and 8 are those of the Mac training command in the
 which names them the speed test's settings, not tuned values. The worked
 examples come from the 5 November run, when a training iteration played 32
 games, in 8 game processes, and a network update was 700 training steps. Today a
-network update is 525 training steps, which draws each kept training sample as
-often from training iterations of 24 games (section 8.7).
+network update is 525 training steps, chosen for the 24 games of 6 game
+processes, the Mac profile's until 25 November 2026; with its 20 games now, it
+draws each kept training sample about a fifth more often (section 8.7).
 
 **Which decisions are kept.** A random 5% of each game's decisions, because a
 game's thousand-odd states are close to one another. Whether a decision is kept
@@ -1921,12 +1922,15 @@ things (`CampaignLearner.update` in `studies/campaign/learning.py`):
    of its two losses.
 
 The next training step draws a new minibatch of 32. After the last, the network
-is saved as a *model export*, and every game takes it up at once (section 9.1).
+is saved as a *model export*, after every network update unless
+`--model-export-every` asks for fewer, and every game takes it up at once
+(section 9.1).
 The network after one network update is *generation* 1, after two network
 updates generation 2, and so on; a fresh network is generation 0. Playing takes
 minutes and the training steps under a minute: on 5 November the 32 games took
 851 seconds and the 700 training steps 49, on 15 November a training iteration
-of today's 24 games played in 499 seconds, also 64×2, and on 17 November a
+of the 24 games the Mac profile then played took 499 seconds, also 64×2, and on
+17 November a
 network update's 525 training steps took 13.7 seconds beside the games
 ([record](../archive/records/one_network_comparison_2026_11_17.md#speed)).
 
@@ -2075,9 +2079,11 @@ A run's first training samples are drawn more often, because the replay buffer i
 not yet full: in the first network update of the 5 November run, its 1,611
 training samples shared all 22,400 draws, 14 each in that one network update.
 
-Today's 525 training steps keep this for training iterations of 24 games: they
-draw 525 × 32 = 16,800 times, 700 for each game of a training iteration as
-before. A training iteration of 24 games kept 1,354 training samples on
+The 525 training steps kept this for the training iterations of 24 games that
+the Mac profile played until 25 November 2026: they draw 525 × 32 = 16,800
+times, 700 for each game of a training iteration as before, and 840 for each of
+the 20 games it plays since. A training iteration of 24 games kept 1,354
+training samples on
 15 November, so each would be drawn about 12 times; those games were longer than
 on 5 November.
 
@@ -2160,23 +2166,28 @@ hardware is unproven: no training run has yet shown robust playing strength.
 
 ### 9.2 Running training on the Mac
 
-**Layout.** The Mac profile (`studies/campaign/profiles/mac.json`) runs 6 game
+**Layout.** The Mac profile (`studies/campaign/profiles/mac.json`) runs 5 game
 processes of 4 games each. One *inference server*, the main training process,
 runs the network for all their states together, on the CPU: for this small
 network the GPU's cost per forward pass outweighs its speed. In self-play that
 never stops, the same process runs the network updates, on a thread of their own
-(section 9.1). Training stays within the
-owner's allowance of 9 cores, the Mac's 10 performance cores less one for
-everything else, and 30 GB of memory. `tools/supervise_campaign_training.py`
-handles the time budget, restarts and memory stops. It counts one core for each
-game process, one for the inference server, one for the network updates in
-self-play that never stops and one for itself, but a game process
-keeps 1.2 to 1.5 cores busy, because its game threads can compute at once
-(below). So the layout was chosen by the load it puts on the Mac: 6 processes
-kept about 9 cores busy, and 7, which also fit the count, about 10
-([record](../archive/records/nine_core_layouts_2026_11_15.md)). Since the engine
-work of 16 November the 6 keep only about 7 busy, because the inference server
-now sets the pace ([record](../archive/records/engine_speed_in_training_2026_11_16.md)).
+(section 9.1). Training stays within the owner's allowance of 8 of the Mac's
+10 performance cores and 16 GB of its 36 GB of memory, "like 8 cores and 16gbs
+of memory" in the owner's words of 21 November 2026, its memory counted by the
+processes' physical footprints, as Activity Monitor counts it.
+`tools/supervise_campaign_training.py` handles the time budget, restarts and
+memory stops. It counts one core for each game process, one for the inference
+server, one for the network updates in self-play that never stops and one for
+itself, which leaves five game processes, but a game process keeps 1.2 to 1.5
+cores busy, because its game threads can compute at once (below). So layouts are
+chosen by the load they put on the Mac. On 15 November, under the allowance of 9
+cores then, 6 processes kept about 9 cores busy, and 7, which also fit the count
+then, about 10 ([record](../archive/records/nine_core_layouts_2026_11_15.md));
+after the engine work of 16 November the 6 kept only about 7 busy, because the
+inference server set the pace
+([record](../archive/records/engine_speed_in_training_2026_11_16.md)). The
+profile has run 5 since 25 November 2026, when the supervisor's count came down
+to the 8 cores.
 How to start, stop and resume a training run is in the
 [campaign learning guide](../../studies/campaign/README.md).
 
@@ -2389,15 +2400,16 @@ time in forward passes, 13% collating, 6% reading the inference requests from th
 pipes and shared memory, turning the outputs into priors and sending the replies,
 and 9% waiting for inference requests
 ([record](../archive/records/coordinator_rounds_2026_11_17.md#the-training-batch)).
-In training iterations of the Mac profile, whose 6 game processes of 4 games keep
-24 *concurrent games*, games being played at the same moment, an inference batch
+In training iterations of the Mac profile on 16 November, whose 6 game processes
+of 4 games then kept 24 *concurrent games*, games being played at the same
+moment, an inference batch
 held about 8 states and took the inference server about 0.62 ms plus 0.13 ms for
 each state, from reading the inference requests' arrays to the outputs, about
 0.21 ms a state in all, and the inference server was busy about 96% of the time
 ([record](../archive/records/engine_speed_in_training_2026_11_16.md#what-limits-training-now)).
 So the more states wait for an inference batch, the less each costs. While all 24
-games play, an inference batch holds about 10 states, fewer as the training
-iteration's games end, and one when its last game plays alone
+games played, an inference batch held about 10 states, fewer as the training
+iteration's games ended, and one when its last game played alone
 ([record](../archive/records/coordinator_rounds_2026_11_17.md#the-batchs-tail); below).
 
 **What the cores and the GPU do.** In the Mac profile the GPU does nothing, and
@@ -2419,8 +2431,8 @@ answers inference batch after inference batch.
 
 The M4 Max has 10 performance cores and 4 efficiency cores. An efficiency core
 runs at 2.6 GHz instead of 3.8 and, in the game processes, does about 42% of a
-performance core's work in a second. The allowance leaves one performance core for
-the Mac's other work. When that work needs more, the training no longer fits on
+performance core's work in a second. The allowance leaves two performance cores
+for the Mac's other work. When that work needs more, the training no longer fits on
 the performance cores. In two training iterations timed with the profiler on
 16 November other work kept about 4 cores busy. macOS then ran 27% to 29% of the
 game processes' CPU time on the efficiency cores. The game processes waited for a
@@ -2526,7 +2538,7 @@ for inference requests less than 2% of the time through the night of
 CPU cores are not far behind. The six game processes kept 6.7 CPU cores busy and
 the main training process 1.0, so even an inference server that cost nothing
 would let the game processes use only about a fifth more CPU time, up to the
-allowance of 9 CPU cores, before the CPU cores limited instead (inferred). Less
+allowance of 9 CPU cores then, before the CPU cores limited instead (inferred). Less
 engine work per decision buys decisions per hour only by filling the inference
 server's inference batches: the game threads ask sooner, more states wait for
 each inference batch, and each costs less. That is how the engine work of
@@ -2740,12 +2752,15 @@ the training used 9.9 cores instead of 8.9
 ([record](../archive/records/coordinator_one_pass_2026_11_14.md#matched-training-batches)).
 
 On 15 November the owner lowered the allowance from 12 cores to 9, and the
-profile went from 8 game processes to 6, which keep about 9 cores busy. In one
+profile went from 8 game processes to 6, which kept about 9 cores busy. In one
 training iteration each, 7 processes played about 229,000 decisions an hour while
 playing, 6 about 192,000 and 5 about 201,000; one training iteration each cannot
 separate 6 from 5. Against the 252,200 of 8 processes the change costs about a
 quarter of the decisions an hour, on slightly different code and not in matched
 training iterations ([record](../archive/records/nine_core_layouts_2026_11_15.md)).
+On 21 November the owner lowered the allowance again, to 8 cores and 16 GB, and
+on 25 November the supervisor's count followed it and the profile went from 6
+game processes to 5.
 
 On 16 November the engine came to hold its names as numbers, to keep units and
 facilities in slot maps and to digest a binary writing of the state for its
@@ -2893,26 +2908,26 @@ roughly one network evaluation per simulation (section 4.2), and decisions with 
 single legal action are not searched, so a decision uses about 50 network
 evaluations at 64 simulations, 197 at 256 and 612 at 800. Each network evaluation
 needs engine work from a core for games, about 1.3 ms in training, and part of
-a forward pass. So the 7 cores for games that the 9-core allowance leaves can
-feed the network about 5,400 network evaluations a second, whatever its size, and
+a forward pass. So the 6 cores for games that the 8-core allowance leaves can
+feed the network about 4,600 network evaluations a second, whatever its size, and
 the network can evaluate as many states a second as the table above gives for its
 size and device. Self-play runs at the lower of the two rates:
 
 $$\text{decisions per hour} = \frac{3600}{\text{network evaluations per decision}} \times \min\left(\frac{\text{cores for games}}{\text{core seconds per network evaluation}}, \text{states the network evaluates per second}\right)$$
 
-![A line chart on a logarithmic scale of network evaluations per second for networks of 64×2, 128×4, 256×8, 384×12 and 512×16 on the Mac. A flat line at about 5,400 a second is what the engine work of the 7 cores for games can feed, the same for every network. The network on the GPU, in inference batches of 64 states, evaluates 9,840 states a second at 64×2 falling to 1,640 at 512×16, and crosses the flat line between 128×4 and 256×8. The network on one CPU core, in inference batches of 16, evaluates 5,850 at 64×2, just above the flat line, falling to 125 at 512×16. Self-play gets the lower rate: the cores' up to 128×4, the GPU's from 256×8 on.](figures/evaluation_supply.svg)
+![A line chart on a logarithmic scale of network evaluations per second for networks of 64×2, 128×4, 256×8, 384×12 and 512×16 on the Mac. A flat line at about 4,600 a second is what the engine work of the 6 cores for games can feed, the same for every network. The network on the GPU, in inference batches of 64 states, evaluates 9,840 states a second at 64×2 falling to 1,640 at 512×16, and crosses the flat line just before 256×8. The network on one CPU core, in inference batches of 16, evaluates 5,850 at 64×2, just above the flat line, falling to 125 at 512×16. Self-play gets the lower rate: the cores' up to 128×4, the GPU's from 256×8 on.](figures/evaluation_supply.svg)
 
 **How decisions per hour changes with the network and the search.** The
 network's size changes only the second rate, and the search's budget divides
-both. Worked out for the Mac, with 7 cores for games, one for the inference server
+both. Worked out for the Mac, with 6 cores for games, one for the inference server
 and one for the supervisor, the network on whichever is faster of one core, in
 inference batches of 16 states, and the GPU, in inference batches of 64, and
-30 GB, decisions per hour are:
+16 GB, decisions per hour are:
 
 | Network | 64 simulations | 256 simulations | 800 simulations | Limited by |
 | --- | ---: | ---: | ---: | --- |
-| 64×2 | 386,000 | 94,000 | 29,000 | the cores |
-| 128×4 | 386,000 | 94,000 | 29,000 | the cores |
+| 64×2 | 332,000 | 84,000 | 27,000 | the cores |
+| 128×4 | 332,000 | 84,000 | 27,000 | the cores |
 | 256×8 | 324,000 | 82,000 | 25,000 | the GPU |
 | 384×12 | 188,000 | 48,000 | 14,500 | the GPU |
 | 512×16 | 118,000 | 30,000 | 9,200 | the GPU |
@@ -2959,8 +2974,9 @@ GPU: about 205,000 decisions an hour while playing with 63 concurrent games and
 324,000 assumes inference batches of 64 states. Those runs' inference batches
 held about 25 and 48 states, and the inference server, busy 98% of the time,
 set the pace. With 126 concurrent games the CPU cores came close behind: at the
-game processes' CPU time per network evaluation, 1.6 ms, the allowance could
-feed only about a fifth more network evaluations a second (inferred). With the
+game processes' CPU time per network evaluation, 1.6 ms, the allowance of 9
+cores then could feed only about a fifth more network evaluations a second
+(inferred). With the
 compiled layers (below) the same layout played about 286,000 decisions an hour
 while playing and 326,000 while all the games played, and the CPU cores were
 about an eighth behind
@@ -3007,10 +3023,10 @@ back in time: half of all states were answered in inference batches of at least
 averages over a whole training iteration, 25.5 and 48 states, are lower, because
 fewer games are left at its end. So an inference batch of 64 states needs about
 128 concurrent games, each holding its search tree in memory. At 800 simulations
-30 GB hold only about 105 concurrent games, each with its search tree and its
-other working memory, so inference batches hold about 50 states (below, when
-memory would limit). The Mac profile has 24
-concurrent games, and its inference batches on one CPU core hold about 10 states
+16 GB hold only about 50 concurrent games, each with its search tree and its
+other working memory, so inference batches hold about 25 states (below, when
+memory would limit). The Mac profile had 24 concurrent games until 25 November
+2026, 20 since, and its inference batches on one CPU core held about 10 states
 (section 9.2). There an inference batch takes about 1.5 ms and a game thread's
 engine work for a network evaluation about 1.1 ms of a CPU core, not much less
 (both worked out from the
@@ -3055,9 +3071,11 @@ since the search runs in C++:
 | The same with 8 simulations a request and overlapped inference batches (24 November) | the CPU cores, a median of 9.4 busy, at about 6,100 network evaluations a second; the inference server busy about 73% in inference batches of about 125 states | they limit | a cheaper engine, in full, until the inference server limits again, about a third more |
 | The same with 24 concurrent games and the lighter engine bookkeeping (24 November) | the inference server, busy 94%, in inference batches of about 54 states, at about 6,700 network evaluations a second; the CPU cores a median of 7.7 busy | about a sixth more | larger inference batches, from more concurrent games or more simulations a request, as far as memory allows |
 | The same with 30 concurrent games and network updates of 50 training steps (24 November) | the inference server, busy 94%, in inference batches of about 71 states, at about 7,600 network evaluations a second between network updates and 7,300 with them; the CPU cores a median of 8.4 busy | about as much, about 7,700 | a cheaper inference server and a cheaper engine together; fewer network evaluations a game, as the fast searches that count a reused tree's visits ask for since 25 November ([Q-023](../questions.md#answered)) |
+| The same with 25 concurrent games in 5 game processes, under the allowance of 8 cores (25 November, the training run at 256×16) | the inference server, busy about 93%, in inference batches of about 57 states, at about 6,800 network evaluations a second between network updates; the CPU cores a median of 7.8 busy | about as much | a cheaper inference server and a cheaper engine together; fewer network evaluations a game |
 
-The CPU cores' rates are inferred: the 9 CPU cores of the allowance, less the
-inference server's process, divided by the game processes' CPU time per network
+The CPU cores' rates are inferred: the CPU cores of the allowance then, 9 until
+25 November 2026, less the inference server's process, divided by the game
+processes' CPU time per network
 evaluation, against the network evaluations a second measured in training or,
 at 512×16, in replayed forward passes
 ([64×2](../archive/records/one_network_comparison_2026_11_17.md#speed),
@@ -3084,10 +3102,14 @@ states, and limited again: a network evaluation cost the game processes
 1.13 ms of CPU, a quarter less, as their threads ran on performance cores 91%
 of their time against 79% with 48. With 30, in inference batches of about 71
 states, the inference server answered about an eighth more, busy 94%, and the
-CPU cores, a median of 8.4 of the 9 busy, could have fed only a little more.
-So at these sizes the Mac's GPU and the CPU cores of the allowance limit
-self-play together, at about 7,600 network evaluations a second, and 30
-concurrent games are the layout the measurements suggest.
+CPU cores, a median of 8.4 of the 9 busy, could have fed only a little more:
+under the allowance of 9 cores then, the Mac's GPU and the CPU cores limited
+self-play together, at about 7,600 network evaluations a second. Under the
+allowance of 8 cores, 30 concurrent games in 6 game processes kept a median of
+8.3 cores busy in the first 24 minutes of the training run of 25 November, too
+many, and 25 in 5 processes, which the run plays since, a median of 7.8 in its
+first 14 minutes, at about 6,800 network evaluations a second between network
+updates ([list of runs](../archive/runs.md), `training-256x16-2026-11-25`).
 
 A cheaper inference server pays until the CPU cores limit. At 256×8 the compiled
 layers made it about a tenth cheaper in the inference batches of steady play
@@ -3399,8 +3421,9 @@ the time, and the CPU cores keep a median of 6.5 busy (above), so these levers
 would pay nothing there: they would only lower the CPU cores' load. More
 concurrent games fill larger inference batches, which the GPU answers more
 cheaply a state, until the CPU cores limit again: at 0.98 ms a network
-evaluation the allowance feeds about 8,600 network evaluations a second, about
-1.5 times the 5,800 measured (inferred). Measured, 252 concurrent games played
+evaluation the allowance of 8 cores feeds about 7,600 network evaluations a
+second, about 1.3 times the 5,800 measured (inferred). Measured, 252 concurrent
+games played
 18% more decisions an hour than 126 while all the games played, with the CPU
 cores at a median of 7.85, and 378 did not fit beside the Mac's other programs
 (below). So at 256×8 the engine's levers pay again only
@@ -3408,8 +3431,13 @@ with more concurrent games; at 512×16, where the GPU's forward pass limits
 (above), they pay nothing; on a faster GPU the engine's cost sets how many CPU
 cores keep it busy.
 
-**When memory would limit.** The allowance's 30 GB hold the processes, about
-3 GB, and for each concurrent game its search tree and about 70 MB besides. In
+**When memory would limit.** The allowance's 16 GB hold the processes, about
+3 GB, and for each concurrent game its search tree and about 70 MB besides. The
+numbers of this paragraph until 25 November 2026 are the supervisor's count of
+then, which counted the memory the processes share in every one of them; since
+then it counts their physical footprints, as Activity Monitor does, which in
+the training run of 25 November were about 0.7 times that count (8.6 GB against
+12.1). In
 training at 256×8 on the GPU with 64 simulations, 63 concurrent games held
 8.0 GB at the sampled peak and 126 held 12.5 to 13.4 GB, about 70 to 85 MB a
 game, of which its search tree is about 11 MB
@@ -3421,7 +3449,7 @@ the table below, worked out with the Python search, may count about 10 MB a
 game too many. With 189, 252 and 378 concurrent games the runs of the C++ search
 held 12.2, 13.5 and about 15 GB
 ([record](../archive/records/concurrent_games_cpp_search_2026_11_19.md#results)).
-The 30 GB are the run's alone: the rest of the Mac, with a browser, a web
+The 16 GB are the run's alone: the rest of the Mac, with a browser, a web
 development server and Claude's apps open, held 11 to 17 GB of its 36 GB during
 those runs, and the operating system keeps 5 to 6 GB. With 378 concurrent games
 macOS reported warning-level memory pressure nearly throughout, swap grew by
@@ -3435,7 +3463,7 @@ critical for 10 seconds or when the swap in use grows by 4 GB above its level
 when the training process started (`machine_memory` and `supervise` in
 `tools/supervise_campaign_training.py`;
 [long unattended runs](../../studies/campaign/README.md#long-unattended-runs)).
-A run within its 30 GB can then be stopped because of other programs, and the
+A run within its 16 GB can then be stopped because of other programs, and the
 supervisor's status file says so. Besides the replay buffer, the learner keeps the events of
 the current training iteration's games, which its progress report reads
 (`action_history` in `studies/campaign/learning.py`, cleared by `train` in
@@ -3452,21 +3480,21 @@ about 1.25 GB an hour in the training run of 19 to 21 November, on 19 and 20 Nov
 ([record](../archive/records/training_process_memory_2026_11_20.md)). It still
 holds the results of the games the latest network update trained on and of the
 games finished since that update began. With the search trees measured above,
-the 30 GB hold (inferred):
+the 16 GB hold (inferred):
 
-| Simulations per decision | Search tree | Memory per concurrent game | Concurrent games in 30 GB | States per inference batch |
+| Simulations per decision | Search tree | Memory per concurrent game | Concurrent games in 16 GB | States per inference batch |
 | ---: | ---: | ---: | ---: | ---: |
-| 64 | 11 MB | about 80 MB | about 330 | about 165 |
-| 256 | 56 MB | about 125 MB | about 215 | about 105 |
-| 800 | about 190 MB | about 260 MB | about 105 | about 50 |
-| 1,600 | about 390 MB | about 460 MB | about 60 | about 30 |
+| 64 | 11 MB | about 80 MB | about 160 | about 80 |
+| 256 | 56 MB | about 125 MB | about 105 | about 50 |
+| 800 | about 190 MB | about 260 MB | about 50 | about 25 |
+| 1,600 | about 390 MB | about 460 MB | about 30 | about 15 |
 
-At 64 simulations the allowance is far from the limit, but the Mac's memory is
-not: beside the Mac's usual programs, 252 concurrent games play the most
-decisions an hour, and 378 already push the Mac into swap (above). With longer
-searches memory limits how full the
-inference batches can be. At 1,600 simulations, the search of AlphaGo Zero,
-inference batches of about 30 states would give the GPU less than its rate in
+At 64 simulations the C++ search's runs held more games than the table counts:
+252 concurrent games, which played the most decisions an hour, held 13.5 GB by
+the supervisor's count of then, and 378 pushed the Mac into swap (above). With
+longer searches memory limits how full the inference batches can be. At 1,600
+simulations, the search of AlphaGo Zero, inference batches of about 15 states
+would give the GPU less than its rate in
 inference batches of 64 (above, where an inference batch's states come from).
 Several simulations in one inference request, built on 24 November (section
 4.7), fill the inference batches from fewer concurrent games: at 256×16 with
@@ -3498,7 +3526,7 @@ Three things follow, inferred:
 - **The engine is the main cost of a simulation.** A network evaluation takes
   about 1.3 ms of a core in the engine and 0.15 to 0.22 ms of the GPU at 256×8.
   Keeping the Mac's GPU busy, in inference batches of 64, takes about 13 cores for
-  games at 64×2, 10 at 128×4, 6 at 256×8, 3 at 384×12 and 2 at 512×16: the 7 of
+  games at 64×2, 10 at 128×4, 6 at 256×8, 3 at 384×12 and 2 at 512×16: the 6 of
   the allowance keep it busy from 256×8 on, and all 10 performance cores would
   nearly keep it busy at 128×4.
 - **Memory grows with the search.** A search tree holds about 0.24 MB per
@@ -3782,19 +3810,19 @@ measured and what would settle it.
   mark. A mark is asked about on every kind of thing the rules put it on, for
   every nation or unit class of that kind
   ([features removed as impossible](network_input.md#8-features-removed-as-impossible)).
-- **The inference server limits self-play on the Mac.** In the Mac profile it is
-  busy about 98% of the time, while the game processes keep about 6.7 of the 9
-  CPU cores of the allowance busy
+- **The inference server limits self-play on the Mac.** In the Mac profile on
+  17 November it was busy about 98% of the time, while its 6 game processes kept
+  about 6.7 of the 9 CPU cores of the allowance then busy
   ([record](../archive/records/one_network_comparison_2026_11_17.md#speed)), so a
   faster engine plays more decisions an hour only as far as it fills the
-  inference server's inference batches (section 9.2). A seventh game process
-  would fill them further, which is untested. With the network on the GPU at
+  inference server's inference batches (section 9.2). With the network on the GPU at
   256×8 and 126 concurrent games the inference server is busy 97% of the time.
   Since the search runs in C++ the run keeps a median of 6.5 CPU cores busy
   ([record](../archive/records/search_in_cpp_2026_11_19.md)); with the Python
-  search it went a little over the allowance, a median of 9.5, which the owner
-  accepted (19 November), and the supervisor's count of cores accepts these
-  layouts (Q-005 in `docs/questions.md`). The
+  search it went a little over the allowance of 9 cores then, a median of 9.5,
+  which the owner accepted (19 November); since 21 November the allowance is 8
+  cores, and the supervisor's count of cores allows 5 game processes (Q-005 in
+  `docs/questions.md`). The
   inference server's levers are listed in section 9.3: fewer PyTorch calls came
   with one network, compiling and more concurrent games are settings, and the
   others are not built. In
@@ -4181,14 +4209,16 @@ the inference batches overlapped on the GPU, about 6,100, 2,400 games a day and
 about 60 days, with 48 concurrent games, more than the Mac's memory allowed
 beside its other programs (below); and with 30 concurrent games and the
 engine's lighter bookkeeping, about 7,300 with the network updates, about 2,900
-games a day and about 50 days, the GPU and the 9 CPU cores both near their
-limits (section 9.3). Since 25 November the fast searches count the visits a
-reused tree brings toward their 150 simulations
-([Q-023](../questions.md#answered)): along two games with a stand-in network the
-searches then asked for about 14% fewer network evaluations
-([record](../archive/records/reused_visits_counted_2026_11_25.md)), which at the
-same rate would take the 145,000 games from about 50 days to about 43
-(inferred). Played at 800 simulations on
+games a day and about 50 days, the GPU and the 9 CPU cores of the allowance then
+both near their limits (section 9.3). Under the allowance of 8 cores the
+training run plays 25 concurrent games, at about 6,800 network evaluations a
+second between network updates and about 6,500 with them (section 9.3). Since 25
+November the fast searches count the visits a reused tree brings toward their
+150 simulations ([Q-023](../questions.md#answered)): along two games with a
+stand-in network the searches then asked for about 14% fewer network evaluations
+([record](../archive/records/reused_visits_counted_2026_11_25.md)), so that at
+6,500 a second the 145,000 games would take about 48 days (inferred). Played at
+800 simulations on
 every decision, as AlphaZero played, every number of days above is 2.6 times as
 large. A computer with 32 CPU cores for the games and a GPU that evaluates
 23,000 states a second at the chosen size would play 145,000 games in about 16
@@ -4227,8 +4257,10 @@ larger one at equal compute, as KataGo did. The owner chose to run it on the
 Mac (Q-021, [answered](../questions.md#answered) on 24 November 2026), once
 self-play at these sizes was made as fast as the Mac allows
 ([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). It started
-on 25 November 2026, with 6 game processes of 5 games and a network update of
-50 training steps of 256 training samples after every 30 finished games, from a
+on 25 November 2026 with 6 game processes of 5 games, which kept a median of 8.3
+CPU cores busy, over the owner's allowance of 8, so after 24 minutes it started
+again from a fresh network with 5 processes of 5 games and a network update of
+50 training steps of 256 training samples after every 25 finished games, from a
 replay buffer of 100,000
 ([list of runs](../archive/runs.md), `training-256x16-2026-11-25`). Its
 held-out evaluations are not set up yet.

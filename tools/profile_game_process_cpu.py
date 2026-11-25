@@ -422,7 +422,7 @@ def main(argv=None) -> int:
     limits = profile.get("supervisor", {})
     python = str(ROOT / Path(profile["python"]).expanduser()) if "python" in profile else sys.executable
     config = supervisor.SupervisorConfig(seconds=args.seconds, cpu_budget=limits.get("cpu_budget", supervisor.CORE_ALLOWANCE),
-                                         memory_bytes=limits.get("memory_bytes", 30_000_000_000),
+                                         memory_bytes=limits.get("memory_bytes", supervisor.MEMORY_ALLOWANCE_BYTES),
                                          max_restarts=0)
     arguments = supervisor.profile_arguments(profile, arguments)
 

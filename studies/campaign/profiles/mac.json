@@ -3,24 +3,25 @@
   "machine": "Apple M4 Max: 14 CPU cores (10 performance, 4 efficiency), 36 GB memory, 32-core GPU",
   "python": "tmp/gpu-mps-env/bin/python",
   "supervisor": {
-    "cpu_budget": 9,
-    "memory_bytes": 30000000000
+    "cpu_budget": 8,
+    "memory_bytes": 16000000000
   },
   "training": {
-    "episode_workers": 6,
+    "episode_workers": 5,
     "games_per_process": 4,
-    "parallel_envs": 24,
+    "parallel_envs": 20,
     "neural_device": "cpu",
     "threads": 1,
-    "cpu_budget": 8,
+    "cpu_budget": 7,
     "continuous": true
   },
   "unset_environment": ["MallocNanoZone"],
   "keep_awake": true,
   "tests": {
-    "cpu_budget": 9
+    "cpu_budget": 8
   },
   "measured": [
+    "25 November 2026, eleven-round games at 256x16 on the GPU, 800 simulations with noise on a quarter of the decisions and 150 on the rest, no depth limit, 8 simulations a request: six game processes of 5 games kept a median of 8.3 cores busy in the first 24 minutes of the training run of that day, over the allowance of 8, so it was stopped and started again with five processes (studies/campaign/runs/training-256x16-2026-11-25). The day before, six processes of 4 games had kept a median of 7.7 (docs/archive/records/self_play_speed_256x16_2026_11_24.md).",
     "17 November 2026, eleven-round games, 64 simulations, depth 16, 64 wide, two message layers, the training command's learning settings, two matched pairs of runs of four network updates: self-play that never stops (continuous) played 6.5% and 12.5% more decisions per wall-clock hour in steady play than alternating training iterations; while a network update ran beside the games the inference server answered about 29% fewer evaluations a second (docs/archive/records/self_play_never_stops_2026_11_17.md).",
     "15 November 2026, eleven-round games, 64 simulations, depth 16, 64 wide, two message layers, one matched-recipe batch each: these 6 game processes of 4 games played about 192,000 decisions per hour while playing (173 games per hour) and kept about 9 cores busy (median half-minute window 8.9, mean 8.2), the coordinator busy 90% of the time.",
     "The same day 7 processes, which also fit the supervisor's count of 9 cores, kept about 10 busy (median window 9.9) and played about 229,000; 5 processes kept about 9 busy (8.9) and played about 201,000, a difference from 6 within the spread of single batches (docs/archive/records/nine_core_layouts_2026_11_15.md).",
@@ -34,9 +35,9 @@
     "python: PyTorch 2.14 from requirements-gpu-mps.txt, which the GPU needs for long runs; the numbers above were measured with it.",
     "unset_environment: agent shells set MallocNanoZone=0, which slows the allocator and costs 26 to 29% more CPU.",
     "keep_awake: caffeinate keeps the Mac awake while the supervisor runs.",
-    "tests: a test's configuration uses at most 9 cores here (tests/machine.py).",
-    "The owner's allowance is 9 cores and 30 GB: the M4 Max has 10 performance cores, and one stays free for everything else. The supervisor counts one core per game process, one for the coordinator and one for itself, but a process of four games keeps 1.2 to 1.5 cores busy, so the layout is set by the measured load, not by that count. The supervisor's --all-cores uses all 14 cores when the owner allows it.",
-    "24 games a batch instead of 32: with the Mac command's --epochs 525 instead of 700, each kept sample is drawn as often as before.",
+    "tests: a test's configuration uses at most 8 cores here (tests/machine.py).",
+    "The owner's allowance is 8 cores and 16 GB of the M4 Max's 10 performance cores and 36 GB (\"I just want to give it like 8 cores and 16gbs of memory\", 21 November 2026), memory counted by the processes' physical footprints, as Activity Monitor counts it. The supervisor counts one core per game process, one for the inference server, one for the network updates of self-play that never stops and one for itself, so the allowance leaves five game processes; but a process of four or five games keeps 1.2 to 1.5 cores busy, so the layout is set by the measured load, not by that count. The supervisor's --all-cores uses all 14 cores when the owner allows it.",
+    "A network update follows every parallel_envs finished games, 20 with five processes of four; the Mac command's --epochs 525 was chosen for the 24 games of six processes of four, so that each kept sample was drawn as often as with 32 games and 700 training steps.",
     "continuous: self-play that never stops; network updates run beside the games on a thread of the inference server's process, so the supervisor and the runner count one more core for them."
   ]
 }

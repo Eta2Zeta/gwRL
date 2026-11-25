@@ -32,7 +32,7 @@ Other open things stay in the pages that own them, and
 
 | Number | Question | About | Recommended |
 | --- | --- | --- | --- |
-| [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Measure and warn, and change a layout that goes over by hand |
+| [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 8 cores by measuring the load, not by counting game processes? | Running training | Measure and warn, and change a layout that goes over by hand |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
@@ -41,7 +41,7 @@ Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 ## Q-005: The supervisor's count of cores
 
 **The question.** Should the supervisor keep a training run within the owner's
-allowance of 9 cores by measuring the CPU its processes use, instead of
+allowance of 8 cores by measuring the CPU its processes use, instead of
 counting one core for each game process?
 
 **What the supervisor does now.** Before it starts a run,
@@ -50,7 +50,7 @@ counting: one core for each game process, one for the inference server and one f
 itself (`validate_training_arguments`, and `busy_cores` in
 `studies/campaign/run.py`). While the run plays it measures only memory: every
 second it reads the process table and stops the run if the memory used comes
-within 1 GB of 30 GB. But a game process plays four games, one on each of its
+within 1 GB of 16 GB. But a game process plays four games, one on each of its
 threads, and the engine releases Python's lock while it works, so the four
 threads compute at the same time. A process keeps 1.2 to 1.5 cores busy, not
 one ([running training on the Mac](design/README.md#92-running-training-on-the-mac)).
@@ -80,9 +80,10 @@ count 9 with self-play that never stops, 9.5: the game processes did more
 engine work each second because the inference server answered them sooner
 ([record](archive/records/readout_without_repeat_2026_11_18.md)). The supervisor
 accepted both; two runs were stopped by hand. On 19 November the owner said that
-going a little over the allowance, as these runs did, is fine, so this layout
-stays and no smaller one is being sought. How far over is still a little is not
-set, and a stop under choice A below would need that number.
+going a little over the allowance of 9 cores then, as these runs did, was fine.
+On 21 November the owner set the allowance at 8 cores and 16 GB; how far over 8
+would still be a little has not been said, and a stop under choice A below would
+need that number.
 
 **A third case** (24 November 2026, the 256×16 network on the GPU, 800
 simulations on a quarter of the decisions and 150 on the rest, 8 simulations a
@@ -90,10 +91,14 @@ request, self-play that never stops). Six game processes count 9 cores whatever
 their games. With 4 games each they kept a median of 7.7 cores busy, with 5 a
 median of 8.4 and with 8 a median of 9.46
 ([record](archive/records/self_play_speed_256x16_2026_11_24.md)). The training
-run at these sizes plays six processes of 5 games, chosen by that measurement.
+run at these sizes started on 25 November with six processes of 5 games, which
+the supervisor's count of 9 cores then accepted; they kept a median of 8.3
+cores busy, over the allowance of 8, and the run started again with five
+processes of 5 games, which count 8 and kept a median of 7.8 in their first 14
+minutes ([list of runs](archive/runs.md), `training-256x16-2026-11-25`).
 
-**Why it matters.** The allowance is there to keep one performance core free
-for everything else. The count does not show whether it is free, and even a
+**Why it matters.** The allowance is there to keep two performance cores free
+for everything else. The count does not show whether they are free, and even a
 layout chosen by measuring it goes over when the Mac is quiet. A different network, device,
 number of games per process or search would change the load without the
 supervisor noticing, and so would a faster inference server, as in the second

@@ -21,7 +21,7 @@ Example (run from the repository root)::
       --control-dir studies/campaign/runs/example-control \
       --run-dir studies/campaign/runs/example --seconds 35000 -- \
       --calendar-rounds 3 --complete-episodes --batches 1000 \
-      --parallel-envs 4 --threads 3 --cpu-budget 8
+      --parallel-envs 4 --threads 3 --cpu-budget 7
 
 Repeat exactly that command to resume, including the original --seconds value.
 The runner validates source/binary/checkpoint compatibility. An exhausted episode
@@ -80,9 +80,12 @@ SWAP_GROWTH_BYTES = 4_000_000_000
 # kern.memorystatus_vm_pressure_level reports 1 (normal), 2 (warning) or 4 (critical).
 CRITICAL_PRESSURE_LEVEL = 4
 PRESSURE_LEVELS = {1: "normal", 2: "warning", 4: "critical"}
-# The owner's allowance: 9 cores, since the Mac's M4 Max has 10 performance
-# cores and one stays free for everything else. --all-cores passes it.
-CORE_ALLOWANCE = 9
+# The owner's allowance, of the Mac's 10 performance cores and 36 GB: "I just
+# want to give it like 8 cores and 16gbs of memory" (21 November 2026).
+# --all-cores passes the cores. Memory is counted as Activity Monitor counts it,
+# by the processes' physical footprints (process_memory_charge).
+CORE_ALLOWANCE = 8
+MEMORY_ALLOWANCE_BYTES = 16_000_000_000
 # Source/configuration errors normally exit 1 and must stop for inspection.
 if sys.platform == "win32":
     # Access violation, stack overflow, heap corruption and fail-fast exits.
@@ -103,7 +106,7 @@ def _windows():
 
 def memory_metric() -> str:
     if sys.platform == "darwin":
-        return "sum of per-process max(RSS, macOS physical footprint including compressed pages)"
+        return "sum of per-process macOS physical footprints, compressed pages included"
     return "sum of per-process working sets" if sys.platform == "win32" else "sum of per-process RSS"
 
 
@@ -179,7 +182,11 @@ def _process_disappeared(pid: int) -> bool:
 
 
 def process_memory_charge(pid: int, resident_bytes: int) -> int:
-    """Charge compressed Darwin pages too; a live API failure is never ignored."""
+    """A process's memory: on macOS its physical footprint, compressed pages
+    included, as Activity Monitor shows it, not its resident size, which counts
+    the shared libraries and shared memory every process maps (a game process of
+    5 games at 256x16: 1.1 GB resident, 0.63 GB footprint, 25 November 2026).
+    A live API failure is never ignored."""
     if type(pid) is not int or not 0 < pid <= 2**31 - 1:
         raise ValueError("Memory sampling requires a positive C-int PID")
     if type(resident_bytes) is not int or resident_bytes < 0:
@@ -188,7 +195,7 @@ def process_memory_charge(pid: int, resident_bytes: int) -> int:
         return resident_bytes
     for attempt in range(3):
         try:
-            return max(resident_bytes, _darwin_physical_footprint(pid))
+            return _darwin_physical_footprint(pid)
         except OSError as error:
             error.monitor_pid = pid
             if _process_disappeared(pid):
@@ -238,7 +245,7 @@ def machine_memory() -> dict | None:
 class SupervisorConfig:
     seconds: float
     cpu_budget: int = CORE_ALLOWANCE
-    memory_bytes: int = 30_000_000_000
+    memory_bytes: int = MEMORY_ALLOWANCE_BYTES
     poll_seconds: float = 1.0
     shutdown_seconds: float = 60.0
     max_restarts: int = 2
@@ -255,8 +262,8 @@ class SupervisorConfig:
         limit = (os.cpu_count() or 1) if self.all_cores else CORE_ALLOWANCE
         if type(self.cpu_budget) is not int or not 2 <= self.cpu_budget <= limit:
             raise ValueError(f"CPU allowance must reserve a coordinator within the authorized {limit} cores")
-        if type(self.memory_bytes) is not int or not MEMORY_MARGIN_BYTES < self.memory_bytes <= 30_000_000_000:
-            raise ValueError("Memory allowance must fit the authorized 30 GB with a safety margin")
+        if type(self.memory_bytes) is not int or not MEMORY_MARGIN_BYTES < self.memory_bytes <= MEMORY_ALLOWANCE_BYTES:
+            raise ValueError("Memory allowance must fit the authorized 16 GB with a safety margin")
         if type(self.max_restarts) is not int or not 0 <= self.max_restarts <= 10:
             raise ValueError("Automatic restarts must be bounded between zero and ten")
 
@@ -760,7 +767,7 @@ def main(argv=None) -> int:
     parser.add_argument("--seconds", type=float, required=True, help="Original fixed active-wall allowance; never reset on resume")
     parser.add_argument("--profile", help="Machine profile in studies/campaign/profiles, such as mac")
     parser.add_argument("--cpu-budget", type=int, help=f"Default {CORE_ALLOWANCE}, or the profile's")
-    parser.add_argument("--memory-bytes", type=int, help="Default 30,000,000,000, or the profile's")
+    parser.add_argument("--memory-bytes", type=int, help="Default 16,000,000,000, or the profile's")
     parser.add_argument("--max-restarts", type=int, default=2)
     parser.add_argument("--all-cores", action="store_true", help="The owner allowed every core for this run")
     parser.add_argument("--shutdown-seconds", type=float, default=60)
@@ -784,7 +791,7 @@ def main(argv=None) -> int:
     config = SupervisorConfig(seconds=args.seconds,
                               cpu_budget=args.cpu_budget if args.cpu_budget is not None else limits.get("cpu_budget", CORE_ALLOWANCE),
                               memory_bytes=args.memory_bytes if args.memory_bytes is not None
-                              else limits.get("memory_bytes", 30_000_000_000),
+                              else limits.get("memory_bytes", MEMORY_ALLOWANCE_BYTES),
                               all_cores=args.all_cores,
                               max_restarts=args.max_restarts, shutdown_seconds=args.shutdown_seconds,
                               poll_seconds=args.poll_seconds)

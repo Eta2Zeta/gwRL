@@ -147,12 +147,12 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
                                "(run / 'ready').write_text('ready')\n"
                                "while True: time.sleep(0.01)\n")
         def resident(_pid):
-            return 29_500_000_000 if (self.run / "ready").exists() else 1_000_000
+            return 15_500_000_000 if (self.run / "ready").exists() else 1_000_000
         state = supervise(self.control, self.run, self.config, ARGUMENTS,
                           command_factory=factory, rss_sampler=resident)
         self.assertEqual(state["status"], "memory_limit")
         self.assertTrue((self.run / "checkpoint.pt").exists())
-        self.assertEqual(state["aggregate_sampled_peak_rss_bytes"], 29_500_000_000)
+        self.assertEqual(state["aggregate_sampled_peak_rss_bytes"], 15_500_000_000)
 
     def test_monitor_failures_preserve_worker_and_orphan_diagnostics_without_retry(self):
         for phase in ("worker", "orphan_cleanup"):
@@ -218,7 +218,7 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
             if not (self.run / "ready").exists():
                 return 1_000_000
             samples.append(len(samples))
-            return 29_500_000_000 if len(samples) == 1 else 30_000_000_000
+            return 15_500_000_000 if len(samples) == 1 else 16_000_000_000
         state = supervise(self.control, self.run, self.config, ARGUMENTS,
                           command_factory=factory, rss_sampler=resident)
         self.assertGreaterEqual(len(samples), 2)
@@ -452,11 +452,12 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             SupervisorConfig(seconds=10, cpu_budget=13)
 
-    def test_darwin_charge_includes_compressed_footprint_and_keeps_larger_resident_count(self):
+    def test_darwin_charge_is_the_physical_footprint_whatever_the_resident_size(self):
         with patch("tools.supervise_campaign_training.sys.platform", "darwin"), \
              patch("tools.supervise_campaign_training._darwin_physical_footprint", return_value=5_000_000_000):
             self.assertEqual(process_memory_charge(123, 1_000_000_000), 5_000_000_000)
-            self.assertEqual(process_memory_charge(123, 6_000_000_000), 6_000_000_000)
+            # Shared libraries and shared memory count in every process's resident size, not in its footprint.
+            self.assertEqual(process_memory_charge(123, 6_000_000_000), 5_000_000_000)
         with patch("tools.supervise_campaign_training.sys.platform", "linux"), \
              patch("tools.supervise_campaign_training._darwin_physical_footprint", side_effect=AssertionError("No macOS API")):
             self.assertEqual(process_memory_charge(123, 10), 10)
@@ -602,10 +603,10 @@ class MachineProfileTests(unittest.TestCase):
         self.assertEqual(profile_arguments({"training": {"continuous": False}}, []), ["--no-continuous"])
 
     def test_self_play_that_never_stops_counts_its_trainer(self):
-        arguments = ["--threads", "1", "--parallel-envs", "24", "--cpu-budget", "8", "--episode-workers", "7"]
-        validate_training_arguments(arguments, SupervisorConfig(seconds=2, cpu_budget=9))
+        arguments = ["--threads", "1", "--parallel-envs", "24", "--cpu-budget", "7", "--episode-workers", "6"]
+        validate_training_arguments(arguments, SupervisorConfig(seconds=2, cpu_budget=8))
         with self.assertRaisesRegex(ValueError, "exceed training CPU budget"):
-            validate_training_arguments([*arguments, "--continuous"], SupervisorConfig(seconds=2, cpu_budget=9))
+            validate_training_arguments([*arguments, "--continuous"], SupervisorConfig(seconds=2, cpu_budget=8))
 
     def test_an_unknown_profile_names_the_known_ones(self):
         with self.assertRaisesRegex(ValueError, "known profiles: .*mac"):
