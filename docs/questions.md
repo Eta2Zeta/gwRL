@@ -239,8 +239,9 @@ the page that now states it.
   minutes in its status file and warns when that median reaches 9 cores, the
   allowance of 8 since 21 November and the bit over it the owner accepts ("a bit
   over 8 is fine, as along as it doesn't go to 9", 25 November), without
-  stopping the run; a layout that goes over is changed by hand. Before a run starts it still counts a core for each game
-  process, the inference server, the network updates and itself. Raised on 15
+  stopping the run; a layout that goes over is changed by hand. Before a run
+  starts it still counts a core for each game process, the inference server,
+  the network updates and itself. Raised on 15
   November, when six game processes of four games, which counted 9 cores, kept
   about 9 busy and seven about 10
   ([record](archive/records/nine_core_layouts_2026_11_15.md)); on 25 November
