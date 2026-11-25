@@ -2170,7 +2170,8 @@ device, the CPU or the GPU (`self_play_never_stops` in
 
 Training can also alternate between playing and learning, as the Windows profile
 does, whose inference server runs on the GPU. A training iteration's games, 24
-in the Windows profile, then start together with the network held fixed, and the network update runs
+in the Windows profile, then start together with the network held fixed, and
+the network update runs
 when the last of them has ended, so self-play stands still while the last games
 finish and while the network updates (section 9.2).
 
