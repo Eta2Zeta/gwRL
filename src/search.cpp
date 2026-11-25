@@ -671,6 +671,15 @@ SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t
         }
     }
 
+    // The new simulations: the whole budget, or, when the budget counts the
+    // visits the root's actions hold from a reused tree, what they lack of it.
+    int budget = settings_.simulations;
+    if (settings_.countReusedVisits) {
+        long held = 0;
+        for (const auto& edge : rootNode.edges) held += edge.visits;
+        budget = static_cast<int>(std::max(0L, static_cast<long>(budget) - held));
+    }
+
     // The simulations, gathered into requests of up to simulationsPerRequest
     // questions. A walk that ends at a known value is backed up at once; one
     // that needs a question waits, its path's edges counted as visits that lost,
@@ -685,12 +694,12 @@ SearchOutcome Searcher::run(std::shared_ptr<const Engine> rootGame, std::uint8_t
     std::vector<SearchQuestion> questions;
     std::vector<SearchAnswer> answers;
     int done = 0, walks = 0, request = 0;
-    while (done < settings_.simulations) {
+    while (done < budget) {
         ++request;
         waiting.clear();
         questions.clear();
         int dropped = 0;
-        while (done + static_cast<int>(waiting.size()) < settings_.simulations &&
+        while (done + static_cast<int>(waiting.size()) < budget &&
                static_cast<int>(waiting.size()) < perRequest && dropped < perRequest) {
             Leaf leaf = walk(walks++, path, edgesPath);
             if (leaf.need == Leaf::Need::Nothing) {

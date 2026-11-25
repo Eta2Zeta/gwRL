@@ -93,6 +93,11 @@ class RunConfig:
     # Simulations of a search whose positions go to the inference server in one
     # request (design document, section 4.7); LearningConfig.
     simulations_per_request: int = 1
+    # A model export in models/ after every this many network updates, besides
+    # the one at the start: at 256x16 an export takes about 80 MB, and a network
+    # update every ten minutes, each exported, would fill the Mac's free disk
+    # within days.
+    model_export_every: int = 1
 
     def __post_init__(self):
         if not isinstance(self.neural_device, str) or self.neural_device not in {"cpu", "mps", "cuda"} and not (
@@ -100,7 +105,7 @@ class RunConfig:
             raise ValueError("Neural device must be cpu, mps or an explicit CUDA device")
         positive = ("batches", "transitions_per_batch", "parallel_envs", "simulations", "max_depth",
                     "hidden_dim", "message_layers", "batch_size", "epochs",
-                    "replay_capacity", "threads", "simulations_per_request")
+                    "replay_capacity", "threads", "simulations_per_request", "model_export_every")
         if any(type(getattr(self, key)) is not int or getattr(self, key) <= 0 for key in positive):
             raise ValueError("Run counts and dimensions must be positive integers")
         if self.kept_simulations is not None and (type(self.kept_simulations) is not int or self.kept_simulations <= 0):
@@ -375,6 +380,11 @@ def train(args) -> int:
                 model_exports += 1
         latest_model_export = {**metadata, "path": relative.as_posix()}
 
+    def export_if_due():
+        # After a network update: every config.model_export_every network updates.
+        if learner.generation % config.model_export_every == 0:
+            export_model()
+
     def factory(seed):
         runner["training_environment_seeds"].append(seed)
         return make_env(seed, calendar_rounds=config.calendar_rounds)
@@ -568,7 +578,7 @@ def train(args) -> int:
             runner["batch_index"] += 1
             runner["total_waves"] += 1  # A network update counts as one wave, as a worker batch does.
             learner.counters["batches"] += 1
-            export_model()
+            export_if_due()
             persist("running", recovery=recovery_checkpoint_due(config, runner["batch_index"],
                                                                 last_checkpoint_time, time.monotonic()))
             progress("update")
@@ -695,7 +705,7 @@ def train(args) -> int:
                 if config.games_per_process:
                     runner["updates"][-1]["evaluator"] = workers.report()
                 runner["batch_index"] += 1
-                export_model()
+                export_if_due()
                 persist("running", recovery=recovery_checkpoint_due(
                     config, runner["batch_index"], last_checkpoint_time, time.monotonic()))
                 progress("update")
@@ -752,7 +762,7 @@ def train(args) -> int:
                 runner["updates"].append({"rollout": rollout, "update": update, "episodes": episodes})
                 runner["batch_index"] += 1
                 runner["wave_index"] = 0
-                export_model()
+                export_if_due()
                 persist("running", recovery=False)
                 progress("update")
         status = "interrupted" if stopped else "episode_budget_exhausted" if exhausted else "completed"

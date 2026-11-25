@@ -51,9 +51,11 @@ class MoveLogTest(unittest.TestCase):
             header, moves = read_log(self.write(directory, self.log))
         kinds = {move["kind"] for move in moves}
         self.assertEqual(kinds, {"search", "action", "chance"})
-        # A kept decision's search adds exploration noise, any other's none.
-        self.assertEqual({(move["simulations"], move["root_noise"]) for move in moves if move["kind"] == "search"},
-                         {(4, True), (4, False)})
+        # A kept decision's full search adds exploration noise; any other's fast search adds none and
+        # counts the visits its root holds from the reused tree toward its budget.
+        self.assertEqual({(move["simulations"], move["root_noise"], move["count_reused_visits"], move["max_depth"],
+                           move["simulations_per_request"]) for move in moves if move["kind"] == "search"},
+                         {(4, True, False, 4, 1), (4, False, True, 4, 1)})
         result = replay(header, moves)
         self.assertEqual(result["outcome"], "replayed")
         self.assertEqual(result["final_planning_key"], self.env.planning_key())

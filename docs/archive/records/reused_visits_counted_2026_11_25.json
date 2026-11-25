@@ -1,0 +1,39 @@
+{
+ "method": "Q-023's choice C as built: network evaluations a search asks for, along games played by self-play's search\nsettings (800 simulations with noise on a quarter of the decisions, 150 on the rest, 8 a request, no depth limit,\nthe move drawn from the visit shares in game round 1 and the most visited after), with and without the fast\nsearches counting the visits their root holds from the reused tree (count_reused_visits), and the stand-in\nnetwork of studies/campaign/runs/speed-256x16-2026-11-24/benchmarks/compare_requests.py: made-up priors and\nvalues from a hash of the position. The two settings play different games once a move differs. Run from the\nrepository root:\n    tmp/gpu-mps-env/bin/python -B studies/campaign/runs/reused-visits-2026-11-25/counted_visits.py OUT.json\n",
+ "report": {
+  "every search runs its whole budget": {
+   "full": {
+    "searches": 97,
+    "mean_evaluations": 800.0,
+    "median_root_visits": 859,
+    "mean_root_visits": 913.6,
+    "share_without_new_evaluations": 0.0
+   },
+   "fast": {
+    "searches": 310,
+    "mean_evaluations": 150.0,
+    "median_root_visits": 206.0,
+    "mean_root_visits": 276.6,
+    "share_without_new_evaluations": 0.0
+   },
+   "mean_evaluations_a_search": 304.9
+  },
+  "fast searches count reused visits": {
+   "full": {
+    "searches": 105,
+    "mean_evaluations": 800.0,
+    "median_root_visits": 841,
+    "mean_root_visits": 895.5,
+    "share_without_new_evaluations": 0.0
+   },
+   "fast": {
+    "searches": 312,
+    "mean_evaluations": 82.2,
+    "median_root_visits": 150.0,
+    "mean_root_visits": 203.7,
+    "share_without_new_evaluations": 0.199
+   },
+   "mean_evaluations_a_search": 262.9
+  }
+ }
+}

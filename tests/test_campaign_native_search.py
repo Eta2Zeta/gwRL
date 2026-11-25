@@ -265,6 +265,60 @@ class SeveralSimulationsTests(unittest.TestCase):
         self.assertGreater(reused, checked // 2)
 
 
+class ReusedVisitsTests(unittest.TestCase):
+    """A budget that counts the visits the root's actions hold from the reused tree (count_reused_visits)."""
+
+    def test_a_search_runs_only_the_visits_its_root_lacks(self):
+        for per_request in (1, 8):
+            for serialized in searched_decisions(23, count=4):
+                env = make_env(SEED, calendar_rounds=1)
+                env.restore(serialized)
+                tree, evaluator = SearchTree(), HashEvaluator()
+
+                def search(simulations, seed, counted):
+                    config = MctsConfig(simulations=simulations, max_depth=16, seed=seed,
+                                        simulations_per_request=per_request, count_reused_visits=counted)
+                    return search_decision(env, evaluator, config, add_root_noise=False, tree=tree)
+
+                first = search(40, 3, True)  # A new tree: nothing to count.
+                self.assertEqual(sum(first.visit_counts), 40)
+                asked = evaluator.requests
+                # The same decision again, its root holding the first search's 40 visits.
+                same = search(40, 4, True)
+                self.assertTrue(same.reused_root)
+                self.assertEqual(evaluator.requests, asked)  # No new simulation, so no question.
+                for name in ("visit_counts", "policy", "values", "action_values"):
+                    self.assertEqual(getattr(same, name), getattr(first, name), name)
+                self.assertEqual(sum(search(64, 5, True).visit_counts), 64)  # 24 new ones.
+                self.assertEqual(sum(search(24, 6, False).visit_counts), 88)  # 24 on top, uncounted.
+
+    def test_both_searches_count_reused_visits_alike(self):
+        """Fast searches along a game, each keeping the tree of the one before."""
+        evaluator = HashEvaluator()
+        env = make_env(17, calendar_rounds=1)
+        rng = random.Random(17)
+        python = VectorMCTS(evaluator, MctsConfig(simulations=32, max_depth=16, count_reused_visits=True))
+        tree = SearchTree()
+        checked = reused = 0
+        while not env.is_terminal() and checked < 40:
+            if env.decision_kind() == "chance":
+                env.resolve_chance()
+                continue
+            seed = rng.getrandbits(64)
+            expected = python.search(env, add_root_noise=False, reuse_root=True, seed=seed)
+            config = MctsConfig(simulations=32, max_depth=16, seed=seed, count_reused_visits=True)
+            actual = search_decision(env, evaluator, config, add_root_noise=False, tree=tree)
+            for name in ("visit_counts", "policy", "priors", "values", "action_values", "reused_root"):
+                self.assertEqual(getattr(actual, name), getattr(expected, name), f"{name} at decision {checked}")
+            self.assertEqual(tree.size, len(python.nodes))
+            if actual.values is not None:
+                self.assertGreaterEqual(sum(actual.visit_counts), 32)
+            reused += actual.reused_root
+            checked += 1
+            env.apply_action(expected.best_action() if rng.random() < 0.5 else rng.choice(expected.actions))
+        self.assertGreater(reused, checked * 3 // 4)
+
+
 class InferenceServerTests(unittest.TestCase):
     def served_search(self, models, env, *, native):
         """A search whose evaluations an inference server answers, one at a time."""

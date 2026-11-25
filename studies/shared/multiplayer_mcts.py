@@ -159,12 +159,19 @@ class MctsConfig:
     # (game/search.hpp, SearchSettings::simulationsPerRequest); this search plays
     # one at a time and refuses any other number.
     simulations_per_request: int = 1
+    # Whether the budget counts the visits the root's actions already hold from
+    # a reused tree: the search then runs only as many new simulations as bring
+    # them to `simulations`, and none when they hold that many (self-play's fast
+    # searches; SearchSettings::countReusedVisits in the C++ search).
+    count_reused_visits: bool = False
 
     def __post_init__(self) -> None:
         if self.simulations <= 0 or self.max_depth <= 0:
             raise ValueError("Simulation budget and maximum depth must be positive")
         if type(self.simulations_per_request) is not int or self.simulations_per_request <= 0:
             raise ValueError("Simulations per request must be a positive integer")
+        if type(self.count_reused_visits) is not bool:
+            raise ValueError("count_reused_visits must be true or false")
         if not math.isfinite(self.c_puct) or self.c_puct < 0:
             raise ValueError("PUCT constant must be finite and nonnegative")
         if not self.rules_version or self.mode not in {"multiplayer", "fixed_opponents"}:
@@ -515,7 +522,12 @@ class VectorMCTS:
         if root.game is None:
             # Never the game itself: it moves on after the search.
             root.game = env.clone_for_search(0)
-        for _ in range(self.config.simulations):
+        # The new simulations: the whole budget, or, when the budget counts the
+        # visits the root's actions hold from a reused tree, what they lack of it.
+        budget = self.config.simulations
+        if self.config.count_reused_visits:
+            budget = max(0, budget - sum(edge.visits for edge in root.edges))
+        for _ in range(budget):
             seed = self._random.getrandbits(64)
             policy_random = random.Random(seed ^ 0xD1B54A32D192ED03)
             # Walk the tree on its saved positions. Only playing a new move or

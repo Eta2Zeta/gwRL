@@ -8,8 +8,10 @@ failed or whose game process died: the failed game's record in manifest.json
 names it. With the game's seed, kept in the log's first line, the moves rebuild
 the game's position exactly, because the game's own random stream rolls its
 dice. The log's "search" lines give each decision's search seed, the size of
-the search tree the game kept, the search's simulations and whether it added
-exploration noise; a log that ends with a "search" line belongs to a
+the search tree the game kept, the search's simulations, whether it added
+exploration noise and, since 25 November 2026, its depth limit, its
+simulations a request and whether its budget counted the reused tree's visits;
+a log that ends with a "search" line belongs to a
 game whose process died during that search, as all five crashes of 20 and 21
 November 2026 did.
 
@@ -77,10 +79,14 @@ def replay(header: dict[str, Any], moves: list[dict[str, Any]], *, search_last: 
         if move["kind"] == "search":
             pending = move
             if index >= first_searched:
-                # The logged simulations and noise, and the training runs' other search settings.
-                config = MctsConfig(simulations=int(move["simulations"]), max_depth=16, c_puct=1.5,
-                                    seed=int(move["search_seed"]), mode="multiplayer", root_dirichlet_alpha=0.3,
-                                    root_dirichlet_epsilon=0.25)
+                # The logged search settings; logs written before 25 November 2026 name
+                # only the simulations and the noise, and searched with a depth limit of
+                # 16, one simulation a request and every search's whole budget.
+                config = MctsConfig(simulations=int(move["simulations"]), max_depth=int(move.get("max_depth", 16)),
+                                    c_puct=1.5, seed=int(move["search_seed"]), mode="multiplayer",
+                                    root_dirichlet_alpha=0.3, root_dirichlet_epsilon=0.25,
+                                    simulations_per_request=int(move.get("simulations_per_request", 1)),
+                                    count_reused_visits=bool(move.get("count_reused_visits", False)))
                 search_decision(env, evaluator, config, add_root_noise=bool(move["root_noise"]), tree=tree)
                 searches += 1
             continue

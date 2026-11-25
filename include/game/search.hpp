@@ -97,6 +97,12 @@ struct SearchSettings {
     // would ask about a position already asked about is dropped and another one
     // walked. One plays the simulations one after another, VectorMCTS's way.
     int simulationsPerRequest{1};
+    // Whether the budget counts the visits the root's actions already hold from
+    // a reused tree: the search then runs only as many new simulations as bring
+    // them to `simulations` visits, and none when they already hold that many.
+    // Self-play's fast searches count them (Q-023, the design document's section
+    // 7.1); without it every search runs `simulations` new ones.
+    bool countReusedVisits{false};
 };
 
 struct SearchOutcome {

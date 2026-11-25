@@ -399,6 +399,15 @@ class SharedTrainingRunTests(unittest.TestCase):
         self.assertTrue((self.run_dir / "models" / "generation-000002.pt").exists())
         self.assertGreaterEqual(manifest["counters"]["episodes"], 8)
 
+    def test_models_are_exported_every_few_network_updates(self):
+        self.assertEqual(self.train(*ARGUMENTS, "--continuous", "--model-export-every", "2"), 0)
+        manifest = json.loads((self.run_dir / "manifest.json").read_text())
+        self.assertEqual(manifest["counters"]["updates"], 2)
+        # The start's export, and the one after the second network update only.
+        self.assertEqual(sorted(path.name for path in (self.run_dir / "models").iterdir()),
+                         ["generation-000000.pt", "generation-000002.pt"])
+        self.assertEqual(manifest["latest_model_export"]["path"], "models/generation-000002.pt")
+
     def test_self_play_that_never_stops_needs_one_inference_server(self):
         with self.assertRaisesRegex(ValueError, "needs games per process"):
             run.RunConfig(complete_episodes=True, parallel_envs=4, episode_workers=2, continuous=True)

@@ -178,8 +178,10 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
     search_random, policy_random = episode_streams(config.seed, environment_seed)
     # Its own stream: which decisions are kept depends only on the run seed,
     # the game's seed and the share kept. A decision is kept or not before its
-    # search, which searches a kept decision with config.kept_simulations and
-    # exploration noise, and any other with config.simulations and none.
+    # search. A kept decision gets a full search, config.kept_simulations new
+    # simulations with exploration noise; any other a fast search, without noise,
+    # whose budget of config.simulations counts the visits its root holds from
+    # the reused tree (Q-023, design document section 7.1).
     sample_random = random.Random(f"campaign-episode-samples:{config.seed}:{environment_seed}")
     pending: list[dict[str, Any]] = []
     events: list[dict[str, Any]] = []
@@ -204,9 +206,11 @@ def play_episode(env: Any, evaluator: Any, *, config: LearningConfig, rules_vers
                 simulations=simulations, max_depth=config.max_depth, c_puct=config.c_puct,
                 seed=search_random.getrandbits(64), rules_version=rules_version, mode=config.mode,
                 root_dirichlet_alpha=config.root_dirichlet_alpha, root_dirichlet_epsilon=config.root_dirichlet_epsilon,
-                simulations_per_request=config.simulations_per_request)
+                simulations_per_request=config.simulations_per_request, count_reused_visits=not kept)
             write_move(moves, {"move": counts["transitions"], "kind": "search", "search_seed": search.seed,
-                               "tree": tree.size, "simulations": simulations, "root_noise": noise})
+                               "tree": tree.size, "simulations": simulations, "root_noise": noise,
+                               "count_reused_visits": not kept, "max_depth": config.max_depth,
+                               "simulations_per_request": config.simulations_per_request})
             result = search_decision(env, evaluator, search, add_root_noise=noise, tree=tree)
             version = getattr(evaluator, "network_version", None) or batch_version
             if not network_versions or network_versions[-1][1] != version:

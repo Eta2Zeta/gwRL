@@ -100,7 +100,8 @@ def search_decision(env: CampaignAdapter, evaluator: Any, config: MctsConfig, *,
             c_puct=config.c_puct, max_depth=config.max_depth, seed=config.seed, root_noise=add_root_noise,
             dirichlet_alpha=config.root_dirichlet_alpha, dirichlet_epsilon=config.root_dirichlet_epsilon,
             search_forced_root=config.search_forced_root, tree=None if tree is None else tree.native,
-            simulations_per_request=config.simulations_per_request)
+            simulations_per_request=config.simulations_per_request,
+            count_reused_visits=config.count_reused_visits)
     except gwrl_cpp.NoLegalSearchAction as error:
         raise NoLegalActionError(_Position(str(error))) from None
     except gwrl_cpp.SearchMoveFailed as error:

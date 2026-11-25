@@ -32,17 +32,11 @@ Other open things stay in the pages that own them, and
 
 | Number | Question | About | Recommended |
 | --- | --- | --- | --- |
-| [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
-| [Q-022](#q-022-several-simulations-in-one-inference-request) | Should self-play's search choose the paths of 8 simulations before it asks the network about the states where they stopped, all in one inference request, as AlphaGo Zero did? | Search | Yes, 8 a request: about two and a half times the network evaluations a second at 256×16 on the Mac |
-| [Q-023](#q-023-counting-a-reused-trees-visits-toward-a-fast-search) | Should a fast search, the 150-simulation search at a decision not kept as a training sample, run only enough new simulations to bring its root to 150 visits, counting those the searches before it left there? | Search | Yes, for the fast searches only: about 18% fewer network evaluations, the full searches and the training targets unchanged |
+| [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Measure and warn, and change a layout that goes over by hand |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
 `e62e01b`). Its numbers are in the
 [record of training within nine cores](archive/records/nine_core_layouts_2026_11_15.md).
-
-Q-022 and Q-023 were raised on 24 November 2026, by the speed work before
-training at AlphaZero's and KataGo's scale. Their numbers are in the
-[record of self-play speed at 256×16](archive/records/self_play_speed_256x16_2026_11_24.md).
 
 ## Q-005: The supervisor's count of cores
 
@@ -90,13 +84,26 @@ going a little over the allowance, as these runs did, is fine, so this layout
 stays and no smaller one is being sought. How far over is still a little is not
 set, and a stop under choice A below would need that number.
 
+**A third case** (24 November 2026, the 256×16 network on the GPU, 800
+simulations on a quarter of the decisions and 150 on the rest, 8 simulations a
+request, self-play that never stops). Six game processes count 9 cores whatever
+their games. With 4 games each they kept a median of 7.7 cores busy, with 5 a
+median of 8.4 and with 8 a median of 9.46
+([record](archive/records/self_play_speed_256x16_2026_11_24.md)). The training
+run at these sizes plays six processes of 5 games, chosen by that measurement.
+
 **Why it matters.** The allowance is there to keep one performance core free
 for everything else. The count does not show whether it is free, and even a
 layout chosen by measuring it goes over when the Mac is quiet. A different network, device,
 number of games per process or search would change the load without the
 supervisor noticing, and so would a faster inference server, as in the second
-case. The count can also be too strict: with the network on the GPU and a slow
-inference server, game threads wait more and use less than they count.
+case. So may the games of a long run as its network learns: a trained network's
+games were about 880 decisions long against a fresh network's 313
+([record](archive/records/game_size_2026_11_24.md)), with more battles and
+moves, which probably cost more engine work a network evaluation (inferred).
+The count can also be too strict: with the
+network on the GPU and a slow inference server, game threads wait more and use
+less than they count.
 
 **The choices.**
 
@@ -105,190 +112,17 @@ inference server, game threads wait more and use less than they count.
 | A. Measure the load | The supervisor adds the processes' CPU time to the process table it already reads every second, and records the load over the last minute in its status file. A run that stays over the allowance, for example for five minutes, is stopped safely, as a requested stop is. Short peaks, such as starting up, stop nothing. The count stays as the check before a run starts. |
 | B. Count better | Count a game process of four games as 1.5 cores instead of one. Checked before the run starts and simple, but the factor depends on the network, the device, the games per process and the Mac's other work, so it would need measuring again whenever those change. |
 | C. Leave it | The count stays a rough check before a run starts, and layouts are chosen by measuring them, as on 15 November. A layout chosen by hand can pass the allowance unnoticed. |
+| D. Measure and warn | As A, but a run that stays over the allowance is not stopped: the supervisor's status file and log say so, and the layout is changed by hand. |
 
-**Recommendation: A.** It holds training to what the allowance means, whatever
-the layout, and the supervisor already samples every process once a second.
-Stopping only a run that stays over keeps a brief peak from costing a training iteration.
+**Recommendation: D.** It shows whether training keeps to the allowance,
+whatever the layout, and the supervisor already samples every process once a
+second. A stop would not help a long run: its keeper, which starts a stopped
+run again, as for the training runs since 19 November, would start the same
+layout, which would go over again.
 
 **If answered.** What the supervisor measures and when it stops a run belong in
 the [campaign learning guide](../studies/campaign/README.md#long-unattended-runs)
 and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
-
-## Q-022: Several simulations in one inference request
-
-**The question.** Should self-play's search choose the paths of 8 simulations
-before it asks the network about any of the states where they stopped, and then
-ask about all 8 states at once, as AlphaGo Zero did, instead of asking after
-each simulation and waiting for the answer before the next one starts?
-
-**What the program does now.** At a decision, the search runs many
-*simulations*, 800 or 150 at these sizes. Each one plays forward from the
-current state on a copy of the game, choosing at every state the action with
-the best PUCT score, which weighs what earlier simulations found against what
-the network expected; it stops at the first state the network has not yet
-rated, asks the network for that state's priors and values, and adds the values
-it gets to every action it played on the way, its *path*
-([design document, section 4.2](design/README.md#42-one-simulation)). The
-network does not run inside the game: one process, the *inference server*,
-runs it for the states of every game being played, and a game asks it about a
-state with a message, an *inference request* (same section, and
-[section 9.2](design/README.md#92-running-training-on-the-mac)). Now a search
-sends one inference request after each simulation and waits for the reply,
-because the next simulation's choices depend on that answer
-(`--simulations-per-request 1`, the default). So each game has at most one state
-waiting at the inference server at a time, and the inference server, whose work
-per state falls the more states it evaluates together, gets at most one state
-from each game at once. Since 24 November `--simulations-per-request N` lets the
-search choose the paths of N simulations first and ask about all N states in
-one inference request, so that each game can have N states waiting. To keep the
-N from all taking the same path, each waiting simulation counts meanwhile on its
-path as a visit that lost, a *virtual loss*, and a simulation that stops at a
-state already in the request is dropped and tried again later
-([design document, section 4.7](design/README.md#47-more-detail-on-the-search),
-with a worked example). AlphaGo Zero's search ran its simulations on parallel threads with a virtual
-loss and evaluated their states in mini-batches of 8 ([Silver et al.
-2017](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf),
-Methods, "Search Algorithm").
-
-**A real case.** In self-play at 256×16 with 800 simulations on a quarter of the
-decisions and 150 on the rest, 48 concurrent games, measured for 25 minutes
-each ([record](archive/records/self_play_speed_256x16_2026_11_24.md)): with one
-simulation a request the inference server answered 2,761 network evaluations a
-second, in inference batches of 24 states, busy 95% of the time, while the game
-processes kept about 4.5 CPU cores busy; with 8 a request, and inference batches
-overlapped on the GPU, it answered about 6,100 a second, in inference batches of
-about 125 states, busy about 73%, and the CPU cores, at a median of 9.4 busy,
-set the pace instead. With 30 concurrent games instead of 48, and lighter
-bookkeeping in the engine, 8 a request answered about 7,600 network evaluations
-a second between network updates and 7,300 with them, in inference batches of
-about 71 states, the inference server busy 94% of the time and the CPU cores a
-median of 8.4, while the run's processes held about 7 GB by their physical
-footprints. On 70 positions of scripted games searched with a
-stand-in network, the most visited action after 800 simulations with
-exploration noise, as at a kept decision, was the same with 8 a request as with
-1 at 56 of them, and two searches of 1 a request with different seeds agreed at
-52; the visit shares differed by a total variation distance of 0.05 on average
-with 8 a request, and 0.17 with another seed: 5% and 17% of the visits would
-have to move from some actions to others to turn one search's visit shares into
-the other's. After 150 simulations without
-noise, as at the other decisions, 8 a request kept the most visited action at
-63 of the 70 and another seed at 66, with distances of 0.05 and 0.02.
-
-**Why it matters.** A game at these sizes asks for about 217,000 network
-evaluations once the network plays full games
-([design document](design/README.md#how-big-should-the-network-and-the-search-be)):
-about 1,100 games a day at 2,761 a second, and about 2,900 at 7,300. KataGo's
-yardstick of about 145,000 games takes about 132 days at the first rate and
-about 50 at the second (inferred). The simulations of one request choose
-their paths without each other's results, so a search of 800 simulations
-explores a little differently from one simulation at a time, as AlphaGo Zero's
-did.
-
-**The choices.**
-
-| Choice | What it changes |
-| --- | --- |
-| A. One simulation a request | The search as in every run so far, simulation by simulation; the inference server limits self-play at about 2,800 network evaluations a second at 256×16. |
-| B. 8 a request | AlphaGo Zero's size. About two and a half times the network evaluations a second with 30 concurrent games; the GPU and the CPU cores then limit together. |
-| C. 16 a request | The same inference batches from half as many concurrent games, so about half the search trees' memory, which does not limit at 8 with 30 games, and no faster; a 150-simulation search then chooses its paths in groups of 16, a tenth of it at a time. |
-
-**Recommendation: B.** It gives about two and a half times the network
-evaluations a second, from 30 concurrent games where one a request needed 48 for
-less, and it is the search AlphaGo Zero learned with.
-
-**If answered.** The run's command takes `--simulations-per-request` with the
-chosen number, and section 4.7 of the design document says that self-play
-searches that way.
-
-## Q-023: Counting a reused tree's visits toward a fast search
-
-**The question.** A fast search, the search of 150 simulations at a decision
-not kept as a training sample, often starts with many visits already at its
-root, left there by the searches before it. Should it run only as many new
-simulations as bring its root to 150 visits, and none if the root already holds
-150, instead of always running 150 new ones?
-
-**What the program does now.** Two parts of the design meet here.
-
-- *Full and fast searches.* At the sizes planned for the training run, a random
-  quarter of the decisions are kept as training samples, the *kept decisions*.
-  A kept decision gets a *full search*: 800 simulations with exploration noise,
-  whose visit shares become the training sample's policy target. Every other
-  decision gets a *fast search*: 150 simulations without noise, only to choose
-  the move
-  ([design document, section 7.1](design/README.md#71-a-training-iterations-games)).
-  KataGo searched this way, with 600 to 1,000 simulations and 100 to 200
-  ([Wu 2019](https://arxiv.org/abs/1902.10565), section 3.1).
-- *Tree reuse.* When the game has played a move, the next search does not start
-  from an empty tree. It takes over the part of the last search's tree below the
-  state the game reached, with all its visit counts, the *reused tree*, and
-  drops the rest, as AlphaGo Zero did
-  ([design document, section 4.7](design/README.md#47-more-detail-on-the-search)).
-  So the new search's root, the decision now to be made, already holds a visit
-  for every earlier simulation that took one of its actions.
-
-Every search then runs its whole budget of new simulations, 800 or 150, on top
-of the visits its root already holds (`SearchSettings::simulations` in
-`include/game/search.hpp`).
-
-**A worked example.** In the toy search of
-[section 4.4 of the design document](design/README.md#44-a-toy-search), with a
-budget of 4 simulations at the state R, simulation 4 went through RA on to RAx.
-Say the game then plays A. The next search starts at RA, whose action x already
-holds that 1 visit. With a budget of 4, the program now runs 4 new simulations,
-and RA's actions end with 5 visits. Counting the reused visit, it would run 3,
-and RA's actions would end with 4, the budget.
-
-**A real case.** In two games played with the run's search settings, 8
-simulations a request and a stand-in network that gives every state made-up
-priors and values, 407 searches
-([record](archive/records/self_play_speed_256x16_2026_11_24.md)): before its
-first new simulation, a fast search's root already held 127 visits on average,
-a median of 56, and 27% of the fast searches already held 150 or more. In one
-of the two games, a full search at a decision with two legal actions sent most
-of its 800 simulations through the action the game then played, and the fast
-search at the next searched decision began with 709 of their visits at its
-root; it then ran 150 new simulations on top. A full search's root already held
-114 visits on average. Counting the reused visits toward the budget would have
-run 17.7% fewer simulations in these 407 searches if only the fast searches
-counted them, and 26.4% fewer if every search did. Counted in the fast searches,
-a fast search's root would end with 150 visits at the median instead of 206,
-and 206 on average instead of 277, and 27% of the fast searches would run no
-new simulation and choose their move from the reused visits alone.
-
-**Why it matters.** Each simulation asks for one network evaluation, and network
-evaluations are the run's cost: 17.7% fewer a game is about a fifth more games a
-day at the same speed, and KataGo's yardstick of 145,000 games in about 41 days
-instead of about 50 (inferred, from the rates of
-[Q-022](#q-022-several-simulations-in-one-inference-request)). A fast search
-only chooses a move: no training sample stores its visit shares, so the training
-targets stay as they are. The moves still shape the games, and with them the
-final scores that every training sample of a game takes as its value target. A
-fast search would choose from fewer visits than now, but never fewer than 150,
-within the 100 to 200 of KataGo's fast searches. KataGo's self-play, moreover,
-seems to have started each search with a fresh tree: its gating games, which
-decide whether a new network replaces the old, turned tree reuse on as one of
-their changes from self-play ([Wu 2019](https://arxiv.org/abs/1902.10565),
-appendix E). Not measured: how many visits a trained network's searches leave
-to the next decision; probably more (inferred), since a trained network's
-priors send more of a search's simulations down the action the game then
-plays.
-
-**The choices.**
-
-| Choice | What it changes |
-| --- | --- |
-| A. As now: every search runs its whole budget of new simulations | A fast search ends with its reused visits plus 150. |
-| B. Count the reused visits toward every search's budget, full searches too | About 26% fewer network evaluations. A full search then runs fewer than 800 new simulations with its exploration noise, so its visit shares, the training target, rest more than now on reused visits, made before that noise was drawn. |
-| C. Count them toward the fast searches' budget only | About 18% fewer network evaluations; the full searches, and so the training targets, unchanged. |
-
-**Recommendation: C.** It takes two thirds of B's saving without touching the
-searches the network learns from, and every fast search still chooses its move
-from at least 150 visits.
-
-**If answered.** The search takes a setting for which searches count the
-reused visits toward their budget, and sections 4.7 and 7.1 of the design
-document say how the budget counts.
 
 ## Open elsewhere
 
@@ -473,3 +307,21 @@ the page that now states it.
   ([record](archive/records/japan_dadao_one_zone_2026_11_23.md)). Stated in
   [rule clarification RCL-024](../game_content/rules/clarifications.md#rcl-024-two-attacks-on-one-land-zone-by-a-controlled-minor-power-and-its-controller)
   and [the politics page](engine/politics.md#one-attacker-for-each-land-zone).
+- **Q-022**, whether self-play's search chooses the paths of 8 simulations
+  before it asks the inference server about the states where they stopped, all
+  in one inference request. Answered on 25 November 2026: yes, 8 (choice B),
+  AlphaGo Zero's size. With inference batches overlapped on the GPU and 30
+  concurrent games, it took self-play at 256×16 with KataGo's search from 2,761
+  to about 7,600 network evaluations a second between network updates
+  ([record](archive/records/self_play_speed_256x16_2026_11_24.md)). Stated in
+  [section 4.7 of the design document](design/README.md#47-more-detail-on-the-search);
+  training runs take `--simulations-per-request 8`.
+- **Q-023**, whether a fast search, at a decision not kept as a training
+  sample, counts the visits its root holds from the reused tree toward its 150
+  simulations. Answered on 25 November 2026: yes, the fast searches only
+  (choice C); a full search, whose visit shares are the training target, still
+  runs its 800 new simulations. Along two games with a stand-in network the fast
+  searches then asked for 82 network evaluations on average instead of 150, and
+  the searches together for about 14% fewer
+  ([record](archive/records/reused_visits_counted_2026_11_25.md)). Stated in
+  [section 4.7 of the design document](design/README.md#47-more-detail-on-the-search).

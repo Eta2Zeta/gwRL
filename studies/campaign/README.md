@@ -73,7 +73,9 @@ Press Ctrl-C in the training terminal to finish the current search wave, save
 An interrupted run exits with code 130; a completed run exits with code 0.
 Full recovery checkpoints default to every 1,800 wall-clock seconds and orderly
 shutdown. Network updates publish small model exports, without forcing full
-recovery writes. An explicit `--checkpoint-every-waves N` overrides the timer for
+recovery writes; `--model-export-every N` publishes one after every N network
+updates only, besides the one at the start, since at 256×16 an export takes
+about 80 MB and a network update can come every ten minutes. An explicit `--checkpoint-every-waves N` overrides the timer for
 controlled comparisons and recovery tests. A crash can resume the latest
 completed recovery checkpoint. The manifest and checkpoint are
 replaced atomically; the checkpoint is the authority if a crash occurs between
@@ -316,8 +318,13 @@ before it asks the inference server about the states where they stopped, all in
 one inference request; meanwhile each waiting simulation counts on its path as
 a visit that lost
 ([section 4.7 of the design document](../../docs/design/README.md#47-more-detail-on-the-search)).
-The default, 1, asks after each simulation. Whether training uses 8 is
-[Q-022](../../docs/questions.md#q-022-several-simulations-in-one-inference-request).
+The default, 1, asks after each simulation; training runs ask with 8, as the
+owner chose on 25 November 2026
+([Q-022](../../docs/questions.md#answered)). A fast search, at a decision not
+kept as a training sample, counts the visits its root holds from the reused
+tree toward its `--simulations`, as the owner chose the same day
+([Q-023](../../docs/questions.md#answered),
+[section 4.7 of the design document](../../docs/design/README.md#47-more-detail-on-the-search)).
 
 One network serves all three alliances by default (`--networks one`). The
 input tells it which alliance is choosing; its policy learns from every

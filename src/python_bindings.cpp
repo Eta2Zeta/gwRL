@@ -596,7 +596,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
                                      const std::vector<std::string>& order, py::object evaluator, int simulations,
                                      double cPuct, int maxDepth, std::uint64_t seed, bool rootNoise,
                                      double dirichletAlpha, double dirichletEpsilon, bool searchForcedRoot,
-                                     py::object tree, int simulationsPerRequest) {
+                                     py::object tree, int simulationsPerRequest, bool countReusedVisits) {
         game::campaign::SearchTree* kept = tree.is_none() ? nullptr : &tree.cast<game::campaign::SearchTree&>();
         game::campaign::SearchSchedule schedule;
         for (const auto& player : passed) schedule.passed |= static_cast<std::uint8_t>(1U << allianceNumber(player));
@@ -605,7 +605,7 @@ PYBIND11_MODULE(gwrl_cpp, module) {
         if (simulationsPerRequest <= 0) throw std::invalid_argument("Simulations per request must be positive");
         const game::campaign::SearchSettings settings{simulations, cPuct, maxDepth, seed, rootNoise,
                                                       dirichletAlpha, dirichletEpsilon, searchForcedRoot,
-                                                      simulationsPerRequest};
+                                                      simulationsPerRequest, countReusedVisits};
         game::campaign::UniformSearchEvaluator uniform;
         std::optional<PythonSearchEvaluator> callback;
         game::campaign::SearchEvaluator* chosen = &uniform;
@@ -641,11 +641,12 @@ PYBIND11_MODULE(gwrl_cpp, module) {
     }, py::arg("env"), py::arg("passed"), py::arg("order"), py::arg("evaluator"), py::arg("simulations"),
        py::arg("c_puct"), py::arg("max_depth"), py::arg("seed"), py::arg("root_noise"), py::arg("dirichlet_alpha"),
        py::arg("dirichlet_epsilon"), py::arg("search_forced_root"), py::arg("tree") = py::none(),
-       py::arg("simulations_per_request") = 1,
+       py::arg("simulations_per_request") = 1, py::arg("count_reused_visits") = false,
        "Search one decision of `env` (include/game/search.hpp) without Python's lock. The evaluator is an "
        "InferenceClient, None for uniform priors and zero values, or an object whose evaluate_zone(zone_input, "
        "actor) the search calls with Python's lock. simulations_per_request simulations ask their positions "
-       "together (SearchSettings::simulationsPerRequest). Studies call it through "
+       "together (SearchSettings::simulationsPerRequest); with count_reused_visits the budget counts the visits "
+       "the root's actions hold from the reused tree (SearchSettings::countReusedVisits). Studies call it through "
        "studies/campaign/native_search.py.");
     module.attr("CAMPAIGN_SCHEMA") = "campaign_entities_v1";
     module.attr("CAMPAIGN_ACTION_SCHEMA") = game::campaign::trainingActionSchema;

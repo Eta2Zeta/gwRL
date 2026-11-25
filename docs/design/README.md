@@ -693,11 +693,18 @@ counts, values and saved copies, and drops the rest of the tree. The part
 carried over is the *reused tree*. Its visits count in the new root's visit
 counts: before its first new simulation, the root already holds a visit for
 every earlier simulation that took one of its actions, and the search's visit
-shares rest on those and on its own simulations. A search runs its whole budget
-of new simulations on top of them. Whether a fast search, the search at a
-decision not kept as a training sample (section 7.1), should count them toward
-its budget instead is
-[Q-023](../questions.md#q-023-counting-a-reused-trees-visits-toward-a-fast-search).
+shares rest on those and on its own simulations. A full search, the search at
+a decision kept as a training sample (section 7.1), runs its whole budget of new
+simulations on top of them. A fast search, at any other decision, counts them
+toward its budget: it runs only as many new simulations as bring its root's
+actions to the budget's visits, and none when they already hold that many
+(`SearchSettings::countReusedVisits` in `include/game/search.hpp`), as the owner
+chose on 25 November 2026 ([Q-023](../questions.md#answered)). Along two games
+searched with the training run's settings and a stand-in network, a fast search
+then asked for 82 network evaluations on average instead of 150, a fifth of
+them none, and the searches together for about 14% fewer
+([record](../archive/records/reused_visits_counted_2026_11_25.md)). A fast
+search only chooses the move, so the training targets stay as they were.
 The dice rolled in the real game between two decisions pick one of the outcomes
 the simulations rolled, if they rolled it; a state the tree never reached
 starts a new tree. The exploration
@@ -793,8 +800,8 @@ simulations with exploration noise, where another noise seed changed them by
 the default, the search is the one of sections 4.2 to 4.6, simulation by
 simulation, which the Python search plays too and
 `tests/test_campaign_native_search.py` compares; the Python search refuses N
-above 1. Whether training uses 8 is
-[Q-022](../questions.md#q-022-several-simulations-in-one-inference-request).
+above 1. Training runs search with 8 a request (`--simulations-per-request 8`),
+as the owner chose on 25 November 2026 ([Q-022](../questions.md#answered)).
 
 ## 5. How a decision becomes numbers
 
@@ -1585,8 +1592,10 @@ target, say more; any other is searched with 16 (`--simulations`) and no noise,
 only to choose the move. KataGo, which split its searches this way, calls the
 first a *full search* and the second a *fast search*
 ([Wu 2019](https://arxiv.org/abs/1902.10565), section 3.1), and so does this
-document. A search's budget counts only its own new simulations, on top of the
-visits a reused tree already brings to its root (section 4.7). In the fourth
+document. A full search's budget counts only its own new simulations, on top
+of the visits a reused tree already brings to its root; a fast search's budget
+counts those visits too, and it runs only the new simulations its root lacks of
+it (section 4.7). In the fourth
 part of the training run of 19 to 21 November, which kept 1% of the decisions
 and searched every one with 64 simulations, 99 of every 100 searches kept no
 training sample, and the inference server's forward passes set the run's speed
@@ -3045,7 +3054,7 @@ since the search runs in C++:
 | 256×16 on the GPU with KataGo's search (800 simulations on a quarter of the decisions, 150 on the rest), 48 concurrent games, one simulation a request (24 November) | the inference server, busy 95%, in inference batches of 24 states, 2,761 network evaluations a second; the CPU cores about 4.5 busy | about twice as much (measured below) | larger inference batches: several simulations a request |
 | The same with 8 simulations a request and overlapped inference batches (24 November) | the CPU cores, a median of 9.4 busy, at about 6,100 network evaluations a second; the inference server busy about 73% in inference batches of about 125 states | they limit | a cheaper engine, in full, until the inference server limits again, about a third more |
 | The same with 24 concurrent games and the lighter engine bookkeeping (24 November) | the inference server, busy 94%, in inference batches of about 54 states, at about 6,700 network evaluations a second; the CPU cores a median of 7.7 busy | about a sixth more | larger inference batches, from more concurrent games or more simulations a request, as far as memory allows |
-| The same with 30 concurrent games and network updates of 50 training steps (24 November) | the inference server, busy 94%, in inference batches of about 71 states, at about 7,600 network evaluations a second between network updates and 7,300 with them; the CPU cores a median of 8.4 busy | about as much, about 7,700 | a cheaper inference server and a cheaper engine together; fewer network evaluations a game ([Q-023](../questions.md#q-023-counting-a-reused-trees-visits-toward-a-fast-search)) |
+| The same with 30 concurrent games and network updates of 50 training steps (24 November) | the inference server, busy 94%, in inference batches of about 71 states, at about 7,600 network evaluations a second between network updates and 7,300 with them; the CPU cores a median of 8.4 busy | about as much, about 7,700 | a cheaper inference server and a cheaper engine together; fewer network evaluations a game, as the fast searches that count a reused tree's visits ask for since 25 November ([Q-023](../questions.md#answered)) |
 
 The CPU cores' rates are inferred: the 9 CPU cores of the allowance, less the
 inference server's process, divided by the game processes' CPU time per network
@@ -4126,10 +4135,11 @@ measured):
   nodes" (section 3.1 of its paper). Its self-play seems to have started each
   search with a fresh tree: its gating games, which decide whether a new network
   replaces the old, turned tree reuse on as one of their changes from self-play
-  (appendix E). Here a search reuses the tree below the state reached and runs
-  its 800 or 150 new simulations on top of what that tree holds (section 4.7),
-  so a fast search ends with more visits at its root than KataGo's did
-  ([Q-023](../questions.md#q-023-counting-a-reused-trees-visits-toward-a-fast-search)).
+  (appendix E). Here a search reuses the tree below the state reached (section
+  4.7): a full search runs its 800 new simulations on top of what that tree
+  holds, and a fast search counts those visits toward its 150, so that it ends
+  with 150 visits at its root unless the reused tree alone brings more
+  ([Q-023](../questions.md#answered)).
 - **The search's reach.** AlphaZero's simulations end where its network has not
   yet been asked, however deep. Here a simulation also stops after 16 actions and
   dice rolls (section 4.2), less than one of Japan's turns, which average 42
@@ -4166,17 +4176,19 @@ network ([record](../archive/records/self_play_speed_256x16_2026_11_24.md)): as
 the program then was, about 2,800 network evaluations a second, about 1,100 games
 a day of 217,000 network evaluations, and 145,000 games in about 132 days; with
 8 simulations in each inference request
-([Q-022](../questions.md#q-022-several-simulations-in-one-inference-request)) and
+([Q-022](../questions.md#answered)) and
 the inference batches overlapped on the GPU, about 6,100, 2,400 games a day and
 about 60 days, with 48 concurrent games, more than the Mac's memory allowed
 beside its other programs (below); and with 30 concurrent games and the
 engine's lighter bookkeeping, about 7,300 with the network updates, about 2,900
 games a day and about 50 days, the GPU and the 9 CPU cores both near their
-limits (section 9.3). Counting the visits a reused tree brings toward the 150
-simulations of a fast search
-([Q-023](../questions.md#q-023-counting-a-reused-trees-visits-toward-a-fast-search))
-would ask for about 18% fewer network evaluations a game, and would take about
-9 days off the 50 (inferred). Played at 800 simulations on
+limits (section 9.3). Since 25 November the fast searches count the visits a
+reused tree brings toward their 150 simulations
+([Q-023](../questions.md#answered)): along two games with a stand-in network the
+searches then asked for about 14% fewer network evaluations
+([record](../archive/records/reused_visits_counted_2026_11_25.md)), which at the
+same rate would take the 145,000 games from about 50 days to about 43
+(inferred). Played at 800 simulations on
 every decision, as AlphaZero played, every number of days above is 2.6 times as
 large. A computer with 32 CPU cores for the games and a GPU that evaluates
 23,000 states a second at the chosen size would play 145,000 games in about 16
@@ -4570,7 +4582,7 @@ qualifier, and the names the code and the dated records use instead.
   simulation that reaches it stops and uses an estimate of the state there.
 - **Simulations per request:** how many simulations' paths a search chooses
   before it asks the inference server about the states where they stopped, all
-  in one inference request; 1 by default.
+  in one inference request; 1 by default, 8 in training runs.
 - **Virtual loss:** a simulation waiting for its inference request's answer,
   counted meanwhile on every action of its path as a visit with the worst value,
   so that the other simulations of the same request choose other paths.
@@ -4675,7 +4687,8 @@ qualifier, and the names the code and the dated records use instead.
   noise instead of 16 without (section 7.1).
 - **Full search, fast search:** KataGo's names for the search at a kept
   decision, with more simulations and exploration noise, and the search at any
-  other decision, with fewer and no noise, only to choose the move.
+  other decision, with fewer and no noise, only to choose the move. A fast
+  search's budget counts the visits the reused tree brings to its root.
 - **Policy target:** a training sample's visit shares, the action probabilities a
   network is trained toward.
 - **Value target:** a training sample's final scores, divided by 100, the values
