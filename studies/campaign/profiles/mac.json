@@ -4,7 +4,7 @@
   "python": "tmp/gpu-mps-env/bin/python",
   "supervisor": {
     "cpu_budget": 8,
-    "memory_bytes": 16000000000
+    "memory_bytes": 20000000000
   },
   "training": {
     "episode_workers": 5,
@@ -36,7 +36,7 @@
     "unset_environment: agent shells set MallocNanoZone=0, which slows the allocator and costs 26 to 29% more CPU.",
     "keep_awake: caffeinate keeps the Mac awake while the supervisor runs.",
     "tests: a test's configuration uses at most 8 cores here (tests/machine.py).",
-    "The owner's allowance is 8 cores and 16 GB of the M4 Max's 10 performance cores and 36 GB (\"I just want to give it like 8 cores and 16gbs of memory\", 21 November 2026), memory counted by the processes' physical footprints, as Activity Monitor counts it. The supervisor counts one core per game process, one for the inference server, one for the network updates of self-play that never stops and one for itself, so the allowance leaves five game processes; but a process of four or five games keeps 1.2 to 1.5 cores busy, so the layout is set by the measured load, not by that count. The supervisor's --all-cores uses all 14 cores when the owner allows it.",
+    "The owner's allowance is 8 cores and 20 GB of the M4 Max's 10 performance cores and 36 GB (\"I just want to give it like 8 cores and 16gbs of memory\", 21 November 2026; \"Let's give the alloance to 20gb\", 25 November 2026), memory counted by the processes' physical footprints, as Activity Monitor counts it. The supervisor counts one core per game process, one for the inference server, one for the network updates of self-play that never stops and one for itself, so the allowance leaves five game processes; but a process of four or five games keeps 1.2 to 1.5 cores busy, so the layout is set by the measured load, not by that count. The supervisor's --all-cores uses all 14 cores when the owner allows it.",
     "A network update follows every parallel_envs finished games, 20 with five processes of four; the Mac command's --epochs 525 was chosen for the 24 games of six processes of four, so that each kept sample was drawn as often as with 32 games and 700 training steps.",
     "continuous: self-play that never stops; network updates run beside the games on a thread of the inference server's process, so the supervisor and the runner count one more core for them."
   ]

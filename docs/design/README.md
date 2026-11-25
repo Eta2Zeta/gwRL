@@ -2172,9 +2172,10 @@ runs the network for all their states together, on the CPU: for this small
 network the GPU's cost per forward pass outweighs its speed. In self-play that
 never stops, the same process runs the network updates, on a thread of their own
 (section 9.1). Training stays within the owner's allowance of 8 of the Mac's
-10 performance cores and 16 GB of its 36 GB of memory, "like 8 cores and 16gbs
-of memory" in the owner's words of 21 November 2026, its memory counted by the
-processes' physical footprints, as Activity Monitor counts it.
+10 performance cores and 20 GB of its 36 GB of memory: "like 8 cores and 16gbs
+of memory" in the owner's words of 21 November 2026, and 20 GB since 25
+November, its memory counted by the processes' physical footprints, as Activity
+Monitor counts it.
 `tools/supervise_campaign_training.py` handles the time budget, restarts and
 memory stops. It counts one core for each game process, one for the inference
 server, one for the network updates in self-play that never stops and one for
@@ -2762,9 +2763,9 @@ playing, 6 about 192,000 and 5 about 201,000; one training iteration each cannot
 separate 6 from 5. Against the 252,200 of 8 processes the change costs about a
 quarter of the decisions an hour, on slightly different code and not in matched
 training iterations ([record](../archive/records/nine_core_layouts_2026_11_15.md)).
-On 21 November the owner lowered the allowance again, to 8 cores and 16 GB, and
-on 25 November the supervisor's count followed it and the profile went from 6
-game processes to 5.
+On 21 November the owner lowered the allowance again, to 8 cores and 16 GB. On
+25 November the supervisor's count followed it and the profile went from 6 game
+processes to 5, and the owner raised the memory to 20 GB.
 
 On 16 November the engine came to hold its names as numbers, to keep units and
 facilities in slot maps and to digest a binary writing of the state for its
@@ -2926,7 +2927,7 @@ network's size changes only the second rate, and the search's budget divides
 both. Worked out for the Mac, with 6 cores for games, one for the inference server
 and one for the supervisor, the network on whichever is faster of one core, in
 inference batches of 16 states, and the GPU, in inference batches of 64, and
-16 GB, decisions per hour are:
+20 GB, decisions per hour are:
 
 | Network | 64 simulations | 256 simulations | 800 simulations | Limited by |
 | --- | ---: | ---: | ---: | --- |
@@ -3027,8 +3028,8 @@ back in time: half of all states were answered in inference batches of at least
 averages over a whole training iteration, 25.5 and 48 states, are lower, because
 fewer games are left at its end. So an inference batch of 64 states needs about
 128 concurrent games, each holding its search tree in memory. At 800 simulations
-16 GB hold only about 50 concurrent games, each with its search tree and its
-other working memory, so inference batches hold about 25 states (below, when
+20 GB hold only about 65 concurrent games, each with its search tree and its
+other working memory, so inference batches hold about 30 states (below, when
 memory would limit). The Mac profile had 24 concurrent games until 25 November
 2026, 20 since, and its inference batches on one CPU core held about 10 states
 (section 9.2). There an inference batch takes about 1.5 ms and a game thread's
@@ -3435,7 +3436,7 @@ with more concurrent games; at 512×16, where the GPU's forward pass limits
 (above), they pay nothing; on a faster GPU the engine's cost sets how many CPU
 cores keep it busy.
 
-**When memory would limit.** The allowance's 16 GB hold the processes, about
+**When memory would limit.** The allowance's 20 GB hold the processes, about
 3 GB, and for each concurrent game its search tree and about 70 MB besides. The
 numbers of this paragraph until 25 November 2026 are the supervisor's count of
 then, which counted the memory the processes share in every one of them; since
@@ -3453,7 +3454,7 @@ the table below, worked out with the Python search, may count about 10 MB a
 game too many. With 189, 252 and 378 concurrent games the runs of the C++ search
 held 12.2, 13.5 and about 15 GB
 ([record](../archive/records/concurrent_games_cpp_search_2026_11_19.md#results)).
-The 16 GB are the run's alone: the rest of the Mac, with a browser, a web
+The 20 GB are the run's alone: the rest of the Mac, with a browser, a web
 development server and Claude's apps open, held 11 to 17 GB of its 36 GB during
 those runs, and the operating system keeps 5 to 6 GB. With 378 concurrent games
 macOS reported warning-level memory pressure nearly throughout, swap grew by
@@ -3467,7 +3468,7 @@ critical for 10 seconds or when the swap in use grows by 4 GB above its level
 when the training process started (`machine_memory` and `supervise` in
 `tools/supervise_campaign_training.py`;
 [long unattended runs](../../studies/campaign/README.md#long-unattended-runs)).
-A run within its 16 GB can then be stopped because of other programs, and the
+A run within its 20 GB can then be stopped because of other programs, and the
 supervisor's status file says so. Besides the replay buffer, the learner keeps the events of
 the current training iteration's games, which its progress report reads
 (`action_history` in `studies/campaign/learning.py`, cleared by `train` in
@@ -3484,20 +3485,20 @@ about 1.25 GB an hour in the training run of 19 to 21 November, on 19 and 20 Nov
 ([record](../archive/records/training_process_memory_2026_11_20.md)). It still
 holds the results of the games the latest network update trained on and of the
 games finished since that update began. With the search trees measured above,
-the 16 GB hold (inferred):
+the 20 GB hold (inferred):
 
-| Simulations per decision | Search tree | Memory per concurrent game | Concurrent games in 16 GB | States per inference batch |
+| Simulations per decision | Search tree | Memory per concurrent game | Concurrent games in 20 GB | States per inference batch |
 | ---: | ---: | ---: | ---: | ---: |
-| 64 | 11 MB | about 80 MB | about 160 | about 80 |
-| 256 | 56 MB | about 125 MB | about 105 | about 50 |
-| 800 | about 190 MB | about 260 MB | about 50 | about 25 |
-| 1,600 | about 390 MB | about 460 MB | about 30 | about 15 |
+| 64 | 11 MB | about 80 MB | about 210 | about 105 |
+| 256 | 56 MB | about 125 MB | about 135 | about 70 |
+| 800 | about 190 MB | about 260 MB | about 65 | about 30 |
+| 1,600 | about 390 MB | about 460 MB | about 35 | about 20 |
 
 At 64 simulations the C++ search's runs held more games than the table counts:
 252 concurrent games, which played the most decisions an hour, held 13.5 GB by
 the supervisor's count of then, and 378 pushed the Mac into swap (above). With
 longer searches memory limits how full the inference batches can be. At 1,600
-simulations, the search of AlphaGo Zero, inference batches of about 15 states
+simulations, the search of AlphaGo Zero, inference batches of about 20 states
 would give the GPU less than its rate in
 inference batches of 64 (above, where an inference batch's states come from).
 Several simulations in one inference request, built on 24 November (section

@@ -112,7 +112,7 @@ class Config:
         if type(self.cpu_budget) is not int or not 3 <= self.cpu_budget <= min(CORE_ALLOWANCE, os.cpu_count() or 1) or cores > self.cpu_budget:
             raise ValueError(f"Tensor threads, search workers and coordinators must fit the {CORE_ALLOWANCE}-core allowance")
         if type(self.memory_bytes) is not int or not 2_000_000_000 < self.memory_bytes <= MEMORY_ALLOWANCE_BYTES:
-            raise ValueError("Aggregate memory must leave a CPU/monitor reserve and fit the 16 GB allowance")
+            raise ValueError("Aggregate memory must leave a CPU/monitor reserve and fit the 20 GB allowance")
         for name in ("seconds", "value_scale", "atol", "rtol"):
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, (float, int)) or not math.isfinite(value) or value <= 0:

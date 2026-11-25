@@ -58,11 +58,12 @@
   choices and resulting states for the same position and dice), never internal
   byte formats. Identical results are a cheap check for speed-only changes, not
   a design constraint; a faster method may change float rounding or randomness.
-- Respect the current user allowance of at most 8 CPU cores and 16,000,000,000
+- Respect the current user allowance of at most 8 CPU cores and 20,000,000,000
   bytes of memory, including worker/coordinator overhead, until the user changes
   it: "I just want to give it like 8 cores and 16gbs of memory" (the user, 21
-  November 2026; on 25 November the user said again that it is 8 cores). The
-  Mac's M4 Max has 10 performance cores and 36 GB. Hold a run's median CPU
+  November 2026; on 25 November the user said again that it is 8 cores), and
+  "Let's give the alloance to 20gb" (25 November 2026). The Mac's M4 Max has 10
+  performance cores and 36 GB. Hold a run's median CPU
   cores, in its half-minute or one-minute windows, at or below 8, and count its
   memory by the processes' physical footprints, as Activity Monitor does.
   Efficient code does not by itself establish that AlphaZero-style search is the

@@ -90,11 +90,12 @@ SWAP_GROWTH_BYTES = 4_000_000_000
 CRITICAL_PRESSURE_LEVEL = 4
 PRESSURE_LEVELS = {1: "normal", 2: "warning", 4: "critical"}
 # The owner's allowance, of the Mac's 10 performance cores and 36 GB: "I just
-# want to give it like 8 cores and 16gbs of memory" (21 November 2026).
-# --all-cores passes the cores. Memory is counted as Activity Monitor counts it,
-# by the processes' physical footprints (process_memory_charge).
+# want to give it like 8 cores and 16gbs of memory" (21 November 2026), and
+# "Let's give the alloance to 20gb" (25 November 2026). --all-cores passes the
+# cores. Memory is counted as Activity Monitor counts it, by the processes'
+# physical footprints (process_memory_charge).
 CORE_ALLOWANCE = 8
-MEMORY_ALLOWANCE_BYTES = 16_000_000_000
+MEMORY_ALLOWANCE_BYTES = 20_000_000_000
 # The run's CPU load: cores used in each window of this many seconds, and the
 # median of the last LOAD_MEDIAN_WINDOWS windows, which is judged against the
 # core allowance once that many windows have been measured.
@@ -277,7 +278,7 @@ class SupervisorConfig:
         if type(self.cpu_budget) is not int or not 2 <= self.cpu_budget <= limit:
             raise ValueError(f"CPU allowance must reserve a coordinator within the authorized {limit} cores")
         if type(self.memory_bytes) is not int or not MEMORY_MARGIN_BYTES < self.memory_bytes <= MEMORY_ALLOWANCE_BYTES:
-            raise ValueError("Memory allowance must fit the authorized 16 GB with a safety margin")
+            raise ValueError("Memory allowance must fit the authorized 20 GB with a safety margin")
         if type(self.max_restarts) is not int or not 0 <= self.max_restarts <= 10:
             raise ValueError("Automatic restarts must be bounded between zero and ten")
 
@@ -872,7 +873,7 @@ def main(argv=None) -> int:
     parser.add_argument("--seconds", type=float, required=True, help="Original fixed active-wall allowance; never reset on resume")
     parser.add_argument("--profile", help="Machine profile in studies/campaign/profiles, such as mac")
     parser.add_argument("--cpu-budget", type=int, help=f"Default {CORE_ALLOWANCE}, or the profile's")
-    parser.add_argument("--memory-bytes", type=int, help="Default 16,000,000,000, or the profile's")
+    parser.add_argument("--memory-bytes", type=int, help="Default 20,000,000,000, or the profile's")
     parser.add_argument("--max-restarts", type=int, default=2)
     parser.add_argument("--all-cores", action="store_true", help="The owner allowed every core for this run")
     parser.add_argument("--shutdown-seconds", type=float, default=60)

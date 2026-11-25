@@ -187,12 +187,12 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
                                "(run / 'ready').write_text('ready')\n"
                                "while True: time.sleep(0.01)\n")
         def resident(_pid):
-            return 15_500_000_000 if (self.run / "ready").exists() else 1_000_000
+            return 19_500_000_000 if (self.run / "ready").exists() else 1_000_000
         state = supervise(self.control, self.run, self.config, ARGUMENTS,
                           command_factory=factory, rss_sampler=resident)
         self.assertEqual(state["status"], "memory_limit")
         self.assertTrue((self.run / "checkpoint.pt").exists())
-        self.assertEqual(state["aggregate_sampled_peak_rss_bytes"], 15_500_000_000)
+        self.assertEqual(state["aggregate_sampled_peak_rss_bytes"], 19_500_000_000)
 
     def test_monitor_failures_preserve_worker_and_orphan_diagnostics_without_retry(self):
         for phase in ("worker", "orphan_cleanup"):
@@ -258,7 +258,7 @@ class CampaignTrainingSupervisorTests(unittest.TestCase):
             if not (self.run / "ready").exists():
                 return 1_000_000
             samples.append(len(samples))
-            return 15_500_000_000 if len(samples) == 1 else 16_000_000_000
+            return 19_500_000_000 if len(samples) == 1 else 20_000_000_000
         state = supervise(self.control, self.run, self.config, ARGUMENTS,
                           command_factory=factory, rss_sampler=resident)
         self.assertGreaterEqual(len(samples), 2)

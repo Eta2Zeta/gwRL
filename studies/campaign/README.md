@@ -174,14 +174,14 @@ which record reports it, and gets a line when a run starts.
 budget, with bounded retries and graceful memory and deadline stops. It reserves
 its own core within the owner's allowance of eight of the Mac's ten performance
 cores (`CORE_ALLOWANCE`), "like 8 cores and 16gbs of memory" in the owner's
-words of 21 November 2026. `--all-cores` uses every core when the owner allows
-it.
+words of 21 November 2026, with the memory raised to 20 GB on 25 November.
+`--all-cores` uses every core when the owner allows it.
 
 Every second the supervisor adds up the memory of the run's processes
 (`aggregate_rss`): on macOS their physical footprints, the memory Activity
 Monitor shows for them, which leave out the shared libraries and shared memory
 that every process maps. It asks the run to stop safely when that sum comes
-within 1 GB of the run's allowance of 16 GB, and kills the run at 16 GB. On macOS it
+within 1 GB of the run's allowance of 20 GB, and kills the run at 20 GB. On macOS it
 also watches the memory of the whole Mac, which the run shares with every other
 program (`machine_memory`). It asks the run to stop safely when macOS's memory
 pressure stays critical for 10 seconds, or when the swap in use grows by 4 GB
@@ -240,7 +240,7 @@ hours of training play whose game processes ran under AddressSanitizer
 `--profile mac` gives the supervisor the setup measured on this Mac, kept in
 [profiles/mac.json](profiles/mac.json): PyTorch 2.14 from `tmp/gpu-mps-env`
 (built from `requirements-gpu-mps.txt`), five game processes of four games
-each, whose states one inference server evaluates on the CPU, the 16 GB
+each, whose states one inference server evaluates on the CPU, the 20 GB
 memory limit, the faster memory allocator and keeping the Mac awake. The
 supervisor counts one core per game process, one for the inference server, one
 for the network updates of self-play that never stops and one for itself, which
