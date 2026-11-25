@@ -4226,7 +4226,12 @@ regular intervals (section 10), and then the network grown or compared with a
 larger one at equal compute, as KataGo did. The owner chose to run it on the
 Mac (Q-021, [answered](../questions.md#answered) on 24 November 2026), once
 self-play at these sizes was made as fast as the Mac allows
-([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)).
+([section 9.3](#93-what-a-larger-network-and-a-longer-search-cost)). It started
+on 25 November 2026, with 6 game processes of 5 games and a network update of
+50 training steps of 256 training samples after every 30 finished games, from a
+replay buffer of 100,000
+([list of runs](../archive/runs.md), `training-256x16-2026-11-25`). Its
+held-out evaluations are not set up yet.
 
 #### How should a count count?
 
