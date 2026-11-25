@@ -60,7 +60,7 @@
 
   <!-- Legend -->
   <rect x="584" y="28" width="292" height="314" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
-  <text class="head" x="600" y="54">Each simulation walks down</text>
+  <text class="head" x="600" y="54">Each simulation plays forward</text>
   <text class="head" x="600" y="72">from R and stops at the first</text>
   <text class="head" x="600" y="90">state not yet asked about:</text>
   <text class="head" x="600" y="108">it asks the network there.</text>

@@ -257,11 +257,13 @@ against it choice by choice
 
 **Every simulation starts from the same place: the current state,** the *root* of
 the search. It plays on its own copy of the game, so the real game does not
-change. It does not play to the end of the game: it walks forward only until it
-reaches a state that no earlier simulation has asked the network about, asks
-about that one, and stops. So the first simulations look one action ahead, and
-later ones look further along the continuations that earlier ones found
-promising.
+change. It does not play to the end of the game: it plays forward, one action or
+dice roll at a time, only until it reaches a state that no earlier simulation
+has asked the network about, asks about that one, and stops. The states it
+passes through and the actions it plays on the way, from the root to the state
+where it stops, are the simulation's *path*. So the first simulations look one
+action ahead, and later ones look further along the continuations that earlier
+ones found promising.
 
 **What the simulations find is kept in a tree,** the *search tree*, which the
 next simulation reads. Each state the search has met is a *node* of the tree. For
@@ -289,8 +291,21 @@ what these simulations found below the action played.
    a state already on this simulation's path; or after 16 actions and dice
    rolls, the depth limit. The last two use an estimate of the state reached
    ([section 4.7](#47-more-detail-on-the-search)).
-6. Add the three values found to every state and action on the path, with one
-   more visit each.
+6. Add the three values found, the simulation's *result*, to every state and
+   action on the path, with one more visit each: this is *backing up* the
+   result.
+
+**How a search asks the network.** In self-play the search does not run the
+network itself. One process, the *inference server*, runs it for every game
+being played: when a simulation stops at a state the network has not rated, its
+game sends that state to the inference server with a request for the state's
+priors and values, an *inference request*, and waits for the reply. The
+network's output for one state, its priors and values, is a *network
+evaluation*. The inference server evaluates the states of many games' inference
+requests together, in one run of the network, which costs far less per state
+than a run for each ([section 9.2](#92-running-training-on-the-mac)). The next
+simulation starts only once the reply has come and the result is backed up,
+because it chooses its path by scores that include that result (section 4.3).
 
 ### 4.3 The PUCT score of an action
 
@@ -599,7 +614,7 @@ search began to stop at such a repetition (item 5 of the list in section 4.2,
 commit `47eb3d6`). Since then a simulation ends without the limit too: it never
 repeats a state, it stops at the first decision no simulation has asked the
 network about, and each simulation adds at most one such decision to the tree, so
-no walk can outrun what earlier simulations added. What the limit does now is cap
+no simulation can outrun what earlier simulations added. What the limit does now is cap
 how far ahead a search can look along one continuation. Like the other learning
 settings, 16 is the value of the 2 November speed test (section 9.2), not a tuned
 one.
@@ -625,10 +640,10 @@ meet the limit more often; that has not been measured.
 **What the search remembers.** The tree holds, for every node, identified by its
 state's planning key, the actions tried there with their visit counts, value
 totals and priors (`Node` and `Edge` in `src/search.cpp`), and a saved copy of
-the game at that state (`Node::game`). A simulation walks the tree on these saved
-states. Following an action already played from a state needs only the tree: the
-engine rolls no dice inside an action, so an action from a state always reaches
-the same state. The simulation copies a saved state only to play an action no
+the game at that state (`Node::game`). A simulation follows its path through the
+tree on these saved states. Following an action already played from a state
+needs only the tree: the engine rolls no dice inside an action, so an action
+from a state always reaches the same state. The simulation copies a saved state only to play an action no
 simulation has played from there yet, or to roll dice. In the toy example,
 simulation 4 follows A to RA in the tree alone, copies the saved RA and plays
 only x. Passing on an offer of declarations changes nothing in the game, so the
@@ -723,36 +738,57 @@ The Python search still serves held-out evaluation, whose fixed opponents
 (section 10) the C++ search does not play, the batching of several searches'
 network evaluations in one process (`studies/campaign/batching.py`), and tools.
 
-**Several simulations in one request.** With `--simulations-per-request N`
+**Several simulations in one inference request.** As section 4.2 describes it,
+a search asks for one network evaluation at a time: each simulation sends one
+inference request and waits for the reply before the next simulation chooses
+its path. With `--simulations-per-request N`
 (`SearchSettings::simulationsPerRequest` in `include/game/search.hpp`), the C++
-search walks up to N simulations before it asks the inference server anything,
-and then asks about all the states they stopped at in one inference request
-([section 9.2](#92-running-training-on-the-mac)). AlphaGo Zero ran its
-simulations on parallel search threads with a virtual loss, below, and evaluated
-their states in mini-batches of 8
+search instead chooses the paths of N simulations, one after another, before it
+asks about any of the states where they stopped, and then asks about all N
+states in one inference request. The reply brings a network evaluation for each
+of them, and the search backs up each simulation's result in turn. A game then
+sends the inference server N states at a time, so the inference server
+evaluates N times as many states together for the same number of games
+([section 9.2](#92-running-training-on-the-mac)).
+
+Without their replies, the N simulations would all choose the same path, since
+nothing would change the PUCT scores between them. So while a simulation waits
+for its reply, every action on its path counts it as a visit that lost, a
+*virtual loss*: the visit raises the action's visit count $n$ in the PUCT score
+(section 4.3), which lowers its exploration term, and it counts as a result at
+the bottom of the value term's scale, 0. When the reply comes, the simulation
+takes its virtual losses back and backs up its real result. AlphaGo Zero
+searched this way: it ran its simulations on parallel threads with a virtual
+loss and evaluated their states in batches of 8
 ([Silver et al. 2017](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf),
-Methods, "Search Algorithm", under "Expand and evaluate" and "Backup"). While a
-simulation waits for its answer, every
-action on its path counts it as a visit that lost, a *virtual loss*: in the
-PUCT score (section 4.3) the visit raises the action's visit count, which lowers
-its exploration term, and it counts at the lowest value the bounds allow, 0 after
-normalizing. So the next simulation of the same request is steered elsewhere.
-When the answers come, each simulation takes its virtual losses back and backs up
-its real value, in the order the simulations were walked. A simulation whose walk
-would ask about a state already asked about in the same request is dropped and
-does not count; another is walked in its place, and after N such drops the
-request goes as it is. A walk that ends at a known value, the end of the game or
-a value asked for earlier, is backed up at once. With N = 1, the default, this is
-the search described above, simulation by simulation, which the Python search
-plays too and `tests/test_campaign_native_search.py` compares. With more, the
-simulations of one request choose their paths without each other's results, so
-a search of the same number of simulations explores a little differently. On 70
-positions with a stand-in network, 8 a request moved a search's visit shares by
-a total variation distance of 0.05 on average, both after 800 simulations with
-exploration noise, where another noise seed moved them by 0.17, and after 150
-without, where another seed moved them by 0.02
-([record](../archive/records/self_play_speed_256x16_2026_11_24.md)). The Python
-search refuses N above 1. Whether training uses 8 is
+Methods, "Search Algorithm", under "Expand and evaluate" and "Backup").
+
+In the toy search of section 4.4, with 4 simulations a request, simulation 1
+plays A, stops at the new state RA and waits. Its virtual loss drops A's value
+term from 1 to 0, so simulation 2 plays B, which scores 1.76 against A's 0.42,
+and with virtual losses on A and B, simulation 3 plays C. Simulation 4, with
+virtual losses on all three, plays A again, the action with the highest prior,
+and stops at RA once more, a state already in this request: it is dropped and
+does not count. Nothing has changed, so the next try takes the same path and is
+dropped too, and after 4 drops the request goes as it is, with RA, RB and RC.
+In section 4.4, where each simulation waits for its reply, simulation 4 had A's
+result and went one action deeper, to RAx; here that step waits for the next
+request. A simulation that stops where the result is already known, at the end
+of the game or at a state rated before, backs up at once and asks nothing.
+
+So the simulations of one request choose their paths without each other's
+results, and a search of the same number of simulations explores a little
+differently. On 70 positions with a stand-in network, 8 a request changed a
+search's visit shares by a total variation distance of 0.05 on average, which
+means that 5% of the visits would have to move from some actions to others to
+turn one search's visit shares into the other's. That held both after 800
+simulations with exploration noise, where another noise seed changed them by
+0.17, and after 150 without, where another seed changed them by 0.02
+([record](../archive/records/self_play_speed_256x16_2026_11_24.md)). With N = 1,
+the default, the search is the one of sections 4.2 to 4.6, simulation by
+simulation, which the Python search plays too and
+`tests/test_campaign_native_search.py` compares; the Python search refuses N
+above 1. Whether training uses 8 is
 [Q-022](../questions.md#q-022-several-simulations-in-one-inference-request).
 
 ## 5. How a decision becomes numbers
@@ -2143,11 +2179,12 @@ on in five parts this way, each after the first starting from the previous part'
 newest networks ([record](../archive/records/long_run_progress_2026_11_21.md)).
 
 **The inference server.** Game threads do not run the network themselves; the
-inference server, which the tools and the dated records name the *coordinator*,
-does it for all of them (`SharedEvaluatorServer` in
-`studies/campaign/shared_evaluator.py`). A *network evaluation* is a network's
-output for one state, its priors and values. When a game thread's search needs a
-network evaluation, the thread writes the state's input, a few arrays of whole
+inference server (section 4.2), which the tools and the dated records name the
+*coordinator*, does it for all of them (`SharedEvaluatorServer` in
+`studies/campaign/shared_evaluator.py`), because a forward pass over the states
+of many games costs far less per state than a forward pass for each (below,
+under how the states enter). When a game thread's search needs a network
+evaluation (section 4.2), the thread writes the state's input, a few arrays of whole
 numbers, into its own block of *shared memory*, memory that its game process and
 the inference server can both read. Then it sends a short note of where those
 arrays lie, its *inference request*, through its own *pipe*, a channel the
@@ -4484,7 +4521,13 @@ qualifier, and the names the code and the dated records use instead.
 **Search (section 4)**
 
 - **Search (MCTS):** the simulations that pick an action at a decision.
-- **Simulation:** one imagined walk forward from the root, on a copy of the game.
+- **Simulation:** one look ahead from the root, on a copy of the game: it
+  chooses a path by the PUCT scores, asks the network about the state where it
+  stops and backs up the result.
+- **Path:** the states a simulation passes through and the actions it plays,
+  from the root to the state where it stops.
+- **Backing up:** adding a simulation's result to every state and action on its
+  path, with one more visit each.
 - **Root:** the current state, where every simulation of a search starts.
 - **Search tree:** what a search remembers between simulations; a game keeps it
   from one decision to the next, below the state reached.
@@ -4510,9 +4553,9 @@ qualifier, and the names the code and the dated records use instead.
   the root before it stopped.
 - **Depth limit:** the greatest simulation depth allowed, 16 in current runs; a
   simulation that reaches it stops and uses an estimate of the state there.
-- **Simulations per request:** how many simulations a search walks before it
-  asks the inference server about all the states they stopped at, in one
-  inference request; 1 by default.
+- **Simulations per request:** how many simulations' paths a search chooses
+  before it asks the inference server about the states where they stopped, all
+  in one inference request; 1 by default.
 - **Virtual loss:** a simulation waiting for its inference request's answer,
   counted meanwhile on every action of its path as a visit with the worst value,
   so that the other simulations of the same request choose other paths.
@@ -4670,8 +4713,8 @@ qualifier, and the names the code and the dated records use instead.
 - **Concurrent games:** the games being played at the same moment, each holding
   its search tree in memory.
 - **Inference server:** the process that runs the network for every game's
-  states and sends each game thread its priors and values; the tools and the
-  dated records name it the coordinator.
+  states and sends each game thread its priors and values (sections 4.2 and
+  9.2); the tools and the dated records name it the coordinator.
 - **Network evaluation:** a network's output for one state, its priors and values;
   a search asks for about one per simulation.
 - **Inference request:** a game thread's request for the network evaluation of

@@ -311,9 +311,10 @@ reports in `manifest.json` give only when one ends:
 tail -f studies/campaign/runs/YOUR_RUN/serving.jsonl
 ```
 
-`--simulations-per-request N` lets a search walk N simulations before it asks
-the inference server about the states they stopped at, all in one inference
-request, each waiting simulation's path counted meanwhile as visits that lost
+`--simulations-per-request N` lets a search choose the paths of N simulations
+before it asks the inference server about the states where they stopped, all in
+one inference request; meanwhile each waiting simulation counts on its path as
+a visit that lost
 ([section 4.7 of the design document](../../docs/design/README.md#47-more-detail-on-the-search)).
 The default, 1, asks after each simulation. Whether training uses 8 is
 [Q-022](../../docs/questions.md#q-022-several-simulations-in-one-inference-request).

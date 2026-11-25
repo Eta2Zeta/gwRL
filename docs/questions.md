@@ -33,7 +33,7 @@ Other open things stay in the pages that own them, and
 | Number | Question | About | Recommended |
 | --- | --- | --- | --- |
 | [Q-005](#q-005-the-supervisors-count-of-cores) | Should the supervisor keep training within the 9 cores by measuring the load, not by counting game processes? | Running training | Yes: measure, warn, and stop a run that stays over |
-| [Q-022](#q-022-several-simulations-in-one-inference-request) | Should self-play's search walk 8 simulations before it asks the inference server about their states, all in one inference request, as AlphaGo Zero did? | Search | Yes, 8 a request: about two and a half times the network evaluations a second at 256×16 on the Mac |
+| [Q-022](#q-022-several-simulations-in-one-inference-request) | Should self-play's search choose the paths of 8 simulations before it asks the network about the states where they stopped, all in one inference request, as AlphaGo Zero did? | Search | Yes, 8 a request: about two and a half times the network evaluations a second at 256×16 on the Mac |
 | [Q-023](#q-023-counting-the-kept-tree-toward-a-searchs-simulations) | Should a fast search stop once its root holds 150 visits, counting those its kept tree brought, instead of always adding 150 new simulations? | Search | Yes, for the fast searches only: about 18% fewer network evaluations, the training samples' searches unchanged |
 
 Q-005 was raised on 15 November 2026, when the allowance became 9 cores (commit
@@ -116,19 +116,36 @@ and in [section 9.2 of the design document](design/README.md#92-running-training
 
 ## Q-022: Several simulations in one inference request
 
-**The question.** Should self-play's search walk 8 simulations before it asks
-the inference server about the states they stopped at, and ask about all 8 in
-one inference request, as AlphaGo Zero did, instead of asking after each
-simulation?
+**The question.** Should self-play's search choose the paths of 8 simulations
+before it asks the network about any of the states where they stopped, and then
+ask about all 8 states at once, as AlphaGo Zero did, instead of asking after
+each simulation and waiting for the answer before the next one starts?
 
-**What the program does now.** A search asks after each simulation and waits
-for the answer before it walks the next (`--simulations-per-request 1`, the
-default). Since 24 November `--simulations-per-request N` walks up to N
-simulations first; while they wait, each one's path counts as visits that lost
-(a *virtual loss*), so that they spread over the tree, and a walk that would ask
-about a state already asked about is dropped and replaced
-([design document, section 4.7](design/README.md#47-more-detail-on-the-search)).
-AlphaGo Zero's search ran its simulations on parallel threads with a virtual
+**What the program does now.** At a decision, the search runs many
+*simulations*, 800 or 150 at these sizes. Each one plays forward from the
+current state on a copy of the game, choosing at every state the action with
+the best PUCT score, which weighs what earlier simulations found against what
+the network expected; it stops at the first state the network has not yet
+rated, asks the network for that state's priors and values, and adds the values
+it gets to every action it played on the way, its *path*
+([design document, section 4.2](design/README.md#42-one-simulation)). The
+network does not run inside the game: one process, the *inference server*,
+runs it for the states of every game being played, and a game asks it about a
+state with a message, an *inference request* (same section, and
+[section 9.2](design/README.md#92-running-training-on-the-mac)). Now a search
+sends one inference request after each simulation and waits for the reply,
+because the next simulation's choices depend on that answer
+(`--simulations-per-request 1`, the default). So each game has at most one state
+waiting at the inference server at a time, and the inference server, whose work
+per state falls the more states it evaluates together, gets at most one state
+from each game at once. Since 24 November `--simulations-per-request N` lets the
+search choose the paths of N simulations first and ask about all N states in
+one inference request, so that each game can have N states waiting. To keep the
+N from all taking the same path, each waiting simulation counts meanwhile on its
+path as a visit that lost, a *virtual loss*, and a simulation that stops at a
+state already in the request is dropped and tried again later
+([design document, section 4.7](design/README.md#47-more-detail-on-the-search),
+with a worked example). AlphaGo Zero's search ran its simulations on parallel threads with a virtual
 loss and evaluated their states in mini-batches of 8 ([Silver et al.
 2017](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf),
 Methods, "Search Algorithm").
@@ -151,7 +168,9 @@ stand-in network, the most visited action after 800 simulations with
 exploration noise, as at a kept decision, was the same with 8 a request as with
 1 at 56 of them, and two searches of 1 a request with different seeds agreed at
 52; the visit shares differed by a total variation distance of 0.05 on average
-with 8 a request, and 0.17 with another seed. After 150 simulations without
+with 8 a request, and 0.17 with another seed: 5% and 17% of the visits would
+have to move from some actions to others to turn one search's visit shares into
+the other's. After 150 simulations without
 noise, as at the other decisions, 8 a request kept the most visited action at
 63 of the 70 and another seed at 66, with distances of 0.05 and 0.02.
 
