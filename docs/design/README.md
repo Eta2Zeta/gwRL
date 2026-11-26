@@ -3976,7 +3976,14 @@ which addresses four of the six together: more search behind the moves played,
 exploration noise at a quarter of the decisions instead of 1 in 100, simulations
 that reach the end of a Combat Phase, and about 25 times the training samples a
 game; the values and the one opponent stay open. See [how big the network and
-the search should be](#how-big-should-the-network-and-the-search-be).
+the search should be](#how-big-should-the-network-and-the-search-be). After 55
+network updates and 1,195 games, the network of the training run at those sizes
+scored above this run's network after 595 network updates in all three seats
+on the 24 held-out seeds, its Allies by 39.1 ± 7.4 points, with about 2.4
+times the network evaluations of a network twice as deep; whether it goes on
+improving past the 4,600 to 5,800 games at which this run stopped is not
+measured yet
+([record](../archive/records/training_256x16_update_55_2026_11_26.md)).
 
 #### One embedding per combination, or embeddings built from parts?
 
@@ -4303,7 +4310,12 @@ network update's network with 5 processes of 4 games and a network update of 40
 training steps after every 20 finished games
 ([list of runs](../archive/runs.md), `training-256x16-2026-11-25`;
 [record of its 19th network update](../archive/records/training_256x16_update_19_2026_11_25.md)).
-Its held-out evaluations are not set up yet.
+Its first held-out evaluation, on 26 November after 55 network updates and
+1,195 games, found its network above its untrained network and above the
+network of the training run under the land-weighted score after 595 network
+updates in all three seats, though not at equal compute
+([record](../archive/records/training_256x16_update_55_2026_11_26.md)).
+Held-out evaluations at regular intervals are not set up yet.
 
 #### How should a count count?
 

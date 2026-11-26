@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="458" viewBox="0 0 960 458" role="img" aria-labelledby="title desc">
+  <title id="title">How each network scored against the scripted policy, seat by seat</title>
+  <desc id="desc">A dot chart of each network's mean final score minus the scripted balanced policy's, in the same seat on the same 24 held-out seeds, with bars of one standard error either side, for the Axis, the Allies and the Comintern. The untrained 256×16 network scores +16.8, −66.9 and −3.6; the 256×16 network after 55 network updates +28.2, −32.9 and +8.9; the 256×8 network of the training run under the land-weighted score after 595 network updates +21.0, −72.0 and +1.3.</desc>
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+      .title { font-size: 15px; font-weight: 600; }
+      .sub { font-size: 12px; fill: #57606a; font-style: italic; }
+      .group { font-size: 13px; font-weight: 600; }
+      .label { font-size: 12px; fill: #57606a; }
+      .tick { font-size: 12px; fill: #57606a; font-variant-numeric: tabular-nums; }
+      .value { font-size: 12px; fill: #1f2328; font-variant-numeric: tabular-nums; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="457" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+  <text class="title" x="24" y="36">How each network scored against the scripted policy, seat by seat</text>
+  <text class="sub" x="24" y="58">Mean difference from the scripted balanced policy in the same seat on the same 24 held-out seeds, the other two seats scripted; the bars span one standard error either side</text>
+  <text class="sub" x="24" y="76">The 256×16 networks are this run's; the 256×8 network is that of the training run under the land-weighted score, 22 to 24 November 2026</text>
+  <line x1="418.5" y1="100" x2="418.5" y2="394" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="418.5" y="412" text-anchor="middle">−80</text>
+  <line x1="495.4" y1="100" x2="495.4" y2="394" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="495.4" y="412" text-anchor="middle">−60</text>
+  <line x1="572.3" y1="100" x2="572.3" y2="394" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="572.3" y="412" text-anchor="middle">−40</text>
+  <line x1="649.2" y1="100" x2="649.2" y2="394" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="649.2" y="412" text-anchor="middle">−20</text>
+  <line x1="726.2" y1="100" x2="726.2" y2="394" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="726.2" y="412" text-anchor="middle">0</text>
+  <line x1="803.1" y1="100" x2="803.1" y2="394" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="803.1" y="412" text-anchor="middle">+20</text>
+  <line x1="880.0" y1="100" x2="880.0" y2="394" stroke="#eaeef2" stroke-width="1"/>
+  <text class="tick" x="880.0" y="412" text-anchor="middle">+40</text>
+  <line x1="726.2" y1="100" x2="726.2" y2="394" stroke="#57606a" stroke-width="1.5"/>
+  <text class="label" x="630" y="436" text-anchor="middle">points of final score above the scripted balanced policy in the same seat, on the same 24 seeds</text>
+  <text class="group" x="24" y="110">Axis</text>
+  <circle cx="46" cy="132" r="5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/>
+  <text class="label" x="60" y="136">untrained 256×16 network</text>
+  <line x1="771.9" y1="132" x2="810.0" y2="132" stroke="#1baf7a" stroke-width="2"/>
+  <line x1="771.9" y1="127" x2="771.9" y2="137" stroke="#1baf7a" stroke-width="2"/>
+  <line x1="810.0" y1="127" x2="810.0" y2="137" stroke="#1baf7a" stroke-width="2"/>
+  <circle cx="790.9" cy="132" r="5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/>
+  <text class="value" x="818.0" y="136">+16.8</text>
+  <circle cx="46" cy="154" r="5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
+  <text class="label" x="60" y="158">256×16 network after 55 network updates</text>
+  <line x1="813.8" y1="154" x2="855.1" y2="154" stroke="#2a78d6" stroke-width="2"/>
+  <line x1="813.8" y1="149" x2="813.8" y2="159" stroke="#2a78d6" stroke-width="2"/>
+  <line x1="855.1" y1="149" x2="855.1" y2="159" stroke="#2a78d6" stroke-width="2"/>
+  <circle cx="834.4" cy="154" r="5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
+  <text class="value" x="863.1" y="158">+28.2</text>
+  <circle cx="46" cy="176" r="5" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
+  <text class="label" x="60" y="180">256×8 network after 595 network updates</text>
+  <line x1="786.6" y1="176" x2="827.0" y2="176" stroke="#eb6834" stroke-width="2"/>
+  <line x1="786.6" y1="171" x2="786.6" y2="181" stroke="#eb6834" stroke-width="2"/>
+  <line x1="827.0" y1="171" x2="827.0" y2="181" stroke="#eb6834" stroke-width="2"/>
+  <circle cx="806.8" cy="176" r="5" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
+  <text class="value" x="835.0" y="180">+21.0</text>
+  <text class="group" x="24" y="212">Allies</text>
+  <circle cx="46" cy="234" r="5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/>
+  <text class="label" x="60" y="238">untrained 256×16 network</text>
+  <line x1="443.9" y1="234" x2="493.9" y2="234" stroke="#1baf7a" stroke-width="2"/>
+  <line x1="443.9" y1="229" x2="443.9" y2="239" stroke="#1baf7a" stroke-width="2"/>
+  <line x1="493.9" y1="229" x2="493.9" y2="239" stroke="#1baf7a" stroke-width="2"/>
+  <circle cx="468.9" cy="234" r="5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/>
+  <text class="value" x="501.9" y="238">−66.9</text>
+  <circle cx="46" cy="256" r="5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
+  <text class="label" x="60" y="260">256×16 network after 55 network updates</text>
+  <line x1="561.1" y1="256" x2="638.2" y2="256" stroke="#2a78d6" stroke-width="2"/>
+  <line x1="561.1" y1="251" x2="561.1" y2="261" stroke="#2a78d6" stroke-width="2"/>
+  <line x1="638.2" y1="251" x2="638.2" y2="261" stroke="#2a78d6" stroke-width="2"/>
+  <circle cx="599.7" cy="256" r="5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
+  <text class="value" x="646.2" y="260">−32.9</text>
+  <circle cx="46" cy="278" r="5" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
+  <text class="label" x="60" y="282">256×8 network after 595 network updates</text>
+  <line x1="423.5" y1="278" x2="475.1" y2="278" stroke="#eb6834" stroke-width="2"/>
+  <line x1="423.5" y1="273" x2="423.5" y2="283" stroke="#eb6834" stroke-width="2"/>
+  <line x1="475.1" y1="273" x2="475.1" y2="283" stroke="#eb6834" stroke-width="2"/>
+  <circle cx="449.3" cy="278" r="5" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
+  <text class="value" x="483.1" y="282">−72.0</text>
+  <text class="group" x="24" y="314">Comintern</text>
+  <circle cx="46" cy="336" r="5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/>
+  <text class="label" x="60" y="340">untrained 256×16 network</text>
+  <line x1="700.4" y1="336" x2="724.6" y2="336" stroke="#1baf7a" stroke-width="2"/>
+  <line x1="700.4" y1="331" x2="700.4" y2="341" stroke="#1baf7a" stroke-width="2"/>
+  <line x1="724.6" y1="331" x2="724.6" y2="341" stroke="#1baf7a" stroke-width="2"/>
+  <circle cx="712.5" cy="336" r="5" fill="#1baf7a" stroke="#ffffff" stroke-width="2"/>
+  <text class="value" x="732.6" y="340">−3.6</text>
+  <circle cx="46" cy="358" r="5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
+  <text class="label" x="60" y="362">256×16 network after 55 network updates</text>
+  <line x1="746.5" y1="358" x2="774.5" y2="358" stroke="#2a78d6" stroke-width="2"/>
+  <line x1="746.5" y1="353" x2="746.5" y2="363" stroke="#2a78d6" stroke-width="2"/>
+  <line x1="774.5" y1="353" x2="774.5" y2="363" stroke="#2a78d6" stroke-width="2"/>
+  <circle cx="760.5" cy="358" r="5" fill="#2a78d6" stroke="#ffffff" stroke-width="2"/>
+  <text class="value" x="782.5" y="362">+8.9</text>
+  <circle cx="46" cy="380" r="5" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
+  <text class="label" x="60" y="384">256×8 network after 595 network updates</text>
+  <line x1="715.3" y1="380" x2="746.8" y2="380" stroke="#eb6834" stroke-width="2"/>
+  <line x1="715.3" y1="375" x2="715.3" y2="385" stroke="#eb6834" stroke-width="2"/>
+  <line x1="746.8" y1="375" x2="746.8" y2="385" stroke="#eb6834" stroke-width="2"/>
+  <circle cx="731.1" cy="380" r="5" fill="#eb6834" stroke="#ffffff" stroke-width="2"/>
+  <text class="value" x="754.8" y="384">+1.3</text>
+</svg>
