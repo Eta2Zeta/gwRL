@@ -1362,6 +1362,131 @@
    }
   }
  },
+ "land_zones_by_nation": {
+  "source": "at the start: china_minor_setup.json's territories and the Axis's starting wealth; at the end: each game's territorial_control, means over the 24 games",
+  "at_the_start": {
+   "kmt": 5,
+   "japan": 11,
+   "dadao": 0,
+   "ccp": 1,
+   "mongolia": 4,
+   "warlords": 10
+  },
+  "axis": {
+   "network after 55 network updates": {
+    "mean_at_the_end": {
+     "kmt": 11.5,
+     "japan": 11.96,
+     "dadao": 0.42,
+     "ccp": 4.96,
+     "mongolia": 0.88,
+     "warlords": 1.29
+    },
+    "games_with_a_warlord_left": 16,
+    "games_with_dadao_holding_land": 3
+   },
+   "untrained network": {
+    "mean_at_the_end": {
+     "kmt": 12.5,
+     "japan": 9.38,
+     "dadao": 0,
+     "ccp": 6.54,
+     "mongolia": 1.75,
+     "warlords": 0.83
+    },
+    "games_with_a_warlord_left": 9,
+    "games_with_dadao_holding_land": 0
+   },
+   "scripted balanced policy": {
+    "mean_at_the_end": {
+     "kmt": 20.25,
+     "japan": 8.92,
+     "dadao": 0,
+     "ccp": 1.46,
+     "mongolia": 0.38,
+     "warlords": 0
+    },
+    "games_with_a_warlord_left": 0,
+    "games_with_dadao_holding_land": 0
+   }
+  },
+  "allies": {
+   "network after 55 network updates": {
+    "mean_at_the_end": {
+     "kmt": 13.96,
+     "japan": 12.88,
+     "dadao": 0,
+     "ccp": 3.62,
+     "mongolia": 0.54,
+     "warlords": 0
+    },
+    "games_with_a_warlord_left": 0,
+    "games_with_dadao_holding_land": 0
+   },
+   "untrained network": {
+    "mean_at_the_end": {
+     "kmt": 7.54,
+     "japan": 16.17,
+     "dadao": 0,
+     "ccp": 5.96,
+     "mongolia": 1.33,
+     "warlords": 0
+    },
+    "games_with_a_warlord_left": 0,
+    "games_with_dadao_holding_land": 0
+   },
+   "scripted balanced policy": {
+    "mean_at_the_end": {
+     "kmt": 20.25,
+     "japan": 8.92,
+     "dadao": 0,
+     "ccp": 1.46,
+     "mongolia": 0.38,
+     "warlords": 0
+    },
+    "games_with_a_warlord_left": 0,
+    "games_with_dadao_holding_land": 0
+   }
+  },
+  "comintern": {
+   "network after 55 network updates": {
+    "mean_at_the_end": {
+     "kmt": 15.67,
+     "japan": 11.42,
+     "dadao": 0,
+     "ccp": 1.54,
+     "mongolia": 2.38,
+     "warlords": 0
+    },
+    "games_with_a_warlord_left": 0,
+    "games_with_dadao_holding_land": 0
+   },
+   "untrained network": {
+    "mean_at_the_end": {
+     "kmt": 20.83,
+     "japan": 9.38,
+     "dadao": 0,
+     "ccp": 0.62,
+     "mongolia": 0.17,
+     "warlords": 0
+    },
+    "games_with_a_warlord_left": 0,
+    "games_with_dadao_holding_land": 0
+   },
+   "scripted balanced policy": {
+    "mean_at_the_end": {
+     "kmt": 20.25,
+     "japan": 8.92,
+     "dadao": 0,
+     "ccp": 1.46,
+     "mongolia": 0.38,
+     "warlords": 0
+    },
+    "games_with_a_warlord_left": 0,
+    "games_with_dadao_holding_land": 0
+   }
+  }
+ },
  "self_play_games_by_network_updates": [
   {
    "part": "2-five-processes",
