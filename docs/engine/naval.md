@@ -61,8 +61,38 @@ there. Each case is a decision for the side it concerns.
 | Enemy ships, or a patrol Fighter, it wants to sail past | The mover: leave some ships behind as a screening force to hold them | `naval_screen_add`, `naval_screen_confirm` |
 | | Then, once the screening fight is won: the rest sails on, or stops | `naval_screen_continue_route`, `naval_screen_stop_route` |
 
-A fight that starts on the way is fought at once, in Combat Movement, and the
-order then carries on from where it stood.
+Submarine and patrol-plane reactions that start a fight on the way are fought
+at once, in Combat Movement, and the order then carries on from where it stood
+(`beginBattleFromPlan` in `src/naval_movement.cpp`).
+
+**Screening (RB 9.4.2, page 58).** When a fleet wants to sail past enemy
+surface warships (or an enemy Fighter on Maritime Air Patrol), the moving side
+divides the fleet into two groups:
+
+- a **screening force**, which stays in the contested sea zone to fight the
+  blocking enemies during the Combat Phase; and
+- a **continuing force**, which is supposed to wait in place until that
+  screening battle is resolved.
+
+During the Combat Phase, once the screening battle finishes (`continueNavalMovement`
+in `src/naval_movement.cpp`):
+
+- if every blocking enemy warship and patrol aircraft is eliminated (even if
+  every screening ship is sunk too), the screening battle is won and the
+  continuing force may either keep sailing along its route or make an
+  amphibious assault (`naval_screen_continue_route`, `naval_screen_stop_route`);
+- if any blocker survives, the screening battle is lost and the continuing
+  force must retreat back to the adjacent sea zone it entered from (RB 10.3,
+  page 62) with its movement ended for the turn.
+
+*Known defect ([Q-025](../questions.md#open-questions)):* during the rest of
+the Combat Movement phase, `available` in `src/naval_movement.cpp` locks out
+ships in the screening force (the battle's attackers) but forgets to lock out
+ships waiting in the continuing force. That lets a waiting continuing ship
+take another move and leave the contested sea zone before the screening battle
+is even fought; if the screening battle later loses and the engine tries to
+retreat that ship back to the sea zone it entered from, the sanity check
+aborts the move (`Failed screening requires its actual adjacent entry sea`).
 
 **Raiders.** In Combat Movement a Battlecruiser may be named a raider
 (`naval_designate_raider`, undone by `naval_remove_raider`). A raider attacks
