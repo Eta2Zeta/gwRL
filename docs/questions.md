@@ -30,7 +30,97 @@ Other open things stay in the pages that own them, and
 
 ## Open questions
 
-No question waits for an answer now.
+### Q-024: What to do with the 256×16 training run after its Allies regressed between network updates 55 and 138
+
+**What the program does now.** `studies/campaign/runs/training-256x16-2026-11-25/3-four-games`
+resumed from its checkpoint at 06:26 on 27 November 2026 and is still playing
+single-network self-play with a 100,000-sample replay buffer (~290 recent games,
+about 14.5 network updates). On all 24 held-out seeds against the scripted
+balanced policy, the network after 55 network updates had improved in every seat
+over its untrained network (+11.3 Axis, +34.0 Allies, +12.5 Comintern;
+[record](archive/records/training_256x16_update_55_2026_11_26.md)), but after
+138 network updates (2,855 games, 1.10 billion network evaluations) its Allies
+fell 33.2 ± 7.1 points to −68.2 (indistinguishable from the untrained network's
+−69.1, higher on 12 of 24 seeds, and −66.1 ± 6.9 below the scripted Allies), its
+Comintern fell 6.8 ± 3.3 points to −88.8 (+2.2 ± 4.1 above the scripted
+Comintern), and its Axis stayed flat at +20.7 (−0.8 ± 4.0 from update 55,
++27.4 ± 5.9 above the scripted Axis;
+[record](archive/records/training_256x16_update_138_2026_11_27.md)). During
+network updates 56 to 109, self-play games ending with all warlords aligned
+(which follows a Japanese invasion of China) fell from 59%–92% (updates 1 to 37)
+to 25%–35%, before rebounding to 37%–45% overnight in updates 110 to 138.
+
+**Why it matters.** Pure self-play against only the current network with a
+short replay buffer appears to be repeating the single-opponent forgetting seen
+in `training-land-weighted-2026-11-22` (where Allies fell to −74.1 after 595
+network updates;
+[design document](design/README.md#why-did-training-stop-improving)): once
+self-play Japan stops invading China for several dozen updates, the replay
+buffer flushes out China-invasion games and the Allies forget how to fight an
+invading Japan. Keeping the run unchanged risks spending days of compute
+cycling between forgetting and relearning, whereas stopping prematurely without
+measuring the intermediate exports (`generation-000072.pt` at update 91 and
+`generation-000108.pt` at update 127) would leave open whether the overnight
+rebound in China wars is already pulling the Allies back up.
+
+**Choices.**
+
+- **Choice A — Let the run keep going unchanged** and evaluate again after
+  another day (around network update 200) to see whether self-play's overnight
+  rebound to 45% warlord-aligned games recovers the Allies by itself. Changes
+  nothing in the code; risks another day of compute if pure self-play stays
+  non-stationary.
+- **Choice B (recommended) — Evaluate the saved exports at updates 91 and 127
+  to see whether the Allies are still falling or starting to recover, and plan
+  an opponent-diversity change (playing a share of self-play games against past
+  model exports and/or the scripted policy, plus a larger replay buffer or
+  wider exploration)**
+  ([open design question](design/README.md#search-guided-self-play-or-direct-policy-learning-and-which-opponents)).
+  Pins down the trajectory before changing the run, then directly addresses the
+  forgetting mechanism.
+- **Choice C — Stop the 256×16 run now and restart with mixed opponents**
+  (past exports and/or scripted opponents in a fraction of self-play games),
+  continuing from `generation-000036.pt` (update 55, before the Allies
+  regressed) or from fresh weights. Saves compute immediately if pure self-play
+  is already ruled out, at the cost of not seeing whether the current run
+  recovers on its own.
+
+### Q-025: Naval screening retreat error in `continueNavalMovement`
+
+**What the program does now.** In `continueNavalMovement`
+(`src/naval_movement.cpp`), when a naval screening battle fails (`!remaining.empty()`)
+and `data` has no `waiting_ports`, each continuing ship is retreated to
+`from = u.route.size() > 1 ? u.route[u.route.size() - 2] : u.turnOrigin` and
+checked with `require(sea(s, from) && adjacent(s, from, b.zone), "Failed screening requires its actual adjacent entry sea")`.
+Two self-play games of `training-256x16-2026-11-25` hit this error during
+search on `naval_take_casualty`: `2-five-processes` batch 18
+(`game-621-seed-8038806183630416492.json`, KMT destroyer in `sea_p32` battle
+with route `[sea_p15, sea_p32, sea_p15]`) and `3-four-games` batch 89
+(`game-1830-seed-3140720981921948512.json`, Japanese transport in `sea_p33`
+battle with route `[sea_p14, sea_p32, sea_p33, sea_p15]`). Replaying both with
+`tools/replay_failed_move.py` reproduces `same_failure`: in both cases the
+continuing ship had already left `b.zone`, so `u.route[u.route.size() - 2]` was
+`b.zone` itself rather than the adjacent entry sea before `b.zone`
+([record](archive/records/training_256x16_update_138_2026_11_27.md#how-it-was-measured)).
+
+**Why it matters.** Each occurrence aborts a self-play game during search (2 of
+2,915 games so far, so rare, ~0.07% of games, and contained to the single
+failed game). Because `3-four-games` runs from its frozen copy of the code, a
+fix on `main` will not take effect until the next run or part starts, and
+changing the engine changes the compatibility signature for resuming old
+checkpoints.
+
+**Choices.**
+
+- **Choice A (recommended) — Fix `continueNavalMovement` on `main` with a
+  regression test built from the kept positions** (retreating to the entry sea
+  before `b.zone` on the screening request's path rather than `route[size - 2]`),
+  leaving the currently running `3-four-games` untouched until it moves to a new
+  part. Fixes the engine defect cleanly for all future runs without disrupting
+  the active checkpoint.
+- **Choice B — Leave it unfixed until a larger rules or training restart**
+  bundles engine changes together, accepting the ~0.07% failed-game rate in the
+  meantime.
 
 ## Open elsewhere
 

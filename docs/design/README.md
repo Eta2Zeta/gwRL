@@ -3976,14 +3976,21 @@ which addresses four of the six together: more search behind the moves played,
 exploration noise at a quarter of the decisions instead of 1 in 100, simulations
 that reach the end of a Combat Phase, and about 25 times the training samples a
 game; the values and the one opponent stay open. See [how big the network and
-the search should be](#how-big-should-the-network-and-the-search-be). After 55
-network updates and 1,195 games, the network of the training run at those sizes
-scored above this run's network after 595 network updates in all three seats
-on the 24 held-out seeds, its Allies by 39.1 ± 7.4 points, with about 2.4
-times the network evaluations of a network twice as deep; whether it goes on
-improving past the 4,600 to 5,800 games at which this run stopped is not
-measured yet
-([record](../archive/records/training_256x16_update_55_2026_11_26.md)).
+the search should be](#how-big-should-the-network-and-the-search-be). After 55 network updates and 1,195 games, the network of the training run at
+those sizes scored above this run's network after 595 network updates in all
+three seats on the 24 held-out seeds, its Allies by 39.1 ± 7.4 points, with
+about 2.4 times the network evaluations of a network twice as deep
+([record](../archive/records/training_256x16_update_55_2026_11_26.md)). After
+138 network updates, 2,855 games and 1.10 billion network evaluations, however,
+it did not hold those gains against the scripted balanced policy: its Allies
+fell 33.2 ± 7.1 points back to −68.2 (indistinguishable from its untrained
+network's −69.1), its Comintern fell 6.8 ± 3.3 points to −88.8 (+2.2 ± 4.1
+above the scripted policy), and its Axis stayed flat at +20.7 (−0.8 ± 4.0 from
+update 55), after self-play games in which all warlords aligned dropped from
+59%–92% in updates 1 to 37 to 25%–35% in updates 56 to 109 before rebounding to
+45% in updates 128 to 138
+([record](../archive/records/training_256x16_update_138_2026_11_27.md),
+[Q-024](../questions.md#open-questions)).
 
 #### One embedding per combination, or embeddings built from parts?
 
