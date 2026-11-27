@@ -3668,30 +3668,64 @@ best Axis player measured (see
 A few games do not establish strength. The scripted opponents are simple
 controls, not expert play.
 
-**Losses on fresh games.** Between held-out evaluations, a run shows how well
-its network learns by how well it predicts each game before training on it. In
-self-play that never stops, each game that ends is first scored by the network
-serving self-play, on the game's training samples, grouped by the alliance that
-chose at each training sample (`fresh_game_losses` in
-`studies/campaign/learning.py`). Two numbers are kept, both defined in section
-8.1 and both lower when the network predicts better:
+### Losses on fresh games
 
-- **the value loss**, how far the network's values are from the game's final
-  scores divided by 100; a hundred times its square root is the typical miss in
-  points of final score;
-- **the KL divergence** of the network's action probabilities from the visit
-  shares, zero only when the network already gives the search's split.
+Between held-out evaluations, a run tracks how well its network predicts new
+self-play games before learning from them. In self-play that never stops, each
+game that ends is first scored by the network serving self-play on all of that
+game's kept decisions—from game round 1 through game round 11—before those
+training samples enter the replay buffer (`fresh_game_losses` in
+`studies/campaign/learning.py`). Because the network has not trained on that
+game yet, those games are *fresh*, separating genuine prediction from fitting
+the replay buffer. Two numbers are kept, both defined in section 8.1 and both
+lower when the network predicts better:
 
-Two runs play different games, whose final scores can be predicted more or less
-well, so a run's value loss is compared beside the variance of its games' final
-scores, which is the value loss of always predicting their mean. The *explained
-variance* is one minus the value loss divided by that variance: the share of
-the final scores' spread that the network's values account for. On 17 November
-one network's value loss was 18% higher than three networks', but its games'
-final scores varied 21% more, and
-the two explained 15.4% and 13.1% of that variance
+- **the value loss**, the mean over the three alliances of the squared
+  difference between the network's values and the game's final scores divided
+  by 100; a hundred times its square root is the typical miss in points of
+  final score;
+- **the KL divergence** of the network's action probabilities from the search's
+  visit shares, zero only when the network already matches the search's split.
+
+**Explained variance.** Raw value loss depends on how much the games' final
+scores swing: a miss of 8 points is strong if games routinely vary by 20 points
+and weak if nearly every game ends within 5 points of the same score. To put
+value loss on a common scale, `summarize_games` in
+`tools/compare_training_runs.py` compares it against the *variance* of those
+same games' final scores (divided by 100, weighted by each game's kept
+decisions and averaged across the three alliances), which is the exact value
+loss of ignoring the board completely and always predicting the block's average
+final score:
+
+$$
+\text{explained variance} = 1 - \frac{\text{value loss}}{\text{variance of the final scores}}
+$$
+
+- **1** means exact predictions of the final scores at every kept decision.
+- **0** means no better than ignoring the board and always guessing the block's
+  average final score.
+- **Below 0** means *worse* than always guessing the average (for example, early
+  in a run when the network's values are still biased or noisy).
+- **Between 0 and 1** is the fraction of the final scores' squared spread that
+  the network accounts for—for example, +0.50 means the network's squared value
+  error is half that of always guessing the average. Because the average pools
+  every kept decision from game round 1 onward, early game rounds—where later
+  dice and choices have not happened yet—keep even a strong value head well
+  below 1.
+
+On 17 November one network's value loss was 18% higher than three networks',
+but its games' final scores varied 21% more, so the two explained 15.4% and
+13.1% of that variance
 ([record](../archive/records/one_network_comparison_2026_11_17.md#learning-on-each-game-before-training-on-it)).
 `tools/compare_training_runs.py` reports both for each hour of a run.
+
+**What it does not measure.** High explained variance on fresh games only shows
+that the value head predicts the outcomes of the run's *current self-play* well;
+it does not establish stronger play against outside opponents. In the 256×16
+training run, fresh-game explained variance rose from near 0 around network
+update 55 to +0.41 around network update 138 while the Allies' held-out score
+against the scripted balanced policy fell by 33.2 points
+([record](../archive/records/training_256x16_update_138_2026_11_27.md)).
 
 ## 11. Known gaps and open questions
 
