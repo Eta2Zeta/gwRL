@@ -131,10 +131,14 @@ failure identically.
 rules loophole: a player or search can sneak continuing ships past an enemy
 naval blockade during Combat Movement without first winning the screening
 battle (the crash only surfaces later if the screening battle is lost and the
-retreat check catches the broken route). Because `3-four-games` runs from its
-frozen copy of the code, a fix on `main` will not take effect until a new run
-or part starts, and changing the engine changes the compatibility signature for
-resuming old checkpoints.
+retreat check catches the broken route). Because `3-four-games` runs from its frozen copy of the code, a fix on `main`
+does not interrupt it. The network structure, inputs and learned weights are
+completely unchanged by this fix: although `--resume` on a full `checkpoint.pt`
+refuses changed sources (`_read` in `studies/campaign/run.py`), a new part
+(`4-...`) on the fixed code carries over all learned weights directly with
+`--initial-models` (`load_initial_weights` in `studies/campaign/model_export.py`),
+resetting only the replay buffer and optimizer moments—just as `3-four-games`
+carried over the weights from `2-five-processes`.
 
 **Choices.**
 
