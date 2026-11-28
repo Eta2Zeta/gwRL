@@ -1213,6 +1213,133 @@ void giftWithdrawalBoardsOnlyAUsableTransport() {
         "Chinese gift transport withdrawal replay differs");
 }
 } // namespace
+// RB 9.4.2 and 10.3 (Q-025): a continuing force waiting on a screening battle
+// cannot move, join another fleet, load cargo or declare an assault during the
+// rest of Combat Movement. Once the screening battle resolves in Combat, a
+// lost screen retreats it back to its adjacent entry sea and a won screen
+// unlocks it to continue sailing and load land units.
+void waitingContinuingShipsWaitForScreeningBattle() {
+  const auto setup = [&] {
+    auto s = fixture(Phase::CombatMovement);
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+    s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
+    add(s, "screen", "destroyer", p16);
+    add(s, "cont", "naval_transport", p16);
+    add(s, "bystander", "destroyer", p15);
+    add(s, "inf", "infantry", honshu);
+    add(s, "enemy", "destroyer", p15, "kmt");
+    s.captureTurnStart();
+    return s;
+  };
+  const auto samePath = [](const std::vector<Id> &expected) {
+    return [=](const Action &a) {
+      std::vector<Id> actual;
+      for (const auto &z : a.parameters.require("request").require("path").asArray())
+        actual.push_back(z.asString());
+      return actual == expected;
+    };
+  };
+  const auto startScreen = [&](const std::vector<int> &dice) {
+    auto s = setup();
+    auto e = std::make_unique<Engine>(s, rules());
+    e->setDiceTapeForTesting(dice);
+    choose(*e, "naval_start_move",
+           [](const Action &a) { return a.parameters.require("unit").asString() == "screen"; });
+    choose(*e, "naval_force_add",
+           [](const Action &a) { return a.parameters.require("unit").asString() == "cont"; });
+    choose(*e, "naval_route", samePath({p16, p15, p14}));
+    choose(*e, "naval_screen_add",
+           [](const Action &a) { return a.parameters.require("unit").asString() == "screen"; });
+    choose(*e, "naval_screen_confirm");
+    return e;
+  };
+  const auto resolveScreen = [&](Engine &e) {
+    choose(e, "end_phase");
+    choose(e, "naval_begin_battle");
+    const auto fighting = [&] {
+      return std::any_of(e.state().battles.begin(), e.state().battles.end(),
+                         [](const auto &entry) { return entry.second.flags.contains(mark::naval_battle); });
+    };
+    for (int i = 0; i < 30 && fighting(); ++i) {
+      if (e.state().chance)
+        e.resolveChance();
+      else
+        e.step(e.legalActions().front());
+    }
+  };
+  {
+    // Screening fails: enemy sinks the screening destroyer while Japan misses.
+    auto e = startScreen({12, 1});
+    check(waitingOnScreening(e->state(), "cont") && !waitingOnScreening(e->state(), "screen"),
+          "Waiting continuing ship was not recognized as pending a screening battle");
+    check(!validateNavalRoute(e->state(), {{"cont"}, zoneNumbers(e->state(), {p15, p14}), true}).allowed,
+          "A waiting continuing ship was allowed to sail on before its screening battle");
+    check(!navalLoadAllowed(e->state(), "cont", "inf"),
+          "A waiting continuing transport was allowed to load before its screening battle");
+    for (const auto &a : e->legalActions()) {
+      check(!(a.kind == "naval_start_move" && a.parameters.require("unit").asString() == "cont"),
+            "Combat Movement offered a fresh move to a waiting continuing ship");
+      check(!(a.kind == "naval_load" && a.parameters.require("transport").asString() == "cont"),
+            "Combat Movement offered loading to a waiting continuing transport");
+    }
+    // Another ship in the same sea zone cannot pull the waiting continuing ship into its fleet.
+    choose(*e, "naval_start_move",
+           [](const Action &a) { return a.parameters.require("unit").asString() == "bystander"; });
+    for (const auto &a : e->legalActions())
+      check(!(a.kind == "naval_force_add" && a.parameters.require("unit").asString() == "cont"),
+            "Another fleet could add a ship waiting on a screening battle");
+    choose(*e, "naval_cancel_move");
+    // In Combat, the screening battle is lost and the continuing ship retreats to P16.
+    resolveScreen(*e);
+    check(!waitingOnScreening(e->state(), "cont") &&
+              !e->state().units.contains("screen") &&
+              e->state().units.at("cont").zone == zoneNumber(e->state(), p16) &&
+              e->state().units.at("cont").movementRemaining == 0,
+          "A waiting continuing ship did not retreat cleanly to its entry sea after failed screening");
+  }
+  {
+    // Screening wins: Japan sinks the enemy destroyer while the enemy misses.
+    auto e = startScreen({1, 12});
+    resolveScreen(*e);
+    check(!waitingOnScreening(e->state(), "cont") &&
+              !e->state().decisions.empty() &&
+              e->state().decisions.back().kind == "naval_screening_continuation",
+          "Winning the screening battle did not unlock the continuing force");
+    choose(*e, "naval_screen_continue_route");
+    check(e->state().decisions.empty() && e->state().units.at("cont").zone == zoneNumber(e->state(), p14),
+          "The continuing force did not reach its destination after winning the screening battle");
+    // After winning screening, the continuing transport may pick up land units in Combat (RB 9.4.2).
+    add(const_cast<State &>(e->state()), "inf2", "infantry", "land_manchuria_rehe");
+    check(navalLoadAllowed(e->state(), "cont", "inf2"),
+          "A continuing transport that won its screening battle could not load cargo in Combat");
+  }
+  {
+    // Blockaded port sortie: waiting continuing transport in berth cannot move or load before screening resolves.
+    auto s = fixture(Phase::CombatMovement);
+    s.nations.at(nationNumber(s, "japan")).atWarWith.insert(nationNumber(s, "kmt"));
+    s.nations.at(nationNumber(s, "kmt")).atWarWith.insert(nationNumber(s, "japan"));
+    add(s, "screen", "destroyer", tokyo);
+    add(s, "cont", "naval_transport", tokyo);
+    s.units.at("screen").gameFlags[MarkKey(mark::in_port, "facility_tokyo_major_shipyard")] = 1;
+    s.units.at("cont").gameFlags[MarkKey(mark::in_port, "facility_tokyo_major_shipyard")] = 1;
+    add(s, "inf", "infantry", tokyo);
+    add(s, "enemy", "destroyer", p16, "kmt");
+    Engine e(s, rules());
+    choose(e, "naval_start_move",
+           [](const Action &a) { return a.parameters.require("unit").asString() == "screen"; });
+    choose(e, "naval_force_add",
+           [](const Action &a) { return a.parameters.require("unit").asString() == "cont"; });
+    choose(e, "naval_route", samePath({p16}));
+    choose(e, "naval_screen_add",
+           [](const Action &a) { return a.parameters.require("unit").asString() == "screen"; });
+    choose(e, "naval_screen_confirm");
+    check(waitingOnScreening(e.state(), "cont") &&
+              !validateNavalRoute(e.state(), {{"cont"}, zoneNumbers(e.state(), {p16}), true}).allowed &&
+              !navalLoadAllowed(e.state(), "cont", "inf"),
+          "A continuing transport waiting in a blockaded port could still move or load before screening");
+  }
+}
+
 int main() {
   try {
     for (const auto &[name, test] :
@@ -1243,6 +1370,8 @@ int main() {
              {"submarine port exit", submarinesLeavePortPastSurfaceWarships},
              {"staged blocked port sortie",
               blockadedPortKeepsContinuingShipsInBerth},
+             {"waiting continuing ships wait for screening",
+              waitingContinuingShipsWaitForScreeningBattle},
              {"carrier route landing stops",
               carrierRoutesKeepLandingsWhereverTheyCanEnd},
              {"engagement keeps landings",

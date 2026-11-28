@@ -40,6 +40,9 @@ bool navalCargoFits(const State &, const Id &transport, const std::vector<Id> &c
 // a Japanese destroyer one Marine.
 bool navalCargoTypesFit(const State &, const UnitState &ship, const std::vector<UnitTypeId> &types);
 bool navalLoadAllowed(const State &, const Id &transport, const Id &cargo);
+// Whether this ship is waiting as part of an unfinished screening battle's
+// continuing force until that battle resolves in the Combat Phase (RB 9.4.2).
+bool waitingOnScreening(const State &, const Id &ship);
 std::vector<Action> navalMovementActions(const State &);
 // Training order construction is forward-only. The ordinary rules retain the
 // editable human picker; these helpers preserve each executable fleet/route

@@ -71,8 +71,8 @@ divides the fleet into two groups:
 
 - a **screening force**, which stays in the contested sea zone to fight the
   blocking enemies during the Combat Phase; and
-- a **continuing force**, which is supposed to wait in place until that
-  screening battle is resolved.
+- a **continuing force**, which waits in place until that screening battle is
+  resolved.
 
 During the Combat Phase, once the screening battle finishes (`continueNavalMovement`
 in `src/naval_movement.cpp`):
@@ -85,14 +85,12 @@ in `src/naval_movement.cpp`):
   force must retreat back to the adjacent sea zone it entered from (RB 10.3,
   page 62) with its movement ended for the turn.
 
-*Known defect ([Q-025](../questions.md#open-questions)):* during the rest of
-the Combat Movement phase, `available` in `src/naval_movement.cpp` locks out
-ships in the screening force (the battle's attackers) but forgets to lock out
-ships waiting in the continuing force. That lets a waiting continuing ship
-take another move and leave the contested sea zone before the screening battle
-is even fought; if the screening battle later loses and the engine tries to
-retreat that ship back to the sea zone it entered from, the sanity check
-aborts the move (`Failed screening requires its actual adjacent entry sea`).
+While a screening battle is pending, `waitingOnScreening`
+(`src/naval_movement.cpp`) locks the continuing force out of moving, joining
+another fleet, loading cargo and declaring amphibious assaults (`available` and
+`canLoad` in `src/naval_movement.cpp`; `navalOperationActions` and
+`applyNavalOperationAction` in `src/naval_operations.cpp`) until the screening
+battle resolves.
 
 **Raiders.** In Combat Movement a Battlecruiser may be named a raider
 (`naval_designate_raider`, undone by `naval_remove_raider`). A raider attacks

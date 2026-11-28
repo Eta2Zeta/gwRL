@@ -85,73 +85,6 @@ rebound in China wars is already pulling the Allies back up.
   is already ruled out, at the cost of not seeing whether the current run
   recovers on its own.
 
-### Q-025: Waiting continuing ships can move before a naval screening battle is fought
-
-**What the program does now.** Under Rulebook §9.4.2 (page 58), when a fleet
-meets enemy warships blocking a sea zone it wants to sail through, the moving
-player splits the fleet in Combat Movement into a *screening force* (which
-stays to fight the blockers in the Combat Phase) and a *continuing force*
-(which must wait until that battle is decided: sailing on if the screening
-force clears the blockers, or retreating back to the adjacent sea zone it
-entered from under Rulebook §10.3, page 62, if the screening battle fails).
-
-In the engine (`beginBattleFromPlan` and `available` in
-`src/naval_movement.cpp`), registering the screening battle locks out the
-screening ships for the rest of Combat Movement, but forgets to lock out the
-waiting continuing ships. As a result, the engine still offers the player a
-normal move for the waiting continuing ships right away in Combat Movement—before
-the screening battle has even been fought.
-
-Two self-play games of `training-256x16-2026-11-25` caught this during search
-([record](archive/records/training_256x16_update_138_2026_11_27.md#how-it-was-measured)):
-
-- In `3-four-games` batch 89 (`game-1830-seed-3140720981921948512.json`, game
-  round 4, Japan's turn), two Japanese Naval Transports sailed from port in
-  Manchuria-Rehe through `P14 → P32 → P33` toward `P15`, where a captured KMT
-  Torpedo Boat Destroyer blocked `P33`. Japan declared screening: one transport
-  stayed to screen in `P33`, and the second waited as the continuing force.
-  Still in Combat Movement, the search used the unlocked move to sail that
-  waiting transport straight past the blockade into `P15`. When the Combat
-  Phase came, the KMT destroyer sank the screening transport, so screening
-  failed; the engine tried to retreat the continuing transport back to its
-  entry sea zone (`P32`), saw that the second-to-last zone on its extended
-  route (`P14 → P32 → P33 → P15`) was `P33` itself, and aborted with
-  `FailedMoveError: Failed screening requires its actual adjacent entry sea`.
-- In `2-five-processes` batch 18 (`game-621-seed-8038806183630416492.json`,
-  game round 4, KMT's turn), the same thing happened when two KMT ships met
-  Japanese warships in `P32`: the waiting continuing Destroyer sailed back out
-  to `P15` during Combat Movement, then tripped the same retreat check when the
-  KMT screening Torpedo Boat Destroyer was sunk in `P32`.
-
-Replaying both positions with `tools/replay_failed_move.py` reproduces the
-failure identically.
-
-**Why it matters.** Besides aborting those two self-play games (~0.07% of the
-2,915 games so far, contained to the single game each time), it is a genuine
-rules loophole: a player or search can sneak continuing ships past an enemy
-naval blockade during Combat Movement without first winning the screening
-battle (the crash only surfaces later if the screening battle is lost and the
-retreat check catches the broken route). Because `3-four-games` runs from its frozen copy of the code, a fix on `main`
-does not interrupt it. The network structure, inputs and learned weights are
-completely unchanged by this fix: although `--resume` on a full `checkpoint.pt`
-refuses changed sources (`_read` in `studies/campaign/run.py`), a new part
-(`4-...`) on the fixed code carries over all learned weights directly with
-`--initial-models` (`load_initial_weights` in `studies/campaign/model_export.py`),
-resetting only the replay buffer and optimizer moments—just as `3-four-games`
-carried over the weights from `2-five-processes`.
-
-**Choices.**
-
-- **Choice A (recommended) — Lock out waiting continuing ships in `available`
-  (and any other Combat Movement action such as loading or declaring an
-  assault) on `main`, with a regression test built from the two kept cases**,
-  leaving the currently running `3-four-games` untouched until it moves to a new
-  part. Closes both the rules loophole and the retreat abort cleanly for all
-  future runs without disrupting the active checkpoint.
-- **Choice B — Leave it unfixed until a larger rules or training restart**
-  bundles engine changes together, accepting the rare screening loophole and
-  ~0.07% failed-game rate in the meantime.
-
 ## Open elsewhere
 
 These are open too, and stay in the pages that own them:
@@ -370,3 +303,11 @@ the page that now states it.
   the campaign learning guide's
   [long unattended runs](../studies/campaign/README.md#long-unattended-runs)
   and in [section 9.2 of the design document](design/README.md#92-running-training-on-the-mac).
+- **Q-025**, waiting continuing ships moving before a naval screening battle is
+  fought. Answered on 27 November 2026: fix on `main` (choice A) while leaving
+  the active frozen `3-four-games` run untouched. `waitingOnScreening` in
+  `src/naval_movement.cpp` now locks continuing ships out of movement, fleet
+  joins, loading and amphibious assaults until their screening battle resolves,
+  covered by `waitingContinuingShipsWaitForScreeningBattle` in
+  `tests/naval_movement_tests.cpp`. Stated in
+  [naval operations](engine/naval.md#3-meeting-the-enemy-on-the-way).

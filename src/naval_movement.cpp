@@ -173,6 +173,8 @@ bool available(const State &s, const UnitState &u, bool combat) {
       (!marked(u.turnFlags, mark::naval_screening_continuing) ||
        u.commitments.contains(mark::naval_combat)))
     return false;
+  if (waitingOnScreening(s, u.id))
+    return false;
   for (const auto &[id, b] : s.battles)
     if (marked(b.flags, mark::naval_battle) && !marked(b.flags, mark::finished) &&
         (std::find(b.attackers.begin(), b.attackers.end(), u.id) !=
@@ -773,7 +775,8 @@ void execute(State &s, const NavalRouteRequest &r) {
     continueRoute(s, id);
 }
 bool canLoad(const State &s, const Id &ship, const Id &cargo) {
-  if (!s.units.contains(ship) || !s.units.contains(cargo))
+  if (!s.units.contains(ship) || !s.units.contains(cargo) ||
+      waitingOnScreening(s, ship))
     return false;
   const auto &t = s.units.at(ship);
   const auto &c = s.units.at(cargo);
@@ -1543,6 +1546,24 @@ NumberSet<ZoneId> navalEndZones(const State &s, const Id &ship) {
 }
 bool navalLoadAllowed(const State &s, const Id &transport, const Id &cargo) {
   return canLoad(s, transport, cargo);
+}
+bool waitingOnScreening(const State &s, const Id &ship) {
+  for (const auto &[id, b] : s.battles) {
+    if (!marked(b.flags, mark::naval_battle) || marked(b.flags, mark::finished))
+      continue;
+    const auto *movement = b.data.find("naval_movement");
+    if (!movement || !movement->isObject())
+      continue;
+    const auto *kind = movement->find("kind");
+    const auto *continuing = movement->find("continuing");
+    if (!kind || !kind->isString() || kind->asString() != "screening" ||
+        !continuing || !continuing->isArray())
+      continue;
+    for (const auto &entry : continuing->asArray())
+      if (entry.isString() && entry.asString() == ship)
+        return true;
+  }
+  return false;
 }
 std::vector<Action> navalMovementActions(const State &s) {
   std::vector<Action> out;

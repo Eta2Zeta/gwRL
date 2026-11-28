@@ -658,6 +658,8 @@ std::vector<Action> navalOperationActions(const State &s) {
           (!flag(u.turnFlags, mark::naval_screening_continuing) ||
            u.commitments.contains(mark::naval_combat)))
         continue;
+      if (waitingOnScreening(s, id))
+        continue;
       // Aircraft on Maritime Air Patrol attack only Enemy ships in their own
       // sea zone, in the Combat Phase (RB 9.3.1): see naval_patrol_attack.
       if (isAircraft(s, u) && !flag(u.gameFlags, mark::on_map) &&
@@ -827,6 +829,8 @@ bool applyNavalOperationAction(State &s, const Action &a) {
                c = a.parameters.require("cargo").asString();
     const auto zone = zoneNumber(s, a.parameters.require("zone").asString());
     auto &transport = s.units.at(t);
+    require(!waitingOnScreening(s, t),
+            "Continuing transport must wait for its screening battle to resolve");
     require(!occupiedForAssault(s, transport.owner, transport.zone, {t}),
             "Clear the launching sea before declaring the amphibious assault");
     require(s.units.at(c).carriedBy == t,
